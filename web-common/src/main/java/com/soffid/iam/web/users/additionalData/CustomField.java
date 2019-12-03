@@ -33,6 +33,7 @@ import es.caib.zkib.events.XPathSubscriber;
 public class CustomField extends Div implements XPathSubscriber {
 	private static final long serialVersionUID = 1L;
 
+	String placeholder;
 	String dataType;
 	String label;
 	Integer maxLength;
@@ -147,6 +148,7 @@ public class CustomField extends Div implements XPathSubscriber {
 			input.setOwnerObject(ownerObject);
 			input.setHideUserName(hideUserName);
 			input.setRaisePrivileges(raisePrivileges);
+			input.setPlaceholder(placeholder);
 			try {
 				input.createField();
 			} catch (Exception e) {
@@ -382,5 +384,13 @@ public class CustomField extends Div implements XPathSubscriber {
 
 	public void setNoLabel(boolean noLabel) {
 		this.noLabel = noLabel;
+	}
+
+	public String getPlaceholder() {
+		return placeholder;
+	}
+
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
 	}
 }

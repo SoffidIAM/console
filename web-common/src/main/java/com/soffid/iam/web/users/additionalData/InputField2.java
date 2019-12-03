@@ -328,6 +328,7 @@ public class InputField2 extends Div
 	private SearchFilter filter;
 	private Listbox containerListbox;
 	private String targetSearchTextboxUuid;
+	private String placeholder;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
 		targetSearchTextboxUuid = dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ||
@@ -1199,7 +1200,9 @@ public class InputField2 extends Div
 		String required = "";
 		if (dataType.isRequired())
 			required = "*";
-
+		String ph = placeholder == null || placeholder.trim().isEmpty() ? "" : 
+			"placeholder='"+escapeString(placeholder)+"' ";
+		
 		String id = getIdForPosition(position);
 		String id2 = id + "b";
 		String id3 = id + "c";
@@ -1220,10 +1223,10 @@ public class InputField2 extends Div
 				{
 					result = "<div style='display:block' visible='true'>"
 							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" "
-									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "id=\""+id+"\" "
-									+ "readonly=\"" +readonlyExpr+ "\"/>"
-							+ "<textbox  "
+							+ "onChange='self.parent.parent.onChildChange(event)' "  
+							+ "id=\""+id+"\" "
+							+ "readonly=\"" +readonlyExpr+ "\"/>"
+							+ "<textbox  "+ph
 								+ "id=\""+id2+"\" "
 								+ "readonly=\""+(readonly)+"\" "
 								+ "onBlur='self.parent.parent.onBlur2(event)' "
@@ -1238,7 +1241,7 @@ public class InputField2 extends Div
 				} else {
 					result = "<listitem>"
 							+ "<listcell>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
+							+ "<textbox "+ph+"sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
 									+ "id=\""+id+"\" "
 									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
@@ -1259,12 +1262,12 @@ public class InputField2 extends Div
 				{
 					result = "<div style='display:block' visible='true'>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
+							+ "id=\""+id+"\" "+ph
+							+ "onChange='self.parent.parent.onChildChange(event)' "  
+							+ "onBlur='self.parent.parent.onBlur(event)' "
+							+ "onChanging='self.parent.parent.onChanging(event)' "
+							+ "readonly=\"" +readonlyExpr+ "\"/>" 
+							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
 									+ "onClick='self.parent.parent.onSelectUser(event)' "
 									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />"
@@ -1273,7 +1276,7 @@ public class InputField2 extends Div
 					result = "<listitem>"
 							+ "<listcell>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
+									+ "id=\""+id+"\" "+ph
 									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
@@ -1297,7 +1300,7 @@ public class InputField2 extends Div
 									+ "id=\""+id+"\" "
 									+ "readonly=\"" +readonlyExpr+ "\"/>"
 							+ "<textbox  "
-								+ "id=\""+id2+"\" "
+								+ "id=\""+id2+"\" "+ph
 								+ "readonly=\""+(readonly)+"\" "
 								+ "onBlur='self.parent.parent.onBlur2(event)' "
 								+ "onChanging='self.parent.parent.onChanging(event)' "
@@ -1312,7 +1315,7 @@ public class InputField2 extends Div
 					result = "<listitem>"
 							+ "<listcell>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
+									+ "id=\""+id+"\" "+ph
 									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
@@ -1332,7 +1335,7 @@ public class InputField2 extends Div
 				{
 					result = "<div style='display:block' visible='true'>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
+									+ "id=\""+id+"\" "+ph
 									+ "onChange='self.parent.parent.onChildChange(event)' "  
 									+ "onBlur='self.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.onChanging(event)' "
@@ -1346,7 +1349,7 @@ public class InputField2 extends Div
 					result = "<listitem>"
 							+ "<listcell>"
 							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
+									+ "id=\""+id+"\" "+ph
 									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
@@ -1370,7 +1373,7 @@ public class InputField2 extends Div
 							+ "onChange='self.parent.parent.onChildChange(event)' "  
 							+ "onBlur='self.parent.parent.onBlur(event)' "
 							+ "onChanging='self.parent.parent.onChanging(event)' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
 							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
@@ -1384,7 +1387,7 @@ public class InputField2 extends Div
 							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
 							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' "
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaGroup(event)' "
@@ -1403,8 +1406,9 @@ public class InputField2 extends Div
 				if (containerListbox == null)
 				{
 					sb.append("<div style='display: block' visible='true'>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' "
+							+ "onOK='' "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
 							+ "onClick='self.parent.parent.onSelectApplication(event)' "
@@ -1415,8 +1419,9 @@ public class InputField2 extends Div
 					sb.append(required+removeAction+"</div>");
 				} else {
 					sb.append("<listitem><listcell>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' "
+							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
 							+ "onClick='self.parent.parent.parent.parent.onSelectApplication(event)' "
@@ -1436,7 +1441,7 @@ public class InputField2 extends Div
 				{
 					sb.append("<div style='display: block' visible='true'>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/host.png' "
 							+ "onClick='self.parent.parent.onSelectHost(event)' "
@@ -1448,7 +1453,7 @@ public class InputField2 extends Div
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/host.png' "
 							+ "onClick='self.parent.parent.onSelectHost(event)' "
@@ -1468,7 +1473,7 @@ public class InputField2 extends Div
 				{
 					sb.append("<div style='display: block' visible='true'>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='~./img/servidorCorreu.gif' "
 							+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
@@ -1480,7 +1485,7 @@ public class InputField2 extends Div
 				} else {
 					sb.append("<listitem><listcell>");
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='~./img/servidorCorreu.gif' "
 							+ "onClick='self.parent.parent.parent.parent.onSelectMailDomain(event)' "
@@ -1503,7 +1508,7 @@ public class InputField2 extends Div
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
 							+ "onBlur='self.parent.parent.onBlur(event)' "
 							+ "onChanging='self.parent.parent.onChanging(event)'  "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
 							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" "
@@ -1517,7 +1522,7 @@ public class InputField2 extends Div
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
 							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
 							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)'  "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly='"+readonlyExpr+"'/>");
 					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
 							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" "
@@ -1568,14 +1573,14 @@ public class InputField2 extends Div
 				if (containerListbox == null)
 				{
 					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
-						+ "id=\""+id+"\" "
+						+ "id=\""+id+"\" "+ph
 							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
 									+ "onChange='self.parent.parent.onChildChange(event)'/>";
 					result = "<div>"+result+required+removeAction+"</div>";
 				}
 				else {
 					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 								+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
 										+ "onChange='self.parent.parent.parent.parent.onChildChange(event)'/>";
 					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
@@ -1586,21 +1591,22 @@ public class InputField2 extends Div
 				String []split = getFormValues ();
 				if (containerListbox == null)
 				{
-					result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-								+ "id=\""+id+"\" "
+					result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" "
+							+ "onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
+								+ "id=\""+id+"\" "+ph
 								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
 								+ "<label value=' = '/>"
 								+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-								+ "id=\""+id2+"\" "
+								+ "id=\""+id2+"\" "+ph
 								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
 					result = "<div>"+result+required+removeAction+"</div>";
 				} else {
 					result = "<listitem><listcell><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-							+ "id=\""+id+"\" "
+							+ "id=\""+id+"\" "+ph
 							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
 							+ "</listcell><listcell>"
 							+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-							+ "id=\""+id2+"\" "
+							+ "id=\""+id2+"\" "+ph
 							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
 					result = result+required+removeAction+"</listitem></listcell>";
 					
@@ -1728,8 +1734,9 @@ public class InputField2 extends Div
 					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
 				}
 			} else { // Listbox
-				result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
-						+ "id=\""+id+"\" "
+				result = "<div width=\"99%\">"
+						+ "<textbox sclass=\"" + (dataType.isMultiValued()? "textbox2m": "textbox2")+ "\" maxlength=\"" + size +"\" "
+						+ "id=\""+id+"\" "+ph
 						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+removeAction+"</div>";
 			}
 		}
@@ -1741,13 +1748,15 @@ public class InputField2 extends Div
 							+ "onClick='self.visible = self.previousSibling.visible = false; "
 								+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
 						+ "<textbox sclass=\"textbox\" width='90%' "
-								+ "id=\""+id+"\" "
+								+ "id=\""+id+"\" "+ph
 								+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' "
 										+ "onChange='parent.parent.onChildChange(event)'/>"
 						+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' "
 						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>";
 			else
-				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' readonly=\""+readonlyExpr+"\"/>"+required+"</div>";
+				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' "
+						+ ph
+						+ "readonly=\""+readonlyExpr+"\"/>"+required+"</div>";
 		}
 		if(compos.isEmpty() || !compos.equals(result))
 		{
@@ -1807,7 +1816,8 @@ public class InputField2 extends Div
 		return v.replaceAll("&", "&amp;")
 				.replaceAll("\"", "&quot;")
 				.replaceAll("<", "&gt;")
-				.replaceAll(">", "&gt;");
+				.replaceAll(">", "&gt;")
+				.replaceAll("'", "&apos;");
 	}
 
 	private String getIdForPosition(Integer position) {
@@ -2245,6 +2255,14 @@ public class InputField2 extends Div
 
 	public void setRaisePrivileges(boolean raisePrivileges) {
 		this.raisePrivileges = raisePrivileges;
+	}
+
+	public void setPlaceholder(String placeholder) {
+		this.placeholder = placeholder;
+	}
+
+	public String getPlaceholder() {
+		return placeholder;
 	}
 
 }

@@ -168,11 +168,14 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 /* menú de inicio */
 .menuprincipal {
-	top: 35px !important;
 	{TEXT_ALIGN_LEFT}: 0px !important;
-	position:absolute;	
 	border: 1px solid {SKY};
+	max-height: calc(100% - 34px);
+	overflow-y: auto;
+	left: 0;
+	top: 35px !important ;
 }
+
 
 .menufavorits {
 	top: 29px !important;
@@ -220,12 +223,15 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 
 /* Entrada de dades: textbox */
-.text, .textbox {
+.text, .textbox, .textbox2, .textbox2m {
 	font-family: Arial;	font-size: 11px;
 	border: 1px solid #7F9196; /*width: 135px;*/
 	background-image: none;
 }
 
+.textbox2 { width: 98%; width: calc( 100% - 16px);}
+.textbox2m { width: 96%; width: calc( 100% - 48px);},
+	
 input [type="checkbox"] {
 	width: 30px;
 }
@@ -694,7 +700,7 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {SKY}; background
 }
 p, div, span, label, a, input, textarea, button, input.button, input.file,
 div.head-cell-inner, div.cell-inner,
-.maintitle, .etiqueta, .text, .textbox {
+.maintitle, .etiqueta, .text, .textbox, .textbox2, .textbox2m {
 	font-family: "Avenir LT Std", Calibri,Arial, sans-serif
 }
 
@@ -934,12 +940,6 @@ tr.seld td.UNKNOWN {
 	z-index: +1;
 	/*DIFFERENT FROM SELF_SERVICE*/
 	overflow: hidden; 
-}
-
-.menuprincipal {
-	position: fixed;
-	left: 0;
-	top: 30px;
 }
 
 .workarea {
@@ -1585,11 +1585,11 @@ tr.grid td.gc {
 }
 
 
-.text, .textbox { 
+.text, .textbox, .textbox2, .textbox2m { 
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox, input.dateboxinp, input.text {
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text {
 	box-sizing: border-box;
 	padding: 2px;
 	border: none;
@@ -1887,7 +1887,7 @@ div.fixedToolbar {
 }
 
 .removeValueIcon {
-	width: 24px; margin-left: 4px; padding: 6px; vertical-align:bottom; opacity:0.5;  cursor:pointer;
+	width: 16px; padding: 2px; vertical-align:bottom; opacity:0.5;  cursor:pointer;
 }
 
 .removeValueIcon:hover {

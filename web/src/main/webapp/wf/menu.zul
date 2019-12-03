@@ -10,6 +10,7 @@
 
 	// Control d'accés del SEU
 	boolean canViewUsuaris =  AutoritzacionsUsuari.hasViewUsuarisSEU();
+	boolean canConfigurePam = Security.isUserInRole("seu:pamSessionConfigure");
 	boolean canViewJob = Security.isUserInRole("schedule:query") || Security.isUserInRole("schedule:admin");
 	boolean canViewVault = Security.isUserInRole("sso:manageAccounts");
 	boolean canViewDirectory = Security.isUserInRole("selfservice:directory");
@@ -219,9 +220,7 @@
 		    		</treeitem>
     			</treechildren>
     		</treeitem>   		   		
-    	   		
-<!-- ATENCIÓ: REVISAR EL 'IF' SI ES CANVIA EL CONTINGUT DEL MENÚ -->    		
-    		<treeitem id="configaudito" if="${canViewParametres || canViewDadesAddicionals || canViewAgents || canViewPlugins || canViewDominiUsuaris || admin || canViewAutoritzacions || canViewAttributeTranslation}" open="false">
+    		<treeitem id="configaudito" if="${canConfigurePam || canViewParametres || canViewDadesAddicionals || canViewAgents || canViewPlugins || canViewDominiUsuaris || admin || canViewAutoritzacions || canViewAttributeTranslation}" open="false">
     			<treerow>
     				<treecell label="${c:l('seu.configaudito')}" onClick="configaudito.setOpen ( ! configaudito.isOpen() )"/>
     			</treerow>
@@ -276,7 +275,11 @@
 		    				<apptreecell if="${canViewAttributeTranslation}" langlabel="seu.attributeTranslation" pagina="/attributeTranslation.zul"/>
 		    			</treerow>
 		    		</treeitem>	    				    		
-
+					<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canConfigurePam}" langlabel="pam_config.title" pagina="/vault/pam_config.zul"/>
+		    			</treerow>
+		    		</treeitem>	    				    		
 
 		    	</treechildren>
     		</treeitem>

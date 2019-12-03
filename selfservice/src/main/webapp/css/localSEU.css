@@ -168,10 +168,12 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 /* menú de inicio */
 .menuprincipal {
-	top: 35px !important;
 	{TEXT_ALIGN_LEFT}: 0px !important;
-	position:absolute;	
 	border: 1px solid {SKY};
+	max-height: calc(100% - 34px);
+	overflow-y: auto;
+	left: 0;
+	top: 35px !important;
 }
 
 .menufavorits {
@@ -934,12 +936,6 @@ tr.seld td.UNKNOWN {
 	z-index: +1;
 	overflow: visible;
 	/*width: 100%;*/
-}
-
-.menuprincipal {
-	position: fixed;
-	left: 0;
-	top: 30px;
 }
 
 .workarea {

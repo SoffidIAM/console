@@ -36,19 +36,16 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
         {
         	targetVO.setValue(sourceEntity.getValue());
         	if(sourceEntity.getMetadata().getType()!= null){
+        		targetVO.setDateValue(null);
         		if(sourceEntity.getMetadata().getType().toString().equals("D")){ //$NON-NLS-1$
-        			try{
-        				String data = sourceEntity.getValue().toString();
-        				SimpleDateFormat curFormater = new SimpleDateFormat(DATE_FORMAT);  //$NON-NLS-1$
-        				Date dateObj = curFormater.parse(data);
-        				Calendar calendar = Calendar.getInstance();
-        				calendar .setTime(dateObj);
-        				targetVO.setDateValue(calendar);
-        			}catch (ParseException e){
-        				throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.IsNotDate"), targetVO.getValue())); //$NON-NLS-1$
+        			Date dateObj = (Date) sourceEntity.getObjectValue();
+        			if (dateObj != null)
+        			{
+	    				Calendar calendar = Calendar.getInstance();
+	    				calendar .setTime(dateObj);
+	    				targetVO.setDateValue(calendar);
         			}
-        		}else 
-        			targetVO.setDateValue(null);
+        		} 
         	}
         }
         targetVO.setVisibility(sourceEntity.getAttributeVisibility());

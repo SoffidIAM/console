@@ -18,6 +18,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 public class GroupAttributeEntityImpl extends com.soffid.iam.model.GroupAttributeEntity {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
 
 	@Override
 	public void setObjectValue(Object value) {
@@ -35,9 +36,9 @@ public class GroupAttributeEntityImpl extends com.soffid.iam.model.GroupAttribut
 		else if (getMetadata().getType().equals( TypeEnumeration.DATE_TYPE))
 		{
 			if (value instanceof Calendar)
-				setValue( DATE_FORMAT.format(((Calendar) value).getTime()));
+				setValue( DATE_FORMAT2.format(((Calendar) value).getTime()));
 			else 
-				setValue( DATE_FORMAT.format((Date) value));
+				setValue( DATE_FORMAT2.format((Date) value));
 		}
 		else
 			setValue(value.toString());
@@ -57,9 +58,13 @@ public class GroupAttributeEntityImpl extends com.soffid.iam.model.GroupAttribut
 				return null;
 			else
 				try {
-					return DATE_FORMAT.parse(getValue());
+					return DATE_FORMAT2.parse(getValue());
 				} catch (ParseException e) {
-					return null;
+					try {
+						return DATE_FORMAT.parse(getValue());
+					} catch (ParseException e2) {
+						return null;
+					}
 				}
 		}
 		else

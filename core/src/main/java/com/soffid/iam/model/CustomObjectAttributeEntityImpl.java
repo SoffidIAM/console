@@ -9,6 +9,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 
 public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
 
 	@Override
 	public void setObjectValue(Object value) {
@@ -25,9 +26,9 @@ public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity
 		else if (getMetadata().getType().equals( TypeEnumeration.DATE_TYPE))
 		{
 			if (value instanceof Calendar)
-				setValue( DATE_FORMAT.format(((Calendar) value).getTime()));
-			else
-				setValue( DATE_FORMAT.format((Date) value));
+				setValue( DATE_FORMAT2.format(((Calendar) value).getTime()));
+			else 
+				setValue( DATE_FORMAT2.format((Date) value));
 		}
 		else
 			setValue(value.toString());
@@ -46,11 +47,13 @@ public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity
 				return null;
 			else
 				try {
-					Calendar c = Calendar.getInstance();
-					c.setTime(DATE_FORMAT.parse(getValue()));
-					return c;
+					return DATE_FORMAT2.parse(getValue());
 				} catch (ParseException e) {
-					return null;
+					try {
+						return DATE_FORMAT.parse(getValue());
+					} catch (ParseException e2) {
+						return null;
+					}
 				}
 		}
 		else

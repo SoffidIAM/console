@@ -243,6 +243,9 @@ grant codeBase "http://scripts.customers.soffid.com/" {
 		permission java.lang.RuntimePermission "accessDeclaredMembers";
 		permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
         permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.util.log";
+        permission java.io.FilePermission "${catalina.base}/apps/-", "read";
+        permission java.io.FilePermission "${catalina.base}/lib/-", "read";
+        permission java.io.FilePermission "${catalina.base}/work/soffid/-", "read";
 };
 
 grant codeBase "http://bpm.customers.soffid.com/-" {

@@ -28,14 +28,12 @@ public abstract class AgentDescriptorEntity {
 	public byte[] userInterface;
 
 	@Column (name="ADE_IDSPL")
-	@Nullable
 	public es.caib.seycon.ng.model.ServerPluginEntity plugin;
 
 	@Column (name="ADE_CAC")
 	public boolean enableAccessControl;
 
 	@Column (name="ADE_SPM_ID")
-	@Nullable
 	public es.caib.seycon.ng.model.ServerPluginModuleEntity module;
 
 	@Column (name="ADE_AUTHOR")

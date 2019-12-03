@@ -42,25 +42,28 @@ public class VaultFolderEntity {
 	@Nullable
 	@Column(name="VAF_PERSON", defaultValue="false")
 	Boolean personal;
+
+	@Column(name="VAF_TEN_ID")
+	TenantEntity tenant;
 	
 	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
-			+ "where v.parent is null")
+			+ "where v.parent is null and tenant.id=:tenantId")
 	public List<VaultFolderEntity> findRoots () { return null; }
 
 	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
-			+ "where v.parent is null and v.personal = false")
+			+ "where v.parent is null and v.personal = false and tenant.id=:tenantId")
 	public List<VaultFolderEntity> findPublicRoots () { return null; }
 
 
 	public List<VaultFolderEntity> findByParent (VaultFolderEntity parent) { return null; }
 
 	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
-			+ "where v.name like :name")
+			+ "where v.name like :name and tenant.id=:tenantId")
 	public List<VaultFolderEntity> findByName (String name) { return null; }
 
 	@DaoFinder("select distinct v from com.soffid.iam.model.VaultFolderEntity as v "
 			+ "join v.acl as acl "
 			+ "join acl.user as user "
-			+ "where v.parent is null and v.personal = true and user.userName=:user")
+			+ "where v.parent is null and v.personal = true and user.userName=:user and user.tenant.id=:tenantId")
 	public List<VaultFolderEntity> findPersonalFolders (String user) { return null; }
 }

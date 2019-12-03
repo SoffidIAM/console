@@ -393,8 +393,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("103");
 			configSvc.update(cfg);
 		}
-		
-
+		if (cfg.getValue().equals("103"))
+		{
+			addTenant();
+			cfg.setValue("104");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void updateFromVersion1() throws IOException, Exception 
@@ -490,6 +494,58 @@ public class ApplicationBootServiceImpl extends
 			conn.close();
 		}
 	}
+
+	private void addTenant() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			Long tenantId = tenantService.getMasterTenant().getId();
+			PreparedStatement stmt = conn
+					.prepareStatement("UPDATE SC_VAUFOL SET VAF_TEN_ID=? WHERE BCO_TEN_ID IS NULL OR VAF_TEN_ID=0");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn
+					.prepareStatement("UPDATE BPM_DOCBLO SET DBL_TEN_ID=? WHERE DBL_TEN_ID IS NULL OR DBL_TEN_ID=0");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn
+					.prepareStatement("UPDATE SC_SAMLREQ SET REQ_TEN_ID=? WHERE REQ_TEN_ID IS NULL OR REQ_TEN_ID=0");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn
+					.prepareStatement("UPDATE SC_RECACO SET RAC_TEN_ID=? WHERE RAC_TEN_ID IS NULL OR RAC_TEN_ID=0");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn
+					.prepareStatement("UPDATE SC_RECASI SET RAS_TEN_ID=? WHERE RAS_TEN_ID IS NULL OR RAS_TEN_ID=0");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
+			stmt.close();
+
+			stmt = conn
+					.prepareStatement("UPDATE SC_RECROL SET RRL_TEN_ID=? WHERE RRL_TEN_ID IS NULL OR RRL_TEN_ID=0");
+			stmt.setLong(1, tenantId);
+			stmt.execute();
+			stmt.close();
+
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
 
 	private void updateDisabledAttribute() throws IOException, Exception 
 	{

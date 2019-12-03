@@ -43,7 +43,6 @@ public abstract class XarxaEntity {
 	public java.lang.String dhcp;
 	
 	@Column (name="XAR_TEN_ID")
-	@Nullable
 	TenantEntity tenant;
 
 	@ForeignKey (foreignColumn="AXA_IDXAR", translated="authorizations")

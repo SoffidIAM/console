@@ -2,6 +2,7 @@ package com.soffid.iam.tomcat.service;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,12 +23,14 @@ import org.apache.tomee.catalina.TomcatSecurityService;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
@@ -171,6 +174,27 @@ public class LoginServiceImpl implements LoginService {
 						return null;
 					}
 					
+					if (userName != null)
+					{
+						ConsoleProperties p = ServiceLocator.instance().getUserService().findConsoleUserByUserName(userName);
+						if (p == null)
+						{
+							p = new ConsoleProperties();
+							p.setUserName(userName);
+							p.setLanguage(MessageFactory.getLocale().getLanguage());
+							p.setLastLoginDate(Calendar.getInstance());
+							p.setLastIP( Security.getClientIp() );
+							p.setPreferences(new HashMap<String, String>());
+							p.getPreferences().put("-","-");
+							p.setVersion("LATEST");
+							ServiceLocator.instance().getUserService().create(p);
+						} else {
+							p.setLastLoginDate(Calendar.getInstance());
+							p.setLastIP( Security.getClientIp() );
+							ServiceLocator.instance().getUserService().update(p);
+						}
+						
+					}
 			
 					if ( ! tenants.contains(tenant.getName()))
 					{

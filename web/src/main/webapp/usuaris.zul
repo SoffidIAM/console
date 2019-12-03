@@ -1872,8 +1872,8 @@ String nomRolsBorrar = "";
 											}
 	
 											// Role Delegation
-								 			es.caib.seycon.ng.common.DelegationStatus ds = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegationStatus");
-								 			if (ds != null && ds.equals (es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)) {
+								 			com.soffid.iam.api.DelegationStatus ds = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "delegationStatus");
+								 			if (ds != null && ds.equals (com.soffid.iam.api.DelegationStatus.DELEGATION_ACTIVE)) {
 												Listcell cell = listcells.get(0);
 								 				es.caib.zkib.zkiblaf.ImageClic ic = new es.caib.zkib.zkiblaf.ImageClic("/img/info.png");
 								 				cell.appendChild(ic);

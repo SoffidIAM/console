@@ -90,14 +90,14 @@
 			 				java.text.DateFormat df = new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("usuaris.zul.dateFormat2"));
 			 				String since = df.format(ra.getDelegateSince());
 			 				String until = ra.getDelegateUntil() == null ? "" :df.format(ra.getDelegateUntil());
-			 				if (ra.getDelegationStatus() == es.caib.seycon.ng.common.DelegationStatus.DELEGATION_PENDING)
+			 				if (ra.getDelegationStatus() == com.soffid.iam.api.DelegationStatus.DELEGATION_PENDING)
 			 				{
 			 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusPending", new Object[] { ra.getDelegateAccount(), since, until }));
 			 					listitem.getChildren().get(1).setVisible(false);
 			 					listitem.getChildren().get(2).setVisible(true);
 			 				}
 			 				else if (ra.getCodiUsuari().equals(es.caib.seycon.ng.utils.Security.getCurrentUser()) &&
-			 						ra.getDelegationStatus() == es.caib.seycon.ng.common.DelegationStatus.DELEGATION_ACTIVE)
+			 						ra.getDelegationStatus() == com.soffid.iam.api.DelegationStatus.DELEGATION_ACTIVE)
 			 				{
 			 					ic.setTitle(org.zkoss.util.resource.Labels.getLabel("selfService.delegationStatusReceived", new Object[] { ra.getOwnerAccount(), since, until }));
 			 					listitem.getChildren().get(1).setVisible(false);

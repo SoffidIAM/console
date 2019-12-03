@@ -13,6 +13,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.DelegationStatus;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.RoleAccount;
@@ -40,7 +41,6 @@ import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.common.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;

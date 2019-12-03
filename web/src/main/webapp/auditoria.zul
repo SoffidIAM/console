@@ -170,7 +170,7 @@
 					
 					<dataitem bind=".">
 						<listcell>
-							<datebox bind="@calendar" format="${c:l('auditoria.dateFormat') }" buttonVisible="true" readonly="true"
+							<datebox bind="@calendar" format="${c:l('auditoria.dateFormat') }" buttonVisible="false" readonly="true"
 								disabled="true"/>
 						</listcell>
 						<listcell>

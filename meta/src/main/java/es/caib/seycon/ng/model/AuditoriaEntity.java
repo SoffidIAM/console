@@ -157,6 +157,16 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public String sourceIp;
 
+	@Column (name="AUD_JUSEGR")
+	@Nullable
+	public String jumpServerGroup;
+
+
+	@Column (name="AUD_PAMSES")
+	@Nullable
+	public String pamSessionId;
+
+
 	@DaoFinder
 	public es.caib.seycon.ng.model.AuditoriaEntity findById(
 		java.lang.Long id) {

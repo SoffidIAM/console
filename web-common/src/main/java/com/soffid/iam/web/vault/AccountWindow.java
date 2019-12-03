@@ -372,7 +372,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		    else
 		    {
 		    	try {
-			    	java.net.URL url = new java.net.URL(value);
+			    	java.net.URI url = new java.net.URI(value);
 		    		txtBox.setStyle("");
 		    		String h = url.getHost();
 		    		if (h.startsWith("www."))

@@ -5,6 +5,7 @@ import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
+import com.soffid.mda.annotation.Index;
 import com.soffid.mda.annotation.Nullable;
 
 @Entity(table="SC_JUSEGR")
@@ -35,4 +36,12 @@ public class JumpServerGroupEntity {
 	
 	@Column(name="JSG_PASSWD", length=100)
 	String password;
+	
+	JumpServerGroupEntity findByName( String name) { return null;}
 }
+
+
+
+@Index(columns = {"JSG_NAME"}, entity = JumpServerGroupEntity.class, name = "SC_JUSEGR_UK")
+class JumpServerGroupUniqueKey {}
+

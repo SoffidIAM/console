@@ -57,6 +57,25 @@
 				return list;
 			</script-finder>
 		</finder>
+		<finder name="launchType" type="launchType">
+			<script-finder>
+				list = new java.util.LinkedList();
+				for (l: com.soffid.iam.api.LaunchType.literals())
+				{
+					list.add (l);
+				}
+				return list;
+			</script-finder>
+		</finder>
+		<finder name="jumpServerGroup" type="jumpServerGroup">
+			<script-finder>
+			    s = new com.soffid.iam.api.JumpServerGroup();
+			    s.name = "";
+			    return s;
+			</script-finder>
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.PamSessionService" method="findJumpServerGroups">
+			</ejb-finder>
+		</finder>
 		<finder name="dispatcher" type="dispatcher">
 			<script-finder>
 				es.caib.seycon.ng.comu.Dispatcher dis = new es.caib.seycon.ng.comu.Dispatcher();
@@ -86,7 +105,8 @@
 				<parameter value="${null}" />
 			</ejb-finder>
 		</finder>
-		<finder name="pamServerGroup" type="pamSorverGroup">
+		
+		<finder name="pamServerGroup" type="pamServerGroup">
 			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.PamSessionService"
 				 method="findJumpServerGroups">
 			</ejb-finder>
@@ -179,6 +199,8 @@
 		</finder>
 	</datanode>
 
+	<datanode name="jumpServerGroup" transient="true"/>
+
 	<datanode name="type" transient="true">
 		<custom-attribute name="literal">
 			if (instance.length() == 0)
@@ -195,6 +217,24 @@
 
 	</datanode>
 	
+	<datanode name="launchType" transient="true">
+		<custom-attribute name="literal">
+			if (instance.length() == 0)
+				return "";
+			else
+			{
+				return org.zkoss.util.resource.Labels.getLabel("launchType."+instance);
+			}
+		</custom-attribute>
+		<custom-attribute name="value">
+			if (instance.length() == 0)
+				return null;
+			else
+				return com.soffid.iam.api.LaunchType.fromString(instance);
+		</custom-attribute>
+
+	</datanode>
+
 	<datanode name="dispatcher" transient="true"/>
 	
 	<datanode name="account">

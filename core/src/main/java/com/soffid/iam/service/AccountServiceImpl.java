@@ -723,6 +723,26 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(ae.getLoginName() == null ? account.getLoginName() != null : ! ae.getLoginName().equals(account.getLoginName())) ||
 				! ae.getPasswordPolicy().getName().equals(account.getPasswordPolicy()))
 			anyChange = true;
+
+		if ( account.getLaunchType() == null && ae.getLaunchType() != null ||
+				account.getLaunchType() != null && ! account.getLaunchType().equals(ae.getLaunchType()))
+		{
+			anyChange = true;
+		}
+		if (account.getJumpServerGroup() == null || account.getJumpServerGroup().trim().isEmpty())
+		{
+			if (ae.getJumpServerGroup() != null)
+				anyChange = true;
+		}
+		else if (ae.getJumpServerGroup() == null)
+		{
+			anyChange = true;
+		}
+		else if (! ae.getJumpServerGroup().getName().equals(ae.getJumpServerGroup()))
+		{
+			anyChange = true;
+		}
+
 		
 
 		getAccountEntityDao().accountToEntity(account, ae, false);
@@ -826,12 +846,26 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (acc == null)
 			return null;
 		
-		if (acc.getType().equals (AccountType.USER) && acc.getUsers().size() == 1)
+		if ( !AutoritzacionsUsuari.hasQueryAccount())
 		{
-			return getUserAccountEntityDao().toUserAccount(acc.getUsers().iterator().next());
+			Account account = getAccountEntityDao().toAccount(acc);
+			if  (account.getAccessLevel() == AccountAccessLevelEnum.ACCESS_NONE ||
+					account.getAccessLevel() == AccountAccessLevelEnum.ACCESS_NAVIGATE)
+				return null;
+			if (acc.getType().equals (AccountType.USER) && acc.getUsers().size() == 1)
+				return getUserAccountEntityDao().toUserAccount(acc.getUsers().iterator().next());
+			else
+				return account;
 		}
 		else
-			return getAccountEntityDao().toAccount(acc);
+		{
+			if (acc.getType().equals (AccountType.USER) && acc.getUsers().size() == 1)
+			{
+				return getUserAccountEntityDao().toUserAccount(acc.getUsers().iterator().next());
+			}
+			else
+				return getAccountEntityDao().toAccount(acc);
+		}
 	}
 
 	@Override

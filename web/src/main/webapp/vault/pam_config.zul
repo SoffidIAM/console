@@ -3,7 +3,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_password" macro-uri="/comu/input_password.zul"?>
 
-<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}"
+<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('pam_config.title')}"
 	 id="topframe" width="100%" >
 	<datamodel id="model" rootNode="root" src="descriptorVault.xml" />
 
@@ -17,8 +17,8 @@
 		<insertbutton acces="${canCreateJumpServer}"
 			listbox="/grid">
 				<attribute name="onClick"><![CDATA[
-					XPathUtils.createPath(model, "/pamServerGroup");
-					listbox.setPagingPosition("bottom");
+					es.caib.zkib.datasource.XPathUtils.createPath(model, "/pamServerGroup");
+					grid.setPagingPosition("bottom");
 				]]></attribute>
 		</insertbutton>
 		<commitbutton datamodel="/model"/>
@@ -38,70 +38,41 @@
 			<column label="" 
 				width="48px"/>
 		</columns>
-		<datarow>
+		<datarow style="vertical-align:top">
 			<textbox width="100%" onChange="" bind="name" />
 			<textbox width="100%" onChange="" bind="description" />
 			<grid fixedLayout="true" width="100%">
 				<columns>
-					<column width="150px"/>
+					<column width="80px"/>
 					<column />
 				</columns>
 				<rows>
 					<row>
-						<label value="${c:l('jumpserver.userName') }"/>
-						<textbox width="100%" bind="storeUserName" disabled="${! canUpdateJumpServer }" />
+						<label value="${c:l('jumpserver.userName') } :"/>
+						<textbox onChange="" width="100%" bind="storeUserName" disabled="${! canUpdateJumpServer }" />
 					</row>
 					<row>
-						<label value="${c:l('jumpserver.password') }"/>
-						<input_password width_custom="100%" bind="pasword"  mascara="no empty"  lectura="${! canUpdateJumpServer }"/>
+						<label value="${c:l('jumpserver.password') } :"/>
+						<input_password width="100%" width_custom="100%" bind="password" 
+							lectura="${! canUpdateJumpServer }"/>
 					</row>
 					<row>
-						<label value="${c:l('jumpserver.url') }"/>
+						<label value="${c:l('jumpserver.url') } :"/>
 						<textbox width="100%" bind="storeUrl" onChange=""  disabled="${! canUpdateJumpServer }"/>
 					</row>
 				</rows>
 			</grid>
-			<listbox bind="jumpServers" width="100%" fixedLayout="true" rows="8">
-				<listhead>
-					<listheader></listheader>
-					<listheader width="48px">
-						<insertbutton acces="${canCreateJumpButton}" listbox="/grid" label="">
-							<attribute name="onClick"><![CDATA[
-						if (canUpdateJumpserver)
-						{
-							es.caib.zkib.datasource.DataSource listbox = new Path("/esquema/lista/listbox").getComponent();							                                   
-							XPathUtils.createPath(listbox, "/objectMapping");
-						}							                                   
-							]]>
-							</attribute>
-						</insertbutton>
-					</listheader>
-				</listhead>
-				<dataitem>
-					<listcell>
-						<textbox bind="." width="100%"></textbox>
-					</listcell>
-					<listcell>
-						<imageclic align="center" src="~./img/list-remove.gif">
-							<attribute name="onClick"><![CDATA[
-								if (canUpdateJumpServer) {
-									es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
-									XPathUtils.removePath(ctx.getDataSource(), ctx.getXPath());
-								}
-							]]></attribute>
-						</imageclic>
-					</listcell>
-				</dataitem>
-			</listbox>
+			<inputfield bind="jumpServers" dataType="string" noLabel="true" width="100%" sclass="std" multiValue="true">
+			</inputfield>
 			<imageclic align="center" src="~./img/list-remove.gif">
 				<attribute name="onClick"><![CDATA[
-					if (canDeleteJumpServer) {
-						es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
-						XPathUtils.removePath(ctx.getDataSource(), ctx.getXPath());
+					if (canRemoveJumpServer) {
+						es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(self);
+						es.caib.zkib.datasource.XPathUtils.removePath(ctx.getDataSource(), ctx.getXPath());
 					}
 				]]></attribute>
 			</imageclic>
 		</datarow>
 	</grid>
-	
+
 </frame>

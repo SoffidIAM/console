@@ -205,8 +205,22 @@
 											</listitem>
 										</listbox>
 									</row>
+									<row >
+										<label value="${c:l('accounts.launchType') } :"></label>
+										<listbox bind="@launchType" dataPath="/model:/launchType" mold="select">
+											<dataitem bind="@value"><listcell bind="@literal"/></dataitem>
+										</listbox>
+									</row>
+									<row >
+										<label value="${c:l('accounts.jumpServerGroup') } :"></label>
+										<listbox bind="@jumpServerGroup" dataPath="/model:/jumpServerGroup" mold="select">
+											<dataitem bind="@name">
+												<listcell bind="@name"/>
+											</dataitem>
+										</listbox>
+									</row>
 									<row id="ownerRow">
-										<label value="Owner:" />
+										<label value="${c:l('accounts.owner') } :" />
 										<div>
 											<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@userName"></label>
 											<image src="/img/cancel.png" width="12px" height="12px" onClick="innerWindow.checkinAccount(self)"/>

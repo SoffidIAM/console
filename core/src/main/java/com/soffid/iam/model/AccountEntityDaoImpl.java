@@ -262,6 +262,9 @@ public class AccountEntityDaoImpl extends
 				target.setDisabled(target.getStatus() != AccountStatus.ACTIVE && target.getStatus() != AccountStatus.FORCED_ACTIVE);
 			}
 
+			if (source.getJumpServerGroup() != null)
+				target.setJumpServerGroup(source.getJumpServerGroup().getName());
+			
 			storeCacheEntry(source, target);
 	
 		} catch (InternalErrorException e) {
@@ -341,6 +344,8 @@ public class AccountEntityDaoImpl extends
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_USER);
 		else
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
+		target.setLaunchType(entry.account.getLaunchType());
+		target.setJumpServerGroup(entry.account.getJumpServerGroup());
 	}
 
 
@@ -421,6 +426,17 @@ public class AccountEntityDaoImpl extends
 					source.getPasswordPolicy(), source.getName(),
 					source.getSystem()));
 		target.setPasswordPolicy(tipus);
+		if ( source.getJumpServerGroup() == null || source.getJumpServerGroup().trim().isEmpty())
+			target.setJumpServerGroup(null);
+		else
+		{
+			JumpServerGroupEntity jsg = getJumpServerGroupEntityDao().findByName(source.getJumpServerGroup());
+			if (jsg == null)
+				throw new IllegalArgumentException(
+						String.format("Jump server group [%s] does not exist", 
+								source.getJumpServerGroup()));
+			target.setJumpServerGroup(jsg);
+		}
 	}
 
 	@SuppressWarnings(value = "unchecked")

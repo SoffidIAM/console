@@ -1,9 +1,12 @@
 package com.soffid.iam.service;
 
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 
 import com.soffid.iam.api.JumpServerGroup;
+import com.soffid.iam.api.NewPamSession;
+import com.soffid.iam.api.PamSession;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.mda.annotation.Depends;
@@ -14,11 +17,13 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.model.AccountEntity;
+import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.servei.AccountService;
 import roles.Tothom;
 
 @Service
-@Depends({JumpServerGroupEntity.class, JumpServerEntity.class, AccountEntity.class, AccountService.class})
+@Depends({JumpServerGroupEntity.class, JumpServerEntity.class, AccountEntity.class, AccountService.class,
+	AuditoriaEntity.class})
 public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	List<JumpServerGroup> findJumpServerGroups() {return null;}
@@ -34,7 +39,19 @@ public class PamSessionService {
 	
 	@Operation(grantees = {Tothom.class})
 	@Description("Creates a jump server session and returns the session URL")
-	URL createJumpServerSession (Account account) {return null;}
+	NewPamSession createJumpServerSession (Account account) {return null;}
+
+	@Operation(grantees = {pamSession_query.class})
+	@Description("Retrieves a pam session descriptor")
+	PamSession findSession (String serverGroup, String sessionId) {return null;}
+
+	@Operation(grantees = {pamSession_query.class})
+	@Description("Retrieves a pam session keystrokes")
+	void generateKeystrokes (PamSession session, long start, long end, OutputStream stream) { }
+
+	@Operation(grantees = {pamSession_query.class})
+	@Description("Retrieves a pam session video")
+	void generateVideo (PamSession session, long start, long end, OutputStream stream) { }
 }
 
 @Role (name="seu:pamSessionConfigure" ) class Soffid_PamSessionConfigure { }

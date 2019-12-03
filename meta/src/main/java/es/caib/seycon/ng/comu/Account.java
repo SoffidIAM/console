@@ -133,4 +133,10 @@ public class Account {
 	@Description("Login name. Used for SSO accounts")
 	@Nullable
 	String loginName;
+
+	@Nullable
+	com.soffid.iam.api.LaunchType launchType;
+	
+	@Nullable
+	String jumpServerGroup;
 }

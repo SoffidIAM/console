@@ -30,9 +30,9 @@ private String sMask;
   /** incrementar la dirección IP ( generar la siguiente ) */
   public void incrementa () 
   {
-    int i = ip.length;
+    int i = ip.length - 1;
     ip [ i ] = (byte) (ip [ i ] + 1);
-    while ( ip [ i ] == 0 && i >= 0) 
+    while ( ip [ i ] == 0 && i > 0) 
     {
       i --;
       ip [ i ] ++;

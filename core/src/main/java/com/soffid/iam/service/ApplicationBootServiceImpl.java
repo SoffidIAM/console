@@ -399,6 +399,64 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("104");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("104"))
+		{
+			configureSSOAttributes();
+			cfg.setValue("105");
+			configSvc.update(cfg);
+		}
+	}
+
+	private void configureSSOAttributes() throws InternalErrorException {
+		DataType td = new DataType();
+		td.setCode("type");
+		td.setLabel("Account type");
+		LinkedList<String> l = new LinkedList<String>();
+		l.add("Windows");
+		l.add("Linux");
+		l.add("Database");
+		td.setValues(l);
+		td.setOrder(40L);
+		td.setRequired(false);
+		td.setScope(MetadataScope.ACCOUNT);
+		td.setSystemName("SSO");
+		td.setType(TypeEnumeration.STRING_TYPE);
+		createIfNotExists(td);
+		
+		td = new DataType();
+		td.setCode("SshPrivateKey");
+		td.setLabel("SSH Private key");
+		td.setOrder(41L);
+		td.setRequired(false);
+		td.setScope(MetadataScope.ACCOUNT);
+		td.setSystemName("SSO");
+		td.setType(TypeEnumeration.PASSWORD_TYPE);
+		createIfNotExists(td);
+
+		td = new DataType();
+		td.setCode("SshPublicKey");
+		td.setLabel("SSH Public key");
+		td.setOrder(42L);
+		td.setRequired(false);
+		td.setScope(MetadataScope.ACCOUNT);
+		td.setSystemName("SSO");
+		td.setType(TypeEnumeration.STRING_TYPE);
+		createIfNotExists(td);
+
+		td = new DataType();
+		td.setCode("passwordStatus");
+		td.setLabel("Password synchronization");
+		l = new LinkedList<String>();
+		l.add("PASSWORD_GOOD: Valid");
+		l.add("PASSWORD_GOOD_EXPIRED: Expired");
+		l.add("PASSWORD_WRONG: Invalid");
+		td.setValues(l);
+		td.setOrder(43L);
+		td.setRequired(false);
+		td.setScope(MetadataScope.ACCOUNT);
+		td.setSystemName("SSO");
+		td.setType(TypeEnumeration.STRING_TYPE);
+		createIfNotExists(td);
 	}
 
 	private void updateFromVersion1() throws IOException, Exception 
@@ -504,7 +562,7 @@ public class ApplicationBootServiceImpl extends
 		{
 			Long tenantId = tenantService.getMasterTenant().getId();
 			PreparedStatement stmt = conn
-					.prepareStatement("UPDATE SC_VAUFOL SET VAF_TEN_ID=? WHERE BCO_TEN_ID IS NULL OR VAF_TEN_ID=0");
+					.prepareStatement("UPDATE SC_VAUFOL SET VAF_TEN_ID=? WHERE VAF_TEN_ID IS NULL OR VAF_TEN_ID=0");
 			stmt.setLong(1, tenantId);
 			stmt.execute();
 			stmt.close();
@@ -1028,6 +1086,9 @@ public class ApplicationBootServiceImpl extends
 			td.setSystemName(disSso.getName());
 			td.setType(TypeEnumeration.SSO_FORM_TYPE);
 			getAdditionalDataService().create(td);
+			
+			configureSSOAttributes();
+
 		}
 
 		Role rol = appSvc
@@ -1252,6 +1313,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("1");
 			configSvc.update(cfg);
 		}
+	}
+
+	private void createIfNotExists(DataType td) throws InternalErrorException {
+		DataType td2 = getAdditionalDataService().findSystemDataType(td.getSystemName(), td.getCode());
+		if (td2 == null)
+			getAdditionalDataService().create(td);
 	}
 
 	private void createStandardAttributes() throws Exception {

@@ -12,6 +12,9 @@ import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PasswordValidation;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -82,6 +85,15 @@ public abstract class SyncStatusService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	@Description("Method user for SSO. Provides the password if the user has the right access level on the account")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password getAccountPassword(
+		java.lang.String user, 
+		java.lang.Long accountId,
+		AccountAccessLevelEnum level)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public byte[] getMazingerRules(
 		java.lang.String user)
@@ -141,4 +153,14 @@ public abstract class SyncStatusService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PasswordValidation checkPasswordSynchronizationStatus(java.lang.String accountName, String serverName)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void setAccountPassword(java.lang.String accountName, String serverName, Password password, boolean mustChange)
+			throws es.caib.seycon.ng.exception.InternalErrorException {	}
 }

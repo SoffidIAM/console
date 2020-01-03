@@ -321,9 +321,16 @@ public class AuditEntityDaoImpl extends
 			try
 			{
 				String domain = passwordService.getDefaultDispatcher();
-				com.soffid.iam.model.AccountEntity usuariEntity = getAccountEntityDao().findByNameAndSystem(usuari, domain);
-				if (usuariEntity == null && usuari.startsWith("*"))
-					usuariEntity = getAccountEntityDao().findByNameAndSystem(usuari.substring(1), domain);
+				String userName = usuari;
+				boolean exit = false;
+				com.soffid.iam.model.AccountEntity  usuariEntity;
+				do {
+					usuariEntity = getAccountEntityDao().findByNameAndSystem(usuari, domain);
+					if (usuariEntity == null && usuari.startsWith("*"))
+						usuari = usuari.substring(1);
+					else
+						exit = true;
+				} while (!exit);
 				targetEntity.setAccountAssoc(usuariEntity);
 			}
 			catch (InternalErrorException e)

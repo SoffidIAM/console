@@ -61,6 +61,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -73,7 +75,8 @@ public class RoleAccountEntityDaoImpl
 	extends com.soffid.iam.model.RoleAccountEntityDaoBase
 	implements ApplicationContextAware
 {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	private ApplicationContext applicationContext;
 
 	private void auditarRolAccount(String accio, RoleAccountEntity grant) {
@@ -236,6 +239,7 @@ public class RoleAccountEntityDaoImpl
 			}
 
 		} catch (Throwable e) {
+			log.warn("Error updating role", e);
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.1"), rolsUsuaris
@@ -359,6 +363,7 @@ public class RoleAccountEntityDaoImpl
 						Messages.getString("RolsUsuarisEntityDaoImpl.3")); //$NON-NLS-1$
 			}
 		} catch (Throwable e) {
+			log.warn("Error updating role", e);
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.4"), rolsUsuaris
@@ -446,6 +451,7 @@ public class RoleAccountEntityDaoImpl
 				super.remove(rolsUsuaris);
 			}
 		} catch (Throwable e) {
+			log.warn("Error updating role", e);
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.6"), rolsUsuaris

@@ -8,10 +8,14 @@ import com.soffid.mda.annotation.ValueObject;
 
 @ValueObject
 public class PamSession {
+	@Nullable
 	String id;
 	
 	@Nullable
 	String user;
+	
+	@Nullable
+	String accountName;
 	
 	@Nullable
 	String jumpServerGroup;

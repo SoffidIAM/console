@@ -27,7 +27,9 @@ import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PasswordValidation;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import roles.account_attribute_query;
 import roles.account_attribute_update;
 import roles.account_query;
@@ -420,11 +422,19 @@ public abstract class AccountService {
 	 return null;
 	}
 
-	@Description ("Gets the account password bypassing passowrd policy")
-	public Password queryAccountPasswordBypassPolicy (long accountId)
+	@Description ("Gets the account password bypassing passowrd policy. Used for SSO")
+	public Password queryAccountPasswordBypassPolicy (long accountId, AccountAccessLevelEnum level)
 	{
 		return null;
 	}
+
+	@Description ("Checks if there is a password available")
+	@Operation ( grantees={roles.Tothom.class} )
+	public boolean isAccountPasswordAvailable (long accountId)
+	{
+		return false;
+	}
+
 	///
 	@Description("Sets the account password")
 	@Operation ( grantees={roles.Tothom.class},
@@ -605,4 +615,10 @@ public abstract class AccountService {
 	public void synchronizeAccount(String accountName, String system)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	@Operation(grantees= {roles.account_update.class} )
+	public PasswordValidation checkPasswordSynchronizationStatus(Account account) throws InternalErrorException {
+		return null;
+	}
+
 }

@@ -611,6 +611,29 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private Map<String, Exception> executeAccountOB(String transa, String account, String system, Password password,
+			boolean mustChange) throws InternalErrorException {
+		Task tasca = new Task();
+		tasca.setTransaction(transa);
+		tasca.setUser(account);
+		tasca.setSystemName(system);
+		tasca.setDatabase(system);
+		tasca.setPassword(password.toString());
+		tasca.setPasswordChange(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
+		tasca.setStatus("P"); //$NON-NLS-1$
+		try {
+			TaskHandler th = new TaskHandler();
+			th.setTenant(Security.getCurrentTenantName());
+			th.setTenantId(Security.getCurrentTenantId());
+			th.setTask(tasca);
+			return getTaskQueue().processOBTask(th);
+		} catch (NoSuchBeanDefinitionException e) {
+			createAccountTask(transa, account, system, password, mustChange, null);
+			return null;
+		}
+	}
+
 	private Password generateRandomPassword(UserEntity usuariEntity, PasswordDomainEntity dc, PasswordPolicyEntity pc,
 			boolean minLength, boolean maxLength) throws InternalErrorException {
 		Random r = new Random(System.currentTimeMillis() + hashCode());
@@ -1599,8 +1622,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		} else {
 			handleStoreAccountPassword(account, password, mustChange, expirationDate);
 
-			executeOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getName(), password,
+			Map<String, Exception> m = executeAccountOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, 
+					account.getName(), account.getSystem().getName(), password,
 					mustChange);
+			Exception ex = m.get(account.getSystem().getName());
+			if (ex != null)
+				throw ex;
 		}
 	}
 

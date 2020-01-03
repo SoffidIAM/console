@@ -15,6 +15,8 @@ import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.PasswordValidation;
+
 @Entity(table = "SC_ACCOUN", translatedName = "AccountEntity", translatedPackage = "com.soffid.iam.model",
 	tenantFilter="system.tenant.id"
 )
@@ -132,6 +134,11 @@ public abstract class AccountEntity {
 
 	@Column(name = "ACC_TUS_ID")
 	public es.caib.seycon.ng.model.TipusUsuariEntity passwordPolicy;
+
+	@Column(name = "ACC_PWDSTA", length = 25)
+	@Nullable
+	public String passwordStatus;
+
 
 	@Operation(translated = "findByNameAndSystem")
 	@DaoFinder("from com.soffid.iam.model.AccountEntity acc\n"

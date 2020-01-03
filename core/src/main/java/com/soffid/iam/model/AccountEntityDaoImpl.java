@@ -5,6 +5,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
@@ -125,6 +126,9 @@ public class AccountEntityDaoImpl extends
 			// Missing attribute grantedUsers on entity
 			// Missing attribute grantedRoles on entity
 			target.setSystem(source.getSystem().getName());
+			target.setPasswordStatus(source.getPasswordStatus() == null ? 
+				null:
+				PasswordValidation.valueOf(source.getPasswordStatus()));
 			Collection<Group> grups = new LinkedList<Group>();
 			Collection<Role> roles = new LinkedList<Role>();
 			Collection<User> usuaris = new LinkedList<User>();
@@ -290,16 +294,8 @@ public class AccountEntityDaoImpl extends
 					.expandACLAccounts(
 							generateAcl (source, AccountAccessLevelEnum.ACCESS_USER)));
 
-		String currentUser = Security.getCurrentAccount();
-		if (entry.ownerAcl.contains(currentUser))
-			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
-		else if (entry.managerAcl.contains(currentUser))
-			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_MANAGER);
-		else if (entry.userAcl.contains(currentUser))
-			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_USER);
-		else
-			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
-
+		entry.account.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
+		
 		getCache().put(source.getId(), entry);
 	}
 
@@ -346,6 +342,7 @@ public class AccountEntityDaoImpl extends
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
 		target.setLaunchType(entry.account.getLaunchType());
 		target.setJumpServerGroup(entry.account.getJumpServerGroup());
+		target.setPasswordExpiration(entry.account.getPasswordExpiration());
 	}
 
 
@@ -418,6 +415,7 @@ public class AccountEntityDaoImpl extends
 					Messages.getString("AccountEntityDaoImpl.WrongDispatcher"),
 					source.getSystem(), source.getName(), source.getSystem()));
 		target.setSystem(dispatcher);
+		target.setPasswordStatus(source.getPasswordStatus() == null ? null : source.getPasswordStatus().toString());
 		UserTypeEntity tipus = getUserTypeEntityDao().findByName(
 				source.getPasswordPolicy());
 		if (tipus == null)

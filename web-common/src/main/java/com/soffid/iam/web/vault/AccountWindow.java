@@ -3,6 +3,7 @@ package com.soffid.iam.web.vault;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.LaunchType;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
@@ -21,6 +22,7 @@ import es.caib.zkib.jxpath.Pointer;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.web.users.additionalData.AttributesDiv;
@@ -109,8 +111,6 @@ public class AccountWindow extends Window implements AfterCompose {
 		es.caib.zkib.component.Form form = (Form) getFellow("form");
 		getFellow("serverRow").setVisible(false);
 		getFellow("urlRow").setVisible(true);
-		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(null);
-//		((DataTextbox) getFellow("urlTextbox")).setBind(null);
 
 		form.setDataPath("/model:" + path);
 
@@ -186,7 +186,6 @@ public class AccountWindow extends Window implements AfterCompose {
 
 		getFellow("serverRow").setVisible(false);
 		getFellow("urlRow").setVisible(false);
-		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind(null);
 //		((DataTextbox) getFellow("urlTextbox")).setBind(null);
 
 		DataNode account = (DataNode) XPathUtils.getValue((DataSource)model, path);
@@ -197,6 +196,14 @@ public class AccountWindow extends Window implements AfterCompose {
 		setTitle(org.zkoss.util.resource.Labels.getLabel("vault.details"));
 
 		String parentPath = path.substring(0, path.lastIndexOf('/'));
+		
+		PasswordValidation passwordStatus = (PasswordValidation) es.caib.zkib.datasource.XPathUtils
+				.getValue((DataSource) model, path + "/@passwordStatus");
+
+		Label l = (Label) getFellowIfAny("passwordStatusLabel");
+		if (l !=null)
+			l.setValue( passwordStatus == null ? "":
+				Labels.getLabel("vault.account."+passwordStatus.toString()));
 
 		boolean isAdmin = displayAccountAcl();
 
@@ -231,26 +238,91 @@ public class AccountWindow extends Window implements AfterCompose {
 		doHighlighted();
 	}
 
+	
+	public void onChangeAccountType ()
+	{
+		Component form = getFellow("form");
+		AccountType type = (AccountType) XPathUtils.getValue(form, "/type");
+		if (AccountType.IGNORED.equals(type))
+		{
+			getFellow("passwordPolicyRow").setVisible(false);
+			getFellow("ssoTypeRow").setVisible(false);
+			getFellow("passwordStatusRow").setVisible(false);			
+		} else {
+			getFellow("passwordPolicyRow").setVisible(true);
+			getFellow("ssoTypeRow").setVisible(true);
+			getFellow("passwordStatusRow").setVisible(true);			
+		}
+	}
+	
+	public void onChangeLaunchType ()
+	{
+		Component form = getFellow("form");
+		LaunchType type = (LaunchType) XPathUtils.getValue(form, "/launchType");
+		if (LaunchType.LAUNCH_TYPE_PAM.equals(type))
+		{
+			getFellow("jumpServerRow").setVisible(true);
+		} else {
+			getFellow("jumpServerRow").setVisible(false);
+		}
+		onChangeServerName();
+	}
+	
+	public void onChangeServerName ()
+	{
+		Component form = getFellow("form");
+		AccountType accountType = (AccountType) XPathUtils.getValue(form, "/type");
+		LaunchType type = (LaunchType) XPathUtils.getValue(form, "/launchType");
+		String serverName = (String) XPathUtils.getValue(form, "/attributes[@name='SSO:Server']");
+		String serverType = (String) XPathUtils.getValue(form, "/attributes[@name='type']");
+		String url = (String) XPathUtils.getValue(form, "/attributes[@name='SSO:URL']");
+		if ( (url == null || url.isEmpty()) &&
+				accountType != AccountType.IGNORED )
+		{
+			url = "";
+			if ("Windows".equals(serverType))
+			{
+				url = "rdp://"+serverName;
+			}
+			if ("Linux".equals(serverType))
+			{
+				url = "ssh://"+serverName;
+			}
+			if ("Database".equals(serverType))
+			{
+				url = "jdbc:<dbtype>://"+serverName+"/databaseName";
+			}
+			XPathUtils.setValue(form, "loginUrl", url);
+			XPathUtils.setValue(form, "/attributes[@name='SSO:URL']", url);
+		}
+	}
+	
 	void displayFormatSSO(boolean isAdmin) {
 		getFellow("txtAccountName").setVisible(false);
 		getFellow("dispatcherRow").setVisible(false);
-		getFellow("typeRow").setVisible(false);
+		getFellow("typeRow").setVisible(true);
 		getFellow("dispatcherRow").setVisible(false);
 		getFellow("enabledRow").setVisible(false);
-		getFellow("passwordPolicyRow").setVisible(false);
-
+		getFellow("passwordPolicyRow").setVisible(true);
+		
+		getFellow("serverRow").setVisible(true);
 		getFellow("txtAccountName2").setVisible(true);
 		getFellow("urlRow").setVisible(true);
 		
 		getFellow("changeFolderButton").setVisible(isAdmin);
 		((Textbox) getFellow("txtAccountName2")).setReadonly(!isAdmin);
-		((Textbox) getFellow("serverTextbox").getFellow("dada")).setReadonly(!isAdmin);
-		((DataTextbox) getFellow("serverTextbox").getFellow("dada")).setBind("/attributes[@name='SSO:Server']");
+		((Textbox) getFellow("serverTextbox")).setReadonly(!isAdmin);
 		((Textbox) getFellow("urlTextbox")).setReadonly(!isAdmin);
 		((Textbox) getFellow("txtAccountDescription").getFellow("dada")).setReadonly(!isAdmin);
 
 		((Textbox) getFellow("txtAccountName2")).focus();
 		getFellow("ownerRow").setVisible(false);
+		
+		Listbox lb = (Listbox) getFellow("lbAccountType");
+		lb.getItemAtIndex(0).setDisabled(true);
+		lb.getItemAtIndex(1).setDisabled(true);
+		onChangeAccountType();
+		onChangeLaunchType();
 	}
 
 	void displayFormatStandard(boolean isAdmin) {
@@ -260,6 +332,9 @@ public class AccountWindow extends Window implements AfterCompose {
 		getFellow("dispatcherRow").setVisible(true);
 		getFellow("enabledRow").setVisible(true);
 		getFellow("passwordPolicyRow").setVisible(true);
+		getFellow("ssoTypeRow").setVisible(false);
+		getFellow("jumpServerRow").setVisible(false);
+		getFellow("passwordStatusRow").setVisible(false);
 
 		getFellow("changeFolderButton").setVisible(isAdmin);
 		((Textbox) getFellow("txtAccountName").getFellow("dada")).setReadonly(!isAdmin);
@@ -269,6 +344,9 @@ public class AccountWindow extends Window implements AfterCompose {
 		getFellow("txtAccountName2").setVisible(false);
 		getFellow("urlRow").setVisible(false);
 		((Textbox) getFellow("txtAccountName").getFellow("dada")).focus();
+		Listbox lb = (Listbox) getFellow("lbAccountType");
+		lb.getItemAtIndex(0).setDisabled(false);
+		lb.getItemAtIndex(1).setDisabled(true);
 	}
 
 	private Long findLastAccount(String system) throws InternalErrorException {
@@ -364,30 +442,34 @@ public class AccountWindow extends Window implements AfterCompose {
 	    es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(txtBox);
 	    if (ssoSystem.equals(es.caib.zkib.datasource.XPathUtils.getValue((DataSource) model, 
 	    		ctx.getXPath() + "/@system"))) {
-		    Textbox serverTextbox = (Textbox) getFellow("serverTextbox").getFellow("dada");
-		    if (value == null || value.trim().length () == 0)
-		    {
-		    	serverTextbox.setValue("");
-		    }
-		    else
-		    {
-		    	try {
-			    	java.net.URI url = new java.net.URI(value);
-		    		txtBox.setStyle("");
-		    		String h = url.getHost();
-		    		if (h.startsWith("www."))
-		    			h = h.substring(4);
-		    		serverTextbox.setValue( h );
-		    	} catch (Exception e) {
-		    		e.printStackTrace();
-		    		txtBox.setStyle("background-color: pink");
-		    	}
-	
-		    }
-
-			ctx.getDataSource().getJXPathContext()
-					.setValue(ctx.getXPath() + "/attributes[@name='SSO:URL']", value);
-			ctx.getDataSource().sendEvent(new XPathRerunEvent(ctx.getDataSource(), ctx.getXPath()+"/attributes"));
+			AccountType accountType = (AccountType) XPathUtils.getValue(txtBox, "/type");
+			LaunchType type = (LaunchType) XPathUtils.getValue(txtBox, "/launchType");
+			if (accountType == AccountType.IGNORED || type != LaunchType.LAUNCH_TYPE_PAM)
+			{
+			    Textbox serverTextbox = (Textbox) getFellow("serverTextbox");
+			    if (value == null || value.trim().length () == 0)
+			    {
+			    	serverTextbox.setValue("");
+			    }
+			    else
+			    {
+			    	try {
+				    	java.net.URI url = new java.net.URI(value);
+			    		txtBox.setStyle("");
+			    		String h = url.getHost();
+			    		if (h != null && h.startsWith("www."))
+			    			h = h.substring(4);
+			    		if (h != null)
+			    			serverTextbox.setValue( h );
+			    	} catch (Exception e) {
+			    		e.printStackTrace();
+			    		txtBox.setStyle("background-color: pink");
+			    	}
+		
+			    }
+				ctx.getDataSource().getJXPathContext()
+						.setValue(ctx.getXPath() + "/attributes[@name='SSO:URL']", value);
+			}
 		}
 		
 	}
@@ -440,17 +522,8 @@ public class AccountWindow extends Window implements AfterCompose {
 		else
 		{
 			
-			es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(getFellow("form"));
-			String system = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@system");
-			if (newAccount)
-			{
-				String currentName = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@name");
-				long l = findLastAccount (ssoSystem) + 1;
-				es.caib.zkib.datasource.XPathUtils.setValue(ctx, "/@name", ""+l);	
-			}
-			Long folderId = (Long) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@vaultFolderId");
-			
-			model.commit();
+			commitAccount();
+			Long folderId = (Long) es.caib.zkib.datasource.XPathUtils.getValue(getFellow("form"), "/@vaultFolderId");
 			setVisible(false);
 			
 			Tree treebox = (Tree) getPage().getFellow("esquema").getFellow("lista").getFellow("treebox");
@@ -473,6 +546,19 @@ public class AccountWindow extends Window implements AfterCompose {
 			}
 		}
 
+	}
+
+	public void commitAccount() throws InternalErrorException, CommitException {
+		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(getFellow("form"));
+		String system = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@system");
+		if (newAccount)
+		{
+			String currentName = (String) es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@name");
+			long l = findLastAccount (ssoSystem) + 1;
+			es.caib.zkib.datasource.XPathUtils.setValue(ctx, "/@name", ""+l);	
+		}
+		
+		model.commit();
 	}
 
 	void searchAndRefresh(es.caib.zkib.datamodel.DataNodeCollection coll, Long folderId) {
@@ -631,7 +717,7 @@ public class AccountWindow extends Window implements AfterCompose {
 	}
 
 	public void setPassword(Component button) throws InternalErrorException, CommitException, NamingException, CreateException {
-		model.commit();
+		commitAccount();
 		try {
 			Component passwordImg = getFellow("passwordImg");
 			final Window newPasswordS = (Window) getParent().getFellow("newPasswordS");

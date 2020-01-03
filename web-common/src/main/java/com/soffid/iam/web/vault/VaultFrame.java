@@ -507,7 +507,7 @@ public class VaultFrame extends Frame {
 		if (item != null)
 		{
 		    es.caib.zkib.datamodel.DataNode dn = (DataNode) XPathUtils.getValue(item, ".");
-		    if (dn == null)
+		    if (dn == null || ! (dn.getInstance() instanceof Account))
 		    	return;
 		    final Account account = (Account) dn.getInstance();
 	    	Treerow row = item.getTreerow();

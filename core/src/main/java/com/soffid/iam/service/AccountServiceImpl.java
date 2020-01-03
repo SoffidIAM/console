@@ -32,6 +32,7 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
+import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
@@ -68,9 +69,11 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
+import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -91,8 +94,6 @@ import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.NotAllowedException;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.sync.servei.SyncStatusService;
 
 public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBase implements ApplicationContextAware
 {
@@ -212,12 +213,31 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private UserAccountEntity bindAccountToUser(UserEntity ue, AccountEntity acc) {
-		UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
-		uae.setAccount(acc);
-		uae.setUser(ue);
-		getUserAccountEntityDao().create(uae);
-		acc.getUsers().add(uae);
-		ue.getAccounts().add(uae);
+		UserAccountEntity uae = null;
+		if (acc.getUsers() != null && ! acc.getUsers().isEmpty())
+		{
+			for (UserAccountEntity uae2: new LinkedList<UserAccountEntity> ( acc.getUsers()))
+			{
+				if (uae2.getAccount() == acc)
+				{
+					uae = uae2;
+				}
+				else
+				{
+					getUserAccountEntityDao().remove(uae2);
+					acc.getUsers().remove(uae2);
+				}
+			}
+		}
+		if (uae == null)
+		{
+			uae = getUserAccountEntityDao().newUserAccountEntity();
+			uae.setAccount(acc);
+			uae.setUser(ue);
+			getUserAccountEntityDao().create(uae);
+			acc.getUsers().add(uae);
+			ue.getAccounts().add(uae);
+		}
 		return uae;
 	}
 
@@ -773,7 +793,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private void removeAcl(AccountEntity ae) {
-		for (AccountAccessEntity aae: ae.getAcl())
+		for (AccountAccessEntity aae: new LinkedList<AccountAccessEntity> (ae.getAcl()))
 		{
 			getAccountAccessEntityDao().remove(aae);
 		}
@@ -1296,6 +1316,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				ae.setPasswordExpiration(null);
 			ae.setLastPasswordSet(new Date());
 			getAccountEntityDao().update(ae, null);
+			ae.setPasswordStatus(PasswordValidation.PASSWORD_GOOD.toString());
 		}
 	}
 
@@ -1311,6 +1332,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (ae != null ) {
 			ae.setPasswordExpiration(passwordTerm);
 			ae.setLastPasswordSet(new Date());
+			ae.setPasswordStatus(PasswordValidation.PASSWORD_GOOD.toString());
 			getAccountEntityDao().update(ae, null);
 		}
 	}
@@ -1331,13 +1353,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToQueryPassword")); //$NON-NLS-1$
 		
 
-		return handleQueryAccountPasswordBypassPolicy(account.getId());
+		return handleQueryAccountPasswordBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_OWNER);
 	}
 
 	@Override
-	protected Password handleQueryAccountPasswordBypassPolicy(long accountId)
+	protected Password handleQueryAccountPasswordBypassPolicy(long accountId, AccountAccessLevelEnum level)
 			throws InternalErrorException, Exception {
-		User usuari = AutoritzacionsUsuari.getCurrentUsuari();
+		User usuari = getUserService().getCurrentUser();
 		
 		AccountEntity acc = getAccountEntityDao().load(accountId);
 		if (acc == null)
@@ -1351,7 +1373,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     RemoteServiceLocator rsl = new RemoteServiceLocator(se.getName());
                     rsl.setAuthToken(se.getAuth());
                     SyncStatusService sss = rsl.getSyncStatusService();
-                    Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId());
+                    Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
                     if (p != null) {
                         Audit audit = new Audit();
                         audit.setAction("S");
@@ -1461,12 +1483,37 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	        if (! check.isValid()) {
 	            throw new BadPasswordException(check.getReason());
 	        }
-			ips.storeAndForwardAccountPassword(ae, password, temporary, null);
+	        sendPasswordNow (ae, password, temporary);
 		}
 		// Now, audit
 		audit("P", ae); //$NON-NLS-1$
 		
 		return result;
+	}
+
+	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
+		Exception lastException = null;
+		if ( account.getStatus() != AccountStatus.DISABLED)
+		{
+			for (ServerEntity se : getServerEntityDao().loadAll()) {
+	            if (se.getType().equals(ServerType.MASTERSERVER)) {
+	            	SyncStatusService sss = null;
+	                try {
+	                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getName());
+	                    rsl.setAuthToken(se.getAuth());
+	                    sss = rsl.getSyncStatusService();
+	                } catch (Exception e) {
+	                    lastException = e;
+	                }
+	                if (sss != null)
+	                {
+	                	sss.setAccountPassword(account.getName(), account.getSystem().getName(), password, temporary);
+	                	return;
+	                }
+	            }
+	        }
+		}
+		getInternalPasswordService().storeAndForwardAccountPassword(account, password, temporary, null);
 	}
 
 	/* (non-Javadoc)
@@ -1568,7 +1615,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         if (! check.isValid()) {
             throw new BadPasswordException(check.getReason());
         }
-		ips.storeAndForwardAccountPassword(ae, password, false, date);
+        sendPasswordNow(ae, password, false);
+//		ips.storeAndForwardAccountPassword(ae, password, false, date);
 //		ae.setPasswordExpiration(date);
 		
 		// Remove previous assignments
@@ -1643,7 +1691,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	public Collection<UserAccount> handleGetUserAccounts(User usuari) throws InternalErrorException {
 		if (!AutoritzacionsUsuari.hasQueryAccount())
 		{
-			User caller = AutoritzacionsUsuari.getCurrentUsuari();
+			User caller = getUserService().getCurrentUser();
 			if (caller != null && caller.getId() != usuari.getId())
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
@@ -1971,8 +2019,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     protected Collection<Account> handleGetUserGrantedAccounts(User usuari, AccountAccessLevelEnum level) throws Exception {
 		if (!AutoritzacionsUsuari.hasQueryAccount())
 		{
-			User caller = AutoritzacionsUsuari.getCurrentUsuari();
-			if (caller != null && caller.getId() != usuari.getId())
+			User caller = getUserService().getCurrentUser();
+			if (caller != null && ! caller.getId().equals( usuari.getId()) )
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
 		Collection<RoleGrant> grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
@@ -2350,7 +2398,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return accounts;
 		if (!AutoritzacionsUsuari.hasQueryAccount())
 		{
-			User caller = AutoritzacionsUsuari.getCurrentUsuari();
+			User caller = getUserService().getCurrentUser();
 			if (caller != null && caller.getId() != u.getId())
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
@@ -2424,6 +2472,40 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
 		if (acc != null)
 			createAccountTask(acc);
+	}
+
+	@Override
+	protected PasswordValidation handleCheckPasswordSynchronizationStatus(Account account) throws Exception {
+		Exception lastException = null;
+		for (ServerEntity se : getServerEntityDao().loadAll()) {
+            if (se.getType().equals(ServerType.MASTERSERVER)) {
+                try {
+                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getName());
+                    rsl.setAuthToken(se.getAuth());
+                    SyncStatusService sss = rsl.getSyncStatusService();
+                    PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
+                    if (status != null) {
+                    	AccountEntity entity = getAccountEntityDao().load(account.getId());
+                    	getAccountEntityDao().removeFromCache( entity );
+                    	return status;
+                    }
+                } catch (Exception e) {
+                    lastException = e;
+                }
+            }
+        }
+		if (lastException != null)
+			throw lastException;
+		return null;
+	}
+
+	@Override
+	protected boolean handleIsAccountPasswordAvailable(long accountId) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(accountId);
+		if (entity != null && entity.getSecrets() != null && ! entity.getSecrets().trim().isEmpty())
+			return true;
+		else
+			return false;
 	}
 
 }

@@ -12,6 +12,9 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.Xarxa;
+import roles.Tothom;
+
 @Service (translatedName="NetworkService",
 	translatedPackage="com.soffid.iam.service")
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
@@ -571,4 +574,8 @@ public abstract class XarxaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation
+	public Xarxa findNetworkByIpAddress(String ipAdress) {return null;}
+
 }

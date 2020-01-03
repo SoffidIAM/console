@@ -6,11 +6,13 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Map;
 
+import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.sync.intf.KerberosAgent;
 
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public abstract class DispatcherHandler {
@@ -85,5 +87,7 @@ public abstract class DispatcherHandler {
 	public abstract boolean runStep () throws InternalErrorException;
 
 	public abstract String parseKerberosToken(String domain, String serviceName, byte[] keytab, byte[] token) throws Exception ;
+
+	public abstract PasswordValidation checkPasswordSynchronizationStatus(String accountName) throws Exception;
 
 }

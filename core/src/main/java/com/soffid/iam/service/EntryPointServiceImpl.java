@@ -47,6 +47,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountEntity;
@@ -66,6 +67,7 @@ import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 
@@ -556,6 +558,26 @@ public class EntryPointServiceImpl extends
 			punt.setName("MZN"); //$NON-NLS-1$
 			punt.setTemplate("exec ( ... );"); //$NON-NLS-1$
 			punt.setMimeType("x-application/x-mazinger-script"); //$NON-NLS-1$
+			getEntryPointExecutionTypeEntityDao().create(punt);
+			tipusMime.add(punt);
+		}
+		if (tipusMime.size() == 2)
+		{
+			EntryPointExecutionTypeEntity punt = getEntryPointExecutionTypeEntityDao()
+					.newEntryPointExecutionTypeEntity();
+			punt.setName("PAM"); //$NON-NLS-1$
+			punt.setTemplate("url=...\nserverGroup=..."); //$NON-NLS-1$
+			punt.setMimeType("Recorded session"); //$NON-NLS-1$
+			getEntryPointExecutionTypeEntityDao().create(punt);
+			tipusMime.add(punt);
+		}
+		if (tipusMime.size() == 3)
+		{
+			EntryPointExecutionTypeEntity punt = getEntryPointExecutionTypeEntityDao()
+					.newEntryPointExecutionTypeEntity();
+			punt.setName("WSSO"); //$NON-NLS-1$
+			punt.setTemplate("https://"); //$NON-NLS-1$
+			punt.setMimeType("Web Single sign on"); //$NON-NLS-1$
 			getEntryPointExecutionTypeEntityDao().create(punt);
 			tipusMime.add(punt);
 		}
@@ -2324,6 +2346,20 @@ public class EntryPointServiceImpl extends
 		if (cache == null)
 			cache = JCSCacheProvider.buildCache(PermissionsCache.class.getName());
 		return cache;
+	}
+
+	@Override
+	protected String handleGetScopeForAddress(String address) throws Exception {
+		if (address == null || address.trim().isEmpty())
+			return "I";
+		Network network = getNetworkService().findNetworkByIpAddress(address);
+    	String defaultNetwork = ConfigurationCache.getProperty("soffid.network.internet"); //$NON-NLS-1$
+    	if (network == null || network.getCode().equals(defaultNetwork))
+    		return "I";
+    	else if ( Boolean.TRUE.equals( network.getLanAccess() ) )
+    		return "L";
+    	else
+    		return "W";
 	}
 
 }

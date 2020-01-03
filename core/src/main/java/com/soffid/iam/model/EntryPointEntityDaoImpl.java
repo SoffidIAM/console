@@ -133,7 +133,7 @@ public class EntryPointEntityDaoImpl extends
 			for (Iterator<EntryPointAccountEntity> it = accounts.iterator(); it.hasNext(); ){
 				EntryPointAccountEntity auto = it.next();
 				if (source.getId()!=null) auto.setEntryPoint(source);
-				autoritzacions.add(getEntryPointAccountEntityDao().toAutoritzacioPuntEntrada(auto));
+				autoritzacions.add(getEntryPointAccountEntityDao().toAccessTreeAuthorization(auto));
 			}
 		}
 		if (autoritzaUsuari!=null && autoritzaUsuari.size()!=0) {

@@ -8,7 +8,9 @@ public enum PasswordValidation {
 	public static PasswordValidation toPasswordValidation(
 			com.soffid.iam.api.PasswordValidation checkAccountPassword)
 	{
-		return PasswordValidation.valueOf(checkAccountPassword.toString());
+		return checkAccountPassword == null ?
+				null:
+				PasswordValidation.valueOf(checkAccountPassword.toString());
 				
 	}
 };

@@ -33,7 +33,7 @@
 			</ejb-finder>
 			<new-instance-script>
 				bean = new com.soffid.iam.api.Account();
-				bean.setType(es.caib.seycon.ng.comu.AccountType.SHARED);
+				bean.setType(es.caib.seycon.ng.comu.AccountType.IGNORED);
 				bean.setGrantedUsers ( new LinkedList()) ;
 				bean.setGrantedRoles (new LinkedList());
 				bean.setGrantedGroups (new LinkedList());

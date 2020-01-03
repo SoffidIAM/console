@@ -139,4 +139,7 @@ public class Account {
 	
 	@Nullable
 	String jumpServerGroup;
+
+	@Nullable
+	PasswordValidation passwordStatus;
 }

@@ -74,7 +74,7 @@
         <plugin>
           <groupId>com.soffid.tools</groupId>
           <artifactId>mda-maven-plugin</artifactId>
-          <version>2.0.42</version>
+          <version>2.0.43-SNAPSHOT</version>
           <configuration>
             <targetServer>tomee</targetServer>
             <translate>true</translate>

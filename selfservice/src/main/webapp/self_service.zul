@@ -513,26 +513,32 @@
 		</window>
 		<window id="selectAccount" closable="true" sclass="new-pass"
 			position="center, center" sizable="true"
-			title="${c:l('selfService.SelectAccount')}" visible="false" width="34em"
+			title="${c:l('selfService.SelectAccount')}" visible="false" width="400px"
 			onClose="self.setVisible(false); event.stopPropagation();">
 			<zscript>
 				<![CDATA[
 				]]>
 			</zscript>
-	 		<listbox style="margin-left: 2em" checkmark="true" id="accountsListbox">
+	 		<listbox style="margin-left: 2em; margin-right: 2em" checkmark="false" fixedLayout="true" id="accountsListbox">
 	 			<listhead>
-	 				<listheader label="${c:l('accounts.name') }" sort="auto"></listheader>
-	 				<listheader label="${c:l('accounts.description') }" sort="auto"></listheader>
+	 				<listheader label="${c:l('accounts.name') }" width="150px" sort="auto"></listheader>
+	 				<listheader label="${c:l('accounts.description') }" sort="auto" width="*"></listheader>
 	 			</listhead>
 	 		</listbox>
 			<div align="center">
 				<button label="${c:l('accounts.setPassword.OK')}"
-					onClick="p_selfService.launchSSOKMAccount(); selectAccount.setVisible(false);" />
+					onClick="p_selfService.launchAccount(); selectAccount.setVisible(false);" />
 				<space width="1em"/>
 				<button label="${c:l('accounts.setPassword.Cancel')}"
 					onClick="selectAccount.setVisible(false)" />
 			</div>
 		</window>
+		
+		<html><![CDATA[
+		<form id="pamLauncherForm" action="/" target="_blank" method="POST">
+			<input type="hidden" id="pamLauncherFormSessionId" name="sessionId"/>
+		</form>	
+		]]></html>
 		<include src="finestres/editorHTML.zul" />
 	</frame>
 </zk>

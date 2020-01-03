@@ -14,20 +14,8 @@ public class AutoritzacionsUsuari
 {
 
 	public static User getCurrentUsuari() throws InternalErrorException {
-		InternalPasswordService ips = ServiceLocator.instance()
-						.getInternalPasswordService();
-		AccountService as = ServiceLocator.instance().getAccountService();
 		UserService us = ServiceLocator.instance().getUserService();
-		String dispatcher = ips.getDefaultDispatcher();
-		Account caller = as.findAccount(Security.getCurrentAccount(), dispatcher);
-		if (caller == null)
-			return null;
-		if (caller instanceof UserAccount)
-		{
-			String codi = ((UserAccount) caller).getUser();
-			return us.findUserByUserName(codi);
-		}
-		return null;
+		return us.getCurrentUser();
 	}
 
 	/*

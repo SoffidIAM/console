@@ -12,8 +12,10 @@ import org.zkoss.zk.ui.util.Clients;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.LaunchType;
 import com.soffid.iam.api.NewPamSession;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 

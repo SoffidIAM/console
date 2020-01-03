@@ -1,3 +1,13 @@
+p, div, span, label, a, input, textarea,
+button, input.button, input.file {
+	font-family:Arial,Helvetica,sans-serif;
+	font-size: 12px;
+}
+.tabsel, .tabsel a, a.tabsel, .tab, .tab a, a.tab {
+	font-family:Arial,Helvetica,sans-serif;
+	font-size: 12px;
+}
+
 /* Títol */
 .title td, .title .caption td 
 {
@@ -16,7 +26,7 @@ td.mwt-modal, td.mwt-highlighted, td.mwt-overlapped,
 td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 {
 	color: white; border: none;
-	background-color: {SKY}; font-size: 13pt;
+	background-color: {SKY}; font-size: 14px;
 	background-image: none;
 	
 }
@@ -24,7 +34,7 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Opcions del manteniment: Afegir nou, Eliminar sel·leccionat i Confirmar canvis */
 .title .caption a, .title .caption a:visited{
-	font-family: Arial;	font-size: 11px; font-weight: bold; color: white;
+	font-family: Arial;	font-size: 12px; font-weight: bold; color: white;
 }
 
 .title .caption a:hover {
@@ -33,13 +43,13 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Títol azul de les capses */
 .titol_capsa {
-	font-family: Arial;	font-size: 13px; font-weight: bold; color: {SKY};
+	font-family: Arial;	font-size: 14px; font-weight: bold; color: {SKY};
 }
 
 /* Títol taronja de tancar la sessió i tornar el menu */
 .titol_tanca {
 	font-family: Arial; 
-	font-size: 11px; 
+	font-size: 12px; 
 	font-weight: bold; 
 	color: #FFF;
 	cursor: pointer;
@@ -144,14 +154,14 @@ div.z-loading-indicator {box-sizing: content-box;}
 
 .inici {
 	font-family:Arial,Helvetica,sans-serif;
-	font-size: 11pt;
+	font-size: 16px;
 	font-weight: bold;
 	color: #FFF;
 }
 
 .benvingutmsg span {
 	font-family: Arial,Helvetica,sans-serif;
-	font-size: 11px;	
+	font-size: 16px;	
 }
 
 .benvingut {
@@ -222,32 +232,35 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 
 /* Entrada de dades: textbox */
-.text, .textbox {
-	font-family: Arial;	font-size: 11px;
+.text, .textbox, .textbox2, .textbox2m {
+	font-family: Arial;	font-size: 12px;
 	border: 1px solid #7F9196; /*width: 135px;*/
 	background-image: none;
 }
 
+.textbox2 { width: 98%; width: calc( 100% - 16px);}
+.textbox2m { width: 96%; width: calc( 100% - 48px);},
+	
 input [type="checkbox"] {
 	width: 30px;
 }
 
 /* Entrada de dades: interior dels textbox */
 textarea {
-	font-family: Arial;	font-size: 11px; 
+	font-family: Arial;	font-size: 12px; 
 }
 
 /* Etiquetes: label */
 span label {
-	font-family: Arial;	font-size: 11px; font-weight: normal; margin-left:3px; color: black;
+	font-family: Arial;	font-size: 12px; font-weight: normal; margin-left:3px; color: black;
 }
 
 span {
-	font-family: Arial;	font-size: 11px; font-weight: normal; color: black;
+	font-family: Arial;	font-size: 12px; font-weight: normal; color: black;
 }
 
 .etiqueta {
-	font-family: Arial;	font-size: 11px; margin-left:3px; font-weight: normal; color: black; vertical-align: middle;	
+	font-family: Arial;	font-size: 12px; margin-left:3px; font-weight: normal; color: black; vertical-align: middle;	
 }
 
 .nowrap {
@@ -255,29 +268,29 @@ span {
 }
 
 .menuinicial {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: white;	
+	font-family: Arial;	font-size: 12px; font-weight: bold; margin-left:3px; color: white;	
 }
 
 .menuinicial:hover {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: white;
+	font-family: Arial;	font-size: 12px; font-weight: bold; margin-left:3px; color: white;
 	text-decoration: underline; cursor: pointer;
 }
 
 .menuinicialnoclicable {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: #5E5A80;	
+	font-family: Arial;	font-size: 12px; font-weight: bold; margin-left:3px; color: #5E5A80;	
 }
 
 .seleccionable {
-	font-family: Arial;	font-size: 11px; font-weight: normal; margin-left:3px; color: black;	
+	font-family: Arial;	font-size: 12px; font-weight: normal; margin-left:3px; color: black;	
 }
 
 .seleccionable:hover {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: black;
+	font-family: Arial;	font-size: 12px; font-weight: bold; margin-left:3px; color: black;
 	text-decoration: underline; cursor: pointer;
 }
 
 .seleccionable:visited{
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: black;
+	font-family: Arial;	font-size: 12px; font-weight: bold; margin-left:3px; color: black;
 }
 
 /* Botons */
@@ -303,7 +316,7 @@ button:hover, input[type="button"]:hover {
 }
 
 .toolbar a, .toolbar a:visited, .toolbar a:hover {
-	font-family: Arial;	font-size: 11px; font-weight: bold; color: #FFF;
+	font-family: Arial;	font-size: 12px; font-weight: bold; color: #FFF;
 	border: 0px; text-decoration: none; background: {BLUE};
 	white-space:nowrap; 
 }
@@ -320,12 +333,12 @@ button:hover, input[type="button"]:hover {
 
 .toolbar-checkbox label
 {
-	font-family: Arial;	font-size: 11px; font-weight: bold; color: #FFF;
+	font-family: Arial;	font-size: 12px; font-weight: bold; color: #FFF;
 }
 
 /* Títols de les capceleres dels listbox, trees i grids */
 div.head-cell-inner {
-	font-family: Arial;	font-size: 11px; font-weight: normal; color: {GREENTEXT}; text-align: {TEXT_ALIGN_LEFT};
+	font-family: Arial;	font-size: 12px; font-weight: normal; color: {GREENTEXT}; text-align: {TEXT_ALIGN_LEFT};
 }
 	
 tr.odd {
@@ -334,7 +347,7 @@ tr.odd {
 
 /* LISTBOX */
 div.listbox {
-	font-family: Arial;	font-size: 11px; color: black;
+	font-family: Arial;	font-size: 12px; color: black;
 	border: 1px solid #0e5462; margin: 0px;
 }
 
@@ -374,7 +387,7 @@ div.listbox-head { background-color: {GREEN}; }
 
 /* Font del contingut del listbox i del tree (capçalera i files) */
 div.head-cell-inner, div.cell-inner {
-	font-family: Arial;	font-size: 11px; text-align: {TEXT_ALIGN_LEFT};
+	font-family: Arial;	font-size: 12px; text-align: {TEXT_ALIGN_LEFT};
 }
 
 /* Fila del Listbox amb el cursor damunt (clar) */
@@ -403,11 +416,11 @@ td.focusd {
 
 /* GRID */ 
 div.grid, div.grid-body {
-	font-family: Arial;	font-size: 11px; color: black; margin: 0px;
+	font-family: Arial;	font-size: 12px; color: black; margin: 0px;
 }
 
 div.grid-head th {
-	font-family: Arial;	font-size: 11px; color: black;	
+	font-family: Arial;	font-size: 12px; color: black;	
 	background: {GREEN};
 	overflow: hidden;
 	border-top: none;
@@ -424,7 +437,7 @@ div.grid-head th:last-child {
 
 /* Files del grid */
 tr.grid td.gc { 
-	font-family: Arial;	font-size: 11px; color: black; background: white; 
+	font-family: Arial;	font-size: 12px; color: black; background: white; 
 	border-bottom: none; border-left: 1px solid #FFF; border-right: 1px solid #606E72; border-top: 1px solid #DDD; 
 	padding: 2px;
 }
@@ -440,7 +453,7 @@ td.lwt-embedded, td.mwt-embedded, td.rwt-embedded {
 	background:#BE6200 none repeat scroll 0 0;
 	color:white;
 	font-family:Arial;
-	font-size:11pt;
+	font-size:12px;
 	font-weight:bold;
 	padding: 0;
 	border: 0 0 1px 0 solid #8AA3C1;
@@ -470,7 +483,7 @@ td.lwt-embedded, td.mwt-embedded, td.rwt-embedded {
 }
 
 .label_link {
-	font-family: Arial;	font-size: 11px; font-weight: bold;  color: #0e5462;
+	font-family: Arial;	font-size: 12px; font-weight: bold;  color: #0e5462;
 	margin: 15px 5px 5px 0; cursor: pointer; display: inline; 
 }
 .label_link:hover {
@@ -605,16 +618,16 @@ td.menu1 {
 
 div.menubar a {
 	font-family: Arial;	
-	font-size: 11px;
+	font-size: 12px;
 	color: #FFF;
 } 
 
 div.menupopup a  {
-	font-family: Arial;	font-size: 11px;
+	font-family: Arial;	font-size: 12px;
 }
 
 .activafiltre {
-	font-family: Arial;	font-size: 11px; text-decoration: none;	
+	font-family: Arial;	font-size: 12px; text-decoration: none;	
 }
 
 .activafiltre:hover {
@@ -668,7 +681,7 @@ div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.
   background-repeat: no-repeat;
 }
 
-.listfilter {background-color: {GREEN}; width:90%; border: white solid 1px;}
+.listfilter {background-color: {GREEN}; width:90%; width:calc(100% - 12px); border: white solid 1px;}
 
 
 
@@ -689,28 +702,28 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {SKY}; background
 .text-disd {color:#000 !important;}
 .titol_tancar_back {padding: 4px; float:{TEXT_ALIGN_RIGHT}; border: 1px solid #BE6200; background-color:#EEEEEE;}
 .titol_tancar, .titol_tancar_fletxa {
-	font-family: sans-serif; font-size: 11px; font-weight: bold; color: #BE6200; cursor: pointer; 
+	font-family: sans-serif; font-size: 12px; font-weight: bold; color: #BE6200; cursor: pointer; 
 }
 .titol_tancar:hover {
 	text-decoration: underline;
 }
 p, div, span, label, a, input, textarea, button, input.button, input.file,
 div.head-cell-inner, div.cell-inner,
-.maintitle, .etiqueta, .text, .textbox {
+.maintitle, .etiqueta, .text, .textbox, .textbox2, .textbox2m {
 	font-family: "Avenir LT Std", Calibri,Arial, sans-serif
 }
 
 .titol_tancar_back:hover {background-color:#FFF7EE;}
 div.head-cell-inner {text-align:{TEXT_ALIGN_LEFT};}
 .dateboxinp  {
-	font-size: 11px;
+	font-size: 12px;
 	padding-left: 2px;
 	padding-right: 24px;
 	width: 120px;
 }
-.dateboxread input {border: 0px !important; font-size:11px; width: 14em !important;}
-.dateboxreadnoborder input {border: 0px !important; font-size:11px; width: 12em !important;}
-span.nomesdata input.nomesdatainp {color:black !important; font-size:11px;border:none;background:transparent;}
+.dateboxread input {border: 0px !important; font-size:12px; width: 14em !important;}
+.dateboxreadnoborder input {border: 0px !important; font-size:12px; width: 12em !important;}
+span.nomesdata input.nomesdatainp {color:black !important; font-size:12px;border:none;background:transparent;}
 
 .titolperfil {font-size:18px !important;color:#8A4700;}
 
@@ -781,7 +794,7 @@ img.z-loading-icon {
 
 .titolapp {
     color: #8A4700;
-    font-size: 1.4em;
+    font-size: 21px;
     font-weight: normal;
 }
 
@@ -1181,6 +1194,16 @@ button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 	color: white;
 }
 
+button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
+	color: {SKYLIGHT};
+	border-color: white
+}
+button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]:hover:disabled {
+	background-color: white;
+	color: white;
+	border-color: white
+}
+
 button.small-button img {
 	height: 1em;
 	vertical-align: baseline;
@@ -1575,17 +1598,17 @@ div.listbox-pgi-t, div.grid-pgi-t, div.tree-pgi-t {
 	border-bottom: 0px solid #AAB; overflow: hidden;
 }
 tr.grid td.gc { 
-	font-size: 11px; color: black; background: white; 
+	font-size: 12px; color: black; background: white; 
 	border: none; 
 	padding: 2px;
 }
 
 
-.text, .textbox { 
+.text, .textbox, .textbox2, .textbox2m { 
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox, input.dateboxinp, input.text {
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text {
 	box-sizing: border-box;
 	padding: 2px;
 	border: none;
@@ -1889,3 +1912,11 @@ div.fixedToolbar {
 .removeValueIcon:hover {
 	opacity:1;
 }
+
+
+div.errbox
+{
+	color: {GREENTEXT};
+	background-color: {GREENLIGHT}
+}
+

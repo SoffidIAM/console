@@ -5,30 +5,56 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
-	<frame id="auditoria" saveContent="true" title="${c:l('auditoria.lblConsultaAuditoria')}" width="99%">
+	<frame id="pamaudit" saveContent="true" title="${c:l('auditoria.lblConsultaAuditoria')}" width="99%">
 		<zscript>
-			//deshabilitem certs camps de cerca si provenim de usuaris
-			import es.caib.seycon.ng.utils.AutoritzacionsUsuari;
+		<![CDATA[
+			import com.soffid.iam.utils.AutoritzacionsUsuari;;
 			
-			canQueryAuditoria = AutoritzacionsUsuari.hasQueryAuditoria();
-			
+			boolean canQueryAuditoria = com.soffid.iam.utils.Security.isUserInRole("pamSession:query") &&
+				AutoritzacionsUsuari.hasQueryAuditoria();
+		]]>
 		</zscript>
 		
-		<attribute name="onCreate">
+		<style>
+			button.activeRowButton {
+				display: none;
+			}
+
+			tr.overd button.activeRowButton {
+				display: inline-block;
+			}
+		</style>
+		<attribute name="onCreate"><![CDATA[
 			javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) org.zkoss.zk.ui.Executions.getCurrent().getNativeRequest();
-			String v_codiUsuari = req.getParameter("codiUsuariAuditat");
-			String v_dataInici = req.getParameter("dataIniciAuditoria");
-			String v_dataFi = req.getParameter("dataFiAuditoria");
-			if (v_codiUsuari!=null @and !"".equals(v_codiUsuari) @and v_dataInici!=null @and !"".equals(v_dataInici)) {
-				qw = esquema.getFellow("queryWindow");
-				searchBox = qw.getFellow("searchBox");
-				searchBox.addAttribute("user").setSearchFilter(v_codiUsuari);
+			String v_account = req.getParameter("accountName");
+			String v_system = req.getParameter("system");
+			Component qw = esquema.getFellow("queryWindow");
+			
+			System.out.println("*************");
+			System.out.println(v_account);
+			System.out.println(v_system);
+			com.soffid.iam.web.component.SearchBox searchBox = qw.getFellow("searchBox");
+			boolean search = false;
+			if (v_account !=null && ! v_account.trim().isEmpty())
+			{
+				search = true;
+				searchBox.addAttribute("account").setSearchFilter(v_account);
+			}
+			
+			if (v_system !=null && ! v_system.trim().isEmpty())
+			{
+				search = true;
+				searchBox.addAttribute("database").setSearchFilter(v_system);
+			}
+			
+			if (search) 
+			{
 				java.util.Calendar c = java.util.Calendar.getInstance();
 				c.add(java.util.Calendar.DAY_OF_MONTH, -7);
 				searchBox.addAttribute("calendar").setDateSearchInterval(c.getTime(), null);
 				searchBox.search();
-				h_tornar.setVisible(true);
-			} 
+			}
+		]]>
 		</attribute>
 		
 		<attribute name="onPrepareClose">
@@ -40,9 +66,6 @@
 		</style>
 		
 		<datamodel id="model" rootNode="auditories" src="descriptorAuditoria.xml"/>
-		
-		<zscript src="comu/netejaCriteris.zul"/>
-		<zscript src="comu/checkTruncatedResults.zul"/>
 		
 		<zscript>
 			<![CDATA[
@@ -118,50 +141,31 @@
 			
 				<searchbox auto="true" id="searchBox"
 					jsonObject="com.soffid.iam.api.Audit" 
-					defaultAttributes="calendar, author, user, group"
+					enforcedFilter='object eq "PAM"'
+					defaultAttributes="calendar, author, account, bbdd"
 					dataPath="/model:/auditoria" variableName="query"></searchbox>
 
 			</criteris>
 			
 			<navegador id="lista" width="${amplaria}">
 				<toolbar>
-					<toolbarbutton use="com.soffid.iam.web.HideColumnsComponent" listbox="listbox" preferenceName="audit"/>
 					<listexporttoolbarbutton acces="true" id="exportbutton" listbox="/esquema/lista/listbox"/>
 				</toolbar>
 				
 				<listbox id="listbox" autocommit="false" dataPath="/model:/auditoria"
+					fixedLayout="true"
 					mold="paging" pageSize="${fileres}">
 					<listhead>
 						<listheader id="ldata" label="${c:l('auditoria.zul.Data/Hora')}"
 							sort="auto" width="12em"/>
 						<listheader id="lautor" label="${c:l('auditoria.zul.Autor-2')}"
 							sort="auto" width="10em"/>
-						<listheader visible="false" id="lip" label="${c:l('com.soffid.iam.api.Audit.sourceIp')}" width="50px"/>
-						<listheader visible="false" id="lobjecte" label="${c:l('auditoria.zul.Objecte-2')}" width="50px"/>
-						<listheader visible="false" id="lusuari" label="${c:l('auditoria.zul.Usuari')}" width="80px"/>
-						<listheader visible="false" id="laplicacio" label="${c:l('auditoria.zul.Aplicacia')}" width="80px"/>
-						<listheader visible="false" id="lrol" label="${c:l('auditoria.zul.Rol')}" width="100px"/>
-						<listheader visible="false" label="${c:l('auditoria.zul.account')}" width="80px"/>
-						<listheader visible="false" id="lbbdd" label="${c:l('auditoria.zul.Bbdd')}" width="80px"/>
-						<listheader visible="false" id="lgroup" label="${c:l('auditoria.zul.Grup')}" width="80px"/>
-						<listheader visible="false" id="lxarxa" label="${c:l('auditoria.zul.Xarxa')}" width="80px"/>
-						<listheader visible="false" id="lmaquina" label="${c:l('auditoria.zul.Maquina')}" width="80px"/>
-						<listheader visible="false" id="limpressora" label="${c:l('auditoria.zul.Impressora')}" width="80px"/>
-						<listheader visible="false" id="ldomini" label="${c:l('auditoria.zul.Domini')}" width="80px"/>
-						<listheader visible="false" id="lvalordomini" label="${c:l('auditoria.zul.Valordomini')}" width="80px"/>
-						<listheader visible="false" id="ldominicorreu" label="${c:l('auditoria.zul.Dominicorreu')}" width="80px"/>	
-						<listheader visible="false" id="lllistacorreu" label="${c:l('auditoria.zul.Llistacorreu')}" width="80px"/>
-						<listheader visible="false" id="ldominicorreupertany" label="${c:l('auditoria.zul.Dominicorreupertany')}" tooltiptext="Domini correu pertany" width="80px"/>	
-						<listheader visible="false" id="lllistacorreupertany" label="${c:l('auditoria.zul.Llistacorreupertany')}" tooltiptext="Llista correu pertany" width="80px"/>
-						<listheader visible="false" id="lparametre" label="${c:l('auditoria.zul.Parametre')}" width="80px"/>
-						<listheader visible="false" id="lfitxer" label="${c:l('auditoria.zul.Fitxer')}" width="80px"/>
-						<listheader visible="false" id="lautoritzacio" label="${c:l('auditoria.zul.Autoritzacia')}" width="80px"/>
-						<listheader visible="false" id="lfederacio" label="${c:l('auditoria.zul.Federacia')}" width="80px"/>
-						<listheader visible="false" id="ldominiUsuaris" label="${c:l('auditoria.zul.Dominiusuaris')}" tooltiptext="Domini d'usuaris" width="80px"/>
-						<listheader visible="false" id="ldominiContrasenyes" label="${c:l('auditoria.zul.Dominicontrasenyes')}" tooltiptext="Domini de contrasenyes" width="80px"/>
-						<listheader visible="false" label="${c:l('auditoria.zul.jumpservergroup')}" width="80px"/>
-						<listheader visible="false" label="${c:l('auditoria.zul.pamsession')}" width="80px"/>
-						<listheader id="laccio" label="${c:l('auditoria.zul.Accia-2')}" />
+						<listheader visible="true" id="lip" label="${c:l('com.soffid.iam.api.Audit.sourceIp')}" width="50px"/>
+						<listheader visible="true" label="${c:l('auditoria.zul.account')}" width="80px"/>
+						<listheader visible="true" id="lbbdd" label="${c:l('auditoria.zul.Bbdd')}" width="80px"/>
+						<listheader visible="true" label="${c:l('auditoria.zul.jumpservergroup')}" width="80px"/>
+						<listheader visible="true" label="${c:l('auditoria.zul.pamsession')}" width="80px"/>
+						<listheader visible="true" label="_" width="80px"/>
 					</listhead>
 					
 					<listfoot>
@@ -171,7 +175,7 @@
 					</listfoot>
 					
 					<dataitem bind=".">
-						<listcell>
+						<listcell style="height:24px">
 							<datebox bind="@calendar" format="${c:l('auditoria.dateFormat') }" buttonVisible="false" readonly="true"
 								disabled="true"/>
 						</listcell>
@@ -197,30 +201,7 @@
 							</imageclic>
 						</listcell>
 						<listcell bind="@sourceIp"/>
-						<listcell bind="@objecte"/>
-						<listcell>
-							<label bind="@usuari" tooltip="tooltipInfoUsuari" style="margin-right: 1em"/>
-							<listener bind="@usuari">
-								<attribute name="onUpdate"><![CDATA[
-									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
-								]]>
-								</attribute>
-							</listener>
-							<imageclic src="/img/link.png">
-								<attribute name="onClick"><![CDATA[
-									String usuari = es.caib.zkib.datasource.XPathUtils.getValue(
-		                          						self,
-		                          						"@usuari");
-	                           		Executions.getCurrent().sendRedirect(
-		                           			"index.zul?embed&target=/usuaris.zul?user="+usuari,
-		                          				"soffid_popup");
-								]]>
-								</attribute>
-							</imageclic>
-						</listcell>
 							
-						<listcell bind="@aplicacio"/>
-						<listcell bind="@rol"/>
 						<listcell>
 							<label bind="@account" style="margin-right:1em"/>
 							<listener bind="@account">
@@ -245,50 +226,12 @@
 							</imageclic>
 						</listcell>
 						<listcell bind="@bbdd"/>
-						<listcell>
-							<label bind="@grup" style="margin-right: 1em"/>
-							<listener bind="@grup">
-								<attribute name="onUpdate"><![CDATA[
-									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
-								]]>
-								</attribute>
-							</listener>
-							<imageclic src="/img/link.png">
-								<attribute name="onClick"><![CDATA[
-									String group = es.caib.zkib.datasource.XPathUtils.getValue(
-		                          						self, "@grup");
-	                           		Executions.getCurrent().sendRedirect(
-		                           			"index.zul?embed&target=/grups.zul?group="+group,
-		                          				"soffid_popup");
-								]]>
-								</attribute>
-							</imageclic>
-						</listcell>
-						<listcell bind="@xarxa"/>
-						<listcell bind="@maquina"/>
-						<listcell bind="@impressora"/>
-						<listcell bind="@domini"/>
-						<listcell bind="@valorDomini"/>
-						<listcell bind="@dominiCorreu"/>
-						<listcell bind="@llistaCorreu"/>
-						<listcell bind="@dominiCorreuPertany"/>
-						<listcell bind="@llistaCorreuPertany"/>
-						<listcell bind="@parametreConfiguracio"/>
-						<listcell bind="@nomFitxer"/>
-						<listcell bind="@autoritzacio"/>
-						<listcell bind="@federacioIdentitats"/>
-						<listcell bind="@dominiUsuaris"/>
-						<listcell bind="@dominiContrasenyes"/>
 						<listcell bind="@jumpServerGroup"/>
+						<listcell bind="@pamSessionId" />
 						<listcell>
-							<label bind="@pamSessionId" style="margin-right: 1em"/>
-							<listener bind="@pamSessionId">
-								<attribute name="onUpdate"><![CDATA[
-									self.getNextSibling().setVisible (self.getValue() != null && self.getValue().length() > 0);
-								]]>
-								</attribute>
-							</listener>
-							<imageclic src="/img/link.png">
+							<button label="${c:l('pamaudit.openSession') }"
+								sclass="activeRowButton"
+								image="/img/link.png">
 								<attribute name="onClick"><![CDATA[
 									String sessionId = es.caib.zkib.datasource.XPathUtils.getValue(
 		                          						self, "@pamSessionId");
@@ -309,15 +252,13 @@
 	                           					"soffid_popup");
 								]]>
 								</attribute>
-							</imageclic>
+							</button>
 						</listcell>
-						<listcell bind="@message"/>
 					</dataitem>
 				</listbox>
 				
 				<popup id="tooltipInfoAutor" width="200px">
-					<attribute name="onOpen">
-					<![CDATA[
+					<attribute name="onOpen"><![CDATA[
 						if (event.getReference() != null) {
 							label = event.getReference();
 							listCell = label.parent; 

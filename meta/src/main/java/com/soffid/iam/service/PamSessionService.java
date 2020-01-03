@@ -41,17 +41,27 @@ public class PamSessionService {
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account) {return null;}
 
+	@Operation(grantees = {Tothom.class})
+	@Description("Creates a jump server session and returns the session URL")
+	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor) {return null;}
+
 	@Operation(grantees = {pamSession_query.class})
 	@Description("Retrieves a pam session descriptor")
 	PamSession findSession (String serverGroup, String sessionId) {return null;}
 
 	@Operation(grantees = {pamSession_query.class})
 	@Description("Retrieves a pam session keystrokes")
-	void generateKeystrokes (PamSession session, long start, long end, OutputStream stream) { }
+	void generateKeystrokes (PamSession session, OutputStream stream) { }
 
 	@Operation(grantees = {pamSession_query.class})
 	@Description("Retrieves a pam session video")
-	void generateVideo (PamSession session, long start, long end, OutputStream stream) { }
+	void generateVideo (PamSession session, long chapter, OutputStream stream, long start, long end) { }
+	
+	@Operation(grantees = {pamSession_query.class})
+	@Description("Retrieves a pam session video")
+	long getVideoSize (PamSession session, long chapter) { return 0; }
+	
+	
 }
 
 @Role (name="seu:pamSessionConfigure" ) class Soffid_PamSessionConfigure { }

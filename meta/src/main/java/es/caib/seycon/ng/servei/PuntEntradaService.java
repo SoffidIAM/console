@@ -9,12 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.model.EntryPointAccountEntity;
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
+import roles.Tothom;
 
 @Service ( grantees={roles.intranetMenus_admin.class,roles.Tothom.class},
 		translatedName="EntryPointService",
@@ -36,6 +38,7 @@ import es.caib.seycon.ng.model.RolEntity;
 	AccountService.class,
 	EntryPointAccountEntity.class,
 	AccountEntity.class,
+	XarxaService.class,
 	es.caib.seycon.ng.servei.UsuariService.class})
 public abstract class PuntEntradaService {
 
@@ -265,4 +268,7 @@ public abstract class PuntEntradaService {
 	public void sortChildren (long entryPointId) {
 		return ;
 	}
+
+	@Operation (grantees = {Tothom.class})
+	public String getScopeForAddress(@Nullable String address) {return null;}
 }

@@ -1,36 +1,44 @@
 package com.soffid.iam.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.JumpServerGroup;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class PamSessionServiceImpl extends PamSessionServiceBase {
@@ -110,10 +118,38 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		JumpServerGroupEntity jumpServerGroup = entity.getJumpServerGroup();
 		if (jumpServerGroup == null)
 			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
+		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl());
+	}
+	
+	@Override
+	protected NewPamSession handleCreateJumpServerSession(Account account, String entryPointDescriptor)
+			throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
 		
-		Password password = getAccountService().queryAccountPasswordBypassPolicy(account.getId());
+		Properties p = new Properties();
+		p.load(new StringReader(entryPointDescriptor));
+		String url = p.getProperty("url");
+		if (url == null || url.trim().isEmpty())
+			throw new InternalErrorException(String.format("The entry point descriptor does not have a value for url"));
+		String serverGroup = p.getProperty("serverGroup");
+		if (serverGroup == null || serverGroup.trim().isEmpty())
+			throw new InternalErrorException(String.format("The entry point descriptor does not have a value for serverGroup"));
+		JumpServerGroupEntity jumpServerGroup = getJumpServerGroupEntityDao().findByName(serverGroup);
+		if (jumpServerGroup == null)
+			throw new InternalErrorException(String.format("Cannot start session. Server group %s does not exist",serverGroup));
+		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl());
+	}
+
+	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl) throws InternalErrorException, MalformedURLException, JSONException
+	{
+		Password password = getAccountService().queryAccountPasswordBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
 		if (password == null)
-			throw new InternalErrorException("Cannot retrieve password for account "+account.getDescription());
+			throw new InternalErrorException("Cannot retrieve password for account "+entity.getDescription());
+		
+		Account account = getAccountEntityDao().toAccount(entity);
+		PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
+		if (! PasswordValidation.PASSWORD_GOOD.equals(status))
+			throw new InternalErrorException("The password stored is not accepted by the target system");
 		URL url2 = new URL(jumpServerGroup.getStoreUrl());
 		String base = url2.getProtocol()+"://"+url2.getHost()+
 				(url2.getPort() == -1 ? "": ":"+url2.getPort());
@@ -122,7 +158,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		HashMap<String, Object> secrets = new HashMap<String, Object>();
-		data.put("serverUrl", entity.getLoginUrl());
+		data.put("serverUrl", targetUrl);
 		data.put("user", Security.getCurrentUser());
 		data.put("secrets", secrets);
 		secrets.put("accountName", entity.getLoginName() == null? entity.getName(): entity.getLoginName());
@@ -153,6 +189,45 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		if (sessionKey == null)
 			throw new InternalErrorException("PAM Store did not return a session key");
 
+		String selected = selectJumpServer(jumpServerGroup);
+
+		if (selected == null)
+			throw new InternalErrorException("There is no jump server available");
+
+		URL url = new URL(selected);
+		
+		NewPamSession nps = new NewPamSession();
+		nps.setJumpServerGroup(jumpServerGroup.getName());
+		nps.setSessionId(sessionKey);
+		nps.setUrl(new URL (url.getProtocol() + "://" + url.getHost() + (url.getPort() == -1 ? "" : ":" + url.getPort())
+				+ "/launch/start?sessionId=" + URLEncoder.encode(sessionKey)));
+		
+		Audit audit = new Audit();
+		audit.setAuthor(Security.getCurrentAccount());
+		audit.setAction("L");
+		audit.setObject("PAM");
+		audit.setHost(url.getHost());
+		audit.setAccount(entity.getName());
+		audit.setDatabase(entity.getSystem().getName());
+		audit.setUser(entity.getLoginName());
+		audit.setPamSessionId((String) map.get("sessionId"));
+		audit.setJumpServerGroup(jumpServerGroup.getName());
+		AuditEntity auditEntity = getAuditEntityDao().auditToEntity(audit);
+		getAuditEntityDao().create(auditEntity);
+
+		return nps;
+		
+	}
+
+	public String selectJumpServer(JumpServerGroupEntity jumpServerGroup)
+			throws MalformedURLException, InternalErrorException, JSONException {
+		
+		if ( jumpServerGroup.getJumpServers().size() == 0)
+			return null;
+		
+		if ( jumpServerGroup.getJumpServers().size() == 1)
+			return jumpServerGroup.getJumpServers().iterator().next().getUrl();
+		
 		int selectedSessions = Integer.MAX_VALUE;
 		String selected = null;
 		JumpServerEntity[] jumpServers = jumpServerGroup.getJumpServers().toArray(new JumpServerEntity[0]);
@@ -169,19 +244,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 				// Ignore
 			}
 		}
-
-		if (selected == null)
-			throw new InternalErrorException("There is no jump server available");
-
-		URL url = new URL(selected);
-		
-		NewPamSession nps = new NewPamSession();
-		nps.setJumpServerGroup(jumpServerGroup.getName());
-		nps.setSessionId(sessionKey);
-		nps.setUrl(new URL (url.getProtocol() + "://" + url.getHost() + (url.getPort() == -1 ? "" : ":" + url.getPort())
-				+ "/launch/start?sessionId=" + URLEncoder.encode(sessionKey)));
-		return nps;
-		
+		return selected;
 	}
 
 	@Override
@@ -288,12 +351,91 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 	}
 
 	@Override
-	protected void handleGenerateKeystrokes(PamSession session, long start, long end, OutputStream stream)
-			throws Exception {
+	protected void handleGenerateKeystrokes(PamSession session, OutputStream stream) throws Exception {
+		JumpServerGroupEntity serverGroup = getJumpServerGroupEntityDao().findByName(session.getJumpServerGroup());
+		URL url = new URL(serverGroup.getStoreUrl());
+		url = new URL ( url.getProtocol()+"://"+url.getHost()+(url.getPort() > 0? ":"+url.getPort(): "") + "/store/downloadKeystrokes/"+
+				session.getPath());
+		
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setDoInput(true);
+		conn.setDoOutput(false);
+		String auth = serverGroup.getStoreUserName()+":"+
+				Password.decode(serverGroup.getPassword()).getPassword();
+		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBase64String(auth.getBytes("UTF-8")));
+		
+		conn.connect();
+		
+		if ( conn.getResponseCode() != 200 && conn.getResponseCode() != HttpServletResponse.SC_PARTIAL_CONTENT)
+		{
+			throw new InternalErrorException ("Unexpected error received from store server: HTTP/"+conn.getResponseCode());
+		} else {
+			InputStream in = conn.getInputStream();
+			for (int i = in.read(); i >= 0; i = in.read())
+				stream.write(i);
+			in.close();
+		}
+		
+		conn.disconnect();
 	}
 
 	@Override
-	protected void handleGenerateVideo(PamSession session, long start, long end, OutputStream stream) throws Exception {
+	public void handleGenerateVideo(PamSession session, long chapter, OutputStream stream, long start, long end) throws InternalErrorException, IOException {
+		JumpServerGroupEntity serverGroup = getJumpServerGroupEntityDao().findByName(session.getJumpServerGroup());
+		URL url = new URL(serverGroup.getStoreUrl());
+		url = new URL ( url.getProtocol()+"://"+url.getHost()+(url.getPort() > 0? ":"+url.getPort(): "") + "/store/downloadVideo/"+
+				session.getPath()+"/"+chapter);
+		
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.addRequestProperty("Range", "bytes="+start+"-"+end);
+		conn.setDoInput(true);
+		conn.setDoOutput(false);
+		String auth = serverGroup.getStoreUserName()+":"+
+				Password.decode(serverGroup.getPassword()).getPassword();
+		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBase64String(auth.getBytes("UTF-8")));
+		
+		conn.connect();
+		
+		if ( conn.getResponseCode() != 200 && conn.getResponseCode() != HttpServletResponse.SC_PARTIAL_CONTENT)
+		{
+			throw new InternalErrorException ("Unexpected error received from store server: HTTP/"+conn.getResponseCode());
+		} else {
+			InputStream in = conn.getInputStream();
+			for (int i = in.read(); i >= 0; i = in.read())
+				stream.write(i);
+			in.close();
+		}
+		
+		conn.disconnect();
+	}
+
+	@Override
+	public long handleGetVideoSize(PamSession session, long chapter) throws InternalErrorException, IOException {
+		JumpServerGroupEntity serverGroup = getJumpServerGroupEntityDao().findByName(session.getJumpServerGroup());
+		URL url = new URL(serverGroup.getStoreUrl());
+		url = new URL ( url.getProtocol()+"://"+url.getHost()+(url.getPort() > 0? ":"+url.getPort(): "") + "/store/downloadVideo/"+
+				session.getPath()+"/"+chapter);
+		
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("HEAD");
+		conn.setDoInput(true);
+		conn.setDoOutput(false);
+		String auth = serverGroup.getStoreUserName()+":"+
+				Password.decode(serverGroup.getPassword()).getPassword();
+		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBase64String(auth.getBytes("UTF-8")));
+		
+		conn.connect();
+		
+		if ( conn.getResponseCode() != 200 )
+		{
+			throw new InternalErrorException ("Unexpected error received from store server: HTTP/"+conn.getResponseCode());
+		}
+		
+		long size = conn.getContentLengthLong();
+		conn.disconnect();
+		return size;
 	}
 
 }

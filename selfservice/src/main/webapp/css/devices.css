@@ -6,7 +6,10 @@ img, video, canvas { max-width: 100%;}
 .startmenu, .startmenu:hover{border: 0px !important; float: {TEXT_ALIGN_LEFT}; width: 65px; border: 0; height: 22px; border-radius: 0; background-color: {SKY} !important; padding: 7px !important; margin: 0 !important;}
 #logo{ margin: 0px 10px 0px 5px; vertical-align: -45%; background: transparent}
 .benvingutmsg{padding:4px 5px 0px 0px;}
-.topline .codiusuari, .inici, .show-pass .title td, .new-pass .title td, .show-pass span, .new-pass span{font-family: "Avenir LT Std", Calibri, Arial, sans-serif !important; font-size:18px !important; color: white; font-weight: normal !important;}
+.topline .codiusuari, .inici, .show-pass .title td, .new-pass .title td, .show-pass span, .new-pass span{
+	font-family: "Avenir LT Std", Calibri, Arial, sans-serif !important; 
+	color: white; font-weight: normal !important;
+}
 .benvingut, .titol_tanca{display:none;}
 .codiusuari:hover{
 	text-decoration: underline;
@@ -24,7 +27,15 @@ span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 0px 10px 0
 span.tree-root-close, span.tree-tee-close, span.tree-last-close{ background-image: url(/selfservice/icons/{COLLAPSE_IMG}.png); background-size: 20px 20px; }
 span.tree-root-open, span.tree-tee-open, span.tree-last-open{ background-image: url(/selfservice/icons/expand.png); background-size: 20px 20px;}	
 span.tree-tee, span.tree-vbar, span.tree-last, span.tree-spacer, span.checkmark-spacer {width: 32px;}
-span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ background-color:white !important; font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:18px; color:{SKY}; font-weight: normal;line-height: 40px; border-top: 1px solid #eee; cursor:pointer; }
+span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ 
+	background-color:white !important; 
+	font-family: "Avenir LT Std", Calibri, Arial, sans-serif; 
+	color:{SKY}; 
+	font-weight: normal;
+	line-height: 40px; 
+	border-top: 1px solid #eee; 
+	cursor:pointer; 
+}
 .mwt-menuprincipal, .rwt-menuprincipal{ box-shadow:none; }
 .menuperfil{ padding-right:10px; z-index: 1;}
 .menuperfil:hover, .menu-display div.cell-inner:hover{background-color: {SKY} !important; color:white;}
@@ -43,7 +54,7 @@ span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ back
 .menuperfil{display:none; top: 35px !important; right: 0px !important; position: absolute; }
 
 /****** TITULOS *******/
-.titolSelf{ font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:25px; color:{BLUEDARK}; }
+.titolSelf{ font-family: "Avenir LT Std", Calibri, Arial, sans-serif; color:{BLUEDARK}; }
 
 .fons{ background-color:transparent; }
 .content{ display: table;width: 100%; max-width: 100%;margin: 0 auto; }
@@ -55,7 +66,7 @@ span.menu-display, .menu-display tr.title td, .menu-display div.cell-inner{ back
 /* Texto de las tablas */
 div.listbox-head{width:100% !important;}
 div.listbox-head th div.head-cell-inner, div.cell-inner, div.cell-inner span, div.cell-inner .dateboxinp {
-	font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:15px;
+	font-family: "Avenir LT Std", Calibri, Arial, sans-serif; 
 }
 
 div.listbox-head th, div.listbox-head th div{white-space:pre-line; word-wrap:break-word;}
@@ -75,7 +86,7 @@ td[class^='tab-thicktabbox-'],
 td[class^='tab-3d-']{background-image:none;}
 .tab-3d-mm', .tab-thicktabbox-mm' a {white-space:pre;}
 
-.tab, .tab a, .tabsel, .tabsel a{font-size:13px; font-weight:bold;}
+.tab, .tab a, .tabsel, .tabsel a{font-weight:bold;}
 .tab a{color:{SKY}}
 .tabsel a{color: {GREEN};}
 .tabsel, .tab{border-bottom:none }
@@ -215,7 +226,7 @@ div.tabpanel {
 
 /*zona IP*/
 .own-ip {position: fixed; left: 0; bottom: 0; background-color: {GREEN}; width: 100%; padding: 10px;opacity: 0.8;}
-.own-ip span {color: white;font-family: "Avenir LT Std", Calibri, Arial, sans-serif; font-size:18px;}
+.own-ip span {color: white;font-family: "Avenir LT Std", Calibri, Arial, sans-serif; }
 /* #Media Queries
 ================================================== */
 /* Smaller than standard 960 (devices and browsers) */
@@ -223,7 +234,7 @@ div.tabpanel {
 	.content{display: block; overflow: hidden; width: auto; margin-top: 10px;}
 	.sidebar, .wrap{float:none; display: block; width: auto; padding:0px 0px 15px 0px; margin: 15px 0px 0px 0px;}	
 	.aplications .tree-body{border:1px solid {BLUEDARK}; width:100%;}
-	.aplications .tree-body span{font-size:20px;}
+	.aplications .tree-body span{}
 	span.tree-root-close, span.tree-tee-close, span.tree-last-close,
 	span.tree-root-open, span.tree-tee-open, span.tree-last-open{ margin: 2px 10px 0px 0px;}
 //	.own-ip{top:37px; padding:3px; bottom:initial;}
@@ -283,7 +294,7 @@ div.whitetoolbar a {
 }
 
 .toolbar a, .toolbar a:visited, .toolbar a:hover {
-	font-family: Arial, sans-serif;	font-size: 11px; font-weight: bold; color: {BLUETEXT};
+	font-family: Arial, sans-serif;	font-weight: bold; color: {BLUETEXT};
 	border: 0px; text-decoration: none; background: ;
 	white-space:nowrap; 
 	display: inline-block;
@@ -298,13 +309,11 @@ div.whitetoolbar a {
 div.cell-inner span.etiqueta {
 	color: {BLUEDARK};
 	font-weight: bold;
-	font-size: 14px
 }
 
 /* Home label additinal data component */
 div.cell-inner span.component-description {
 	color: {BLUEDARK};
-	font-size: 13px;
 	font-weight: normal;
 	font-style: italic;
 }

@@ -1,3 +1,12 @@
+p, div, span, label, a, input, textarea,
+button, input.button, input.file {
+	font-family:Arial,Helvetica,sans-serif;
+	font-size: 11px;
+}
+.tabsel, .tabsel a, a.tabsel, .tab, .tab a, a.tab {
+	font-family:Arial,Helvetica,sans-serif;
+	font-size: 11px;
+}
 /* Títol */
 .title td, .title .caption td 
 {
@@ -144,7 +153,7 @@ div.z-loading-indicator {box-sizing: content-box;}
 
 .inici {
 	font-family:Arial,Helvetica,sans-serif;
-	font-size: 11pt;
+	font-size: 12pt;
 	font-weight: bold;
 	color: #FFF;
 }
@@ -672,7 +681,7 @@ div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.
   background-repeat: no-repeat;
 }
 
-.listfilter {background-color: {GREEN}; width:90%; border: white solid 1px;}
+.listfilter {background-color: {GREEN}; width:90%; width:calc(100% - 12px); border: white solid 1px;}
 
 
 
@@ -1183,6 +1192,16 @@ input[type="submit"] {
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 	background-color: {GREEN};
 	color: white;
+}
+
+button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
+	color: {SKYLIGHT};
+	border-color: white
+}
+button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]:hover:disabled {
+	background-color: white;
+	color: white;
+	border-color: white
 }
 
 button.small-button img {
@@ -1892,4 +1911,10 @@ div.fixedToolbar {
 
 .removeValueIcon:hover {
 	opacity:1;
+}
+
+div.errbox
+{
+	color: {GREENTEXT};
+	background-color: {GREENLIGHT}
 }

@@ -261,7 +261,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	 */
 	public Password handleQueryAccountPasswordBypassPolicy (Account account) throws InternalErrorException
 	{
-		Password p = getAccountService().queryAccountPasswordBypassPolicy(account.getId());
+		Password p = getAccountService().queryAccountPasswordBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_USER);
 		return p;
 	}
 	

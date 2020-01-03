@@ -2687,7 +2687,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	@Override
 	protected void handleSignal(ProcessInstance instanceVO) throws Exception {
-		signal(instanceVO, null);
+		handleSignal(instanceVO, null);
 	}
 
 	@Override

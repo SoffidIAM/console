@@ -157,4 +157,12 @@ public class Auditoria {
 	@Nullable
 	public String sourceIp;
 
+
+	@Nullable
+	public String jumpServerGroup;
+
+
+	@Nullable
+	public String pamSessionId;
+
 }

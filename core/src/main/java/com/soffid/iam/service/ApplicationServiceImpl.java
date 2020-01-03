@@ -1290,12 +1290,16 @@ public class ApplicationServiceImpl extends
 	        RoleAccount oldRolsUsuaris = getRoleAccountEntityDao().toRoleAccount(oldRoleAccountEntity);
 	        String codiAplicacio = rolsUsuaris.getInformationSystemName();
 
-	        if (!rolsUsuaris.getAccountName().equals(oldRolsUsuaris.getAccountName()) || !rolsUsuaris.getAccountSystem().equals(oldRolsUsuaris.getAccountSystem()) || !rolsUsuaris.getSystem().equals(oldRolsUsuaris.getSystem()) || !rolsUsuaris.getRoleName().equals(oldRolsUsuaris.getRoleName()))
-        	{
+	        if (!rolsUsuaris.getAccountName().equals(oldRolsUsuaris.getAccountName()) || !rolsUsuaris.getAccountSystem().equals(oldRolsUsuaris.getAccountSystem()) || 
+	        		!rolsUsuaris.getSystem().equals(oldRolsUsuaris.getSystem()) || !rolsUsuaris.getRoleName().equals(oldRolsUsuaris.getRoleName()))
+	        {
+	        	log.info("Trying to modify " + oldRolsUsuaris);
+	        	log.info("To "+rolsUsuaris);
         		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        				"Invalid rol grant change. Cannot change rol or account")); //$NON-NLS-1$
-        	}
-            RoleAccountEntity roleAccountEntity = getRoleAccountEntityDao().roleAccountToEntity(rolsUsuaris);
+        				"Invalid rol grant change. Cannot change rol or account " )); //$NON-NLS-1$
+	        }
+
+	        RoleAccountEntity roleAccountEntity = getRoleAccountEntityDao().roleAccountToEntity(rolsUsuaris);
 
         	roleAccountEntity.setEnabled(getEnableState(roleAccountEntity));
         	
@@ -2358,7 +2362,8 @@ public class ApplicationServiceImpl extends
 		for (UserAccountEntity uae : new LinkedList<UserAccountEntity>(user.getAccounts())) {
             AccountEntity acc = uae.getAccount();
             for (RoleAccountEntity rae : new LinkedList<RoleAccountEntity>(acc.getRoles())) {
-                if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals(groupId)) {
+                if (rae.getHolderGroup() != null && rae.getHolderGroup().getId().equals(groupId) &&
+                		rae.getRule() == null) {
                     deleteRoleAccountEntity(rae, user, false);
                 }
             }

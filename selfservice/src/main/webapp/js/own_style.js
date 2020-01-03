@@ -40,10 +40,21 @@ bj(document).ready(function() {
 		});
 		
 		//Muestra menu perfil
+		bj('.codiusuari').mouseleave(function () {
+			bj('.menuperfil').fadeOut();
+		});
+		//Muestra menu perfil
 		bj('.codiusuari').mouseover(function () {
 			if(bj('.menuperfil [style*="display:none"]')){
 				bj('.menuperfil').fadeIn();
+			} else {
+				bj('.menuperfil').fadeOut();
 			}
+		});
+		//Active menu perfil
+		bj('.menuperfil').mouseover(function () {
+			bj('.menuperfil').finish();
+			bj('.menuperfil').show();
 		});
 		//Oculta menu perfil
 		bj('.menuperfil').mouseleave(function () {

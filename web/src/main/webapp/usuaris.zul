@@ -1478,20 +1478,24 @@
 											try {
 												if (r != null)
 												{
-													Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
-													if (instance instanceof Account) {
-														disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
-																"/@disabled");
-														if (disabled != null && disabled) {
-															it = r.getChildren().iterator();
-															while (it.hasNext()) {
-																Component c = it.next();
-																if (c instanceof HtmlBasedComponent) {
-																	c.setStyle("text-decoration:line-through;");
+													es.caib.zkib.datamodel.DataNode dn = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".");
+													if (dn != null)
+													{
+														Object instance = dn.instance;
+														if (instance instanceof Account) {
+															disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
+																	"/@disabled");
+															if (disabled != null && disabled) {
+																it = r.getChildren().iterator();
+																while (it.hasNext()) {
+																	Component c = it.next();
+																	if (c instanceof HtmlBasedComponent) {
+																		c.setStyle("text-decoration:line-through;");
+																	}
 																}
 															}
+															checkIsUpdatePending(r.treerow);
 														}
-														checkIsUpdatePending(r.treerow);
 													}
 												}
 											} catch (Throwable e) {}

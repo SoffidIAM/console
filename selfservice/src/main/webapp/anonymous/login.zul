@@ -3,6 +3,8 @@
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
 	<script><![CDATA[
 	    var useHolderGroup = true;
+	    var enableSubmit = true;
+	    
 		function updateUsername ()
 		{
 			document.getElementById("j_username").value = '';
@@ -15,18 +17,21 @@
 		{
 			var tenant = document.getElementById("j_tenant").value;
 			var account = document.getElementById("j_account").value;
-			if (useHolderGroup) {
+			if (useHolderGroup) 
+			{
 				option = document.getElementById('j_group').value;
 				if (option.length == 0)
 				{
 					document.getElementById("j_username").value = '';
 					if (document.getElementById('loginButton'))
 						document.getElementById('loginButton').style.display="none";
+					enableSubmit = false;
 					return;
 				}
 				account = option+"\\"+account;
 				if (document.getElementById('loginButton'))
 					document.getElementById('loginButton').style.display="";
+				enableSubmit = true;
 			}
 			if (tenant == null || tenant.length == 0)
 			{
@@ -59,6 +64,7 @@
 			selector.focus();
 			useHolderGroup = true;
 			updateAccountName();
+			enableSubmit = false;
 		}
 
 		function hideHolderGroup() {
@@ -68,6 +74,17 @@
 			if (document.getElementById('loginButton'))
 				document.getElementById('loginButton').style.display="";
 			updateAccountName();
+			enableSubmit = true;
+		}
+		
+		function onSubmit(event) {
+			if (enableSubmit)
+				return true;
+			else
+			{
+				event.preventDefault();
+				return false;
+			}
 		}
 	]]></script>
 	<style src="~./styles/estil.css" />
@@ -127,12 +144,11 @@
         		<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
 			<div class="loginbox" id="loginbox"> 
 				<p>${c:l('configure.header')}</p>
-				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8">
+				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8" onsubmit="onSubmit(event)">
 				<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 				<input name="j_username" id="j_username" type="hidden" value="${user }">
 				<input name="j_tenant" id="j_tenant" type="hidden" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>
 				<p>
-				
 					<div class="inputlogin">${c:l('login.lblUser')} :
 					<input name="j_account" id="j_account" type="text" autocomplete="off" autofocus onChange="updateUsername ()" style="width: 200px"/></div>
 				</p>

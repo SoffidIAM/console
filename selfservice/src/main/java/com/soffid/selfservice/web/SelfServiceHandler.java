@@ -45,7 +45,6 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeExecution;
 import com.soffid.iam.api.AccessTreeExecutionType;
-import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -479,88 +478,30 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			selected.setOpen(false);
 		else{
 			Long name = instance.getId();
-			Collection<ExecucioPuntEntrada> punt = instance.getExecucions();
-			if(!punt.isEmpty())
+			ExecucioPuntEntrada exe = findExecucio ( instance.getExecucions() );
+			if (exe != null)
 			{
-				boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
-				String system = instance.getSystem();
-				String type = exe.getCodiTipusExecucio();
-				List<com.soffid.iam.api.Account> accounts = fetchAccounts(instance);
-				Class executor = findExecutionType( exe );
-				if (executor != null)
+				Collection<ExecucioPuntEntrada> punt = instance.getExecucions();
+				if(!punt.isEmpty())
 				{
-					ApplicationLauncher l = (ApplicationLauncher) executor.newInstance();
-					l.open(AccessTree.toAccessTree(instance),
-							AccessTreeExecution.toAccessTreeExecution(exe),
-							accounts);
-				}
-				else if ( exe.getCodiTipusExecucio().equals("PAM") )
-				{
-					String user = Security.getCurrentUser();
-					List<Account> accounts = null;
-					// Get accounts list
-					Security.nestedLogin(Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
-					try {
-						es.caib.seycon.ng.servei.AccountService accountService = ServiceLocator.instance().getAccountService();
-						accounts = new LinkedList<Account>(accountService.findUserAccounts(user, system));
-						for (Account acc: accountService.findSharedAccountsByUser(user))
-						{
-							if (acc.getDispatcher().equals(system))
-								accounts.add(acc);
-						}
-					} finally {
-						Security.nestedLogoff();
-					}
-					// Get passwords
-					List<String[]> r = new LinkedList<String[]>();
-					es.caib.seycon.ng.servei.ejb.SelfService sss = es.caib.seycon.ng.EJBLocator.getSelfService();
-					String url = instance.getExecucions().iterator().next().getContingut();
-					for (Account account: accounts)
+					boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
+					String system = instance.getSystem();
+					String type = exe.getCodiTipusExecucio();
+					List<com.soffid.iam.api.Account> accounts = fetchAccounts(instance);
+					Class executor = findExecutionType( exe );
+					if (executor != null)
 					{
-						com.soffid.iam.api.Password password = sss.queryAccountPasswordBypassPolicy(account);
-						if (password != null)
-							r.add(new String [] { account.getName(), account.getDescription(), password.toString(), url });
-						else
-							r.add(new String [] { account.getName(), account.getDescription(), "", url });
+						ApplicationLauncher l = (ApplicationLauncher) executor.newInstance();
+						l.open(AccessTree.toAccessTree(instance),
+								AccessTreeExecution.toAccessTreeExecution(exe),
+								accounts);
 					}
-					if (r.size() == 0)
-					{
-						Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
-					}
-					else if (r.size() == 1)
-					{
-						try {
-							JSONObject j = new JSONObject();
-							j.put("url", url);
-							String[] row = r.get(0);
-							j.put("account", row[0]);
-							j.put("password", Password.decode(row[2]).getPassword());
-							Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
-						} catch (JSONException e) {
-							Clients.evalJavaScript("window.open('"+url+"', '_blank');");
-						}
-					} else {
-						Window w = (Window) getFellow ("selectAccount");
-						Listbox lb = (Listbox) w.getFellow("accountsListbox");
-						lb.getItems().clear();
-						Collections.sort(r, new Comparator<String[]>() {
-							public int compare(String[] o1, String[] o2) {
-								return o1[0].compareTo(o2[0]);
-							}
-							
-						});
-						for ( String[] row: r)
-						{
-							Listitem item = new Listitem();
-							item.setValue(row);
-							item.appendChild(new Listcell(row[0]));
-							item.appendChild(new Listcell(row[1]));
-							lb.appendChild(item);
-						}
-						w.doHighlighted();
-					}
-					
-				}
+	 				else
+						Clients.evalJavaScript("window.open('execucions?id="+id+"', '_blank');");
+  	                       }
+        	               else
+                	                Messagebox.show("Cannot execute");
+ 
 			}
 			else
 				Messagebox.show("Cannot execute");
@@ -584,76 +525,6 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			}
 		}
 		return null;
-	}
-	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, List<com.soffid.iam.api.Account> accounts) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
-		Long name = instance.getId();
-		// Get passwords
-		List<Object[]> r = new LinkedList<Object[]>();
-		SelfService sss = EJBLocator.getSelfService();
-		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
-		String url = instance.getExecucions().iterator().next().getContingut();
-		for (com.soffid.iam.api.Account account: accounts)
-		{
-			if (accountService.isAccountPasswordAvailable(account.getId()))
-				r.add(new Object [] { account.getLoginName(), account.getDescription(), account });
-		}
-		if (r.size() == 0)
-		{
-			throw new UiException("Sorry. There is no account available to open this service");
-		}
-		else if (r.size() == 1)
-		{
-			openPamEntryPoint (instance, exe, (com.soffid.iam.api.Account) r.get(0)[2]);
-		} else {
-			Window w = (Window) getFellow ("selectAccount");
-			Listbox lb = (Listbox) w.getFellow("accountsListbox");
-			lb.getItems().clear();
-			Collections.sort(r, new Comparator<Object[]>() {
-				public int compare(Object[] o1, Object[] o2) {
-					return ((String)o1[0]).compareTo((String)o2[0]);
-				}
-				
-			});
-			
-			this.currentEntryPoint = instance;
-			this.currentExecutionMethod = exe;
-			
-			for ( Object[] row: r)
-			{
-				Listitem item = new Listitem();
-				item.setValue(row);
-				item.appendChild(new Listcell(row[0].toString()));
-				item.appendChild(new Listcell(row[1].toString()));
-				lb.appendChild(item);
-			}
-			w.doHighlighted();
-		}
-	}
-	
-	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, com.soffid.iam.api.Account account) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
-		NewPamSession s = EJBLocator.getPamSessionService()
-				.createJumpServerSession(account, exe.getContingut());
-		if (s == null)
-			throw new UiException("Unable to start session");
-		else
-		{
-			URL u = s.getUrl();
-			StringBuffer sb = new StringBuffer();
-			String targetUrl = u.getProtocol()+"://"+u.getHost()+ ( u.getPort() > 0 ? ":"+u.getPort(): "" ) + u.getPath();
-			
-			sb.append("var f=document.getElementById(\"pamLauncherForm\");");
-			sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
-			for (String part: (u.getQuery() != null && !u.getQuery().trim().isEmpty()? u.getQuery().split("&"): new String[0]))
-			{
-				int i = part.indexOf("=");
-				String tag = i > 0? part.substring(0, i): part;
-				String value = i >0? part.substring(i+1): "";
-				sb.append("f.elements.namedItem(\""+encodeJS( URLDecoder.decode( tag, "UTF-8") )+"\").value=\""+
-						URLDecoder.decode(encodeJS(value), "UTF-8")+"\";");
-			}
-			sb.append("f.submit();");
-			Clients.evalJavaScript(sb.toString());
-		}
 	}
 	
 	public String encodeJS(String url) {
@@ -772,15 +643,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		return accounts;
 	}
 	
-	boolean wssoAccount = false;
-	public void launchAccount () throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
-		if (wssoAccount)
-			launchWSSOAccount();
-		else
-			launchPAMAccount();
-	}
-	
-	protected void launchWSSOAccount () throws InternalErrorException, NamingException, CreateException
+	protected void launchAccount () throws InternalErrorException, NamingException, CreateException
 	{
 		Window w = (Window) getFellow ("selectAccount");
 		Listbox lb = (Listbox) w.getFellow("accountsListbox");

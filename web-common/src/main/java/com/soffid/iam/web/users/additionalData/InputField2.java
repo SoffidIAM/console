@@ -63,6 +63,7 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailDomain;
+import com.soffid.iam.api.Password;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
@@ -88,11 +89,12 @@ import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathEvent;
+import es.caib.zkib.events.XPathSubscriber;
 import es.caib.zkib.events.XPathValueEvent;
 import es.caib.zkib.jxpath.JXPathException;
 import es.caib.zkib.zkiblaf.Frame;
 
-public class InputField2 extends Div 
+public class InputField2 extends Div implements XPathSubscriber
 {
 	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
 	
@@ -101,12 +103,13 @@ public class InputField2 extends Div
 			try {
 				updateSearchStatus();
 			} catch (Throwable e) {
-				throw new UiException(""+e);
+				throw new UiException(""+e); //$NON-NLS-1$
 			}
 		}
 	}
 
 	private static final long serialVersionUID = 1L;
+	private static final String DUMMY_PASSWORD = "&[{}(=*)+]";
 	private String compos;
 	DataType dataType;
 	private String bind;
@@ -114,8 +117,8 @@ public class InputField2 extends Div
 	SingletonBinder binder = new SingletonBinder(this);
 	boolean hideUserName = false;
 	boolean raisePrivileges = false;
-	boolean updating = false;
-
+	boolean updating = false; 
+	
 	public DataType getDataType() {
 		return dataType;
 	}
@@ -165,10 +168,10 @@ public class InputField2 extends Div
 	public void onSelectUser (Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("usuarisLlista");
+			Page p = getDesktop().getPage("usuarisLlista"); //$NON-NLS-1$
 			Boolean multiValued = dataType.isMultiValued();
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {   //$NON-NLS-1$ //$NON-NLS-2$
 					filter, 
 					multiValued, 
 					dataType.getFilterExpression(),
@@ -179,10 +182,10 @@ public class InputField2 extends Div
 	public void onSelectRole (Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("rolsLlista2");
+			Page p = getDesktop().getPage("rolsLlista2"); //$NON-NLS-1$
 			Boolean multiValued = dataType.isMultiValued();
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {   //$NON-NLS-1$ //$NON-NLS-2$
 					filter, 
 					multiValued, 
 					dataType.getFilterExpression(),
@@ -193,73 +196,73 @@ public class InputField2 extends Div
 	public void onSelectGroup(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("grupsLlista");
-			p.setAttribute("tipus", "");
-			p.setAttribute("llistaObsolets", false);
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() });
+			Page p = getDesktop().getPage("grupsLlista"); //$NON-NLS-1$
+			p.setAttribute("tipus", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			p.setAttribute("llistaObsolets", false); //$NON-NLS-1$
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() }); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	public void onSelectApplication(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("aplicacionsLlista");
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() });
+			Page p = getDesktop().getPage("aplicacionsLlista"); //$NON-NLS-1$
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() }); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	public void onSelectCustomObject(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("customObjectsLlista");
-			p.setAttribute("type", dataType.getDataObjectType());
+			Page p = getDesktop().getPage("customObjectsLlista"); //$NON-NLS-1$
+			p.setAttribute("type", dataType.getDataObjectType()); //$NON-NLS-1$
 			Boolean multiValued = dataType.isMultiValued();
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued});
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued, dataType.getFilterExpression() });
+			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued}); //$NON-NLS-1$ //$NON-NLS-2$
+			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued, dataType.getFilterExpression() }); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	public void onSelectHost(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPageIfAny("maquinesLlista");
+			Page p = getDesktop().getPageIfAny("maquinesLlista"); //$NON-NLS-1$
 			if ( p == null)
 			{
-				Component hostsWindow = getPage().getFellowIfAny("hostsWindow");
+				Component hostsWindow = getPage().getFellowIfAny("hostsWindow"); //$NON-NLS-1$
 				if (hostsWindow == null)
 				{
 					hostsWindow = new Window();
-					hostsWindow.setId("hostsWindow");
+					hostsWindow.setId("hostsWindow"); //$NON-NLS-1$
 					hostsWindow.setPage(getPage());
-					Executions.getCurrent().createComponents("/maquinesllista.zul", hostsWindow, new HashMap());
+					Executions.getCurrent().createComponents("/maquinesllista.zul", hostsWindow, new HashMap()); //$NON-NLS-1$
 				}
-				Events.postEvent("onInicia", hostsWindow.getFellow("esquemaLlista"), event.getTarget());
+				Events.postEvent("onInicia", hostsWindow.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else
-				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	public void onSelectMailDomain(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPageIfAny("dominisCorreuLlista");
+			Page p = getDesktop().getPageIfAny("dominisCorreuLlista"); //$NON-NLS-1$
 			if ( p == null)
 			{
-				Component mailDomainWindow = getPage().getFellowIfAny("mailDomainWindow");
+				Component mailDomainWindow = getPage().getFellowIfAny("mailDomainWindow"); //$NON-NLS-1$
 				if (mailDomainWindow == null)
 				{
 					mailDomainWindow = new Window();
-					mailDomainWindow.setId("mailDomainWindow");
+					mailDomainWindow.setId("mailDomainWindow"); //$NON-NLS-1$
 					mailDomainWindow.setPage(getPage());
-					Executions.getCurrent().createComponents("/dominisCorreullista.zul", mailDomainWindow, new HashMap());
+					Executions.getCurrent().createComponents("/dominisCorreullista.zul", mailDomainWindow, new HashMap()); //$NON-NLS-1$
 				}
-				Events.postEvent("onInicia", mailDomainWindow.getFellow("esquemaLlista"), event.getTarget());
+				Events.postEvent("onInicia", mailDomainWindow.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else
-				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget());
+				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -331,12 +334,14 @@ public class InputField2 extends Div
 	private SearchFilter filter;
 	private Listbox containerListbox;
 	private String targetSearchTextboxUuid;
+	private String placeholder;
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
-		targetSearchTextboxUuid = dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ||
+		InputElement targetSearchTextbox = (InputElement) (dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ||
 				dataType.getType() == TypeEnumeration.ROLE_TYPE && hideUserName ?
-				currentSearchTextbox.getParent().getFirstChild().getUuid() :
-				currentSearchTextbox.getUuid();
+				currentSearchTextbox.getParent().getFirstChild() :
+				currentSearchTextbox);
+		targetSearchTextboxUuid = targetSearchTextbox.getUuid();
 		searchCriteria = (String) event.getValue();
 		cancelSearch();
 		if (searchBox != null)
@@ -351,54 +356,106 @@ public class InputField2 extends Div
 			{
 				currentSearch = EJBLocator.getCustomObjectService().findCustomObjectByTextAndFilterAsync(
 						dataType.getDataObjectType(), 
-						searchCriteria, 
+						removeNonAscii (searchCriteria), 
 						dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.USER_TYPE)
 			{
 				if (hideUserName)
-					currentSearchTextbox.setStyle("background-color: yellow");
-				currentSearch = EJBLocator.getUserService().findUserByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
+				{
+					currentSearchTextbox.setStyle("background-color: yellow"); //$NON-NLS-1$
+					updateHiddenTextbox (targetSearchTextbox, searchCriteria);
+				}
+				currentSearch = EJBLocator.getUserService()
+						.findUserByTextAndFilterAsync(removeNonAscii (searchCriteria), 
+						dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.ROLE_TYPE)
 			{
 				if (hideUserName)
-					currentSearchTextbox.setStyle("background-color: yellow");
-				currentSearch = EJBLocator.getApplicationService().findRoleByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
+				{
+					currentSearchTextbox.setStyle("background-color: yellow"); //$NON-NLS-1$
+					updateHiddenTextbox (targetSearchTextbox, searchCriteria);
+				}
+				currentSearch = EJBLocator.getApplicationService
+						().findRoleByTextAndFilterAsync(removeNonAscii (searchCriteria), dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.GROUP_TYPE)
 			{
-				currentSearch = EJBLocator.getGroupService().findGroupByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
+				currentSearch = EJBLocator.getGroupService()
+						.findGroupByTextAndFilterAsync(removeNonAscii (searchCriteria), dataType.getFilterExpression());
 			}
 			if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
 			{
-				currentSearch = EJBLocator.getApplicationService().findApplicationByTextAndFilterAsync(searchCriteria, dataType.getFilterExpression());
+				currentSearch = EJBLocator.getApplicationService()
+						.findApplicationByTextAndFilterAsync(removeNonAscii (searchCriteria), dataType.getFilterExpression());
 			}
 		} catch (Exception e) {
-			log.warn("Error querying objects", e);
+			log.warn("Error querying objects", e); //$NON-NLS-1$
 		} finally {
 			if (raisePrivileges)
 				Security.nestedLogoff();
 		}
 		searchBox = new org.zkoss.zhtml.Div();
-		searchBox.setDynamicProperty("tabindex", "-1");
-		searchBox.setSclass("attributeSearchPopup");
+		searchBox.setDynamicProperty("tabindex", "-1"); //$NON-NLS-1$ //$NON-NLS-2$
+		searchBox.setSclass("attributeSearchPopup"); //$NON-NLS-1$
 		currentSearchTextbox.getParent().insertBefore(searchBox, currentSearchTextbox);
 		Timer t = new org.zkoss.zul.Timer();
 		t.setDelay(1000);
 		t.setRepeats(true);
-		t.addEventListener("onTimer", new TimerEventListener());
+		t.addEventListener("onTimer", new TimerEventListener()); //$NON-NLS-1$
 		searchBox.appendChild(t);
 		searchContent = new Div();
 		searchBox.appendChild (searchContent);
 		Image searchProgress = new Image();
-		searchProgress.setSrc("~./img/soffid-progress.gif");
-		searchProgress .setStyle("height: 2em");
+		searchProgress.setSrc("~./img/soffid-progress.gif"); //$NON-NLS-1$
+		searchProgress .setStyle("height: 2em"); //$NON-NLS-1$
 		searchBox.appendChild(searchProgress);
 		searchBox.invalidate();
 		updateSearchStatus ();
 		
 	}
+
+	private String removeNonAscii(String searchCriteria2) {
+		if (searchCriteria2 == null)
+			return null;
+		else
+			return searchCriteria2.replace(',', ' ').replace('.', ' ').replace('-', ' ');
+	}
+
+	private void updateHiddenTextbox(InputElement tb, String value) throws UnsupportedEncodingException, IOException {
+		Integer order = (Integer) tb.getAttribute("position"); //$NON-NLS-1$
+		String id = getIdForPosition(order);
+		tb.setRawValue(value);
+		if (order == null) {
+			binder.setValue(value);
+		}
+		else {
+			List l = (List) binder.getValue();
+			if (l == null) l = new LinkedList();
+			else l = new LinkedList(l);
+			if (order.intValue() == l.size() )
+			{
+				l.add(value);
+				createFieldElement(new Integer (l.size()), null);
+			}
+			else
+				l.set(order.intValue(), value);
+			LinkedList l2 = new LinkedList();
+			int pos = 0;
+			for (Object vv: l)
+			{
+				if (vv != null && ! vv.toString().trim().isEmpty())
+					l2.add(vv);
+				else {
+					if (pos < order)
+						order --;
+				}
+			}
+			binder.setValue(l2);
+		}
+				
+}
 
 	private void updateSearchStatus() throws Throwable {
 		if (currentSearch == null)
@@ -455,7 +512,7 @@ public class InputField2 extends Div
 					Object o = id.getObject();
 					String value = o instanceof CustomObject ? ((CustomObject) o).getName() :
 						o instanceof User ? ((User) o).getUserName() :
-						o instanceof Role ? ((Role) o).getName()+"@"+ ((Role) o).getSystem() :
+						o instanceof Role ? ((Role) o).getName()+"@"+ ((Role) o).getSystem() : //$NON-NLS-1$
 						o instanceof Group ? ((Group) o).getName() :
 						o instanceof Application ? ((Application) o).getName() :
 						o instanceof Role ? ((Role) o).getName() :
@@ -466,8 +523,8 @@ public class InputField2 extends Div
 						if ( hideUserName && dataType.getType() == TypeEnumeration.USER_TYPE )
 							id.setSelectorLabel( ((User)o).getFullName() );
 						Div d = id.generateSelector(searchCriteria);
-						d.setAction("onMouseDown: {var e=document.getElementById('"+targetSearchTextboxUuid+"');e.value='" + value + "'; "
-									+ "zkTxbox.onupdate(e);}");
+						d.setAction("onMouseDown: {var e=document.getElementById('"+targetSearchTextboxUuid+"');e.value='" + value + "'; " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "zkTxbox.onupdate(e);}"); //$NON-NLS-1$
 						searchContent.appendChild(d);
 					}
 				}
@@ -477,7 +534,7 @@ public class InputField2 extends Div
 
 	protected void selectCandidate(Event e) throws UnsupportedEncodingException, IOException, CommitException {
 		Div d = (Div) e.getTarget();
-		Identity identity = (Identity) d.getAttribute("identity");
+		Identity identity = (Identity) d.getAttribute("identity"); //$NON-NLS-1$
 		Object o = identity.getObject();
 		String value = null;
 		if ( o instanceof CustomObject)
@@ -487,7 +544,7 @@ public class InputField2 extends Div
 			cancelSearch();
 			currentSearchTextbox.setRawValue( value.toString() );
 			applyChange(currentSearchTextbox, value.toString());
-			Events.postEvent("onChange", this, null);
+			Events.postEvent("onChange", this, null); //$NON-NLS-1$
 		}
 	}
 
@@ -503,8 +560,8 @@ public class InputField2 extends Div
 		InputElement ie = (InputElement) event.getTarget();
 		if (ie.getText() == null || ie.getText().trim().isEmpty())
 		{
-			((InputElement) tb).setRawValue ( "" );
-			applyChange(tb, "");
+			((InputElement) tb).setRawValue ( "" ); //$NON-NLS-1$
+			applyChange(tb, ""); //$NON-NLS-1$
 		}
 	}
 
@@ -537,7 +594,7 @@ public class InputField2 extends Div
 		{
 			value = ((Checkbox) tb).isChecked();
 		}
-		Events.postEvent("onChange", this, null);
+		Events.postEvent("onChange", this, null); //$NON-NLS-1$
 		try {
 			applyChange(tb, value);
 		} catch (WrongValueException e) {
@@ -549,7 +606,7 @@ public class InputField2 extends Div
 				if ( o instanceof User )
 					value = ((User) o).getUserName();
 				else if ( o instanceof Role )
-					value = ((Role) o).getName()+"@"+((Role) o).getSystem();
+					value = ((Role) o).getName()+"@"+((Role) o).getSystem(); //$NON-NLS-1$
 				else if ( o instanceof Group )
 					value = ((Group) o).getName();
 				else if ( o instanceof CustomObject )
@@ -570,6 +627,23 @@ public class InputField2 extends Div
 		}
 	}
 
+	public void onChildPasswordChange(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		Component tb = event.getTarget();
+		
+		Object value = null;
+		if (tb instanceof InputElement)
+			value = ((InputElement) tb).getRawValue();
+		else if (tb instanceof Listbox)
+		{
+			Listbox lb = (Listbox) tb;
+			if (lb.getSelectedItem() != null)
+				value = lb.getSelectedItem().getValue();
+		}
+		Events.postEvent("onChange", this, null); //$NON-NLS-1$
+		applyChange(tb, value == null || "".equals(value) ? null: 
+			new Password(value.toString()).toString());
+	}
+
 	public void onRemoveValue(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		Component tb = event.getTarget().getParent().getFirstChild();
 		
@@ -578,7 +652,7 @@ public class InputField2 extends Div
 		} catch (WrongValueException e) {
 //				throw e;
 		}
-		Events.postEvent("onChange", this, null);
+		Events.postEvent("onChange", this, null); //$NON-NLS-1$
 	}
 
 	/**
@@ -611,7 +685,7 @@ public class InputField2 extends Div
 			else if ( o instanceof Application)
 				value = ((Application) o).getName();
 			else if ( o instanceof Role)
-				value = ((Role) o).getName() + "@" + ((Role) o).getSystem();
+				value = ((Role) o).getName() + "@" + ((Role) o).getSystem(); //$NON-NLS-1$
 			else
 				value = null;
 			((InputElement) tb).setRawValue( value.toString() );
@@ -623,9 +697,9 @@ public class InputField2 extends Div
 		boolean oldUpdating = updating;
 		updating = true;
 		try {
-			Integer order = (Integer) tb.getAttribute("position");
+			Integer order = (Integer) tb.getAttribute("position"); //$NON-NLS-1$
 			String id = getIdForPosition(order);
-			String removeIconId = id+"_removeIcon";
+			String removeIconId = id+"_removeIcon"; //$NON-NLS-1$
 			boolean refresh = false;
 			boolean novallidate = false;
 			if (order == null) {
@@ -680,8 +754,9 @@ public class InputField2 extends Div
 				getFellowIfAny(removeIconId).setVisible( value != null && ! value.equals(""));			
 			}
 
-		
-		
+	
+			
+			
 			Component c = this;
 			do
 			{
@@ -708,7 +783,7 @@ public class InputField2 extends Div
 
 	public void changeHtml(Event ev) throws Exception {
 		String text = (String) ev.getData();
-        byte data[] = text.getBytes("UTF-8");
+        byte data[] = text.getBytes("UTF-8"); //$NON-NLS-1$
         applyChange(ev.getTarget(), data);
         if (twoPhaseEdit)
         	binder.getDataSource().commit();
@@ -793,7 +868,7 @@ public class InputField2 extends Div
 			}
 			InputElement textbox = (InputElement) c;
 			String user = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user="+user, "_new");
+			Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user="+user, "_new"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -802,7 +877,7 @@ public class InputField2 extends Div
 		{
 			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
 			String grup = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + grup, "_new");
+			Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + grup, "_new"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -811,17 +886,17 @@ public class InputField2 extends Div
 		{
 			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
 			String application = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + application, "_new");
+			Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + application, "_new"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	public void openCustomObject(Event event) {
-		if ( Security.isUserInRole( "seu:customObject:show"))
+		if ( Security.isUserInRole( "seu:customObject:show")) //$NON-NLS-1$
 		{
 			String type = dataType.getDataObjectType();
 			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
 			String customObject = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new");
+			Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 	}
 
@@ -830,14 +905,14 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String user = inputElement.getText();
 		
-		Component c = getFellowIfAny(id+"b");
+		Component c = getFellowIfAny(id+"b"); //$NON-NLS-1$
 		Label l = (Label) (c != null && c instanceof Label? c: null);
 		Textbox tb = (Textbox) (c != null && c instanceof Textbox ? c: null);
 		
 		User u = null;
 		if (user == null || user.isEmpty())
 		{
-			if (l != null) l.setValue("");
+			if (l != null) l.setValue(""); //$NON-NLS-1$
 		}
 		else
 		{
@@ -845,7 +920,7 @@ public class InputField2 extends Div
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				UserService ejb = com.soffid.iam.EJBLocator.getUserService();
-				Collection<User> users = com.soffid.iam.EJBLocator.getUserService().findUserByJsonQuery(buildJsonFilter("userName", user));
+				Collection<User> users = com.soffid.iam.EJBLocator.getUserService().findUserByJsonQuery(buildJsonFilter("userName", user)); //$NON-NLS-1$
 				if (users != null && ! users.isEmpty())
 					u = users.iterator().next();
 			} catch (Exception e) {
@@ -855,15 +930,21 @@ public class InputField2 extends Div
 			}
 			if (u == null || ( filter != null && ! filter.isAllowedValue(u)))
 			{
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue( user + "?"); //$NON-NLS-1$
+				if (tb != null) {
+					tb.setValue(user);
+					tb.setStyle("background-color: yellow"); //$NON-NLS-1$
+					throw new WrongValueException(tb, Messages.getString("InputField2.88"));  //$NON-NLS-1$
+				}
+				else
+					throw new WrongValueException(inputElement, Messages.getString("InputField2.89")); //$NON-NLS-1$
 			}
 			else
 			{
 				if (l != null) l.setValue(u.getFullName());
 				if (tb != null) {
 					tb.setValue(u.getFullName());
-					tb.setStyle("background-color: white");
+					tb.setStyle("background-color: white"); //$NON-NLS-1$
 				}
 			}
 		}
@@ -877,15 +958,15 @@ public class InputField2 extends Div
 		String n = inputElement.getText();
 		int i = n.lastIndexOf('@');
 		String roleName = i >= 0 ? n.substring(0, i): n;
-		String roleSystem = i >= 0 ? n.substring(i+1): "";
-		Component c = getFellowIfAny(id+"b");
+		String roleSystem = i >= 0 ? n.substring(i+1): ""; //$NON-NLS-1$
+		Component c = getFellowIfAny(id+"b"); //$NON-NLS-1$
 		Label l = (Label) (c != null && c instanceof Label? c: null);
 		Textbox tb = (Textbox) (c != null && c instanceof Textbox ? c: null);
 		
 		Role r = null;
 		if (roleName == null || roleName.isEmpty())
 		{
-			if (l != null) l.setValue("");
+			if (l != null) l.setValue(""); //$NON-NLS-1$
 		}
 		else
 		{
@@ -893,7 +974,7 @@ public class InputField2 extends Div
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				ApplicationService ejb = com.soffid.iam.EJBLocator.getApplicationService();
-				Collection<Role> roles = ejb.findRoleByJsonQuery(buildJsonFilter("name", roleName, "system", roleSystem));
+				Collection<Role> roles = ejb.findRoleByJsonQuery(buildJsonFilter("name", roleName, "system", roleSystem)); //$NON-NLS-1$ //$NON-NLS-2$
 				if (roles != null && ! roles.isEmpty())
 					r = roles.iterator().next();
 			} catch (Exception e) {
@@ -903,15 +984,21 @@ public class InputField2 extends Div
 			}
 			if (r == null || ( filter != null && ! filter.isAllowedValue(r)))
 			{
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				if (tb != null) {
+					tb.setValue(n);
+					tb.setStyle("background-color: yellow"); //$NON-NLS-1$
+					throw new WrongValueException(tb, Messages.getString("InputField2.98")); //$NON-NLS-1$
+				}
+				else
+					throw new WrongValueException(inputElement, Messages.getString("InputField2.99")); //$NON-NLS-1$
 			}
 			else
 			{
 				if (l != null) l.setValue(r.getDescription());
 				if (tb != null) {
 					tb.setValue(r.getDescription());
-					tb.setStyle("background-color: white");
+					tb.setStyle("background-color: white"); //$NON-NLS-1$
 				}
 			}
 		}
@@ -924,19 +1011,19 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String group = inputElement.getText();
 
-		Label l = (Label) getFellowIfAny(id+"b");
+		Label l = (Label) getFellowIfAny(id+"b"); //$NON-NLS-1$
 
 		
 		if (group == null || group.isEmpty())
 		{
-			if (l != null) l.setValue("");
+			if (l != null) l.setValue(""); //$NON-NLS-1$
 		}
 		else {
 			Group g = null;
 			if (raisePrivileges)
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
-				Collection<Group> groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByJsonQuery(buildJsonFilter("name", group));
+				Collection<Group> groups = com.soffid.iam.EJBLocator.getGroupService().findGroupByJsonQuery(buildJsonFilter("name", group)); //$NON-NLS-1$
 				if (groups != null && ! groups.isEmpty())
 					g = groups.iterator().next();
 			} catch (Exception e) {
@@ -945,8 +1032,8 @@ public class InputField2 extends Div
 					Security.nestedLogoff();
 			}
 			if (g == null || ( filter != null && ! filter.isAllowedValue(g))) {
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				throw new WrongValueException(inputElement, Messages.getString("InputField2.0")); //$NON-NLS-1$
 			}
 			if (l != null )
 				l.setValue(g.getDescription());
@@ -955,31 +1042,31 @@ public class InputField2 extends Div
 	}
 
 	String buildJsonFilter (String attribute, String value) {
-		String q = attribute+" eq \""+escapeJson(value)+"\"";
+		String q = attribute+" eq \""+escapeJson(value)+"\""; //$NON-NLS-1$ //$NON-NLS-2$
 		if (dataType.getFilterExpression() == null || dataType.getFilterExpression().trim().isEmpty())
 			return q;
 		else
 		{
-			q = q + " and ("+dataType.getFilterExpression()+")";
+			q = q + " and ("+dataType.getFilterExpression()+")"; //$NON-NLS-1$ //$NON-NLS-2$
 			return q;
 		}
 	}
 
 	String buildJsonFilter (String attribute1, String value1, String attribute2, String value2) {
-		String q = attribute1+" eq \""+escapeJson(value1)+"\" and "+
-			attribute2+" eq \""+escapeJson(value2)+"\"";
+		String q = attribute1+" eq \""+escapeJson(value1)+"\" and "+ //$NON-NLS-1$ //$NON-NLS-2$
+			attribute2+" eq \""+escapeJson(value2)+"\""; //$NON-NLS-1$ //$NON-NLS-2$
 		if (dataType.getFilterExpression() == null || dataType.getFilterExpression().trim().isEmpty())
 			return q;
 		else
 		{
-			q = q + " and ("+dataType.getFilterExpression()+")";
+			q = q + " and ("+dataType.getFilterExpression()+")"; //$NON-NLS-1$ //$NON-NLS-2$
 			return q;
 		}
 	}
 
 	private String escapeJson (String s)
 	{
-		return s.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"");
+		return s.replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 	
 	public void updateApplication(String id) {
@@ -987,17 +1074,17 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String application = inputElement.getText();
 
-		Label l = (Label) getFellowIfAny(id+"b");
+		Label l = (Label) getFellowIfAny(id+"b"); //$NON-NLS-1$
 
 		if (application == null || application.isEmpty()) {
 			if (l != null)
-				l.setValue("");
+				l.setValue(""); //$NON-NLS-1$
 		} else {
 			Application a = null;
 			if (raisePrivileges)
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
-				Collection<Application> apps = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByJsonQuery(buildJsonFilter("name", application));
+				Collection<Application> apps = com.soffid.iam.EJBLocator.getApplicationService().findApplicationByJsonQuery(buildJsonFilter("name", application)); //$NON-NLS-1$
 				if (apps != null && ! apps.isEmpty())
 					a = apps.iterator().next();
 			} catch (Exception e) {
@@ -1006,8 +1093,8 @@ public class InputField2 extends Div
 					Security.nestedLogoff();
 			}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				throw new WrongValueException(inputElement, Messages.getString("InputField2.124")); //$NON-NLS-1$
 			}
 			if (l != null) l.setValue(a.getName());
 		}
@@ -1018,11 +1105,11 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String host = inputElement.getText();
 
-		Label l = (Label) getFellowIfAny(id+"b");
+		Label l = (Label) getFellowIfAny(id+"b"); //$NON-NLS-1$
 
 		if (host == null || host.isEmpty()) {
 			if (l != null)
-				l.setValue("");
+				l.setValue(""); //$NON-NLS-1$
 		} else {
 			Host a = null;
 			if (raisePrivileges)
@@ -1035,8 +1122,8 @@ public class InputField2 extends Div
 					Security.nestedLogoff();
 			}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				throw new WrongValueException(inputElement, Messages.getString("InputField2.128")); //$NON-NLS-1$
 			}
 			if (l != null) l.setValue(a.getDescription());
 		}
@@ -1047,11 +1134,11 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String mailDomain = inputElement.getText();
 
-		Label l = (Label) getFellowIfAny(id+"b");
+		Label l = (Label) getFellowIfAny(id+"b"); //$NON-NLS-1$
 
 		if (mailDomain == null || mailDomain.isEmpty()) {
 			if (l != null)
-				l.setValue("");
+				l.setValue(""); //$NON-NLS-1$
 		} else {
 			MailDomain a = null;
 			if (raisePrivileges)
@@ -1064,8 +1151,8 @@ public class InputField2 extends Div
 					Security.nestedLogoff();
 			}
 			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				throw new WrongValueException(inputElement, Messages.getString("InputField2.132")); //$NON-NLS-1$
 			}
 			if (l != null) l.setValue(a.getDescription());
 		}
@@ -1075,11 +1162,11 @@ public class InputField2 extends Div
 		InputElement inputElement = (InputElement) getFellow(id);
 		String customObject = inputElement.getText();
 
-		Label l = (Label) getFellowIfAny(id+"b");
+		Label l = (Label) getFellowIfAny(id+"b"); //$NON-NLS-1$
 
 		if (customObject == null || customObject.isEmpty())
 		{
-			if (l != null) l.setValue("");
+			if (l != null) l.setValue(""); //$NON-NLS-1$
 		}
 		else {
 			CustomObject co = null;
@@ -1087,7 +1174,7 @@ public class InputField2 extends Div
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				Collection<CustomObject> cos = com.soffid.iam.EJBLocator.getCustomObjectService()
-						.findCustomObjectByJsonQuery(dataType.getDataObjectType(), buildJsonFilter("name", customObject));
+						.findCustomObjectByJsonQuery(dataType.getDataObjectType(), buildJsonFilter("name", customObject)); //$NON-NLS-1$
 				if (cos != null && ! cos.isEmpty())
 					co = cos.iterator().next();
 			} catch (Exception e) {
@@ -1096,8 +1183,8 @@ public class InputField2 extends Div
 					Security.nestedLogoff();
 			}
 			if (co == null || ( filter != null && ! filter.isAllowedValue(co))) {
-				if (l != null) l.setValue("?");
-				throw new WrongValueException(inputElement, MZul.VALUE_NOT_MATCHED);
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				throw new WrongValueException(inputElement, String.format(Messages.getString("InputField2.137"), dataType.getDataObjectType())); //$NON-NLS-1$
 			}
 			else
 				if (l != null) l.setValue(co.getDescription());
@@ -1114,7 +1201,7 @@ public class InputField2 extends Div
 		
 		if (getId().equals(getUuid()))
 		{
-			setId("inputField_"+getUuid());
+			setId("inputField_"+getUuid()); //$NON-NLS-1$
 		}
 		disableRecursive = true;
 		
@@ -1124,6 +1211,7 @@ public class InputField2 extends Div
 			{
 				((Component)getChildren().get(0)).setParent(null);
 			}
+			compos = "";
 			if(dataType != null)
 			{
 				Object value = binder.getValue();
@@ -1143,10 +1231,10 @@ public class InputField2 extends Div
 							containerListbox = new Listbox();
 							containerListbox.setFixedLayout(true);
 							containerListbox.setRows(dataType.getMultiValuedRows().intValue());
-							Listheader header1 = new Listheader( Labels.getLabel("accounts.name"));
+							Listheader header1 = new Listheader( Labels.getLabel("accounts.name")); //$NON-NLS-1$
 							header1.setSortDescending( new SmartListitemComparator(header1, false, true));
 							header1.setSortAscending( new SmartListitemComparator(header1, true, true));
-							header1.setSort("auto");
+							header1.setSort("auto"); //$NON-NLS-1$
 							Listhead head = new Listhead();
 							head.appendChild(header1);
 							if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE) ||
@@ -1156,10 +1244,10 @@ public class InputField2 extends Div
 									dataType.getType().equals(TypeEnumeration.ROLE_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.HOST_TYPE))
 							{
-								Listheader header3 = new Listheader( Labels.getLabel("accounts.description"));
+								Listheader header3 = new Listheader( Labels.getLabel("accounts.description")); //$NON-NLS-1$
 								header3.setSortDescending( new SmartListitemComparator(header3, false, true));
 								header3.setSortAscending( new SmartListitemComparator(header3, true, true));
-								header3.setSort("auto");
+								header3.setSort("auto"); //$NON-NLS-1$
 								head.appendChild(header3);
 							}
 							containerListbox.appendChild(head);
@@ -1188,14 +1276,14 @@ public class InputField2 extends Div
 	}
 
 	private void createFieldElement(Integer position, Object value) throws IOException, UnsupportedEncodingException {
-		String result = "";
+		String result = ""; //$NON-NLS-1$
 		Map <String,Object> map=new HashMap<String, Object>();
 		updateUser = false;
 		updateRole = false;
 		updateGroup = false;
 		updateApplication = false;
 		updateCustomObject = false;
-		String readonlyExpr = readonly ? "true" : "false";
+		String readonlyExpr = readonly ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
 		TypeEnumeration type = dataType.getType();
 		String stringType = new String();
 		if(type!=null)
@@ -1203,21 +1291,23 @@ public class InputField2 extends Div
 		int size = 0;
 		if(dataType.getSize() != null)
 			size = dataType.getSize();
-		String required = "";
+		String required = ""; //$NON-NLS-1$
 		if (dataType.isRequired())
-			required = "*";
-
+			required = "*"; //$NON-NLS-1$
+		String ph = placeholder == null || placeholder.trim().isEmpty() ? "" :  //$NON-NLS-1$
+			"placeholder='"+escapeString(placeholder)+"' "; //$NON-NLS-1$ //$NON-NLS-2$
+		
 		String id = getIdForPosition(position);
-		String id2 = id + "b";
-		String id3 = id + "c";
+		String id2 = id + "b"; //$NON-NLS-1$
+		String id3 = id + "c"; //$NON-NLS-1$
 
 		String removeAction = dataType.isMultiValued() && !readonly? 
-				"<imageclic src='~./img/remove.png' sclass='removeValueIcon' "
-				+ "onClick='event.getTarget().getFellow(\""+getId()+"\").onRemoveValue(event)' "
-				+ "id='"+id+"_removeIcon' title='"+
-				Labels.getLabel("contenidoTarea.btnEliminar")+"' "
-						+ "visible='"+ (value==null || value.equals("") ? "false": "true")+"'/>": 
-					"";
+				"<imageclic src='~./img/remove.png' sclass='removeValueIcon' " //$NON-NLS-1$
+				+ "onClick='event.getTarget().getFellow(\""+getId()+"\").onRemoveValue(event)' " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "id='"+id+"_removeIcon' title='"+ //$NON-NLS-1$ //$NON-NLS-2$
+				Labels.getLabel("contenidoTarea.btnEliminar")+"' " //$NON-NLS-1$ //$NON-NLS-2$
+						+ "visible='"+ (value==null || value.equals("") ? "false": "true")+"'/>":  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+					""; //$NON-NLS-1$
 		
 		if(stringType != null && !stringType.trim().isEmpty()){
 			if(TypeEnumeration.USER_TYPE.equals(type) && hideUserName) 
@@ -1225,38 +1315,38 @@ public class InputField2 extends Div
 				updateUser = true;
 				if (containerListbox == null)
 				{
-					result = "<div style='display:block' visible='true'>"
-							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" "
-									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "id=\""+id+"\" "
-									+ "readonly=\"" +readonlyExpr+ "\"/>"
-							+ "<textbox  "
-								+ "id=\""+id2+"\" "
-								+ "readonly=\""+(readonly)+"\" "
-								+ "onBlur='self.parent.parent.onBlur2(event)' "
-								+ "onChanging='self.parent.parent.onChanging(event)' "
-								+ "onOK='self.parent.parent.onChildChange2(event)' "
-								+ "sclass='widetextbox textbox' "   
-								+ "/>"
-							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
-							+ "onClick='self.parent.parent.onSelectUser(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-							+ required+removeAction+"</div>";
+					result = "<div style='display:block' visible='true'>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange='self.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+							+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly=\"" +readonlyExpr+ "\"/>" //$NON-NLS-1$ //$NON-NLS-2$
+							+ "<textbox  "+ph //$NON-NLS-1$
+								+ "id=\""+id2+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+								+ "readonly=\""+(readonly)+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+								+ "onBlur='self.parent.parent.onBlur2(event)' " //$NON-NLS-1$
+								+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+								+ "onOK='self.parent.parent.onChildChange2(event)' " //$NON-NLS-1$
+								+ "sclass='widetextbox textbox' " //$NON-NLS-1$
+								+ "/>" //$NON-NLS-1$
+							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "onClick='self.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+							+ required+removeAction+"</div>"; //$NON-NLS-1$
 				} else {
-					result = "<listitem>"
-							+ "<listcell>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" "
-									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
-									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-									+ "</listcell><listcell>"
-							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+removeAction+"</listcell></listitem>";
+					result = "<listitem>" //$NON-NLS-1$
+							+ "<listcell>" //$NON-NLS-1$
+							+ "<textbox "+ph+"sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
+									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
+							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+									+ "</listcell><listcell>" //$NON-NLS-1$
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
+							+ required+removeAction+"</listcell></listitem>"; //$NON-NLS-1$
 				}
 			}
 			else if(TypeEnumeration.USER_TYPE.equals(type))
@@ -1264,33 +1354,33 @@ public class InputField2 extends Div
 				updateUser = true;
 				if (containerListbox == null)
 				{
-					result = "<div style='display:block' visible='true'>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" "
-									+ "onClick='self.parent.parent.onSelectUser(event)' "
-									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+removeAction+"</div>";
+					result = "<div style='display:block' visible='true'>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange='self.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+							+ "readonly=\"" +readonlyExpr+ "\"/>"  //$NON-NLS-1$ //$NON-NLS-2$
+							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick='self.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
+									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
+							+ required+removeAction+"</div>"; //$NON-NLS-1$
 				} else {
-					result = "<listitem>"
-							+ "<listcell>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" "
-									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' "
-									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-									+ "</listcell><listcell>"
-							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+removeAction+"</listcell></listitem>";
+					result = "<listitem>" //$NON-NLS-1$
+							+ "<listcell>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
+									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
+							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+									+ "</listcell><listcell>" //$NON-NLS-1$
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
+							+ required+removeAction+"</listcell></listitem>"; //$NON-NLS-1$
 				}
 			}
 			else if(TypeEnumeration.ROLE_TYPE.equals(type) && hideUserName) 
@@ -1298,38 +1388,38 @@ public class InputField2 extends Div
 				updateRole = true;
 				if (containerListbox == null)
 				{
-					result = "<div style='display:block' visible='true'>"
-							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" "
-									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "id=\""+id+"\" "
-									+ "readonly=\"" +readonlyExpr+ "\"/>"
-							+ "<textbox  "
-								+ "id=\""+id2+"\" "
-								+ "readonly=\""+(readonly)+"\" "
-								+ "onBlur='self.parent.parent.onBlur2(event)' "
-								+ "onChanging='self.parent.parent.onChanging(event)' "
-								+ "onOK='self.parent.parent.onChildChange2(event)' "
-								+ "sclass='textbox widetextbox' "   
-								+ "/>"
-							+ "<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" "
-							+ "onClick='self.parent.parent.onSelectRole(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-							+ required+removeAction+"</div>";
+					result = "<div style='display:block' visible='true'>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" visible='false' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+									+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "readonly=\"" +readonlyExpr+ "\"/>" //$NON-NLS-1$ //$NON-NLS-2$
+							+ "<textbox  " //$NON-NLS-1$
+								+ "id=\""+id2+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+								+ "readonly=\""+(readonly)+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+								+ "onBlur='self.parent.parent.onBlur2(event)' " //$NON-NLS-1$
+								+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+								+ "onOK='self.parent.parent.onChildChange2(event)' " //$NON-NLS-1$
+								+ "sclass='textbox widetextbox' "    //$NON-NLS-1$
+								+ "/>" //$NON-NLS-1$
+							+ "<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "onClick='self.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+							+ required+removeAction+"</div>"; //$NON-NLS-1$
 				} else {
-					result = "<listitem>"
-							+ "<listcell>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" "
-									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' "
-									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-									+ "</listcell><listcell>"
-							+ "<label id=\""+id2+"\" />"
-							+ required+removeAction+"</listcell></listitem>";
+					result = "<listitem>" //$NON-NLS-1$
+							+ "<listcell>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
+									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
+							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+									+ "</listcell><listcell>" //$NON-NLS-1$
+							+ "<label id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
+							+ required+removeAction+"</listcell></listitem>"; //$NON-NLS-1$
 				}
 			}
 			else if(TypeEnumeration.ROLE_TYPE.equals(type))
@@ -1337,33 +1427,33 @@ public class InputField2 extends Div
 				updateRole = true;
 				if (containerListbox == null)
 				{
-					result = "<div style='display:block' visible='true'>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" "
-									+ "onClick='self.parent.parent.onSelectRole(event)' "
-									+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-							+ "<label id=\""+id2+"\" />"
-							+ required+removeAction+"</div>";
+					result = "<div style='display:block' visible='true'>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+									+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+									+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
+							"<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick='self.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
+									+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+							+ "<label id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
+							+ required+removeAction+"</div>"; //$NON-NLS-1$
 				} else {
-					result = "<listitem>"
-							+ "<listcell>"
-							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" "
-									+ "id=\""+id+"\" "
-									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
-									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
-									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
-									+ "readonly=\"" +readonlyExpr+ "\"/>" +
-							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" "
-									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' "
-									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />"
-									+ "</listcell><listcell>"
-							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />"
-							+ required+removeAction+"</listcell></listitem>";
+					result = "<listitem>" //$NON-NLS-1$
+							+ "<listcell>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" onOK='' maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
+									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
+									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
+							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
+									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+									+ "</listcell><listcell>" //$NON-NLS-1$
+							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openUser(event)' id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
+							+ required+removeAction+"</listcell></listitem>"; //$NON-NLS-1$
 				}
 			}
 			else if(TypeEnumeration.GROUP_TYPE.equals(type))
@@ -1372,34 +1462,34 @@ public class InputField2 extends Div
 				StringBuffer sb = new StringBuffer();
 				if (containerListbox == null)
 				{
-					sb.append("<div style='display:block' visible='true'>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
-							+ "onChange='self.parent.parent.onChildChange(event)' "  
-							+ "onBlur='self.parent.parent.onBlur(event)' "
-							+ "onChanging='self.parent.parent.onChanging(event)' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly  && Security.isUserInRole("group:query"))+"\" />");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</div>");
+					sb.append("<div style='display:block' visible='true'>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange='self.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly  && Security.isUserInRole("group:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
 				} else {
-					sb.append("<listitem><listcell>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' "
-							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "  
-							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
-							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' "
-							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaGroup(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" />");
-					sb.append("</listcell><listcell>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup(event)' id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</listcell></listitem>");
+					sb.append("<listitem><listcell>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("</listcell><listcell>"); //$NON-NLS-1$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openGroup(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</listcell></listitem>"); //$NON-NLS-1$
 				}
 				result = sb.toString();
 			}
@@ -1409,30 +1499,32 @@ public class InputField2 extends Div
 				StringBuffer sb = new StringBuffer();
 				if (containerListbox == null)
 				{
-					sb.append("<div style='display: block' visible='true'>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
-							+ "onClick='self.parent.parent.onSelectApplication(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</div>");
+					sb.append("<div style='display: block' visible='true'>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onOK='' " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' " //$NON-NLS-1$
+							+ "onClick='self.parent.parent.onSelectApplication(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
 				} else {
-					sb.append("<listitem><listcell>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' "
-							+ "onClick='self.parent.parent.parent.parent.onSelectApplication(event)' "
-							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaApplication(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>");
-					sb.append("</listcell><listcell>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication(event)' id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</listcell></listitem>");
+					sb.append("<listitem><listcell>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' " //$NON-NLS-1$
+							+ "onClick='self.parent.parent.parent.parent.onSelectApplication(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaApplication(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("application:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("</listcell><listcell>"); //$NON-NLS-1$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openApplication(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</listcell></listitem>"); //$NON-NLS-1$
 				}
 				result = sb.toString();
 			}
@@ -1441,30 +1533,30 @@ public class InputField2 extends Div
 				StringBuffer sb = new StringBuffer();
 				if (containerListbox == null)
 				{
-					sb.append("<div style='display: block' visible='true'>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/host.png' "
-							+ "onClick='self.parent.parent.onSelectHost(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>");
-					sb.append("<label id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</div>");
+					sb.append("<div style='display: block' visible='true'>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/host.png' " //$NON-NLS-1$
+							+ "onClick='self.parent.parent.onSelectHost(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("<label id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
 				} else {
-					sb.append("<listitem><listcell>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/host.png' "
-							+ "onClick='self.parent.parent.onSelectHost(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>");
-					sb.append("</listcell><listcell>");
-					sb.append("<label id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</listcell></listitem>");
+					sb.append("<listitem><listcell>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/host.png' " //$NON-NLS-1$
+							+ "onClick='self.parent.parent.onSelectHost(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("</listcell><listcell>"); //$NON-NLS-1$
+					sb.append("<label id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</listcell></listitem>"); //$NON-NLS-1$
 				}
 				result = sb.toString();
 			}
@@ -1473,30 +1565,30 @@ public class InputField2 extends Div
 				StringBuffer sb = new StringBuffer();
 				if (containerListbox == null)
 				{
-					sb.append("<div style='display: block' visible='true'>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='~./img/servidorCorreu.gif' "
-							+ "onClick='self.parent.parent.onSelectMailDomain(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>");
-					sb.append("<label id=\""+id2+"\" visible='false'/>");
-					sb.append(required+removeAction+"</div>");
+					sb.append("<div style='display: block' visible='true'>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='~./img/servidorCorreu.gif' " //$NON-NLS-1$
+							+ "onClick='self.parent.parent.onSelectMailDomain(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("<label id=\""+id2+"\" visible='false'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
 				} else {
-					sb.append("<listitem><listcell>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='~./img/servidorCorreu.gif' "
-							+ "onClick='self.parent.parent.parent.parent.onSelectMailDomain(event)' "
-							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaMailDomain(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' "
-							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>");
-					sb.append("</listcell><listcell>");
-					sb.append("<label id=\""+id2+"\" visible='false'/>");
-					sb.append(required+removeAction+"</listcell></listitem>");
+					sb.append("<listitem><listcell>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='~./img/servidorCorreu.gif' " //$NON-NLS-1$
+							+ "onClick='self.parent.parent.parent.parent.onSelectMailDomain(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaMailDomain(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly && Security.isUserInRole("mail:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("</listcell><listcell>"); //$NON-NLS-1$
+					sb.append("<label id=\""+id2+"\" visible='false'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</listcell></listitem>"); //$NON-NLS-1$
 				}
 				result = sb.toString();
 			}
@@ -1506,86 +1598,86 @@ public class InputField2 extends Div
 				StringBuffer sb = new StringBuffer();
 				if (containerListbox == null)
 				{
-					sb.append("<div style='display:block' visible='true' >");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' "
-							+ "onBlur='self.parent.parent.onBlur(event)' "
-							+ "onChanging='self.parent.parent.onChanging(event)'  "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" "
-							+ "onClick='self.parent.parent.onSelectCustomObject(event)' "
-							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>");
-					sb.append(required+removeAction+"</div>");
+					sb.append("<div style='display:block' visible='true' >"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.onChanging(event)'  " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "onClick='self.parent.parent.onSelectCustomObject(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />"); //$NON-NLS-1$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
 				} else {
-					sb.append("<listitem><listcell>");
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' "
-							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' "
-							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)'  "
-							+ "id=\""+id+"\" "
-							+ "readonly='"+readonlyExpr+"'/>");
-					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' "
-							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" "
-							+ "onClick='self.parent.parent.parent.parent.onSelectCustomObject(event)' "
-							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' "
-							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
-					sb.append("</listcell><listcell>");
-					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>");
+					sb.append("<listitem><listcell>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)'  " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' " //$NON-NLS-1$
+							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "onClick='self.parent.parent.parent.parent.onSelectCustomObject(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' " //$NON-NLS-1$
+							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />"); //$NON-NLS-1$
+					sb.append("</listcell><listcell>"); //$NON-NLS-1$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.parent.parent.openCustomObject(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
 					sb.append(required+removeAction);
-					sb.append("</listcell><listitem>");
+					sb.append("</listcell><listitem>"); //$NON-NLS-1$
 				}
 				result = sb.toString();
 			}
 			else if(TypeEnumeration.BINARY_TYPE.equals(type))
 			{
 				boolean visible = fileAlreadySaved();
-				result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +
-							"onClick=\"self.parent.parent.uploadBinary();\" "
-							+ "disabled=\""+readonlyExpr+"\">" +
-							"</button><button label=\"Download\" disabled=\""+readonlyExpr+"\" visible=\"" + visible + "\" "
-									+ "onClick=\"self.parent.parent.downloadBinary(self.parent);\">" +
-							"</button>"+required+removeAction+"</h:span>";
+				result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " + //$NON-NLS-1$
+							"onClick=\"self.parent.parent.uploadBinary();\" " //$NON-NLS-1$
+							+ "disabled=\""+readonlyExpr+"\">" + //$NON-NLS-1$ //$NON-NLS-2$
+							"</button><button label=\"Download\" disabled=\""+readonlyExpr+"\" visible=\"" + visible + "\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+									+ "onClick=\"self.parent.parent.downloadBinary(self.parent);\">" + //$NON-NLS-1$
+							"</button>"+required+removeAction+"</h:span>"; //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if(TypeEnumeration.PHOTO_TYPE.equals(type))
 			{
 				if(getValue() != null){
-					map.put("image", byteArrayToImage((byte[])getValue()));
-					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" "
-						    + " onClick=\"self.parent.parent.upload(self.parent);\" "
-						    + "disabled=\""+readonlyExpr+"\"/>"
-							+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+removeAction+"</h:span>";
+					map.put("image", byteArrayToImage((byte[])getValue())); //$NON-NLS-1$
+					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " //$NON-NLS-1$
+						    + " onClick=\"self.parent.parent.upload(self.parent);\" " //$NON-NLS-1$
+						    + "disabled=\""+readonlyExpr+"\"/>" //$NON-NLS-1$ //$NON-NLS-2$
+							+ "<image content=\"${arg.image}\" style=\"max-width: 100px; max-height: 100px;\"/>"+required+removeAction+"</h:span>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}else{
-					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " +
-						    " onClick=\"self.parent.parent.upload(self.parent);\" "
-						    + "disabled=\""+readonlyExpr+"\">" +
-							"</button>"+required+removeAction+"</h:span>";
+					result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload Photo\" " + //$NON-NLS-1$
+						    " onClick=\"self.parent.parent.upload(self.parent);\" " //$NON-NLS-1$
+						    + "disabled=\""+readonlyExpr+"\">" + //$NON-NLS-1$ //$NON-NLS-2$
+							"</button>"+required+removeAction+"</h:span>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			else if(TypeEnumeration.DATE_TYPE.equals(type))
 			{
-				result = "<div><datebox format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' "
-						+ (readonly ? "buttonVisible=\"false\" ": "")
-						+ "id=\""+id+"\" "
-						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>"; 
+				result = "<div><datebox format=\"${c:l('usuaris.zul.dateFormat2')}\" " + "disabled=\""+readonlyExpr+"\" onOK='' visible='true' " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						+ (readonly ? "buttonVisible=\"false\" ": "") //$NON-NLS-1$ //$NON-NLS-2$
+						+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>";  //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			else if(TypeEnumeration.EMAIL_TYPE.equals(type))
 			{
 				if (containerListbox == null)
 				{
-					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
-						+ "id=\""+id+"\" "
-							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
-									+ "onChange='self.parent.parent.onChildChange(event)'/>";
-					result = "<div>"+result+required+removeAction+"</div>";
+					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' " //$NON-NLS-1$ //$NON-NLS-2$
+						+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" " //$NON-NLS-1$ //$NON-NLS-2$
+									+ "onChange='self.parent.parent.onChildChange(event)'/>"; //$NON-NLS-1$
+					result = "<div>"+result+required+removeAction+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				else {
-					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' "
-							+ "id=\""+id+"\" "
-								+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" "
-										+ "onChange='self.parent.parent.parent.parent.onChildChange(event)'/>";
-					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
+					result = "<textbox sclass=\"textbox\" onOK=''  maxlength=\"" + size +"\"  width='100%' visible='true' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+								+ "readonly=\""+readonlyExpr+"\" constraint=\"/(^$|.+@.+\\.[a-z]+)/: ${c:l('InputField.NoCorrectEmail')}\" " //$NON-NLS-1$ //$NON-NLS-2$
+										+ "onChange='self.parent.parent.parent.parent.onChildChange(event)'/>"; //$NON-NLS-1$
+					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}	
 			else if(TypeEnumeration.SSO_FORM_TYPE.equals(type))
@@ -1593,177 +1685,181 @@ public class InputField2 extends Div
 				String []split = getFormValues ();
 				if (containerListbox == null)
 				{
-					result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-								+ "id=\""+id+"\" "
-								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
-								+ "<label value=' = '/>"
-								+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-								+ "id=\""+id2+"\" "
-								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
-					result = "<div>"+result+required+removeAction+"</div>";
+					result = "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  " //$NON-NLS-1$
+								+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>"  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+								+ "<label value=' = '/>" //$NON-NLS-1$
+								+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  " //$NON-NLS-1$ //$NON-NLS-2$
+								+ "id=\""+id2+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+								+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					result = "<div>"+result+required+removeAction+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$
 				} else {
-					result = "<listitem><listcell><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-							+ "id=\""+id+"\" "
-							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>" 
-							+ "</listcell><listcell>"
-							+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  "
-							+ "id=\""+id2+"\" "
-							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>";
-					result = result+required+removeAction+"</listitem></listcell>";
+					result = "<listitem><listcell><textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[0])+"'/>"  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "</listcell><listcell>" //$NON-NLS-1$
+							+ "<textbox sclass=\"textbox\" maxlength=\"" + size/2 +"\" onChange=\"self.parent.parent.updateSsoForm(event)\" width='40%'  " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id2+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly=\""+readonlyExpr+"\" onOK='' value='"+StringEscapeUtils.escapeXml(split[1])+"'/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					result = result+required+removeAction+"</listitem></listcell>"; //$NON-NLS-1$
 					
 				}
 			}	
 			else if ( TypeEnumeration.HTML.equals(type))
 			{
-				String v = value == null ? "": value instanceof byte[] ? new String((byte[])value, "UTF-8") : value.toString(); 
-				result = "<div>"
-						+ "<html style='display: inline-block; border: solid 1px black' id='"+id+"'>"
-						+ "<attribute name=\"onChange\"><![CDATA[\n" 
-						+ "self.parent.parent.changeHtml (event);"
-						+ "]]></attribute>" 
-					  	+ "<![CDATA["
+				String v = value == null ? "": value instanceof byte[] ? new String((byte[])value, "UTF-8") : value.toString();  //$NON-NLS-1$ //$NON-NLS-2$
+				result = "<div>" //$NON-NLS-1$
+						+ "<html style='display: inline-block; border: solid 1px black' id='"+id+"'>" //$NON-NLS-1$ //$NON-NLS-2$
+						+ "<attribute name=\"onChange\"><![CDATA[\n"  //$NON-NLS-1$
+						+ "self.parent.parent.changeHtml (event);" //$NON-NLS-1$
+						+ "]]></attribute>"  //$NON-NLS-1$
+					  	+ "<![CDATA[" //$NON-NLS-1$
 						+ (v)
-						+ "]]></html>" ;
+						+ "]]></html>" ; //$NON-NLS-1$
 				if (!readonly)
 				{
 						result = result + 
-							"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" + 
-								"<attribute name=\"onClick\"><![CDATA[\n" + 
-									"Events.sendEvent(new Event (\"onEdit\", \n" + 
-										"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" + 
-										"new Object[] {\n" + 
-											"event.getTarget().getPreviousSibling()"+ 
-										"}" + 
-									"));" + 
-								"]]></attribute>" + 
-							"</imageclic>";
+							"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" +  //$NON-NLS-1$
+								"<attribute name=\"onClick\"><![CDATA[\n" +  //$NON-NLS-1$
+									"Events.sendEvent(new Event (\"onEdit\", \n" +  //$NON-NLS-1$
+										"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" +  //$NON-NLS-1$
+										"new Object[] {\n" +  //$NON-NLS-1$
+											"event.getTarget().getPreviousSibling()"+  //$NON-NLS-1$
+										"}" +  //$NON-NLS-1$
+									"));" +  //$NON-NLS-1$
+								"]]></attribute>" +  //$NON-NLS-1$
+							"</imageclic>"; //$NON-NLS-1$
 				}
-				result = result + removeAction+ "</div>";
+				result = result + removeAction+ "</div>"; //$NON-NLS-1$
 			}
 			else if ( TypeEnumeration.BOOLEAN_TYPE.equals(type))
 			{
-					result = "<div><checkbox  id=\""+id+"\" "
-							+ "disabled=\""+readonlyExpr+"\" onCheck='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>";
+					result = "<div><checkbox  id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "disabled=\""+readonlyExpr+"\" onCheck='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 			else if ( TypeEnumeration.SEPARATOR.equals(type))
 			{
-					result = "<div sclass='separator'/>";
+					result = "<div sclass='separator'/>"; //$NON-NLS-1$
 			}
 			else if (dataType.getValues() != null && ! dataType.getValues().isEmpty())//String
 			{
 				if (containerListbox == null)
 				{
-					result = "<listbox mold=\"select\" onChange=\"\" "
-							+ "id=\""+id+"\" "
-							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
+					result = "<listbox mold=\"select\" onChange=\"\" " //$NON-NLS-1$
+							+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>"; //$NON-NLS-1$ //$NON-NLS-2$
 					if (! dataType.isRequired())
-						result = result + "<listitem value=\"\"/>";
+						result = result + "<listitem value=\"\"/>"; //$NON-NLS-1$
 					for (String v: dataType.getValues())
 					{
 						String s = escapeString(v);
 						int separator = s.indexOf(':');
 						if (separator > 0)
-							result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>";
+							result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						else
-							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
-					result = result + "</listbox>";
-					result = "<div>"+result+required+removeAction+"</div>"; 
+					result = result + "</listbox>"; //$NON-NLS-1$
+					result = "<div>"+result+required+removeAction+"</div>";  //$NON-NLS-1$ //$NON-NLS-2$
 				} else {
-					result = "<listbox mold=\"select\" onChange=\"\" "
-							+ "id=\""+id+"\" "
-							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>";
+					result = "<listbox mold=\"select\" onChange=\"\" " //$NON-NLS-1$
+							+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>"; //$NON-NLS-1$ //$NON-NLS-2$
 					if (! dataType.isRequired())
-						result = result + "<listitem value=\"\"/>";
+						result = result + "<listitem value=\"\"/>"; //$NON-NLS-1$
 					for (String v: dataType.getValues())
 					{
 						String s = escapeString(v);
 						int separator = s.indexOf(':');
 						if (separator > 0)
-							result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>";
+							result = result + "<listitem value=\""+ s.substring(0, separator).trim() +"\" label=\""+ s.substring(separator+1).trim()+"\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						else
-							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>";
+							result = result + "<listitem value=\""+s+"\" label=\""+s+"\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
-					result = result + "</listbox>";
-					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
+					result = result + "</listbox>"; //$NON-NLS-1$
+					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 			else if (TypeEnumeration.USER_TYPE_TYPE.equals(type))
 			{
 				if (containerListbox == null)
 				{
-					result = "<listbox mold=\"select\" onChange=\"\" "
-							+ "id=\""+id+"\" "
-							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>";
-					result = result + "<listitem value=\"\"/>";
+					result = "<listbox mold=\"select\" onChange=\"\" " //$NON-NLS-1$
+							+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.onChildChange(event)'>"; //$NON-NLS-1$ //$NON-NLS-2$
+					result = result + "<listitem value=\"\"/>"; //$NON-NLS-1$
 					if (raisePrivileges)
 						Security.nestedLogin(Security.ALL_PERMISSIONS);
 					try {
 						for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
 						{
-							result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>";
+							result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					} catch (Exception e) {
-						log.info("Error getting user types", e);
+						log.info("Error getting user types", e); //$NON-NLS-1$
 
 					} finally {
 						if (raisePrivileges)
 							Security.nestedLogoff();
 					}
-					result = result + "</listbox>";
-					result = "<div>"+result+required+removeAction+"</div>"; 
+					result = result + "</listbox>"; //$NON-NLS-1$
+					result = "<div>"+result+required+removeAction+"</div>";  //$NON-NLS-1$ //$NON-NLS-2$
 				} else {
-					result = "<listbox mold=\"select\" onChange=\"\" "
-							+ "id=\""+id+"\" "
-							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>";
-					result = result + "<listitem value=\"\"/>";
+					result = "<listbox mold=\"select\" onChange=\"\" " //$NON-NLS-1$
+							+ "id=\""+id+"\" " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "disabled=\""+readonlyExpr+"\" visible='true' onSelect='self.parent.parent.parent.parent.onChildChange(event)'>"; //$NON-NLS-1$ //$NON-NLS-2$
+					result = result + "<listitem value=\"\"/>"; //$NON-NLS-1$
 					if (raisePrivileges)
 						Security.nestedLogin(Security.ALL_PERMISSIONS);
 					try {
 						for (UserType v: com.soffid.iam.EJBLocator.getUserDomainService().findAllUserType())
 						{
-							result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>";
+							result = result + "<listitem value=\""+escapeString(v.getCode())+ "\" label=\""+escapeString(v.getDescription())+"\"/>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						}
 					} catch (Exception e) {
-						log.info("Error getting user types", e);
+						log.info("Error getting user types", e); //$NON-NLS-1$
 
 					} finally {
 						if (raisePrivileges)
 							Security.nestedLogoff();
 					}
-					result = result + "</listbox>";
-					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>";
+					result = result + "</listbox>"; //$NON-NLS-1$
+					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			} else { // Listbox
-				result = "<div><textbox sclass=\"textbox\" maxlength=\"" + size +"\" width='98%' "
-						+ "id=\""+id+"\" "
-						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+removeAction+"</div>";
+				result = "<div width=\"99%\">" //$NON-NLS-1$
+						+ "<textbox sclass=\"" + (dataType.isMultiValued()? "textbox2m": "textbox2")+ "\" maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+						+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+removeAction+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		}
-		if (result.equals(""))
+		if (result.equals("")) //$NON-NLS-1$
 		{
 			if (twoPhaseEdit && ! readonly)
-				result= "<div><label id='"+id3+"'/>"
-						+ "<imageclic src='/img/pencil.png' "
-							+ "onClick='self.visible = self.previousSibling.visible = false; "
-								+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> "
-						+ "<textbox sclass=\"textbox\" width='90%' "
-								+ "id=\""+id+"\" "
-								+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' "
-										+ "onChange='parent.parent.onChildChange(event)'/>"
-						+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' "
-						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>";
+				result= "<div><label id='"+id3+"'/>" //$NON-NLS-1$ //$NON-NLS-2$
+						+ "<imageclic src='/img/pencil.png' " //$NON-NLS-1$
+							+ "onClick='self.visible = self.previousSibling.visible = false; " //$NON-NLS-1$
+								+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> " //$NON-NLS-1$
+						+ "<textbox sclass=\"textbox\" width='90%' " //$NON-NLS-1$
+								+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+								+ "readonly=\""+readonlyExpr+"\" visible='false' onOK='parent.parent.changeData()' " //$NON-NLS-1$ //$NON-NLS-2$
+										+ "onChange='parent.parent.onChildChange(event)'/>" //$NON-NLS-1$
+						+ "<imageclic src='/img/accepta16.png' visible='false' onClick='parent.parent.changeData()' " //$NON-NLS-1$
+						+ "onChange='self.parent.parent.onChildChange(event)'/>"+required+removeAction+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$
 			else
-				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' readonly=\""+readonlyExpr+"\"/>"+required+"</div>";
+				result= "<div><textbox sclass=\"textbox\" id=\""+id+"\" width='100%' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+						+ ph
+						+ "readonly=\""+readonlyExpr+"\"/>"+required+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		if(compos.isEmpty() || !compos.equals(result))
 		{
 			compos=result;
-			Executions.createComponentsDirectly(result, "zul", containerListbox != null ? containerListbox : this, map);
+			Executions.createComponentsDirectly(result, "zul", containerListbox != null ? containerListbox : this, map); //$NON-NLS-1$
 			Component c = getFellowIfAny(id);
 			if (c != null)
 			{
-				c.setAttribute("position", position);
+				c.setAttribute("position", position); //$NON-NLS-1$
 				if (value != null && ! TypeEnumeration.SSO_FORM_TYPE.equals(type))
 				{
 					if (c instanceof Datebox) {
@@ -1773,7 +1869,7 @@ public class InputField2 extends Div
 							((Datebox) c).setValue ( ((Calendar) value ).getTime() );
 						else
 						{
-							log.info("Wrong value "+value+" for datebox");
+							log.info("Wrong value "+value+" for datebox"); //$NON-NLS-1$ //$NON-NLS-2$
 //							((Datebox) c).setRawValue(value);
 						}
 					}
@@ -1787,12 +1883,12 @@ public class InputField2 extends Div
 					else if (c instanceof InputElement) 
 						((InputElement) c).setRawValue(value == null ? null: value.toString());
 					else if (c instanceof Checkbox)
-						((Checkbox) c).setChecked( value != null && value.toString().equals("true"));
+						((Checkbox) c).setChecked( value != null && value.toString().equals("true")); //$NON-NLS-1$
 				}
 			}
 			Component c2 = getFellowIfAny(id2);
 			if (c2 != null)
-				c2.setAttribute("position", position);
+				c2.setAttribute("position", position); //$NON-NLS-1$
 			Component c3 = getFellowIfAny(id3);
 			if (c3 != null && c3 instanceof Label && value != null)
 				((Label) c3).setValue(value.toString());
@@ -1811,16 +1907,17 @@ public class InputField2 extends Div
 	}
 
 	private String escapeString(String v) {
-		return v.replaceAll("&", "&amp;")
-				.replaceAll("\"", "&quot;")
-				.replaceAll("<", "&gt;")
-				.replaceAll(">", "&gt;");
+		return v.replaceAll("&", "&amp;") //$NON-NLS-1$ //$NON-NLS-2$
+				.replaceAll("\"", "&quot;") //$NON-NLS-1$ //$NON-NLS-2$
+				.replaceAll("<", "&gt;") //$NON-NLS-1$ //$NON-NLS-2$
+				.replaceAll(">", "&gt;") //$NON-NLS-1$ //$NON-NLS-2$
+				.replaceAll("'", "&apos;"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private String getIdForPosition(Integer position) {
-		String id = "s_"+hashCode();
+		String id = "s_"+hashCode(); //$NON-NLS-1$
 		if ( position != null)
-			id = id + "_p_" + position;
+			id = id + "_p_" + position; //$NON-NLS-1$
 		return id;
 	}
 
@@ -1830,7 +1927,7 @@ public class InputField2 extends Div
 		{
 			BindContext ctx = XPathUtils.getComponentContext(this);
 			String path = ctx.getXPath() + bind;
-			int i = path.lastIndexOf("/attributes");
+			int i = path.lastIndexOf("/attributes"); //$NON-NLS-1$
 			if (i > 0)
 			{
 				path = path.substring(0, i);
@@ -1856,15 +1953,15 @@ public class InputField2 extends Div
 	}
 
 	private String[] getFormValues() throws UnsupportedEncodingException {
-		String result[] = new String[] {"", ""};
+		String result[] = new String[] {"", ""}; //$NON-NLS-1$ //$NON-NLS-2$
 		String v = (String) getValue();
 		if (v != null)
 		{
-			String split [] = v.split("=");
+			String split [] = v.split("="); //$NON-NLS-1$
 			if (split.length > 0)
-				result[0] = URLDecoder.decode(split[0], "UTF-8");
+				result[0] = URLDecoder.decode(split[0], "UTF-8"); //$NON-NLS-1$
 			if (split.length > 1)
-				result[1] = URLDecoder.decode(split[1], "UTF-8");
+				result[1] = URLDecoder.decode(split[1], "UTF-8"); //$NON-NLS-1$
 		}
 		return result;
 	}
@@ -1910,7 +2007,7 @@ public class InputField2 extends Div
         org.zkoss.zul.Image img = new org.zkoss.zul.Image();
         img.setContent(byteArrayToImage(data));
         img.setParent(span);       
-        img.setStyle("max-width: 100px; max-height: 100px; ");
+        img.setStyle("max-width: 100px; max-height: 100px; "); //$NON-NLS-1$
         if (twoPhaseEdit)
         {
         	commit();
@@ -1920,7 +2017,7 @@ public class InputField2 extends Div
 
 	public static AImage byteArrayToImage(byte[] bytes) throws IOException{
 		
-		return new AImage("photo", bytes);
+		return new AImage("photo", bytes); //$NON-NLS-1$
 	}
 	
 	
@@ -1930,14 +2027,14 @@ public class InputField2 extends Div
         byte data[];
         if (!uploadData.isBinary()) {
 	        if (uploadData.inMemory()) {
-	            data = uploadData.getStringData().getBytes("UTF-8");
+	            data = uploadData.getStringData().getBytes("UTF-8"); //$NON-NLS-1$
 	        } else {
 	            ByteArrayOutputStream os = new ByteArrayOutputStream();
 	            Reader is = uploadData.getReaderData();
 	            char b[] = new char[2048];
 	            int read = is.read(b);
 	            while (read > 0) {
-	                os.write(new String (b,  0, read).getBytes("UTF-8"));
+	                os.write(new String (b,  0, read).getBytes("UTF-8")); //$NON-NLS-1$
 	                read = is.read(b);
 	            }
 	            is.close();
@@ -1971,7 +2068,7 @@ public class InputField2 extends Div
 		if(b != null)
 		{
 			ByteArrayInputStream is=new ByteArrayInputStream(b);
-			AMedia amedia = new AMedia("Temporary", null, "binary/octet-stream", is);
+			AMedia amedia = new AMedia("Temporary", null, "binary/octet-stream", is); //$NON-NLS-1$ //$NON-NLS-2$
 			org.zkoss.zul.Iframe iframe = new org.zkoss.zul.Iframe();
 			iframe.setContent(amedia);
 			span = span.getParent();
@@ -1983,7 +2080,7 @@ public class InputField2 extends Div
 		}
 		else
 		{
-			throw new UiException(Messages.getString("InputField.NotDocument"));
+			throw new UiException(Messages.getString("InputField.NotDocument")); //$NON-NLS-1$
 		}
 	}
 	
@@ -2008,7 +2105,7 @@ public class InputField2 extends Div
 	
 	public void updateSsoForm (Event event) throws IOException
 	{
-		String values[] = new String[] { "", ""};
+		String values[] = new String[] { "", ""}; //$NON-NLS-1$ //$NON-NLS-2$
 		int i = 0;
 		for (Object obj: event.getTarget().getParent().getChildren())
 		{
@@ -2017,9 +2114,9 @@ public class InputField2 extends Div
 				values[i++] = ((Textbox)obj).getText();
 			}
 		}
-		binder.setValue(URLEncoder.encode(values[0], "UTF-8")
-				+ "="
-				+URLEncoder.encode(values[1], "UTF-8"));
+		binder.setValue(URLEncoder.encode(values[0], "UTF-8") //$NON-NLS-1$
+				+ "=" //$NON-NLS-1$
+				+URLEncoder.encode(values[1], "UTF-8")); //$NON-NLS-1$
 		attributeValidate( null, null );
 
 		Component c = this;
@@ -2073,8 +2170,8 @@ public class InputField2 extends Div
 			inputElement.clearErrorMessage();
 		}
 		
-		if (dataType.isRequired() && ( value == null ||  "".equals(value)))
-			throw new WrongValueException(input, MZul.VALUE_NOT_MATCHED);
+		if (dataType.isRequired() && ( value == null ||  "".equals(value))) //$NON-NLS-1$
+			throw new WrongValueException(input, "Please, enter some value"); //$NON-NLS-1$
 			
 		if (dataType.getType() == TypeEnumeration.APPLICATION_TYPE)
 			updateApplication( getIdForPosition(position) );
@@ -2098,14 +2195,12 @@ public class InputField2 extends Div
 			SecureInterpreter i = createInterpreter();
 			Object o = i.eval(dataType.getValidationExpression());
 			if (o == null)
-				throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode()));
-			if (o != null && o instanceof Boolean)
+				throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
+			if (o != null && ! Boolean.TRUE.equals(o))
 			{
 				if  (!((Boolean) o).booleanValue())
-					throw new WrongValueException(input, MZul.VALUE_NOT_MATCHED);
+					throw new WrongValueException(input, o instanceof String ? (String) o: "Wrong value"); //$NON-NLS-1$
 			}
-			else
-				throw new UiException(String.format("Validation expression for attribute %s has not returned a boolean value", dataType.getCode()));
 		} catch ( TargetError e) {
 			if (e.getTarget() instanceof UiException)
 				throw new UiException(e);
@@ -2129,11 +2224,11 @@ public class InputField2 extends Div
 			SecureInterpreter i = createInterpreter();
 			Object o = i.eval(dataType.getVisibilityExpression());
 			if (o == null)
-				throw new UiException(String.format("Visibility expression for attribute %s has returned a null value", dataType.getCode()));
+				throw new UiException(String.format("Visibility expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
 			if (o != null && o instanceof Boolean)
 				return ((Boolean) o).booleanValue();
 			else
-				throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode()));
+				throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode())); //$NON-NLS-1$
 		} catch ( TargetError e) {
 			throw new UiException(e.getTarget());
 		} catch ( EvalError e) {
@@ -2152,7 +2247,7 @@ public class InputField2 extends Div
 		Component grandpa = getParent().getParent();
 		Map attributes = grandpa instanceof UserAttributesDiv ? 
 			((UserAttributesDiv) grandpa).getAttributesMap():
-			(Map) XPathUtils.getValue(ctx, "/.");
+			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
 		SecureInterpreter i = new SecureInterpreter();
 
 		// Identify attributes div
@@ -2180,45 +2275,45 @@ public class InputField2 extends Div
 		i.set("inputField", this);
 		if (ownerObject != null)
 		{
-			i.set("object", ownerObject);
+			i.set("object", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof User)
-				i.set("user", ownerObject);
+				i.set("user", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Usuari)
 			{
-				i.set("user", User.toUser((Usuari) ownerObject));
-				i.set("object", User.toUser((Usuari) ownerObject));
+				i.set("user", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
+				i.set("object", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Group)
-				i.set("group", ownerObject);
+				i.set("group", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Grup)
 			{
-				i.set("group", Group.toGroup((Grup) ownerObject) );
-				i.set("object", Group.toGroup((Grup) ownerObject) );
+				i.set("group", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
+				i.set("object", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Role)
-				i.set("role", ownerObject);
+				i.set("role", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Rol)
 			{
-				i.set("role", Role.toRole((Rol) ownerObject));
-				i.set("object", Role.toRole((Rol) ownerObject));
+				i.set("role", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
+				i.set("object", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Application)
-				i.set("application", ownerObject);
+				i.set("application", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Aplicacio)
 			{
-				i.set("application", Application.toApplication((Aplicacio) ownerObject));
-				i.set("object", Application.toApplication((Aplicacio) ownerObject));
+				i.set("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
+				i.set("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Task)
 			{
-				i.set("task",  ownerObject);
+				i.set("task",  ownerObject); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof ProcessInstance)
 			{
-				i.set("process", ownerObject);
+				i.set("process", ownerObject); //$NON-NLS-1$
 			}
 		}
-		i.set("context", ownerContext);
+		i.set("context", ownerContext); //$NON-NLS-1$
 		return i;
 	}
 

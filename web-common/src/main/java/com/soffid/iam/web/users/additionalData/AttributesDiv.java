@@ -137,7 +137,8 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 						
 				if (system == null || system.trim().isEmpty())
 					return;
-				dataTypes = new LinkedList<TipusDada>(ServiceLocator.instance().getDadesAddicionalsService().findSystemDataTypes(system));
+				List<TipusDada> systemDataTypes = ServiceLocator.instance().getDadesAddicionalsService().findSystemDataTypes(system);
+				dataTypes = systemDataTypes == null ? new LinkedList<TipusDada>():  new LinkedList<TipusDada>(systemDataTypes);
 			}
 			else
 				dataTypes = new LinkedList<TipusDada>(ServiceLocator.instance().getDadesAddicionalsService().findDataTypes(this.scope));

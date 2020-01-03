@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Path;
@@ -13,7 +14,10 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.web.users.additionalData.CustomField;
+
 import es.caib.bpm.servei.ejb.BpmEngine;
+import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.bpm.toolkit.exception.WorkflowException;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
@@ -134,8 +138,23 @@ public class WorkflowWindow extends Window {
         this.taskInstance = task;
     }
 
-    protected void prepareTransition(String trasition) throws WorkflowException {
-    }
+	protected void prepareTransition(String trasition) throws WorkflowException {
+		validateCustomFields (this);
+	}
+
+
+	private void validateCustomFields(Component c) {
+		if (c instanceof CustomField)
+		{
+			CustomField customField = (CustomField) c;
+			customField.validate();
+		}
+		else
+		{
+			for (Component c2 = c.getFirstChild(); c2 != null; c2 = c2.getNextSibling())
+				validateCustomFields(c2);
+		}
+	}
 
     protected void completeTransition(String trasition)
             throws WorkflowException {

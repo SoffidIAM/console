@@ -485,8 +485,8 @@ public class TaskUI extends Frame implements EventListener {
     {
         if (component instanceof InputElement)
             ((InputElement) component).setReadonly(true);
-        else if (component instanceof Listbox)
-            ((Listbox) component).setDisabled(true);
+        else if (component instanceof Listitem)
+            ((Listitem) component).setDisabled(true);
         else if (component instanceof Button)
             ((Button) component).setDisabled(true);
         else if (component instanceof Radio)
@@ -496,6 +496,9 @@ public class TaskUI extends Frame implements EventListener {
         else if (component instanceof Checkbox)
             ((Checkbox) component).setDisabled(true);
         else {
+            if (component instanceof Listbox)
+                ((Listbox) component).setDisabled(true);
+
             for (Iterator it = component.getChildren().iterator(); it
                     .hasNext();) {
                 Component child = (Component) it.next();
@@ -648,14 +651,40 @@ public class TaskUI extends Frame implements EventListener {
         try {
         	final WorkflowWindow workflowWindow = getWorkflowWindow ();
             if (workflowWindow != null) {
+            	try {
+            		Events.sendEvent(new Event(WorkflowWindow.SAVE_EVENT,
+            				workflowWindow));
+            		
+            		
+            		Events.sendEvent(new Event(
+            				WorkflowWindow.PREPARE_TRANSITION_EVENT,
+            				workflowWindow, transicion));
+                } catch (Exception ex) {
+                	if (ex instanceof UiException)
+                		throw (UiException) ex;
+                    log.error(Messages.getString("TaskUI.TransitionError"), ex); //$NON-NLS-1$
+                    // Localizar el mensaje
+                    String message = Labels.getLabel("task.msgError") + " " //$NON-NLS-1$ //$NON-NLS-2$
+                            + ex.toString();
+                    Throwable ex2 = ex;
+                    while (ex2 != null) {
+                        if (ex2 instanceof WorkflowException)
+                        {
+                            message = Labels.getLabel("task.msgError") //$NON-NLS-1$
+                                    + " " + ex2.getMessage(); //$NON-NLS-1$
+                            Missatgebox.error(message);
+                            return;
+                        }
+                        if (ex2 instanceof EJBException)
+                        	ex2 = ((EJBException)ex2).getCausedByException();
+                        else if (ex2.getCause() == ex2)
+                            ex2 = null;
+                        else
+                            ex2 = ex2.getCause();
+                    }
+                    throw new UiException(message, ex);
+                }
                 try {
-                    Events.sendEvent(new Event(WorkflowWindow.SAVE_EVENT,
-                            workflowWindow));
-
-                    
-                    Events.sendEvent(new Event(
-                    		WorkflowWindow.PREPARE_TRANSITION_EVENT,
-                    		workflowWindow, transicion));
 
                     EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
 						@Override

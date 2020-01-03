@@ -3,13 +3,10 @@ package com.soffid.iam.service.impl.tenant;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.sql.Blob;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,62 +15,41 @@ import java.util.Set;
 import java.util.HashSet;
 
 import javax.naming.InitialContext;
-import javax.sql.DataSource;
 
 import java.util.HashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-
-import com.soffid.tools.db.persistence.XmlReader;
+import com.soffid.iam.api.Tenant;
 import com.soffid.tools.db.schema.Column;
-import com.soffid.tools.db.schema.Database;
 import com.soffid.tools.db.schema.ForeignKey;
 import com.soffid.tools.db.schema.Table;
 import com.soffid.tools.db.updater.MySqlUpdater;
 
-import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
-public class TenantExporter {
+public class TenantExporter extends TenantDataManager {
 	private Long id;
 	private ObjectOutputStream out;
-	private Database db;
 	private List<Action> firstStep = new LinkedList<Action>();
 	private List<Action> secondStep = new LinkedList<Action>();
 	private LinkedList<Table> tables;
 	private HashMap<String,Long> ids = new HashMap<String,Long>();
 	private long nextId;
-	private Connection conn;
-	Log log = LogFactory.getLog(getClass());
+	private Tenant tenant;
 	
 
 	
-	boolean ignoreFailures;
-	
-	public void export(Long id, OutputStream out) throws Exception {
-		this.id = id;
+	public void export(Tenant t, OutputStream out) throws Exception {
+		this.id = t.getId();
+		this.tenant = t;
 		this.out = new ObjectOutputStream( out );
-    	PathMatchingResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
-
-    	DataSource ds = (DataSource) ServiceLocator.instance().getService("dataSource"); 
-    	conn = ds.getConnection();
-
-    	db = new Database();
-    	XmlReader reader = new XmlReader();
-    	parseResources(rpr, db, reader, "console-ddl.xml");
-    	parseResources(rpr, db, reader, "core-ddl.xml");
-    	parseResources(rpr, db, reader, "plugin-ddl.xml");
-
-        try {
-        	createExportPlan();
-        	export ();
-        } finally {
-        	conn.close();
-        }
+    	loadDatabaseDefinition();
         	
+    	try {
+    		createExportPlan();
+    		export ();
+    	} finally {
+    		conn.close();
+    	}
 	}
 
 	private void createExportPlan() {
@@ -163,6 +139,9 @@ public class TenantExporter {
 	private void export() throws IOException, SQLException, InternalErrorException {
 		ids.put("SC_TENANT#"+id, 0L);
 		nextId = 1L;
+		out.writeObject(new Integer(1)); // File version
+		out.writeObject(tenant.getName());
+		out.writeObject(tenant.getDescription());
 		for ( Action action: firstStep)
 		{
 			export(action);
@@ -171,6 +150,7 @@ public class TenantExporter {
 		{
 			export(action);
 		}
+		out.writeObject(null);
 	}
 
 	public void export(Action action) throws IOException, SQLException, InternalErrorException {
@@ -187,15 +167,13 @@ public class TenantExporter {
 
 		StringBuffer sb = new StringBuffer();
 		Map<String,String> foreignColumns = findForeignColumns ( table.name );
+		sb.append("SELECT "+table.name+"."+table.getPrimaryKey());
 		for (Column c: table.columns)
 		{
 			if ( foreignColumns.containsKey(c.name) && ! c.notNull)
 			{
 				columns.add( c.name );
-				if (sb.length() == 0)
-					sb.append("SELECT ");
-				else
-					sb.append(",");
+				sb.append(",");
 				sb.append(table.name+"."+c.name);
 			}
 		}
@@ -206,15 +184,16 @@ public class TenantExporter {
 
 		try {
 			Statement stmt = conn.createStatement();
+			ResultSet rset = stmt.executeQuery(sb.toString());
 			out.writeObject ( "update" );
 			out.writeObject ( table.name );
 			out.writeObject ( table.getPrimaryKey() );
-			ResultSet rset = stmt.executeQuery(sb.toString());
 			out.writeObject( columns.toArray(new String[0]));
 			while (rset.next())
 			{
 				writeRow ( rset, table, columns, foreignColumns, true);
 			}
+			out.writeObject(null);
 		} catch (SQLException e) {
 			if ( ignoreFailures && e.getMessage().contains("Table not found"))
 			{
@@ -252,9 +231,9 @@ public class TenantExporter {
 
 		try {
 			Statement stmt = conn.createStatement();
+			ResultSet rset = stmt.executeQuery(sb.toString());
 			out.writeObject ( "insert" );
 			out.writeObject( table.name );
-			ResultSet rset = stmt.executeQuery(sb.toString());
 			out.writeObject( columns.toArray(new String[0]));
 			while (rset.next())
 			{
@@ -292,9 +271,9 @@ public class TenantExporter {
 
 		try {
 			Statement stmt = conn.createStatement();
+			ResultSet rset = stmt.executeQuery(sb.toString());
 			out.writeObject ( "insert" );
 			out.writeObject( table.name );
-			ResultSet rset = stmt.executeQuery(sb.toString());
 			out.writeObject( columns.toArray(new String[0]));
 			while (rset.next())
 			{
@@ -309,22 +288,6 @@ public class TenantExporter {
 			else
 				throw e;
 		}
-	}
-
-	private Map<String,String> findForeignColumns(String tableName) {
-		Map<String,String> result = new HashMap<String,String>();
-		
-		Table t = db.findTable(tableName, true);
-		
-		for ( ForeignKey fk: db.foreignKeys)
-		{
-			if (fk.tableName.equals(t.name) )
-			{
-				for (String col: fk.columns)
-					result.put(col, fk.foreignTable);
-			}
-		}
-		return result;
 	}
 
 	private void writeRow(ResultSet rset, Table table, List<String> columns, Map<String,String> foreignColumns, boolean update) throws SQLException, IOException {
@@ -531,23 +494,6 @@ public class TenantExporter {
 		return result;
 	}
 
-	private void parseResources(ResourcePatternResolver rpr, Database db,
-			XmlReader reader, String path) throws Exception {
-		Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(path);
-    	while (resources.hasMoreElements())
-    	{
-    		reader.parse(db, resources.nextElement().openStream());
-    	}
-	}
-
-	public boolean isIgnoreFailures() {
-		return ignoreFailures;
-	}
-
-	public void setIgnoreFailures(boolean ignoreFailures) {
-		this.ignoreFailures = ignoreFailures;
-	}
-
 	String[] hints = new String[] {
 			"BPM_DATABASE_PROPERTY", "WHERE 1=0",
 			"BPM_FILE_SYSTEM", "WHERE 1=0",
@@ -569,6 +515,14 @@ public class TenantExporter {
 			"JBPM_PROCESSINSTANCE", 
 				", JBPM_MODULEINSTANCE "
 				+ "WHERE JBPM_PROCESSINSTANCE.ID_ = JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
+				+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
+			"JBPM_TOKEN", 
+				", JBPM_MODULEINSTANCE "
+				+ "WHERE JBPM_TOKEN.PROCESSINSTANCE_= JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
+				+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
+			"JBPM_JOB", 
+				", JBPM_TOKEN, JBPM_MODULEINSTANCE "
+				+ "WHERE JBPM_JOB.PROCESSINSTANCE_= JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
 				+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
 			"JBPM_BYTEBLOCK",
 				" WHERE PROCESSFILE_ IN ( SELECT JBPM_LOG.NEWBYTEARRAY_ FROM JBPM_LOG, JBPM_TOKEN, JBPM_MODULEINSTANCE "

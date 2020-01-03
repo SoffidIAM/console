@@ -106,6 +106,14 @@ public class IdentityGeneratorBean implements InitializingBean
 			return thread.getNext(session);
 	}
 
+	
+	public long[] reserve (long number) throws SQLException, InterruptedException
+	{
+		if (thread != null)
+			return thread.reserve(number);
+		else
+			return null;
+	}
 	/**
 	 * @param i	
 	 * @param j

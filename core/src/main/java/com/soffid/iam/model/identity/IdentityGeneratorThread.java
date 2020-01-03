@@ -23,11 +23,20 @@ public class IdentityGeneratorThread extends Thread
 	long next = 0;
 	long cache = 0;
 	long increment;
+	long skip = 0;
 	private SQLException lastException;
 	Object sem1 = new Object();
 	Object sem2 = new Object ();
 	public boolean createTable;
 	Boolean isOffline = null;
+	
+	public synchronized void clearCache() 
+	{
+		synchronized (sem1)
+		{
+			cache = 0;
+		}		
+	}
 	
 	public synchronized long getNext(SessionImplementor session) throws SQLException, InterruptedException
 	{
@@ -116,13 +125,23 @@ public class IdentityGeneratorThread extends Thread
 				}
 				// Update sequence
 				PreparedStatement st2 = connection.prepareStatement(str2);
-				long next2 = next1 + cache1 * increment1;
+				long next2;
+				next2 = next1 + cache1 * increment1;
+				if ( skip > 0 )
+				{
+					next2 += skip * increment1;
+				}
 				st2.setLong(1, next2);
 				st2.setLong(2, next1);
 				try {
 					if (st2.executeUpdate() == 1)
 					{
 						next = next1;
+						if ( skip > 0 )
+						{
+							next = next + skip * increment1;
+							skip = 0;
+						}
 						increment = increment1;
 						cache = cache1;
 						break;
@@ -147,6 +166,15 @@ public class IdentityGeneratorThread extends Thread
 		connection.createStatement().execute("CREATE TABLE "+tableName+" (SEQ_NEXT BIGINT, SEQ_CACHE BIGINT, SEQ_INCREMENT BIGINT)"); //$NON-NLS-1$ //$NON-NLS-2$
 		connection.createStatement().execute("INSERT INTO "+tableName+" (SEQ_NEXT, SEQ_CACHE, SEQ_INCREMENT) VALUES (1, 10, 1)"); //$NON-NLS-1$ //$NON-NLS-2$
 		createTable = false;
+	}
+
+	public synchronized long[] reserve(long number) throws SQLException, InterruptedException {
+		clearCache();
+		skip = number;
+		long last = getNext(null);
+		long first = last - number * increment;
+		return new long [] { first, increment };
+		
 	}
 	
 	

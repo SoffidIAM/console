@@ -130,6 +130,52 @@
 			{
 				esquema.showFormulari();
 			}
+			
+			void export () {
+				es.caib.zkib.datasource.DataSource ds = form.getDataSource(); 
+				es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext(); 
+				com.soffid.iam.api.Tenant tenant = ctx.getValue("/").getInstance();
+				java.io.File f = java.io.File.createTempFile("tenant","dump");
+				java.io.OutputStream out = new java.io.FileOutputStream(f);
+				
+				com.soffid.iam.EJBLocator.getTenantService().exportTenant(tenant, out);
+				
+				out.close();
+				
+				org.zkoss.util.media.AMedia media = new org.zkoss.util.media.AMedia(
+						tenant.getName()+".dump", 
+						"txt", "binary/octet-stream", f);
+				
+				Filedownload.save(media, media.getName());
+				f.deleteOnExit();
+						
+			}
+
+			void importTenant () {
+				org.zkoss.util.media.Media media = Fileupload.get();
+
+				java.io.InputStream in ;
+				if (media.isBinary())
+					if (media.inMemory())
+						in = new java.io.ByteArrayInputStream ( media.getByteData());
+					else
+						in = media.getStreamData();
+				else
+					if (media.inMemory())
+						in = new java.io.ByteArrayInputStream (media.getStringData().getBytes());
+					else
+						in = new es.caib.bpm.attachment.ReaderInputStream( media.getReaderData() );
+				
+				Tenant t = com.soffid.iam.EJBLocator.getTenantService().importTenant(in);
+				
+				String path = es.caib.zkib.datasource.XPathUtils.createPath(model, "/tenant", t);
+				es.caib.zkib.datamodel.DataNode node = es.caib.zkib.datasource.XPathUtils.getValue(model, path);
+				
+				node.setDirty(false);
+				Listbox lb = lista.getFellow("listbox");
+				lb.setSelectedIndex( lb.getItemCount() - 1 );
+			}
+
 		]]>
 	</zscript>
 
@@ -156,6 +202,7 @@
 					listbox="/esquema/lista/listbox"/>
 				<commitbutton datamodel="/model"/>
 				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
+				<toolbarbutton label="${c:l('tenant.import') }" onClick="importTenant()"> </toolbarbutton>
 			</toolbar>
 			<listbox id="listbox" autocommit="false" dataPath="/model:/tenant"
 				fixedLayout="true" height="340px" onClick="showDetall()"
@@ -361,6 +408,10 @@ es.caib.zkib.datasource.XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.g
 						</row>
 					</rows>
 				</grid>
+				
+				<div style="margin-top: 20px; width: 100%; align: right">
+					<button label="${c:l('tetant.zul.export') }" onClick="export()"/>
+				</div>
 			</form>
 		</detalls>
 	</esquema>

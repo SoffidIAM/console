@@ -158,5 +158,34 @@ public class SoffidStackTrace
         s.flush();
     }
 
+	public static String generateShortDescription(Exception e) {
+		StringBuffer sb = new StringBuffer();
+	   	Throwable root = e;
+	   	String last = null;
+	   	do
+	   	{
+	   		String next ;
+	   		if ( root instanceof InternalErrorException)
+	   			next = root.getMessage();
+	   		else
+	   			next = root.toString();
+	   		if (next != null)
+	   		{
+		   		if (last == null || ! last.contains(next))
+		   		{
+		   			if ( sb.length() > 0)
+		   				sb.append("\ncaused by ");
+		   			sb.append(next);
+		   			last = next;
+		   		} 
+	   		}
+	   		if (root.getCause() == null || root.getCause() == root)
+	   			break;
+	   		else
+	   			root = root.getCause ();
+	   	} while (true);
+	   	return sb.toString();
+	}
+
 
 }

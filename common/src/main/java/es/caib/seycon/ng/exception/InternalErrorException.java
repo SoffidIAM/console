@@ -22,6 +22,7 @@ public class InternalErrorException extends Exception {
     private static final long serialVersionUID = 1L;
     String _cause;
     String _causeFiltrat;
+    String shortMessage;
     transient Throwable realCause = null;
 
     public InternalErrorException() {
@@ -53,6 +54,7 @@ public class InternalErrorException extends Exception {
             this._causeFiltrat = new String(bout.toByteArray());
             ps.close();
             bout.close();
+            shortMessage = SoffidStackTrace.generateShortDescription(this);
         } catch (IOException ex) {
 
         }
@@ -88,6 +90,14 @@ public class InternalErrorException extends Exception {
 	public Throwable getCause()
 	{
 		return realCause;
+	}
+
+	@Override
+	public String getMessage() {
+		if (realCause == null && shortMessage != null)
+			return shortMessage;
+		else
+			return super.getMessage();
 	}
 
 }

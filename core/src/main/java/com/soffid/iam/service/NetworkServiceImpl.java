@@ -287,11 +287,23 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      */
     protected com.soffid.iam.api.Host handleCreate(com.soffid.iam.api.Host maquina) throws java.lang.Exception {
         if (AutoritzacionsUsuari.canCreateAllHosts() || maquinaPermesa(maquina, ADMINISTRACIO)) {
-            HostEntity entity = getHostEntityDao().hostToEntity(maquina);
-            entity.setDeleted(new Boolean(false));
-            getHostEntityDao().create(entity);
-            maquina.setId(entity.getId());
-            return getHostEntityDao().toHost(entity);
+        	HostEntity old = getHostEntityDao().findByName(maquina.getName());
+        	if (old != null)
+        	{
+        		if ( ! Boolean.TRUE.equals( old.getDeleted() ) )
+        			throw new InternalErrorException (String.format("The host %s already exists", maquina.getName()));
+        		maquina.setId(old.getId());
+        		getHostEntityDao().hostToEntity(maquina, old, true);
+                old.setDeleted(new Boolean(false));
+                getHostEntityDao().update(old);
+	            return getHostEntityDao().toHost(old);                
+        	} else {
+	            HostEntity entity = getHostEntityDao().hostToEntity(maquina);
+	            entity.setDeleted(new Boolean(false));
+	            getHostEntityDao().create(entity);
+	            maquina.setId(entity.getId());
+	            return getHostEntityDao().toHost(entity);
+        	}
         }
         throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.NotAuthorizedMakeMachine"), maquina.getName())); //$NON-NLS-1$
     }
@@ -1795,6 +1807,13 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		{
 			return null;
 		}
+	}
+
+	@Override
+	protected Network handleFindNetworkByIpAddress(String ipAdress) throws Exception {
+        InetAddress addr = InetAddress.getByName(ipAdress);
+        NetworkEntity x = guessNetwork(addr.getAddress());
+    	return getNetworkEntityDao().toNetwork(x);
 	}
 
 }

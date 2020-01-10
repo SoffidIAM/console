@@ -328,6 +328,12 @@ public class ApplicationBootServiceImpl extends
 				configSvc.update(cfg);
 			}
 
+			if (version < 104) { //$NON-NLS-1$
+				cfg.setValue("104"); //$NON-NLS-1$
+				updateFromVersion1();
+				configSvc.update(cfg);
+			}
+
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -408,6 +414,8 @@ public class ApplicationBootServiceImpl extends
 	}
 
 	private void configureSSOAttributes() throws InternalErrorException {
+		if ( dispatcherSvc.findDispatcherByName("SSO") == null)
+			return;
 		DataType td = new DataType();
 		td.setCode("type");
 		td.setLabel("Account type");
@@ -457,6 +465,8 @@ public class ApplicationBootServiceImpl extends
 		td.setSystemName("SSO");
 		td.setType(TypeEnumeration.STRING_TYPE);
 		createIfNotExists(td);
+
+		createScheduledTasks();
 	}
 
 	private void updateFromVersion1() throws IOException, Exception 
@@ -656,7 +666,7 @@ public class ApplicationBootServiceImpl extends
 	private void createScheduledTasks() throws InternalErrorException {
 		Map<String, ScheduledTaskHandler> handlers = new HashMap<String, ScheduledTaskHandler>();
 		Map<String, ScheduledTask> tasks = new HashMap<String, ScheduledTask>();
-		;
+
 		for (ScheduledTaskHandler handler : getScheduledTaskService()
 				.listHandlers()) {
 			handlers.put(handler.getName(), handler);
@@ -708,6 +718,14 @@ public class ApplicationBootServiceImpl extends
 			getScheduledTaskService().create(handler);
 		}
 
+		if (!handlers
+				.containsKey(SystemScheduledTasks.UPDATE_STATS)) {
+			ScheduledTaskHandler handler = new ScheduledTaskHandler();
+			handler.setClassName("com.soffid.iam.sync.engine.cron.UpdateStatsTask"); //$NON-NLS-1$
+			handler.setName(SystemScheduledTasks.UPDATE_STATS);
+			getScheduledTaskService().create(handler);
+		}
+
 		for (ScheduledTask task : getScheduledTaskService().listTasks()) {
 			String id = task.getHandlerName();
 			if (task.getParams() != null)
@@ -717,7 +735,7 @@ public class ApplicationBootServiceImpl extends
 
 		if (!tasks.containsKey(SystemScheduledTasks.EXPIRE_UNTRUSTED_PASSWORDS)) {
 			ScheduledTask task = new ScheduledTask();
-			task.setActive(true);
+			task.setActive(false);
 			task.setDayOfWeekPattern("*"); //$NON-NLS-1$
 			task.setDayPattern("*"); //$NON-NLS-1$
 			task.setHandlerName(SystemScheduledTasks.EXPIRE_UNTRUSTED_PASSWORDS);
@@ -731,7 +749,7 @@ public class ApplicationBootServiceImpl extends
 
 		if (!tasks.containsKey(SystemScheduledTasks.DISABLE_EXPIRE_PASSWORDS)) {
 			ScheduledTask task = new ScheduledTask();
-			task.setActive(true);
+			task.setActive(false);
 			task.setDayOfWeekPattern("*"); //$NON-NLS-1$
 			task.setDayPattern("*"); //$NON-NLS-1$
 			task.setHandlerName(SystemScheduledTasks.DISABLE_EXPIRE_PASSWORDS);
@@ -780,7 +798,7 @@ public class ApplicationBootServiceImpl extends
 
 		if (!tasks.containsKey(SystemScheduledTasks.ENABLE_DISABLE_ROLES)) {
 			ScheduledTask task = new ScheduledTask();
-			task.setActive(true);
+			task.setActive(false);
 			task.setDayOfWeekPattern("*");
 			task.setDayPattern("*");
 			task.setHandlerName(SystemScheduledTasks.ENABLE_DISABLE_ROLES);
@@ -791,6 +809,19 @@ public class ApplicationBootServiceImpl extends
 			getScheduledTaskService().create(task);
 		}
 
+
+		if (!tasks.containsKey(SystemScheduledTasks.UPDATE_STATS)) {
+			ScheduledTask task = new ScheduledTask();
+			task.setActive(false);
+			task.setDayOfWeekPattern("*");
+			task.setDayPattern("*");
+			task.setHandlerName(SystemScheduledTasks.UPDATE_STATS);
+			task.setHoursPattern("*");
+			task.setMinutesPattern("*/5");
+			task.setMonthsPattern("*");
+			task.setName("Feed statistic tables");
+			getScheduledTaskService().create(task);
+		}
 	}
 
 	private void executeSentence(Connection conn, String sql, Object... objects)

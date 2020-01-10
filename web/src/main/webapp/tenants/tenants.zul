@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?page id="parametres" title="Gestió dels Paràmetres de configuració"?>
+<?page id="parametres" title="${c:l('seu.tenants')}"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="parametres" ?>
 <?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
-<zk xmlns:h="http://www.w3.org/1999/xhtml"> 
+<frame xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<style>
 		tr.noBorderGrid td.gc {vertical-align: top} 
@@ -22,7 +22,7 @@
 			try
 			{
 				es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
-					.Labels.getLabel("parametres.Titol"));
+					.Labels.getLabel("seu.tenants"));
 			}
 			catch (Exception ex){}
 			
@@ -40,7 +40,7 @@
 			boolean isMaster = com.soffid.iam.utils.Security.getCurrentTenantName().equals ( masterTenant.getName() );
 			boolean canCreateTenant = isMaster && Security.isUserInRole("tenant:create");
 			boolean canUpdateTenant = isMaster && Security.isUserInRole("tenant:update");
-			boolean canDeleteTenant = false && isMaster && Security.isUserInRole("tenant:remove");
+			boolean canDeleteTenant = isMaster && Security.isUserInRole("tenant:delete");
 			boolean canQueryTenant = isMaster && Security.isUserInRole("tenant:query");;
 			
 			model.getVariables().declareVariable("queryEnabled", false);
@@ -144,7 +144,7 @@
 				
 				org.zkoss.util.media.AMedia media = new org.zkoss.util.media.AMedia(
 						tenant.getName()+".dump", 
-						"txt", "binary/octet-stream", f);
+						"txt", "binary/octet-stream", f, true);
 				
 				Filedownload.save(media, media.getName());
 				f.deleteOnExit();
@@ -166,7 +166,7 @@
 					else
 						in = new es.caib.bpm.attachment.ReaderInputStream( media.getReaderData() );
 				
-				Tenant t = com.soffid.iam.EJBLocator.getTenantService().importTenant(in);
+				com.soffid.iam.api.Tenant t = com.soffid.iam.EJBLocator.getTenantService().importTenant(in);
 				
 				String path = es.caib.zkib.datasource.XPathUtils.createPath(model, "/tenant", t);
 				es.caib.zkib.datamodel.DataNode node = es.caib.zkib.datasource.XPathUtils.getValue(model, path);
@@ -202,7 +202,8 @@
 					listbox="/esquema/lista/listbox"/>
 				<commitbutton datamodel="/model"/>
 				<undobutton datamodel="/model" listbox="/esquema/lista/listbox"/>
-				<toolbarbutton label="${c:l('tenant.import') }" onClick="importTenant()"> </toolbarbutton>
+				<toolbarbutton label="${c:l('tenant.zul.import') }" 
+					image="/img/upload.png" onClick="importTenant()"> </toolbarbutton>
 			</toolbar>
 			<listbox id="listbox" autocommit="false" dataPath="/model:/tenant"
 				fixedLayout="true" height="340px" onClick="showDetall()"
@@ -410,7 +411,7 @@ es.caib.zkib.datasource.XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.g
 				</grid>
 				
 				<div style="margin-top: 20px; width: 100%; align: right">
-					<button label="${c:l('tetant.zul.export') }" onClick="export()"/>
+					<button label="${c:l('tenant.zul.export') }" onClick="export()"/>
 				</div>
 			</form>
 		</detalls>
@@ -418,4 +419,4 @@ es.caib.zkib.datasource.XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.g
 	<zscript>
 		esquema.getFellow("queryWindow").getFellow("criteria_name").getFellow("textbox").focus();
 	</zscript>
-</zk>
+</frame>

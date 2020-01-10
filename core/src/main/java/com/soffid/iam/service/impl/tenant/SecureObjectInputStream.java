@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Calendar;
 
 public class SecureObjectInputStream extends ObjectInputStream {
 	Class<?> validClasses [] = {
@@ -20,7 +22,10 @@ public class SecureObjectInputStream extends ObjectInputStream {
 		Boolean.class,
 		String[].class,
 		Number.class,
-		Object[].class
+		Object[].class,
+		Timestamp.class,
+		java.util.Date.class,
+		Calendar.class,
 	};
 	public SecureObjectInputStream() throws IOException, SecurityException {
 		super();

@@ -1391,7 +1391,7 @@
 	</autoritzacio>
 	
 	<autoritzacio>
-		<codi>tenant:remove</codi>
+		<codi>tenant:delete</codi>
 		<descripcio>Remove tenants</descripcio>
 		<ambit>Tenancy</ambit>
 	</autoritzacio>
@@ -1508,6 +1508,19 @@
 		<codi>pamSession:query</codi>
 		<descripcio>Query jump server sessions</descripcio>
 		<ambit>PAM</ambit>
+	</autoritzacio>
+
+
+	<autoritzacio>
+		<codi>pamSession:create</codi>
+		<descripcio>Create a jump server session</descripcio>
+		<ambit>PAM</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:pamDashboard</codi>
+		<descripcio>Open PAM Dashboard</descripcio>
+		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 

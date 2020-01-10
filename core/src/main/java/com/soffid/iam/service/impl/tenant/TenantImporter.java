@@ -14,6 +14,8 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.model.identity.IdentityGenerator;
@@ -36,12 +38,18 @@ public class TenantImporter extends TenantDataManager {
 	public Tenant importTenant (InputStream in) throws SQLException, IOException, InternalErrorException, Exception {
 		loadDatabaseDefinition();
 		
+		int read;
+		ZipInputStream zin = new ZipInputStream(in);
+		ZipEntry zentry = zin.getNextEntry();
+		if (!zentry.getName().endsWith(".soffid-dump"))
+			throw new IOException ("Not a soffid dump file");
+		
 		tmpFile = File.createTempFile("import", "data");
 		OutputStream out = new FileOutputStream(tmpFile);
-		int read;
-		for ( read = in.read(); read >= 0; read = in.read())
+		for ( read = zin.read(); read >= 0; read = zin.read())
 			out.write(read);
 		out.close();
+		zin.close();
 		
 		long rows = countRows();
 		IdentityGeneratorBean bean = IdentityGeneratorBean.instance();
@@ -128,6 +136,7 @@ public class TenantImporter extends TenantDataManager {
 		t.setId(firstId);
 		t.setName(name + append);
 		t.setDescription(description);
+		t.setEnabled(false);
 		PreparedStatement stmt = conn.prepareStatement("INSERT INTO SC_TENANT(TEN_ID, TEN_NAME, TEN_DESCRI, TEN_ENABLE) VALUES (?,?,?,?)");
 		stmt.setLong(1, firstId);
 		stmt.setString(2, name + append);

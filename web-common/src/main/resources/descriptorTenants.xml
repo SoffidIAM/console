@@ -52,7 +52,7 @@
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
-			<delete-method method="delete">
+			<delete-method method="remove">
 				<parameter value="${instance}" />
 			</delete-method>
 			<update-method method="update">

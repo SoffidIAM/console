@@ -7,12 +7,12 @@ import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.naming.InitialContext;
 
@@ -20,120 +20,35 @@ import java.util.HashMap;
 
 import com.soffid.iam.api.Tenant;
 import com.soffid.tools.db.schema.Column;
-import com.soffid.tools.db.schema.ForeignKey;
 import com.soffid.tools.db.schema.Table;
 import com.soffid.tools.db.updater.MySqlUpdater;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantExporter extends TenantDataManager {
-	private Long id;
 	private ObjectOutputStream out;
-	private List<Action> firstStep = new LinkedList<Action>();
-	private List<Action> secondStep = new LinkedList<Action>();
-	private LinkedList<Table> tables;
 	private HashMap<String,Long> ids = new HashMap<String,Long>();
 	private long nextId;
 	private Tenant tenant;
 	
-
-	
 	public void export(Tenant t, OutputStream out) throws Exception {
 		this.id = t.getId();
 		this.tenant = t;
-		this.out = new ObjectOutputStream( out );
+		ZipOutputStream zipOut = new ZipOutputStream(out);
+		ZipEntry zentry = new ZipEntry(t.getName()+".soffid-dump");
+		zipOut.putNextEntry(zentry);
+		
+		this.out = new ObjectOutputStream( zipOut );
     	loadDatabaseDefinition();
         	
     	try {
     		createExportPlan();
     		export ();
+    		this.out.close();
+    		zipOut.close();
     	} finally {
     		conn.close();
     	}
-	}
-
-	private void createExportPlan() {
-		tables = new LinkedList<Table>( db.tables );
-		
-		// Export remove tenant		
-		for ( Iterator<Table> it = tables.iterator(); it.hasNext(); )
-		{
-			Table t = it.next();
-			if (t.name.equals("SC_TENANT"))
-				it.remove();
-		}
-		
-		
-		
-		while ( !tables.isEmpty()) {
-			boolean anyChange;
-			do {
-				anyChange = false;
-				for ( Iterator<Table> it = tables.iterator(); it.hasNext(); )
-				{
-					Table t = it.next();
-					if ( ! pendingForeignKeys (t) )
-					{
-						firstStep.add( new Action(Action.Operation.EXPORT_FULL, t));
-						it.remove();
-						anyChange = true;
-					}
-				}
-			} while (anyChange);
-
-			for ( Iterator<Table> it = tables.iterator(); it.hasNext(); )
-			{
-				Table t = it.next();
-				if ( ! pendingMandatoryForeignKeys (t) )
-				{
-					firstStep.add( new Action(Action.Operation.EXPORT_NOFK, t));
-					secondStep.add( new Action(Action.Operation.EXPORT_FK, t));
-					it.remove();
-					anyChange = true;
-					break;
-				}
-			}
-		} 
-	}
-
-	private boolean pendingMandatoryForeignKeys(Table t) {
-		for ( ForeignKey fk: db.foreignKeys)
-		{
-			if (fk.tableName.equals(t.name) )
-			{
-				if ( isPending (fk.foreignTable))
-				{
-					for (String column: fk.columns)
-					{
-						Column col = t.findColumn(column, false);
-						if (col != null && col.notNull)
-							return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean pendingForeignKeys(Table t) {
-		for ( ForeignKey fk: db.foreignKeys)
-		{
-			if (fk.tableName.equals(t.name) )
-			{
-				if ( isPending (fk.foreignTable))
-					return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean isPending(String foreignTable) {
-		for ( Table table: tables)
-		{
-			if (table.name.equals(foreignTable))
-				return true;
-		}
-		return false;
 	}
 
 	private void export() throws IOException, SQLException, InternalErrorException {
@@ -178,9 +93,8 @@ public class TenantExporter extends TenantDataManager {
 			}
 		}
 		sb.append(" FROM "+table.name);
-		sb.append(generateQuery(table));
+		sb.append(generateQuery(table, false));
 
-		log.info(sb.toString());
 
 		try {
 			Statement stmt = conn.createStatement();
@@ -189,10 +103,13 @@ public class TenantExporter extends TenantDataManager {
 			out.writeObject ( table.name );
 			out.writeObject ( table.getPrimaryKey() );
 			out.writeObject( columns.toArray(new String[0]));
+			int rows = 0;
 			while (rset.next())
 			{
+				rows ++;
 				writeRow ( rset, table, columns, foreignColumns, true);
 			}
+			log.info(table.name+" (step 2): "+rows);
 			out.writeObject(null);
 		} catch (SQLException e) {
 			if ( ignoreFailures && e.getMessage().contains("Table not found"))
@@ -200,7 +117,10 @@ public class TenantExporter extends TenantDataManager {
 				// Ignore
 			}
 			else
+			{
+				log.info(sb.toString());
 				throw e;
+			}
 		}
 		out.writeObject(null);
 	}
@@ -225,9 +145,8 @@ public class TenantExporter extends TenantDataManager {
 			}
 		}
 		sb.append(" FROM "+table.name);
-		sb.append(generateQuery(table));
+		sb.append(generateQuery(table, false));
 
-		log.info(sb.toString());
 
 		try {
 			Statement stmt = conn.createStatement();
@@ -235,18 +154,24 @@ public class TenantExporter extends TenantDataManager {
 			out.writeObject ( "insert" );
 			out.writeObject( table.name );
 			out.writeObject( columns.toArray(new String[0]));
+			int rows = 0;
 			while (rset.next())
 			{
+				rows ++;
 				writeRow ( rset, table, columns, foreignColumns, false);
 			}
 			out.writeObject(null);
+			log.info(table.name+" (step 1) : "+rows);
 		} catch (SQLException e) {
 			if ( ignoreFailures && e.getMessage().contains("Table not found"))
 			{
 				// Ignore
 			}
 			else
+			{
+				log.info(sb.toString());
 				throw e;
+			}
 		}
 	}
 
@@ -265,10 +190,10 @@ public class TenantExporter extends TenantDataManager {
 			sb.append(table.name+"."+c.name);
 		}
 		sb.append(" FROM "+table.name);
-		sb.append(generateQuery(table));
+		sb.append(generateQuery(table, false));
 
-		log.info(sb.toString());
 
+		int rows = 0;
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet rset = stmt.executeQuery(sb.toString());
@@ -277,16 +202,21 @@ public class TenantExporter extends TenantDataManager {
 			out.writeObject( columns.toArray(new String[0]));
 			while (rset.next())
 			{
+				rows ++;
 				writeRow ( rset, table, columns, foreignColumns, false);
 			}
 			out.writeObject(null);
+			log.info(table.name+": "+rows);
 		} catch (SQLException e) {
 			if ( ignoreFailures && e.getMessage().contains("Table not found"))
 			{
 				// Ignore
 			}
 			else
+			{
+				log.info(sb.toString());
 				throw e;
+			}
 		}
 	}
 
@@ -316,262 +246,25 @@ public class TenantExporter extends TenantDataManager {
 				{
 					ids.put(table.name+"#"+value, nextId);
 					value = nextId;
+					nextId++;
 				}
 			}
+			row[i-1] = value;
 			i ++;
 		}
 		out.writeObject(row);
 	}
-
-	private String generateQuery(Table table) throws InternalErrorException {
-		return generateQuery(table, new HashSet<String>());
-	}
-	
-	private String generateHint ( Table table)
-	{
-		for (int i=0; i < hints.length; i+=2)
-			if (hints[i].equals(table.name))
-			{
-				String r = " " + hints[i+1];
-				do {
-					int m = r.indexOf("${tenantId}");
-					if (m >= 0)
-						r =  r.substring(0, m) + id + r.substring(m+11);
-					else
-						return r;
-				} while (true);
-			}
-		return null;
-		
-	}
-	private String generateQuery(Table table, Set<String> forbiddenTables) throws InternalErrorException {
-		String hint = generateHint(table);
-		if (hint != null)
-			return hint;
-		
-		LinkedList<SearchPath> list = new LinkedList<SearchPath>();
-		SearchPath sp = new SearchPath();
-		sp.from = "";
-		sp.where = "";
-		sp.lastTable = table.name;
-		sp.path =  new HashSet<String>(forbiddenTables);
-		sp.path.add(table.name);
-		list.add(sp);
-		String s = generateDirectQuery(list);
-		if (!s.isEmpty())
-			return s;
-
-		s = generateIndirectQuery ( table, sp.path);
-		if (s.isEmpty())
-		{
-			throw new InternalErrorException("There is no filter for table "+table.name);
-		}
-		return s;
-	}
-
-	private String generateIndirectQuery(Table table, Set<String> forbiddenTables) throws InternalErrorException {
-		StringBuffer query = new StringBuffer();
-		for ( ForeignKey fk: references (table.name))
-		{
-			if (! forbiddenTables.contains(fk.tableName))
-			{
-				Table master = db.findTable(fk.tableName, false);
-				String s = null;
-				try {
-					s = generateQuery ( master, forbiddenTables );
-				} catch (InternalErrorException e) {}
-				if (s != null && ! s.isEmpty())
-				{
-					if (query.length() > 0) query.append(" OR ");
-					else query.append(" WHERE ");
-					query.append(table.getPrimaryKey())
-						.append(" IN ( SELECT ");
-					for (String columnName: fk.columns)
-					{
-						query.append(columnName);
-					}
-					query.append(" FROM ")
-						.append(fk.tableName)
-						.append(s)
-						.append(")");
-				}
-			}
-		}
-		return query.toString();
-	}
-
-	public String generateDirectQuery(LinkedList<SearchPath> list) {
-		SearchPath sp;
-		while ( ! list.isEmpty())
-		{
-			sp = list.poll();
-			for ( ForeignKey fk: mandatoryForeignKeys(sp.lastTable))
-			{
-				if (fk.foreignTable.equals("SC_TENANT"))
-				{
-					for ( String col: fk.columns)
-					{
-						if (! sp.where.isEmpty())
-							sp.where = sp.where+ " AND ";
-						sp.where = sp.where + col + "="+id;
-					}
-					return sp.from+" WHERE "+sp.where;
-				}
-				else if ( !sp.path.contains(fk.foreignTable))
-				{
-					Table table = db.findTable(fk.foreignTable, false);
-					String hint = generateHint( table );
-					if (hint == null)
-					{
-						SearchPath newsp = new SearchPath();
-						newsp.from = sp.from+", "+fk.foreignTable;
-						newsp.where = sp.where;
-						for ( int i = 0; i < fk.columns.size(); i++)
-						{
-							if (! newsp.where.isEmpty())
-								newsp.where = newsp.where+ " AND ";
-							newsp.where = newsp.where + sp.lastTable+"."+ fk.columns.get(i) + "="+
-									fk.foreignTable+"."+fk.foreignKeyColumns.get(i);
-						}
-						newsp.lastTable = fk.foreignTable;
-						newsp.path = new HashSet<String>(sp.path);
-						newsp.path.add(newsp.lastTable);
-						list.add(newsp);
-					} else {
-						String where = sp.where;
-						for ( int i = 0; i < fk.columns.size(); i++)
-						{
-							if ( !where.isEmpty())
-								where = where + " AND ";
-							where = where +
-									sp.lastTable+"."+ fk.columns.get(i) + " IN (SELECT "+
-									table.getPrimaryKey()+
-									" FROM "+table.name+ hint+ ")";
-						}
-						return sp.from + " WHERE " + where;
-					}
-						
-				}
-			}
-		}
-		return "";
-	}
-
-	private List<ForeignKey> mandatoryForeignKeys(String lastTable) {
-		List<ForeignKey> result = new LinkedList<ForeignKey>();
-		
-		Table t = db.findTable(lastTable, true);
-		
-		for ( ForeignKey fk: db.foreignKeys)
-		{
-			if (fk.tableName.equals(t.name) )
-			{
-				boolean mandatory = true;
-				for (String column: fk.columns)
-				{
-					Column col = t.findColumn(column, false);
-					if (col != null && ! col.notNull &&
-							!col.name.equals("TENANT_")) // Hack for JBPM modules
-						mandatory = false;
-				}
-				if (mandatory)
-					result.add(fk);
-			}
-		}
-		return result;
-	}
-
-	private List<ForeignKey> references(String lastTable) {
-		List<ForeignKey> result = new LinkedList<ForeignKey>();
-		
-		for ( ForeignKey fk: db.foreignKeys)
-		{
-			if (fk.foreignTable.equals(lastTable) )
-			{
-				result.add(fk);
-			}
-		}
-		return result;
-	}
-
-	String[] hints = new String[] {
-			"BPM_DATABASE_PROPERTY", "WHERE 1=0",
-			"BPM_FILE_SYSTEM", "WHERE 1=0",
-			"JBPM_ID_GROUP", "WHERE 1=0",
-			"JBPM_ID_MEMBERSHIP", "WHERE 1=0",
-			"JBPM_ID_USER", "WHERE 1=0",
-			"JBPM_ID_PERMISSIONS", "WHERE 1=0",
-			"JBPM_VARIABLEACCESS", "WHERE 1=0",
-			"JBPM_PROCESSDEFINITION", "WHERE ID_ IN (SELECT PROCESSDEFINITION_ FROM JBPM_MODULEDEFINITION WHERE TENANT_=${tenantId}",
-//			"JBPM_BYTEARRAY", 
-//					"WHERE ID_ IN (SELECT BYTEARRAYVALUE_ "
-//					+ "FROM JBPM_VARIABLEINSTANCE, JBPM_MODULEINSTANCE "
-//					+ "WHERE JBPM_VARIABLEINSTANCE.PROCESSINSTANCE_ = JBPM_MODULE.ID_"
-//					+ "FROM JBPM_MODULEDEFINITION WHERE TENANT_=${tenantId}",
-			"JBPM_VARIABLEINSTANCE", 
-					", JBPM_MODULEINSTANCE "
-					+ "WHERE JBPM_VARIABLEINSTANCE.PROCESSINSTANCE_ = JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
-					+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
-			"JBPM_PROCESSINSTANCE", 
-				", JBPM_MODULEINSTANCE "
-				+ "WHERE JBPM_PROCESSINSTANCE.ID_ = JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
-				+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
-			"JBPM_TOKEN", 
-				", JBPM_MODULEINSTANCE "
-				+ "WHERE JBPM_TOKEN.PROCESSINSTANCE_= JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
-				+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
-			"JBPM_JOB", 
-				", JBPM_TOKEN, JBPM_MODULEINSTANCE "
-				+ "WHERE JBPM_JOB.PROCESSINSTANCE_= JBPM_MODULEINSTANCE.PROCESSINSTANCE_ "
-				+ "AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}",
-			"JBPM_BYTEBLOCK",
-				" WHERE PROCESSFILE_ IN ( SELECT JBPM_LOG.NEWBYTEARRAY_ FROM JBPM_LOG, JBPM_TOKEN, JBPM_MODULEINSTANCE "
-				+								 "WHERE JBPM_LOG.TOKEN_=JBPM_TOKEN.ID_ AND JBPM_TOKEN.PROCESSINSTANCE_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) "
-				+ "OR PROCESSFILE_ IN ( SELECT JBPM_LOG.OLDBYTEARRAY_ FROM JBPM_LOG, JBPM_TOKEN, JBPM_MODULEINSTANCE " 
-				+                                "WHERE JBPM_LOG.TOKEN_=JBPM_TOKEN.ID_ AND JBPM_TOKEN.PROCESSINSTANCE_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId})"
-				+ "OR PROCESSFILE_ IN ( SELECT BYTEARRAYVALUE_ FROM JBPM_VARIABLEINSTANCE , JBPM_MODULEINSTANCE "
-				+								 "WHERE JBPM_VARIABLEINSTANCE.PROCESSINSTANCE_ = JBPM_MODULEINSTANCE.PROCESSINSTANCE_AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) " 
-				+ "OR PROCESSFILE_ IN ( SELECT ID_ FROM JBPM_MODULEDEFINITION WHERE JBPM_MODULEDEFINITION.TENANT_=${tenantId})" ,
-			"JBPM_BYTEARRAY",
-				" WHERE JBPM_BYTEARRAY.ID_ IN ( SELECT JBPM_LOG.NEWBYTEARRAY_ FROM JBPM_LOG, JBPM_TOKEN, JBPM_MODULEINSTANCE "
-				+								 "WHERE JBPM_LOG.TOKEN_=JBPM_TOKEN.ID_ AND JBPM_TOKEN.PROCESSINSTANCE_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) "
-				+ "OR JBPM_BYTEARRAY.ID_ IN ( SELECT JBPM_LOG.OLDBYTEARRAY_ FROM JBPM_LOG, JBPM_TOKEN, JBPM_MODULEINSTANCE " 
-				+                                "WHERE JBPM_LOG.TOKEN_=JBPM_TOKEN.ID_ AND JBPM_TOKEN.PROCESSINSTANCE_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId})"
-				+ "OR JBPM_BYTEARRAY.ID_ IN ( SELECT BYTEARRAYVALUE_ FROM JBPM_VARIABLEINSTANCE , JBPM_MODULEINSTANCE "
-				+								 "WHERE JBPM_VARIABLEINSTANCE.PROCESSINSTANCE_ = JBPM_MODULEINSTANCE.PROCESSINSTANCE_AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) " 
-				+ "OR JBPM_BYTEARRAY.FILEDEFINITON_ IN ( SELECT ID_ FROM JBPM_MODULEDEFINITION WHERE JBPM_MODULEDEFINITION.TENANT_=${tenantId})" ,
-			"BPM_PROHIE",
-				" WHERE BPM_PROHIE.PRH_PARPRO IN ( SELECT JBPM_MODULEINSTANCE.PROCESSINSTANCE_ FROM JBPM_MODULEINSTANCE "
-				+								 "WHERE JBPM_MODULEINSTANCE.TENANT_=${tenantId}) ",
-			"SC_ICONES",
-				" WHERE SC_ICONES.ICO_ID IN (SELECT PUE_ICON FROM SC_PUNENT WHERE PUE_TEN_ID=${tenantId}) OR "
-				+" SC_ICONES.ICO_ID IN (SELECT PUE_ICON2 FROM SC_PUNENT WHERE PUE_TEN_ID=${tenantId}) ",
-			"SC_TIPEXE",
-				" WHERE 1 = 0 ",
-			"SC_SEQUENCE",
-				" WHERE 1 = 0 ",
-			"JBPM_TASKINSTANCE",
-				",JBPM_MODULEINSTANCE WHERE JBPM_TASKINSTANCE.PROCINST_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) ",
-			"JBPM_POOLEDACTOR",
-				",JBPM_TASKACTORPOOL,JBPM_TASKINSTANCE,JBPM_MODULEINSTANCE "
-				+ "WHERE JBPM_POOLEDACTOR.POOLEDACTOR_=JBPM.TASKACTORPOOL.ID_ AND JBPM_TASKINSTANCE.ID_=JBPM_TASKACTORPOOL.TASKINSTANCE_ AND JBPM_TASKINSTANCE.PROCINST_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) ",
-			"JBPM_TASKACTORPOOL",
-				",JBPM_TASKINSTANCE,JBPM_MODULEINSTANCE "
-				+ "WHERE JBPM_TASKINSTANCE.ID_=JBPM_TASKACTORPOOL.TASKINSTANCE_ AND JBPM_TASKINSTANCE.PROCINST_=JBPM_MODULEINSTANCE.PROCESSINSTANCE_ AND JBPM_MODULEINSTANCE.TENANT_=${tenantId}) ",
-			"JBPM_NODE",
-				",JBPM_MODULEDEFINITION WHERE JBPM_NODE.PROCESSDEFINITION_=JBPM_MODULEDEFINITION.PROCESSDEFINITION_ AND JBPM_MODULEDEFINITION.TENANT_=${tenantId}) ",
-			"JBPM_DECISIONCONDITION",
-				",JBPM_NODE,JBPM_MODULEDEFINITION "
-				+ "WHERE JBPM_DECISIONCONDITION.DECISION_ = JBPM_NODE.ID_ AND "
-				+ "JBPM_NODE.PROCESSDEFINITION_=JBPM_MODULEDEFINITION.PROCESSDEFINITION_ AND "
-				+ "JBPM_MODULEDEFINITION.TENANT_=${tenantId}) "
-	};
 }
 
 
 class SearchPath {
 	String from;
 	String where;
+	
+	String from2;
+	String where2;
+	String tail2;
+	
 	String lastTable;
 	Set<String> path;
 }

@@ -56,6 +56,12 @@ public class TenantService extends Object {
 		return null;
 	}
 
+	@Description("Remove at tenant")
+	@Operation(grantees={tenantCreate.class})
+	public void remove (Tenant tenant) {
+	}
+
+
 	@Description("Updates a tenant")
 	@Operation(grantees={tenantUpdate.class})
 	public Tenant update (Tenant tenant) {

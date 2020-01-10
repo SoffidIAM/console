@@ -21,6 +21,7 @@ import com.soffid.iam.model.UserEntityImpl;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.impl.tenant.TenantExporter;
 import com.soffid.iam.service.impl.tenant.TenantImporter;
+import com.soffid.iam.service.impl.tenant.TenantRemover;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.PoliticaContrasenya;
@@ -77,5 +78,26 @@ public class TenantTest extends AbstractTest
 		}
 	}
 
+	public void testRemove() throws Exception
+	{
+		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
+
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
+		try {
+			TenantService tenantService = com.soffid.iam.ServiceLocator.instance().getTenantService();
+			
+			Tenant t = new Tenant();
+			t.setName("test");
+			t.setDescription("Test tenant");
+			t.setEnabled(false);
+			t = tenantService.create(t);
+			
+			TenantRemover remover = new TenantRemover();
+			remover.setIgnoreFailures(true);
+			remover.remove(t);
+		} finally {
+			Security.nestedLogoff();
+		}
+	}
 }
 

@@ -18,6 +18,7 @@ import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.model.TenantServerEntity;
 import com.soffid.iam.service.impl.tenant.TenantExporter;
 import com.soffid.iam.service.impl.tenant.TenantImporter;
+import com.soffid.iam.service.impl.tenant.TenantRemover;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -223,5 +224,18 @@ public class TenantServiceImpl extends TenantServiceBase {
 	@Override
 	protected Tenant handleImportTenant(InputStream in) throws Exception {
 		return new TenantImporter().importTenant(in);
+	}
+
+	@Override
+	protected void handleRemove(Tenant tenant) throws Exception {
+		TenantEntity te = getTenantEntityDao().load(tenant.getId());
+		if (te.isEnabled())
+			throw new InternalErrorException( String.format("The tenant %s cannot be deleted as it is active", te.getName() ) );
+		if (te.getName().equals(MASTER_NAME))
+			throw new InternalErrorException( "The master tenant cannot be deleted") ;
+		
+		new TenantRemover().remove(tenant);
+		
+		getTenantEntityDao().remove(te);
 	}
 }

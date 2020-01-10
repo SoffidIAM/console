@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_OSTYPE", translatedName="OsTypeEntity", translatedPackage="com.soffid.iam.model" )
@@ -24,6 +25,9 @@ public abstract class OsTypeEntity {
 	@Nullable
 	public java.lang.String description;
 
+	@Column (name="OST_TEN_ID")
+	public TenantEntity tenant;
+	
 	@ForeignKey (foreignColumn="MAQ_OST_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.MaquinaEntity> operatingSystemHost;
 

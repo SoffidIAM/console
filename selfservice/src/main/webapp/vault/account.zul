@@ -19,7 +19,19 @@
 		document.getElementById(uuid2).style.display="inline"; 
 		document.getElementById(uuid1).style.display="none"; 
 	}
+
+	statusEnabled = com.soffid.iam.api.AccountStatus.ACTIVE;
+	statusForceEnabled = com.soffid.iam.api.AccountStatus.FORCED_ACTIVE;
+	statusForceDisabled = com.soffid.iam.api.AccountStatus.FORCED_DISABLED;
+	statusDisabled = com.soffid.iam.api.AccountStatus.DISABLED;
+	statusRemoved = com.soffid.iam.api.AccountStatus.REMOVED;
 	</script>
+	
+	<zscript>
+	<![CDATA[
+	   	boolean canQueryAuditoria = com.soffid.iam.utils.Security.isUserInRole("pamSession:query");
+	]]>
+	</zscript>
 	<window id="innerWindow" visible="false" sizable="true"
 		position="center,center" width="80%" use="com.soffid.iam.web.vault.AccountWindow">
 		<form id="form" dataPath="/model:/void" orient="vertical"
@@ -41,179 +53,244 @@
 				<tabpanels>
 					<tabpanel id="basica">
 						<hbox width="100%" widths="50%,1px,45%,*">
-							<grid>
-								<rows>
-									<row>
-										<input_etiqueta value="${c:l('vault.account.folder')}:" />
-										<div>
-											<label bind="@vaultFolder" />
-											<imageclic src="/img/root.gif" id="changeFolderButton" width="16px" height="16px" onClick="innerWindow.selectParent()">
-											</imageclic>
-										</div>
-									</row>
-									<row id="nameRow">
-										<input_etiqueta
-											value="${c:l('accounts.name')}:" />
-										<div>
-											<image
-												 style="float:right"
-												src="~./img/exclamacio.gif" id="updateIndicator"
-												visible="false" width="16px" height="16px">
-											</image>
-											<label value="*" style="float:right"/>
-											<div style="padding: 0 5px 0 0; overflow: hidden">
-												<input_dada
-													id="txtAccountName" bind="@name"
-													maxlength="128"
-													multiline_custom="false" width_custom="95%" />
-												<textbox sclass="textbox"
-													id="txtAccountName2" 
-													onChange="innerWindow.onChangeAccountName(self)"
-													bind="@loginName"
-													maxlength="128"
-													multiline="false" width="90%" />
+							<div>
+								<grid>
+									<columns>
+										<column width="150px"/>
+										<column width="*"/>
+									</columns>
+									<rows>
+										<row>
+											<input_etiqueta value="${c:l('vault.account.folder')}:" />
+											<div>
+												<label bind="@vaultFolder" />
+												<imageclic src="/img/root.gif" id="changeFolderButton" width="16px" height="16px" onClick="innerWindow.selectParent()">
+												</imageclic>
 											</div>
-										</div>
-									</row>
-									<row id="dispatcherRow">
-										<input_etiqueta
-											style="white-space:nowrap;"
-											value="${c:l('accounts.dispatcher')}:" />
-										<hbox>
-											<listbox bind="@system"
-												id="lbAccountDispatcher" mold="select"
-												dataPath="/model:/dispatcher">
-												<dataitem
-													bind="@codi">
+										</row>
+										<row id="nameRow">
+											<input_etiqueta
+												value="${c:l('accounts.name')}:" />
+											<div>
+												<image
+													 style="float:right"
+													src="~./img/exclamacio.gif" id="updateIndicator"
+													visible="false" width="16px" height="16px">
+												</image>
+												<label value="*" style="float:right"/>
+												<div style="padding: 0 5px 0 0; overflow: hidden">
+													<input_dada
+														id="txtAccountName" bind="@name"
+														maxlength="128"
+														multiline_custom="false" width_custom="95%" />
+													<textbox sclass="textbox"
+														id="txtAccountName2" 
+														onChange="innerWindow.onChangeAccountName(self)"
+														maxlength="128"
+														bind="@loginName"
+														multiline="false" width="90%" />
+												</div>
+											</div>
+										</row>
+										<row id="dispatcherRow">
+											<input_etiqueta
+												style="white-space:nowrap;"
+												value="${c:l('accounts.dispatcher')}:" />
+											<hbox>
+												<listbox bind="@system"
+													id="lbAccountDispatcher" mold="select"
+													dataPath="/model:/dispatcher">
+													<dataitem
+														bind="@codi">
+														<listcell
+															bind="@codi" />
+													</dataitem>
+												</listbox>
+	
+												<label value="*" />
+											</hbox>
+										</row>
+										<row>
+											<input_etiqueta
+												value="${c:l('accounts.description')}:" />
+											<input_dada
+												id="txtAccountDescription" bind="@description"
+												maxlength="255"
+												multiline_custom="false" width_custom="97%" />
+										</row>
+									</rows>
+								</grid>
+								<div sclass="titolpagina">
+									Account management
+								</div>
+								<grid>
+									<columns>
+										<column width="150px"/>
+										<column width="*"/>
+									</columns>
+									<rows>
+										<row id="typeRow">
+											<input_etiqueta
+												style="white-space:nowrap;" value="${c:l('accounts.type')}:" />
+											<listbox bind="@type"
+												onSelect="innerWindow.onChangeAccountType()"
+												id="lbAccountType" mold="select" dataPath="/model:/type">
+												<dataitem bind="@value">
 													<listcell
-														bind="@codi" />
+														bind="@literal" />
 												</dataitem>
 											</listbox>
-
-											<label value="*" />
-										</hbox>
-									</row>
-									<row id="typeRow">
-										<input_etiqueta
-											style="white-space:nowrap;" value="${c:l('accounts.type')}:" />
-										<listbox bind="@type"
-											id="lbAccountType" mold="select" dataPath="/model:/type">
-											<dataitem bind="@value">
-												<listcell
-													bind="@literal" />
-											</dataitem>
-										</listbox>
-									</row>
-									<row id="passwordPolicyRow">
-										<input_etiqueta
-											style="white-space:nowrap;"
-											value="${c:l('accounts.policy')}:" />
-
-										<hbox>
+										</row>
+										<row id="passwordPolicyRow">
+											<input_etiqueta
+												style="white-space:nowrap;"
+												value="${c:l('accounts.policy')}:" />
+	
+											<hbox>
+												<listbox
+													bind="@passwordPolicy" id="lbPolicy" mold="select"
+													dataPath="/model:/tipusUsuari">
+													<dataitem
+														bind="@codi">
+														<listcell
+															bind="@descripcio" />
+													</dataitem>
+												</listbox>
+	
+												<label value="*" />
+											</hbox>
+										</row>
+										<row id="ssoTypeRow">
+											<input_etiqueta
+												style="white-space:nowrap;"
+												value="${c:l('accounts.type')}:" />
+	
 											<listbox
-												bind="@passwordPolicy" id="lbPolicy" mold="select"
-												dataPath="/model:/tipusUsuari">
-												<dataitem
-													bind="@codi">
-													<listcell
-														bind="@descripcio" />
+												bind="attributes[@name='type']" id="lbSsoType" mold="select" >
+												<listitem value="Windows" label="Windows"/>
+												<listitem value="Linux" label="Linux"/>
+												<listitem value="Database" label="${c:l('accounts.database') }"/>
+												<listitem value="" label="${c:l('accounts.others') }"/>
+											</listbox>
+										</row>
+										<row id="serverRow">
+											<input_etiqueta
+												value="${c:l('vault.account.server')}:" />
+											<textbox
+												maxlength="128"
+												onChange="innerWindow.onChangeServerName()"
+												bind="attributes[@name='SSO:Server']" 
+												id="serverTextbox" 
+												width="100%" />
+										</row>
+									</rows>
+								</grid>
+								<div sclass="titolpagina">
+									Account usage
+								</div>
+								<grid>
+									<columns>
+										<column width="150px"/>
+										<column width="*"/>
+									</columns>
+									<rows>
+										<row id="urlRow">
+											<input_etiqueta
+												value="${c:l('vault.account.url')}:" />
+											<textbox
+												id="urlTextbox"
+												sclass="textbox" 
+												maxlength="255"
+												bind="loginUrl"
+												multiline="false" width="100%" >
+												<attribute name="onChanging"><![CDATA[
+											    		self.setStyle("");
+												]]></attribute>
+												<attribute name="onChange">
+													<![CDATA[innerWindow.onChangeLoginUrl(self)]]>
+												</attribute>
+											</textbox>
+										</row>
+										<row id="enabledRow">
+											<input_etiqueta
+												value="${c:l('accounts.status')}:" />
+											<listbox bind="@status" disabled="true" id="lbAccountDisabled"
+												mold="label">
+												<listitem value="${statusEnabled}" disabled="t">
+													<listcell label="${c:l('accounts.Enabled')}" />
+												</listitem>
+												<listitem value="${statusDisabled}">
+													<listcell label="${c:l('accounts.Disabled')}" />
+												</listitem>
+												<listitem value="${statusRemoved}">
+													<listcell label="${c:l('accounts.Removed')}" />
+												</listitem>
+											</listbox>
+										</row>
+										<row >
+											<label sclass="etiqueta" value="${c:l('accounts.launchType') } :"></label>
+											<listbox bind="@launchType" dataPath="/model:/launchType" mold="select"
+												onSelect="innerWindow.onChangeLaunchType()">
+												<dataitem bind="@value"><listcell bind="@literal"/></dataitem>
+											</listbox>
+										</row>
+										<row id="jumpServerRow">
+											<label sclass="etiqueta" value="${c:l('accounts.jumpServerGroup') } :"></label>
+											<listbox bind="@jumpServerGroup" dataPath="/model:/jumpServerGroup" 
+												mold="select">
+												<dataitem bind="@name">
+													<listcell bind="@name"/>
 												</dataitem>
 											</listbox>
-
-											<label value="*" />
-										</hbox>
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.description')}:" />
-										<input_dada
-											id="txtAccountDescription" bind="@description"
-											maxlength="255"
-											multiline_custom="false" width_custom="97%" />
-									</row>
-									<row id="urlRow">
-										<input_etiqueta
-											value="${c:l('vault.account.url')}:" />
-										<textbox
-											id="urlTextbox"
-											sclass="textbox" 
-											maxlength="255"
-											bind="loginUrl"
-											multiline="false" width="100%" >
-											<attribute name="onChanging"><![CDATA[
-										    		self.setStyle("");
-											]]></attribute>
-											<attribute name="onChange">
-												<![CDATA[innerWindow.onChangeLoginUrl(self)]]>
-											</attribute>
-										</textbox>
-									</row>
-									<row id="serverRow">
-										<input_etiqueta
-											value="${c:l('vault.account.server')}:" />
-										<input_dada
-											id="serverTextbox" 
-											maxlength="128"
-											multiline_custom="false" width_custom="100%" />
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.lastUpdated')}:" />
-										<datebox readonly="true"
-											disabled="true" bind="@lastUpdated" width="10em"
-											format="${c:l('usuaris.zul.dateFormat')}" />
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.lastPasswordSet')}:" />
-										<hbox>
-											<datebox readonly="true"
-												disabled="true" bind="@lastPasswordSet" width="10em"
+										</row>
+										<row id="ownerRow">
+											<label sclass="etiqueta" value="${c:l('accounts.owner') } :" />
+											<div>
+												<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@userName"></label>
+												<image src="/img/cancel.png" width="12px" height="12px" onClick="innerWindow.checkinAccount(self)"/>
+											</div>
+										</row>
+										<row>
+											<input_etiqueta
+												value="${c:l('accounts.lastUpdated')}:" />
+											<datebox readonly="true" buttonVisible="false"
+												disabled="true" bind="@lastUpdated" width="10em"
 												format="${c:l('usuaris.zul.dateFormat')}" />
-											<imageclic src="/img/lupa.gif" id ="queryImg">
-												<attribute name="onClick">
-													innerWindow.queryPassword(self);
-												</attribute>
-											</imageclic>
-											<imageclic src="~./img/pwd.gif" id="passwordImg" title="${c:l('accounts.setPassword')}">
-												<attribute name="onClick">
-													innerWindow.setPassword(self);
-												</attribute>
-											</imageclic>
-										</hbox>
-									</row>
-									<row>
-										<input_etiqueta
-											value="${c:l('accounts.passwordExpiration')}:" />
-										<datebox readonly="true"
-											disabled="true" bind="@passwordExpiration" width="10em"
-											format="${c:l('usuaris.zul.dateFormat')}" />
-									</row>
-									<row id="enabledRow">
-										<input_etiqueta
-											value="${c:l('accounts.status')}:" />
-										<listbox bind="@disabled"
-											id="lbAccountDisabled" mold="select">
-											<listitem
-												value="${false}">
-												<listcell
-													label="${c:l('accounts.Enabled')}" />
-											</listitem>
-											<listitem value="${true}">
-												<listcell
-													label="${c:l('accounts.Disabled')}" />
-											</listitem>
-										</listbox>
-									</row>
-									<row id="ownerRow">
-										<label value="Owner:" />
-										<div>
-											<label style="margin-left: 6px; margin-right: 4px" bind="/owner/@userName"></label>
-											<image src="/img/cancel.png" width="12px" height="12px" onClick="innerWindow.checkinAccount(self)"/>
-										</div>
-									</row>
-								</rows>
-							</grid>
+										</row>
+										<row>
+											<input_etiqueta
+												value="${c:l('accounts.lastPasswordSet')}:" />
+											<div>
+												<datebox readonly="true" buttonVisible="false"
+													disabled="true" bind="@lastPasswordSet" width="10em"
+													format="${c:l('usuaris.zul.dateFormat')}" />
+												<imageclic  src="/img/lupa.gif" id ="queryImg">
+													<attribute name="onClick">
+														innerWindow.queryPassword(self);
+													</attribute>
+												</imageclic>
+												<imageclic src="~./img/pwd.gif" id="passwordImg" title="${c:l('accounts.setPassword')}">
+													<attribute name="onClick">
+														innerWindow.setPassword(self);
+													</attribute>
+												</imageclic>
+											</div>
+										</row>
+										<row>
+											<input_etiqueta
+												value="${c:l('accounts.passwordExpiration')}:" />
+											<datebox readonly="true" buttonVisible="false"
+												disabled="true" bind="@passwordExpiration" width="10em"
+												format="${c:l('usuaris.zul.dateFormat')}" />
+										</row>
+										<row id="passwordStatusRow">
+											<input_etiqueta
+												value="${c:l('vault.account.passwordStatus')}:" />
+											<label id="passwordStatusLabel" />
+										</row>
+									</rows>
+								</grid>
+							</div>
 							<separator />
 							<vbox id="permissionsBox">
 								<label value="${c:l('accounts.owner')}" />
@@ -243,11 +320,32 @@
 				</tabpanels>
 			</tabbox>
 
-			<div style="float:right; margin-top: 2em;">
-				<button label="${c:l('accounts.setPassword.Cancel')}"
-					onClick="innerWindow.onCancel()" />
-				<button label="${c:l('accounts.setPassword.OK')}"
-					onClick="innerWindow.onApply()" />
+			<div style="margin-top: 2em;">
+				<button label="${c:l('vault.account.QuerySessions')}"
+					image="img/auditoria.png"
+					visible="${canQueryAuditoria}"
+					id="querySessionsButton">
+					<attribute name="onClick">
+						<![CDATA[
+							try {
+								String accountName = es.caib.zkib.datasource.XPathUtils.getValue(form, "name");
+								String system = es.caib.zkib.datasource.XPathUtils.getValue(form, "system");
+                           		Executions.getCurrent().sendRedirect(
+	                           			"index.zul?embed&target=/vault/pamaudit.zul?accountName=" + accountName
+											+ "&system=" + system,
+	                          				"_blank");
+							} catch (Throwable th) {
+								Missatgebox.error(th.getMessage());
+							}
+						]]>
+					</attribute>
+				</button>
+				<div style="float:right;">
+					<button label="${c:l('accounts.setPassword.Cancel')}"
+						onClick="innerWindow.onCancel()" />
+					<button label="${c:l('accounts.setPassword.OK')}"
+						onClick="innerWindow.onApply()" />
+				</div>
 			</div>
 		</form>
 	</window>
@@ -282,7 +380,8 @@
 			onClose="onCancelPassword(); event.stopPropagation();">
 		<zscript>
 			<![CDATA[
-				void onCancelPassword() {
+
+			     void onCancelPassword() {
 					password.setValue("");
 					newPassword.setVisible(false);
 				}
@@ -417,6 +516,9 @@
 					onCancelPassword();
 					innerWindow.checkIsUpdatePending();
 					topframe.checkIsUpdatePending();
+					innerWindow.getFellow("passwordStatusLabel")
+						.setValue(org.zkoss.util.resource.Labels.getLabel("vault.account."+
+							com.soffid.iam.api.PasswordValidation.PASSWORD_GOOD.toString()));
 				}
 			]]>
 		</zscript>

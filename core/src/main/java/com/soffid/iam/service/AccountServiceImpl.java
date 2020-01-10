@@ -294,6 +294,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		acc.setName(account.getName());
 		acc.setType(account.getType());
 		acc.setInheritNewPermissions(account.isInheritNewPermissions());
+		acc.setLoginName(account.getLoginName());
+		acc.setLoginUrl(account.getLoginUrl());
+		acc.setLaunchType(account.getLaunchType());
+		if (account.getJumpServerGroup() != null && !account.getJumpServerGroup().trim().isEmpty())
+			acc.setJumpServerGroup( getJumpServerGroupEntityDao().findByName(account.getJumpServerGroup()) );
+		acc.setCreated(new Date());
+		acc.setDisabled(false);
+		acc.setStatus(AccountStatus.ACTIVE);
 		UserTypeEntity tu = getUserTypeEntityDao().findByName(account.getPasswordPolicy());
 		if (tu == null)
 			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$

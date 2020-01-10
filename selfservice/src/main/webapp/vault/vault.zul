@@ -9,7 +9,6 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}"
 	 id="topframe" width="100%" use="com.soffid.iam.web.vault.VaultFrame" >
-	<script src="/js/ssokm.js"/>
 	<datamodel id="model" rootNode="root" src="descriptorVault.xml" />
 	<zscript>
 		model.getVariables().declareVariable("enabled", false);
@@ -94,50 +93,9 @@
 							<label bind="@description" style="display: inline-block; padding-bottom: 5px; padding-top: 5px;"/>
 							<imageclic src="/img/link.png" title="Open" style="margin-left: 1em; margin-right: 1em">
 								<attribute name="onClick"><![CDATA[
-   						        com.soffid.iam.api.Account account = es.caib.zkib.datasource.XPathUtils.getValue(self, ".").instance;
-                    			String url = account.getLoginUrl();
-                    			if ( url == null || url.trim().isEmpty())
-                    				url = (String) account.getAttributes().get("SSO:URL");
-                    			if (url != null)
-                    			{
-                    				url.replaceAll("'", "\\'");
-                    				String name = account.getName();
-                    				if (account.getLoginName() != null && ! account.getLoginName().isEmpty())
-                    					name = account.getLoginName();
-                    				com.soffid.iam.api.Password password = com.soffid.iam.EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
-                    				boolean ssokm = "true".equals(com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.ssokm.enable"));
-                    				if (password == null || ! ssokm)
-                    					Clients.evalJavaScript("window.open('"+url+"', '_blank');");
-                    				else
-                    				{
-                    					org.json.JSONObject j = new org.json.JSONObject();
-                    					for (String att: account.getAttributes().keySet())
-                    					{
-                    						if (att.startsWith("SSO:") &&
-                    								!att.equals("SSO:URL") && 
-                    								!att.equals("SSO:Server"))
-                    						{
-                    							try {
-                    								String value = (String) account.getAttributes().get(att);
-                    								String[] values = value.split("=");
-                    								if (values.length == 2)
-                    								{
-                    									j.put( java.net.URLDecoder.decode(values[0], "UTF-8"), 
-                    											java.net.URLDecoder.decode(values[1], "UTF-8"));
-                    								}
-                    							} catch (Exception e) {}
-                    						}
-                    					}
-                    					try {
-                    						j.put("url", url);
-                    						j.put("account", name);
-                    						j.put("password", password.getPassword());
-                    						Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
-                    					} catch (Exception e) {
-                    						Clients.evalJavaScript("window.open('"+url+"', '_blank');");
-                    					}
-                    				}
-                    			}
+						        com.soffid.iam.api.Account account = es.caib.zkib.datasource.XPathUtils.getValue(self, ".").instance;
+						        new com.soffid.iam.web.vault.LaunchHelper()
+						        	.launchAccount(account);
 								]]></attribute>
 							</imageclic>
 							<div sclass="hpowner">
@@ -167,6 +125,11 @@
 			</tree>
 		</navegador>		
 	</esquemavertical>
+	<html><![CDATA[
+	<form id="pamLauncherForm" action="/" target="_blank" method="POST">
+		<input type="hidden" id="pamLauncherFormSessionId" name="sessionId"/>
+	</form>	
+	]]></html>
 	<folderWindow id="folderWindow"></folderWindow>
 	<accountWindow id="accountWindow"/>
 	<include src="/customObjectsllista.zul" />

@@ -170,6 +170,7 @@
 												<listitem value="Windows" label="Windows"/>
 												<listitem value="Linux" label="Linux"/>
 												<listitem value="Database" label="${c:l('accounts.database') }"/>
+												<listitem value="" label="${c:l('accounts.others') }"/>
 											</listbox>
 										</row>
 										<row id="serverRow">
@@ -322,7 +323,8 @@
 			<div style="margin-top: 2em;">
 				<button label="${c:l('vault.account.QuerySessions')}"
 					image="img/auditoria.png"
-					visible="${canQueryAuditoria}">
+					visible="${canQueryAuditoria}"
+					id="querySessionsButton">
 					<attribute name="onClick">
 						<![CDATA[
 							try {

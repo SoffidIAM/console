@@ -99,6 +99,7 @@ public class AccountWindow extends Window implements AfterCompose {
 		
 		getFellow("accountTypeSelector").setVisible(true);
 		getFellow("panels").setVisible(false);
+		getFellow("querySessionsButton").setVisible(false);
 		newAccountType = null;
 
 		if (ssoSystem == null)
@@ -127,8 +128,6 @@ public class AccountWindow extends Window implements AfterCompose {
 				es.caib.zkib.datasource.XPathUtils.createPath(model, path + "/" + pathToCopy, obj);
 			}
 		}
-		System.out.println("TTT" + path);
-
 		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/@system", ssoSystem);
 		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/@passwordPolicy", ssoPolicy);
 		es.caib.zkib.datasource.XPathUtils.setValue((DataSource) model, path + "/@type",
@@ -181,6 +180,7 @@ public class AccountWindow extends Window implements AfterCompose {
 
 		getFellow("accountTypeSelector").setVisible(false);
 		getFellow("panels").setVisible(true);
+		getFellow("querySessionsButton").setVisible(true);
 
 		canUpdateUserMetadata = true;
 
@@ -467,9 +467,9 @@ public class AccountWindow extends Window implements AfterCompose {
 			    	}
 		
 			    }
-				ctx.getDataSource().getJXPathContext()
-						.setValue(ctx.getXPath() + "/attributes[@name='SSO:URL']", value);
 			}
+			ctx.getDataSource().getJXPathContext()
+			.setValue(ctx.getXPath() + "/attributes[@name='SSO:URL']", value);
 		}
 		
 	}
@@ -515,6 +515,7 @@ public class AccountWindow extends Window implements AfterCompose {
 				}
 				else 
 				{
+					XPathUtils.setValue(getFellow("form"), "/attributes[@name='type']", "");
 					displayFormatSSO(true);
 				}
 			}

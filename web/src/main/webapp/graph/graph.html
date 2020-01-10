@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<header>
+	<script src="../js/Chart.bundle.js">
+	</script>
+	<script>
+	Chart.pluginService.register({
+	    beforeRender: function (chart) {
+	        if (chart.config.options.showAllTooltips) {
+	            // create an array of tooltips
+	            // we can't use the chart tooltip because there is only one tooltip per chart
+	            chart.pluginTooltips = [];
+	            chart.config.data.datasets.forEach(function (dataset, i) {
+	                chart.getDatasetMeta(i).data.forEach(function (sector, j) {
+	                    chart.pluginTooltips.push(new Chart.Tooltip({
+	                        _chart: chart.chart,
+	                        _chartInstance: chart,
+	                        _data: chart.data,
+	                        _options: chart.options,
+	                        _active: [sector]
+	                    }, chart));
+	                });
+	            });
+
+	            // turn off normal tooltips
+	            chart.options.tooltips.enabled = false;
+	        }
+	    },
+	    afterDraw: function (chart, easing) {
+	        if (chart.config.options.showAllTooltips) {
+	            // we don't want the permanent tooltips to animate, so don't do anything till the animation runs atleast once
+	            if (!chart.allTooltipsOnce) {
+	                if (easing !== 1)
+	                    return;
+	                chart.allTooltipsOnce = true;
+	            }
+
+	            // turn on tooltips
+	            chart.options.tooltips.enabled = true;
+	            Chart.helpers.each(chart.pluginTooltips, function (tooltip) {
+	                tooltip.initialize();
+	                tooltip.update();
+	                // we don't actually need this since we are not animating tooltips
+	                tooltip.pivot();
+	                tooltip.transition(easing).draw();
+	            });
+	            chart.options.tooltips.enabled = false;
+	        }
+	    }
+	});
+	
+	async function loadData () 
+	    {
+			var url = document.location.href;
+			var i  = url.indexOf("?data=");
+			var dataPath = url.substring(i+6);
+			console.log(dataPath);
+	        const response = await fetch("./"+dataPath, {
+	          method: 'GET',
+	          headers: {
+	            'Content-Type': 'application/json',
+	            'Accept': 'application/json'
+	          }
+	        });
+	        const data = await response.json();
+	        if (data.options && data.options.scales && 
+	        		data.options.scales.yAxes &&
+	        		data.options.scales.yAxes[0] &&
+	        		data.options.scales.yAxes[0].ticks &&
+	        		data.options.scales.yAxes[0].ticks.callback &&
+	        		data.options.scales.yAxes[0].ticks.callback == "locale")
+       		{
+	        	data.options.scales.yAxes[0].ticks.callback = 
+    	   			function(value, index, values) {
+	        		console.log("value for "+value);
+							return value.toLocaleString(); 
+					};
+       		}
+	        console.log(data);
+			var ctx = document.getElementById('myChart').getContext('2d');
+			var myChart = new Chart(ctx, data);
+	        return data;
+	    }
+	</script>
+</header>
+<body onLoad="loadData()" style="overflow: hidden ">
+	<canvas id="myChart" width="90%" height="90%"></canvas>
+</body>
+</html>

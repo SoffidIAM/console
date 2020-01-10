@@ -438,4 +438,69 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		return size;
 	}
 
+	@Override
+	public Integer handleGetActiveSessions(String server) throws InternalErrorException, MalformedURLException, JSONException {
+		try {
+			return getUsedThreads(server);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Override
+	protected Long handleGetConsoleFreeSpace(String jumpServerGroup) throws Exception {
+		JumpServerGroupEntity sg = getJumpServerGroupEntityDao().findByName(jumpServerGroup);
+		if (sg == null)
+			return null;
+		
+		try {
+			URL url2 = new URL(sg.getStoreUrl());
+			String base = url2.getProtocol()+"://"+url2.getHost()+
+					(url2.getPort() == -1 ? "": ":"+url2.getPort());
+			Response response = 
+					WebClient
+					.create(base+"/store/check", sg.getStoreUserName(), Password.decode(sg.getPassword()).getPassword(), null)
+					.accept(MediaType.APPLICATION_JSON)
+					.get();
+			if (response.hasEntity())
+				response.getEntity();
+					
+			if (response.getStatus() != 200)
+				return null;
+			
+			JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
+			return result.optLong("freeSpace");
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Override
+	protected Long handleGetConsoleUsedSpace(String jumpServerGroup) throws Exception {
+		JumpServerGroupEntity sg = getJumpServerGroupEntityDao().findByName(jumpServerGroup);
+		if (sg == null)
+			return null;
+		
+		try {
+			URL url2 = new URL(sg.getStoreUrl());
+			String base = url2.getProtocol()+"://"+url2.getHost()+
+					(url2.getPort() == -1 ? "": ":"+url2.getPort());
+			Response response = 
+					WebClient
+					.create(base+"/store/check", sg.getStoreUserName(), Password.decode(sg.getPassword()).getPassword(), null)
+					.accept(MediaType.APPLICATION_JSON)
+					.get();
+			if (response.hasEntity())
+				response.getEntity();
+					
+			if (response.getStatus() != 200)
+				return null;
+			
+			JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
+			return result.optLong("usedSpace");
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 }

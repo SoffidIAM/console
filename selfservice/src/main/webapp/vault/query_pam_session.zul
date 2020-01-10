@@ -1,0 +1,55 @@
+<?page id="passwordVault" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="folderWindow" macro-uri="/vault/folder.zul"?>
+<?component name="accountWindow" macro-uri="/vault/account.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('pamSession.title')}"
+	 id="topframe" width="100%" use="com.soffid.iam.web.vault.QueryPamSessionFrame" >
+	<label use="com.soffid.iam.web.vault.QueryPamSessionData" id="data"/>
+	
+	<style>
+		div.grid td {vertical-align: top;}
+		div.grid td.gc div { min-height: 24px};
+	</style>
+
+	<grid id="grid" fixedLayout="true" style="width: 500px; margin-top: 80px; margin-left: auto; margin-right: auto">
+		<columns>
+			<column width="150px"/>
+			<column width="350px"/>
+		</columns>
+		<rows>
+			<row>
+				<label value="${c:l('pamSession.jumpServerGroup') } :"/>
+				<label value="${pamSession.jumpServerGroup }"/>
+			</row>
+			<row>
+				<label value="${c:l('pamSession.sessionId') } :"/>
+				<label value="${pamSession.path}"/>
+			</row>
+			<row>
+				<label value="${c:l('pamSession.userName') } :"/>
+				<label value="${pamSession.user } ${user.fullName }"/>
+			</row>
+			<row>
+				<label value="${c:l('pamSession.start') } :"/>
+				<datebox value="${pamSession.serverStart }" format="${c:l('selfService.Format') }" disabled="true" buttonVisible="false"/>
+			</row>
+			<row>
+				<label value="${c:l('pamSession.end') } :"/>
+				<datebox value="${pamSession.serverEnd }" format="${c:l('selfService.Format') }" disabled="true" buttonVisible="false"/>
+			</row>
+			<row>
+				<label value="${c:l('pamSession.serviceUrl') } :"/>
+				<label value="${pamSession.serverUrl}"/>
+			</row>
+			<row>
+				<label value="${c:l('pamSession.accountName') } :"/>
+				<label value="${pamSession.accountName}"/>
+			</row>
+		</rows>
+	</grid>
+
+</frame>

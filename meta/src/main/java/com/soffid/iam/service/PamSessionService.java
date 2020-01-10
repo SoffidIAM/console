@@ -61,6 +61,11 @@ public class PamSessionService {
 	@Description("Retrieves a pam session video")
 	long getVideoSize (PamSession session, long chapter) { return 0; }
 	
+	Integer getActiveSessions(String server)  {return null;}
+	
+	Long getConsoleFreeSpace(String jumpServerGroup)  {return null;}
+	
+	Long getConsoleUsedSpace(String jumpServerGroup)  {return null;}
 	
 }
 
@@ -77,3 +82,5 @@ public class PamSessionService {
 @Role (name="jumpServer:query" ) class JumpServer_query { }
 
 @Role (name="pamSession:query" ) class pamSession_query { }
+
+@Role (name="pamSession:create" ) class pamSession_create { }

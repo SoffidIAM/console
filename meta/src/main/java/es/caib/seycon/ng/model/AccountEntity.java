@@ -106,12 +106,12 @@ public abstract class AccountEntity {
 	@Column (name="ACC_INHPER", defaultValue="false")
 	@Nullable
 	Boolean inheritNewPermissions;
-
+/*
 	@Column(name="ACC_SVCTYP", length = 50)
 	@Nullable
 	@Description("Known values are Windows, Linux and Database")
 	String serviceType;
-	
+*/	
 	@Column (name="ACC_URL")
 	@Nullable
 	String loginUrl;
@@ -229,7 +229,32 @@ public abstract class AccountEntity {
 
 	@DaoFinder("from com.soffid.iam.model.AccountEntity where :text is null")
 	public Collection<AccountEntity>findByText (String text) { return null; }
+
+	@DaoFinder("select count(a.id) "
+			+ "from com.soffid.iam.model.AccountEntity as a "
+			+ "where a.type='P' and a.system.url is not null and a.system.tenant.id=:tenantId")
+	public Long getHPAccounts() {return null;}
 	
+	@DaoFinder("select count(ua.id) "
+			+ "from com.soffid.iam.model.UserAccountEntity as ua "
+			+ "where ua.account.type='P' and ua.account.system.url is not null and ua.account.system.tenant.id=:tenantId")
+	public Long getReservedHPAccounts() {return null;}
+
+	@DaoFinder("select count(a.id) "
+			+ "from com.soffid.iam.model.AccountEntity as a "
+			+ "where a.launchType = 'P' and a.system.tenant.id=:tenantId")
+	public Long getPamAccounts() {return null;}
+
+	@DaoFinder("select count(a.id) "
+			+ "from com.soffid.iam.model.AccountEntity as a "
+			+ "where a.launchType = 'P' and a.passwordStatus = 'PASSWORD_WRONG' and a.system.tenant.id=:tenantId")
+	public Long getPamAccountsWrongPassword() {return null;}
+
+	@DaoFinder("select count(a.id) "
+			+ "from com.soffid.iam.model.AccountEntity as a "
+			+ "where a.launchType = 'P' and a.passwordStatus = 'PASSWORD_GOOD_EXPIRED' and a.system.tenant.id=:tenantId")
+	public Long getPamAccountsExpiredPassword() {return null;}
+
 }
 
 @Index (name="SC_ACCOUN_NAME",	unique=true,

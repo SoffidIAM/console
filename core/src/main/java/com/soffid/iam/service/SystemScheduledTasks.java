@@ -15,4 +15,5 @@ public class SystemScheduledTasks
 	public static final String AUTHORITATIVE_DATA_IMPORT = "system:authoritative-import"; //$NON-NLS-1$
 	public static final String ENABLE_DISABLE_ROLES = "system:enable-disable-roles";  //$NON-NLS-1$
 	public static final String DISPATCHER_IMPACT = "system:dispatcher-impact"; //$NON-NLS-1$
+	public static final String UPDATE_STATS = "system:update-stats";
 }

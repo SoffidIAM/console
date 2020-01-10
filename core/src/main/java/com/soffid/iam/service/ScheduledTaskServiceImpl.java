@@ -101,6 +101,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	{
 		reconfigureTasks();
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
+		entity.setActive(false);
 		getScheduledTaskEntityDao().create(entity);
 		audit (task.getName(), "C"); //$NON-NLS-1$
 		return getScheduledTaskEntityDao().toScheduledTask(entity);

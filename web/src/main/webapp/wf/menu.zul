@@ -11,6 +11,7 @@
 	// Control d'accés del SEU
 	boolean canViewUsuaris =  AutoritzacionsUsuari.hasViewUsuarisSEU();
 	boolean canConfigurePam = Security.isUserInRole("seu:pamSessionConfigure");
+	boolean canViewPamDashboard = Security.isUserInRole("seu:pamDashboard");
 	boolean canViewJob = Security.isUserInRole("schedule:query") || Security.isUserInRole("schedule:admin");
 	boolean canViewVault = Security.isUserInRole("sso:manageAccounts");
 	boolean canViewDirectory = Security.isUserInRole("selfservice:directory");
@@ -313,6 +314,11 @@
 		    		<treeitem>
 		    			<treerow>
 		    				<apptreecell if="${canViewSeyconServer}" langlabel="seu.seyconserver" pagina="/seyconserver.zul"/>
+		    			</treerow>
+		    		</treeitem>
+    				<treeitem>
+		    			<treerow>
+		    				<apptreecell if="${canViewPamDashboard}" langlabel="seu.pam_dashboard" pagina="/pam_dashboard.zul"/>
 		    			</treerow>
 		    		</treeitem>
 		    	</treechildren>

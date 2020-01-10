@@ -25,11 +25,6 @@
 		<servlet-class>org.zkoss.web.servlet.dsp.InterpreterServlet</servlet-class>
 	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>dspLoader</servlet-name>
-		<url-pattern>*.dsp</url-pattern>
-	</servlet-mapping>
-	
 	<!--  SAML Login -->
 	<servlet>
 		<description>
@@ -41,16 +36,6 @@
 		</servlet-class>
 	</servlet>
 		
-	<servlet-mapping>
-		<servlet-name>samlServlet</servlet-name>
-		<url-pattern>/saml</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>samlServlet</servlet-name>
-		<url-pattern>/saml/*</url-pattern>
-	</servlet-mapping>
-
 	<!-- Servlet d'execucions punt d'entrada -->
 	<servlet>
 		<description>
@@ -61,11 +46,6 @@
 					com.soffid.iam.ui.Executions
 		</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>execucio</servlet-name>
-		<url-pattern>/execucions/*</url-pattern>
-	</servlet-mapping>
-
 
 	<!-- Servlet per a descarregar CSV de ListExport@zkiblaf - u88683 -->
 	<servlet>
@@ -75,11 +55,6 @@
 		<servlet-name>contentexport</servlet-name>
 		<servlet-class>es.caib.zkib.zkiblaf.export.ContentExportServlet</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>contentexport</servlet-name>
-		<url-pattern>/contentexport/*</url-pattern>
-	</servlet-mapping>
-
 	<!-- /// -->
 
 	<!-- Servlets de workflow -->
@@ -113,11 +88,6 @@
 		<servlet-name>logoutServlet</servlet-name>
 		<servlet-class>com.soffid.iam.web.LogoutServlet</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>logoutServlet</servlet-name>
-		<url-pattern>/prelogout</url-pattern>
-	</servlet-mapping>
-
 	<!-- servlet per obtindre logs del seycon-server -->
 	<servlet>
 		<description>servlet para propiedades de firma del applet de firma</description>
@@ -126,10 +96,7 @@
 			es.caib.seycon.ng.web.servlet.ServerLogServlet
 		</servlet-class>
 	</servlet>
-	<servlet-mapping>
-		<servlet-name>ServerLogServlet</servlet-name>
-		<url-pattern>/SEU/serverlog</url-pattern>
-	</servlet-mapping>
+
 
 	<servlet>
 		<description>
@@ -138,20 +105,53 @@
 		<servlet-name>documentServlet</servlet-name>
 		<servlet-class>com.soffid.iam.doc.servlet.NASServlet</servlet-class>
 	</servlet>
+
+
 	<servlet-mapping>
-		<servlet-name>documentServlet</servlet-name>
-		<url-pattern>/doc/*</url-pattern>
+		<servlet-name>error400</servlet-name>
+		<url-pattern>/error400</url-pattern>
 	</servlet-mapping>
-
-
 	<servlet-mapping>
 		<servlet-name>error467</servlet-name>
 		<url-pattern>/error467</url-pattern>
 		<url-pattern>/j_security_check</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>error400</servlet-name>
-		<url-pattern>/error400</url-pattern>
+		<servlet-name>documentServlet</servlet-name>
+		<url-pattern>/doc/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>ServerLogServlet</servlet-name>
+		<url-pattern>/SEU/serverlog</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>logoutServlet</servlet-name>
+		<url-pattern>/prelogout</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>contentexport</servlet-name>
+		<url-pattern>/contentexport/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>execucio</servlet-name>
+		<url-pattern>/execucions/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>dspLoader</servlet-name>
+		<url-pattern>*.dsp</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>samlServlet</servlet-name>
+		<url-pattern>/saml</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>samlServlet</servlet-name>
+		<url-pattern>/saml/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>download-servlet</servlet-name>

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.VaultService;
@@ -61,7 +62,8 @@ import roles.account_query;
 	VaultService.class,
 	AsyncRunnerService.class,
 	AttributeValidationService.class,
-	VaultFolderEntity.class})
+	VaultFolderEntity.class,
+	JumpServerGroupEntity.class})
 public abstract class AccountService {
 
 	/// listUserAccounts

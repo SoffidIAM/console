@@ -26,6 +26,7 @@ public class SecureObjectInputStream extends ObjectInputStream {
 		Timestamp.class,
 		java.util.Date.class,
 		Calendar.class,
+		byte[].class
 	};
 	public SecureObjectInputStream() throws IOException, SecurityException {
 		super();

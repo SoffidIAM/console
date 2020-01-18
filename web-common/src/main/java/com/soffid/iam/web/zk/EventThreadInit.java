@@ -19,14 +19,15 @@ import es.caib.zkib.zkiblaf.tomee.TomeeThreadInit;
 
 public class EventThreadInit extends TomeeThreadInit {
 	String cacheSession;
-	private SessionCacheService ejb;
+	private static SessionCacheService ejb = null;
 	private SoffidPrincipal currentIdentity;
 	Locale locale;
 	private String clientIp;
 	
 	public EventThreadInit() throws NamingException, CreateException {
 		super();
-		ejb = EJBLocator.getSessionCacheService();
+		if (ejb == null)
+			ejb = EJBLocator.getSessionCacheService(); 
 	}
 
 	@Override

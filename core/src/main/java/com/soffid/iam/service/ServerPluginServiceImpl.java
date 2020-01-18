@@ -71,6 +71,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     	}
     	return version;
     }
+    
     /**
      * @see es.caib.seycon.ng.servei.ServerPluginServer#deployPlugin(java.io.InputStream)
      */
@@ -79,7 +80,12 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     	spp.parse(b);
     	if (spp.getPlugin() == null)
     		throw new InternalErrorException (Messages.getString("ServerPluginNameImpl.NotAPluginFile")); //$NON-NLS-1$
-    	// Test duplicated classes
+    	deployPlugin(spp);
+    }
+
+	public void deployPlugin(ServerPluginParser spp)
+			throws DuplicatedClassException, InternalErrorException, SecurityException {
+		// Test duplicated classes
     	testDuplicatedClasses (spp.getPlugin());
     	// Test duplicated syncserver
     	testDuplicatedSyncServer (spp.getPlugin());
@@ -204,7 +210,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     		}
     	}
         updateConfig();
-    }
+	}
 
     private void testDuplicatedSyncServer(ServerPlugin plugin) throws DuplicatedClassException
 	{
@@ -508,5 +514,63 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
 		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
 				auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
+	}
+
+	@Override
+	protected void handleUpdatePlugin(byte[] b) throws Exception {
+    	ServerPluginParser spp = new ServerPluginParser();
+    	spp.parse(b);
+    	if (spp.getPlugin() == null)
+    		throw new InternalErrorException (Messages.getString("ServerPluginNameImpl.NotAPluginFile")); //$NON-NLS-1$
+    	ServerPluginEntity plugin = getServerPluginEntityDao().findByName(spp.getPlugin().getName());
+    	if (plugin == null)
+    	{
+    		deployPlugin(spp);
+    	}
+    	else 
+    	{
+    		int i = compareVersions (plugin.getVersion(), spp.getPlugin().getVersion());
+    		if ( i < 0) 
+    			deployPlugin(spp);
+    	}
+	}
+
+	private int compareVersions(String version1, String version2) {
+		String[] versionA = version1.split("[.-]*");
+		String[] versionB = version2.split("[.-]*");
+		for ( int i = 0; i <  versionB.length && i < versionA.length; i++)
+		{
+			if (versionB[i].equals(versionA[i]))
+			{
+				// Skip to next
+			}
+			else
+			{
+				Integer i1 = null;
+				Integer i2 = null;
+				try {
+					i1 = Integer.parseInt(versionA[i]);
+				} catch ( NumberFormatException e ) { }
+				try {
+					i2 = Integer.parseInt(versionB[i]);
+				} catch ( NumberFormatException e ) { }
+				if (i1 != null && i2 != null)
+				{
+					int c = i1.intValue() - i2.intValue();
+					if ( c != 0 ) return c;
+				}
+				else if ( i1 == null)
+					return -1;
+				else if ( i2 == null)
+					return +1;
+				else
+				{
+					int c = versionA[i].compareToIgnoreCase(versionB[i]);
+					if (c != 0)
+						return c;
+				}
+			}
+		}
+		return versionA.length - versionB.length;
 	}
 }

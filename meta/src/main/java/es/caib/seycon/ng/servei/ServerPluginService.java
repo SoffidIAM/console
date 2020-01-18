@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
@@ -32,6 +33,15 @@ public abstract class ServerPluginService {
 		byte[] i)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.servei.DuplicatedClassException {
 	}
+
+	@Description("Only deploys if it's a newer version")
+	@Operation
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void updatePlugin(
+		byte[] i)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.servei.DuplicatedClassException {
+	}
+
 	@Operation ( grantees={roles.plugins_update.class},
 			translated="enablePlugin")
 	@Transactional(rollbackFor={java.lang.Exception.class})

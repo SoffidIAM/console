@@ -32,6 +32,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	es.caib.bpm.servei.BpmConfigService.class,
 	es.caib.bpm.servei.BpmEngine.class,
 	es.caib.seycon.ng.servei.SoDRuleService.class,
+	ServerPluginService.class,
 	TenantService.class,
 	TipusDadaEntity.class,
 	com.soffid.iam.service.ScheduledTaskService.class})

@@ -251,6 +251,12 @@
 			<version>1.0.4</version>
 			<type>par</type>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.sync.plugins</groupId>
+			<artifactId>sso-plugin</artifactId>
+			<version>1.0.0</version>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 	<reporting>
 		<plugins>

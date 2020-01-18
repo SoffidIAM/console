@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.axis.utils.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -142,6 +143,8 @@ public class ApplicationBootServiceImpl extends
 
 		loadWorkflows();
 		
+		loadConnectors();
+		
 		started = Boolean.TRUE;
 	}
 
@@ -187,6 +190,39 @@ public class ApplicationBootServiceImpl extends
 						} catch (InternalErrorException e) {
 							log.info(String
 									.format("Error uploading workflow definition file %s: %s", wf.toString(), e.toString())); //$NON-NLS-1$
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void loadConnectors() {
+		String jbossHome = System.getProperty("catalina.base"); //$NON-NLS-1$
+		if (jbossHome != null) {
+			File jbossdir = new File(jbossHome); //$NON-NLS-1$
+			File soffiddir = new File(jbossdir, "soffid"); //$NON-NLS-1$
+			File bpm = new File(soffiddir, "plugins"); //$NON-NLS-1$
+			if (bpm.isDirectory()) {
+				for (File wf : bpm.listFiles()) {
+					if (wf.getName().endsWith(".jar")) //$NON-NLS-1$
+					{
+						try {
+							log.info(String
+									.format("Verifying Plugin %s", wf.toString())); //$NON-NLS-1$
+							FileInputStream in = new FileInputStream(wf);
+							ByteArrayOutputStream out = new ByteArrayOutputStream();
+							for (int read = in.read(); read >= 0; read = in.read())
+								out.write(read);
+							out.close();
+							in.close();
+							getServerPluginService().updatePlugin(out.toByteArray());
+						} catch (IOException e) {
+							log.info(String
+									.format("Error reading file %s: %s", wf.toString(), e.toString())); //$NON-NLS-1$
+						} catch (Exception e) {
+							log.info(String
+									.format("Error uploading plugin file %s", wf.toString()), e); //$NON-NLS-1$
 						}
 					}
 				}
@@ -1081,11 +1117,13 @@ public class ApplicationBootServiceImpl extends
 			disSso.setName("SSO"); //$NON-NLS-1$
 			disSso.setDescription("External SSO accounts");
 			disSso.setAccessControl(new Boolean(false));
+			disSso.setManualAccountCreation(true);
 			disSso.setPasswordsDomain(dc.getCode());
 			disSso.setUsersDomain(du.getCode());
 			disSso.setPasswordsDomainId(dc.getId());
-			disSso.setClassName("- no class -"); //$NON-NLS-1$
+			disSso.setClassName("com.soffid.iam.sync.sso.agent"); //$NON-NLS-1$
 			disSso.setUserTypes("S"); //$NON-NLS-1$
+			disSso.setUrl("local");
 			disSso = dispatcherSvc.create(disSso);
 
 			DataType td = new DataType();

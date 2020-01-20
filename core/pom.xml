@@ -533,6 +533,10 @@
 					<groupId>bouncycastle</groupId>
 				</exclusion>
 				<exclusion>
+					<artifactId>jackson-core</artifactId>
+					<groupId>com.fasterxml.jackson.core</groupId>
+				</exclusion>
+				<exclusion>
 					<artifactId>jackson-databind</artifactId>
 					<groupId>com.fasterxml.jackson.core</groupId>
 				</exclusion>
@@ -695,6 +699,10 @@
 			<artifactId>cxf-rt-rs-client</artifactId>
 			<version>3.1.10</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-databind</artifactId>
 		</dependency>
 	</dependencies>
 </project>

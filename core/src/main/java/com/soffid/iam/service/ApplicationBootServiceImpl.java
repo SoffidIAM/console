@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,7 +22,6 @@ import java.util.Map;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.apache.axis.utils.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -1121,7 +1121,7 @@ public class ApplicationBootServiceImpl extends
 			disSso.setPasswordsDomain(dc.getCode());
 			disSso.setUsersDomain(du.getCode());
 			disSso.setPasswordsDomainId(dc.getId());
-			disSso.setClassName("com.soffid.iam.sync.sso.agent"); //$NON-NLS-1$
+			disSso.setClassName("com.soffid.iam.sync.sso.agent.SSOAgent"); //$NON-NLS-1$
 			disSso.setUserTypes("S"); //$NON-NLS-1$
 			disSso.setUrl("local");
 			disSso = dispatcherSvc.create(disSso);

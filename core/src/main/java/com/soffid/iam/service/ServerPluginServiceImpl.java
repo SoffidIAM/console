@@ -106,7 +106,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     		plugin.setEnabled(true);
     		plugin.setVersion(translateVersion(spp.getPlugin().getVersion()));
     		SoffidPrincipal p = Security.getSoffidPrincipal();
-    		if (p.getUserName() != null)
+    		if (p != null && p.getUserName() != null)
     			plugin.setAuthor(p.getUserName());
     		plugin.setDeployed(new Date());
     		getServerPluginEntityDao().create(plugin);
@@ -116,7 +116,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     	{
     		plugin.setVersion(translateVersion(spp.getPlugin().getVersion()));
     		SoffidPrincipal p = Security.getSoffidPrincipal();
-    		if (p.getUserName() != null)
+    		if (p != null && p.getUserName() != null)
     			plugin.setAuthor(p.getUserName());
     		else
     			plugin.setAuthor(null);

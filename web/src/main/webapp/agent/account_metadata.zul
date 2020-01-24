@@ -226,6 +226,50 @@
 							</div>
 						</div>
 					</row>
+					<row >
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.onLoadTrigger')} :" />
+							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@onLoadTrigger" multiline="true" onChange=""/>
+								<imageclic src="/img/pencil.png" width="1em" >
+									<attribute name="onClick"><![CDATA[
+									    Events.sendEvent(new Event ("onEdit", 
+									    		desktop.getPage("editor").getFellow("top"),
+									    		new Object[] {
+													    event.getTarget().getPreviousSibling(),
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null)
+												}
+									    ));
+									]]></attribute>
+								</imageclic>
+							</div>
+						</div>
+					</row>
+					<row >
+						<div>
+							<input_etiqueta value="${c:l('dadesAddicionals.zul.onChangeTrigger')} :" />
+							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
+						</div>
+						<div width="100%">
+							<div width="100%">
+								<textbox width="90%" visible="true" bind="@onChangeTrigger" multiline="true" onChange=""/>
+								<imageclic src="/img/pencil.png" width="1em" >
+									<attribute name="onClick"><![CDATA[
+									    Events.sendEvent(new Event ("onEdit", 
+									    		desktop.getPage("editor").getFellow("top"),
+									    		new Object[] {
+													    event.getTarget().getPreviousSibling(),
+													    new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null)
+												}
+									    ));
+									]]></attribute>
+								</imageclic>
+							</div>
+						</div>
+					</row>
 				</rows>
 			</grid>
 			<imageclic align="right" src="~./img/list-remove.gif" visible="${canModifyMetadata}">

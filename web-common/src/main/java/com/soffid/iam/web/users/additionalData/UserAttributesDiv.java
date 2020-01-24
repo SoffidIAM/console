@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
@@ -126,6 +127,7 @@ public class UserAttributesDiv extends Div implements XPathSubscriber, BindConte
 			List<XmlDataNode> attributes = (List<XmlDataNode>) binder.getValue();
 			if (attributes != null)
 			{
+				List<InputField2> inputFields = new LinkedList<InputField2>();
 				for (TipusDada att: dataTypes)
 				{
 					// Find Datatype
@@ -156,6 +158,7 @@ public class UserAttributesDiv extends Div implements XPathSubscriber, BindConte
 							d.appendChild(input);
 							try {
 								input.createField();
+								inputFields.add(input);
 							} catch (Exception e) {
 								throw new UiException(e);
 							};
@@ -170,6 +173,8 @@ public class UserAttributesDiv extends Div implements XPathSubscriber, BindConte
 						}
 					}
 				}
+				for ( InputField2 input: inputFields)
+					input.runOnLoadTrigger();
 			}
 		} finally {
 			recursive = false;
@@ -252,5 +257,19 @@ public class UserAttributesDiv extends Div implements XPathSubscriber, BindConte
 			}
 		}
 		return m ;
+	}
+
+	public Map<String,InputField2> getInputFieldsMap() {
+		Map<String, InputField2> r = new HashMap<String, InputField2>();
+		for (Component c : (Collection<Component>)getChildren())
+		{
+			if (c instanceof InputField2) {
+				InputField2 inputField2 = (InputField2) c;
+				DataType dt = inputField2.getDataType();
+				if (dt != null && dt.getCode() != null)
+					r.put(dt.getCode(), (InputField2) c);
+			}
+		}
+		return r;
 	}
 }

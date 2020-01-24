@@ -594,7 +594,9 @@ public class ScriptEnviroment {
 					"\"attributes\":\"customAttributes"+t.getName()+"\",";
 		}
 		return "{" + partial +
-				"\"value\":\"java.lang.String\","
+				"\"inputField\":\"com.soffid.iam.web.users.additionalData.InputField2\","
+			+ "\"inputFields\":\"java.util.Map\","
+			+ "\"value\":\"java.lang.String\","
 			+ "\"requestContext\":\"java.lang.String\","
 			+ "\"serviceLocator\":\"com.soffid.iam.ServiceLocator\"}";
 	}

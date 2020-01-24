@@ -100,6 +100,19 @@ public class TipusDada {
 	@Nullable
 	String filterExpression;
 
+	
+	@Description("Trigger to run when the data is displayed")
+	@Nullable
+	String onLoadTrigger;
+	
+	@Description("Trigger to run when the data is changed")
+	@Nullable
+	String onChangeTrigger;
+	
+	@Description("Trigger to run when the field is focused")
+	@Nullable
+	String onFocusTrigger;
+	
 	@Description("Built-in attribute")
 	@Nullable
 	@Attribute (defaultValue="false")

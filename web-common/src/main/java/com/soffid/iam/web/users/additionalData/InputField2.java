@@ -772,6 +772,9 @@ public class InputField2 extends Div implements XPathSubscriber
 				else
 					c = c.getParent();
 			} while (c != null);
+			
+			// Now, run the onChange trigger
+			runOnChangeTrigger();
 		} finally {
 			updating = oldUpdating;
 		}
@@ -896,10 +899,6 @@ public class InputField2 extends Div implements XPathSubscriber
 		}
 	}
 
-	private Object getValue() {
-		return XPathUtils.getValue( XPathUtils.getComponentContext(this), bind );
-	}
-	
 	public boolean updateUser(String id)
 	{
 		InputElement inputElement = (InputElement) getFellow(id);
@@ -2262,9 +2261,29 @@ public class InputField2 extends Div implements XPathSubscriber
 			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
 		SecureInterpreter i = new SecureInterpreter();
 
+		// Identify attributes div
+		Component c = this;
+		do
+		{
+			if (c instanceof AttributesDiv)
+			{
+				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap());
+				break;
+			}
+			else if (c instanceof UserAttributesDiv)
+			{
+				((UserAttributesDiv) c).adjustVisibility();
+				i.set("inputFields", ((UserAttributesDiv) c).getInputFieldsMap());
+				break;
+			}
+			else
+				c = c.getParent();
+		} while (c != null);
+
 		i.set("value", value); //$NON-NLS-1$
 		i.set("attributes", attributes); //$NON-NLS-1$
 		i.set("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
+		i.set("inputField", this);
 		if (ownerObject != null)
 		{
 			i.set("object", ownerObject); //$NON-NLS-1$
@@ -2341,6 +2360,27 @@ public class InputField2 extends Div implements XPathSubscriber
 		return true;
 	}
 
+	public void runOnChangeTrigger() {
+		if (dataType != null && dataType.getOnChangeTrigger() != null && ! dataType.getOnChangeTrigger().trim().isEmpty())
+		{
+			try {
+				SecureInterpreter i = createInterpreter();
+				i.eval(dataType.getOnChangeTrigger());
+			} catch ( TargetError e) {
+				if (e.getTarget() instanceof UiException)
+					throw new UiException(e);
+				else
+					throw new RuntimeException(e.getTarget());
+			} catch ( EvalError e) {
+				throw new UiException(e.toString());
+			} catch (MalformedURLException e) {
+				throw new UiException (e.toString());
+			}
+
+		}
+	}
+
+	
 	public void setSearchFilter(SearchFilter filter) {
 		this.filter = filter;
 	}
@@ -2381,5 +2421,60 @@ public class InputField2 extends Div implements XPathSubscriber
 			
 		}
 	}
+	
+	public void setValue (Object o) throws NamingException, CreateException, InternalErrorException, IOException {
+		binder.setValue(o);
+		createField();
+	}
 
+	public Object getValue () {
+		return binder.getValue();
+	}
+
+	public void runOnLoadTrigger() {
+		if (dataType != null && dataType.getOnLoadTrigger() != null && ! dataType.getOnLoadTrigger().trim().isEmpty() &&
+				binder.isValid())
+		{
+			try {
+				SecureInterpreter i = createInterpreter();
+				i.eval(dataType.getOnLoadTrigger());
+			} catch ( TargetError e) {
+				if (e.getTarget() instanceof UiException)
+					throw new UiException(e);
+				else
+					throw new RuntimeException(e.getTarget());
+			} catch ( EvalError e) {
+				throw new UiException(e.toString());
+			} catch (MalformedURLException e) {
+				throw new UiException (e.toString());
+			}
+
+		}
+	}
+
+	public void onFocus(Event ev) 
+	{
+		// Nothing to do for now
+	}
+	
+	
+	public void runOnFocusTrigger() {
+		if (dataType != null && dataType.getOnFocusTrigger() != null && ! dataType.getOnFocusTrigger().trim().isEmpty())
+		{
+			try {
+				SecureInterpreter i = createInterpreter();
+				i.eval(dataType.getOnFocusTrigger());
+			} catch ( TargetError e) {
+				if (e.getTarget() instanceof UiException)
+					throw new UiException(e);
+				else
+					throw new RuntimeException(e.getTarget());
+			} catch ( EvalError e) {
+				throw new UiException(e.toString());
+			} catch (MalformedURLException e) {
+				throw new UiException (e.toString());
+			}
+
+		}
+	}
 }

@@ -201,6 +201,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		}
 		if (attributes != null)
 		{
+			List<InputField2> inputFields  = new LinkedList<InputField2>();
 			for (TipusDada att: dataTypes)
 			{
 				AttributeVisibilityEnum v = getVisibility (att);
@@ -227,6 +228,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					d.appendChild(input);
 					try {
 						input.createField();
+						inputFields.add(input);
 					} catch (Exception e) {
 						throw new UiException(e);
 					};
@@ -239,6 +241,8 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					d.setVisible(input.attributeVisible());
 				}
 			}
+			for ( InputField2 input: inputFields)
+				input.runOnLoadTrigger();
 		}
 	}
 
@@ -404,5 +408,23 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 			updateMetadata();
 		}
 		
+	}
+
+	public Map<String,InputField2> getInputFieldsMap() {
+		Map<String, InputField2> r = new HashMap<String, InputField2>();
+		for (Component c : (Collection<Component>)getChildren())
+		{
+			if (c instanceof Div)
+			{
+				Component cc = c.getFirstChild().getNextSibling();
+				if (cc instanceof InputField2) {
+					InputField2 inputField2 = (InputField2) cc;
+					DataType dt = inputField2.getDataType();
+					if (dt != null && dt.getCode() != null)
+						r.put(dt.getCode(), inputField2);
+				}
+			}
+		}
+		return r;
 	}
 }

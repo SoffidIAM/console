@@ -103,6 +103,18 @@ public abstract class AccountMetadataEntity {
 	@Column(name="AME_FILEXP")
 	String filterExpression;
 
+	@Column (name="AME_LOATRI", length=4096)
+	@Nullable
+	String onLoadTrigger;
+	
+	@Column (name="AME_CHATRI", length=4096)
+	@Nullable
+	String onChangeTrigger;
+	
+	@Column (name="AME_FOCTRI", length=4096)
+	@Nullable
+	String onFocusTrigger;
+	
 
 	/********************** DAOS ************************/
 	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :system and name = :name\n"

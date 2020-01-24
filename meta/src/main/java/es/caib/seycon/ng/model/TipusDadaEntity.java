@@ -128,6 +128,18 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	String validationExpression;
 	
+	@Column (name="TDA_LOATRI", length=4096)
+	@Nullable
+	String onLoadTrigger;
+	
+	@Column (name="TDA_CHATRI", length=4096)
+	@Nullable
+	String onChangeTrigger;
+	
+	@Column (name="TDA_FOCTRI", length=4096)
+	@Nullable
+	String onFocusTrigger;
+	
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;
 
@@ -187,7 +199,7 @@ public abstract class TipusDadaEntity {
 	}
 }
 
-@Index (name="TAD_UK_CODE",	unique=true,
+@Index (name="TAD_UK_CODE",	
 entity=es.caib.seycon.ng.model.TipusDadaEntity.class,
 columns={"TDA_TEN_ID", "TDA_SCOPE", "TDA_CODI"})
 abstract class TipusDadaCodiIndex {

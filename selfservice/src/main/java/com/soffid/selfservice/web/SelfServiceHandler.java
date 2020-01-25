@@ -20,6 +20,7 @@ import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.ClientInfoEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
@@ -55,6 +56,7 @@ import com.soffid.iam.web.launcher.ApplicationLauncher;
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.AutoritzacioPuntEntrada;
 import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PuntEntrada;
@@ -477,16 +479,12 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}else if (instance.getMenu().equals("S"))
 			selected.setOpen(false);
 		else{
-			Long name = instance.getId();
 			ExecucioPuntEntrada exe = findExecucio ( instance.getExecucions() );
 			if (exe != null)
 			{
 				Collection<ExecucioPuntEntrada> punt = instance.getExecucions();
 				if(!punt.isEmpty())
 				{
-					boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
-					String system = instance.getSystem();
-					String type = exe.getCodiTipusExecucio();
 					List<com.soffid.iam.api.Account> accounts = fetchAccounts(instance);
 					Class executor = findExecutionType( exe );
 					if (executor != null)
@@ -496,12 +494,14 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 								AccessTreeExecution.toAccessTreeExecution(exe),
 								accounts);
 					}
+	 				else if ( exe.getCodiTipusExecucio().equals("URL") )
+	 					Executions.getCurrent().sendRedirect(exe.getContingut(), "_blank");
 	 				else
-						Clients.evalJavaScript("window.open('execucions?id="+id+"', '_blank');");
-  	                       }
-        	               else
-                	                Messagebox.show("Cannot execute");
- 
+						Clients.evalJavaScript("window.open('execucions?id="+exe.getId()+"', '_blank');"); 
+				}
+				else
+					Messagebox.show("Cannot execute");
+
 			}
 			else
 				Messagebox.show("Cannot execute");
@@ -539,7 +539,8 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
 		for (com.soffid.iam.api.Account account: accounts)
 		{
-			if (accountService.isAccountPasswordAvailable(account.getId()))
+			com.soffid.iam.api.Password p = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
+			if (p != null)
 				r.add(new Object [] { account.getLoginName(), account.getDescription(), account });
 		}
 		if (r.size() == 0)
@@ -567,8 +568,6 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 				Clients.evalJavaScript("window.open('"+exe.getContingut()+"', '_blank');");
 			}
 		} else {
-			currentEntryPoint = instance;
-			currentExecutionMethod = exe;
 			Window w = (Window) getFellow ("selectAccount");
 			Listbox lb = (Listbox) w.getFellow("accountsListbox");
 			lb.getItems().clear();
@@ -591,9 +590,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 	}
 
 	private ExecucioPuntEntrada findExecucio(Collection<ExecucioPuntEntrada> execucions) throws InternalErrorException {
-		String scope = com.soffid.iam.ServiceLocator.instance()
-				.getEntryPointService()
-				.getScopeForAddress(Security.getClientIp());
+		String scope = getScopeForAddress(Security.getClientIp());
 		ExecucioPuntEntrada selected = null;
 		if ("L".equals(scope))
 			selected = findExecucio (execucions, "L");
@@ -604,6 +601,10 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		return selected;
 	}
 	
+	private String getScopeForAddress(String address) {
+		return "I";
+	}
+
 	private ExecucioPuntEntrada findExecucio(Collection<ExecucioPuntEntrada> execucions, String scope) {
 		for (ExecucioPuntEntrada exe: execucions)
 			if (scope.equals(exe.getAmbit()))

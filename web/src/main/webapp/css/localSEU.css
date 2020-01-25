@@ -1918,3 +1918,12 @@ div.errbox
 	color: {GREENTEXT};
 	background-color: {GREENLIGHT}
 }
+
+div.scroll-listbox div.listbox-head {
+	padding-right: 15px;
+}
+
+div.scroll-listbox div.listbox-body {
+	overflow-y: scroll;
+	scrollbar-width: 15px;
+}

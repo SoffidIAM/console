@@ -22,4 +22,7 @@ public class TipusExecucioPuntEntrada {
 	@Attribute(translated = "template" )
 	public java.lang.String plantilla;
 
+	@Nullable
+	public java.lang.String javaClass;
+
 }

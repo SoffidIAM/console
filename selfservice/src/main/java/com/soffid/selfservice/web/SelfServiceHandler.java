@@ -45,12 +45,16 @@ import org.zkoss.zul.Treerow;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AccessTree;
+import com.soffid.iam.api.AccessTreeExecution;
+import com.soffid.iam.api.AccessTreeExecutionType;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
+import com.soffid.iam.web.launcher.ApplicationLauncher;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
@@ -325,7 +329,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		return (Tree) getFellowIfAny("treebox");
 	}
 	
-	void select() throws InterruptedException, InternalErrorException, NamingException, CreateException, UnsupportedEncodingException{
+	void select() throws Exception{
 		openTree(getTreebox().getSelectedItem());
 	}
 	
@@ -414,7 +418,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 	}
 	
-	public void openTree(Treeitem selected) throws InterruptedException, InternalErrorException, NamingException, CreateException, UnsupportedEncodingException{
+	public void openTree(Treeitem selected) throws Exception{
 		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(selected);
 		DataNode obj2 = (DataNode) XPathUtils.getValue(ctx, ".");
 		Object obj = obj2.getInstance();
@@ -476,7 +480,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 	}
 
 	private void openEntryPoint(Treeitem selected, Object obj)
-			throws InternalErrorException, NamingException, CreateException, InterruptedException, UnsupportedEncodingException {
+			throws Exception {
 		PuntEntrada instance = (PuntEntrada) obj;
 		if(!selected.isOpen() && instance.getMenu().equals("S")){
 			selected.setOpen(true);
@@ -491,7 +495,15 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 				String system = instance.getSystem();
 				String type = exe.getCodiTipusExecucio();
 				List<com.soffid.iam.api.Account> accounts = fetchAccounts(instance);
-				if ( exe.getCodiTipusExecucio().equals("PAM") )
+				Class executor = findExecutionType( exe );
+				if (executor != null)
+				{
+					ApplicationLauncher l = (ApplicationLauncher) executor.newInstance();
+					l.open(AccessTree.toAccessTree(instance),
+							AccessTreeExecution.toAccessTreeExecution(exe),
+							accounts);
+				}
+				else if ( exe.getCodiTipusExecucio().equals("PAM") )
 				{
 					openPamEntryPoint (instance, exe, accounts);
 				}
@@ -507,6 +519,24 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 	}
 	
+	private Class findExecutionType(ExecucioPuntEntrada exe) throws InternalErrorException, NamingException, CreateException {
+		for (AccessTreeExecutionType et: EJBLocator.getEntryPointService().getAllMimeTypeExecution())
+		{
+			if (et.getCode().equals(exe.getCodiTipusExecucio()) && et.getJavaClass() != null)
+			{
+				Class c;
+				try {
+					c = Class.forName(et.getJavaClass());
+					if (c != null && ApplicationLauncher.class.isAssignableFrom(c))
+					{
+						return c;
+					}
+				} catch (ClassNotFoundException e) {
+				}
+			}
+		}
+		return null;
+	}
 	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, List<com.soffid.iam.api.Account> accounts) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
 		Long name = instance.getId();
 		// Get passwords

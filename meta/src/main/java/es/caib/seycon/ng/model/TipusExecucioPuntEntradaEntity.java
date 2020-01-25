@@ -25,6 +25,10 @@ public abstract class TipusExecucioPuntEntradaEntity {
 	@Nullable
 	public java.lang.String plantilla;
 
+	@Column (name="EXE_JAVCLA", length=150)
+	@Nullable
+	public java.lang.String javaClass;
+
 	@Operation(translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusExecucioPuntEntradaEntity findByCodi(

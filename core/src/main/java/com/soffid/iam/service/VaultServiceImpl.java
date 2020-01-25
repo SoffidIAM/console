@@ -118,6 +118,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 			throws Exception {
 		VaultFolderEntity entity = getVaultFolderEntityDao().load(parent.getId());
 		
+		if (entity == null)
+			return new LinkedList<VaultFolder>();
+		
 		List<VaultFolder> folders = getVaultFolderEntityDao().toVaultFolderList(entity.getChildren());
 		
 		filterFolders(folders);

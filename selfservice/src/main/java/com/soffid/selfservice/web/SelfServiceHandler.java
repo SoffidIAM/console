@@ -42,10 +42,16 @@ import org.zkoss.zul.Treerow;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AccessTree;
+import com.soffid.iam.api.AccessTreeExecution;
+import com.soffid.iam.api.AccessTreeExecutionType;
+import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
+import com.soffid.iam.web.launcher.ApplicationLauncher;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Account;
@@ -315,7 +321,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		return (Tree) getFellowIfAny("treebox");
 	}
 	
-	void select() throws InterruptedException, InternalErrorException, NamingException, CreateException{
+	void select() throws Exception{
 		openTree(getTreebox().getSelectedItem());
 	}
 	
@@ -404,7 +410,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 	}
 	
-	public void openTree(Treeitem selected) throws InterruptedException, InternalErrorException, NamingException, CreateException{
+	public void openTree(Treeitem selected) throws Exception{
 		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(selected);
 		DataNode obj2 = (DataNode) XPathUtils.getValue(ctx, ".");
 		Object obj = obj2.getInstance();
@@ -465,7 +471,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 	}
 
 	private void openEntryPoint(Treeitem selected, Object obj)
-			throws InternalErrorException, NamingException, CreateException, InterruptedException {
+			throws Exception {
 		PuntEntrada instance = (PuntEntrada) obj;
 		if(!selected.isOpen() && instance.getMenu().equals("S")){
 			selected.setOpen(true);
@@ -478,10 +484,17 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			{
 				boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
 				String system = instance.getSystem();
-				String type = instance.getExecucions().iterator().next().getCodiTipusExecucio();
-				if (! ssokm || system == null || ! type.equals("URL"))
-					Clients.evalJavaScript("window.open('execucions?id="+name+"', '_blank');");
-				else 
+				String type = exe.getCodiTipusExecucio();
+				List<com.soffid.iam.api.Account> accounts = fetchAccounts(instance);
+				Class executor = findExecutionType( exe );
+				if (executor != null)
+				{
+					ApplicationLauncher l = (ApplicationLauncher) executor.newInstance();
+					l.open(AccessTree.toAccessTree(instance),
+							AccessTreeExecution.toAccessTreeExecution(exe),
+							accounts);
+				}
+				else if ( exe.getCodiTipusExecucio().equals("PAM") )
 				{
 					String user = Security.getCurrentUser();
 					List<Account> accounts = null;
@@ -554,7 +567,221 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 	}
 	
-	public void launchSSOKMAccount () {
+	private Class findExecutionType(ExecucioPuntEntrada exe) throws InternalErrorException, NamingException, CreateException {
+		for (AccessTreeExecutionType et: EJBLocator.getEntryPointService().getAllMimeTypeExecution())
+		{
+			if (et.getCode().equals(exe.getCodiTipusExecucio()) && et.getJavaClass() != null)
+			{
+				Class c;
+				try {
+					c = Class.forName(et.getJavaClass());
+					if (c != null && ApplicationLauncher.class.isAssignableFrom(c))
+					{
+						return c;
+					}
+				} catch (ClassNotFoundException e) {
+				}
+			}
+		}
+		return null;
+	}
+	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, List<com.soffid.iam.api.Account> accounts) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
+		Long name = instance.getId();
+		// Get passwords
+		List<Object[]> r = new LinkedList<Object[]>();
+		SelfService sss = EJBLocator.getSelfService();
+		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
+		String url = instance.getExecucions().iterator().next().getContingut();
+		for (com.soffid.iam.api.Account account: accounts)
+		{
+			if (accountService.isAccountPasswordAvailable(account.getId()))
+				r.add(new Object [] { account.getLoginName(), account.getDescription(), account });
+		}
+		if (r.size() == 0)
+		{
+			throw new UiException("Sorry. There is no account available to open this service");
+		}
+		else if (r.size() == 1)
+		{
+			openPamEntryPoint (instance, exe, (com.soffid.iam.api.Account) r.get(0)[2]);
+		} else {
+			Window w = (Window) getFellow ("selectAccount");
+			Listbox lb = (Listbox) w.getFellow("accountsListbox");
+			lb.getItems().clear();
+			Collections.sort(r, new Comparator<Object[]>() {
+				public int compare(Object[] o1, Object[] o2) {
+					return ((String)o1[0]).compareTo((String)o2[0]);
+				}
+				
+			});
+			
+			this.currentEntryPoint = instance;
+			this.currentExecutionMethod = exe;
+			
+			for ( Object[] row: r)
+			{
+				Listitem item = new Listitem();
+				item.setValue(row);
+				item.appendChild(new Listcell(row[0].toString()));
+				item.appendChild(new Listcell(row[1].toString()));
+				lb.appendChild(item);
+			}
+			w.doHighlighted();
+		}
+	}
+	
+	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, com.soffid.iam.api.Account account) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		NewPamSession s = EJBLocator.getPamSessionService()
+				.createJumpServerSession(account, exe.getContingut());
+		if (s == null)
+			throw new UiException("Unable to start session");
+		else
+		{
+			URL u = s.getUrl();
+			StringBuffer sb = new StringBuffer();
+			String targetUrl = u.getProtocol()+"://"+u.getHost()+ ( u.getPort() > 0 ? ":"+u.getPort(): "" ) + u.getPath();
+			
+			sb.append("var f=document.getElementById(\"pamLauncherForm\");");
+			sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
+			for (String part: (u.getQuery() != null && !u.getQuery().trim().isEmpty()? u.getQuery().split("&"): new String[0]))
+			{
+				int i = part.indexOf("=");
+				String tag = i > 0? part.substring(0, i): part;
+				String value = i >0? part.substring(i+1): "";
+				sb.append("f.elements.namedItem(\""+encodeJS( URLDecoder.decode( tag, "UTF-8") )+"\").value=\""+
+						URLDecoder.decode(encodeJS(value), "UTF-8")+"\";");
+			}
+			sb.append("f.submit();");
+			Clients.evalJavaScript(sb.toString());
+		}
+	}
+	
+	public String encodeJS(String url) {
+		return url.replaceAll("\\\\","\\\\\\\\").replaceAll("'", "\\'");
+	}
+
+	public void openWssoEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, List<com.soffid.iam.api.Account> accounts)
+			throws InternalErrorException, NamingException, CreateException {
+		// Get passwords
+		List<Object[]> r = new LinkedList<Object[]>();
+		SelfService sss = EJBLocator.getSelfService();
+		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
+		for (com.soffid.iam.api.Account account: accounts)
+		{
+			if (accountService.isAccountPasswordAvailable(account.getId()))
+				r.add(new Object [] { account.getLoginName(), account.getDescription(), account });
+		}
+		if (r.size() == 0)
+		{
+			throw new UiException("Sorry. There is no account available to open this service");
+		}
+		else if (r.size() == 1)
+		{
+			try {
+				Object[] row = r.get(0);
+				com.soffid.iam.api.Account account = accountService.findAccountById((Long)row[2]);
+				com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
+				if (password == null)
+					throw new InternalErrorException(
+							String.format("Unable to fetch password for account %s at %s",
+									account.getName(),
+									account.getSystem()));
+				
+				JSONObject j = new JSONObject();
+				j.put("url", exe.getContingut());
+				j.put("account", row[0]);
+				j.put("password", password.getPassword());
+				Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+			} catch (JSONException e) {
+				Clients.evalJavaScript("window.open('"+exe.getContingut()+"', '_blank');");
+			}
+		} else {
+			currentEntryPoint = instance;
+			currentExecutionMethod = exe;
+			Window w = (Window) getFellow ("selectAccount");
+			Listbox lb = (Listbox) w.getFellow("accountsListbox");
+			lb.getItems().clear();
+			Collections.sort(r, new Comparator<Object[]>() {
+				public int compare(Object[] o1, Object[] o2) {
+					return o1[0].toString().compareTo(o2[0].toString());
+				}
+				
+			});
+			for ( Object[] row: r)
+			{
+				Listitem item = new Listitem();
+				item.setValue(row);
+				item.appendChild(new Listcell(row[0].toString()));
+				item.appendChild(new Listcell(row[1].toString()));
+				lb.appendChild(item);
+			}
+			w.doHighlighted();
+		}
+	}
+
+	private ExecucioPuntEntrada findExecucio(Collection<ExecucioPuntEntrada> execucions) throws InternalErrorException {
+		String scope = com.soffid.iam.ServiceLocator.instance()
+				.getEntryPointService()
+				.getScopeForAddress(Security.getClientIp());
+		ExecucioPuntEntrada selected = null;
+		if ("L".equals(scope))
+			selected = findExecucio (execucions, "L");
+		if ("W".equals(scope) || "L".equals(scope) && selected == null)
+			selected = findExecucio (execucions, "W");
+		if (selected == null)
+			selected = findExecucio (execucions, "I");
+		return selected;
+	}
+	
+	private ExecucioPuntEntrada findExecucio(Collection<ExecucioPuntEntrada> execucions, String scope) {
+		for (ExecucioPuntEntrada exe: execucions)
+			if (scope.equals(exe.getAmbit()))
+				return exe;
+		return null;
+	}
+	public List<com.soffid.iam.api.Account> fetchAccounts(PuntEntrada instance) throws InternalErrorException, NamingException, CreateException {
+		String user = Security.getCurrentUser();
+		String system = instance.getSystem();
+		List<com.soffid.iam.api.Account> accounts = new LinkedList<com.soffid.iam.api.Account>();
+		// Get accounts list
+		Security.nestedLogin(Security.getCurrentAccount(), Security.ALL_PERMISSIONS);
+		try {
+			com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
+			if (system != null &&  !system.trim().isEmpty())
+			{
+				accounts.addAll(accountService.findUsersAccounts(user, system));
+				for (com.soffid.iam.api.Account acc: accountService.findSharedAccountsByUser(user))
+				{
+					if (acc.getSystem().equals(system))
+						accounts.add(acc);
+				}
+			}
+			
+			for ( AutoritzacioPuntEntrada auth: instance.getAutoritzacions())
+			{
+				if (auth.getTipusEntitatAutoritzada().equals(TipusAutoritzacioPuntEntrada.ACCOUNT) &&
+						auth.getDescripcioNivellAutoritzacio().equals(TipusAutoritzacioPuntEntrada.NIVELL_QUERY_DESCRIPCIO))
+				{
+					accounts.add(accountService.findAccountById(auth.getIdEntitatAutoritzada()));
+				}
+			}
+			
+		} finally {
+			Security.nestedLogoff();
+		}
+		return accounts;
+	}
+	
+	boolean wssoAccount = false;
+	public void launchAccount () throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		if (wssoAccount)
+			launchWSSOAccount();
+		else
+			launchPAMAccount();
+	}
+	
+	protected void launchWSSOAccount () throws InternalErrorException, NamingException, CreateException
+	{
 		Window w = (Window) getFellow ("selectAccount");
 		Listbox lb = (Listbox) w.getFellow("accountsListbox");
 		Listitem selected = lb.getSelectedItem();

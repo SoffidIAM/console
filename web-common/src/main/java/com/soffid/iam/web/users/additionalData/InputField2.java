@@ -87,6 +87,8 @@ import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.events.XPathEvent;
+import es.caib.zkib.events.XPathValueEvent;
 import es.caib.zkib.jxpath.JXPathException;
 import es.caib.zkib.zkiblaf.Frame;
 
@@ -112,6 +114,7 @@ public class InputField2 extends Div
 	SingletonBinder binder = new SingletonBinder(this);
 	boolean hideUserName = false;
 	boolean raisePrivileges = false;
+	boolean updating = false;
 
 	public DataType getDataType() {
 		return dataType;
@@ -617,68 +620,71 @@ public class InputField2 extends Div
 	}
 
 	private void applyChange(Component tb, Object value) throws IOException, UnsupportedEncodingException, CommitException {
-		Integer order = (Integer) tb.getAttribute("position");
-		String id = getIdForPosition(order);
-		String removeIconId = id+"_removeIcon";
-		boolean refresh = false;
-		boolean novallidate = false;
-		if (order == null) {
-			attributeValidate( order , value);			
-			binder.setValue(value);
-		}
-		else {
-			List l = (List) binder.getValue();
-			if (l == null) l = new LinkedList();
-			else l = new LinkedList(l);
-			if (order.intValue() == l.size() )
+		boolean oldUpdating = updating;
+		updating = true;
+		try {
+			Integer order = (Integer) tb.getAttribute("position");
+			String id = getIdForPosition(order);
+			String removeIconId = id+"_removeIcon";
+			boolean refresh = false;
+			boolean novallidate = false;
+			if (order == null) {
+				attributeValidate( order , value);			
+				binder.setValue(value);
+			}
+			else {
+				List l = (List) binder.getValue();
+				if (l == null) l = new LinkedList();
+				else l = new LinkedList(l);
+				if (order.intValue() == l.size() )
+				{
+					l.add(value);
+					createFieldElement(new Integer (l.size()), null);
+				}
+				else
+					l.set(order.intValue(), value);
+				LinkedList l2 = new LinkedList();
+				int pos = 0;
+				for (Object vv: l)
+				{
+					if (vv != null && ! vv.toString().trim().isEmpty())
+						l2.add(vv);
+					else {
+						if (pos < order)
+							order --;
+						else if (pos == order)
+							novallidate = true;
+						refresh = true;
+					}
+				}	
+				if ( ! novallidate)
+					attributeValidate( order, value );
+				binder.setValue(l2);
+			}
+				
+			if (refresh)
 			{
-				l.add(value);
-				createFieldElement(new Integer (l.size()), null);
+				try {
+					createField();
+					Component component = (Component) getFellowIfAny(id);
+					if (component != null && component instanceof HtmlBasedComponent)
+						((HtmlBasedComponent) component).focus();
+				} catch (Exception e) {
+					throw new UiException(e);
+				}
+			
 			}
 			else
-				l.set(order.intValue(), value);
-			LinkedList l2 = new LinkedList();
-			int pos = 0;
-			for (Object vv: l)
 			{
-				if (vv != null && ! vv.toString().trim().isEmpty())
-					l2.add(vv);
-				else {
-					if (pos < order)
-						order --;
-					else if (pos == order)
-						novallidate = true;
-					refresh = true;
-				}
-			}
-			if ( ! novallidate)
-				attributeValidate( order, value );
-			binder.setValue(l2);
-		}
-				
-		if (refresh)
-		{
-			try {
-				createField();
-				Component component = (Component) getFellowIfAny(id);
-				if (component != null && component instanceof HtmlBasedComponent)
-					((HtmlBasedComponent) component).focus();
-			} catch (Exception e) {
-				throw new UiException(e);
-			}
-			
-		}
-		else
-		{
 			if (getFellowIfAny(removeIconId) != null )
 				getFellowIfAny(removeIconId).setVisible( value != null && ! value.equals(""));			
-		}
+			}
 
 		
 		
-		Component c = this;
-		do
-		{
+			Component c = this;
+			do
+			{
 				if (c instanceof AttributesDiv)
 				{
 					((AttributesDiv) c).adjustVisibility();
@@ -2289,8 +2295,6 @@ public class InputField2 extends Div
 		this.raisePrivileges = raisePrivileges;
 	}
 
-<<<<<<< HEAD
-=======
 	public void setPlaceholder(String placeholder) {
 		this.placeholder = placeholder;
 	}
@@ -2367,5 +2371,4 @@ public class InputField2 extends Div
 
 		}
 	}
->>>>>>> d3d3066... New triggers for custom attributes
 }

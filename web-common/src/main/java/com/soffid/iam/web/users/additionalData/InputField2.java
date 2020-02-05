@@ -428,7 +428,10 @@ public class InputField2 extends Div implements XPathSubscriber
 		String id = getIdForPosition(order);
 		tb.setRawValue(value);
 		if (order == null) {
+			boolean oldUpdating = updating;
+			updating = true;
 			binder.setValue(value);
+			updating = oldUpdating;
 		}
 		else {
 			List l = (List) binder.getValue();
@@ -452,10 +455,12 @@ public class InputField2 extends Div implements XPathSubscriber
 						order --;
 				}
 			}
+			boolean oldUpdating = updating;
+			updating = true;
 			binder.setValue(l2);
+			updating = oldUpdating;
 		}
-				
-}
+	}
 
 	private void updateSearchStatus() throws Throwable {
 		if (currentSearch == null)
@@ -2330,6 +2335,8 @@ public class InputField2 extends Div implements XPathSubscriber
 	public boolean attributeValidateAll() {
 		if(dataType != null)
 		{
+			if (isReadonly())
+				return true;
 			Object value = binder.getValue();
 			if (dataType.isMultiValued())
 			{

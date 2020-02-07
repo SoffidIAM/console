@@ -1481,7 +1481,7 @@
 													es.caib.zkib.datamodel.DataNode dn = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".");
 													if (dn != null)
 													{
-														Object instance = dn.instance;
+														Object instance = dn.getInstance();
 														if (instance instanceof Account) {
 															disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
 																	"/@disabled");

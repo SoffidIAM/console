@@ -220,11 +220,16 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 
 /* Entrada de dades: textbox */
-.text, .textbox {
+/* Entrada de dades: textbox */
+.text, .textbox, .textbox2, .textbox2m {
 	font-family: Arial;	font-size: 11px;
 	border: 1px solid #7F9196; /*width: 135px;*/
 	background-image: none;
 }
+
+.textbox2 { width: 98%; width: calc( 100% - 16px);}
+.textbox2m { width: 96%; width: calc( 100% - 48px);},
+	
 
 input [type="checkbox"] {
 	width: 30px;

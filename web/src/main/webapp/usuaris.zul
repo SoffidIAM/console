@@ -201,7 +201,7 @@
 					while (it.hasNext())
 					{
 						es.caib.zkib.jxpath.Pointer p = it.next();
-						PoliticaContrasenya politica = p.getValue().instance;
+						PoliticaContrasenya politica = p.getValue().getInstance();
 						if (politica.getTipus().equals("M"))
 						{
 							if (domini == null)
@@ -1478,7 +1478,7 @@
 											try {
 												if (r != null)
 												{
-													Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
+													Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").getInstance();
 													if (instance instanceof Account) {
 														disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx,
 																"/@disabled");
@@ -2270,7 +2270,7 @@ String nomRolsBorrar = "";
 		es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(r);
 		try {
 			if (r != null) {
-				Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").instance;
+				Object instance = es.caib.zkib.datasource.XPathUtils.getValue(ctx, ".").getInstance();
 				if (instance instanceof Account) {
 					disabled = es.caib.zkib.datasource.XPathUtils.getValue(ctx, "/@disabled");
 					if (disabled != null && disabled) {
@@ -2731,7 +2731,7 @@ String nomRolsBorrar = "";
 				
 						es.caib.zkib.datasource.DataSource ds = newPassword.getAttribute("ds");
 						String xpath = newPassword.getAttribute("xpath");
-						account = ds.getJXPathContext().getValue(xpath+"/account[1]").instance;
+						account = ds.getJXPathContext().getValue(xpath+"/account[1]").getInstance();
 
 						service.setAccountPassword(account, new Password(password.getValue()));
 						es.caib.zkib.zkiblaf.Missatgebox

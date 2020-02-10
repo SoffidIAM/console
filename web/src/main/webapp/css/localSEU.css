@@ -220,7 +220,6 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 
 /* Entrada de dades: textbox */
-/* Entrada de dades: textbox */
 .text, .textbox, .textbox2, .textbox2m {
 	font-family: Arial;	font-size: 11px;
 	border: 1px solid #7F9196; /*width: 135px;*/
@@ -1587,11 +1586,11 @@ tr.grid td.gc {
 }
 
 
-.text, .textbox { 
+.text, .textbox, .textbox2, .textbox2m { 
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox, input.dateboxinp, input.text {
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text {
 	box-sizing: border-box;
 	padding: 2px;
 	border: none;

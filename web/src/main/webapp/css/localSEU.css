@@ -1927,3 +1927,221 @@ div.scroll-listbox div.listbox-body {
 	overflow-y: scroll;
 	scrollbar-width: 15px;
 }
+
+table.datatable, table.datatable td {
+	border: solid 1px #c0c0c0;
+	border-collapse: collapse;
+}
+table.datatable thead td {
+	background-color: #f0f0f0;
+}
+table.datatable thead td input {
+	width:100%;
+}
+table.datatable tfoot td {
+	background-color: #f0f0f0;
+	text-align: right;
+}
+
+table.datatable thead td.filter-cell {
+	padding-left:10px;
+	padding-right: 10px;
+}
+
+table.datatable tbody td {
+	padding-left:10px;
+	padding-right: 10px;
+}
+
+table.datatable tbody tr:hover {
+	background-color: #e0e0ff;
+}
+
+table.datatable tbody tr.selected {
+	background-color: #c0c0ff;
+}
+
+table.datatable tbody tr {
+	cursor: pointer;
+}
+
+
+table.datatable td.selector {
+	padding: 0px;
+	margin: 0px;
+	width: 35px;
+}
+
+table.datatable td.selector input {
+	width: auto;
+}
+
+td.sortable-column {
+	cursor: pointer;
+}
+td.sortable-column div.sort-indicator {
+	display: inline-block;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+td.sortable-column div.sort-indicator div {
+	font-size: 50%;
+}
+div.sort-indicator-disabled {
+	visibility: hidden;
+}
+
+.switch, .switch * {
+    box-sizing: content-box;
+}
+
+.switch {
+    color: white;
+    width: 80px;
+    position: relative;
+    font-size: 14px;
+    line-height: 1.6;
+    cursor: pointer;
+    vertical-align: text-bottom;
+}
+
+.switch.disabled {
+    opacity: 0.3;
+}
+
+.switch.outdated,
+.switch.incompatible {
+    width: auto;
+}
+
+
+/* create a new BFC to have floating label work correctly.
+ * http://colinaarts.com/articles/float-containment/ */
+.switch:before, .switch:after {
+  content    : '';
+  display    : table;
+}
+
+.switch:after {
+  clear: both;
+}
+
+.switch { display : inline-block;}
+
+.switch * {
+    display: block;
+    user-select: none;
+}
+
+.switch .slider.not-dragging {
+    -webkit-transition: left 0.2s ease-in-out;
+    -moz-transition: left 0.2s ease-in-out;
+    -ms-transition: left 0.2s ease-in-out;
+    -o-transition: left 0.2s ease-in-out;
+    transition: left 0.2s ease-in-out;
+}
+
+.switch .slider {
+    position: absolute;
+    /* (80px / 2) - 2px */
+    width: 38px;
+    top: -2px;
+    bottom: -2px;
+
+    border: 3px solid #5f5f5f;
+    background-color: #5f5f5f;
+    border-radius: 4px;
+}
+
+.switch .slider .handle {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -5px;
+    margin-top: -4px;
+    width: 2px;
+    height: 8px;
+    border-width: 0 6px 0 2px;
+    border-style: none double none solid;
+    border-color: black;
+}
+
+.switch .off,
+.switch .on,
+.switch.customized .custom-content {
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6),
+                 0 1px 0   rgba(0, 0, 0, 0.6);
+    border-style: solid;
+    border-width: 2px;
+    text-align: center;
+    padding: 1px 0;
+}
+
+.switch .off,
+.switch .on {
+    /* 80px / 2 - 2px */
+    width: 38px;
+}
+
+
+.slider.not-dragging.slider-on {
+	left: 38px;
+}
+
+.slider.not-dragging.slider-off {
+	left: 0px;
+}
+.switch .custom-content {
+    /* To aid with writing style sheets, put the default color styles
+     * in a less specified selector, so they're easily overridden. */
+    display: none;
+
+    /* default colors */
+    background-color: #000000;
+    border-color: #2e3436;
+}
+
+.switch.customized .custom-content {
+    display: block;
+
+    /* 80px - 4px */
+    width: 76px;
+    border-radius: 4px;
+}
+
+.switch.customized .custom-content.outdated,
+.switch.customized .custom-content.incompatible {
+    width: auto;
+}
+
+.switch.customized .custom-content.incompatible {
+    cursor: help;
+}
+
+.switch .off {
+    float: right;
+    border-color: {BLUELIGHT};
+    border-left-style: none;
+    border-radius: 0 4px 4px 0;
+    background-color: #303030;
+    color: white;
+}
+
+.switch .on {
+    float: left;
+    border-color: {BLUELIGHT};
+    border-right-style: none;
+    border-radius: 4px 0 0 4px;
+    background-color: {BLUE};
+    color: {BLUETEXT}
+}
+
+.switch.customized .on,
+.switch.customized .off,
+.switch.customized .slider {
+    display: none;
+}
+		
+		

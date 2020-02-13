@@ -24,7 +24,7 @@
   <url>http://www.soffid.com/doc/console</url>
   <scm>
         <connection>scm:git:ssh://git@stash.dev.lab:7999/iam2/console.git</connection>
-    <tag>HEAD</tag>
+    <tag>console-2.7.3</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -361,7 +361,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkdb</artifactId>
-        <version>1.43</version>
+        <version>${zkdb.version}</version>
       </dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -415,7 +415,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>1.25</zkiblaf.version>
-    <zkdb.version>1.43</zkdb.version>
+    <zkdb.version>1.44-SNAPSHOT</zkdb.version>
   </properties>
   <pluginRepositories>
     <pluginRepository>

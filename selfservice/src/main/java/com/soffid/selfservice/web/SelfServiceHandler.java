@@ -14,6 +14,8 @@ import java.util.List;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.zkoss.image.AImage;
@@ -75,6 +77,7 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SelfServiceHandler extends com.soffid.iam.web.component.Frame 
 {
+	Log log = LogFactory.getLog(getClass());
 	private String ambit;
 
 	public SelfServiceHandler () throws CreateException, NamingException, InternalErrorException
@@ -525,13 +528,18 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			if (et.getCode().equals(exe.getCodiTipusExecucio()) && et.getJavaClass() != null)
 			{
 				Class c;
+				ClassLoader cl = Thread.currentThread().getContextClassLoader(); 
 				try {
-					c = Class.forName(et.getJavaClass());
+					Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
+					c = getClass().getClassLoader().loadClass(et.getJavaClass());
 					if (c != null && ApplicationLauncher.class.isAssignableFrom(c))
 					{
 						return c;
 					}
 				} catch (ClassNotFoundException e) {
+					log.warn("Error loading class "+et.getJavaClass(), e);
+				} finally {
+					Thread.currentThread().setContextClassLoader(cl);
 				}
 			}
 		}

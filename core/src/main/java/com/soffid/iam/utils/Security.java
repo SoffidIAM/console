@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
@@ -746,6 +747,12 @@ public class Security {
 		for (String t: tp)
 			if (ip.equalsIgnoreCase(t))
 				return true;
+			else if (t.contains("*"))
+			{
+				String t2 = t.replaceAll("\\*", "[0-9]*");
+				if ( Pattern.matches(t2, ip))
+					return true;
+			}
 		return false;
 	}
 }

@@ -153,50 +153,63 @@ public class TenantImporter extends TenantDataManager {
 		String tableName = (String) in.readObject();
 		String columns[] = (String[]) in.readObject();
 		
+		boolean ignore = false;
 		Table t = db.findTable(tableName, true);
-		Map<String, String> foreignKeys = findForeignColumns(t.name);
-		do {
-			Object[] row = (Object[]) in.readObject();
-			if (row == null)
-				break;
-			StringBuffer sb = new StringBuffer();
-			StringBuffer sb2 = new StringBuffer();
-			List<Object> values = new LinkedList<Object>();
-			for ( int i = 0; i < row.length; i++ )
-			{
-				Column col = t.findColumn(columns[i], true);
-				Object value = row[i];
-				if ( value != null )
+		if (t == null)
+		{
+			log.info("Ignoring table "+tableName);
+			Object[]  row;
+			do {
+				row = (Object[]) in.readObject();
+			} while (row != null);
+		}
+		else
+		{
+			
+			Map<String, String> foreignKeys = findForeignColumns(t.name);
+			do {
+				Object[] row = (Object[]) in.readObject();
+				if (row == null)
+					break;
+				StringBuffer sb = new StringBuffer();
+				StringBuffer sb2 = new StringBuffer();
+				List<Object> values = new LinkedList<Object>();
+				for ( int i = 0; i < row.length; i++ )
 				{
-					if (col.primaryKey || foreignKeys.containsKey(col.name))
+					Column col = t.findColumn(columns[i], true);
+					Object value = row[i];
+					if ( value != null )
 					{
-						long l = ((Long) value).longValue();
-						value = new Long ( l * stepId + firstId);
+						if (col.primaryKey || foreignKeys.containsKey(col.name))
+						{
+							long l = ((Long) value).longValue();
+							value = new Long ( l * stepId + firstId);
+						}
+						if (sb.length() == 0)
+						{
+							sb.append("INSERT INTO "+tableName+"("+columns[i]);
+							sb2.append("?");
+						}
+						else
+						{
+							sb.append(","+columns[i]);
+							sb2.append(",?");
+						}
+						values.add(value);
 					}
-					if (sb.length() == 0)
-					{
-						sb.append("INSERT INTO "+tableName+"("+columns[i]);
-						sb2.append("?");
-					}
-					else
-					{
-						sb.append(","+columns[i]);
-						sb2.append(",?");
-					}
-					values.add(value);
 				}
-			}
-			if (sb.length() > 0)
-			{
-				String sql = sb.toString()+") values ("+sb2.toString()+")";
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				int n = 1;
-				for ( Object v: values)
-					stmt.setObject(n++, v);
-				stmt.execute();
-				stmt.close();
-			}
-		} while (true);
+				if (sb.length() > 0)
+				{
+					String sql = sb.toString()+") values ("+sb2.toString()+")";
+					PreparedStatement stmt = conn.prepareStatement(sql);
+					int n = 1;
+					for ( Object v: values)
+						stmt.setObject(n++, v);
+					stmt.execute();
+					stmt.close();
+				}
+			} while (true);
+		}
 	}
 
 	private void updateTable() throws ClassNotFoundException, IOException, SQLException {
@@ -205,49 +218,61 @@ public class TenantImporter extends TenantDataManager {
 		String columns[] = (String[]) in.readObject();
 		
 		Table t = db.findTable(tableName, true);
-		Map<String, String> foreignKeys = findForeignColumns(t.name);
-		do {
-			Object[] row = (Object[]) in.readObject();
-			if (row == null)
-				break;
-			StringBuffer sb = new StringBuffer();
-			List<Object> values = new LinkedList<Object>();
-			for ( int i = 1; i < row.length; i++ )
-			{
-				Object value = row[i];
-				if ( value != null )
+		if (t == null)
+		{
+			log.info("Ignoring table "+tableName);
+			Object[] row;
+			do {
+				row = (Object[]) in.readObject();
+			} while (row != null);
+		}
+		else
+		{
+			Map<String, String> foreignKeys = findForeignColumns(t.name);
+			do {
+				Object[] row = (Object[]) in.readObject();
+				if (row == null)
+					break;
+				StringBuffer sb = new StringBuffer();
+				List<Object> values = new LinkedList<Object>();
+				for ( int i = 1; i < row.length; i++ )
 				{
-					String columnName = columns[i-1];
-					if (foreignKeys.containsKey(columnName))
+					Object value = row[i];
+					if ( value != null )
 					{
-						long l = ((Long) value).longValue();
-						value = new Long ( l * stepId + firstId);
+						String columnName = columns[i-1];
+						if (foreignKeys.containsKey(columnName))
+						{
+							long l = ((Long) value).longValue();
+							value = new Long ( l * stepId + firstId);
+						}
+						if (sb.length() == 0)
+						{
+							sb.append("UPDATE "+tableName+"SET ");
+						}
+						else
+						{
+							sb.append(",");
+						}
+						sb.append( columnName) .append("=?");
+						values.add(value);
 					}
-					if (sb.length() == 0)
-					{
-						sb.append("UPDATE "+tableName+"SET ");
-					}
-					else
-					{
-						sb.append(",");
-					}
-					sb.append( columnName) .append("=?");
-					values.add(value);
 				}
-			}
-			if (sb.length() > 0)
-			{
-				String sql = " WHERE "+primaryKey+"=?";
-				PreparedStatement stmt = conn.prepareStatement(sql);
-				int n = 1;
-				for ( Object v: values)
-					stmt.setObject(n++, v);
-				Long pk = (Long) row[0];
-				stmt.setLong(n++, pk.longValue() * stepId + firstId );
-				stmt.execute();
-				stmt.close();
-			}
-		} while (true);
+				if (sb.length() > 0)
+				{
+					String sql = " WHERE "+primaryKey+"=?";
+					PreparedStatement stmt = conn.prepareStatement(sql);
+					int n = 1;
+					for ( Object v: values)
+						stmt.setObject(n++, v);
+					Long pk = (Long) row[0];
+					stmt.setLong(n++, pk.longValue() * stepId + firstId );
+					stmt.execute();
+					stmt.close();
+				}
+			} while (true);
+			
+		}
 	}
 
 }

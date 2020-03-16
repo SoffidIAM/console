@@ -3,9 +3,10 @@
 <?page id="index" title="Soffid Identity and Access Manager" ?>
 <?meta http-equiv="X-UA-Compatible" content="IE=9" ?>
 
-<vbox xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+<div xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
-	id="finestraSEU" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	id="main" use="es.caib.seycon.ng.web.ConfiguraSEUACLs" width="100%" 
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: hidden">
 	<script><![CDATA[
 		var floatingToolbar = {
@@ -16,7 +17,6 @@
 		}
 	                 
 		document.addEventListener ("scroll", function() {
-			console.log("onscroll "+floatingToolbar.toolbar);
 		    var el = floatingToolbar.toolbar;
 		    var el2 = floatingToolbar.floating;
 		    if (el2 != null)
@@ -53,86 +53,16 @@
 			
 	</attribute>
 	
-    <div>
-    
-    	<include src="wf/menu.zul"/>
-		<zscript>
-			<![CDATA[
-				boolean embed = Executions.getCurrent().getNativeRequest().getParameter("embed") != null;
-			]]>
-		</zscript>
-		<style src="/css/localSEU.css"/>
-		<style src="/css/devices.css"/>
-		<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits" 
-			initialPage="wf/inbox.zul"
-			style="overflow: visible" embed="${embed}" 
-			menu="//menu/menu" embeddedMenu="true"
-			logoutPage="/prelogout" mainWindowTitle="Soffid IAM" showFavorites="false" width="100%">
-			<div id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
-				<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>
-			</div>
-		</application>
-		<image src="img/wait.gif" style="display:none;visibility:hidden;"/>		
-		<zscript>
-			<![CDATA[
-				Executions.getCurrent().getDesktop().getSession().setAttribute("paginaActual", null);
-				if ("true".equals (System.getProperty("soffid.fail-safe")))
-					finestraSEU.getFellow("fail-safe-mode").visible = true;
-			]]>
-		</zscript>
-		<div id="appletFirmaDiv"/>
-	    <zscript><![CDATA[
-			void find ( Treechildren treechildren, String target)
-			{
-				String page;
-				int i = target.indexOf('?');
-				if ( i < 0)
-					page = target;
-				else
-					page = target.substring(0, i);
-				Collection children = treechildren.getItems();
-				for (Iterator it = children.iterator(); it.hasNext();)
-				{
-					Treeitem item  = it.next();
-					if (! "availableprocesses".equals (item.getId())) 
-					{
-						Treerow row = item.getTreerow();
-						Collection grandchildren = row.getChildren();
-						for (Iterator it2 = grandchildren.iterator(); it2.hasNext();)
-						{
-							Component c = it2.next();
-							if (c instanceof es.caib.bpm.ui.tree.ApplicationTreecell)
-							{
-								es.caib.bpm.ui.tree.ApplicationTreecell atc = (es.caib.bpm.ui.tree.ApplicationTreecell) c;
-								String menuPage=atc.getPagina();
-								if (menuPage != null)
-								{
-									i = menuPage.indexOf('?');
-									if ( i > 0)
-										menuPage = menuPage.substring(0, i);
-									if (page.equals(menuPage))
-									{
-										app.setInitialPage(target);
-									}
-								}
-							}
-						}
-						if (item.getTreechildren() != null)
-							find (item.getTreechildren(), target);
-						
-					}							
-				}
-			}
-			
-			String target = Executions.getCurrent().getNativeRequest().getParameter("target");
-			if (target != null)
-			{
-				Component menuPage = Executions.createComponents("/wf/menu.zul", self, new HashMap());                      
-				Treechildren children = menuPage.getFellow("menu").getFellow("menutree").getTreechildren();
-				find (children, target);
-				menuPage.setParent(null);
-			}
-	
-		]]></zscript>
-	</div>
-</vbox> 
+	<style src="/css/localSEU.css"/>
+	<style src="/css/devices.css"/>
+	<application id="app" allowOpenMultipleTabs="true" autoReload="false" favorits="//favorits/favorits"
+	    template="main/application.zul" 
+		initialPage="main/menu.zul"
+		style="overflow: visible" embed="true" 
+		logoutPage="/prelogout" mainWindowTitle="Soffid IAM" showFavorites="false" width="100%">
+		<div id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
+			<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>
+		</div>
+	</application>
+	<image src="img/wait.gif" style="display:none;visibility:hidden;"/>		
+</div> 

@@ -129,9 +129,7 @@ public class TenantDataManager {
 				"SCV_RECIS",
 					" WHERE RIS_TEN_ID=${tenantId}",
 				"SCV_RECGRO",
-					" WHERE RGR_TEN_ID=${tenantId}",
-				"SC_SCTAHA",
-					" WHERE 1=0"
+					" WHERE RGR_TEN_ID=${tenantId}"
 					
 		};
 

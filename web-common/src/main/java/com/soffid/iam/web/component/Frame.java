@@ -1,18 +1,9 @@
 package com.soffid.iam.web.component;
 
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequestWrapper;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.ext.AfterCompose;
-import org.zkoss.zul.Window;
-
-import com.soffid.iam.utils.ConfigurationCache;
 
 public class Frame extends es.caib.zkib.zkiblaf.Frame implements AfterCompose {
+	String permissions[];
 
 	@Override
 	public void afterCompose() {
@@ -20,4 +11,15 @@ public class Frame extends es.caib.zkib.zkiblaf.Frame implements AfterCompose {
 			setVisible(false);
 	}
 
+	public String[] getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(String[] permissions) {
+		this.permissions = permissions;
+	}
+
+	public void setPermissions(String permissions) {
+		this.permissions = permissions.split(" +");
+	}
 }

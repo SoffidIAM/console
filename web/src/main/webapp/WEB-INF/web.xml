@@ -298,6 +298,10 @@
 		<mime-type>image/jpeg</mime-type>
 	</mime-mapping>
 	<mime-mapping>
+		<extension>svg</extension>
+		<mime-type>image/svg+xml</mime-type>
+	</mime-mapping>
+	<mime-mapping>
 		<extension>js</extension>
 		<mime-type>application/x-javascript</mime-type>
 	</mime-mapping>

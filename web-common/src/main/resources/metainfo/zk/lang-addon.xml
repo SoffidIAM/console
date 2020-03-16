@@ -63,11 +63,32 @@
 		</mold>
 	</component>	
 	
-
+	<component>
+		<component-name>menu2</component-name>
+		<component-class>com.soffid.iam.web.component.Menu2</component-class>
+		<mold>
+			<mold-name>default</mold-name>
+			<mold-uri>~./zul/html/menu2.dsp</mold-uri>
+		</mold>
+	</component>	
+	
+	<component>
+		<component-name>menu2item</component-name>
+		<component-class>com.soffid.iam.web.component.Menu2item</component-class>
+		<mold>
+			<mold-name>default</mold-name>
+			<mold-uri>~./zul/html/menu2item.dsp</mold-uri>
+		</mold>
+	</component>	
+	
 	<component>
 		<extends>frame</extends>
 		<component-name>frame</component-name>
 		<component-class>com.soffid.iam.web.component.Frame</component-class>
+		<mold>
+			<mold-name>div</mold-name>
+			<mold-uri>~./zul/html/div.dsp</mold-uri>
+		</mold>
 	</component>
 
 

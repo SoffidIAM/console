@@ -106,4 +106,8 @@ zk.error = function (msg) {
 		<language-name>Java</language-name>
 		<interpreter-class>es.caib.seycon.ng.web.component.BSHInterpreter</interpreter-class>
 	</zscript-config>
+	<zscript-config>
+		<language-name>ref</language-name>
+		<interpreter-class>es.caib.seycon.ng.web.component.RefInterpreter</interpreter-class>
+	</zscript-config>
 </zk>

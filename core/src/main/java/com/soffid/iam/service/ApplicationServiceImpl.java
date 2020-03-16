@@ -1236,7 +1236,7 @@ public class ApplicationServiceImpl extends
 				if (rolsUsuarisEntity.getEndDate() == null ||
 						rolsUsuarisEntity.getEndDate().after(new Date()))
 					rolsUsuarisEntity.setEndDate(new Date());
-				getRoleAccountEntityDao().update(rolsUsuarisEntity);
+				getRoleAccountEntityDao().update(rolsUsuarisEntity, "D");
 			}
 			else
 			{

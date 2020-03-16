@@ -295,19 +295,20 @@ span {
 
 /* Botons */
 button, input[type="button"] {
-	background-color: white;
+	background-color: {GREEN};
 	border: 1px solid {GREEN};
 	border-image: none;
+	border-radius: 2px;
 	padding: 4px;
 	margin-left: 4px;
 	margin-right: 4px;
-	color: {SKYDARK};
+	color: {GREENTEXT};
 }	
 
 /* Buttons */
 button:hover, input[type="button"]:hover {
-	background-color: {GREEN};
-	color: white;
+	background-color: {GREENLIGHT};
+	color: {GREENTEXT};
 }
 
 /* Barra de botons */
@@ -525,13 +526,16 @@ div.listbox, div.tree, div.grid {
 	background-color: #FFFFFF;
 }
 
-select.listbox {
+select {
 	font-size: 12px;
 }
 
 /* Workflows: nou SEU */
 .workarea {
 	padding: 20px;
+	min-height: calc( 100vh - 30px );
+	oveflow: auto;
+    perspective: calc( 5 * 100vw );
 }
 
 .wf_listbox {
@@ -1190,17 +1194,23 @@ input[type="submit"] {
     color: {SKYDARK};
 }
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
-	background-color: {GREEN};
-	color: white;
+	background-color: {GREENLIGHT};
+	color: black;
 }
 
 button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
-	color: {SKYLIGHT};
+	color: white;
+	background-color: #505050;
 	border-color: white
 }
+
+
+button:disabled img, input[type="button"]:disabled img, input[type="submit"]:disabled img {
+	visibility: hidden;
+}
+
 button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]:hover:disabled {
-	background-color: white;
-	color: white;
+	color: #505050;
 	border-color: white
 }
 
@@ -1750,7 +1760,7 @@ span.rbtnbk {
 	border: none;
 }
 
-select.listbox {
+select {
     border: 1px solid #AAB;
     padding: 2px 18px 2px 2px;
     color: black;
@@ -1779,12 +1789,12 @@ select.listbox {
   background-repeat: no-repeat;
 }
 
-select.listbox::-ms-expand {
+select::-ms-expand {
     display: none;
 }
 
 
-select.listbox:disabled {
+select:disabled {
     background: white;
     border:none;
 }
@@ -1928,69 +1938,106 @@ div.scroll-listbox div.listbox-body {
 	scrollbar-width: 15px;
 }
 
-table.datatable, table.datatable td {
-	border: solid 1px #c0c0c0;
-	border-collapse: collapse;
-}
-table.datatable thead td {
-	background-color: #f0f0f0;
-}
-table.datatable thead td input {
-	width:100%;
-}
-table.datatable tfoot td {
-	background-color: #f0f0f0;
-	text-align: right;
-}
+		div.datatable table, div.datatable table td {
+			border: solid 1px #c0c0c0;
+			border-collapse: collapse;
+		}
+		div.datatable table.thead td {
+			box-sizing: border-box;
+			background-color: {GREEN};
+			text-color: {GREENTEXT};
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    white-space: nowrap;		
+    	}
+		div.datatable .thead td input {
+			width:100%;
+		}
+		div.datatable div.tfoot {
+			background-color: white;
+			text-align: right;
+			box-sizing: border-box;
+			border: none;
+		}
+		div.datatable table.thead td.filter-cell {
+			padding-left:10px;
+			padding-right: 10px;
+		    text-overflow: clip;
+		}
+		
+		div.datatable {
+			display: block;
+			border-spacing: 0;
+  		}
+		
+		div.datatable table.thead {
+		  width:100%;
+		  table-layout: fixed;  
+		  border-bottom: 4px solid {GREEN};
+		}
+		
+		div.datatable div.tfoot {
+		  width:100%;
+		  box-sizing: border-box;
+		}
+				
+		div.datatable div.tbodydiv{
+		  background-color: white;
+		  box-sizing: border-box;
+		  width:100%; 
+		  overflow-y:auto;
+		  overflow-x:clip;
+		  border-bottom: 1px solid #c0c0c0;
+		}
+		
+		div.datatable table.tbody{
+		  width:100%; 
+		}
 
-table.datatable thead td.filter-cell {
-	padding-left:10px;
-	padding-right: 10px;
-}
+		div.datatable tr{
+		  width: 100%;
+		}
+		
+		div.datatable table.tbody td {
+			padding-left:10px;
+			padding-right: 10px;
+			padding-top: 3px;
+			padding-bottom: 3px;
+			margin: 0px;
+		}
+		
+		div.datatable table.tbody tr:hover {
+			background-color: {BLUELIGHT};
+		}
 
-table.datatable tbody td {
-	padding-left:10px;
-	padding-right: 10px;
-}
+		div.datatable table.tbody tr.selected {
+			background-color: {BLUE};
+			color: {BLUETEXT};
+		}
 
-table.datatable tbody tr:hover {
-	background-color: #e0e0ff;
-}
+		div.datatable table.tbody tr {
+			cursor: pointer;
+		}
 
-table.datatable tbody tr.selected {
-	background-color: #c0c0ff;
-}
+		div.datatable table.thead td {
+			box-sizing: border-box;
+    	}
 
-table.datatable tbody tr {
-	cursor: pointer;
-}
-
-
-table.datatable td.selector {
-	padding: 0px;
-	margin: 0px;
-	width: 35px;
-}
-
-table.datatable td.selector input {
-	width: auto;
-}
-
-td.sortable-column {
-	cursor: pointer;
-}
-td.sortable-column div.sort-indicator {
-	display: inline-block;
-	margin-left: 5px;
-	margin-right: 5px;
-}
-td.sortable-column div.sort-indicator div {
-	font-size: 50%;
-}
-div.sort-indicator-disabled {
-	visibility: hidden;
-}
-
+		div.datatable td.sortable-column {
+			cursor: pointer;
+		}
+		div.datatable td.sortable-column div.sort-indicator {
+			display: inline-block;
+			margin-left: 5px;
+			margin-right: 5px;
+		}
+		div.datatable td.sortable-column div.sort-indicator div {
+			font-size: 50%;
+		}
+		div.datatable div.sort-indicator-disabled {
+			visibility: hidden;
+		}
+		
 .switch, .switch * {
     box-sizing: content-box;
 }
@@ -1999,10 +2046,13 @@ div.sort-indicator-disabled {
     color: white;
     width: 80px;
     position: relative;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 11px;
+    line-height: 1.4;
     cursor: pointer;
-    vertical-align: text-bottom;
+}
+
+.switch span { 
+    font-size: 10px;
 }
 
 .switch.disabled {
@@ -2013,7 +2063,6 @@ div.sort-indicator-disabled {
 .switch.incompatible {
     width: auto;
 }
-
 
 /* create a new BFC to have floating label work correctly.
  * http://colinaarts.com/articles/float-containment/ */
@@ -2026,9 +2075,12 @@ div.sort-indicator-disabled {
   clear: both;
 }
 
-.switch { display : inline-block;}
+.switch { display : inline-block; }
+.switch { display : block; }
 
-.switch * {
+
+
+.switch, .switch * {
     display: block;
     user-select: none;
 }
@@ -2049,7 +2101,7 @@ div.sort-indicator-disabled {
     bottom: -2px;
 
     border: 3px solid #5f5f5f;
-    background-color: #5f5f5f;
+    background-color: #000;
     border-radius: 4px;
 }
 
@@ -2064,15 +2116,13 @@ div.sort-indicator-disabled {
     height: 8px;
     border-width: 0 6px 0 2px;
     border-style: none double none solid;
-    border-color: black;
+    border-color: #5f5f5f;
 }
 
 .switch .off,
 .switch .on,
 .switch.customized .custom-content {
     font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6),
-                 0 1px 0   rgba(0, 0, 0, 0.6);
     border-style: solid;
     border-width: 2px;
     text-align: center;
@@ -2085,7 +2135,6 @@ div.sort-indicator-disabled {
     width: 38px;
 }
 
-
 .slider.not-dragging.slider-on {
 	left: 38px;
 }
@@ -2093,6 +2142,7 @@ div.sort-indicator-disabled {
 .slider.not-dragging.slider-off {
 	left: 0px;
 }
+
 .switch .custom-content {
     /* To aid with writing style sheets, put the default color styles
      * in a less specified selector, so they're easily overridden. */
@@ -2122,20 +2172,21 @@ div.sort-indicator-disabled {
 
 .switch .off {
     float: right;
-    border-color: {BLUELIGHT};
+    border-color: #2e3436;
     border-left-style: none;
     border-radius: 0 4px 4px 0;
-    background-color: #303030;
+    background-color: #606060;
     color: white;
 }
 
 .switch .on {
     float: left;
-    border-color: {BLUELIGHT};
+    border-color: #3465a4;
     border-right-style: none;
     border-radius: 4px 0 0 4px;
-    background-color: {BLUE};
-    color: {BLUETEXT}
+    background-color: {GREEN};
+    font-weight: normal;
+    color: {GREENTEXT};
 }
 
 .switch.customized .on,
@@ -2144,4 +2195,197 @@ div.sort-indicator-disabled {
     display: none;
 }
 		
+
+
+.card {
+  width: 100%;
+  height: 100%;
+  min-height: calc( 100vh - 75px );
+  position: relative;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+}
+
+.card__face {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  backface-visibility: hidden;
+  background-color: white;
+}
+
+.card__face--front {
+}
+
+.card__face--back {
+  transform: rotateY( 180deg );
+}
+
+.card.is-flipped {
+  transform: rotateY(180deg);
+}
 		
+div.addButton {
+	display: inline-block;
+	margin: 5px;
+	height: 40px;
+	width: 40px;
+	background-color: {BLUE};
+	border-radius: 20px;
+	opacity: 0.5;
+	text-align: center;
+	line-height: 40px;
+	cursor: pointer;
+}
+
+div.addButton:hover {
+	margin: 0px;
+	height: 50px;
+	width: 50px;
+	background-color: {BLUE};
+	border-radius: 25px;
+	opacity: 1;
+	text-align: center;
+	line-height: 50px;
+}
+
+div.addButton span {
+	vertical-align: middle;
+	display: inline-block;
+	color: white;
+	font-size: 35px;
+}
+
+span.link {
+	text-decoration: underline;
+	cursor: pointer;	
+}
+
+div.menu2 {
+	 display: inline-block;
+	 float:right;
+	 font-size: 14px;
+	 width: 20px;
+	 cursor: pointer;
+	 text-align: center;
+}
+
+div.menu2modal {
+	display:none;
+}
+
+div.menu2modal.open {
+    position: fixed;
+    z-index: +1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(173, 216, 230);
+    background-color: rgb(173, 216, 230, 0.1);
+    display: block;
+}
+
+div.menu2modal.open div.menu2dropdown {
+	display: block;
+	position: absolute;
+	border: solid 1px #404040;
+	border-radius: 1px;
+	z-index: +1;
+	background: white;
+	text-align: left;
+	box-shadow: 4px 4px #a0a0a0;
+}
+
+div.menu2modal.open div.menu2dropdown table {
+	border-collapse: collapse;
+	border: none;
+}
+
+div.menu2modal.open div.menu2dropdown tr td {
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	cursor: pointer;
+}
+
+div.menu2modal.open div.menu2dropdown tr td img{
+	margin-right: 8px;
+	height: 18px;
+}
+
+div.menu2modal.open div.menu2dropdown tr:hover {
+	color: {BLUETEXT};
+	background-color: {BLUE};
+}
+
+div.menu2 div.menu2starter {
+	display: inline-block;
+	height: 20px;
+}
+
+div.menu2 div.menu2starter:hover {
+	background-color: #e0e0e0;
+}
+
+span.pager span:first-child,
+span.pager span:last-child {
+	color: {GREEN};
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+div.options {
+	text-align: center;
+}
+.options .menuoption {
+	width: 200px;
+	padding: 10px;
+	text-align: center;
+	cursor: pointer;
+	display: inline-block;
+}
+
+.options .menuoption img {
+	padding-left: 9px;
+	padding-right: 9px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	width: 100%;
+	opacity: 1;
+	border: solid 1px {GREEN};
+	border-radius: 6px;
+}
+
+.options .menuoption:hover img {
+	width: 100%;
+	padding: 0px;
+	opacity: 0.8;
+	background-color: {GREEN};
+}
+
+.options .menuoption .menuoption-title {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.options .menuoption .menuoption-suboptions {
+	height: 1.2em;
+	overflow-y: hidden;
+	overflow-wrap: break-word;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow-x: hidden;
+}
+
+div.navigation-bar {
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+div.navigation-bar span {
+	color: {BLUE};
+	font-weight: bold;
+}

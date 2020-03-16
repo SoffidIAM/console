@@ -67,10 +67,10 @@ public abstract class BpmEngine {
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<ProcessInstance> findProcessInstances(
 		java.util.List definitions, 
-		java.lang.String processId, 
-		java.lang.String estado, 
-		java.lang.String actor, 
-		java.util.Date startDate, 
+		@Nullable java.lang.String processId, 
+		@Nullable java.lang.String estado, 
+		@Nullable java.lang.String actor, 
+		@Nullable java.util.Date startDate, 
 		boolean finalizada)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;

@@ -1,0 +1,61 @@
+- name: seu.configuration
+  img: /img/menu/system-settings.png
+  options:
+  - name: seu.settings
+    img: /img/menu/settings.png
+    options:
+    - name: seu.tenants
+      url: config/tenants.zul
+      permissions: ["seu:tenant:show"]
+      img: /img/menu/tenant.png
+    - name: seu.plugins
+      url: plugins.zul
+      img: /img/menu/plugin.png
+      permissions: ["seu:plugins:show"]
+    - name: user-interface 
+      url: parametres.zul
+      permissions: ["seu:parametres:show"]
+    - name: memory-cache
+      url: parametres.zul
+      permissions: ["seu:parametres:show"]
+    - name: parametres
+      url: parametres.zul
+      permissions: ["seu:parametres:show"]
+    - name: memory-cache
+      url: parametres.zul
+      permissions: ["seu:parametres:show"]
+  - name: seu.integration-engine
+    img: /img/menu/integration-engine.png
+    options:
+    - name: sync-server-engine  
+      url: parametres.zul
+      permissions: ["seu:parametres:show"]
+    - name: sync-servers
+      url: agents.zul
+      permissions: ["seu:agents:show"]
+    - name: integrations
+      url: agents.zul
+      permissions: ["seu:agents:show"]
+    - name: pam-servers
+      url: pam_config.zul
+      permissions: ["seu:pamSessionConfigure"]
+  - name: seu.workflow-settings
+    img: /img/menu/workflow.png
+    options:
+    - name: workflow-engine
+      url: wf/configure-index.zul
+    - name: business-processes
+      url: wf/configure-index.zul
+  - name: seu.security
+    img: /img/menu/safebox.png
+    options:
+    - name: user-password-domains
+      url: /dominiUsuaris.zul
+      permissions: ["seu:userDomain:show"]
+    - name: authorizations
+      url: /autoritzacions.zul
+      permissions: ["seu:autoritzacions:shw"]
+    - name: authentication-methods
+      url: /parametres.zul
+      permissions: ["seu:parametres:show"]
+  

@@ -23,6 +23,9 @@ public abstract class ScheduledTaskHandlerEntity {
 	@Column (name="STH_CLANAM", length=250)
 	public java.lang.String className;
 
+	@Column (name="STH_TEN_ID")
+	public TenantEntity tenant;
+
 	@ForeignKey (foreignColumn="SCT_HANDLE")
 	public java.util.Collection<com.soffid.iam.model.ScheduledTaskEntity> tasks;
 
@@ -35,7 +38,7 @@ public abstract class ScheduledTaskHandlerEntity {
 
 @Index (name="SC_SCTAHA_NAME_UK",	unique=true,
 entity=com.soffid.iam.model.ScheduledTaskHandlerEntity.class,
-columns={"STH_NAME"})
+columns={"STH_TEN_ID", "STH_NAME"})
 abstract class SheculedTaskHandlerNameIndex {
 }
 

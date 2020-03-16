@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="tenants" title="${c:l('seu.tenants')}"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="parametres" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.tenant.TenantHandler" id="frame">
+
+	<style>tr.noBorderGrid td.gc {vertical-align: top}</style>
+	<datamodel id="model" rootNode="root" src="descriptorTenants.xml" />
+
+	<script>
+	function renderDetails(td, col, value)
+	{
+		if (value.enabled)
+			td.appendChild( document.createTextNode ("${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}"));
+		else
+			td.appendChild( document.createTextNode ("${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}"));
+	}
+	</script>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" onClick="ref:frame.importTenant"/>
+					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/tenant"
+				sortColumn="0" maxheight="400%" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+		- name: ${c:l('tenant.zul.name')}
+		  value: name
+		- name: ${c:l('tenant.zul.description')}
+		  value: description
+		- name: ${c:l('tenant.zul.enabled')}
+		  value: enabled
+		  render: renderDetails
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right">
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div id="dades">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+					<pager datatable="listbox"/>
+					
+					<menu2>
+						<menu2item if="${canUpdateTenant}" image="~./img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.export"/>
+						<menu2item if="${canDeleteTenant}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+						<menu2item if="${canUpdateTenant}" image="~./img/login.svg" label="${c:l('configure.Login') }" onClick="ref:frame.nestedLogin"/>
+					</menu2>
+					
+				</div>
+				<form id="form" onChangeXPath="ref:frame.onChangeDades"
+					dataPath="/listbox:/." width="100%">
+						<grid sclass="noBorderGrid">
+							<rows>
+								<row>
+									<input_etiqueta value="${c:l('tenant.zul.name')} :"/>
+									
+									<hbox>
+										<textbox bind="@name" id="form_name" readonly="${!canUpdateTenant}" maxlength="50"
+											width="12em" constraint="no empty"/>
+										<label value="*" />
+									</hbox>
+								</row>
+								
+								<row>
+									<input_etiqueta value="${c:l('tenant.zul.description')} :"/>
+									<input_dada bind="@description"
+											lectura="${!canUpdateTenant}"
+											width_custom="100%"/>
+								</row>
+								
+								<row>
+									<input_etiqueta value="${c:l('tenant.zul.enabled')} :"/>
+									
+									<switch bind="@enabled" 
+											disabled="${!canUpdateTenant}"/>
+								</row>
+								<row>
+									<input_etiqueta value="${c:l('tenant.zul.permission')} :"/>
+									<div>
+										<grid sclass="noBorderGrid" dataPath="permissions">
+											<datarow>
+ 												<select
+													keyPath="codi"
+													labelPath="codi"
+													dataPath="/model:/auth" 
+													bind="/newValue"
+													disabled="${!canUpdateTenant}"
+													width="95%"/>
+												<imageclic id="imgDelete" if="${canUpdateTenant}"
+													src="~./img/remove.png"
+													sclass='removeValueIcon' 
+													onClick="ref:frame.removeValue">
+												</imageclic>
+											</datarow>
+										</grid>
+										<button
+											image="~./img/list-add.gif"
+											label="${c:l('usuaris.zul.Afegeixnou')}"
+											visible="${canUpdateTenant}"
+											onClick="ref:frame.addPermission">
+										</button>
+									</div>
+								</row>
+								<row>
+									<input_etiqueta value="${c:l('tenant.zul.servers')} :"/>
+									<div>
+										<grid sclass="noBorderGrid" dataPath="servers">
+											<datarow>
+												<listbox
+													dataPath="/model:/server" 
+													bind="/newValue"
+													disabled="${!canUpdateTenant}"
+													mold="select"
+													width="95%">
+													<dataitem bind="name">
+														<listcell bind="name"></listcell>
+													</dataitem>
+												</listbox>
+												<imageclic id="imgDelete" if="${canUpdateTenant}"
+													src="~./img/remove.png" sclass='removeValueIcon' 
+													onClick="ref:frame.removeValue">
+												</imageclic>
+											</datarow>
+										</grid>
+										<button
+											image="~./img/list-add.gif"
+											label="${c:l('usuaris.zul.Afegeixnou')}"
+											visible="${canUpdateTenant}"
+											onClick="ref:frame.addNewServer">
+										</button>
+									</div>
+								</row>
+							</rows>
+						</grid>
+						
+					</form>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<databutton image="~./img/undo.svg" label="Undo" datamodel="/model" onClick="ref:frame.undo">
+					</databutton>
+					<databutton image="~./img/save.svg" label="Apply changes" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+		</div>
+	</div>
+</frame>

@@ -48,7 +48,7 @@ import es.caib.seycon.ng.servei.ejb.UsuariService;
  * @author u88683
  * 
  */
-public class ConfiguraSEU extends Vbox {
+public class ConfiguraSEU extends Div {
 
 	private static final long serialVersionUID = 1L;
 

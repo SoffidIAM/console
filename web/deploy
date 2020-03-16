@@ -1,6 +1,4 @@
 #!/bin/bash
-cp -r /home/gbuades/soffid-2.0/console/web/src/main/webapp/*    /home/gbuades/soffid-2.0/test/iam-console-2/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/
-cp -r /home/gbuades/soffid-2.0/console/web/src/main/resources/* /home/gbuades/soffid-2.0/test/iam-console-2/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/WEB-INF/classes/
+cp -ru /home/gbuades/soffid/console/web/src/main/webapp/*    /home/gbuades/soffid/test/iam-console-3/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/
+cp -ru /home/gbuades/soffid/console/web/src/main/resources/* /home/gbuades/soffid/test/iam-console-3/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/WEB-INF/classes/
  
-#rsync -vauz -e ssh /home/gbuades/soffid/console2/console/web/src/main/webapp/*		root@bubu.test.lab:/opt/soffid/iam-console/jboss/server/default/tmp/soffid/iam-ear.ear/iam-web-*.war
-#rsync -vauz -e ssh /home/gbuades/soffid/console2/console/web/src/main/resources/*	root@bubu.test.lab:/opt/soffid/iam-console/jboss/server/default/tmp/soffid/iam-ear.ear/iam-web-*.war/WEB-INF/classes

@@ -142,7 +142,9 @@ public class AuditEntityDaoImpl extends
         p.print(" "); // SP
         p.print("SOFFID"+audobj.getId()); // MSGID
         p.print(" - "); // STRUCTURED DATA
-        p.print("[" + audobj.getAuthor() + "] " + audobj.getMessage());// MSG     
+        p.print("[" + audobj.getAuthor() + "] [" +
+        		(audobj.getSourceIp() == null? "": audobj.getSourceIp())+ 
+        		"]" + audobj.getMessage());// MSG     
         p.flush ();
         
         byte buf [] = out.toByteArray();

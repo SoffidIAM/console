@@ -131,7 +131,10 @@ public class TenantDataManager {
 				"SCV_RECGRO",
 					" WHERE RGR_TEN_ID=${tenantId}",
 				"SC_SCTAHA",
-					" WHERE 1=0"
+					" WHERE 1=0",
+				"SC_USUPRO",
+					"WHERE UPR_IDPROC IN (SELECT JBPM_MODULEINSTANCE.PROCESSINSTANCE_ FROM  JBPM_MODULEINSTANCE "
+						+ "WHERE JBPM_MODULEINSTANCE.TENANT_=${tenantId})"
 					
 		};
 

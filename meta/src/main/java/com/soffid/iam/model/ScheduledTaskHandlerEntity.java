@@ -22,7 +22,6 @@ public abstract class ScheduledTaskHandlerEntity {
 
 	@Column (name="STH_CLANAM", length=250)
 	public java.lang.String className;
-
 	@ForeignKey (foreignColumn="SCT_HANDLE")
 	public java.util.Collection<com.soffid.iam.model.ScheduledTaskEntity> tasks;
 

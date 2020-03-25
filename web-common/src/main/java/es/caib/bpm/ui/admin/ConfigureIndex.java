@@ -105,7 +105,7 @@ public class ConfigureIndex extends Frame
 
 	public JbpmSchedulerServiceInterface getJobSchedulerEjb() throws NamingException {
 		return (JbpmSchedulerServiceInterface) new InitialContext()
-				.lookup("/JbpmSchedulerServiceLocal");
+				.lookup("java:/module/JbpmSchedulerService");
 	}
 
 	public void configure () throws IOException, CreateException,

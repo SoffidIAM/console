@@ -5,7 +5,7 @@
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<script src='~./js/codemirror/java-classes.js' />
-	<script src='comu/syncserver-classes.js' />
+	<script src='/comu/syncserver-classes.js' />
 
 	<window closable="true" id="top" position="center, center" onCancel="" title="${c:l('editorJS.Titol')}" visible="false" width="90%">
 		<zscript>

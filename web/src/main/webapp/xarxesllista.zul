@@ -4,7 +4,7 @@
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<datamodel id="model" rootNode="xarxes" src="descriptorXarxa.xml"/>
+	<datamodel id="model_network" rootNode="xarxes" src="descriptorXarxa.xml"/>
 	
 	<zscript src="comu/checkTruncatedResults.zul" />
 	
@@ -14,9 +14,9 @@
 		
 			mode = "query"; 
 			boolean view_altres = false;
-			model.getVariables().declareVariable("queryEnabled", false);
+			model_network.getVariables().declareVariable("queryEnabled", true);
 			
-			boolean queryEnabled = false;
+			boolean queryEnabled = true;
 			boolean retrySearch = false;
 		
 			void populateDetails ()
@@ -85,16 +85,14 @@
 				
 				for (String key : lista.keySet())
 				{
-					model.getVariables().declareVariable(key, lista.get(key));
+					model_network.getVariables().declareVariable(key, lista.get(key));
 				}
 				 
-				model.getVariables().declareVariable("queryEnabled", queryEnabled);
+				model_network.getVariables().declareVariable("queryEnabled", true);
 				
 				listbox = esquemaLlista.getFellow("lista").getFellow("listbox");
-				if(queryEnabled){
-					model.getJXPathContext().getValue("/xarxa").refresh();
-					listbox.dataPath = "/model:/xarxa"; 
-				}
+				model_network.getJXPathContext().getValue("/xarxa").refresh();
+				listbox.dataPath = "../../model_network:/xarxa"; 
 				
 				if ((listbox.getModel().getSize() == 0) && !retrySearch)
 				{
@@ -107,7 +105,7 @@
 					retrySearch = false;
 				}
 				
-				checkTruncatedList(listbox);
+//				checkTruncatedList(listbox);
 			}
 	
 			void showAltres () 
@@ -135,8 +133,8 @@
 				queryWindow.getFellow("queryIP").getFellow("textbox").value = "";
 				queryWindow.getFellow("queryDescripcio").getFellow("textbox").value = "";
 				queryWindow.getFellow("queryMascara").getFellow("textbox").value = "";
-				model.getVariables().declareVariable("queryEnabled", false);
-				lista.getFellow("listbox").dataPath = "/model:/xarxa[false]";
+				model_network.getVariables().declareVariable("queryEnabled", false);
+				lista.getFellow("listbox").dataPath = "../../model_network:/xarxa[false]";
 				esquemaLlista.visible=false;
 				view_altres = false;
 				esquemaLlista.getFellow("finishButton").disabled = true;
@@ -188,7 +186,7 @@
 		</criteris>
 		
 		<navegador id="lista" width="790px">
-			<listbox id="listbox" autocommit="false" dataPath="/model:/xarxa"
+			<listbox id="listbox" autocommit="false" dataPath="../../model_network:/xarxa"
 				fixedLayout="true" rows="${fileres}">
 				<attribute name="onSelect">
 					esquemaLlista.getFellow("finishButton").setDisabled(listbox.selectedIndex @lt 0);
@@ -242,5 +240,4 @@
 		</hbox>
 
 	</esquema>
-
 </zk>

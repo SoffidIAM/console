@@ -172,6 +172,11 @@
 	</filter>
 
 	<filter>
+		<filter-name>FrameFilter</filter-name>
+		<filter-class>com.soffid.iam.filter.FrameFilter</filter-class>
+	</filter>
+
+	<filter>
 		<filter-name>CheckPasswordLoginFilter</filter-name>
 		<filter-class>es.caib.loginModule.CheckPasswordLoginFilter</filter-class>
 		<init-param>
@@ -201,6 +206,12 @@
 		<filter-name>securityFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>FrameFilter</filter-name>
+		<url-pattern>*.zul</url-pattern>
+	</filter-mapping>
+
 	<!-- //// -->
 
 
@@ -483,6 +494,11 @@
 		<ejb-ref-type>Session</ejb-ref-type>
 		
 		<local>es.caib.seycon.ng.servei.ejb.ConfiguracioService</local>
+	</ejb-local-ref>
+	<ejb-local-ref>
+		<ejb-ref-name>ejb/ConfigurationService</ejb-ref-name>
+		<ejb-ref-type>Session</ejb-ref-type>
+		<local>com.soffid.iam.service.ejb.ConfigurationService</local>
 	</ejb-local-ref>
 	<ejb-local-ref>
 		<ejb-ref-name>ejb/XarxaEJB</ejb-ref-name>

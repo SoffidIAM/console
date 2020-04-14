@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="userDomain" type="userDomain">
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findAllUserDomain">
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.UserDomain">
+			</new-instance-bean>
+		</finder>
+		<finder name="userDomainType" type="userDomainType">
+			<script-finder>
+			return com.soffid.iam.web.domain.UserDomainType.values;
+			</script-finder>
+		</finder>
+		<finder name="nameGenerator" type="nameGenerator">
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findNameGenerators" if="${queryEnabled}">
+			</ejb-finder>
+		</finder>
+
+	</datanode>
+	
+	<datanode name="userDomain">
+		<ejb-handler jndi="java:/module/UserDomainService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="userDomainType" transient="true" />
+
+	<datanode name="nameGenerator" transient="true" >
+		<custom-attribute name="text" depends="" expr="${instance}">
+		</custom-attribute>
+	</datanode>
+</zkib-model>

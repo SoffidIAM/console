@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml"
+	use="com.soffid.iam.web.domain.UserDomainHandler" >
+
+	<script src='~./js/codemirror/java-classes.js'/>
+	<datamodel id="model" rootNode="root" src="userDomainsDescriptor.xml"/>
+	
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateTenant}" onClick="ref:frame.importTenant"/>
+					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateTenant}"  onClick="ref:frame.addNew"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/userDomain"
+				sortColumn="0" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+		- name: ${c:l('tenant.zul.name')}
+		  value: name
+		- name: ${c:l('tenant.zul.description')}
+		  value: description
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${canCreateUserDomain}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+				
+				<menu2>
+					<menu2item if="${canDeleteUserDomain}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+				
+			</div>
+			<form id="form" onChangeXPath="ref:frame.onChangeForm()"
+				dataPath="/listbox:/." width="100%">
+				<grid sclass="noBorderGrid">
+					<rows>
+						<row>
+							<label value="${c:l('dominiUsuaris.zul.Codi')}"/>
+							
+							<textbox bind="@name" id="du_detall_codi"
+								readonly="${!canModifyUserDomain}" maxlength="50"
+								style="width: 100%; max-width: 50em" constraint="no empty"/>
+						</row>
+						<row>
+							<label value="${c:l('dominiUsuaris.zul.Descripcia')}"/>
+							<textbox bind="@description" id="du_detall_descripcio"
+								readonly="${!canModifyUserDomain}" maxlength="100"
+								style="width: 100%; max-width: 100em" constraint="no empty"/>
+						</row>
+						<row>
+							<label value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+							<select id="lbtipusDominiUsuari" 
+								bind="type"
+								dataPath="/model:/userDomainType"
+								disabled="${!canModifyUserDomain}"
+								keyPath="value" labelPath="desc"
+								onSelect="ref:frame.onChangeType">
+							</select>
+						</row>
+						<row>
+							<label value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+							<select id="lbGenerator" bind="@beanGenerator"
+								keyPath="text"
+								labelPath="text"
+								disabled="${!canModifyUserDomain}"
+								dataPath="/model:/nameGenerator">
+							</select>
+						</row>
+						<row>
+							<div>
+								<imageclic src="/img/help.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
+								<label value="${c:l('dominiUsuaris.zul.scriptCreate')}"/>
+							</div>
+							<codemirror bind="@bshExprCreate" id="du_script1" 
+								readonly="${!canModifyUserDomain}"
+								linenumbers="true" 
+								language="java" 
+								width="99%" height="8em">
+							</codemirror>
+						</row>
+
+						<row>
+							<div>
+								<imageclic src="/img/help.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
+								<label value="${c:l('dominiUsuaris.zul.script')}"/>
+							</div>
+							<codemirror bind="@bshExpr" id="du_script2"
+								linenumbers="true" 
+								readonly="${!canModifyUserDomain}"
+								language="java" 
+								width="99%" height="8em">
+							</codemirror>
+						</row>
+					</rows>
+				</grid>
+			</form>
+			<div style="text-align: right; width: 100%">
+				<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+			</div>
+		</div>
+	</div>
+</frame>

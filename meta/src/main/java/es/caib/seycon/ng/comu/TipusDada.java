@@ -20,7 +20,7 @@ import com.soffid.mda.annotation.ValueObject;
 	 translatedPackage="com.soffid.iam.api")
 public class TipusDada {
 
-	@Attribute(translated = "code" )
+	@Attribute(translated = "code", synonyms = {"name"} )
 	public java.lang.String codi;
 
 	@Attribute(translated = "order" )

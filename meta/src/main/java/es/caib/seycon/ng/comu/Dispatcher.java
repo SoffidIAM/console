@@ -5,8 +5,13 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.DispatcherEntity;
+
+@JsonObject(hibernateClass = DispatcherEntity.class)
 @ValueObject ( translatedName="System",
 	 translatedPackage="com.soffid.iam.api")
 public class Dispatcher {
@@ -72,6 +77,10 @@ public class Dispatcher {
 	@Nullable
 	@Attribute(translated = "groups" )
 	public java.lang.String grups;
+
+	@Nullable
+	public List<java.lang.String> groupsList;
+
 
 	@Nullable
 	@Attribute(translated = "accessControl" )

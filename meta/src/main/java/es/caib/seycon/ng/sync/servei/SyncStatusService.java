@@ -144,6 +144,9 @@ public abstract class SyncStatusService {
 			SoffidObjectType type, String object1, @Nullable String object2)
 	{ return null; }
 
+	public void checkConnectivity (String dispatcher) { }
+
+
 	public GetObjectResults reconcile (String dispatcher, String accountName)
 	{ return null; }
 

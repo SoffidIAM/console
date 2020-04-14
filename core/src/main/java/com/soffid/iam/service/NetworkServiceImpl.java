@@ -16,6 +16,7 @@ package com.soffid.iam.service;
 import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AdministratorAuthorizationToAccessHost;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
@@ -27,11 +28,13 @@ import com.soffid.iam.api.OsType;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Session;
 import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostAdminEntity;
 import com.soffid.iam.model.HostAliasEntity;
 import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.HostEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.NetworkEntityDao;
@@ -48,6 +51,9 @@ import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.XarxaSearchCriteria;
@@ -58,6 +64,7 @@ import es.caib.seycon.ng.exception.UnknownNetworkException;
 import es.caib.seycon.util.TimedOutException;
 import es.caib.seycon.util.TimedProcess;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -76,6 +83,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.XarxaService
@@ -1815,5 +1823,90 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         NetworkEntity x = guessNetwork(addr.getAddress());
     	return getNetworkEntityDao().toNetwork(x);
 	}
+
+	@Override
+	protected AsyncList<Host> handleFindHostByTextAndJsonQueryAsync(String text, String jsonQuery) throws Exception {
+		final AsyncList<Host> result = new AsyncList<Host>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					handleFindHostByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected AsyncList<Network> handleFindNetworkByTextAndJsonQueryAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<Network> result = new AsyncList<Network>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					handleFindNetworkByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void handleFindNetworkByTextAndJsonQueryAsync(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<Network> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+		final NetworkEntityDao dao = getNetworkEntityDao();
+		ScimHelper h = new ScimHelper(Network.class);
+		h.setPrimaryAttributes(new String[] { "name", "description", "address"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toNetwork((NetworkEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
+	private void handleFindHostByTextAndJsonQueryAsync(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<Host> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+		final HostEntityDao dao = getHostEntityDao();
+		ScimHelper h = new ScimHelper(Network.class);
+		h.setPrimaryAttributes(new String[] { "name", "description", "ip"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setGenerator((entity) -> {
+			return dao.toHost((HostEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+
+	@Override
+	protected Collection<Host> handleFindHostByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<Host> result = new LinkedList<Host>();
+		handleFindHostByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+
+	@Override
+	protected Collection<Network> handleFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<Network> result = new LinkedList<Network>();
+		handleFindNetworkByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+
 
 }

@@ -162,7 +162,7 @@ public class YamlParser {
 		do {
 			lines++;
 			line=reader.readLine();
-		} while (line != null && line.trim().isEmpty());
+		} while (line != null && (line.trim().isEmpty() || line.trim().startsWith("#")));
 	}
 	
 	public static void main(String args[]) throws IOException

@@ -3,7 +3,7 @@
 <zkib-model>
 	<datanode name="agents">
 		<finder name="customObjectType" type="objectType">
-			<ejb-finder jndi="java:comp/env/ejb/v2/AdditionalDataServiceEJB" method="findCustomObjectTypeByJsonQuery">
+			<ejb-finder jndi="java:/module/AdditionalDataService-v2" method="findCustomObjectTypeByJsonQuery">
 				<parameter value=""/>
 			</ejb-finder>
 		</finder>
@@ -19,20 +19,6 @@
 				return list;
 			</script-finder>
 		</finder>
-		<!-- 
-		<finder name="soffidObjectType" type="soffidObjectType">
-			<script-finder>
-				import es.caib.seycon.ng.comu.*;
-				list = new java.util.LinkedList();
-				list.add (new String(""));
-				for (l: SoffidObjectType.literals())
-				{
-					list.add (l);
-				}
-				return list;
-			</script-finder>
-		</finder>
- -->
 		<finder name="soffidObjectTypeTrigger" type="soffidObjectType">
 			<script-finder>
 				import es.caib.seycon.ng.comu.*;
@@ -60,100 +46,107 @@
 			</script-finder>
 		</finder>
 		<finder name="agent" type="agent">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
-				method="findDispatchersByFiltre" if = "${queryEnabled}"> <!--agent:query, application:update-->
-				<parameter value="${codi}"/>
-				<parameter value="${nom}"/>
-				<parameter value="${url}"/>
-				<parameter value="${basatRols}"/>
-				<parameter value="${segur}"/>
-				<parameter value="${actiu}"/>
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
+					method="findSystemByTextAndJsonQueryAsync" if="${query != null  &amp;&amp; synchro == null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
+					method="findSystemByTexntAndJsonQuery" if="${query != null  &amp;&amp; synchro != null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.Dispatcher">
+				className="com.soffid.iam.api.System">
+				<bean-attribute name="readOnly" value="true"/>
+				<bean-attribute name="manualAccountCreation" value="true"/>
 			</new-instance-bean>
 		</finder>
 		<finder name="plugin" type="plugin">
-			<ejb-finder jndi="java:comp/env/ejb/ServerPluginEJB"
+			<script-finder>
+				sp = new com.soffid.iam.api.AgentDescriptor();
+				sp.setClassName("- no class -");
+				sp.setDescription("-");
+				return sp;
+			</script-finder>
+			<ejb-finder jndi="java:/module/ServerPluginService-v2"
 				method="getAgentDescriptors">  <!--agent:query-->
 			</ejb-finder>
 		</finder>
 		<finder name="pluginNames" type="plugin">
-			<ejb-finder jndi="java:comp/env/ejb/ServerPluginEJB"
+			<ejb-finder jndi="java:/module/ServerPluginService-v2"
 				method="getAllAgentDescriptorsInfo">  <!--agent:query-->
 			</ejb-finder>
 		</finder>
 		<finder name="dominisUsuari" type="dominiUsuari">
 			<script-finder>
 			   v = new Vector();
-			   obj = new es.caib.seycon.ng.comu.DominiUsuari();
-			   obj.setCodi ("");
-			   obj.setDescripcio (org.zkoss.util.resource.Labels.getLabel("descriptorAgent.Select"));
+			   obj = new com.soffid.iam.api.UserDomain();
+			   obj.setCode ("");
+			   obj.setDescription (org.zkoss.util.resource.Labels.getLabel("descriptorAgent.Select"));
 			   v.add(obj);
 			   return obj;
 			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
-				method="findAllDominiUsuari">  <!-- ?? -->
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findAllUserDomain">  <!-- ?? -->
 			</ejb-finder>
 		</finder>
 		<finder name="tipusUsuari" type="tipusUsuari">
-			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
-				method="findAllTipusUsuari">  <!-- ?? -->
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findAllUserType">  <!-- ?? -->
 			</ejb-finder>
 		</finder>		
 		<finder name="dominisContrasenya" type="dominisContrasenya">
 			<script-finder>
 			   v = new Vector();
-			   obj = new es.caib.seycon.ng.comu.DominiContrasenya();
-			   obj.setCodi ("");
-			   obj.setDescripcio (org.zkoss.util.resource.Labels.getLabel("descriptorAgent.Select"));
+			   obj = new com.soffid.iam.api.PasswordDomain();
+			   obj.setCode ("");
+			   obj.setDescription (org.zkoss.util.resource.Labels.getLabel("descriptorAgent.Select"));
 			   v.add(obj);
 			   return obj;
 			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB"
-				method="findAllDominiContrasenya"> 
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findAllPasswordDomain"> 
 			</ejb-finder>
 		</finder>
 		<finder name="server" type="server">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findAllServers"> <!--agent:query, application:update-->
 			</ejb-finder>
 		</finder>
-		<!--  No longer supported finder name="database" type="database">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
-				method="findAllDatabases"> 
-			</ejb-finder>
-			<new-instance-bean
-				className="es.caib.seycon.ng.comu.ReplicaDatabase">
-			</new-instance-bean>
-		</finder -->
-		<!--  finder name="databaseSelector" type="database">
-			<script-finder>
-				obj = new es.caib.seycon.ng.comu.ReplicaDatabase();
-				obj.setId(null);
-				obj.setUrl("- no replica -");
-				v = new java.util.Vector();
-				v.add (obj);
-				return v;				
-			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
-				method="findAllDatabases"> 
-			</ejb-finder>
-		</finder -->
 		<finder name="serverSelector" type="server">
 			<script-finder>
 				v = new java.util.Vector();
-				obj = new es.caib.seycon.ng.comu.Server();
+				obj = new com.soffid.iam.api.Server();
 				obj.setUrl(null);
-				obj.setNom(org.zkoss.util.resource.Labels.getLabel("agents.disabledAgent"));
+				obj.setName(org.zkoss.util.resource.Labels.getLabel("agents.disabled"));
 				v.add (obj);
-				obj = new es.caib.seycon.ng.comu.Server();
+				obj = new com.soffid.iam.api.Server();
 				obj.setUrl("local");
-				obj.setNom(org.zkoss.util.resource.Labels.getLabel("agents.local"));
+				obj.setName(org.zkoss.util.resource.Labels.getLabel("agents.local"));
 				v.add (obj);
 				return v;				
 			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
+				method="findAllServers"> <!--agent:query, application:update-->
+			</ejb-finder>
+		</finder>
+		<finder name="serverSelector2" type="server">
+			<script-finder>
+				v = new java.util.Vector();
+				obj = new com.soffid.iam.api.Server();
+				obj.setUrl(null);
+				obj.setName("");
+				v.add (obj);
+				obj = new com.soffid.iam.api.Server();
+				obj.setUrl("local");
+				obj.setName(org.zkoss.util.resource.Labels.getLabel("agents.local"));
+				v.add (obj);
+				return v;				
+			</script-finder>
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findAllServers"> <!--agent:query, application:update-->
 			</ejb-finder>
 		</finder>
@@ -174,7 +167,7 @@
 					obj.setSecond(es.caib.seycon.ng.comu.ServerType.PROXYSERVER);
 					v.add(obj);
 					obj = new es.caib.seycon.ng.web.PairContainer();
-					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.hub"));
+					obj.setFirst(org.zkoss.util.resource.Labels.getLabel("servers.zul.gateway"));
 					obj.setSecond(es.caib.seycon.ng.comu.ServerType.GATEWAY);
 					v.add(obj);
 					obj = new es.caib.seycon.ng.web.PairContainer();
@@ -187,7 +180,7 @@
 		</finder>
 		<finder name="authoritativeProcess" type="authoritativeProcess">
 			<script-finder>
-				engine = es.caib.seycon.ng.EJBLocator.getBpmEngine();
+				engine = com.soffid.iam.EJBLocator.getBpmEngine();
 				java.util.LinkedList list = new java.util.LinkedList ();
 				tv = new es.caib.seycon.ng.web.utils.TagValueEntry ();
 				tv.setTag ("-");
@@ -243,30 +236,8 @@
 	
 	<datanode name="tipusUsuari"/>
 	
-	<!--  NO LONGER SUPPORTED
-		datanode name="database">
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
-			<insert-method method="create" returnBean="true">
-				<parameter value="${instance}"/>
-			</insert-method>
-			<delete-method method="delete">
-				<parameter value="${instance}"/>
-			</delete-method>
-			<update-method method="update">
-				<parameter value="${instance}"/>
-			</update-method>
-		</ejb-handler>
-		<validator>
-			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="agents.DataBaseNameValidation"/>
-		</validator>
-		<validator>
-			<attribute-validator expr="${instance.url}" notNull="true" friendlyName="agents.DataBaseUrlValidation"/>
-		</validator>
-	</datanode -->
-
-	
 	<datanode name="server">
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<delete-method method="delete">
 				<parameter value="${instance}"/>
 			</delete-method>
@@ -278,28 +249,28 @@
 
 	<datanode name="agent">
 		<finder name="controlAcces" type="controlAcces">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
-				method="getControlAcces">  <!--agent:query-->
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
+				method="getAccessControl">  <!--agent:query-->
 				<parameter value="${instance}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.ControlAcces">
+				className="com.soffid.iam.api.AccessControl">
 			</new-instance-bean>
 		</finder>	
 
 		<finder name="objectMapping" type="objectMapping" refreshAfterCommit="false">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findObjectMappingsByDispatcher"> 
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.ObjectMapping">
-				<bean-attribute name="soffidObject" value="${es.caib.seycon.ng.comu.SoffidObjectType.OBJECT_ACCOUNT}"></bean-attribute>
+				className="com.soffid.iam.api.ObjectMapping">
+				<bean-attribute name="soffidObject" value="${com.soffid.iam.api.SoffidObjectType.OBJECT_ACCOUNT}"></bean-attribute>
 			</new-instance-bean>
 		</finder>	
 
 		<finder name="reconcileTrigger" type="reconcileTrigger" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findReconcileTriggersByDispatcher"> 
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
@@ -312,22 +283,22 @@
 
 
 		<finder name="metadata" type="metadata">
-			<ejb-finder jndi="java:comp/env/ejb/DadesAddicionalsEJB"
+			<ejb-finder jndi="java:/module/AdditionalDataService-v2"
 				method="findSystemDataTypes">  <!--agent:query-->
-				<parameter value="${instance.codi}"/>
+				<parameter value="${instance.name}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.TipusDada">
+				className="com.soffid.iam.api.DataType">
 			</new-instance-bean>
 		</finder>	
 
 		<finder name="tasks" type="tasks">
 			<script-finder>
-				return com.soffid.iam.web.agent.AgentTasksStatusHelper.getStatus(instance.codi);
+				return com.soffid.iam.web.agent.AgentTasksStatusHelper.getStatus(instance.name);
 			</script-finder>
 		</finder>	
 
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -341,9 +312,9 @@
 		
 		
 		<validator>
-			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="agents.DispatcherCodiValidation"/>
-			<attribute-validator expr="${instance.dominiContrasenyes}" notNull="true" friendlyName="agents.DominiContrasenyaValidation"/>
-			<attribute-validator expr="${instance.dominiUsuaris}" notNull="true" friendlyName="agents.DominiUsuariValidation"/>	 		
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="agents.DispatcherCodiValidation"/>
+			<attribute-validator expr="${instance.passwordsDomain}" notNull="true" friendlyName="agents.DominiContrasenyaValidation"/>
+			<attribute-validator expr="${instance.usersDomain}" notNull="true" friendlyName="agents.DominiUsuariValidation"/>	 		
 		</validator>
 
 
@@ -354,10 +325,10 @@
 	<datanode name="metadata">
 		<script-handler>
 			<insert-script>
-				instance.setSystemName(parent.getInstance().getCodi());
+				instance.setSystemName(parent.getInstance().getName());
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DadesAddicionalsEJB">
+		<ejb-handler jndi="java:/module/AdditionalDataService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -369,18 +340,18 @@
 			</update-method>
 		</ejb-handler>
 		<validator>
-			<attribute-validator expr="${instance.ordre}" notNull="true" friendlyName="dadesAddicionals.OrdreValidation"/>
-			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="dadesAddicionals.CodiValidation"/>
+			<attribute-validator expr="${instance.order}" notNull="true" friendlyName="dadesAddicionals.OrdreValidation"/>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="dadesAddicionals.CodiValidation"/>
 		</validator>
 	</datanode>
 
 	<datanode name="controlAcces">
 		<script-handler>
 			<insert-script>
-				instance.dispatcherId=parent.instance.id;
+				instance.agentId=parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -399,7 +370,7 @@
 				instance.objectId=parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -418,7 +389,7 @@
 				instance.objectId=parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -434,10 +405,10 @@
 	<datanode name="reconcileTrigger">
 		<script-handler>
 			<insert-script>
-				instance.system=parent.instance.codi;
+				instance.system=parent.instance.name;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -452,32 +423,32 @@
 	
 	<datanode name="objectMapping">
 		<finder name="property" type="objectProperty" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findObjectMappingPropertiesByObject"> 
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.ObjectMappingProperty">
+				className="com.soffid.iam.api.ObjectMappingProperty">
 			</new-instance-bean>
 		</finder>	
 
 		<finder name="objectMappingTrigger" type="objectMappingTrigger" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findObjectMappingTriggersByObject"> 
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.ObjectMappingTrigger">
+				className="com.soffid.iam.api.ObjectMappingTrigger">
 			</new-instance-bean>
 		</finder>	
 
 		<finder name="attributeMapping" type="attributeMapping" refreshAfterCommit="true">
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB"
+			<ejb-finder jndi="java:/module/DispatcherService-v2"
 				method="findAttributeMappingsByObject"> 
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.AttributeMapping">
+				className="com.soffid.iam.api.AttributeMapping">
 				<bean-attribute name="direction" value="${es.caib.seycon.ng.comu.AttributeDirection.INPUT}"></bean-attribute>
 			</new-instance-bean>
 		</finder>	
@@ -487,7 +458,7 @@
 				instance.dispatcherId=parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -506,7 +477,7 @@
 				instance.objectId=parent.instance.id;
 			</insert-script>
 		</script-handler>
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -519,11 +490,11 @@
 		</ejb-handler>
 	</datanode>
 	
-	<datanode name="plugin">
+	<datanode name="plugin" transient="true">
 	</datanode>
 	
 	<datanode name="grupsAgent">
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -534,7 +505,7 @@
 	</datanode>
 
 	<datanode name="tipusUsuariAgent">
-		<ejb-handler jndi="java:comp/env/ejb/DispatcherEJB">
+		<ejb-handler jndi="java:/module/DispatcherService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>

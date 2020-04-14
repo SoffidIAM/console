@@ -2,23 +2,23 @@
 
 <zkib-model>
 
-	<datanode name="parametres">
-		<finder name="parametre" type="parametre">
-			<ejb-finder jndi="java:comp/env/ejb/ConfiguracioEJB"
-				method="findConfiguracioByFiltre" if="${queryEnabled}"> <!-- parameter:query -->
+	<datanode name="parameters">
+		<finder name="parameter" type="parameter">
+			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ConfigurationService"
+				method="findConfigurationByFilter"> <!-- parameter:query -->
 				<parameter value="${codi}"/>
 				<parameter value="${valor}"/>
 				<parameter value="${descripcio}"/>
 				<parameter value="${xarxa}"/>
 			</ejb-finder>
 			<new-instance-bean
-				className="es.caib.seycon.ng.comu.Configuracio">
+				className="com.soffid.iam.api.Configuration">
 			</new-instance-bean>
 		</finder>
 	</datanode>	
 	
-	<datanode name="parametre">
-		<ejb-handler jndi="java:comp/env/ejb/ConfiguracioEJB">
+	<datanode name="parameter">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ConfigurationService">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -30,8 +30,8 @@
 			</update-method>
 		</ejb-handler>
 		<validator>
-			<attribute-validator expr="${instance.valor}" notNull="true" friendlyName="parametres.ValueValidation"/>
-			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="parametres.CodiValidation"/>
+			<attribute-validator expr="${instance.value}" notNull="true" friendlyName="parametres.ValueValidation"/>
+			<attribute-validator expr="${instance.code}" notNull="true" friendlyName="parametres.CodiValidation"/>
 		</validator>
 	</datanode>
 	

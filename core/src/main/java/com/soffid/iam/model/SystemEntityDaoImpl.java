@@ -160,11 +160,14 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         }
         
         // convertim els grups a string separada per comes
+        targetVO.setGroupsList(new LinkedList<>());
         if (sourceEntity.getSystemGroup() != null) {
             String grups = ""; //$NON-NLS-1$
             for (Iterator it = sourceEntity.getSystemGroup().iterator(); it.hasNext(); ) {
-                grups += ((SystemGroupEntity) it.next()).getGroup().getName();
+                SystemGroupEntity systemGroupEntity = (SystemGroupEntity) it.next();
+				grups += systemGroupEntity.getGroup().getName();
                 if (it.hasNext()) grups += ",";
+                targetVO.getGroupsList().add(systemGroupEntity.getGroup().getName());
             }
             targetVO.setGroups(grups);
         }

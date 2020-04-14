@@ -12,12 +12,41 @@
 			} else {
 				document.getElementById("j_username").value = tenant + "\\" + account;
 			}
-			
 		}
 		</script>
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
 	<style src="/css/devices.css"/>
+	<style>
+		body {
+			background-image: url(/anonymous/background.svg);
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+		div.login {
+			font-size: 12pt;
+			background-color: black;
+			opacity: 0.8;
+			color: white;
+			margin-top: 100px;
+			padding: 30px;
+			border-radius: 12px;
+		}
+		div.login div.loginbox div.inputlogin {
+			font-weight: bold;
+		}		
+		div.loginbox {
+			width: 100%;
+		}
+		input, input[type="submit"] {
+			margin-top: 12px;
+			margin-bottom: 6px;
+			width: 100%;
+			margin-left: 0px;
+			font-size: 11pt;
+			padding: 6px;
+		}
+	</style>
 		<zscript><![CDATA[
    			javax.servlet.http.HttpServletRequest req = execution.getNativeRequest();
    			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
@@ -77,16 +106,15 @@
 				<input name="j_username" id="j_username" type="hidden" value="${user }">
 				<input name="j_tenant" id="j_tenant" type="hidden" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>
 				<p>
-				
-					<div class="inputlogin">${c:l('login.lblUser')} :
-					<input name="j_account" id="j_account" type="text" autocomplete="off" autofocus onChange="updateUsername ()" /></div>
+					<input placeholder="${c:l('login.lblUser')}" name="j_account" id="j_account" type="text" autocomplete="off" autofocus="true" onChange="updateUsername ()" />
 				</p>
 				<p>
-					<div class="inputlogin">${c:l('login.lblPassword')} :
-					<input name="j_password" id="j_password" type="password" autocomplete="off" value="${password }"/></div>
+					<input placeholder="${c:l('login.lblPassword')}" name="j_password" id="j_password" type="password" autocomplete="off" value="${password }"/>
 				</p>
 				<p style="color:red;">${error}</p>
+				<p>
 				<input name="formUCboton" type="submit" value="${c:l('configure.Login')}">
+				</p>
 ]]></html>
 <html if="${saml }"><![CDATA[
    				<input type="button" value="${c:l('configure.samlLogin')}" onClick="location.href='${rootPath }/saml'"/>

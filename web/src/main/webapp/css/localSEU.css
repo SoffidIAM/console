@@ -1,22 +1,46 @@
+@font-face {
+	font-family: soffid;
+	src: url(/anonymous/AvenirLTStd-Medium.otf);
+	font-weight: normal;
+}
+@font-face {
+	font-family: soffid;
+	src: url(/anonymous/AvenirLTStd-Black.otf);
+	font-weight: bold;
+}
+@font-face {
+	font-family: soffid;
+	src: url(/anonymous/AvenirLTStd-Light.otf);
+	font-weight: lighter;
+}
 p, div, span, label, a, input, textarea,
 button, input.button, input.file {
-	font-family:Arial,Helvetica,sans-serif;
-	font-size: 11px;
+	font-family: inherit;
+	font-size: inherit;
+	word-break: break-all;
 }
+
+span.missatge {
+	word-break: break-word;
+}
+
 .tabsel, .tabsel a, a.tabsel, .tab, .tab a, a.tab {
-	font-family:Arial,Helvetica,sans-serif;
-	font-size: 11px;
+	font-family: inherit;
+	font-size: inherit;
 }
 /* Títol */
 .title td, .title .caption td 
 {
-	font-family: Arial; font-weight: bold;
-	padding-top: 2px; padding-bottom: 3px; margin-bottom: 10px;
+	font-family: inherit; font-weight: bold;
+	padding-top: 12px; padding-bottom: 3px; margin-bottom: 10px;
 	
 }
 
 body {
 	direction: {DIRECTION};
+	font-size: 12pt;
+	font-family: soffid, Calibri, Arial, sans-serif;
+	margin: 0;
 }
 
 .title td, .title .caption td ,
@@ -25,7 +49,7 @@ td.mwt-modal, td.mwt-highlighted, td.mwt-overlapped,
 td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 {
 	color: white; border: none;
-	background-color: {SKY}; font-size: 13pt;
+	background-color: {BLUE}; font-size: 13pt;
 	background-image: none;
 	
 }
@@ -33,7 +57,7 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Opcions del manteniment: Afegir nou, Eliminar sel·leccionat i Confirmar canvis */
 .title .caption a, .title .caption a:visited{
-	font-family: Arial;	font-size: 11px; font-weight: bold; color: white;
+	font-family: inherit;	font-size: inherit; font-weight: bold; color: white;
 }
 
 .title .caption a:hover {
@@ -42,13 +66,13 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Títol azul de les capses */
 .titol_capsa {
-	font-family: Arial;	font-size: 13px; font-weight: bold; color: {SKY};
+	font-family: inherit;	font-size: 13pt; font-weight: bold; color: {SKY};
 }
 
 /* Títol taronja de tancar la sessió i tornar el menu */
 .titol_tanca {
-	font-family: Arial; 
-	font-size: 11px; 
+	font-family: inherit; 
+	font-size: inherit; 
 	font-weight: bold; 
 	color: #FFF;
 	cursor: pointer;
@@ -62,50 +86,131 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Borde dels windows de tipus Llista */
 div.wc-modal, div.wc-modal-none, div.wc-highlighted, div.wc-highlighted-none {
-	border: 2px solid {SKY}; background: #FFF;
+	border: 2px solid {BLUE}; background: #FFF;
 }
+
 
 /* Linia superior de l'aplicació */
 .topline {
-	background-color: {SKY};
+	background-color: #2b2d2f; 
+/*	background-image: url(/anonymous/background.svg);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	*/
+	color: {BLUETEXT};
 	margin: 0 0 4px 0;
-	border-bottom:0.3em solid #70a3cc;
-	padding: 2px 3px;
-	height: 30px;
-	/*width: 100%;*/
+	height: 41px;
+	box-shadow: 0px 0px 7px black;
+	width: 100%;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	z-index: +1;
+	overflow: hidden; 
+	text-align: center;
 }
+
+div.topline div.col_der img.logo {
+	height: 37px;
+}
+
+div.topline div.col_der.help {
+	padding: 10px;
+}
+
+div.topline div.col_der img {
+	filter: invert(1);
+	height: 17px;
+}
+
+div.topline div.col_der div.menu2starter:hover,
+div.topline div.col_der.help:hover {
+	background-color: {BLUEDARK};
+}
+
 
 * {margin:0;padding:0;}
 html, body {height: 100%; width: 100%;padding: 0px !important; 	box-sizing: border-box; }
 *, *:before, *:after {  box-sizing: inherit; }
 div.z-loading-indicator {box-sizing: content-box;}
 
-.col_der, .col_izq, .col_cen {height: 100%;}
+.col_der, .col_izq {
+	height: 100%;
+	cursor: pointer;
+}
+
 .col_der {
 	float: {TEXT_ALIGN_RIGHT}; 
 	text-align: {TEXT_ALIGN_RIGHT};
 	vertical-align:middle;
-	padding-right:5px;
-	padding-top: 10px;
+	padding: 0px;
+	background-color: #2b2d2f;
+	opacity: 0.8;
 }
+
+.col_der div.menu2starter {
+	padding: 10px;
+}
+
+.col_der img.menu3starter {
+	padding: 10px;
+	vertical-align: middle;
+	height: 24px;
+}
+
 .col_izq {
 	float: {TEXT_ALIGN_LEFT};
 	vertical-align:middle;
+	padding: 2px 3px;
+	background-color: #2b2d2f;
+	opacity: 0.8;
 }
+
+.col_izq img {
+	height: 35px;
+	margin-right: 10px;
+	vertical-align: middle;
+}
+
 .col_cen {
 	vertical-align:middle;
-	margin: 5px auto;
 	white-space: nowrap;
 	max-width: 50%;
 	overflow: hidden;
-	height: 19px;
+	height: auto;
 	display: inline-block;
+	width: 350px;
+	text-align:center;
+	margin-left: 5px;
+	margin-right: 5px;
+	white-space: nowrap;
+	background-color: #2b2d2f;
+	padding-left: 10px;
+	padding-right: 10px;
+	border: solid 2px #c0c0c0;
+	border-radius: 10px;
 }
-/* Titol principal */
 
+.col_cen input.searchBox {
+	background-color: #2b2d2f;
+	padding: 4px;
+	color: white;
+	border: none;
+	width: 100%;
+	padding-left: 20px;
+	background-image: url(/img/search.svg);
+	background-position-x: left;
+	background-position-y: center;
+	background-size: 17px;
+	background-repeat: no-repeat;
+}
+
+/* Titol principal */
 .maintitle {
-	font-family: Arial;	
-	font-size: 18px; 
+	font-family: inherit;	
+	font-size: 14pt; 
 	font-weight: bold; 
 	color: #FFF;
 	padding-top: 2px; padding-bottom: 3px; margin-bottom: 10px;
@@ -152,15 +257,15 @@ div.z-loading-indicator {box-sizing: content-box;}
 }
 
 .inici {
-	font-family:Arial,Helvetica,sans-serif;
-	font-size: 12pt;
+	font-family: inherit;
+	font-size: inherit;
 	font-weight: bold;
 	color: #FFF;
 }
 
 .benvingutmsg span {
-	font-family: Arial,Helvetica,sans-serif;
-	font-size: 11px;	
+	font-family: inherit;
+	font-size: 11pt;	
 }
 
 .benvingut {
@@ -233,7 +338,8 @@ div.z-loading-indicator {box-sizing: content-box;}
 
 /* Entrada de dades: textbox */
 .text, .textbox, .textbox2, .textbox2m {
-	font-family: Arial;	font-size: 11px;
+	font-family: inherit;
+	font-size: inherit;
 	border: 1px solid #7F9196; /*width: 135px;*/
 	background-image: none;
 }
@@ -247,20 +353,27 @@ input [type="checkbox"] {
 
 /* Entrada de dades: interior dels textbox */
 textarea {
-	font-family: Arial;	font-size: 11px; 
+	font-family: inherit;
+	font-size: inherit; 
 }
 
 /* Etiquetes: label */
 span label {
-	font-family: Arial;	font-size: 11px; font-weight: normal; margin-left:3px; color: black;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; margin-left:3px; color: black;
 }
 
 span {
-	font-family: Arial;	font-size: 11px; font-weight: normal; color: black;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; color: black;
 }
 
 .etiqueta {
-	font-family: Arial;	font-size: 11px; margin-left:3px; font-weight: normal; color: black; vertical-align: middle;	
+	font-family: inherit;
+	font-size: inherit;
+	margin-left:3px; font-weight: normal; color: black; vertical-align: middle;	
 }
 
 .nowrap {
@@ -268,47 +381,59 @@ span {
 }
 
 .menuinicial {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: white;	
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: white;	
 }
 
 .menuinicial:hover {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: white;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: white;
 	text-decoration: underline; cursor: pointer;
 }
 
 .menuinicialnoclicable {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: #5E5A80;	
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: #5E5A80;	
 }
 
 .seleccionable {
-	font-family: Arial;	font-size: 11px; font-weight: normal; margin-left:3px; color: black;	
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; margin-left:3px; color: black;	
 }
 
 .seleccionable:hover {
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: black;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: black;
 	text-decoration: underline; cursor: pointer;
 }
 
 .seleccionable:visited{
-	font-family: Arial;	font-size: 11px; font-weight: bold; margin-left:3px; color: black;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: black;
 }
 
 /* Botons */
 button, input[type="button"] {
-	background-color: {GREEN};
-	border: 1px solid {GREEN};
+	background-color: {SKY};
+	border: 1px solid {SKY};
 	border-image: none;
 	border-radius: 2px;
 	padding: 4px;
 	margin-left: 4px;
 	margin-right: 4px;
-	color: {GREENTEXT};
+	color: {SKYTEXT};
 }	
 
 /* Buttons */
 button:hover, input[type="button"]:hover {
-	background-color: {GREENLIGHT};
-	color: {GREENTEXT};
+	background-color: {SKYLIGHT};
+	color: {SKYTEXT};
 }
 
 /* Barra de botons */
@@ -317,7 +442,9 @@ button:hover, input[type="button"]:hover {
 }
 
 .toolbar a, .toolbar a:visited, .toolbar a:hover {
-	font-family: Arial;	font-size: 11px; font-weight: bold; color: #FFF;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; color: #FFF;
 	border: 0px; text-decoration: none; background: {BLUE};
 	white-space:nowrap; 
 } 
@@ -334,12 +461,16 @@ button:hover, input[type="button"]:hover {
 
 .toolbar-checkbox label
 {
-	font-family: Arial;	font-size: 11px; font-weight: bold; color: #FFF;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; color: #FFF;
 }
 
 /* Títols de les capceleres dels listbox, trees i grids */
 div.head-cell-inner {
-	font-family: Arial;	font-size: 11px; font-weight: normal; color: {GREENTEXT}; text-align: {TEXT_ALIGN_LEFT};
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; color: {GREENTEXT}; text-align: {TEXT_ALIGN_LEFT};
 }
 	
 tr.odd {
@@ -348,7 +479,9 @@ tr.odd {
 
 /* LISTBOX */
 div.listbox {
-	font-family: Arial;	font-size: 11px; color: black;
+	font-family: inherit;
+	font-size: inherit;
+	color: black;
 	border: 1px solid #0e5462; margin: 0px;
 }
 
@@ -357,7 +490,9 @@ div.listbox-head th, div.listbox-paging th,
 div.tree-head th, div.tree-paging th,
 div.listbox-head th span, div.listbox-paging th span,
 div.tree-head th span, div.tree-paging th span  {
-	font-family: Arial;	font-size: 21px; color: {GREENTEXT} ;	
+	font-family: inherit;
+	font-size: inherit;
+	color: {GREENTEXT} ;	
 	background: {GREEN};
 	overflow: hidden;
 	border-top: none;
@@ -388,7 +523,9 @@ div.listbox-head { background-color: {GREEN}; }
 
 /* Font del contingut del listbox i del tree (capçalera i files) */
 div.head-cell-inner, div.cell-inner {
-	font-family: Arial;	font-size: 11px; text-align: {TEXT_ALIGN_LEFT};
+	font-family: inherit;
+	font-size: inherit;
+	text-align: {TEXT_ALIGN_LEFT};
 }
 
 /* Fila del Listbox amb el cursor damunt (clar) */
@@ -417,11 +554,16 @@ td.focusd {
 
 /* GRID */ 
 div.grid, div.grid-body {
-	font-family: Arial;	font-size: 11px; color: black; margin: 0px;
+	font-family: inherit;
+	font-size: inherit;
+	color: black; margin: 0px;
 }
 
-div.grid-head th {
-	font-family: Arial;	font-size: 11px; color: black;	
+
+div.grid-head th, table.grid th {
+	font-family: inherit;
+	font-size: inherit;
+	color: {GREENTEXT};	
 	background: {GREEN};
 	overflow: hidden;
 	border-top: none;
@@ -430,31 +572,39 @@ div.grid-head th {
 	border-right: 1px solid #cfff4e !important;
 }
 
-div.grid-head th:last-child {
-	/* background-image:url('../img/bder.gif');
-	background-repeat:repeat-y;
-	background-position: top right */
+table.grid th div {
+	padding: 4px;
+}
+
+table.grid  {
+    border-spacing: 0px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+table.grid>tbody>tr.grid:hover, table.grid >tbody> tr.grid:hover>td.gc{
+	background-color: #f0f0f0;
+}
+
+table.grid.grayhover>tbody>tr.grid.grayhover:hover, table.grid.grayhover>tbody>tr.grid.grayhover:hover>td.gc{
+	background-color: #f8f8f8;
 }
 
 /* Files del grid */
 tr.grid td.gc { 
-	font-family: Arial;	font-size: 11px; color: black; background: white; 
+	font-family: inherit;
+	font-size: inherit;
+	color: black; background: white; 
 	border-bottom: none; border-left: 1px solid #FFF; border-right: 1px solid #606E72; border-top: 1px solid #DDD; 
 	padding: 2px;
 }
-
-/* Hacemos que la tabla marque las filas pares-impares de distinto color */
-/*table.grid-btable tr.odd td {
-	background-color: #FAEBD7 !important;
-}*/
-
 
 /* Bara inicial de seycon-web */
 td.lwt-embedded, td.mwt-embedded, td.rwt-embedded { 
 	background:#BE6200 none repeat scroll 0 0;
 	color:white;
-	font-family:Arial;
-	font-size:11pt;
+	font-family: inherit;
+	font-size: inherit;
 	font-weight:bold;
 	padding: 0;
 	border: 0 0 1px 0 solid #8AA3C1;
@@ -484,7 +634,9 @@ td.lwt-embedded, td.mwt-embedded, td.rwt-embedded {
 }
 
 .label_link {
-	font-family: Arial;	font-size: 11px; font-weight: bold;  color: #0e5462;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold;  color: #0e5462;
 	margin: 15px 5px 5px 0; cursor: pointer; display: inline; 
 }
 .label_link:hover {
@@ -510,13 +662,6 @@ capsa_navegador div.tree {
 	border: 1px 0 0 0 solid #0e5462 !important;
 }
 
-div.tabpanel {
-	border-top: 0px;
-	border-bottom: 1px solid #0e5462;
-	border-right: 1px solid #0e5462;
-	border-left: 1px solid #0e5462;
-}
-
 div.wc-capsa_detalls-none {
 	padding:0px 0 0 0px;
 }
@@ -527,7 +672,8 @@ div.listbox, div.tree, div.grid {
 }
 
 select {
-	font-size: 12px;
+	font-family: inherit;
+	font-size: inherit;
 }
 
 /* Workflows: nou SEU */
@@ -551,7 +697,13 @@ select {
 
 /* imageclic: enlloc de imagemap */
 img.imageclic {
+	width: 1em;
 	cursor: pointer;	
+	vertical-align: top;
+}
+
+img.imageclic:hover {
+	opacity: 0.7;	
 }
 
 img.imageclic .centre{
@@ -576,7 +728,9 @@ table.vcentre td {vertical-align: middle;}
 
 
 .dateboxread input, .dateboxreadnoborder input 
-	{background-color:transparent; color: black !important;font-family: Arial; font-size: 12px;border: 1px solid #7F9DB9;}
+	{background-color:transparent; color: black !important;font-family: inherit;
+	font-size: inherit;
+	border: 1px solid #7F9DB9;}
 .dateboxreadnoborder input {border:none;}
 img.imageclic.centre{
 	display: block;
@@ -586,7 +740,9 @@ img.imageclic.centre{
 td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 
 /* Estil per als combobox */
-.combobox, .comboboxinp {font-family: Arial; font-size: 12px; color: black;}
+.combobox, .comboboxinp {font-family: inherit;
+	font-size: inherit;
+	color: black;}
 
 
 /* Estil per als menubar */
@@ -621,17 +777,20 @@ td.menu1 {
 }
 
 div.menubar a {
-	font-family: Arial;	
-	font-size: 11px;
+	font-family: inherit;
+	font-size: inherit;
 	color: #FFF;
 } 
 
 div.menupopup a  {
-	font-family: Arial;	font-size: 11px;
+	font-family: inherit;
+	font-size: inherit;
 }
 
 .activafiltre {
-	font-family: Arial;	font-size: 11px; text-decoration: none;	
+	font-family: inherit;
+	font-size: inherit;
+	text-decoration: none;	
 }
 
 .activafiltre:hover {
@@ -650,7 +809,7 @@ div.menupopup a  {
 
 
 .outer-frame {padding: 16px;}
-.tabpanel-real {padding: 8px;}
+.tabpanel-real {padding: 0px;}
 div.frame-none {width: 100%; padding: 0px; border: none}
 div.frame-vertical-none {width: 100%; padding: 0px; border:none}
 
@@ -702,11 +861,13 @@ button.vbuton {text-align:{TEXT_ALIGN_LEFT};width:130px;margin:0 0 5px 0;padding
 .noclick {}
 button.pue {padding: 1px !important;}
 div.modal_mask {background-color: white;}
-div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {SKY}; background: #FFF;}
+div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {BLUE}; background: #FFF;}
 .text-disd {color:#000 !important;}
 .titol_tancar_back {padding: 4px; float:{TEXT_ALIGN_RIGHT}; border: 1px solid #BE6200; background-color:#EEEEEE;}
 .titol_tancar, .titol_tancar_fletxa {
-	font-family: sans-serif; font-size: 11px; font-weight: bold; color: #BE6200; cursor: pointer; 
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; color: #BE6200; cursor: pointer; 
 }
 .titol_tancar:hover {
 	text-decoration: underline;
@@ -714,22 +875,31 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {SKY}; background
 p, div, span, label, a, input, textarea, button, input.button, input.file,
 div.head-cell-inner, div.cell-inner,
 .maintitle, .etiqueta, .text, .textbox, .textbox2, .textbox2m {
-	font-family: "Avenir LT Std", Calibri,Arial, sans-serif
+	font-family: inherit
 }
 
 .titol_tancar_back:hover {background-color:#FFF7EE;}
 div.head-cell-inner {text-align:{TEXT_ALIGN_LEFT};}
 .dateboxinp  {
-	font-size: 11px;
+	font-family: inherit;
+	font-size: inherit;
 	padding-left: 2px;
 	padding-right: 24px;
-	width: 120px;
+	width: 140px;
 }
-.dateboxread input {border: 0px !important; font-size:11px; width: 14em !important;}
-.dateboxreadnoborder input {border: 0px !important; font-size:11px; width: 12em !important;}
-span.nomesdata input.nomesdatainp {color:black !important; font-size:11px;border:none;background:transparent;}
+.dateboxread input {border: 0px !important; font-family: inherit;
+	font-size: inherit;
+	width: 14em !important;}
+.dateboxreadnoborder input {border: 0px !important; font-family: inherit;
+	font-size: inherit;
+	width: 12em !important;}
+span.nomesdata input.nomesdatainp {color:black !important; font-family: inherit;
+	font-size: inherit;
+	border:none;background:transparent;}
 
-.titolperfil {font-size:18px !important;color:#8A4700;}
+.titolperfil {font-family: inherit;
+	font-size: 14px;
+	 !important;color:#8A4700;}
 
 td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 
@@ -798,8 +968,9 @@ img.z-loading-icon {
 
 .titolapp {
     color: #8A4700;
-    font-size: 1.4em;
-    font-weight: normal;
+    font-family: inherit;
+	font-size: 14px;
+	font-weight: normal;
 }
 
 
@@ -851,7 +1022,7 @@ tr.seld td.UNKNOWN {
 }
 
 .titolpagina span {
-	font-size: 15px;
+	font-size: 14pt;
 	font-weight: bold;
 }
 
@@ -863,7 +1034,6 @@ tr.seld td.UNKNOWN {
 	padding: 20px 0 0 0;
 	font-weight: bold;
 	width:340px;
-	height: 140px;
 }
 
 .inputlogin{
@@ -932,53 +1102,15 @@ tr.seld td.UNKNOWN {
 .titolSelf{
 	font-weight:bold;
 	color: #70a3cc;
-	font-size: 12pt;
+	font-size: 14pt;
 }
 
 .fonsBlanc{
 	background-color:white;
 }
 
-/* Linia superior de l'aplicació */
-.topline {
-	background-color: #0e5462;
-	margin: 0 0 4px 0;
-	border-bottom:0.3em solid #70a3cc;
-	padding: 2px 3px;
-	height: 30px;
-	position: fixed;
-	left: 0;
-	right: 0;
-	top: 0;
-	z-index: +1;
-	/*DIFFERENT FROM SELF_SERVICE*/
-	overflow: hidden; 
-}
-
 .workarea {
-	margin-top: 35px;
-}
-
-.col_der {
-	padding-top: 5px;
-}
-
-.col_cen {
-	padding-top: 5px;
-	text-align:center;
-	vertical-align:middle;
-	margin-left: 20px;
-	margin-right: 5px;
-	white-space: nowrap;
-	max-width: 50%;
-	overflow: hidden;
-	height: auto !important;
-	
-}
-
-.col_izq {
-	float: {TEXT_ALIGN_LEFT};
-	vertical-align:middle;
+	margin-top: 17px;
 }
 
 .startmenu {
@@ -1000,16 +1132,10 @@ tr.seld td.UNKNOWN {
 /* Titol principal */
 
 .maintitle {
-	font-size: 18px; 
+	font-size: 14pt; 
 	font-weight: bold; 
 	color: #FFF;
 	
-}
-
-body
-{
-	font-family: sans-serif;
-	margin: 0;
 }
 
 .content-title
@@ -1024,13 +1150,8 @@ body
 
 .section-title
 {
-	font-size:18px !important;
+	font-size:14pt;
 	color:rgb(14, 84, 98);
-}
-
-.section
-{
-	font-size: 12px;
 }
 
 .subsection
@@ -1040,7 +1161,7 @@ body
 
 .subsection-title
 {
-	font-size:18px !important;
+	font-size:14pt;
 	font-weight: 400;
 	color:rgb(14, 84, 98);
 }
@@ -1098,7 +1219,7 @@ body
 
 .etiquetaxacml {
 	font-family: sans-serif;	
-	font-size: 15px; 
+	font-size: 13pt; 
 	font-weight: bold; 
 	margin-left:350px; 
 	margin-right:auto; 
@@ -1109,7 +1230,7 @@ body
 
 .etiquetaxacml2 {
 	font-family: sans-serif;	
-	font-size: 14px; 
+	font-size: 13pt; 
 	font-weight: bold; 
 	color: black; 
 	vertical-align: middle;
@@ -1164,7 +1285,8 @@ body
 }
 
 
-.noBorderGrid tr.z-row td.z-row-inner, tr.z-row .z-cell, div.z-grid { border: none;  }
+table.noBorderGrid {table-layout: fixed;}
+.noBorderGrid tr.z-row td.z-row-inner, tr.z-row .z-cell, div.z-grid { border: none;}
 .noBorderGrid div.grid-body tbody tr td.gc {border: none;}
 tr.noBorderGrid td.gc, tr.noBorderGrid { background-color: white;}  
 
@@ -1172,36 +1294,37 @@ tr.noBorderGrid td.gc, tr.noBorderGrid { background-color: white;}
 /* Botons */
 button.small-button {
 	background-color: white;
-	border: 1px solid {GREEN};
+	border: 1px solid {SKY};
 	border-image: none;
 	padding: 0px;
 	margin-left: 4px;
 	margin-right: 4px;
-	color: {BLUELIGHT};
+	color: {SKYLIGHT};
 	height: 2em;
  	border-radius: 8px;
- 	font-size: 10px;
+ 	font-size: 10pt;
 }	
 
 /* Buttons */
 input[type="submit"] {
-    background-color: white;
-    border: 1px solid {GREEN};
+    background-color: {SKY};
+    border: 1px solid {SKY};
     border-image: none;
     padding: 4px;
     margin-left: 4px;
     margin-right: 4px;
-    color: {SKYDARK};
+ 	border-radius: 2px;
+    color: {SKYTEXT};
 }
 button:hover, input[type="button"]:hover, input[type="submit"]:hover {
-	background-color: {GREENLIGHT};
+	background-color: {SKYLIGHT};
 	color: black;
 }
 
 button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 	color: white;
-	background-color: #505050;
-	border-color: white
+	background-color: #707070;
+	border-color: #707070
 }
 
 
@@ -1210,7 +1333,7 @@ button:disabled img, input[type="button"]:disabled img, input[type="submit"]:dis
 }
 
 button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]:hover:disabled {
-	color: #505050;
+	color: #707070;
 	border-color: white
 }
 
@@ -1230,9 +1353,9 @@ div.CodeMirror-code   {
 }
 
 
-pre.CodeMirror-line {font-size: 12px; font-family: monospace, "Courier new"} 
-pre.CodeMirror-line span {font-size: 12px; font-family: monospace, "Courier new"} 
-div.CodeMirror-linenumber {font-size: 12px} 
+pre.CodeMirror-line {font-size: 12pt; font-family: monospace, "Courier new"} 
+pre.CodeMirror-line span {font-size: 12pt; font-family: monospace, "Courier new"} 
+div.CodeMirror-linenumber {font-size: 12pt} 
 
 
 .search-background {
@@ -1267,10 +1390,10 @@ div.CodeMirror-linenumber {font-size: 12px}
 }
 
 .search-icon {
-	width:2em;
+	width:28px;
 	opacity:0.5;
 	position: relative;
-	top: 2px;
+	top: 0px;
 	vertical-align:top;
 }
 
@@ -1286,6 +1409,11 @@ div.CodeMirror-linenumber {font-size: 12px}
 	text-align: {TEXT_ALIGN_RIGHT};
 }
 
+span.search-box {
+	margin-bottom: 12px;
+	display: inline-block;
+	width: 100%;
+}
 span.search-box ul li {
 	display: inline-block;
 	margin-bottom: 5px
@@ -1342,9 +1470,8 @@ li.attribute-search-box:hover {
     cursor: pointer;
 }
 
-
-li.attribute-search-box  > button:hover {
-    color: white;
+li.attribute-search-box:hover > button div span {
+    color: {GREENTEXT};
 }
 
 .search-box ul {
@@ -1572,7 +1699,9 @@ div.tree-head th, div.listbox-head th, div.grid-head th
 	overflow: hidden; 
 	border: none;
 	white-space: nowrap; padding: 2px;
-	font-size: small; font-weight: normal;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal;
 	vertical-align: top;
 }
 div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
@@ -1608,9 +1737,12 @@ div.listbox-pgi-t, div.grid-pgi-t, div.tree-pgi-t {
 	border-bottom: 0px solid #AAB; overflow: hidden;
 }
 tr.grid td.gc { 
-	font-size: 11px; color: black; background: white; 
+	font-family: inherit;
+	font-size: inherit;
+	color: black; background: white; 
 	border: none; 
 	padding: 2px;
+	vertical-align:top;
 }
 
 
@@ -1916,7 +2048,7 @@ div.fixedToolbar {
 }
 
 .removeValueIcon {
-	width: 16px; padding: 2px; vertical-align:bottom; opacity:0.5;  cursor:pointer;
+	width: 24px; padding: 2px; vertical-align:bottom; opacity:0.5;  cursor:pointer;
 }
 
 .removeValueIcon:hover {
@@ -1941,23 +2073,37 @@ div.scroll-listbox div.listbox-body {
 		div.datatable table, div.datatable table td {
 			border: solid 1px #c0c0c0;
 			border-collapse: collapse;
+			min-width: 80px;
+		}
+		
+		div.datatable table.tbody tr td.selector {
+			width: 38px;
+			text-align: center;
 		}
 		div.datatable table.thead td {
 			box-sizing: border-box;
 			background-color: {GREEN};
-			text-color: {GREENTEXT};
+			color: {GREENTEXT};
 		    overflow: hidden;
 		    text-overflow: ellipsis;
 		    white-space: nowrap;		
-    	}
+		    padding-bottom: 4px;
+		    border-left: 1px solid {GREENDARK};
+		    border-right: 1px solid {GREENLIGHT}   
+      	}
 		div.datatable .thead td input {
 			width:100%;
 		}
 		div.datatable div.tfoot {
+			margin-top: 5px;
 			background-color: white;
 			text-align: right;
 			box-sizing: border-box;
 			border: none;
+		    width:100%;
+		}
+		div.datatable div.tfoot a {
+			float: left;
 		}
 		div.datatable table.thead td.filter-cell {
 			padding-left:10px;
@@ -1973,14 +2119,8 @@ div.scroll-listbox div.listbox-body {
 		div.datatable table.thead {
 		  width:100%;
 		  table-layout: fixed;  
-		  border-bottom: 4px solid {GREEN};
 		}
 		
-		div.datatable div.tfoot {
-		  width:100%;
-		  box-sizing: border-box;
-		}
-				
 		div.datatable div.tbodydiv{
 		  background-color: white;
 		  box-sizing: border-box;
@@ -2008,6 +2148,7 @@ div.scroll-listbox div.listbox-body {
 		
 		div.datatable table.tbody tr:hover {
 			background-color: {BLUELIGHT};
+			color: {BLUETEXT};
 		}
 
 		div.datatable table.tbody tr.selected {
@@ -2046,9 +2187,12 @@ div.scroll-listbox div.listbox-body {
     color: white;
     width: 80px;
     position: relative;
-    font-size: 11px;
+    font-family: inherit;
+	font-size: inherit;
     line-height: 1.4;
     cursor: pointer;
+    display: inline-block;
+    vertical-align:bottom;
 }
 
 .switch span { 
@@ -2075,12 +2219,8 @@ div.scroll-listbox div.listbox-body {
   clear: both;
 }
 
-.switch { display : inline-block; }
-.switch { display : block; }
 
-
-
-.switch, .switch * {
+.switch * {
     display: block;
     user-select: none;
 }
@@ -2116,7 +2256,7 @@ div.scroll-listbox div.listbox-body {
     height: 8px;
     border-width: 0 6px 0 2px;
     border-style: none double none solid;
-    border-color: #5f5f5f;
+    border-color: white;
 }
 
 .switch .off,
@@ -2200,7 +2340,7 @@ div.scroll-listbox div.listbox-body {
 .card {
   width: 100%;
   height: 100%;
-  min-height: calc( 100vh - 75px );
+  min-height: calc( 100vh - 65px );
   position: relative;
   transition: transform 1s;
   transform-style: preserve-3d;
@@ -2212,6 +2352,8 @@ div.scroll-listbox div.listbox-body {
   width: 100%;
   backface-visibility: hidden;
   background-color: white;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .card__face--front {
@@ -2230,7 +2372,8 @@ div.addButton {
 	margin: 5px;
 	height: 40px;
 	width: 40px;
-	background-color: {BLUE};
+	background-color: {SKY};
+	color: {SKYTEXT};
 	border-radius: 20px;
 	opacity: 0.5;
 	text-align: center;
@@ -2242,7 +2385,7 @@ div.addButton:hover {
 	margin: 0px;
 	height: 50px;
 	width: 50px;
-	background-color: {BLUE};
+	background-color: {SKYLIGHT};
 	border-radius: 25px;
 	opacity: 1;
 	text-align: center;
@@ -2274,9 +2417,13 @@ div.menu2modal {
 	display:none;
 }
 
+div.menu2modal table {
+	width: 100%;
+}
+
 div.menu2modal.open {
     position: fixed;
-    z-index: +1;
+    z-index: +20;
     left: 0;
     top: 0;
     width: 100%;
@@ -2321,18 +2468,48 @@ div.menu2modal.open div.menu2dropdown tr:hover {
 	background-color: {BLUE};
 }
 
-div.menu2 div.menu2starter {
+div.menu2 div.menu2starter, button.icon-button {
 	display: inline-block;
-	height: 20px;
+	height: 25px;
+	width: 25px;
+	float: right;
+	background-color: transparent;
+	cursor: pointer;
+	padding: 0;
+	border: none;
 }
 
-div.menu2 div.menu2starter:hover {
+button.grid-icon-button {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background-color: transparent;
+	cursor: pointer;
+	padding: 0;
+	border: none;
+}
+
+div.menu2 div.menu2starter img, button.icon-button img, grid-icon-button img {
+	width: 25px;
+}
+
+button.icon-button:disabled, button.grid-icon-button:disabled {
+	display: none;
+}
+
+div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-button:hover {
 	background-color: #e0e0e0;
 }
 
-span.pager span:first-child,
-span.pager span:last-child {
+
+div.navigation-bar span.pager span {
 	color: {GREEN};
+	font-weight: bold;
+}
+
+div.navigation-bar span.pager span:first-child,
+div.navigation-bar span.pager span:last-child {
+	color: {SKY};
 	margin-left: 8px;
 	margin-right: 8px;
 }
@@ -2341,9 +2518,10 @@ div.options {
 	text-align: center;
 }
 .options .menuoption {
-	width: 200px;
-	padding: 10px;
+	width: 350px;
+	padding: 40px;
 	text-align: center;
+	vertical-align: top;
 	cursor: pointer;
 	display: inline-block;
 }
@@ -2355,20 +2533,23 @@ div.options {
 	padding-bottom: 6px;
 	width: 100%;
 	opacity: 1;
-	border: solid 1px {GREEN};
-	border-radius: 6px;
+	border: solid 1px #c0c0c0;
+	border-radius: 20px;
+	margin-bottom: 18px;
 }
 
 .options .menuoption:hover img {
 	width: 100%;
+	box-shadow: 12px 12px 8px {GREEN};
 	padding: 0px;
-	opacity: 0.8;
-	background-color: {GREEN};
+	background-color: #e8e8e8;
 }
 
 .options .menuoption .menuoption-title {
-	font-size: 14px;
-	font-weight: bold;
+	font-family: inherit;
+	font-size: 15pt;
+	font-weight: lighter;
+	word-break: break-word;
 }
 
 .options .menuoption .menuoption-suboptions {
@@ -2381,11 +2562,275 @@ div.options {
 }
 
 div.navigation-bar {
-	margin-top: 10px;
-	margin-bottom: 20px;
+	padding: 10px 0 10px 0;
+	margin-bottom: 10px;
+	background-color: {SKYTEXT};
+	color: {SKY}
 }
 
 div.navigation-bar span {
-	color: {BLUE};
+	color: {SKY};
 	font-weight: bold;
+}
+
+
+/****************** DATATREE ******************/
+div.datatree div.sortable-column div.sort-indicator {
+	display: inline-block;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+div.datatree div.sortable-column div.sort-indicator div {
+	font-size: 50%;
+}
+div.datatree div.sort-indicator-disabled {
+	visibility: hidden;
+}
+
+div.datatree div.tbody {
+	border: 1px solid {GREEN};
+}
+
+div.datatree div.thead {
+	box-sizing: border-box;
+	background-color: {GREEN};
+	color: {GREENTEXT};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;		
+  	}
+div.datatree div.thead input {
+	width:100%;
+}
+
+div.datatree div.thead div.filter-cell {
+	padding-left:10px;
+	padding-right: 10px;
+	padding-bottom: 2px;
+    text-overflow: clip;
+       border-bottom: 1px solid #c0c0c0;
+}
+
+div.datatree {
+	display: block;
+	border-spacing: 0;
+}
+
+div.datatree div.thead div.sortable-column {
+	cursor: pointer;
+}
+div.datatree div.tfoot {
+	width:100%;
+	box-sizing: border-box;
+	margin-top: 5px;
+	background-color: white;
+	text-align: right;
+	box-sizing: border-box;
+	border: none;
+}
+		
+div.datatree div.tbody {
+  background-color: white;
+  box-sizing: border-box;
+  width:100%; 
+  overflow-y:auto;
+  overflow-x:clip;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+div.tree-collapse {
+	padding-top: 3px;
+	padding-right: 6px;
+}
+svg.tree-collapse, div.tree-collapse svg{
+	width: 16px;
+	height: 16px;
+	display: inline-block; 
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+    vertical-align: top;
+	transform: scale(0.8, 0.8);		    
+	color: {BLUE};
+}
+
+svg.tree-collapse.open, div.tree-collapse.open svg {
+	transition: transform 0.2s ease-in-out;
+    transform: rotate(90deg) scale(1, 1);	
+	color: {BLUELIGHT};	    
+}
+
+div.datatree div.tbody div.tree-item {
+	width: calc( 100% - 16px );
+	overflow-x: hidden;
+	display: inline-block; 
+	padding-left: 4px;
+}
+
+div.tree-children.waiting {
+	background-image: url(img/wait.gif); 
+	background-size: 16px 16px;
+	width: 16px;
+	height: 16px;
+}
+
+div.datatree div.tree-itemholder img.tree-icon {
+	width: 1em;
+	height: 1em;
+	margin-right: 4px;			
+}
+
+div.datatree div.tree-label {
+	cursor: pointer;		
+	height: 24px;
+	padding-top: 4px;
+}
+div.datatree div.tree-label:hover {
+	background-color: {BLUELIGHT};
+}
+
+div.datatree div.tree-label.selected {
+	background-color: {BLUE};
+	color: {BLUETEXT};
+}
+
+div.datatree. div.tfoot {
+	background-color: white;
+	text-align: right;
+	box-sizing: border-box;
+	border: none;
+}
+
+tr.noBorderGrid td {
+	vertical-align: top;
+}
+
+tr.noBorderGrid > td:first-child {
+	width: 250px;
+}
+
+tr.noBorderGrid td:first-child div.gc.cell-inner span {
+	color: 	{BLUE};
+}
+
+tr.noBorderGrid td div.gc.cell-inner {
+	margin: 4px;
+}
+
+span.welcome {
+	padding: 6px; 
+	display: block;
+	color: {SKY}
+}
+
+input.required {
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='1em' width='1em'><text x='0' y='1em' fill='{URL_SKY}' font-size='11'>*</text></svg>");
+    background-position: top right;
+    background-repeat: no-repeat;
+}
+
+div.menu3modal {
+    position: fixed;
+    z-index: +1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(173, 216, 230);
+    background-color: rgb(173, 216, 230, 0.1);
+    display: block;
+}
+
+div.menu3 {
+	position: absolute;
+	z-index:10;
+	display: block;
+	border: solid 3px {BLUE};	
+	border-radius: 3px;
+	z-index: +1;
+	background: white;
+	text-align: left;
+	box-shadow: 4px 4px #a0a0a0;
+}
+
+div.menu3 div.menu3menu {
+	padding: 6px;
+	width: 100%;
+}
+
+div.menu3 table {
+	border-collapse: collapse;
+	border: none;
+}
+
+div.menu3 tr td {
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	cursor: pointer;
+}
+
+div.menu3 table tr td a,
+div.menu3 table tr td a:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+div.menu3 table tr td img{
+	margin-right: 8px;
+	height: 18px;
+	width: 27px;
+	vertical-align: middle;
+}
+
+div.menu3 tr:hover {
+	color: {BLUETEXT};
+	background-color: {BLUE};
+}
+
+img.menu3starter {
+	height: 24px;
+	filter: invert(1);
+}
+
+img.menu3starter:hover {
+	background-color: {BLUELIGHT};
+}
+
+div.form {
+	height: calc( 100vh - 120px);
+	overflow-y: auto;
+	overflow-x: hidden; 
+}
+
+div.tabpanel {
+	border: none;
+}
+
+div.form > div > div.tabpanels div.tabpanel {
+	height: calc( 100vh - 165px);
+	overflow-y: auto;
+	overflow-x: hidden; 
+	padding: 0;
+}
+
+div.form > div > div.tabpanels div.tabpanel >div.tabpanel-real {
+	padding-top: 8px;
+	width: 100%;
+}
+
+tr.compactGrid > td.gc, tr.compactGrid > td.gc > div.gc {
+	padding: 0px;
+	margin: 0px;
+}
+
+span.label {
+	color: {BLUE};
+}
+
+div.tree-body td, div.listbox-body td, 
+div.tree-foot td, div.listbox-foot td, 
+tr.item, tr.item a, tr.item a:visited {
+	font-size: inherit; 
 }

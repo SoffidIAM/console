@@ -90,4 +90,6 @@ public abstract class DispatcherHandler {
 
 	public abstract PasswordValidation checkPasswordSynchronizationStatus(String accountName) throws Exception;
 
+	public abstract Object connect(boolean main, boolean debug) throws Exception;
+
 }

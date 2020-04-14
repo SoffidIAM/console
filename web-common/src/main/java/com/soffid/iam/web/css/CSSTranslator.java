@@ -1,5 +1,6 @@
 package com.soffid.iam.web.css;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,19 +34,19 @@ public abstract class CSSTranslator extends HttpServlet {
 		
 		String green = ConfigurationCache.getProperty("soffid.ui.color1");
 		if (green == null) green = "#9ec73c";
-		String greenLight = enlight (green);
-		String greenDark = dark (green);
+		String greenLight = generateString( Color.decode(green).brighter() );
+		String greenDark = generateString( Color.decode(green).darker() );
 
 		String blue = ConfigurationCache.getProperty("soffid.ui.color2");
 		if (blue == null) blue = "#637792";
-		String blueLight = enlight (blue);
-		String blueDark = dark (blue);
+		String blueLight = generateString( Color.decode(blue).brighter() );
+		String blueDark = generateString( Color.decode(blue).darker() );
 
 		
 		String sky = ConfigurationCache.getProperty("soffid.ui.color3");
 		if (sky == null) sky = "#22B9D8";
-		String skyLight = enlight (sky);
-		String skyDark = dark (sky);
+		String skyLight = generateString( Color.decode(sky).brighter() );
+		String skyDark = generateString( Color.decode(sky).darker() );
 
 
 		String greenText = ConfigurationCache.getProperty("soffid.ui.text1");
@@ -70,6 +71,18 @@ public abstract class CSSTranslator extends HttpServlet {
 			.replaceAll("\\{SKYLIGHT\\}", skyLight)
 			.replaceAll("\\{SKYTEXT\\}", skyText)
 			.replaceAll("\\{SKY\\}", sky)
+			.replaceAll("\\{URL_GREENLIGHT\\}", greenLight.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_GREENDARK\\}", greenDark.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_GREENTEXT\\}", greenText.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_GREEN\\}", green.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_BLUE\\}", blue.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_BLUELIGHT\\}", blueLight.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_BLUEDARK\\}", blueDark.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_BLUETEXT\\}", blueText.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_SKYDARK\\}", skyDark.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_SKYLIGHT\\}", skyLight.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_SKYTEXT\\}", skyText.replaceAll("#", "%23"))
+			.replaceAll("\\{URL_SKY\\}", sky.replaceAll("#", "%23"))
 			.replaceAll("\\{DIRECTION\\}", rtl? "rtl" : "ltr")
 			.replaceAll("\\{COLSORTER_POSITION\\}", rtl? "1%" : "99%")
 			.replaceAll("\\{TEXT_ALIGN_LEFT\\}", rtl? "right": "left")
@@ -86,6 +99,12 @@ public abstract class CSSTranslator extends HttpServlet {
 		ServletOutputStream outputStream = resp.getOutputStream();
 		outputStream.write(b);
 		outputStream.close();
+	}
+
+	private String generateString(Color color) {
+		return "#" + Long.toString( ((long)color.getRed()) << 16 |
+									((long)color.getGreen()) << 8 |
+									((long)color.getBlue()), 16);
 	}
 
 	private String enlight(String green) {

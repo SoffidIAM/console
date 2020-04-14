@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+<?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div"
+	style="position: relative" use="com.soffid.iam.web.agent.SyncServerHandler"
+	id="frame">
+
+	<datamodel id="model" rootNode="agents" src="descriptorAgent.xml" />
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar"
+				frame="frame">
+				<menu2>
+					<menu2item image="~./img/add.svg"
+						label="${c:l('agents.zul.Afegeixnou') }"
+						if="${canCreateAgent}" onClick="ref:frame.addNew" />
+				</menu2>
+			</div>
+
+			<datatable id="listbox" autocommit="true"
+				use="com.soffid.iam.web.agent.ServersTable"
+				dataPath="/model:/server" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="true">
+				<attribute name="columns"><![CDATA[
+- name: ${c:l('servers.zul.Name')} 
+  value: name 
+- name: ${c:l('servers.zul.Type')}
+  value: typeString
+- name: ${c:l('servers.zul.URL')}
+  value: url ]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"
+				if="${canManageServers}">
+				<div class="addButton" onClick="ref:frame.addNew">
+					+
+				</div>
+			</div>
+		</div>
+
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar"
+				frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox" />
+
+				<menu2>
+					<menu2item if="${canManageServers}"
+						image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }"
+						onClick="ref:frame.delete" />
+				</menu2>
+
+				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+
+			<form2 id="form" dataPath="listbox:/."
+				onChangeXPath="ref:frame.onChangeForm" width="100%"  >
+				<grid width="100%" fixedLayout="false" style="width: 100%; mxargin-left: 5px; mxargin-right. 5px;">
+					<rows>
+						<row>
+							<label value="${c:l('servers.zul.Name')} :" />
+							<textbox readonly="true" bind="@name" maxlength="50"
+									style="width:100%; max-width: 50em" constraint="no empty"/>
+						</row>
+						<row>
+							<label value="${c:l('servers.zul.URL')} :"/>
+							<textbox readonly="true" bind="@url" maxlength="50"
+									style="width:100%; max-width: 50em" constraint="no empty"/>
+						</row>
+						<row>
+							<label value="${c:l('servers.zul.Type')} :"/>
+							<select bind="@type" dataPath="/model:/servertype"
+									labelPath="@first" keyPath="@second" />
+						</row>
+						<row>
+							<label value="${c:l('servers.zul.JavaOptions')} :"/>
+							<textbox bind="@javaOptions" maxlength="256" multiline="true"
+									rows="1"
+									style="width:100%; resize: vertical" constraint="no empty"/>
+						</row>
+					</rows>
+				</grid>
+				<div style="text-align: right; width: 100%">
+					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					</databutton>
+					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+			</form2>
+		</div>
+	</div>
+
+</frame>

@@ -29,6 +29,9 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
+
+import com.soffid.iam.web.component.FrameHandler;
+
 import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.servei.ejb.BpmEngine;
 import es.caib.bpm.toolkit.BPMApplication;
@@ -38,8 +41,12 @@ import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Frame;
 
-public class DespliegueUI extends Frame 
+public class DespliegueUI extends FrameHandler 
 {
+	public DespliegueUI() throws InternalErrorException {
+		super();
+	}
+
 	private static final long serialVersionUID = 1L;
 	private Listbox listbox;
 	private Button disablebutton;

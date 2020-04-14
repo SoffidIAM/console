@@ -23,6 +23,7 @@ import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Listbox;
@@ -51,7 +52,7 @@ import es.caib.zkib.zkiblaf.Esquema;
 import es.caib.zkib.zkiblaf.EsquemaVertical;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class SearchBox extends HtmlBasedComponent {
+public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	public static final String CHANGE_MODE_EVENT = "onChangeMode";
 	public static final String SEARCH_EVENT = "onSearch";
 	SearchDictionary dictionary;
@@ -293,13 +294,17 @@ public class SearchBox extends HtmlBasedComponent {
 		textSearchBox.setVisible(mode == TEXT);
 	}
 	
-	public void onCreate () throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
+	public void afterCompose () 
 	{
-		initialize();
-		initialized  = true;
 		try {
-			loadPreferences ();
-		} catch (JSONException e) {
+			initialize();
+			initialized  = true;
+			try {
+				loadPreferences ();
+			} catch (JSONException e) {
+			}
+		} catch (Exception e) {
+			throw new UiException(e);
 		}
 	}
 

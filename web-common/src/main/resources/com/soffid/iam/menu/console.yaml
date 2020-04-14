@@ -1,61 +1,77 @@
 - name: seu.configuration
-  img: /img/menu/system-settings.png
+  img_old: /img/menu/system-settings.png
+  img: /img/menu/toolbox.svg
   options:
   - name: seu.settings
-    img: /img/menu/settings.png
+    img_old: /img/menu/settings.png
+    img: /img/menu/gear.svg
     options:
     - name: seu.tenants
-      url: config/tenants.zul
+      url: /config/tenants.zul
       permissions: ["seu:tenant:show"]
-      img: /img/menu/tenant.png
+      img: /img/menu/tenants.svg
     - name: seu.plugins
-      url: plugins.zul
-      img: /img/menu/plugin.png
+      url: /config/plugins.zul
+      img: /img/menu/plugins.svg
       permissions: ["seu:plugins:show"]
-    - name: user-interface 
-      url: parametres.zul
+    - name: seu.lookAndFeel
+      img: /img/menu/lookAndFeel.svg
+      url: /config/lookAndFeel.zul
       permissions: ["seu:parametres:show"]
-    - name: memory-cache
-      url: parametres.zul
-      permissions: ["seu:parametres:show"]
-    - name: parametres
-      url: parametres.zul
-      permissions: ["seu:parametres:show"]
-    - name: memory-cache
-      url: parametres.zul
+    - name: seu.parametres
+      url: /config/parameters.zul
+      img: /img/menu/parameters.svg
       permissions: ["seu:parametres:show"]
   - name: seu.integration-engine
-    img: /img/menu/integration-engine.png
+    img: /img/menu/integration.svg
     options:
-    - name: sync-server-engine  
-      url: parametres.zul
+    - name: seu.sync-server-engine  
+      url: /config/integration-engine.zul
+      img: /img/menu/integration-engine.svg
       permissions: ["seu:parametres:show"]
-    - name: sync-servers
-      url: agents.zul
+    - name: seu.agents
+      url: /config/agents.zul
       permissions: ["seu:agents:show"]
-    - name: integrations
-      url: agents.zul
+      img: /img/menu/agents.svg
+    - name: seu.syncservers
+      img: /img/menu/sync-servers.svg
+      url: /config/syncservers.zul
       permissions: ["seu:agents:show"]
-    - name: pam-servers
-      url: pam_config.zul
-      permissions: ["seu:pamSessionConfigure"]
+    - name: seu.user-domains
+      url: /config/userDomains.zul
+      permissions: ["seu:usersDomain:show"]
+      img: /img/menu/user-domains.svg
   - name: seu.workflow-settings
-    img: /img/menu/workflow.png
+    img: /img/menu/workflow.svg
     options:
-    - name: workflow-engine
-      url: wf/configure-index.zul
-    - name: business-processes
-      url: wf/configure-index.zul
+    - name: main.lblAdminBPM
+      img: /img/menu/workflow-engine.svg
+      url: /wf/configure-index.zul
+      permissions: ["workflow:admin"]
+    - name: main.lblDeploy
+      img: /img/menu/business-process.svg
+      url: /wf/despliegue.zul
+      permissions: ["workflow:admin"]
   - name: seu.security
-    img: /img/menu/safebox.png
+    img: /img/menu/security.svg
     options:
-    - name: user-password-domains
-      url: /dominiUsuaris.zul
-      permissions: ["seu:userDomain:show"]
-    - name: authorizations
-      url: /autoritzacions.zul
-      permissions: ["seu:autoritzacions:shw"]
-    - name: authentication-methods
-      url: /parametres.zul
+    - name: seu.autoritzacions
+      url: /config/authorizations.zul
+      img: /img/menu/authorizations.svg
+      permissions: ["seu:autoritzacions:show"]
+    - name: seu.authentication
+      url: /config/authentication.zul
+      img: /img/menu/authentication.svg
       permissions: ["seu:parametres:show"]
-  
+    - name: seu.pam_config
+      img: /img/menu/pam-servers.svg
+      url: /vault/pam_config.zul
+      permissions: ["seu:pamSessionConfigure"]
+- name: seu.monitoritzacio
+  permissions: ["seu:tenant:show"]
+  img: /img/menu/monitor.svg
+  options:
+  - name: seu.seyconserver
+    url: /seyconserver.zul
+    permissions: ["seu:monitor:show"]
+    img: /img/menu/monitor-sync.svg

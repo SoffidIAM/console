@@ -476,7 +476,8 @@ public class Config {
         String[] split = list.split("[, ]+"); //$NON-NLS-1$
         String split2[] = new String[split.length];
         for (int i = 0; i < split.length; i++) {
-            split2[i] = new URLManager(split[i]).getServerURL().getHost();
+            URL serverURL = new URLManager(split[i]).getServerURL();
+			split2[i] = serverURL.getHost()+":"+serverURL.getPort();
         }
         return split2;
     }

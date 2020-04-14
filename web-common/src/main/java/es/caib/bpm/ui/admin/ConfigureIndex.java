@@ -28,6 +28,7 @@ import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.service.workflow.JbpmSchedulerServiceInterface;
+import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.seycon.ng.EJBLocator;
@@ -37,8 +38,12 @@ import es.caib.seycon.ng.servei.ejb.ConfiguracioService;
 import es.caib.zkib.zkiblaf.Frame;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class ConfigureIndex extends Frame
+public class ConfigureIndex extends FrameHandler
 {
+	public ConfigureIndex() throws InternalErrorException {
+		super();
+	}
+
 	private static final long serialVersionUID = 1L;
 	private Textbox txt;
 	private Listbox selected;
@@ -105,7 +110,7 @@ public class ConfigureIndex extends Frame
 
 	public JbpmSchedulerServiceInterface getJobSchedulerEjb() throws NamingException {
 		return (JbpmSchedulerServiceInterface) new InitialContext()
-				.lookup("openejb:/local/JbpmSchedulerServiceLocal");
+				.lookup("java:/module/JbpmSchedulerService");
 	}
 
 	public void configure () throws IOException, CreateException,

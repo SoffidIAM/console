@@ -24,7 +24,6 @@
   <url>http://www.soffid.com/doc/console</url>
   <scm>
         <connection>scm:git:ssh://git@stash.dev.lab:7999/iam2/console.git</connection>
-    <tag>console-2.7.3</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -356,7 +355,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkiblaf</artifactId>
-        <version>1.25</version>
+        <version>${zkiblaf.version}</version>
       </dependency>
       <dependency>
         <groupId>com.soffid.zkib</groupId>
@@ -414,8 +413,10 @@
     <document.manager.version>${project.version}</document.manager.version>
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
-    <zkiblaf.version>1.25</zkiblaf.version>
+    <zkiblaf.version>1.27-SNAPSHOT</zkiblaf.version>
     <zkdb.version>1.44-SNAPSHOT</zkdb.version>
+		<maven.compile.source>1.8</maven.compile.source>
+    <maven.compile.target>1.8</maven.compile.target>
   </properties>
   <pluginRepositories>
     <pluginRepository>

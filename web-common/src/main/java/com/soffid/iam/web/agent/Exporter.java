@@ -19,10 +19,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import es.caib.seycon.ng.comu.AttributeDirection;
-import es.caib.seycon.ng.comu.AttributeMapping;
-import es.caib.seycon.ng.comu.ObjectMapping;
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
-import es.caib.seycon.ng.comu.ObjectMappingTrigger;
+import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.ObjectMapping;
+import com.soffid.iam.api.ObjectMappingProperty;
+import com.soffid.iam.api.ObjectMappingTrigger;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.jxpath.JXPathContext;

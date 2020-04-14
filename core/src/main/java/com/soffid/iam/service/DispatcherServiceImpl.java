@@ -13,6 +13,7 @@
  */
 package com.soffid.iam.service;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import com.soffid.iam.api.AccessControl;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ObjectMapping;
@@ -51,6 +53,7 @@ import com.soffid.iam.api.SystemGroup;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserTypeDispatcher;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccessControlEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
@@ -70,6 +73,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemEntityDao;
 import com.soffid.iam.model.SystemGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TenantServerEntity;
@@ -79,6 +83,7 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.UserTypeSystemEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.RuleEvaluatorServiceImpl.InterpreterEnvironment;
 import com.soffid.iam.service.impl.AccountDiffReport;
 import com.soffid.iam.service.impl.RuleDryRunMethod;
@@ -344,22 +349,21 @@ public class DispatcherServiceImpl extends
 			SystemEntity entity) throws InternalErrorException, Exception {
 		GroupEntityDao grupDao = getGroupEntityDao();
 		com.soffid.iam.service.AccountService accService = getAccountService();
-		String[] grups = dispatcher.getGroups() == null ? new String[0]
-				: dispatcher.getGroups().split("[, ]+"); //$NON-NLS-1$
+		List<String> grups = dispatcher.getGroupsList() == null ? 
+				new LinkedList<>():
+				dispatcher.getGroupsList();
 
 		Collection<GroupEntity> groupsToGenerateAccounts = new HashSet<GroupEntity>();
-		boolean emptyGrups = grups.length == 0 || grups.length == 1
-				&& grups[0].length() == 0;
-		if ((emptyGrups && !entity.getSystemGroup().isEmpty())
-				|| (!emptyGrups && entity.getSystemGroup().isEmpty())) {
+		if ( grups.isEmpty() && !entity.getSystemGroup().isEmpty()
+				|| (!grups.isEmpty() && entity.getSystemGroup().isEmpty())) {
 			List<GroupEntity> tots = grupDao.loadAll();
 			for (GroupEntity g : tots) {
 				groupsToGenerateAccounts.add(g);
 			}
 		}
 
-		for (int i = 0; i < grups.length; i++) {
-			String t = grups[i].trim();
+		for (int i = 0; i < grups.size(); i++) {
+			String t = grups.get(i).trim();
 			boolean found = false;
 			for (SystemGroupEntity gd : entity.getSystemGroup()) {
 				if (gd.getGroup().getName().equals(t)) {
@@ -386,8 +390,8 @@ public class DispatcherServiceImpl extends
 				.iterator(); it.hasNext();) {
 			SystemGroupEntity gd = it.next();
 			boolean found = false;
-			for (int i = 0; i < grups.length; i++) {
-				if (grups[i].trim().equals(gd.getGroup().getName())) {
+			for (int i = 0; i < grups.size(); i++) {
+				if (grups.get(i).trim().equals(gd.getGroup().getName())) {
 					found = true;
 					break;
 				}
@@ -1524,6 +1528,15 @@ public class DispatcherServiceImpl extends
 	}
 
 	@Override
+	protected void handleCheckConnectivity(String dispatcher) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		svc.checkConnectivity(dispatcher);
+	}
+
+	@Override
 	protected String handleGenerateChangesReport(com.soffid.iam.api.System dispatcher) throws Exception {
 		SessionFactory sessionFactory;
 		sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
@@ -1841,4 +1854,48 @@ public class DispatcherServiceImpl extends
 		
 		return o;
 	}
+
+	@Override
+	protected AsyncList<com.soffid.iam.api.System> handleFindSystemByTextAndJsonQueryAsync(String text,
+			String jsonQuery) throws Exception {
+		final AsyncList<com.soffid.iam.api.System> result = new AsyncList<com.soffid.iam.api.System>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					handleFindSystemByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected Collection<com.soffid.iam.api.System> handleFindSystemByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<com.soffid.iam.api.System> result = new LinkedList<com.soffid.iam.api.System>();
+		handleFindSystemByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+	
+	private void handleFindSystemByTextAndJsonQueryAsync(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<com.soffid.iam.api.System> result) throws Exception {
+		final SystemEntityDao dao = getSystemEntityDao();
+		ScimHelper h = new ScimHelper(com.soffid.iam.api.System.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toSystem((SystemEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+
 }

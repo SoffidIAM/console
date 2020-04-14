@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml"
+	use="com.soffid.iam.web.config.AuthenticationHandler"> 
+
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+	</div>
+
+	<datamodel id="model" class="com.soffid.web.saml.SamlDataModel"/>
+
+	<form dataPath="model:/conf" id="samlform" width="100%">
+		<grid sclass="noBorderGrid" width="100%">
+			<rows>
+				<row>
+					<label value="${c:l('parametres.zul.classicMethod')}"/>
+					<label/>
+				</row>
+				<row>
+					<label/>
+					<div width="100%">
+						<checkbox bind="classicMethod" label="${c:l('deploy.lblEnable')}"
+							style="display: block"></checkbox>
+						<checkbox bind="trustedAuthentication" 
+							label="${c:l('parametres.zul.trustedAuthentication')}"
+							style="display: block"></checkbox>
+					</div>
+				</row>
+				<row>
+					<label value="${c:l('parametres.zul.samlMethod')}"/>
+					<label/>
+				</row>
+				<row>
+					<label/>
+					<div  width="100%">
+						<div>
+							<checkbox bind="samlMethod" label="${c:l('deploy.lblEnable') }" 
+								style="display:block"/> 
+							<div>
+								<label value="${c:l('parametres.zul.hostName')}: "/>
+								<textbox bind="hostName" width="30em"/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.metadataURL')}: "/>
+								<textbox bind="metadata" width="30em"
+									onChange="ref:frame.refreshIDP"
+									onOK=""/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.cacheLimit')}: "/>
+								<intbox bind="cache"/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.IDP')}: "/>
+								<listbox mold="select" bind="idp" id="idpselect"
+									dataPath="/model:/idps">
+									<dataitem bind="/value">
+										<listcell bind="/value"/>
+									</dataitem>
+								</listbox>
+							</div>
+						</div>
+					</div>
+				</row>
+				<row>
+					<label value="${c:l('parametres.zul.linotpIntegration')}"/>
+					<label/>
+				</row>
+				<row>
+					<label/>
+					<div  width="100%">
+						<div>
+							<checkbox bind="enableLinotp" label="${c:l('deploy.lblEnable') }" 
+								style="display:block"/> 
+							<div>
+								<label value="${c:l('parametres.zul.linotpServer')}: "/>
+								<textbox bind="linotpServer" width="30em"/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.linotpUser')}: "/>
+								<textbox bind="linotpUser" width="30em"
+									onOK=""/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.linotpPassord')}: "/>
+								<input_password width_custom="30em" bind="linotpPassword"/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.linotpUserDomain')}: "/>
+								<listbox mold="select" bind="linotpUserDomain"
+									dataPath="/model:/userDomain">
+									<dataitem bind="/code">
+										<listcell bind="/description"/>
+									</dataitem>
+								</listbox>
+							</div>
+						</div>
+					</div>
+				</row>
+				<row>
+					<label value="${c:l('parametres.zul.otpUsage')}"/>
+					<label/>
+				</row>
+				<row>
+					<label/>
+					<div  width="100%">
+						<div>
+							<div>
+								<label value="${c:l('parametres.zul.otpOptional')}: "/>
+								<textbox bind="optionalToken" width="100%" multiline="true" rows="5" maxlength="500"/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.otpRequired')}: "/>
+								<textbox bind="requireToken" width="100%" multiline="true" rows="5" maxlength="500"/>
+							</div>
+							<div>
+								<label value="${c:l('parametres.zul.otpTimeout')}: "/>
+								<intbox bind="tokenTimeout" width="30" maxlength="500"/>
+								<label value="${c:l('parametres.zul.otpTimeout2')}: "/>
+								
+							</div>
+						</div>
+					</div>
+				</row>
+				<row>
+					<label/>
+					<div style="margin-top: 2em">
+						<button label="${c:l('parametres.zul.downloadMetadata') }" onClick="ref:frame.downloadMetadata"/>
+						<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.commit"
+							style="text-align:right"/>
+					</div>
+			
+				</row>
+			</rows>
+		</grid>
+	</form>				
+</frame>

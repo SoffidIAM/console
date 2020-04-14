@@ -94,6 +94,13 @@ public abstract class ServerPluginService {
 		es.caib.seycon.ng.comu.ServerPlugin plugin)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Operation ( grantees={roles.plugins_update.class})
+	public void updatePlugin(
+		es.caib.seycon.ng.comu.ServerPlugin plugin)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Operation ( grantees={roles.plugins_update.class},
 			translated="getAllAgentDescriptorsInfo")
 	@Transactional(rollbackFor={java.lang.Exception.class})

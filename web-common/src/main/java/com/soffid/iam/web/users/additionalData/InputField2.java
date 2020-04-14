@@ -63,6 +63,7 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailDomain;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Task;
@@ -109,7 +110,7 @@ public class InputField2 extends Div implements XPathSubscriber
 	}
 
 	private static final long serialVersionUID = 1L;
-	private static final String DUMMY_PASSWORD = "&[{}(=*)+]";
+	private static final String DUMMY_PASSWORD = "&[{}(=*)+]"; //$NON-NLS-1$
 	private String compos;
 	DataType dataType;
 	private String bind;
@@ -244,6 +245,26 @@ public class InputField2 extends Div implements XPathSubscriber
 				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
+	public void onSelectNetwork (Event event) {
+		if (!readonly)
+		{
+			Page p = getDesktop().getPageIfAny("xarxesLlista"); //$NON-NLS-1$
+			if ( p == null)
+			{
+				Component networksWindow = getPage().getFellowIfAny("networksWindow"); //$NON-NLS-1$
+				if (networksWindow == null)
+				{
+					networksWindow = new Window();
+					networksWindow.setId("networksWindow"); //$NON-NLS-1$
+					networksWindow.setPage(getPage());
+					Executions.getCurrent().createComponents("/xarxesllista.zul", networksWindow, new HashMap()); //$NON-NLS-1$
+				}
+				Events.postEvent("onInicia", networksWindow.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			else
+				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
 
 	public void onSelectMailDomain(Event event) {
 		if (!readonly)
@@ -335,6 +356,7 @@ public class InputField2 extends Div implements XPathSubscriber
 	private Listbox containerListbox;
 	private String targetSearchTextboxUuid;
 	private String placeholder;
+	
 	public void onChanging(InputEvent event) throws Throwable {
 		currentSearchTextbox = (InputElement) event.getTarget();
 		InputElement targetSearchTextbox = (InputElement) (dataType.getType() == TypeEnumeration.USER_TYPE && hideUserName ||
@@ -389,6 +411,11 @@ public class InputField2 extends Div implements XPathSubscriber
 			{
 				currentSearch = EJBLocator.getApplicationService()
 						.findApplicationByTextAndFilterAsync(removeNonAscii (searchCriteria), dataType.getFilterExpression());
+			}
+			if (dataType.getType() == TypeEnumeration.NETWORK_TYPE)
+			{
+				currentSearch = EJBLocator.getNetworkService()
+						.findNetworkByTextAndJsonQueryAsync(removeNonAscii (searchCriteria), dataType.getFilterExpression());
 			}
 		} catch (Exception e) {
 			log.warn("Error querying objects", e); //$NON-NLS-1$
@@ -500,6 +527,10 @@ public class InputField2 extends Div implements XPathSubscriber
 							identity = new Identity( (Role ) o);
 						if (o instanceof Application)
 							identity = new Identity( (Application ) o);
+						if (o instanceof Host)
+							identity = new Identity( (Host ) o);
+						if (o instanceof Network)
+							identity = new Identity( (Network ) o);
 						if (identity != null)
 						{
 							searchResults.add(identity);
@@ -520,6 +551,8 @@ public class InputField2 extends Div implements XPathSubscriber
 						o instanceof Role ? ((Role) o).getName()+"@"+ ((Role) o).getSystem() : //$NON-NLS-1$
 						o instanceof Group ? ((Group) o).getName() :
 						o instanceof Application ? ((Application) o).getName() :
+						o instanceof Host ? ((Host) o).getName() :
+						o instanceof Network ? ((Network) o).getCode() :
 						o instanceof Role ? ((Role) o).getName() :
 						null;
 					if (value != null)
@@ -618,6 +651,8 @@ public class InputField2 extends Div implements XPathSubscriber
 					value = ((CustomObject) o).getName();
 				else if ( o instanceof Host )
 					value = ((Host) o).getName();
+				else if ( o instanceof Network )
+					value = ((Network) o).getCode();
 				else if ( o instanceof MailDomain)
 					value = ((MailDomain) o).getCode();
 				else if ( o instanceof Application)
@@ -645,7 +680,7 @@ public class InputField2 extends Div implements XPathSubscriber
 				value = lb.getSelectedItem().getValue();
 		}
 		Events.postEvent("onChange", this, null); //$NON-NLS-1$
-		applyChange(tb, value == null || "".equals(value) ? null: 
+		applyChange(tb, value == null || "".equals(value) ? null:  //$NON-NLS-1$
 			new Password(value.toString()).toString());
 	}
 
@@ -685,6 +720,8 @@ public class InputField2 extends Div implements XPathSubscriber
 				value = ((CustomObject) o).getName();
 			else if ( o instanceof Host )
 				value = ((Host) o).getName();
+			else if ( o instanceof Network )
+				value = ((Network) o).getCode();
 			else if ( o instanceof MailDomain)
 				value = ((MailDomain) o).getCode();
 			else if ( o instanceof Application)
@@ -826,6 +863,12 @@ public class InputField2 extends Div implements XPathSubscriber
 	public void onActualitzaHost(Event event) throws UnsupportedEncodingException, IOException, CommitException {
 		Object[] data = (Object[]) event.getData();
 		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(data[0]);
+		onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
+	}
+
+	public void onActualitzaNetwork(Event event) throws UnsupportedEncodingException, IOException, CommitException {
+		String network = (String) event.getData();
+		((InputElement) event.getTarget().getPreviousSibling()).setRawValue(network);
 		onChildChange( new Event (event.getName(), event.getTarget().getPreviousSibling() ) );
 	}
 
@@ -1133,6 +1176,35 @@ public class InputField2 extends Div implements XPathSubscriber
 		}
 	}
 
+	public void updateNetwork(String id) {
+
+		InputElement inputElement = (InputElement) getFellow(id);
+		String host = inputElement.getText();
+
+		Label l = (Label) getFellowIfAny(id+"b"); //$NON-NLS-1$
+
+		if (host == null || host.isEmpty()) {
+			if (l != null)
+				l.setValue(""); //$NON-NLS-1$
+		} else {
+			Network a = null;
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
+			try {
+				a = com.soffid.iam.EJBLocator.getNetworkService().findNetworkByName(host);
+			} catch (Exception e) {
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
+			}
+			if (a == null || ( filter != null && ! filter.isAllowedValue(a))) {
+				if (l != null) l.setValue("?"); //$NON-NLS-1$
+				throw new WrongValueException(inputElement, Messages.getString("InputField2.3")); //$NON-NLS-1$
+			}
+			if (l != null) l.setValue(a.getDescription());
+		}
+	}
+
 	public void updateMailDomain(String id) {
 
 		InputElement inputElement = (InputElement) getFellow(id);
@@ -1215,7 +1287,7 @@ public class InputField2 extends Div implements XPathSubscriber
 			{
 				((Component)getChildren().get(0)).setParent(null);
 			}
-			compos = "";
+			compos = ""; //$NON-NLS-1$
 			if(dataType != null)
 			{
 				Object value = binder.getValue();
@@ -1246,6 +1318,7 @@ public class InputField2 extends Div implements XPathSubscriber
 									dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.USER_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.ROLE_TYPE) ||
+									dataType.getType().equals(TypeEnumeration.NETWORK_TYPE) ||
 									dataType.getType().equals(TypeEnumeration.HOST_TYPE))
 							{
 								Listheader header3 = new Listheader( Labels.getLabel("accounts.description")); //$NON-NLS-1$
@@ -1537,16 +1610,18 @@ public class InputField2 extends Div implements XPathSubscriber
 				StringBuffer sb = new StringBuffer();
 				if (containerListbox == null)
 				{
-					sb.append("<div style='display: block' visible='true'>"); //$NON-NLS-1$
-					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<div style='display:block' visible='true'>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onChange='self.parent.parent.onChildChange(event)' "   //$NON-NLS-1$
+							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/host.png' " //$NON-NLS-1$
-							+ "onClick='self.parent.parent.onSelectHost(event)' " //$NON-NLS-1$
-							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' " //$NON-NLS-1$
+					sb.append("<imageclic src='/zkau/web/img/host.png' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
-							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					sb.append("<label id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+							+ " visible=\""+(!readonly  && Security.isUserInRole("host:all:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup(event)' id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
 					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
 				} else {
 					sb.append("<listitem><listcell>"); //$NON-NLS-1$
@@ -1558,6 +1633,44 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly && Security.isUserInRole("host:all:query"))+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("</listcell><listcell>"); //$NON-NLS-1$
+					sb.append("<label id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</listcell></listitem>"); //$NON-NLS-1$
+				}
+				result = sb.toString();
+			}
+			else if(TypeEnumeration.NETWORK_TYPE.equals(type))
+			{
+				StringBuffer sb = new StringBuffer();
+				if (containerListbox == null)
+				{
+					sb.append("<div style='display: block' visible='true'>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' "
+							+ "onChange='self.parent.parent.onChildChange(event)' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onOK='' " //$NON-NLS-1$
+							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/img/network.svg' visible=\""+(!readonly && Security.isUserInRole("network:all:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "onClick='self.parent.parent.onSelectNetwork(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaNetwork(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+							); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					sb.append("<label id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(required+removeAction+"</div>"); //$NON-NLS-1$
+				} else {
+					sb.append("<listitem><listcell>"); //$NON-NLS-1$
+					sb.append("<textbox sclass='textbox' maxlength='"+size+"' "
+							+ "onChange='self.parent.parent.onChildChange(event)' " //$NON-NLS-1$ //$NON-NLS-2$
+							+ "onOK='' " //$NON-NLS-1$
+							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
+							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
+							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
+							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append("<imageclic src='/img/network.svg' visible=\""+(!readonly && Security.isUserInRole("network:all:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "onClick='self.parent.parent.onSelectNetwork(event)' " //$NON-NLS-1$
+							+ "onActualitza='self.parent.parent.onActualitzaNetwork(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
+							); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sb.append("</listcell><listcell>"); //$NON-NLS-1$
 					sb.append("<label id=\""+id2+"\"/>"); //$NON-NLS-1$ //$NON-NLS-2$
 					sb.append(required+removeAction+"</listcell></listitem>"); //$NON-NLS-1$
@@ -1748,11 +1861,11 @@ public class InputField2 extends Div implements XPathSubscriber
 			}
 			else if ( TypeEnumeration.PASSWORD_TYPE.equals(type))
 			{
-					result ="<h:form xmlns:h=\"http://www.w3.org/1999/xhtml\" width=\"100%\">" + 
-							"<textbox id=\""+id+"\" width='100%' onOK=\"\" sclass=\"textbox\" type=\"password\" " +
-							"readonly=\""+readonlyExpr+"\" " +
-							"onChange='self.parent.parent.onChildPasswordChange(event)' "+ph +" />" + 
-							"</h:form>"; 
+					result ="<h:form xmlns:h=\"http://www.w3.org/1999/xhtml\" width=\"100%\">" +  //$NON-NLS-1$
+							"<textbox id=\""+id+"\" width='100%' onOK=\"\" sclass=\"textbox\" type=\"password\" " + //$NON-NLS-1$ //$NON-NLS-2$
+							"readonly=\""+readonlyExpr+"\" " + //$NON-NLS-1$ //$NON-NLS-2$
+							"onChange='self.parent.parent.onChildPasswordChange(event)' "+ph +" />" +  //$NON-NLS-1$ //$NON-NLS-2$
+							"</h:form>";  //$NON-NLS-1$
 			}
 			else if (dataType.getValues() != null && ! dataType.getValues().isEmpty())//String
 			{
@@ -2201,6 +2314,8 @@ public class InputField2 extends Div implements XPathSubscriber
 			updateCustomObject( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.HOST_TYPE)
 			updateHost( getIdForPosition(position) );
+		if (dataType.getType() == TypeEnumeration.NETWORK_TYPE)
+			updateNetwork( getIdForPosition(position) );
 		if (dataType.getType() == TypeEnumeration.MAIL_DOMAIN_TYPE)
 			updateMailDomain( getIdForPosition(position) );
 		
@@ -2272,13 +2387,13 @@ public class InputField2 extends Div implements XPathSubscriber
 		{
 			if (c instanceof AttributesDiv)
 			{
-				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap());
+				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else if (c instanceof UserAttributesDiv)
 			{
 				((UserAttributesDiv) c).adjustVisibility();
-				i.set("inputFields", ((UserAttributesDiv) c).getInputFieldsMap());
+				i.set("inputFields", ((UserAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else
@@ -2288,7 +2403,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		i.set("value", value); //$NON-NLS-1$
 		i.set("attributes", attributes); //$NON-NLS-1$
 		i.set("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
-		i.set("inputField", this);
+		i.set("inputField", this); //$NON-NLS-1$
 		if (ownerObject != null)
 		{
 			i.set("object", ownerObject); //$NON-NLS-1$

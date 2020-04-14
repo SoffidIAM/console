@@ -3,7 +3,7 @@
 <zkib-model>
 	<datanode name="autoritzacions">
 		<finder name="autoritzacio" type="autoritzacio">   <!-- tothom -->
-			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
+			<ejb-finder jndi="java:/module/AuthorizationService-v2"
 				method="findAuthorizations">
 				<parameter value="${ambitList}" />
 				<parameter value="${description}" />
@@ -13,7 +13,7 @@
 			</new-instance-bean>-->
 		</finder>
 		<finder name="scope" type="scope">
-			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
+			<ejb-finder jndi="java:/module/AuthorizationService-v2"
 				method="getScopeList">
 			</ejb-finder>
 		</finder>
@@ -47,8 +47,8 @@
 			return tds2.toString();
 		</custom-attribute>
 		<finder name="autoritzacioRol" type="autoritzacioRol">   <!-- tothom -->
-			<ejb-finder jndi="java:comp/env/ejb/AutoritzacioRolsEJB"
-				method="getRolsAutoritzacio">
+			<ejb-finder jndi="java:/module/AuthorizationService-v2"
+				method="getAuthorizationRoles">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.AutoritzacioRol">
@@ -57,7 +57,7 @@
 	</datanode>
 	
 	<datanode name="autoritzacioRol">
-		<ejb-handler jndi="java:comp/env/ejb/AutoritzacioRolsEJB">
+		<ejb-handler jndi="java:/module/AuthorizationService-v2">
 			<insert-method method="create" returnBean="true"> 
 				<parameter value="${instance}" />
 			</insert-method>

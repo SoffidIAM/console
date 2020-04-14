@@ -1611,8 +1611,8 @@
 						</rows>
 					</grid>
 					</vbox>
-					<vbox id="customAgentProperties" visible="false" width="100%"/>
-					</vbox>
+					<div id="customAgentProperties" visible="false" width="100%"/>
+					</div>
 					</tabpanel>
 					<tabpanel id="tabAttributeMapping">
 					

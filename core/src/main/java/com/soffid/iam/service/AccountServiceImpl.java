@@ -437,7 +437,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			} else {
 				if (m.getUnique() != null && m.getUnique().booleanValue())
 				{
-					Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
+					Collection<String> l = (Collection<String>) ( o instanceof Collection? (Collection) o: Collections.singletonList(o) );
 					for (String v: l)
 					{
 						List<AccountAttributeEntity> p = getAccountAttributeEntityDao().findByNameAndValue(app.getSystem(), m.getName(), v);

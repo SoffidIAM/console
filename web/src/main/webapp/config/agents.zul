@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+<?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div"
+	style="position: relative" use="com.soffid.iam.web.agent.AgentHandler"
+	id="frame">
+
+	<style>
+		.tcoth div {text-align:center !important;} tr.seld td
+		div.cell-inner input.text { background-color: #D3D3D3; }
+		.readonly {background-color: transparent !important}
+
+		div.method-collapsed-div div.grid { max-height:48px; overflow:
+		hidden; }
+
+		div.method-full-div div.grid { max-height: inherit; overflow:
+		hidden; }
+
+		div.method-collapse-button-div { text-align: center; }
+
+		div.method-collapse-button-div:hover { background-color:
+		#c0c0c0; }
+
+	</style>
+
+	<datamodel id="model" rootNode="agents" src="descriptorAgent.xml" />
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar"
+				frame="frame">
+				<menu2>
+					<menu2item image="~./img/add.svg"
+						label="${c:l('agents.zul.Afegeixnou') }"
+						if="${canCreateAgent}" onClick="ref:frame.addNew" />
+				</menu2>
+			</div>
+
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.System"
+				defaultAttributes="name,description,url" dataPath="model:/agent"
+				variableName="query">
+			</searchbox>
+
+			<datatable id="listbox" autocommit="true"
+				dataPath="/model:/agent" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+				<attribute name="columns"><![CDATA[
+- name: ${c:l('agents.zul.Codi')} 
+  value: name 
+- name: ${c:l('parametres.zul.Descripcia-2')}
+  value: description 
+- name: ${c:l('agents.zul.Classe-2')} 
+  value: className 
+- name: ${c:l('agents.zul.Url-2')}
+  value: url ]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"
+				if="${canCreateAgent}">
+				<div class="addButton" onClick="ref:frame.addNew">
+					+
+				</div>
+			</div>
+		</div>
+
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar"
+				frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox" />
+
+				<menu2>
+					<menu2item if="${canDeleteAgent}"
+						image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }"
+						onClick="ref:frame.delete" />
+					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:frame.importMapping"/>
+					<menu2item image="~./img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.exportMapping"/>
+					<menu2item image="~./img/add.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
+					<menu2item image="/img/question.svg" label="${c:l('agents.zul.Test') }" if="${canQueryAgent}" onClick="ref:frame.test"/>
+				</menu2>
+
+				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+
+			<form2 id="form" dataPath="listbox:/."
+				onChangeXPath="ref:frame.onChangeForm" width="100%"  >
+				<timer delay="20000" onTimer="ref:frame.refreshTasks()" id="refreshTasksTimer" running="false" repeats="true" />
+				<tabbox id="panels" width="100%" onSelect="ref:frame.onChangeTab">
+					<tabs>
+						<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
+						<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
+						<tab id="r_reconcileTriggers" label="${c:l('agents.loadTriggers')}"/>
+						<tab label="${c:l('agents.zul.MassiveActions')}" if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}" id ="r_tasksTab"/>
+						<tab id="r_controlAcces" label="${c:l('agents.zul.Controldaccas')}"/>
+						<tab id="r_metadata" label="${c:l('agents.zul.accountMetadata')}"/>
+					</tabs>
+					<tabpanels>
+						<tabpanel id="basica" width="100%">
+						<grid width="99%" sclass="noBorderGrid" fixedLayout="true" mold="table">
+							<rows>
+								<row id="serverStatusRow">
+									<label style="color:#8A4700" value="${c:l('parametres.zul.taskMode') }:"/>
+									<label style="color:#8A4700" value="" id="serverStatusMessage"/>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.Codi')}"/>
+									<div>
+										<textbox bind="@name" id="agentName" maxlength="50" constraint="no empty"/>
+										<div id="missatge" visible="false">
+											<label value="${c:l('agents.zul.AlertSpreadUsers')}" style="color:red;"/>
+											<button label="${c:l('rules.preview')}" onClick="ref:frame.preview">
+											</button>
+										</div>
+									</div>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.Descripcion') }"/>
+									<textbox bind="@description" id="detall_description" maxlength="250" width="100%" constraint="no empty"/>
+								</row>
+								
+								<row>
+									<label value="${c:l('agents.zul.Tipus-2')}"/>
+									<div>
+										<select bind="@className" dataPath="/model:/plugin"  id="cbClassDescription"
+											onSelect="ref:frame.onChangeClass" width="50%"
+											labelPath="@description" keyPath="@className" />
+										
+										<label sclass="etiqueta" value="${c:l('agents.zul.Classe')}"/>
+										<label bind="@className" id="classNameLabel"/>
+									</div>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.Server')}"/>
+									<div width="100%">
+										<select keyPath="url"
+												labelPath="name"
+												bind="@url" id="url"
+												dataPath="/model:/serverSelector"
+												disabled="${!canModifyAgent}"
+												style="margin-right: 2em" /> 
+										<select keyPath="url"
+												labelPath="name"
+												bind="@url2" id="url2"
+												dataPath="/model:/serverSelector2"
+												disabled="${!canModifyAgent}"
+												style="margin-right: 2em" /> 
+									</div>
+								</row>
+								<row>
+									${c:l('agents.zul.sharedThread')}:
+									<div >
+										<switch bind="@sharedDispatcher"  disabled="${!canModifyAgent}"  onCheck="agentThreadsBox.setDisabled(self.isChecked())"/>
+										<div style="width: 50%; display: inline-block; padding-left: 12px;">
+											<label value=" ${c:l('agents.zul.threads')}:" />
+											<intbox bind="@threads" onChange="" id="agentThreadsBox"/> 
+										</div>
+									</div>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.timeout')}"/>
+									<div width="90%">
+										<intbox bind="@timeout" readonly="${!canModifyAgent}" sclass="textbox" width="10em" style="margin-right: 2em" onChange=""/>
+										<label value=" ${c:l('agents.zul.longTimeout')}:" />
+										<intbox bind="@longTimeout" readonly="${!canModifyAgent}" sclass="textbox" width="10em" onChange=""/>
+									</div>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.Fiable')}"/>
+									<switch bind="@trusted" disabled="${!canModifyAgent}" id="detall_segur" onCheck=""/>
+								</row>
+								<row id="row_authoritative">
+									<label value="${c:l('agents.zul.Authoritative')}"/>
+									<div style="inline-block">
+										<switch bind="@authoritative" disabled="${!canModifyAgent}" id="detall_authoritative" onCheck=""/>
+										<listbox mold="select" dataPath="/model:/authoritativeProcess" disabled="${!canModifyAgent}"  bind="@authoritativeProcess"
+											style="margin-left: 24px; vertical-align: top">
+											<dataitem bind="@value"><listcell bind="@tag"></listcell></dataitem>
+										</listbox>
+									</div>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.Readonly')}"/>
+									<switch bind="@readOnly" disabled="${!canModifyAgent}" id="detall_readonly" onCheck=""/>
+								</row>
+								<row>
+									<label value="${c:l('agents.zul.ManualAccountCreation')}"/>
+									<switch bind="@manualAccountCreation" disabled="${!canModifyAgent}" id="detall_manual" 
+										onCheck="ref:frame.onEnableManualAccount"/>
+								</row>
+								<row id="rols_row">
+									<input_etiqueta value="${c:l('agents.zul.Basatenrols')}"/>
+									<switch bind="@rolebased" disabled="${!canModifyAgent}" id="detall_basatRols" 
+										onCheck="ref:frame.showMessage"/>
+								</row>
+								<row id="groups_row">
+									<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
+									<inputfield
+										noLabel="true"
+										dataType="group"
+										bind="@groupsList" 
+										id="groups"
+										multiValue="true"
+										readonly="${!canModifyAgent}"
+										width="100%" 
+										onChange="ref:frame.showMessage"/>
+								</row>
+								<row id="userdomain_row">
+									<input_etiqueta value="${c:l('agents.zul.Dominidusuaris')}"/>
+									<div>
+										<select bind="@usersDomain" dataPath="/model:/dominisUsuari" id="cbDominiUsuaris"
+											keyPath="code" labelPath="description"
+											onSelect="ref:frame.showMessage" />
+										<label style="margin-left: 20px" value="*"/>
+									</div>
+								</row>
+								
+								<row>
+									<input_etiqueta value="${c:l('agents.zul.DominideContrasenyes')}"/>
+									<div>
+										<select bind="@passwordsDomain" dataPath="/model:/dominisContrasenya" id="cbDominiContrasenyes"
+											keyPath="code" labelPath="description"
+											onSelect="ref:frame.showMessage" />
+										<label style="margin-left: 20px" value="*"/>
+									</div>
+								</row>
+								
+								<row id="r_tipusUsuari">
+									<input_etiqueta value="${c:l('agents.zul.Tipusdusuari')}"/>
+									<div>  
+										<datatable multiselect="true" dataPath="/model:/tipusUsuari" id="lbTipusUsuari"
+											footer="false"
+											onSelect="ref:frame.onSelectUserType"
+											sortColumn="0" enablefilter="false">
+				<attribute name="columns"><![CDATA[
+	- name: ${c:l('agents.zul.Tipusdusuari')}
+	  value: description]]>
+				</attribute>
+										</datatable>
+									</div>		
+								</row>
+							</rows>
+						</grid>
+						<label sclass="etiqueta" style="display: block" value="${c:l('agents.zul.Parametresdelagent')}" width="100%"/>
+						<div id="customAgentProperties" visible="false" width="100%"/>
+						<div style="text-align: right; width: 100%">
+							<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</tabpanel>
+					<tabpanel id="tabAttributeMapping">
+						<div style="margin-bottom: 10px;">
+							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+						</div>
+						<grid sclass="grayhover grid" dataPath="listbox:/objectMapping" id="objectsGrid" width="100%" fixedLayout="false" mold="table"
+							onNewRow="ref:objectsGrid.onNewObjectMapping"  use="com.soffid.iam.web.agent.AttributeMappingHandler">
+							<columns>
+								<column label="System objects" valign="top">
+								</column>
+								<column label="" width="30px"  valign="top" align="center">
+									<imageclic  align="center" src="~./img/list-add.gif" if="${canUpdateAgent}"
+										onClick="ref:objectsGrid.addObject" />
+								</column>
+							</columns>
+							<datarow>
+								<window width="100%" >
+									<div>
+										<textbox onChange="" bind="@systemObject" width ="15%" />
+										<label value="based on" width="10%"></label>
+										<listbox use="com.soffid.iam.web.agent.CustomTypeListbox"
+											bind="." 
+											mold="select" 
+											width="15%"/>
+									</div>
+	
+										
+									<div style="width: 90%; float: right; display:block; ">
+									
+										<div style="display: block; " id="methodsBlock"  sclass="grid compactGrid">
+
+											<tree-collapse open="false" style="float:left" onClick="ref:objectsGrid.foldUnfold" />	
+											
+											<div id="propertiesLabel2" style="height: 20px; padding-top: 4px;" >
+												<label value="Methods" />
+											</div>
+																						
+											<div id="propertiesDiv2"  visible="false">																				
+												<grid sclass="grid compactGrid" style="width: 100%; width: calc( 100% - 26px )"
+													fixedLayout="true" id="propertiesGrid2"
+													dataPath="property"
+													mold="table"
+													use="com.soffid.iam.web.agent.CustomPropertiesGrid">
+													<columns>
+														<column label="Method" width = "15em">
+														</column>
+														<column label="Properties">
+														</column>
+														<column label="" width="30px">
+															<imageclic align="center" src="~./img/list-add.gif" onClick="ref:propertiesGrid2.createMethod"/>
+														</column>
+													</columns>
+												</grid>
+												<div style="height: 20px;" />
+											</div>
+										</div>
+										
+										<div style="display: block; ">
+	
+											<tree-collapse open="false" style="float:left" onClick="ref:objectsGrid.foldUnfold" />	
+											
+											<div id="propertiesLabel" style="height: 1.5em;  padding-top: 4px;" >
+												<label value="Properties" />
+											</div>
+																						
+											<div style="" id="propertiesDiv"  visible="false">																				
+												<grid sclass="grid compactGrid" 
+													style="width: 100%; width: calc( 100% - 26px )" 
+													mold="table" 
+													dataPath="property" fixedLayout="true" id ="propertiesGrid">
+													<columns>
+														<column label="Property" width = "15em">
+														</column>
+														<column label="Value">
+														</column>
+														<column label="" width="30px">
+															<imageclic align="middle" src="~./img/list-add.gif" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
+															</imageclic>
+														</column>
+													</columns>
+													<datarow>
+														<textbox bind="@property" width="95%" onChange="ref:propertiesGrid2.generateGrid"/>
+														<textbox bind="@value" width ="95%" onChange="ref:propertiesGrid2.generateGrid" style="display:block; resize: vertical; height: 1.6em"  multiline="true"  height="1em"
+															onFocus="ref:objectsGrid.focusTextarea">
+														</textbox>
+														<imageclic align="middle" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeProperty" if="${canUpdateAgent }">
+														</imageclic>
+													</datarow>
+												</grid>
+												<div style="height: 20px;" />
+											</div>
+										</div>
+
+										<div style="display: block">
+											<tree-collapse open="false" style="float:left" onClick="ref:objectsGrid.foldUnfold" />	
+		
+											<div id="attributesLabel" style="height: 1.5em; padding-top: 4px;" >
+												<label value="Attributes" sclass=""/>
+											</div>
+																						
+																																
+											<div style="" id="attributesDiv"  visible="false">																				
+												<grid sclass="grid compactGrid" 
+													dataPath="attributeMapping" id="attributesGrid" 
+													mold="table"
+													style="width: 100%; width: calc( 100% - 26px )">
+													<columns>
+														<column label="System attribute">
+														</column>
+														<column width="30px"/>
+														<column label="Direction" width="100px">
+														</column>
+														<column label="Soffid attribute">
+														</column>
+														<column width="30px"/>
+														<column label="Test result" id="testColumn" visible="false">
+														</column>
+														<column label="" width="30px">
+															<imageclic  align="middle" src="~./img/list-add.gif" onClick="ref:objectsGrid.createProperty" >
+															</imageclic>
+														</column>
+													</columns>
+													<datarow>
+														<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" 
+															height="27px" onFocus="ref:objectsGrid.focusTextarea">
+														</textbox>
+														<imageclic style="display:table-cell" src="/img/pencil.svg" width="24px" onClick="ref:objectsGrid.editAttribute">
+														</imageclic>
+														<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection" style="width: 80px; text-align-last: center">
+															<dataitem bind="@value">
+																<listcell bind="@literal"/>
+															</dataitem>
+														</listbox>
+														<textbox bind="@soffidAttribute" width ="100%" onChange=""  style="display:block; resize: none" multiline="true"  
+															height="27px" onFocus="ref:objectsGrid.focusTextarea">
+														</textbox>
+														<imageclic style="display:table-cell" src="/img/pencil.svg" width="24px" >
+															<attribute name="onClick"><![CDATA[
+															    Events.sendEvent(new Event ("onEdit", 
+															    		desktop.getPage("editor").getFellow("top"),
+															    		new Object[] {
+																			    event.getTarget().getPreviousSibling(),
+																			    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars(self)
+																		}
+															    ));
+															]]></attribute>
+														</imageclic>
+														<div>
+															<label multiline="true"/>
+															<imageclic src="/img/exclamation.png" visible="false"/>
+														</div>
+														<imageclic align="right" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeProperty"
+															if="${canUpdateAgent }">
+														</imageclic>
+													</datarow>
+												</grid>
+												<div id="testRow" style="margin-left: 16px; margin-top: 8px;">
+													<button id="testRowButton1" label="Test" onClick="ref:objectsGrid.displayTestRow" style="margin-left: 0px;"/>
+													<label id="testRowLabel1" visible="false"/>
+													<textbox id="testRowTextbox1" visible="false" onOK="ref:objectsGrid.testRowTextbox1OK"/>
+													<label id="testRowLabel2" style="margin-left: 2em" visible="false"/>
+													<textbox id="testRowTextbox2" visible="false" onOK="ref:objectsGrid.doTest"/>
+													<button id="testRowButton2" label="${c:l('agents.zul.TestExpression') }" 
+													onClick="ref:objectsGrid.doTest" visible="false"/>
+													<button id="testRowButton3" label="${c:l('agents.zul.TestFull') }" 
+														onClick="ref:objectsGrid.doFullTest" visible="false"/>
+													<button id="testRowButton4" label="${c:l('agents.zul.TestQuery') }"
+														onClick="ref:objectsGrid.doQueryTest" visible="false"/>
+													<button id="testRowButton5" label="${c:l('agents.zul.TestLoad') }" 
+														onClick="ref:objectsGrid.doLoadTest" visible="false"/>
+												</div>
+												<div style="height: 20px;" />
+											</div>
+										</div>
+	
+	<!--  TRIGGERS -->
+										<div style="display: block" id="triggersBlock">
+		
+											<tree-collapse open="false" style="float:left" onClick="ref:objectsGrid.foldUnfold" />	
+		
+											<div id="triggersLabel" style="height: 20px; padding-top: 4px;" >
+												<label value="Triggers" sclass=""/>
+											</div>
+																						
+																																
+											<div style="" id="triggersDiv"  visible="false">	
+												<grid sclass="grid compactGrid" 
+													dataPath="objectMappingTrigger" 
+													fixedLayout="false" 
+													mold="table" 
+													id="triggersGrid" 
+													style="width: 100%; width: calc( 100% - 26px )">
+													<columns>
+														<column label="Trigger" width="10em" valign="top">
+														</column>
+														<column label="Script" >
+														</column>
+														<column label="" width="2em"/>
+														<column label="" width="2em">
+															<imageclic  align="right" src="~./img/list-add.gif" onClick="ref:objectsGrid.createTrigger">
+															</imageclic>
+														</column>
+													</columns>
+													<datarow>
+														<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" style="vertical-align: top;">
+															<dataitem bind="@value">
+																<listcell bind="@literal"/>
+															</dataitem>
+														</listbox>
+														<textbox bind="@script" width ="100%" onOK="" onChange="" style="display:block; resize: none; height: 1.6em" multiline="true" height="1em"
+															onFocus="ref:objectsGrid.focusTextarea">
+														</textbox>
+														<imageclic src="/img/pencil.svg" width="24px" onClick="ref:objectsGrid.editTrigger">
+														</imageclic>
+														<imageclic align="right" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeObject">
+														</imageclic>
+													</datarow>
+												</grid>
+											<div style="height: 20px;" />
+										</div>
+									</div>
+
+									<div style="width: 15px; height: 15px;"/>
+									</div>
+								</window>
+								<imageclic align="center" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeObject" if="${canUpdateAgent }">
+								</imageclic>
+							</datarow>
+						</grid>
+					</tabpanel>
+
+					<!--  Reconcile triggers -->
+
+					<tabpanel id="tabReconcileTriggers" use="com.soffid.iam.web.agent.TriggerHandler" >
+						<div style="margin-bottom: 10px;">
+							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+						</div>
+						<div style="margin-bottom: 32px">
+							<switch bind="@fullReconciliation" disabled="${!canModifyAgent}" label="${c:l('agents.zul.fullReconcile') }" onCheck=""/>
+							<label value="${c:l('agents.zul.fullReconcile2')}" style="margin-left:16px; display:inline-block;"/>
+						</div>
+						<div style="margin-bottom: 32px">
+							<switch bind="@generateTasksOnLoad" disabled="${!canModifyAgent}" label="${c:l('agents.zul.generateTasksOnLoad') }" onCheck=""/>
+							<label value="${c:l('agents.zul.generateTasksOnLoad2')}" style="margin-left:16px; display:inline-block;"/>
+						</div>
+					
+						<grid mold="table" dataPath="listbox:/reconcileTrigger" width="100%" fixedLayout="false">
+							<columns>
+								<column label="Object" width="10em" valign="top">
+								</column>
+								<column label="Trigger" width="10em" valign="top">
+								</column>
+								<column label="Script" >
+								</column>
+								<column label="" width="2em"/>
+								<column label="" width="2em">
+									<imageclic  align="right" src="~./img/list-add.gif" onClick="ref:tabReconcileTriggers.addTrigger" if="${canUpdateAgent }">
+									</imageclic>
+								</column>
+							</columns>
+							<datarow height="7em">
+							
+								<listbox bind="@objectType" mold="select" dataPath="/model:/soffidObjectTypeTrigger" >
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>
+								</listbox>
+
+								<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" 
+									style="vertical-align: top;">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>
+								</listbox>
+								<textbox multiline="true" rows="5"  
+										style="resize: vertical"
+										width="100%" 
+										onChange="" 
+										height="5em" bind="@script" >
+								</textbox>
+								<imageclic style="display:table-cell" src="/img/pencil.svg" width="24px" onClick="ref:tabReconcileTriggers.editTrigger" >
+								</imageclic>
+								<imageclic align="right" src="~./img/list-remove.gif" width="2em" onClick="ref:tabReconcileTriggers.removeTrigger">
+								</imageclic>
+							</datarow>
+						</grid>
+					</tabpanel>
+			
+					<tabpanel if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}">
+						<div style="margin-bottom: 10px;">
+							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+						</div>
+						<vbox>
+							<button image="/img/propagausu.gif" label="${c:l('agents.PropagaUsuaris')}"
+									id="imgPropaga" if="${canPropagateAgentUsers}" onClick='ref:frame.propagaCanvisAgent_Usuaris'> 
+							</button>
+							<space width="4px"/>
+							<button id="imgPropagaRols" if="${canPropagateAgentRoles}" image="/img/propagarols.gif" label="${c:l('agents.PropagaRols')}"
+								onClick="ref:frame.propagaCanvisAgent_Rols"> 
+							</button>
+							<space width="4px"/>
+							<button id="imgPropagaGroups" if="${canPropagateAgentGroups}" image="/img/propagagroup.png" label="${c:l('agents.PropagaGroups')}"
+								onClick="ref:frame.propagaCanvisAgent_Groups()"> 
+							</button>
+							<space width="4px"/>
+							<div id="reconcileDiv">
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.reconcile')}" onClick="ref:frame.startReconcile"> 
+								</button>
+								<label value="Last run:" id="reconcileLabel"/> 
+								<datebox id="reconcileLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<label id="reconcileSeparator" value="-"/>
+								<datebox id="reconcileLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="reconcileStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showReconcileTaskMessage'/>
+							</div>
+							<space width="4px"/>
+							<div id="importDiv">
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.loadAuhtoratitve')}" onClick="ref:frame.startImportTask"> 
+								</button>
+								<label value="Last run:" id="importLabel"/> 
+								<datebox id="importLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<label id="importSeparator" value="-"/>
+								<datebox id="importLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="importStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showImportTaskMessage'/>
+							</div>
+							<space width="4px"/>
+							<div  id="impactDiv">
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.impactAnalyis')}" onClick="ref:frame.startImpactTask"> 
+								</button>
+								<label value="Last run:" id="impactLabel"/> 
+								<datebox id="impactLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<label id="impactSeparator" value="-"/>
+								<datebox id="impactLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="impactStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showImpactTaskMessage'/>
+							</div>
+						</vbox>
+					</tabpanel>
+
+					<tabpanel id="tabControlAcces" use="com.soffid.iam.web.agent.AccessControlHandler">
+						<div style="margin-bottom: 10px;">
+							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+						</div>
+						<style>
+							div.datatable.actable table.thead td:last-child { width:120px; }
+ 							div.datatable.actable table.tbody td:last-child { width:120px; }
+						</style>
+						<switch bind="@accessControl" disabled="${!canSetAccessControl}" id="c_controlAcces" onCheck=""/> 
+						<label value="${c:l('agents.zul.Activarcontroldacca')}" />
+						<datatable dataPath="listbox:/controlAcces" sclass="actable datatable"
+							onEdit="ref:tabControlAcces.editRule"
+							onRemove="ref:tabControlAcces.onRemove"
+							onClone="ref:tabControlAcces.onClone"
+							maxheight="300px" id="gridControlAccess" width="100%">
+							<attribute name="columns"><![CDATA[
+- name: ${c:l('agents.zul.Usuari')}
+  value: genericUser
+- name: ${c:l('agents.zul.Rol')}
+  value: roleDescription
+- name: ${c:l('agents.zul.Maquina/IP')}
+  value: hostName
+- name: ${c:l('agents.zul.Programa')}
+  value: program
+- name: ""
+  template: <button class="grid-icon-button" title="${c:l('agents.zul.editRule') }" onClick='zkDatatable.sendClientAction(this,"onEdit")'><img src="/img/pencil.svg"/></button><button class="grid-icon-button" title="${c:l('plugins.zul.Delete') }" onClick='zkDatatable.sendClientAction(this,"onRemove")'><img src="/img/remove.svg"/></button><button class="grid-icon-button" title="${c:l('agents.zul.Clonaregla') }" onClick='zkDatatable.sendClientAction(this,"onClone")'><img src="/img/copy.svg"/></button>
+  filter: false
+  sort: false
+  ]]> </attribute>
+  					</datatable>
+					<div align="right"><listexportbutton acces="${canQueryAgent}" listbox="gridControlAccess"/></div>
+					<div width="100%" style="text-align: right"
+						if="${canCreateAgent}">
+						<div class="addButton" onClick="ref:tabControlAcces.addNew">
+							+
+						</div>
+					</div>
+					</tabpanel>
+					<tabpanel id="tabMetadata">
+						<accountMetadata/>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>				
+		</form2>
+		</div>
+	</div>
+
+	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					previewWindow.setVisible(false);
+				</attribute>
+			</button>
+			<button label="${c:l('rules.apply')}" onClick="ref:frame.applyChanges">
+			</button>
+		</div>
+		
+	</window>
+
+	<window visible="false" width="80%" title="Test log" id="testWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div>
+			<label value="${c:l('job.status') }: "/>
+			<label id="status"/>
+		</div>
+		<textbox id="log" multiline="true" rows="20" width="100%" readonly="true"/>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					testWindow.setVisible(false);
+				</attribute>
+			</button>
+		</div>
+	</window>
+
+	<window closable="true" width="80%" id="logWindow"
+		title=""
+		onClose='self.visible=false; event.stopPropagation();'
+		visible="false">
+		<textbox id="tb" width="100%" height="150px" multiline="true" style="font-family: monospace; resize: vertical"/>
+	</window>
+	
+	<include src="grupsllista.zul"/>
+	<include src="controlAcces.zul"/>
+ 	<include src="finestres/editor.zul"/>
+ 	<include src="finestres/agent_objectAttributes.zul"/>
+</frame>

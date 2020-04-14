@@ -13,6 +13,8 @@ import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
 
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.User;
@@ -27,7 +29,7 @@ import es.caib.zkib.zkiblaf.ImageClic;
 
 public class Identity implements Comparable<Identity>{
 	public enum Type {
-		USER, ACCOUNT, ROLE, GROUP, GRANT, CUSTOM_OBJECT, APPLICATION
+		USER, ACCOUNT, ROLE, GROUP, GRANT, CUSTOM_OBJECT, APPLICATION, NETWORK, HOST
 	} ;
 	
 	Type type;
@@ -147,6 +149,18 @@ public class Identity implements Comparable<Identity>{
 		object = o;
 	}
 
+	public Identity(Network o) {
+		type = Type.NETWORK;
+		label = o.getCode()+" - "+o.getDescription();
+		object = o;
+	}
+
+	public Identity(Host o) {
+		type = Type.HOST;
+		label = o.getName()+" - "+o.getDescription();
+		object = o;
+	}
+
 	public Type getType() {
 		return type;
 	}
@@ -181,6 +195,8 @@ public class Identity implements Comparable<Identity>{
 			type == Type.ROLE ? "/img/key.png":
 			type == Type.GRANT ? "/img/key.png":
 			type == Type.APPLICATION ? "/img/key.png":
+			type == Type.NETWORK ? "/img/network.svg":
+			type == Type.HOST ? "/img/host.png":
 				"/img/account.png");
 		d.appendChild(img);
 		String l = selectorLabel == null ? label: selectorLabel;

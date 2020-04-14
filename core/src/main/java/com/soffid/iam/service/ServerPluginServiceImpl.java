@@ -573,4 +573,14 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
 		}
 		return versionA.length - versionB.length;
 	}
+
+	@Override
+	protected void handleUpdatePlugin(ServerPlugin plugin) throws Exception {
+		ServerPluginEntity spe = getServerPluginEntityDao().load(plugin.getId());
+		if (spe.isEnabled() != plugin.isEnabled())
+		{
+			spe.setEnabled(plugin.isEnabled());
+			getServerPluginEntityDao().update(spe);
+		}
+	}
 }

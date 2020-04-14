@@ -2,28 +2,30 @@
 <?page id="index"?>
 <window id="appWindow" xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
- width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-	<zscript> <![CDATA[
-	String usuari = Executions.getCurrent().getUserPrincipal().getName();
-	String nom = Executions.getCurrent().getUserPrincipal().getFullName();
-	]]>
-	</zscript>
-	<div sclass="topline">
-		<div align="right" sclass="col_der">
-			<div sclass="benvingutmsg">
-				<label sclass="benvingut" value="${c:l('zkiblaf.lblUsuario')}: "/>
-		    	<label id="fullNameLabel" onClick='es.caib.zkib.zkiblaf.Application.setPage("perfil/perfil.zul")' sclass="codiusuari" value="${nom} (${usuari})"/>
-				<label id="logoutButton" sclass="titol_tanca" value="${c:l('zkiblaf.tancarSessio')}"/>
-			</div>
+ width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+ use="com.soffid.iam.web.main.MainWindow" >
+	<div sclass="topline">		
+		<menu2 image="/img/gear.svg" sclass="col_der">
+			<label value="${c:l('zkiblaf.lblUsuario')} ${nom } " sclass="welcome"/>
+			<menu2item image="/img/power.svg" label="${c:l('zkiblaf.tancarSessio')}" id="logoutButton"/>
+			<menu2item image="/img/profile.svg" onClick='es.caib.zkib.zkiblaf.Application.setPage("perfil/perfil.zul")'   label="${c:l('perfil.Titol') }" />
+		</menu2>
+
+		<div sclass="col_der help"  onClick="ref:appWindow.help">
+			<image src="/img/question.svg"/>
 		</div>
-
-
+		
+		<image src="anonymous/small-logo.png" sclass="logo col_der"/>
+		
 		<div sclass="col_izq">
+			<image src="/img/menu/ninedots.svg" onClick="ref:appWindow.menu" sclass="menu3starter"/>
+			<menu3 id="menu3" style="display: inline-block"/>			
 			<image src="icons/logo-letras.png" id="logo"/>
 		</div>
 
 		<div sclass="col_cen">
-			<label class="maintitle" id="title" value="${c:l('application.zul.BPM')}"/>
+			<textbox class="searchBox" placeholder="${c:l('adminPersonalConfigs.zul.Cercar') }" onChanging="ref:searchBox.onChanging(event)"/>
+			<label class="maintitle" id="title" visible="false"/>
 		</div>
 	</div>
 	<div sclass="workarea" style="width: 100%">
@@ -39,4 +41,9 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		<include/>
 	</div>
 	</div>
+	<window id="searchBox" use="com.soffid.iam.web.main.SearchBoxWindow">
+		<datamodel id="model" class="com.soffid.iam.web.main.SmartSearchNode"/>
+		<timer id="timer" running="false" repeats="true" delay="500" />	
+		<datatable id="table" footer="false" dataPath="/appWindow/searchBox/model:/data" />
+	</window>
 </window>

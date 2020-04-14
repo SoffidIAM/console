@@ -50,19 +50,25 @@
 			app.getFellow("appWindow").getFellow("fullNameLabel").setValue ( principal.getFullName () + " ("+ principal.getName() + ")" );
 		} catch (ComponentNotFoundException e) {
 		}
-			
+
 	</attribute>
-	
+	<zscript>
+		String initialPage = "main/menu.zul";
+		String target = execution.getNativeRequest().getAttribute("$soffid$target");
+		session.removeAttribute("$soffid$target");
+		if (target != null) initialPage = target;
+	</zscript>
 	<style src="/css/localSEU.css"/>
 	<style src="/css/devices.css"/>
 	<application id="app" allowOpenMultipleTabs="true" autoReload="false" favorits="//favorits/favorits"
 	    template="main/application.zul" 
-		initialPage="main/menu.zul"
-		style="overflow: visible" embed="true" 
+		initialPage="${initialPage}"
+		style="overflow: visible; margin-top: 40px;" embed="true" 
 		logoutPage="/prelogout" mainWindowTitle="Soffid IAM" showFavorites="false" width="100%">
 		<div id="fail-safe-mode" visible="false" style="zindex: 1; position:fixed; top: 3em; right: 10px; ">
 			<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>
 		</div>
 	</application>
 	<image src="img/wait.gif" style="display:none;visibility:hidden;"/>		
+	
 </div> 

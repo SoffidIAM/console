@@ -11,11 +11,13 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.ScheduledTaskService;
 import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
@@ -25,6 +27,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ObjectMappingTrigger;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.Server;
@@ -34,6 +37,7 @@ import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 import roles.agent_create;
+import roles.agent_query;
 import roles.agent_queryObjects;
 import roles.agent_update;
 
@@ -49,7 +53,8 @@ import roles.agent_update;
 		es.caib.seycon.ng.model.ObjectMappingEntity.class, AccountEntity.class, DominiUsuariEntity.class,
 		AccountMetadataEntity.class, AccountAttributeEntity.class, ScheduledTaskService.class,
 		ObjectMappingTriggerEntity.class, es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
-		SeyconServerService.class, AutoritzacioService.class, TenantEntity.class, ReconcileTriggerEntity.class })
+		SeyconServerService.class, AutoritzacioService.class, TenantEntity.class, ReconcileTriggerEntity.class,
+		AsyncRunnerService.class})
 public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_create.class }, translated = "create")
@@ -434,6 +439,11 @@ public abstract class DispatcherService {
 		return null;
 	}
 
+	@Operation(grantees = { agent_query.class })
+	@Description("Tests system connectivity")
+	public void checkConnectivity(String dispatcher) throws InternalErrorException {
+	}
+
 	@Operation(grantees = { roles.agent_update.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void delete(@Nullable ReconcileTrigger rp) throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -462,4 +472,21 @@ public abstract class DispatcherService {
 	String createRemoteServer (String name, String tenant) {
 		return null;
 	}
+	
+
+	@Operation(grantees = { roles.agent_query.class })
+	public java.util.Collection<Dispatcher> findSystemByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.agent_query.class })
+	public AsyncList<Dispatcher> findSystemByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
+		return null;
+	}
+
 }

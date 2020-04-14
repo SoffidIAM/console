@@ -7,6 +7,10 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.model.XarxaEntity;
+
+@JsonObject (hibernateClass=XarxaEntity.class)
 @ValueObject ( translatedName="Network",
 	 translatedPackage="com.soffid.iam.api")
 public class Xarxa {

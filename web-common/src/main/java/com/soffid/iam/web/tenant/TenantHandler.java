@@ -22,6 +22,7 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.XPathUtils;
@@ -42,14 +43,6 @@ public class TenantHandler extends FrameHandler {
 		canUpdateTenant = isMaster && Security.isUserInRole("tenant:update");
 		canDeleteTenant = isMaster && Security.isUserInRole("tenant:delete");
 		canQueryTenant = isMaster && Security.isUserInRole("tenant:query");;
-		
-		try
-		{
-			es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
-				.Labels.getLabel("seu.tenants"));
-		}
-		catch (Exception ex){}
-
 	}
 
 	@Override
@@ -63,9 +56,7 @@ public class TenantHandler extends FrameHandler {
 	}
 		
 	public void export() throws InternalErrorException, NamingException, CreateException, IOException {
-		es.caib.zkib.datasource.DataSource ds = getForm().getDataSource();
-		es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();
-		Tenant tenant = (Tenant) ((DataNode) ctx.getValue("/")).getInstance();
+		Tenant tenant = (Tenant) ((DataNode) XPathUtils.getValue(getForm(), "/")).getInstance();
 		java.io.File f = java.io.File.createTempFile("tenant", "dump");
 		java.io.OutputStream out = new java.io.FileOutputStream(f);
 
@@ -104,37 +95,36 @@ public class TenantHandler extends FrameHandler {
 		DataNode node = (DataNode) getModel().getValue(path);
 
 		node.setDirty(false);
-		DataTable lb = getListbox();
+		DataTable lb = (DataTable) getListbox();
 		lb.setSelectedIndex(lb.getModel().getSize() - 1);
 	}
 
-	public void onChangeDades() {
-		Textbox tb = (Textbox) getForm().getFellow("form_name");
+	public void onChangeForm() {
+		Textbox tb = (Textbox) getFellow("form_name");
 		try {
-			es.caib.zkib.datasource.DataSource ds = getForm().getDataSource();
-			es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();
-			DataNode registre = (DataNode) ctx.getValue("/");
+			BindContext ctx = getForm();
+			DataNode registre = (DataNode)  XPathUtils.getValue(getForm(),"/");
 			tb.setDisabled(!registre.isNew());
-			Collection<DataNode> permissions = (Collection<DataNode>) es.caib.zkib.datasource.XPathUtils.getValue(ds, "/permissions");
+			Collection<DataNode> permissions = (Collection<DataNode>) XPathUtils.getValue(ctx, "/permissions");
 			if (registre.isNew() && permissions.isEmpty()) 
 			{
-				es.caib.zkib.datasource.XPathUtils.setValue(ds,
-						es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions") + "/newValue",
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx,
+						es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/permissions") + "/newValue",
 						"seu:tenant:show");
-				es.caib.zkib.datasource.XPathUtils.setValue(ds,
-						es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions") + "/newValue",
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx,
+						es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/permissions") + "/newValue",
 						"tenant:query");
-				es.caib.zkib.datasource.XPathUtils.setValue(ds,
-						es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions") + "/newValue",
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx,
+						es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/permissions") + "/newValue",
 						"tenant:create");
-				es.caib.zkib.datasource.XPathUtils.setValue(ds,
-						es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions") + "/newValue",
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx,
+						es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/permissions") + "/newValue",
 						"tenant:update");
-				es.caib.zkib.datasource.XPathUtils.setValue(ds,
-						es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions") + "/newValue",
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx,
+						es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/permissions") + "/newValue",
 						"tenant:delete");
-				es.caib.zkib.datasource.XPathUtils.setValue(ds,
-						es.caib.zkib.datasource.XPathUtils.createPath(ds, "/permissions") + "/newValue",
+				es.caib.zkib.datasource.XPathUtils.setValue(ctx,
+						es.caib.zkib.datasource.XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath()+"/permissions") + "/newValue",
 						"tenant:switch");
 			}
 		} catch (Exception e) {
@@ -152,10 +142,9 @@ public class TenantHandler extends FrameHandler {
 		String name = (String) XPathUtils.getValue((Component) getForm(), "name");
 		if (name != null) {
 			LinkedList<String> effectiveRoles = new LinkedList();
-			es.caib.zkib.binder.BindContext ctx = es.caib.zkib.datasource.XPathUtils.getComponentContext(getForm());
 			for (String role : Security.getAuthorizations()) {
 				boolean forbidden = false;
-				for (Iterator<String> it = (Iterator<String>) ctx.getDataSource().getJXPathContext().iterate("/permissions/newValue");
+				for (Iterator<String> it = (Iterator<String>) getForm().getDataSource().getJXPathContext().iterate("/permissions/newValue");
 						it.hasNext();)
 				{
 					String tp = it.next();
@@ -196,5 +185,5 @@ public class TenantHandler extends FrameHandler {
 		es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(ev.getTarget());
 		es.caib.zkib.datasource.XPathUtils.removePath(bindCtx.getDataSource(), bindCtx.getXPath());
 	}
-	
+
 }

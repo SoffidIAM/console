@@ -8,8 +8,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
@@ -21,10 +23,15 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.zkiblaf.Application;
 
 
-public class MainMenu extends Div implements AfterCompose {
+public class MainMenu extends FrameHandler implements AfterCompose {
+	public MainMenu() throws InternalErrorException {
+		super();
+	}
+
 	String menu;
 	LinkedList<MenuOption> stack = new LinkedList<>();
 	private List<MenuOption> options;
@@ -48,6 +55,7 @@ public class MainMenu extends Div implements AfterCompose {
 		navigator = (Div) getFirstChild();
 		optionsDiv = (Div) getLastChild();
 		loadMenus();
+		super.afterCompose();
 	}
 
 	
@@ -58,7 +66,7 @@ public class MainMenu extends Div implements AfterCompose {
 			{
 				if (option.getLabel().equals(optionName))
 				{
-					stack.push(option);
+					stack.add(option);
 					currentOptions = option.getOptions();
 					return true;
 				}
@@ -151,18 +159,26 @@ public class MainMenu extends Div implements AfterCompose {
 
 	public void onNavigate (Event event) {
 		MenuOption s = (MenuOption) event.getTarget().getAttribute("menuOption");
-		do {
-			MenuOption o = stack.getLast();
-			if ( s == o ) break;
+		if (event instanceof MouseEvent &&
+				((MouseEvent) event).getKeys() == MouseEvent.CTRL_KEY ) {
+			if ( s == null)
+				Executions.getCurrent().sendRedirect("/main/menu.zul", "_blank");
+			else
+				Executions.getCurrent().sendRedirect("/main/menu.zul?option="+s.getLabel(), "_blank");
+		} else {
 			stack.removeLast();
-		} while ( ! stack.isEmpty());
-
-		if (stack.isEmpty())
-			currentOptions = options;
-		else
-			currentOptions = stack.getLast().getOptions();
-		
-		loadMenus();
+			while ( ! stack.isEmpty()) {
+				MenuOption o = stack.getLast();
+				if ( s != null &&   s.getLabel().equals(o.getLabel()) ) break;
+				stack.removeLast();
+			} 
+			if (stack.isEmpty())
+				currentOptions = options;
+			else 
+				currentOptions = stack.getLast().getOptions();
+			
+			loadMenus();
+		}
 	}
 	
 	private void addNavigatorItem(MenuOption menuOption, String optionName, boolean hasNext) {

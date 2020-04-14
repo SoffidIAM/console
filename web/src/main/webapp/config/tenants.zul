@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?page id="tenants" title="${c:l('seu.tenants')}"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
-<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="parametres" ?>
 <?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
@@ -25,12 +24,12 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" onClick="ref:frame.importTenant"/>
-					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
+					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateTenant}" onClick="ref:frame.importTenant"/>
+					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateTenant}"  onClick="ref:frame.addNew"/>
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/tenant"
-				sortColumn="0" maxheight="400%" onSelect="ref:frame.showDetails">
+				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
 					<![CDATA[
 		- name: ${c:l('tenant.zul.name')}
@@ -43,7 +42,7 @@
 					]]>
 				</attribute>
 			</datatable>
-			<div width="100%" style="text-align: right">
+			<div width="100%" style="text-align: right"  if="${canCreateTenant}" >
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -60,7 +59,7 @@
 					</menu2>
 					
 				</div>
-				<form id="form" onChangeXPath="ref:frame.onChangeDades"
+				<form id="form" onChangeXPath="ref:frame.onChangeForm()"
 					dataPath="/listbox:/." width="100%">
 						<grid sclass="noBorderGrid">
 							<rows>
@@ -148,11 +147,11 @@
 						
 					</form>
 				</div>
-				<div style="text-align: right; width: 100%">
-					<databutton image="~./img/undo.svg" label="Undo" datamodel="/model" onClick="ref:frame.undo">
-					</databutton>
-					<databutton image="~./img/save.svg" label="Apply changes" datamodel="/model" onClick="ref:frame.apply"/>
-				</div>
+					<div style="text-align: right; width: 100%">
+						<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+						</databutton>
+						<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+					</div>
 		</div>
 	</div>
 </frame>

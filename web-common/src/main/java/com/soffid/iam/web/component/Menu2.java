@@ -12,6 +12,9 @@ public class Menu2 extends Div {
 		if (image == null)
 			return null;
 
+		if ( getChildren().isEmpty() )
+			return "";
+		
 		final StringBuffer sb = new StringBuffer(64)
 			.append("<img src=\"")
 			.append(getDesktop().getExecution().encodeURL(image))

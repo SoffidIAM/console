@@ -5,13 +5,17 @@
 //
 
 package es.caib.seycon.ng.servei;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Xarxa;
 import roles.Tothom;
 
@@ -32,7 +36,8 @@ import roles.Tothom;
 	es.caib.seycon.ng.model.OsTypeEntity.class,
 	es.caib.seycon.ng.servei.ImpressoraService.class,
 	es.caib.seycon.ng.model.XarxaEntity.class,
-	es.caib.seycon.ng.model.XarxaACEntity.class})
+	es.caib.seycon.ng.model.XarxaACEntity.class, 
+	AsyncRunnerService.class})
 public abstract class XarxaService {
 
 	@Operation ( grantees={roles.host_all_query.class},
@@ -578,4 +583,34 @@ public abstract class XarxaService {
 	@Operation
 	public Xarxa findNetworkByIpAddress(String ipAdress) {return null;}
 
+	@Operation(grantees = { roles.host_all_query.class })
+	public java.util.Collection<Maquina> findHostByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.host_all_query.class })
+	public AsyncList<Maquina> findHostByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
+		return null;
+	}
+
+
+	@Operation(grantees = { roles.network_all_query.class })
+	public java.util.Collection<Xarxa> findNetworkByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.network_all_query.class })
+	public AsyncList<Xarxa> findNetworkByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
+		return null;
+	}
 }

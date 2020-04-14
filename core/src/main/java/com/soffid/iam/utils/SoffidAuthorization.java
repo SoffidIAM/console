@@ -9,13 +9,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class SoffidAuthorization {
-	String codi;
-	String descripcio;
-	String tipusDomini; //opcional [SENSE_DOMINI per defecte]
+	String name;
+	String description;
+	String type; //opcional [SENSE_DOMINI per defecte]
 	String scope; //opcional
 	String ambit; //opcional
-	HashSet<String> autoritzacionsHereta = new HashSet();
-	String hereta; //opcional [com al xml]
+	HashSet<String> inherits = new HashSet();
+	String inherited; //opcional [com al xml]
 	
 	private static Log log = LogFactory.getLog(SoffidAuthorization.class);
 	
@@ -38,18 +38,18 @@ public class SoffidAuthorization {
 			String autosHereta = getAtributXML(nodeAnalitzar, "hereta"); //$NON-NLS-1$
 			String ambit = getAtributXML(nodeAnalitzar, "ambit"); //$NON-NLS-1$
 			
-			this.codi = codiAutoritzacio;
-			this.descripcio = descripcio;
-			this.tipusDomini = tipusDomini;
+			this.name = codiAutoritzacio;
+			this.description = descripcio;
+			this.type = tipusDomini;
 			this.scope = scope;
 			this.ambit = ambit;
-			this.hereta = autosHereta;
+			this.inherited = autosHereta;
 			if (autosHereta!=null && !"".equals(autosHereta)) { //$NON-NLS-1$
 				String [] autos_hereta = autosHereta.split(","); //$NON-NLS-1$
 				if (autos_hereta !=null) {
 					for (int i=0; i < autos_hereta.length; i++) {
 						String auto = autos_hereta[i];
-						if (auto!=null) autoritzacionsHereta.add(auto.trim());
+						if (auto!=null) inherits.add(auto.trim());
 					}
 				}
 			}
@@ -67,16 +67,16 @@ public class SoffidAuthorization {
 	 * @param autosHereta
 	 */
 	public SoffidAuthorization(String codi, String descripcio, String tipusDomini, String scope, String autosHereta) {
-		this.codi = codi;
-		this.descripcio = descripcio;
-		this.tipusDomini = tipusDomini;
+		this.name = codi;
+		this.description = descripcio;
+		this.type = tipusDomini;
 		this.scope = scope;
 		if (autosHereta!=null && !"".equals(autosHereta)) { //$NON-NLS-1$
 			String [] autos_hereta = autosHereta.split(","); //$NON-NLS-1$
 			if (autos_hereta !=null) {
 				for (int i=0; i < autos_hereta.length; i++) {
 					String auto = autos_hereta[i];
-					if (auto!=null) autoritzacionsHereta.add(auto.trim());
+					if (auto!=null) inherits.add(auto.trim());
 				}
 			}
 		}
@@ -103,27 +103,27 @@ public class SoffidAuthorization {
 	}	
 
 	public String getCodi() {
-		return codi;
+		return name;
 	}
 
 	public void setCodi(String codi) {
-		this.codi = codi;
+		this.name = codi;
 	}
 
 	public String getDescripcio() {
-		return descripcio;
+		return description;
 	}
 
 	public void setDescripcio(String descripcio) {
-		this.descripcio = descripcio;
+		this.description = descripcio;
 	}
 
 	public String getTipusDomini() {
-		return tipusDomini;
+		return type;
 	}
 
 	public void setTipusDomini(String tipusDomini) {
-		this.tipusDomini = tipusDomini;
+		this.type = tipusDomini;
 	}
 
 	public String getScope() {
@@ -135,11 +135,11 @@ public class SoffidAuthorization {
 	}
 
 	public HashSet<String> getAutoritzacionsHereta() {
-		return autoritzacionsHereta;
+		return inherits;
 	}
 
 	public void setAutoritzacionsHereta(HashSet<String> hereta) {
-		this.autoritzacionsHereta = hereta;
+		this.inherits = hereta;
 	}
 
 	public String getAmbit() {
@@ -153,12 +153,62 @@ public class SoffidAuthorization {
 
 
 	public String getHereta() {
-		return hereta;
+		return inherited;
 	}
 
 
 	public void setHereta(String hereta) {
-		this.hereta = hereta;
+		this.inherited = hereta;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+
+	public String getType() {
+		return type;
+	}
+
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
+	public HashSet<String> getInherits() {
+		return inherits;
+	}
+
+
+	public void setInherits(HashSet<String> inherits) {
+		this.inherits = inherits;
+	}
+
+
+	public String getInherited() {
+		return inherited;
+	}
+
+
+	public void setInherited(String inherited) {
+		this.inherited = inherited;
 	}
 	
 	

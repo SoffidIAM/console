@@ -111,5 +111,50 @@
 		<component-class>com.soffid.iam.web.users.additionalData.CustomField</component-class>
 	</component>
 
+
+	<component>
+		<component-name>menu3</component-name>
+		<component-class>com.soffid.iam.web.component.Menu3</component-class>
+		<mold>
+			<mold-name>default</mold-name>
+			<mold-uri>~./zul/html/menu3.dsp</mold-uri>
+		</mold>
+	</component>	
+
+
+	<component>
+		<component-name>tree-collapse</component-name>
+		<component-class>com.soffid.iam.web.component.TreeCollapse</component-class>
+	</component>	
+
+	<component>
+		<component-name>grid</component-name>
+		<extends>grid</extends>
+		<mold>
+			<mold-name>table</mold-name>
+			<mold-uri>~./zul/html/grid-table.dsp</mold-uri>
+		</mold>
+	</component>	
+
+	<component>
+		<component-name>column</component-name>
+		<component-class>com.soffid.iam.web.component.Column</component-class>
+		<extends>column</extends>
+		<mold>
+			<mold-name>table</mold-name>
+			<mold-uri>~./zul/html/column-table.dsp</mold-uri>
+		</mold>
+	</component>	
+
+	<component>
+		<component-name>columns</component-name>
+		<component-class>com.soffid.iam.web.component.Columns</component-class>
+		<extends>columns</extends>
+		<mold>
+			<mold-name>table</mold-name>
+			<mold-uri>~./zul/html/columns-table.dsp</mold-uri>
+		</mold>
+	</component>	
+
 </language-addon>
 

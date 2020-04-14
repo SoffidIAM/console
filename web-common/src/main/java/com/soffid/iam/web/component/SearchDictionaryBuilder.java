@@ -23,6 +23,8 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.Server;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 
@@ -47,6 +49,17 @@ public class SearchDictionaryBuilder {
 		 add("com.soffid.iam.api.Group.driveServerName");
 		 add("com.soffid.iam.api.Group.section");
 		 add("com.soffid.iam.api.CustomObject.type");
+		 add("com.soffid.iam.api.System.param0");
+		 add("com.soffid.iam.api.System.param1");
+		 add("com.soffid.iam.api.System.param2");
+		 add("com.soffid.iam.api.System.param3");
+		 add("com.soffid.iam.api.System.param4");
+		 add("com.soffid.iam.api.System.param5");
+		 add("com.soffid.iam.api.System.param6");
+		 add("com.soffid.iam.api.System.param7");
+		 add("com.soffid.iam.api.System.param8");
+		 add("com.soffid.iam.api.System.param9");
+		 add("com.soffid.iam.api.System.blobParam");
 	}};
 	private static Map<String, SearchDictionary> map = new HashMap<String, SearchDictionary>();
 
@@ -72,6 +85,8 @@ public class SearchDictionaryBuilder {
 			}
 			map.put(clazz, sd);
 		}
+		
+		// Add tenant dependent attributes
 		if (clazz.equals("com.soffid.iam.api.User")) {
 			sd = addUserAttributes (sd, MetadataScope.USER);
 		} else if (clazz.equals("com.soffid.iam.api.Role")) {
@@ -82,6 +97,8 @@ public class SearchDictionaryBuilder {
 			sd = addAttributes (sd, MetadataScope.GROUP);
 		} else if (clazz.equals("com.soffid.iam.api.Account")) {
 			sd = addAccountAttributes (sd);
+		} else if (clazz.equals("com.soffid.iam.api.System")) {
+			sd = addSystemAttributes (sd);
 		}
 		if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
 			sd = addCustomAttributes (sd, MetadataScope.CUSTOM, clazz.substring(COM_SOFFID_IAM_API_CUSTOM_OBJECT.length()));
@@ -402,4 +419,53 @@ public class SearchDictionaryBuilder {
 		}
 		return sd2;
 	}
+	
+	private static SearchDictionary addSystemAttributes(SearchDictionary sd1) throws InternalErrorException, NamingException, CreateException {
+		SearchDictionary sd2 = new SearchDictionary(sd1);
+		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
+		// Replace system attribute
+		try {
+			for ( SearchAttributeDefinition sad: sd2.getAttributes())
+			{
+				if (sad.getName().equals("url") || sad.getName().equals("url2"))
+				{
+					sd2.getAttributes().remove(sad);
+					addServerURL(sad.getName(), sd2);
+				}
+			}
+		} catch (Exception e) {
+			// Cannot retrieve accounts list
+		}
+		return sd2;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void addServerURL(String name, SearchDictionary sd) throws InternalErrorException, NamingException, CreateException {
+		SearchAttributeDefinition sad = new SearchAttributeDefinition();
+		sad.setLabelName("com.soffid.iam.api.System.url");
+		sad.setType(TypeEnumeration.STRING_TYPE);
+		sad.setName(name);
+		sad.setJavaType(String.class);
+		LinkedList<String> listLabels = new LinkedList<String>();
+		LinkedList<String> valueLabels = new LinkedList<String>();
+		Security.nestedLogin(Security.ALL_PERMISSIONS);
+		try {
+			listLabels.add (org.zkoss.util.resource.Labels.getLabel("agents.disabledAgent"));
+			valueLabels.add(null);
+			listLabels.add (org.zkoss.util.resource.Labels.getLabel("agents.local"));
+			valueLabels.add("local");
+			
+			for (Server server: EJBLocator.getDispatcherService().findAllServers()) {
+				listLabels.add(server.getName());
+				valueLabels.add(server.getUrl());
+			}
+		} finally {
+			Security.nestedLogoff();
+		}
+		sad.setLabels(listLabels);
+		sad.setValues(AccountType.literals());
+		sd.getAttributes().add(sad);
+	}
+
+
 }

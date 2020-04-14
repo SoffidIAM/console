@@ -17,6 +17,7 @@ public class TypeEnumeration {
 	public String roleType = "R";
 	public String applicationType = "A";
 	public String hostType = "1";
+	public String networkType = "N";
 	public String userTypeType = "T";
 	public String customObjectType = "C";
 	public String mailDomainType = "M";

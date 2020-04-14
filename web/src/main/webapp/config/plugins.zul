@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Plugins"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="plugins" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" 
+	use="com.soffid.iam.web.plugin.PluginHandler" >
+
+	<script>
+	function renderName(td, col, value)
+	{
+		td.appendChild( document.createTextNode (value.name));
+		if (!value.enabled)
+		{
+			td.style.color = "#808080";
+			td.style.textDecoration = "line-through";
+		}
+	}
+
+	function renderVersion(td, col, value)
+	{
+		td.appendChild( document.createTextNode (value.version));
+		if (!value.enabled)
+		{
+			td.style.color = "#808080";
+			td.style.textDecoration = "line-through";
+		}
+	}
+	</script>
+
+	<datamodel id="model" rootNode="serverPlugins" src="descriptorPlugins.xml"/>
+	
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="~./img/restart.svg" if="${canUpdatePlugins}" label="${c:l('plugins.zul.RestartServer') }" onClick="ref:frame.restartConsole"/>
+					<menu2item image="~./img/add.svg"  if="${canUpdatePlugins}"  label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/serverPlugin"
+				sortColumn="0" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+- name: ${c:l('plugins.zul.Plugin')}
+  render: renderName
+- name: ${c:l('deploy.lblVersion')}
+  render: renderVersion
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right" if="${canUpdatePlugins}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+	
+		<div sclass="card__face card__face--back">
+			<div id="dades">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+					<pager datatable="listbox"/>
+					
+					<menu2>
+						<menu2item if="${canUpdatePlugins}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					</menu2>
+					
+					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				</div>
+				<form id="form" onChangeXPath="ref:frame.onChangeForm"
+					dataPath="/listbox:/." width="100%">
+						<grid sclass="noBorderGrid">
+							<columns>
+								<column width="150px"/>
+								<column/>
+							</columns>
+							<rows>
+								<row>
+									<label value="${c:l('tenant.zul.name')} :"/>
+									
+									<textbox bind="@name" id="form_name" readonly="true" width="100%"/>
+								</row>
+								
+								<row>
+									<label value="${c:l('tenant.zul.description')} :"/>
+									<textbox  readonly="true" bind="@description" width="100%"/>
+								</row>
+								
+								<row>
+									<label value="${c:l('tenant.zul.enabled')} :"/>
+									
+									<switch bind="@enabled" 
+											disabled="${!canUpdatePlugins}"/>
+								</row>
+								
+								<row>
+									<label value="${c:l('plugins.zul.component') } :"></label>
+									<datatree2 dataPath="/listbox:/" 
+										width="100%" 
+										header="${c:l('plugins.zul.component') }" 
+										openLevels="10"
+										enablefilter="false">
+										<attribute name="finders">
+										<![CDATA[
+- path: /module
+  value: description
+- path: /agent
+  value: description
+  leaf: true
+										]]>
+										</attribute>
+									</datatree2>
+								</row>
+							</rows>
+						</grid>
+						
+					</form>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<databutton image="~./img/undo.svg" label="Undo" datamodel="/model" onClick="ref:frame.undo">
+					</databutton>
+					<databutton image="~./img/save.svg" label="Apply changes" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+		</div>		
+	</div>
+	<window id="popupRefreshPage" visible="false" position="center">
+		<vbox pack="center" align="center" style="border: #bdd3ea 2px solid;
+			padding:20px 40px; display:inline-block; padding: 5px 5px 20px 5px;">
+			<label id="popupRefresh" style="font-family: Arial; font-size: 13px;"
+				value="${c:l('plugins.zul.RestartServerMsg')}"/>
+			<image src="/img/waitpacman.gif"/>
+			
+		<h:input type="button" value="${c:l('plugins.zul.Reload')}"
+			onClick="location.reload()" />
+		</vbox>
+	</window>
+</frame>

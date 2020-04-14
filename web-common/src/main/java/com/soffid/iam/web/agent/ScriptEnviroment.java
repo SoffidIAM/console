@@ -14,14 +14,13 @@ import org.zkoss.zul.Grid;
 
 import bsh.Primitive;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.SoffidObjectType;
 
-import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.SoffidObjectType;
-import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.remote.RemoteServiceLocator;
@@ -321,12 +320,12 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 				
-		DataSource lb = (DataSource) Path.getComponent(c.getPage(), "/esquema/lista/listbox");
+		DataSource lb = (DataSource) Path.getComponent(c.getPage(), "listbox");
 		JXPathContext ctx = lb.getJXPathContext();
 		for (Iterator<Pointer> it = ctx.iteratePointers("/metadata"); it.hasNext(); )
 		{
 			Pointer p = it.next();
-			String name = (String) ctx.getValue(p.asPath()+"/@codi");
+			String name = (String) ctx.getValue(p.asPath()+"/@code");
 			TypeEnumeration t = (TypeEnumeration) ctx.getValue(p.asPath()+"/@type");
 			if ( sb.length() > 0)
 				sb.append(",");
@@ -348,11 +347,11 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		for (TipusDada td: EJBLocator.getDadesAddicionalsService().getTipusDades())
+		for (DataType td: EJBLocator.getAdditionalDataService().getDataTypes())
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -371,11 +370,11 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypes(MetadataScope.ROLE))
+		for (DataType td: EJBLocator.getAdditionalDataService().findDataTypes(MetadataScope.ROLE))
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -394,11 +393,11 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypes(MetadataScope.APPLICATION))
+		for (DataType td: EJBLocator.getAdditionalDataService().findDataTypes(MetadataScope.APPLICATION))
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -417,18 +416,18 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		for (CustomObjectType ot: EJBLocator.getDadesAddicionalsService().findCustomObjectTypeByJsonQuery(null))
+		for (CustomObjectType ot: EJBLocator.getAdditionalDataService().findCustomObjectTypeByJsonQuery(null))
 		{
 			sb.append("CodeMirrorJavaTypes[\"customAttributes")
 				.append(ot.getName())
 				.append("\"]={");
 			boolean first = true;
-			for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypesByObjectTypeAndName(ot.getName(), null))
+			for (DataType td: EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName(ot.getName(), null))
 			{
 				if ( !first )
 					sb.append(",");
 				first = false;
-				sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+				sb.append("'{\"").append(td.getCode()).append("\"}':\"");
 				TypeEnumeration t = td.getType();
 				if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 					sb.append("byte");
@@ -450,11 +449,11 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 		
-		for (TipusDada td: EJBLocator.getDadesAddicionalsService().findDataTypes(MetadataScope.GROUP))
+		for (DataType td: EJBLocator.getAdditionalDataService().findDataTypes(MetadataScope.GROUP))
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCodi()).append("\"}':\"");
+			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");

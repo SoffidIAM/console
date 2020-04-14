@@ -17,6 +17,14 @@
 	</datanode>
 	
 	<datanode name="serverPlugin">
+		<ejb-handler jndi="java:comp/env/ejb/ServerPluginEJB">
+			<delete-method method="deletePlugin">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="updatePlugin">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
 		<custom-attribute name="description">
 			<depends>@name</depends>
 			<depends>@version</depends>

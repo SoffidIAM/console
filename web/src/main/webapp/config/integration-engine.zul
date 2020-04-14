@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml"
+	use="com.soffid.iam.web.config.IntegrationEngineHandler"> 
+
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+	</div>
+
+	<grid sclass="noBorderGrid">
+		<rows>
+			<row>
+				<label value="${c:l('parametres.zul.taskMode')}"/>
+				<listbox mold="select" id="taskMode">
+					<listitem value="readonly" label="${c:l('parametres.zul.mode.readonly') }"></listitem>
+					<listitem value="manual" label="${c:l('parametres.zul.mode.manual') }"></listitem>
+					<listitem value="auto" label="${c:l('parametres.zul.mode.auto') }"></listitem>
+				</listbox>
+			</row>
+			<row>
+				<label value="${c:l('parametres.zul.limit')}"/>
+				<div width="100%">
+					<intbox id="taskLimit"/>
+					<label value="${c:l('parametres.zul.limit2')}"/>
+				</div>
+			</row>
+			<row>
+				<label/>
+				<div style="margin-top: 2em">
+					<button label="${c:l('rolsllista.zul.Cancel·la') }" onClick="ref:frame.refreshTaskEngine"/>
+					<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.updateTaskEngine"
+						style="text-align:right"/>
+				</div>
+			</row>
+		</rows>
+	</grid>
+
+</frame>

@@ -17,12 +17,13 @@ import org.xml.sax.SAXException;
 import org.zkoss.util.media.Media;
 
 import es.caib.seycon.ng.comu.AttributeDirection;
-import es.caib.seycon.ng.comu.AttributeMapping;
-import es.caib.seycon.ng.comu.ObjectMapping;
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
-import es.caib.seycon.ng.comu.ObjectMappingTrigger;
 import es.caib.seycon.ng.comu.SoffidObjectTrigger;
-import es.caib.seycon.ng.comu.SoffidObjectType;
+
+import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.ObjectMapping;
+import com.soffid.iam.api.ObjectMappingProperty;
+import com.soffid.iam.api.ObjectMappingTrigger;
+import com.soffid.iam.api.SoffidObjectType;
 import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;

@@ -1604,11 +1604,11 @@ tr.grid td.gc {
 }
 
 
-.text, .textbox, .textbox2, .textbox2m { 
+.text, .textbox, .textbox2m, .textbox2 { 
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text {
+input.textbox, input.textbox2m, input.textbox2, input.dateboxinp, input.text {
 	box-sizing: border-box;
 	padding: 2px;
 	border: none;

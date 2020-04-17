@@ -115,19 +115,21 @@ public class HTTPStrategy implements CommunicationStrategy
 
 	private void put(File archivoSalida, String urlPath) throws IOException {
 		URL url = new URL(urlPath);
+		log.info("Putting "+urlPath);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		String auth = user+":"+password;
 		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBytes(auth.getBytes("UTF-8")));
-		conn.setDoInput(false);
 		conn.setDoOutput(true);
 		conn.setRequestMethod("PUT");
-		conn.connect();
 		OutputStream out = conn.getOutputStream();
+		log.info("Source file "+archivoSalida+" size "+archivoSalida.length());
 		FileInputStream in = new FileInputStream(archivoSalida);
 		for (int read = in.read(); read >= 0; read = in.read())
 			out.write(read);
 		in.close();
 		out.close();
+		conn.getInputStream().close();
+		log.info("End putting "+urlPath);
 	}
 
 	private void delete(String urlPath) throws IOException {

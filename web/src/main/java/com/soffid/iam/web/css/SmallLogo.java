@@ -1,5 +1,6 @@
 package com.soffid.iam.web.css;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,17 +13,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
-@WebServlet(name="custom.logo", urlPatterns="/anonymous/logo.png")
-public class CustomLogo extends HttpServlet {
+@WebServlet(name="small.logo", urlPatterns="/anonymous/small-logo.png")
+public class SmallLogo extends HttpServlet {
 	byte[] getOriginalImage () throws IOException {
-		InputStream in = getServletContext().getResourceAsStream("/anonymous/logo.png");
+		InputStream in = getServletContext().getResourceAsStream("/img/pixel.png");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		for (int i = in.read(); i >= 0; i = in.read())
 		{
@@ -38,7 +38,7 @@ public class CustomLogo extends HttpServlet {
 		
 		byte[] img;
 		try {
-			img = ServiceLocator.instance().getConfigurationService().getBlob("logo");
+			img = ServiceLocator.instance().getConfigurationService().getBlob("logo2");
 			if (img == null)
 			{
 				img = getOriginalImage();

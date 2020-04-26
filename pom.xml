@@ -459,10 +459,8 @@
    			<module>common</module>
    			<module>core</module>
    			<module>tomee</module>
-   			<module>web-common</module>
    			<module>weblogout</module>
    			<module>web</module>
-   			<module>selfservice</module>
    			<module>webservice</module>
    			<module>upload-components</module>
    			<module>ear</module>
@@ -480,11 +478,9 @@
     		<module>common</module>
     		<module>tomee</module>
     		<module>core</module>
-   			<module>web-common</module>
     		<module>bpm-sar</module>
     		<module>weblogout</module>
     		<module>web</module>
-    		<module>selfservice</module>
     		<module>webservice</module>
     		<module>upload-components</module>
     		<module>ear</module>

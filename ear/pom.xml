@@ -60,12 +60,6 @@
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>selfservice</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-		</dependency>
 	</dependencies>
 	<build>
 		<resources>

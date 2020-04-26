@@ -5,7 +5,6 @@ import java.util.Locale;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
-import org.apache.catalina.realm.GenericPrincipal;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 

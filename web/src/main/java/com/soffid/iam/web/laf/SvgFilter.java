@@ -1,4 +1,4 @@
-package com.soffiid.iam.web.laf;
+package com.soffid.iam.web.laf;
 
 import java.awt.Color;
 import java.io.IOException;

@@ -15,11 +15,12 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.UploadEvent;
-import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.api.Tenant;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.common.FileUpload2;
 import com.soffid.iam.web.component.FrameHandler;
@@ -29,7 +30,6 @@ import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.XPathUtils;
-import es.caib.zkib.zkiblaf.Application;
 
 public class TenantHandler extends FrameHandler {
 	private boolean isMaster;
@@ -167,7 +167,7 @@ public class TenantHandler extends FrameHandler {
 					effectiveRoles.add(role);
 			}
 
-			com.soffid.iam.common.security.SoffidPrincipal p = new com.soffid.iam.security.SoffidPrincipalImpl(
+			SoffidPrincipal p = new SoffidPrincipalImpl(
 					name + "\\" + Security.getCurrentAccount(), effectiveRoles, Security.getSoffidPrincipal());
 			
 			Executions

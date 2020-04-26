@@ -274,10 +274,8 @@
 									<div>
 										<textbox onChange="" bind="@systemObject" width ="15%" />
 										<label value="based on" width="10%"></label>
-										<listbox use="com.soffid.iam.web.agent.CustomTypeListbox"
-											bind="." 
-											mold="select" 
-											width="15%"/>
+										<select bind="."
+											use="com.soffid.iam.web.agent.CustomObjectTypeSelect"/>
 									</div>
 	
 										

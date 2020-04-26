@@ -9,7 +9,8 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 
-import es.caib.seycon.ng.comu.TypeEnumeration;
+import com.soffid.iam.api.SoffidObjectType;
+
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.component.Select;
 import es.caib.zkib.datamodel.DataNode;
@@ -17,7 +18,7 @@ import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathSubscriber;
 
-public class CustomDataTypeSelect extends Select implements XPathSubscriber {
+public class CustomObjectTypeSelect extends Select implements XPathSubscriber {
 	boolean accountMetadata = false;
 
 	private static final long serialVersionUID = 7972552691186027886L;
@@ -34,26 +35,25 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 	}
 
     protected void clientSelect(String value ) {
-    	String prefix = TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue()+":";
-    	TypeEnumeration type;
+    	String prefix = SoffidObjectType.OBJECT_CUSTOM.getValue()+":";
+    	SoffidObjectType type;
     	String customObjectType;
 		if (value.startsWith( prefix))
     	{
-			type = TypeEnumeration.CUSTOM_OBJECT_TYPE;
+			type = SoffidObjectType.OBJECT_CUSTOM;
     		customObjectType = value.substring( prefix.length() );
     	} else {
-    		type = TypeEnumeration.fromString(value);
+    		type = SoffidObjectType.fromString(value);
     		customObjectType = null;
     	}
 		DataSource ds = valueBinder.getDataSource();
 		String path = valueBinder.getXPath();
 		if (!path.endsWith("/"))
 			path = path + "/";
-		ds.getJXPathContext().setValue(path+"@type", 
+		ds.getJXPathContext().setValue(path+"/@soffidObject", 
 				type);
-		ds.getJXPathContext().setValue(path+"@dataObjectType", 
+		ds.getJXPathContext().setValue(path+"/@soffidCustomObject", 
 				customObjectType);
-
 		
 		selectedValue = value;
 		Events.postEvent(new Event("onSelect", this, selectedValue));
@@ -80,13 +80,13 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 	}
 
 	public Object clone() {
-		CustomDataTypeSelect clone = (CustomDataTypeSelect) super.clone();
+		CustomObjectTypeSelect clone = (CustomObjectTypeSelect) super.clone();
 		clone.valueBinder = new SingletonBinder(clone);
 		clone.setBind(valueBinder.getDataPath());
 		return clone;
 	}
 
-	public CustomDataTypeSelect() {
+	public CustomObjectTypeSelect() {
 		super();
 
 	}
@@ -95,7 +95,7 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 	{
 		getChildren().clear();
 
-		TypeEnumeration currentType = null;
+		SoffidObjectType currentType = null;
 		String currentCustomType = null;
 
 		try {
@@ -103,8 +103,8 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 			if (value == null)
 				return;
 			DataNode dn = (DataNode) value;
-			currentType = (TypeEnumeration) dn.get("type");
-			currentCustomType = (String) dn.get("dataObjectType");
+			currentType = (SoffidObjectType) dn.get("soffidObject");
+			currentCustomType = (String) dn.get("soffidCustomObject");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -116,8 +116,8 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 			o.put("value", "");
 			array.put(o);
 			String selected = null;
-			for (String sot : (List<String>) TypeEnumeration.literals()) {
-				if (!sot.equals(TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue())) {
+			for (String sot : (List<String>) SoffidObjectType.literals()) {
+				if (!sot.equals(SoffidObjectType.OBJECT_CUSTOM.getValue())) {
 					o = new JSONObject();
 					o.put("label", org.zkoss.util.resource.Labels.getLabel("typeDadaAddicional."+sot));
 					o.put("value", sot);
@@ -129,11 +129,11 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 					.findCustomObjectTypeByJsonQuery(null)) {
 				o = new JSONObject();
 				o.put("label", cot.getName());
-				String value = TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue()+":"+cot.getName();
+				String value = SoffidObjectType.OBJECT_CUSTOM.getValue()+":"+cot.getName();
 				o.put("value", value);
 				array.put(o);
 				if (currentType != null &&
-						currentType.getValue().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue())
+						currentType.getValue().equals(SoffidObjectType.OBJECT_CUSTOM.getValue())
 						&& cot.getName().equals(currentCustomType))
 					selected = value;
 			}

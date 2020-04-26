@@ -12,17 +12,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import java.io.ByteArrayOutputStream;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
-@WebServlet(name="small.logo", urlPatterns="/anonymous/small-logo.png")
-public class SmallLogo extends HttpServlet {
+@WebServlet(name="custom.logo", urlPatterns="/anonymous/logo.png")
+public class CustomLogo extends HttpServlet {
 	byte[] getOriginalImage () throws IOException {
-		InputStream in = getServletContext().getResourceAsStream("/img/pixel.png");
+		InputStream in = getServletContext().getResourceAsStream("/anonymous/logo.png");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		for (int i = in.read(); i >= 0; i = in.read())
 		{
@@ -38,7 +38,7 @@ public class SmallLogo extends HttpServlet {
 		
 		byte[] img;
 		try {
-			img = ServiceLocator.instance().getConfigurationService().getBlob("logo2");
+			img = ServiceLocator.instance().getConfigurationService().getBlob("logo");
 			if (img == null)
 			{
 				img = getOriginalImage();

@@ -180,20 +180,31 @@
 			<version>${zkiblaf.version}</version>
 			<classifier>classes</classifier>
 		</dependency>		
+         <dependency>
+            <groupId>org.zkoss.zk</groupId>
+            <artifactId>zk</artifactId>
+            <version>3.0.8-2</version>
+         </dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>web-common</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.zkoss.zk</groupId>
+			<artifactId>zul</artifactId>
+			<version>3.0.8-1</version>
 		</dependency>
-                <dependency>
-                        <groupId>org.zkoss.zk</groupId>
-                        <artifactId>zk</artifactId>
-                        <version>3.0.8-2</version>
-                </dependency>
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zhtml</artifactId>
 			<version>3.0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.zkoss.common</groupId>
+			<artifactId>zcommon</artifactId>
+			<version>3.0.8</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-el</groupId>
+			<artifactId>commons-el</artifactId>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -202,28 +213,15 @@
 			<type>war</type>
 		</dependency>
 		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 			<version>1.6.1</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>signaturacaib</groupId>
-			<artifactId>signaturacaib.core</artifactId>
-			<version>3.3.0</version>
-			<classifier>api</classifier>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>signaturacaib</groupId>
-					<artifactId>signaturacaib.jarSigner</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.openejb</groupId>
@@ -248,6 +246,16 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.zkib</groupId>
+			<artifactId>zkdb</artifactId>
+			<version>${zkdb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

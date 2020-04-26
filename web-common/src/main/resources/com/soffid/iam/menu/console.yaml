@@ -22,6 +22,10 @@
       url: /config/parameters.zul
       img: /img/menu/parameters.svg
       permissions: ["seu:parametres:show"]
+    - name: seu.user-types
+      url: /config/user-types.zul
+      img: /img/menu/user-types.svg
+      permissions: ["seu:userTypes:show"]
   - name: seu.integration-engine
     img: /img/menu/integration.svg
     options:
@@ -67,6 +71,10 @@
       img: /img/menu/pam-servers.svg
       url: /vault/pam_config.zul
       permissions: ["seu:pamSessionConfigure"]
+    - name: seu.password-policies
+      url: /config/password-policies.zul
+      img: /img/menu/password-policy.svg
+      permissions: ["seu:userTypes:show"]
 - name: seu.monitoritzacio
   permissions: ["seu:tenant:show"]
   img: /img/menu/monitor.svg

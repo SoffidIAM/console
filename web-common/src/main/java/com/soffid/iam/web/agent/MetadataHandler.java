@@ -24,11 +24,12 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 public class MetadataHandler extends Div implements AfterCompose{
 	private DataTable metadataGrid;
 	private Window metadataWindow;
+	private boolean canModifyMetadata;
 
 	@Override
 	protected void addMoved(Component oldparent, Page oldpg, Page newpg) {
 		super.addMoved(oldparent, oldpg, newpg);
-		boolean canModifyMetadata = AutoritzacionsUsuari.hasUpdateMetadata();
+		canModifyMetadata = AutoritzacionsUsuari.hasUpdateMetadata();
 		if (newpg != null)
 			newpg.setVariable("canModifyMetadata", canModifyMetadata);
 	}
@@ -86,5 +87,12 @@ public class MetadataHandler extends Div implements AfterCompose{
 							metadataWindow.setVisible(false);
 						}
 					});
+	}
+	
+	public void addValue(Event event) throws Exception {
+		if (canModifyMetadata) {
+			es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(event.getTarget());
+			XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath(), new String());
+		}
 	}
 }

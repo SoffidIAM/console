@@ -8,17 +8,20 @@ import java.util.LinkedList;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.util.media.Media;
 import org.zkoss.zhtml.Filedownload;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.common.FileUpload2;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -73,7 +76,16 @@ public class TenantHandler extends FrameHandler {
 	}
 	
 	public void importTenant() throws Exception {
-		org.zkoss.util.media.Media media = Fileupload.get();
+		FileUpload2.get(event -> {
+			if ( event instanceof UploadEvent) {
+				Media m = ((UploadEvent) event).getMedia();
+				if (m != null)
+					importTenant2(m);
+			}
+		});
+	}
+
+	public void importTenant2(Media media) throws Exception {
 		
 		if (media == null)
 			return;

@@ -33,12 +33,18 @@ public class RefInterpreter extends GenericInterpreter implements
 			String method = s[1];
 			if (method.contains("("))
 				method = method.substring(0, method.indexOf('('));
+			Object event = getFromNamespace("event");
 			try {
 				m = o.getClass().getMethod(method, Event.class);
-				m.invoke(o, getFromNamespace("event"));
+				m.invoke(o, event);
 			} catch (NoSuchMethodException e1) {
-				m = o.getClass().getMethod(method);
-				m.invoke(o);
+				try {
+					m = o.getClass().getMethod(method, event.getClass());
+					m.invoke(o, event);
+				} catch (NoSuchMethodException e2) {
+					m = o.getClass().getMethod(method);
+					m.invoke(o);
+				}
 			}
 		} catch (NoSuchMethodException e2) {
 			throw new UiException("Cannot find method "+script);

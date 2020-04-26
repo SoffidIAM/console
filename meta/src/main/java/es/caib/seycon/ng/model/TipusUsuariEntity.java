@@ -20,7 +20,7 @@ public abstract class TipusUsuariEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="TUS_CODI", length=1, translated="name")
+	@Column (name="TUS_CODI", length=10, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="TUS_DESC", length=50, translated="description")

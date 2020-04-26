@@ -9,7 +9,9 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateParameter}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateParameter}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateParameter &amp;&amp; canUpdateParameter &amp;&amp; canDeleteParameter}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/parameter"
@@ -19,10 +21,10 @@
 					<![CDATA[
 		- name: ${c:l('parametres.zul.Parametre-2')}
 		  value: code
+		- name: ${c:l('parametres.zul.Xarxa-2')}
+		  value: networkName
 		- name: ${c:l('parametres.zul.Valor-2')}
 		  value: value
-		- name: ${c:l('parametres.zul.Xarxa-2')}
-		  value: network
 		- name: ${c:l('parametres.zul.Descripcia-2')}
 		  value: description
 					]]>
@@ -39,9 +41,10 @@
 					<pager datatable="listbox"/>
 					
 					<menu2>
-						<menu2item if="${canDeleteTenant}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+						<menu2item if="${canDeleteParameter}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 					</menu2>
 					
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				</div>
 				<form id="form" onChangeXPath="ref:frame.onChangeDades"
 					dataPath="/listbox:/." width="100%">
@@ -83,9 +86,9 @@
 					</form>
 				</div>
 				<div style="text-align: right; width: 100%">
-					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 					</databutton>
-					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+					<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 				</div>
 		</div>
 	</div>

@@ -29,6 +29,9 @@
 	</datanode>
 	
 	<datanode name="autoritzacio">
+		<script-handler>
+			<update-script>;</update-script> 
+		</script-handler>
 		<custom-attribute name="domainTypeDescription">
 			StringBuffer tds2 = new StringBuffer ();
 			if (instance.tipusDomini != null)
@@ -51,7 +54,7 @@
 				method="getAuthorizationRoles">
 				<parameter value="${instance.codi}" />
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.AutoritzacioRol">
+			<new-instance-bean className="com.soffid.iam.api.AuthorizationRole">
 			</new-instance-bean>
 		</finder>
 	</datanode>

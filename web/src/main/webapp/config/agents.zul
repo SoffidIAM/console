@@ -37,7 +37,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar"
 				frame="frame">
 				<menu2>
-					<menu2item image="~./img/add.svg"
+					<menu2item image="/img/add.svg"
 						label="${c:l('agents.zul.Afegeixnou') }"
 						if="${canCreateAgent}" onClick="ref:frame.addNew" />
 				</menu2>
@@ -49,7 +49,7 @@
 				variableName="query">
 			</searchbox>
 
-			<datatable id="listbox" autocommit="true"
+			<datatable id="listbox" autocommit="true" use="com.soffid.iam.web.agent.AgentsTable"
 				dataPath="/model:/agent" maxheight="70vh" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 				<attribute name="columns"><![CDATA[
@@ -78,15 +78,15 @@
 
 				<menu2>
 					<menu2item if="${canDeleteAgent}"
-						image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }"
+						image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }"
 						onClick="ref:frame.delete" />
-					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:frame.importMapping"/>
-					<menu2item image="~./img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.exportMapping"/>
-					<menu2item image="~./img/add.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:frame.importMapping"/>
+					<menu2item image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.exportMapping"/>
+					<menu2item image="/img/add.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
 					<menu2item image="/img/question.svg" label="${c:l('agents.zul.Test') }" if="${canQueryAgent}" onClick="ref:frame.test"/>
 				</menu2>
 
-				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 
 			<form2 id="form" dataPath="listbox:/."
@@ -247,12 +247,12 @@
 								</row>
 							</rows>
 						</grid>
-						<label sclass="etiqueta" style="display: block" value="${c:l('agents.zul.Parametresdelagent')}" width="100%"/>
+						<label sclass="section-title" style="display: block" value="${c:l('agents.zul.Parametresdelagent')}" width="100%"/>
 						<div id="customAgentProperties" visible="false" width="100%"/>
 						<div style="text-align: right; width: 100%">
-							<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							<databutton image="/img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 							</databutton>
-							<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+							<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 						</div>
 					</tabpanel>
 					<tabpanel id="tabAttributeMapping">
@@ -264,8 +264,8 @@
 							<columns>
 								<column label="System objects" valign="top">
 								</column>
-								<column label="" width="30px"  valign="top" align="center">
-									<imageclic  align="center" src="~./img/list-add.gif" if="${canUpdateAgent}"
+								<column label="" width="40px"  valign="top" align="center">
+									<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
 										onClick="ref:objectsGrid.addObject" />
 								</column>
 							</columns>
@@ -303,7 +303,7 @@
 														<column label="Properties">
 														</column>
 														<column label="" width="30px">
-															<imageclic align="center" src="~./img/list-add.gif" onClick="ref:propertiesGrid2.createMethod"/>
+															<imageclic align="center" src="/img/add.svg" onClick="ref:propertiesGrid2.createMethod"/>
 														</column>
 													</columns>
 												</grid>
@@ -330,7 +330,7 @@
 														<column label="Value">
 														</column>
 														<column label="" width="30px">
-															<imageclic align="middle" src="~./img/list-add.gif" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
+															<imageclic align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
 															</imageclic>
 														</column>
 													</columns>
@@ -339,7 +339,7 @@
 														<textbox bind="@value" width ="95%" onChange="ref:propertiesGrid2.generateGrid" style="display:block; resize: vertical; height: 1.6em"  multiline="true"  height="1em"
 															onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
-														<imageclic align="middle" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeProperty" if="${canUpdateAgent }">
+														<imageclic align="middle" src="/img/remove.svg" onClick="ref:objectsGrid.removeProperty" if="${canUpdateAgent }">
 														</imageclic>
 													</datarow>
 												</grid>
@@ -363,16 +363,16 @@
 													<columns>
 														<column label="System attribute">
 														</column>
-														<column width="30px"/>
+														<column width="40px"/>
 														<column label="Direction" width="100px">
 														</column>
 														<column label="Soffid attribute">
 														</column>
-														<column width="30px"/>
+														<column width="40px"/>
 														<column label="Test result" id="testColumn" visible="false">
 														</column>
 														<column label="" width="30px">
-															<imageclic  align="middle" src="~./img/list-add.gif" onClick="ref:objectsGrid.createProperty" >
+															<imageclic  align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" >
 															</imageclic>
 														</column>
 													</columns>
@@ -380,7 +380,8 @@
 														<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" 
 															height="27px" onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
-														<imageclic style="display:table-cell" src="/img/pencil.svg" width="24px" onClick="ref:objectsGrid.editAttribute">
+														<imageclic src="/img/pencil.svg" 
+															onClick="ref:objectsGrid.editAttribute">
 														</imageclic>
 														<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection" style="width: 80px; text-align-last: center">
 															<dataitem bind="@value">
@@ -390,7 +391,7 @@
 														<textbox bind="@soffidAttribute" width ="100%" onChange=""  style="display:block; resize: none" multiline="true"  
 															height="27px" onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
-														<imageclic style="display:table-cell" src="/img/pencil.svg" width="24px" >
+														<imageclic src="/img/pencil.svg" >
 															<attribute name="onClick"><![CDATA[
 															    Events.sendEvent(new Event ("onEdit", 
 															    		desktop.getPage("editor").getFellow("top"),
@@ -405,7 +406,7 @@
 															<label multiline="true"/>
 															<imageclic src="/img/exclamation.png" visible="false"/>
 														</div>
-														<imageclic align="right" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeProperty"
+														<imageclic align="right" src="/img/remove.svg" onClick="ref:objectsGrid.removeProperty"
 															if="${canUpdateAgent }">
 														</imageclic>
 													</datarow>
@@ -451,9 +452,9 @@
 														</column>
 														<column label="Script" >
 														</column>
-														<column label="" width="2em"/>
-														<column label="" width="2em">
-															<imageclic  align="right" src="~./img/list-add.gif" onClick="ref:objectsGrid.createTrigger">
+														<column label="" width="40px"/>
+														<column label="" width="40px">
+															<imageclic  align="right" src="/img/add.svg" onClick="ref:objectsGrid.createTrigger">
 															</imageclic>
 														</column>
 													</columns>
@@ -466,9 +467,9 @@
 														<textbox bind="@script" width ="100%" onOK="" onChange="" style="display:block; resize: none; height: 1.6em" multiline="true" height="1em"
 															onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
-														<imageclic src="/img/pencil.svg" width="24px" onClick="ref:objectsGrid.editTrigger">
+														<imageclic src="/img/pencil.svg" onClick="ref:objectsGrid.editTrigger">
 														</imageclic>
-														<imageclic align="right" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeObject">
+														<imageclic align="right" src="/img/remove.svg" onClick="ref:objectsGrid.removeObject">
 														</imageclic>
 													</datarow>
 												</grid>
@@ -479,7 +480,7 @@
 									<div style="width: 15px; height: 15px;"/>
 									</div>
 								</window>
-								<imageclic align="center" src="~./img/list-remove.gif" onClick="ref:objectsGrid.removeObject" if="${canUpdateAgent }">
+								<imageclic align="center" src="/img/remove.svg" onClick="ref:objectsGrid.removeObject" if="${canUpdateAgent }">
 								</imageclic>
 							</datarow>
 						</grid>
@@ -510,7 +511,7 @@
 								</column>
 								<column label="" width="2em"/>
 								<column label="" width="2em">
-									<imageclic  align="right" src="~./img/list-add.gif" onClick="ref:tabReconcileTriggers.addTrigger" if="${canUpdateAgent }">
+									<imageclic  align="right" src="/img/add.svg" onClick="ref:tabReconcileTriggers.addTrigger" if="${canUpdateAgent }">
 									</imageclic>
 								</column>
 							</columns>
@@ -536,7 +537,7 @@
 								</textbox>
 								<imageclic style="display:table-cell" src="/img/pencil.svg" width="24px" onClick="ref:tabReconcileTriggers.editTrigger" >
 								</imageclic>
-								<imageclic align="right" src="~./img/list-remove.gif" width="2em" onClick="ref:tabReconcileTriggers.removeTrigger">
+								<imageclic align="right" src="/img/remove.svg" onClick="ref:tabReconcileTriggers.removeTrigger">
 								</imageclic>
 							</datarow>
 						</grid>
@@ -630,14 +631,16 @@
 					</div>
 					</tabpanel>
 					<tabpanel id="tabMetadata">
-						<accountMetadata/>
+						<div style="margin-bottom: 10px;">
+							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+						</div>
+						<accountMetadata id="accountMetadata"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>				
 		</form2>
 		</div>
 	</div>
-
 	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
 		closable="true"
 		onClose="self.setVisible(false); event.stopPropagation();">

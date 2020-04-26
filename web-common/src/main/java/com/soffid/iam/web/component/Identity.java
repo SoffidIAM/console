@@ -318,4 +318,34 @@ public class Identity implements Comparable<Identity>{
 	public void setSelectorLabel(String selectorLabel) {
 		this.selectorLabel = selectorLabel;
 	}
+
+	public static Identity fromObject(Object o) {
+		if (o instanceof User)
+			return new Identity((User) o);
+		if (o instanceof Account)
+			return new Identity((Account) o);
+		if (o instanceof Application)
+			return new Identity((Application) o);
+		if (o instanceof CustomObject)
+			return new Identity((CustomObject) o);
+		if (o instanceof Group)
+			return new Identity((Group) o);
+		if (o instanceof Host)
+			return new Identity((Host) o);
+		if (o instanceof Network)
+			return new Identity((Network) o);
+		if (o instanceof Role)
+			return new Identity((Role) o);
+		throw new IllegalArgumentException("Invalid object "+o.toString());
+	}
+
+	public static Identity fromObject(Role role, Object o) {
+		if (o instanceof Application)
+			return new Identity(role, (Application) o);
+		if (o instanceof DomainValue)
+			return new Identity(role, (DomainValue) o);
+		if (o instanceof Group)
+			return new Identity(role, (Group) o);
+		throw new IllegalArgumentException("Invalid object "+o.toString());
+	}
 }

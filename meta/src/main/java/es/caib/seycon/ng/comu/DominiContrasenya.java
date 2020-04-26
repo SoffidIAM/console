@@ -15,7 +15,7 @@ public class DominiContrasenya {
 	public java.lang.Long id;
 
 	@Nullable
-	@Attribute(translated = "code" )
+	@Attribute(translated = "name", synonyms = "code" )
 	public java.lang.String codi;
 
 	@Nullable

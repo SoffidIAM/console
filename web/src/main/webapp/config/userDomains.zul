@@ -11,8 +11,10 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateTenant}" onClick="ref:frame.importTenant"/>
-					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateTenant}"  onClick="ref:frame.addNew"/>
+					<menu2item if="${canQueryUserDomain}" image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.export"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canModifyUserDomain}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUserDomain}"  onClick="ref:frame.addNew"/>
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/userDomain"
@@ -36,7 +38,7 @@
 				<pager datatable="listbox"/>
 				
 				<menu2>
-					<menu2item if="${canDeleteUserDomain}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					<menu2item if="${canDeleteUserDomain}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 				</menu2>
 				
 			</div>
@@ -68,7 +70,7 @@
 							</select>
 						</row>
 						<row>
-							<label value="${c:l('dominiUsuaris.zul.Tipus')}"/>
+							<label value="${c:l('dominiUsuaris.zul.Generator')} :"/>
 							<select id="lbGenerator" bind="@beanGenerator"
 								keyPath="text"
 								labelPath="text"
@@ -78,8 +80,8 @@
 						</row>
 						<row>
 							<div>
-								<imageclic src="/img/help.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
-								<label value="${c:l('dominiUsuaris.zul.scriptCreate')}"/>
+								<imageclic src="/img/question.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
+								<label value="${c:l('dominiUsuaris.zul.scriptCreate')} :"/>
 							</div>
 							<codemirror bind="@bshExprCreate" id="du_script1" 
 								readonly="${!canModifyUserDomain}"
@@ -91,8 +93,8 @@
 
 						<row>
 							<div>
-								<imageclic src="/img/help.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
-								<label value="${c:l('dominiUsuaris.zul.script')}"/>
+								<imageclic src="/img/question.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
+								<label value="${c:l('dominiUsuaris.zul.script')} :"/>
 							</div>
 							<codemirror bind="@bshExpr" id="du_script2"
 								linenumbers="true" 
@@ -105,9 +107,9 @@
 				</grid>
 			</form>
 			<div style="text-align: right; width: 100%">
-				<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 				</databutton>
-				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 			</div>
 		</div>
 	</div>

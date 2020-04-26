@@ -1,8 +1,12 @@
 package com.soffid.iam.web.main;
 
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.InputEvent;
+import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.ext.AfterCompose;
+import org.zkoss.zul.Div;
+import org.zkoss.zul.Popup;
 import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
@@ -11,37 +15,55 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datamodel.DataNodeCollection;
 
 
-public class SearchBoxWindow extends Window implements AfterCompose {
-
-	private DataTable table;
+public class SearchBoxWindow extends Popup implements AfterCompose { 
 	private Timer timer;
-	private DataModel model;
 
-	static String[] types = {"menu", "user", "group", "application", "account"};
+	SearchHandler[] handlers = {
+			new SearchMenuHandler(),
+			new SearchUserHandler()};
 	
 	@Override
 	public void afterCompose() {
-		table = (DataTable) getFellow("table");
 		timer = (Timer) getFellow("timer");
-		model = (DataModel) getFellow("model");
+		for (SearchHandler handler: handlers) {
+			Div div = new Div();
+			div.setSclass("search-divisor");
+			appendChild(div);
+			handler.setParentDiv(div);
+		}
 	}
 
-	public void onChanging(Event event) throws Exception {
-		InputEvent inputEvent = (InputEvent) event;
-		String text = inputEvent.getValue();
-		model.getVariables().declareVariable("text", text);
-		if (text.length() > 2) {
-			for ( String type: types)
-			{
-				DataNodeCollection coll = (DataNodeCollection) model.getJXPathContext().getValue("users");
-				if (coll.isInProgress())
-					coll.cancel();
-				coll.refresh();
-			}
-			if ( !timer.isRunning())
-				timer.start();
-		} else {
+	public void onChanging(InputEvent inputEvent) throws Exception {
+		for (SearchHandler handler: handlers) {
+			handler.cancelSarch();
+			handler.startSearch(inputEvent.getValue());
+		}
+		timer.start();
+		onTimer(inputEvent);
+		open (inputEvent.getTarget());
+	}
+	
+	public void onTimer (Event event) throws Exception {
+		boolean pending = false;
+		for (SearchHandler handler: handlers) {
+			handler.update();
+			if (! handler.isFinished())
+				pending = true;
+		}
+		if (!pending)
 			timer.stop();
+	}
+	
+	public void onNavigate( MouseEvent event) {
+		String url = (String) event.getTarget().getAttribute("url");
+		if (url != null)
+		{
+			if ( (event.getKeys() & MouseEvent.CTRL_KEY) != 0)
+				Executions.getCurrent().sendRedirect(url, "_blank");
+			else
+				Executions.getCurrent().sendRedirect(url);
 		}
 	}
 }
+
+

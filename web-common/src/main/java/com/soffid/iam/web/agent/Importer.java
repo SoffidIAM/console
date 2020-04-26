@@ -1,31 +1,32 @@
 package com.soffid.iam.web.agent;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Entity;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.zkoss.util.media.Media;
 
-import es.caib.seycon.ng.comu.AttributeDirection;
-import es.caib.seycon.ng.comu.SoffidObjectTrigger;
-
 import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.AttributeVisibilityEnum;
+import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.ObjectMapping;
 import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.ObjectMappingTrigger;
+import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.SoffidObjectType;
+
+import es.caib.seycon.ng.comu.AttributeDirection;
+import es.caib.seycon.ng.comu.SoffidObjectTrigger;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.zkib.datamodel.DataModelNode;
-import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -53,6 +54,14 @@ public class Importer {
 				dn.delete();
 		}
 		
+		coll = (DataNodeCollection) XPathUtils.getValue(ds, "/reconcileTrigger");
+		for (int i = 0; i < coll.getSize(); i++)
+		{
+			DataModelNode dn = coll.getDataModel(i);
+			if (dn != null && ! dn.isDeleted())
+				dn.delete();
+		}
+
 		NodeList nodes = doc.getElementsByTagName("objectMapping");
 		for (int i = 0; i < nodes.getLength(); i++)
 		{
@@ -71,6 +80,69 @@ public class Importer {
 			addTriggers(n, ds, path);
 		}
 				
+		nodes = doc.getElementsByTagName("loadTrigger");
+		for (int i = 0; i < nodes.getLength(); i++)
+		{
+			Element n = (Element) nodes.item(i);
+			ReconcileTrigger om = new ReconcileTrigger();
+			
+			om.setObjectType( SoffidObjectType.fromString( n.getAttribute("objectType")));
+			om.setTrigger( SoffidObjectTrigger.fromString( n.getAttribute("trigger")));
+			om.setScript(n.getAttribute("script"));
+
+			XPathUtils.createPath(ds, "/reconcileTrigger", om);
+			
+		}
+				
+		nodes = doc.getElementsByTagName("metadata");
+		for (int i = 0; i < nodes.getLength(); i++)
+		{
+			Element n = (Element) nodes.item(i);
+			DataType dt = new DataType();
+			
+			Element e = doc.createElement("metadata");
+			dt.setName(n.getAttribute("name"));
+			dt.setCustomObjectType( n.getAttribute("customObjectType") );
+			dt.setDataObjectType( n.getAttribute("dataObjectType") );
+			dt.setFilterExpression( n.getAttribute("filterExpression") );
+			dt.setLabel( n.getAttribute("label") );
+			dt.setOnChangeTrigger( n.getAttribute("onChangeTrigger") );
+			dt.setOnFocusTrigger( n.getAttribute("onFocusTrigger") );
+			dt.setOnLoadTrigger( n.getAttribute("onLoadTrigger") );
+			dt.setValidationExpression( n.getAttribute("validationExpression") );
+			dt.setVisibilityExpression( n.getAttribute("visibilityExpression") );
+			if (n.hasAttribute("adminVisibility"))
+				dt.setAdminVisibility(AttributeVisibilityEnum.fromString(n.getAttribute("adminVisibility")));
+			if (n.hasAttribute("operatorVisibility"))
+				dt.setOperatorVisibility(AttributeVisibilityEnum.fromString(n.getAttribute("operatorVisibility")));
+			if (n.hasAttribute("userVisibility"))
+				dt.setUserVisibility(AttributeVisibilityEnum.fromString(n.getAttribute("userVisibility")));
+			if (n.hasAttribute("letterCase"))
+				dt.setLetterCase(LetterCaseEnum.fromString(n.getAttribute("letterCase")));
+			if (n.hasAttribute("multiValuedRows"))
+				dt.setMultiValuedRows( Integer.parseInt(n.getAttribute("multiValuedRows")));
+			dt.setMultiValued(Boolean.getBoolean(n.getAttribute("multiValued")));
+			dt.setRequired(Boolean.getBoolean(n.getAttribute("required")));
+			dt.setOrder(Long.parseLong(n.getAttribute("order")));
+			if (n.hasAttribute("size"))
+				dt.setSize( Integer.parseInt(n.getAttribute("size")));
+			if (n.hasAttribute("type"))
+				dt.setType( TypeEnumeration.fromString(n.getAttribute("type")));
+			if (n.hasAttribute("unique"))
+				dt.setUnique( "true".equals(n.getAttribute("multiValuedRows")));
+			
+			List<String> l = null;
+			NodeList nodes2 = n.getElementsByTagName("value");
+			for (int j = 0; j < nodes2.getLength(); j++)
+			{
+				if (l == null) l = new LinkedList<String>();
+				l.add( nodes2.item(i).getTextContent() );
+			}
+			dt.setValues(l);
+
+			XPathUtils.createPath(ds, "/metadada", dt);
+			
+		}
 	}
 
 	private void addProperties(Element mappingElement, DataSource ds, String path) throws Exception {

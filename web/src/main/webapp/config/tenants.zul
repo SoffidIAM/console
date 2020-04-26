@@ -9,12 +9,11 @@
 
 	<style>tr.noBorderGrid td.gc {vertical-align: top}</style>
 	<datamodel id="model" rootNode="root" src="descriptorTenants.xml" />
-
 	<script>
 	function renderDetails(td, col, value)
 	{
 		if (value.enabled)
-			td.appendChild( document.createTextNode ("${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}"));
+			td.appendChild( document.createTextNode (""));
 		else
 			td.appendChild( document.createTextNode ("${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}"));
 	}
@@ -24,8 +23,9 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateTenant}" onClick="ref:frame.importTenant"/>
-					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateTenant}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateTenant}" onClick="ref:frame.importTenant"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateTenant}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/tenant"
@@ -38,7 +38,7 @@
 		  value: description
 		- name: ${c:l('tenant.zul.enabled')}
 		  value: enabled
-		  render: renderDetails
+		  template: ${"${"}renderDetails ? '${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}' : '${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}' ${"}"}
 					]]>
 				</attribute>
 			</datatable>
@@ -53,11 +53,12 @@
 					<pager datatable="listbox"/>
 					
 					<menu2>
-						<menu2item if="${canUpdateTenant}" image="~./img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.export"/>
-						<menu2item if="${canDeleteTenant}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
-						<menu2item if="${canUpdateTenant}" image="~./img/login.svg" label="${c:l('configure.Login') }" onClick="ref:frame.nestedLogin"/>
+						<menu2item if="${canUpdateTenant}" image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.export"/>
+						<menu2item if="${canDeleteTenant}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+						<menu2item if="${canUpdateTenant}" image="/img/login.svg" label="${c:l('configure.Login') }" onClick="ref:frame.nestedLogin"/>
 					</menu2>
-					
+
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				</div>
 				<form id="form" onChangeXPath="ref:frame.onChangeForm()"
 					dataPath="/listbox:/." width="100%">
@@ -92,8 +93,8 @@
 										<grid sclass="noBorderGrid" dataPath="permissions">
 											<datarow>
  												<select
-													keyPath="codi"
-													labelPath="codi"
+													keyPath="name"
+													labelPath="name"
 													dataPath="/model:/auth" 
 													bind="/newValue"
 													disabled="${!canUpdateTenant}"
@@ -106,14 +107,14 @@
 											</datarow>
 										</grid>
 										<button
-											image="~./img/list-add.gif"
+											image="/img/add.svg"
 											label="${c:l('usuaris.zul.Afegeixnou')}"
 											visible="${canUpdateTenant}"
 											onClick="ref:frame.addPermission">
 										</button>
 									</div>
 								</row>
-								<row>
+								<row> 
 									<input_etiqueta value="${c:l('tenant.zul.servers')} :"/>
 									<div>
 										<grid sclass="noBorderGrid" dataPath="servers">
@@ -135,7 +136,7 @@
 											</datarow>
 										</grid>
 										<button
-											image="~./img/list-add.gif"
+											image="/img/add.svg"
 											label="${c:l('usuaris.zul.Afegeixnou')}"
 											visible="${canUpdateTenant}"
 											onClick="ref:frame.addNewServer">
@@ -148,9 +149,9 @@
 					</form>
 				</div>
 					<div style="text-align: right; width: 100%">
-						<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+						<databutton image="/img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 						</databutton>
-						<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 					</div>
 		</div>
 	</div>

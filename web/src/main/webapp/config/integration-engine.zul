@@ -28,8 +28,8 @@
 			<row>
 				<label/>
 				<div style="margin-top: 2em">
-					<button label="${c:l('rolsllista.zul.Cancel·la') }" onClick="ref:frame.refreshTaskEngine"/>
-					<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.updateTaskEngine"
+					<button image="/img/undo-r.svg" label="${c:l('rolsllista.zul.Cancel·la') }" onClick="ref:frame.refreshTaskEngine"/>
+					<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.updateTaskEngine"
 						style="text-align:right"/>
 				</div>
 			</row>

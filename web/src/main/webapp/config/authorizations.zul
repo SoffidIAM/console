@@ -5,26 +5,34 @@
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?page title="Gestió d'autoritzacions" ?>
 <frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml"
-	use="com.soffid.iam.web.config.AuthorizationHandler" >
+	use="com.soffid.iam.web.config.AuthorizationHandler" 
+	onAddRole="ref:frame.addRole">
 	
 	<xmldatasource id="autoritzacions" src="/es/caib/seycon/autoritzacions.xml"/>
-	
+	<style>
+		div.datatable.roles table tr td:last-child {
+			width: 24px;
+		}
+	</style>
 	<datamodel id="model" rootNode="autoritzacions"
 		src="descriptorAutoritzacions.xml"/>
 		
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" >
 				<menu2>
-					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateTenant}" onClick="ref:frame.importTenant"/>
-					<menu2item image="~./img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateTenant}"  onClick="ref:frame.addNew"/>
+					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateRolAutoritzacion}" onClick="ref:frame.importCsv"/>
 				</menu2>
+				
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/autoritzacio"
+			    maxheight="70vh"
 				use="com.soffid.iam.web.config.AuthorizationTable"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
 					<![CDATA[
+					- name: ${c:l('autoritzacions.zul.Ambit')}
+					  value: ambit
 					- name: ${c:l('autoritzacions.zul.codi')}
 					  value: name
 					- name: ${c:l('autoritzacions.zul.Description')}
@@ -34,283 +42,47 @@
 					]]>
 				</attribute>
 			</datatable>
-			<div width="100%" style="text-align: right"  if="${canCreateUserDomain}" >
-				<div class="addButton" onClick="ref:frame.addNew">+</div>
-			</div>
 		</div>
 		<div sclass="card__face card__face--back">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatable="listbox"/>
 				
-				<menu2>
-					<menu2item if="${canDeleteUserDomain}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
-				</menu2>
+				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				
 			</div>
-			<form id="form" onChangeXPath="ref:frame.onChangeForm()"
+			<form2 id="form" onChangeXPath="ref:frame.onChangeForm()"
 				dataPath="listbox:/">
 				
-				<vbox width="100%">
-					<label id="auto_seleccionada" value=""/>
-					<hbox width="100%">
-						<button label="${c:l('autoritzacions.zul.Consultarelaciaambal')}" style="float:left;">
-							<attribute name="onClick">
-							<![CDATA[
-								// Les carreguem si encara no les tenim:
-								carregaDescripcionsXML();
-								String s_heretaSeleccionat = (String) model.getVariables().getVariable("heretaSeleccionat");
-								String s_descripcioSeleccionat = (String) model.getVariables().getVariable("descripcioSeleccionat");
-								String s_tipusDominiSeleccionat = (String) model.getVariables().getVariable("s_tipusDominiSeleccionat");
-								String texteHereta = "";
-								String texteSocHeretada = "";
-			
-								String sHereta = "";
-								if (s_heretaSeleccionat != null && !"".equals(s_heretaSeleccionat.trim())) {
-									String [] autosHereta = s_heretaSeleccionat.trim().split(",");
-									for (int i=0; i < autosHereta.length; i++) {
-										if (autosHereta[i]!=null) {
-											if ("*".equals(autosHereta[i].trim())) {
-												sHereta+= "\t- "+org.zkoss.util.resource.Labels.getLabel("autoritzacions.Totes")+"\n";
-											}
-											else{
-												sHereta+= "\t- "+(String) autoDescripcions.get(autosHereta[i].trim())+"\n";
-											}
-										}
-									}
-								}
-								if ("".equals(sHereta))
-									texteHereta = String.format(org.zkoss.util.resource.Labels.getLabel("autoritzacions.Autoritzacio"),
-																new Object[] {s_descripcioSeleccionat});
-								else  
-									texteHereta =  String.format(org.zkoss.util.resource.Labels.getLabel("autoritzacions.TenirAutoritzacio"),
-																new Object [] {s_descripcioSeleccionat, sHereta, s_tipusDominiSeleccionat});
-								
-								// Sóc heretada
-								String s_codiAutoH = (String) model.getVariables().getVariable("codiAutoritzacio");
-								
-								Listbox llistaxml = esquema.getFellow("lista").getFellow("listbox");
-								
-								// Recorrem el listbox xml
-								/*List*/ allAuto = llistaxml.getItems();
-								
-								HashMap socHeretat = new HashMap();
-								
-								if (allAuto!=null) {
-									int pos =0;
-									for (Iterator it = allAuto.iterator(); it.hasNext(); ){
-										elem = it.next();
-										String heretaElem = es.caib.zkib.datasource.XPathUtils.getValue(elem, "hereta");
-										if (heretaElem!=null && heretaElem.indexOf(s_codiAutoH)!=-1) {
-											int pos = heretaElem.indexOf(s_codiAutoH);
-											// correcció de autoritzacions que acaben igual
-											if (pos>0 && heretaElem.charAt(pos-1)!=':' || pos==0) {
-												String codiElem = es.caib.zkib.datasource.XPathUtils.getValue(elem, "codi");
-												String descripcioElem = es.caib.zkib.datasource.XPathUtils.getValue(elem, "descripcio");
-												socHeretat.put(codiElem,descripcioElem);
-											}
-										}
-									}
-								}
-								
-								if (socHeretat.size()==0) {
-									texteSocHeretada = String.format(
-										org.zkoss.util.resource.Labels.getLabel("autoritzacions.NOExisteix"),
-										new Object [] {s_descripcioSeleccionat});
-								}
-								else {
-									descSocHeretada = "";
-									for (Iterator it = socHeretat.values().iterator(); it.hasNext(); ) {
-										descSocHeretada += "\t- "+(String) it.next()+"\n";
-									}
-									texteSocHeretada = String.format(org.zkoss.util.resource.Labels.getLabel("autoritzacions.SiAutoritzacions"),
-										new Object [] { descSocHeretada, s_descripcioSeleccionat} ) ;
-								}						
-									
-								Missatgebox.info (texteHereta+"\n\n"+texteSocHeretada+"\n\n"+org.zkoss.util.resource.Labels.getLabel("autoritzacions.Transitiva"),org.zkoss.util.resource.Labels.getLabel("autoritzacions.Relacions"));
-								]]>
-								</attribute>
-						</button>
-					</hbox>
-					<hbox style="float:right;">
-						<label id="tipusDomini_seleccionada" value=""/>
-						<label id="scope_seleccionada" value=""/>
-					</hbox>
-					<label style="float:right"
-						value="${c:l('autoritzacions.zul.NOTAElsrolsSENSEDOMI')}"/>
-					<listbox id="gridAutoritzacions" dataPath="/autoritzacioRol"
-						fixedLayout="true" height="252px" sclass="likeagrid" width="100%">
-						<attribute name="onActualitza">
-							<![CDATA[
-								// Obtenim el codi de l'autorització actual:
-								codiAuto = model.getVariables().getVariable("codiAutoritzacio");
-								
-								Object[] dades = (Object[]) event.getData();
-								//Obtenim les dades del rol
-								//{nom, aplicacio, descripcio, valorDomini, domini, bbdd, idrol}
-								//Missatgebox.info ("tipus domini "+dades[4]);
-								
-								// Comprovem el tipus de domini del rol
-								String tipusDominiRol = dades[4]!=null ? dades[4].trim() :"";
-								String tipusDominiAutoDescription = model.getVariables().getVariable("tipusDominiSeleccionat");
-								String tipusDominiAuto = model.getVariables().getVariable("tipusDomini");
-								
-/*								if (tipusDominiAuto!=null && (!"".equals(tipusDominiAuto.trim())) 
-									&& !es.caib.seycon.util.TipusDomini.SENSE_DOMINI.equals(tipusDominiRol)) {
-									String [] td = tipusDominiAuto.split(",");
-									boolean trobat = false;
-									if (td!=null) for (int i=0;!trobat && i<td.length; i++) {
-										if (tipusDominiRol.equals(td[i].trim()))
-											trobat = true;
-									}
-									if (!trobat) {
-										o = !"".equals(tipusDominiAuto.trim())?", ":"";
-										Missatgebox.error(String.format (org.zkoss.util.resource.Labels.getLabel("autoritzacions.Restriccio"), 
-												new Object[]{tipusDominiAutoDescription}),
-											org.zkoss.util.resource.Labels.getLabel("autoritzacions.ErrorDomini"));
-										return;
-									}
-								}
-	*/							
-								String nomRol = (String) dades[0];
-								String codiAplicacio = (String) dades[1];
-								String descripcio = (String) dades[2];
-								/* // no tenim valor domini ni domini
-									// Valor domini té dos valors: valor, descripció
-									String valorDomini = null;
-									if (dades[3] instanceof String) {
-										valorDomini = (String) dades[3];
-									} else if (dades[3] instanceof String[]) {
-										valorDomini = (String) dades[3][0];
-									}
-								*/
-								String domini = (String) dades[4]; //tipus domini
-								String bbdd = (String) dades[5];
-								String idrol = (String) dades[6];
-								
-								//Missatgebox.info ("rol = "+nomRol+"#"+codiAplicacio+"#"+descripcio+"#"+domini+"#"+bbdd+"#"+idrol);
-								modelProxy = gridAutoritzacions.getModel();
-								
-								ds = gridAutoritzacions.getDataSource(); 
-								ctx =  ds.getJXPathContext();
-								/*if (false @and event.getData()[3] != null) {
-									valorDomini = (event.getData()[3])[0];
-									bbdd = (String)(event.getData()[5]);
-									xpath = gridAutoritzacions.getXPath() + 
-										"[@rol/nom = '" + nomRol + "' and @rol/baseDeDades = '" + bbdd + "' and rol/valorDomini/@valor = '" + valorDomini + "']";
-								} else {*/
-									valorDomini = "";
-									bbdd = (String)(event.getData()[5]);		
-									xpath = gridAutoritzacions.getXPath() + 
-										"[@rol/nom = '" + nomRol + "' and @rol/baseDeDades = '" + bbdd + "']";
-								//}
-								boolean jaExisteix = true;
-								try {
-									valor = ctx.getValue(xpath);
-								} catch(Exception e){
-									jaExisteix = false;
-								}
-								// Verificamos si el rol es SC_REPONSABLE que no está asignado ya a la misma aplicación
-								if(jaExisteix) {
-									Missatgebox.info(String.format(org.zkoss.util.resource.Labels.getLabel("autoritzacions.JaExisteix"), 
-																	new Object[]{nomRol, bbdd}),
-													 org.zkoss.util.resource.Labels.getLabel("autoritzacions.ErrorRol"));
-								} else {
-									position = modelProxy.newInstance();
-									ds = gridAutoritzacions.getDataSource(); 
-									ctx =  ds.getJXPathContext(); 
-									xpath = gridAutoritzacions.getXPath() + modelProxy.getBind(position); 
-									pointer =ctx.createPath (xpath);
-									ctx2 = ctx.getRelativeContext(pointer);
-									
-									// obtenim el rol
-									es.caib.seycon.ng.comu.Rol rolnou = null;
-									try {
-										aplicacioService = es.caib.seycon.ng.EJBLocator.getAplicacioService();
-										rolnou = aplicacioService.findRolById(new Long(idrol));
-									} catch (Throwable th) {
-										Missatgebox.error (String.format(org.zkoss.util.resource.Labels.getLabel("autoritzacions.ErrorRol2"),new Object[] {nomRol, bbdd, codiAplicacio}));
-									}
-									
-									ctx2.setValue("@autoritzacio", codiAuto);
-									ctx2.setValue("@rol", rolnou);
-									
-									pointer.invalidate ();
-								}
-							]]>
-						</attribute>
-						<listhead>	
-							<listheader label="${c:l('autoritzacions.zul.Rol')}" sort="auto" width="40%"/>
-							<listheader label="${c:l('autoritzacions.zul.Bbdd')}" sort="auto" width="15%"/>
-							<listheader label="${c:l('autoritzacions.zul.Aplicacia')}" sort="auto" width="25%"/>
-							<listheader label="${c:l('autoritzacions.zul.Domini')}" sort="auto" width="19%"/>
-							<listheader label="${c:l('autoritzacions.zul.')}" visible="${canDeleteRolAutoritzacion}" width="30px"/>
-						</listhead>
-						<dataitem bind=".">
-							<listcell bind="rol/@nom" tooltip="rolsTooltip"/>
-							<listcell bind="rol/@baseDeDades"/>
-							<listcell bind="rol/codiAplicacio"/>
-							<listcell bind="rol/domini/@nom"/>
-							<listcell>
-								<imageclic align="right" src="~./img/list-remove.gif">
-									<attribute name="onClick">
-										<![CDATA[
-											if (canDeleteRolAutoritzacion)
-											{
-												listCell = self.getParent(); 
-												dlistbox = listCell.getListbox(); 
-												modelo = dlistbox.getModel();
-												listItem = listCell.getParent(); 
-												posicio = listItem.getIndex(); 
-												elemPos = modelo.getElementAt(posicio); 
-												xpath = elemPos.getDataContext().getXPath(); 
-												dataSource = gridAutoritzacions.getDataSource(); 
-												context = dataSource.getJXPathContext();  
-												dada = context.getValue(xpath+"/@rol/nom");
-												Missatgebox.confirmaOK_CANCEL(String.format(org.zkoss.util
-														.resource.Labels.getLabel("autoritzacions.ConfirmaOK"),
-													new Object[] {dada}),
-													org.zkoss.util.resource
-														.Labels.getLabel("autoritzacions.Esborra"),
-													new EventListener()
-													{
-														public void onEvent(Event evt)
-														{
-															if ("onOK".equals(evt.getName()))
-															{
-																context.removePath(xpath);
-															}
-														}
-													}
-												);
-											}
-										]]>
-									</attribute>
-								</imageclic>
-							</listcell>
-						</dataitem>
-					</listbox>
-					<hbox width="100%" widths="100px,*">
-					<button if="${canCreateRolAutoritzacion}" image="~./img/list-add.gif"
-						label="${c:l('autoritzacions.zul.Afegeixrol')}" style="float:left;">
-						<attribute name="onClick">
-							<![CDATA[
-								desktop.getPage("rolsLlista").setAttribute("tipus", "cap");
-								desktop.getPage("rolsLlista")
-									.setAttribute("mostraGestionableWF", "true");//perquè mostre rols gestionableWF	
-								desktop.getPage("rolsLlista").setAttribute("usuari", ""); //??
-								es.caib.seycon.ng.servei.PasswordService ps =
-									es.caib.seycon.ng.ServiceLocator.instance().getPasswordService();
-								//desktop.getPage("rolsLlista").setAttribute("rol_bbdd", ps.getDefaultDispatcher());
-								Events.postEvent ("onInicia", desktop.getPage("rolsLlista")
-										.getFellow("esquemaLlista"), gridAutoritzacions);
-							]]>
-						</attribute>
-					</button>
-					<label style="float:right"
-						value="${c:l('autoritzacions.zul.NOTAAbansdafegirunr')}"/>
-					</hbox>
-				</vbox>
-			</form>
+				<label bind="/@name"/> : <label bind="@description"/>
+				<datatable id="rolesTable" autocommit="false" dataPath="/autoritzacioRol"
+					onRemove="ref:frame.rolesTableAction"
+					sortColumn="0" onSelect="ref:frame.showDetails" sclass="datatable roles">
+					<attribute name="columns">
+						<![CDATA[
+						- name: ${c:l('autoritzacions.zul.Rol')}
+						  value: role.name
+						- name: ${c:l('autoritzacions.zul.Bbdd')}
+						  value: role.description
+						- name: ${c:l('autoritzacions.zul.Aplicacia')}
+						  value: role.informationSystemName
+						- name: ${c:l('autoritzacions.zul.Domini')}
+						  value: role.domain.name
+						- name: ""
+						  template: <img src='/img/remove.svg' class='imageclic' onClick='zkDatatable.sendClientAction(this,"onRemove")' />
+						  sort: false
+						  filter: false
+						]]>
+					</attribute>
+				</datatable>
+				<div width="100%" style="text-align: right"  if="${canCreateRolAutoritzacion}" >
+					<div class="addButton" onClick="ref:frame.addNew">+</div>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					</databutton>
+					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+			</form2>
 		</div>
 	</div>
 	<include src="rolsllista.zul"/>

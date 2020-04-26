@@ -36,6 +36,7 @@ public class SvgFilter extends HttpServlet {
 		String originalGreen = "#9ec73c";
 		String originalBlue = "#637792";
 		String originalSky = "#22B9D8";
+		boolean reverse = false;
 		String green = ConfigurationCache.getProperty("soffid.ui.color1");
 		if (green == null) green = originalGreen;
 		
@@ -46,7 +47,16 @@ public class SvgFilter extends HttpServlet {
 		String sky = ConfigurationCache.getProperty("soffid.ui.color3");
 		if (sky == null) sky = originalSky;
 
-		StringBuffer t = getText( req.getRequestURI() );
+		String uri = req.getRequestURI();
+		if (uri.endsWith("-r.svg")) {
+			uri = uri.substring(0, uri.length()-6)+".svg";
+			originalBlue = "#ffffff";
+			blue = sky;
+			sky = ConfigurationCache.getProperty("soffid.ui.text3");
+			if (sky == null) sky = "#ffffff";
+			reverse = true;
+		}
+		StringBuffer t = getText( uri );
 		boolean background = req.getRequestURI().contains("background");
 		
 		if (t == null) {

@@ -11,14 +11,14 @@ import com.soffid.mda.annotation.*;
 	 translatedPackage="com.soffid.iam.api")
 public class Configuracio {
 
-	@Attribute(translated = "code" )
+	@Attribute(translated = "name", synonyms = {"code"} )
 	public java.lang.String codi;
 
 	@Attribute(translated = "value" )
 	public java.lang.String valor;
 
 	@Nullable
-	@Attribute(translated = "networkCode" )
+	@Attribute(translated = "networkName", synonyms= {"networkCode"} )
 	public java.lang.String codiXarxa;
 
 	@Nullable

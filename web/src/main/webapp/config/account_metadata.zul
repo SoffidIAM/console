@@ -4,7 +4,7 @@
 <div  xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 	id="frame"
 	use="com.soffid.iam.web.agent.MetadataHandler">
-	<datatable id="metadataGrid" autocommit="true"
+	<datatable id="metadataGrid" autocommit="true" use="com.soffid.iam.web.agent.MetadataTable"
 				dataPath="/metadata" maxheight="70vh" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 				<attribute name="columns"><![CDATA[
@@ -15,7 +15,7 @@
 - name: ${c:l('dadesAddicionals.zul.Label')}
   value: label 
 - name: ${c:l('dadesAddicionals.zul.Type')}
-  value: type  
+  value: typeDescription
   				]]></attribute>
 	</datatable>
 	<div width="100%" style="text-align: right"
@@ -33,7 +33,7 @@
 				${c:l('agents.zul.accountMetadata') } <pager datatable="../metadataGrid" />
 				<menu2>
 					<menu2item
-						image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }"
+						image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }"
 						onClick="ref:frame.delete" />
 				</menu2>
 				
@@ -91,15 +91,7 @@
 							<columns>
 								<column label="${c:l('dadesAddicionals.zul.Values')}"></column>
 								<column visible="${canModifyMetadata}" width="2em">
-									<imageclic align="center" src="~./img/list-add.gif">
-										<attribute name="onClick"><![CDATA[
-						if (canModifyMetadata) {
-							es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(self);
-							XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath(), "");
-						}
-						]]>
-														</attribute>
-									</imageclic>
+									<imageclic align="center" src="~./img/list-add.gif" onClick="ref:frame.addValue"/>
 								</column>
 							</columns>
 							<datarow>
@@ -208,8 +200,8 @@
 				</rows>
 			</grid>
 			<div style="text-align: right ">
-				<button image="~./img/undo.svg" label="${c:l('common.undo')}" onClick="ref:frame.undo"/>
-				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.undo"/>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 			</div>
 		</form>
 	</window>

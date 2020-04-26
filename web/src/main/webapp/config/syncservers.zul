@@ -22,6 +22,7 @@
 					<menu2item image="~./img/add.svg"
 						label="${c:l('agents.zul.Afegeixnou') }"
 						if="${canCreateAgent}" onClick="ref:frame.addNew" />
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
 
@@ -53,11 +54,11 @@
 
 				<menu2>
 					<menu2item if="${canManageServers}"
-						image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }"
+						image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }"
 						onClick="ref:frame.delete" />
 				</menu2>
 
-				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 
 			<form2 id="form" dataPath="listbox:/."
@@ -88,9 +89,9 @@
 					</rows>
 				</grid>
 				<div style="text-align: right; width: 100%">
-					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 					</databutton>
-					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+					<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 				</div>
 			</form2>
 		</div>

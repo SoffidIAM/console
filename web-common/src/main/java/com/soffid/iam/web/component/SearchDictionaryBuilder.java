@@ -463,7 +463,7 @@ public class SearchDictionaryBuilder {
 			Security.nestedLogoff();
 		}
 		sad.setLabels(listLabels);
-		sad.setValues(AccountType.literals());
+		sad.setValues(valueLabels);
 		sd.getAttributes().add(sad);
 	}
 

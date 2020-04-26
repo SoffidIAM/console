@@ -5,8 +5,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -41,6 +44,9 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.web.SearchAttributeDefinition;
+import com.soffid.iam.web.SearchDictionary;
+import com.soffid.iam.web.component.AttributeSearchBox;
 import com.soffid.iam.web.component.FileDump;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.SearchBox;
@@ -276,7 +282,23 @@ public class AgentHandler extends FrameHandler {
 		getModel().addEventListener("onCommit", 
 				(evt) -> onChangeClass());
 		
-		((SearchBox) getFellow("searchBox")).search();
+		
+		SearchBox searchBox = (SearchBox) getFellow("searchBox");
+		SearchDictionary dictionary = searchBox.getDictionary();
+		SearchAttributeDefinition att = findAttribute(dictionary, "url");
+		if (att != null) {
+			
+			AttributeSearchBox box = searchBox.addAttribute("url");
+			
+			Set<String> values = new HashSet<>();
+			Iterator<String> iterator = att.getValues().iterator();
+			iterator.next();
+			while (iterator.hasNext())
+				values.add (iterator.next());
+			box.setSelectedValues(values);
+		}			
+		searchBox.search();
+		
 		DataNodeCollection servers = (DataNodeCollection) getModel().getValue("/server");
 		if (servers.isEmpty())
 		{
@@ -289,6 +311,14 @@ public class AgentHandler extends FrameHandler {
 			}
 
 		}
+	}
+
+	private SearchAttributeDefinition findAttribute(SearchDictionary dictionary, String name) {
+		for (SearchAttributeDefinition att: dictionary.getAttributes()) {
+			if (att.getName().equals(name))
+				return att;
+		}
+		return null;
 	}
 
 	@Override
@@ -628,13 +658,13 @@ public class AgentHandler extends FrameHandler {
 	public void onSelectUserType (Event evt) {
 		missatge.setVisible(true);
 		// no es pot saber quin és el darrer que ha seleccionat... els agafem tots
-		List<Integer> elements = userTypeTable.getSelectedIndexes();
+		int[] elements = userTypeTable.getSelectedIndexes();
 		String tipusUsuariSeleccionats = "";
 		ListModel model = userTypeTable.getModel();
 		int numSel = 0;
-		for ( Integer pos: elements)
+		for ( int pos: elements)
 		{
-			DataNode dn = (DataNode) model.getElementAt(pos.intValue());
+			DataNode dn = (DataNode) model.getElementAt(pos);
 			UserType ut = (UserType) dn.getInstance();
 			tipusUsuariSeleccionats += ut.getCode()+",";
 			numSel++;

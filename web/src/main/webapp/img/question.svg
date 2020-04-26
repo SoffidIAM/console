@@ -45,7 +45,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="22.4"
-     inkscape:cx="13.680373"
+     inkscape:cx="3.8589444"
      inkscape:cy="17.370254"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -56,9 +56,9 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-width="1920"
-     inkscape:window-height="1043"
+     inkscape:window-height="1016"
      inkscape:window-x="0"
-     inkscape:window-y="1080"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:snap-global="false"
      inkscape:pagecheckerboard="true" />
@@ -70,7 +70,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -93,11 +93,11 @@
     </g>
     <g
        aria-label="?"
-       style="font-style:normal;font-weight:normal;font-size:9.50300121px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.23757505"
+       style="font-style:normal;font-weight:normal;font-size:9.50300121px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#22b9d8;fill-opacity:1;stroke:none;stroke-width:0.23757505"
        id="text1442">
       <path
          d="m 3.8392993,294.88595 h 0.9419478 v 1.17859 H 3.8392993 Z m 0.914107,-0.6821 H 3.8671401 v -0.71458 q 0,-0.46866 0.1299238,-0.77026 0.1299239,-0.30161 0.5475362,-0.70067 l 0.4176124,-0.41297 q 0.2644878,-0.24592 0.3804913,-0.46401 0.1206435,-0.21809 0.1206435,-0.44545 0,-0.41298 -0.306249,-0.66818 -0.301609,-0.25521 -0.8027438,-0.25521 -0.3665708,0 -0.7841832,0.1624 -0.4129722,0.16241 -0.8630655,0.4733 v -0.87235 q 0.4361729,-0.26449 0.8816261,-0.39441 0.4500933,-0.12992 0.9280274,-0.12992 0.8537853,0 1.3688405,0.45009 0.5196954,0.45009 0.5196954,1.18787 0,0.35265 -0.1670449,0.67282 -0.167045,0.31553 -0.5846573,0.71459 l -0.4083321,0.39905 q -0.2180865,0.21808 -0.3108892,0.34337 -0.088163,0.12064 -0.1252837,0.23664 -0.027841,0.0975 -0.041761,0.23665 -0.01392,0.13921 -0.01392,0.38049 z"
-         style="stroke-width:0.23757505"
+         style="stroke-width:0.23757505;fill:#22b9d8"
          id="path1498" />
     </g>
   </g>

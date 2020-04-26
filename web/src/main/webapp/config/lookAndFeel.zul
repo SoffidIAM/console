@@ -61,20 +61,20 @@
 			<h:input type='color' id="color1TextSelector" value="${color1text }" onChange="onChangeColor('${color1Texttb.uuid }', this.value)"></h:input >
 		</div>
 	</div>
+	<div >
+		<label style="display: inline-block; position: relative; bottom: 15px" value="Upload new image (250px wide):"/>
+		<fileupload mold="short" style="display:inline-block; width:500px; height:40px" onUpload="ref:frame.onUpload"/> 
+	</div>
 	<image style="width:250px; display:block; margin-left:175px" content="${logoImage }" id="logoImage"/>
 	<div >
-		<label style="vertical-align: top" value="Upload new image (250px wide):"/>
-		<fileupload native="true" mold="logo" style="display:inline-block; width:500px; height:40px" onUpload="ref:frame.onUpload"/> 
+		<label style="display: inline-block; position: relative; bottom: 15px" value="Upload new header image (35px height):"/>
+		<fileupload mold="short" style="display:inline-block; width:500px; height:40px" onUpload="ref:frame.onUpload2"/> 
 	</div>
 	<image style="height:35px; display:block;" content="${logoImage2 }" id="logoImage2"/>
-	<div >
-		<label style="vertical-align: top" value="Upload new header image (35px height):"/>
-		<fileupload native="true" mold="logo" style="display:inline-block; width:500px; height:40px" onUpload="ref:frame.onUpload2"/> 
-	</div>
 	<div style="margin-top: 2em">
-		<button label="${c:l('parametres.zul.Reset') }" onClick="ref:frame.reset"
+		<button image="/img/undo-r.svg" label="${c:l('parametres.zul.Reset') }" onClick="ref:frame.reset"
 			style="text-align:right"/>
-		<button label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.commit"
+		<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.commit"
 				style="text-align:right"/>
 	</div>
 </frame>

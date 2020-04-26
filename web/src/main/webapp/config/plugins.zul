@@ -28,6 +28,7 @@
 			td.style.textDecoration = "line-through";
 		}
 	}
+	
 	</script>
 
 	<datamodel id="model" rootNode="serverPlugins" src="descriptorPlugins.xml"/>
@@ -36,8 +37,9 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="~./img/restart.svg" if="${canUpdatePlugins}" label="${c:l('plugins.zul.RestartServer') }" onClick="ref:frame.restartConsole"/>
-					<menu2item image="~./img/add.svg"  if="${canUpdatePlugins}"  label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
+					<menu2item image="/img/restart.svg" if="${canUpdatePlugins}" label="${c:l('plugins.zul.RestartServer') }" onClick="ref:frame.restartConsole"/>
+					<menu2item image="/img/add.svg"  if="${canUpdatePlugins}"  label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/serverPlugin"
@@ -62,10 +64,10 @@
 					<pager datatable="listbox"/>
 					
 					<menu2>
-						<menu2item if="${canUpdatePlugins}" image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+						<menu2item if="${canUpdatePlugins}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 					</menu2>
 					
-					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				</div>
 				<form id="form" onChangeXPath="ref:frame.onChangeForm"
 					dataPath="/listbox:/." width="100%">
@@ -117,9 +119,8 @@
 					</form>
 				</div>
 				<div style="text-align: right; width: 100%">
-					<databutton image="~./img/undo.svg" label="Undo" datamodel="/model" onClick="ref:frame.undo">
-					</databutton>
-					<databutton image="~./img/save.svg" label="Apply changes" datamodel="/model" onClick="ref:frame.apply"/>
+					<databutton image="/img/undo-r.svg" label="Undo" datamodel="/model" onClick="ref:frame.undo" />
+					<databutton image="/img/save-r.svg" label="Apply changes" datamodel="/model" onClick="ref:frame.apply"/>
 				</div>
 		</div>		
 	</div>

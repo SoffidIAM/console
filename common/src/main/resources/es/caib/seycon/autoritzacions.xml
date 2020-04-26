@@ -1127,14 +1127,82 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>passwordDomain:create</codi>
+		<descripcio>Create password domains and policies</descripcio>
+		<ambit>Password policies</ambit>
+		<hereta>
+			passwordDomain:query,
+			passwordDomain:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>passwordDomain:update</codi>
+		<descripcio>Update password domains and policies</descripcio>
+		<ambit>Password policies</ambit>
+		<hereta>
+			passwordDomain:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>passwordDomain:delete</codi>
+		<descripcio>Delete password domains and policies</descripcio>
+		<ambit>Password policies</ambit>
+		<hereta>
+			passwordDomain:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>passwordDomain:query</codi>
+		<descripcio>Query password domains and policies</descripcio>
+		<ambit>Password policies</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>userType:create</codi>
+		<descripcio>Create user types</descripcio>
+		<ambit>User domains</ambit>
+		<hereta>
+			userType:query,
+			userType:update
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>userType:update</codi>
+		<descripcio>Update user types</descripcio>
+		<ambit>User domains</ambit>
+		<hereta>
+			userType:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>userType:delete</codi>
+		<descripcio>Delete user types</descripcio>
+		<ambit>User domains</ambit>
+		<hereta>
+			userType:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>userType:query</codi>
+		<descripcio>Query user types</descripcio>
+		<ambit>User domains</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>seu:agents:show</codi>
-		<descripcio>Access to agents window</descripcio>
+		<descripcio>Access to agents page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:aplicacions:show</codi>
-		<descripcio>Access to applications window</descripcio>
+		<descripcio>Access to applications page</descripcio>
 		<tipusDomini>APLICACIONS</tipusDomini>
 		<ambit>Soffid</ambit>
 		<hereta>
@@ -1144,81 +1212,81 @@
 
 	<autoritzacio>
 		<codi>seu:auditoria:show</codi>
-		<descripcio>Access to audit window</descripcio>
+		<descripcio>Access to audit page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:autoritzacions:show</codi>
-		<descripcio>Access to authorizations window</descripcio>
+		<descripcio>Access to authorizations page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:correu:show</codi>
-		<descripcio>Access to mailing list window</descripcio>
+		<descripcio>Access to mailing list page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:dominiscorreu:show</codi>
-		<descripcio>Access to mail domains window</descripcio>
+		<descripcio>Access to mail domains page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:dadesAddicionals:show</codi>
-		<descripcio>Access to additional data window</descripcio>
+		<descripcio>Access to additional data page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:grups:show</codi>
-		<descripcio>Access to groups management window</descripcio>
+		<descripcio>Access to groups management page</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:impressores:show</codi>
-		<descripcio>Access to printers window</descripcio>
+		<descripcio>Access to printers page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:parametres:show</codi>
-		<descripcio>Access to configuration parameters window</descripcio>
+		<descripcio>Access to configuration parameters page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:plugins:show</codi>
-		<descripcio>Access to agents window</descripcio>
+		<descripcio>Access to agents page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:registreAcces:show</codi>
-		<descripcio>Access to access logs window</descripcio>
+		<descripcio>Access to access logs page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:serveis:show</codi>
-		<descripcio>Access to services window</descripcio>
+		<descripcio>Access to services page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:tipusUO:show</codi>
-		<descripcio>Access to organizational unit window</descripcio>
+		<descripcio>Access to organizational unit page</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:usuaris:show</codi>
-		<descripcio>Access to users management window</descripcio>
+		<descripcio>Access to users management page</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<ambit>Soffid</ambit>
 		<hereta>
@@ -1229,25 +1297,37 @@
 
 	<autoritzacio>
 		<codi>seu:menusIntranet:show</codi>
-		<descripcio>Access to intranet menu access window</descripcio>
+		<descripcio>Access to intranet menu access page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:monitor:show</codi>
-		<descripcio>Access to seycon server status window</descripcio>
+		<descripcio>Access to seycon server status page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:usersDomain:show</codi>
-		<descripcio>Access to user domains management window</descripcio>
+		<descripcio>Access to user domains management page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:userTypes:show</codi>
+		<descripcio>Access to user types management page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:passwordPolicies:show</codi>
+		<descripcio>Access to user password policies management page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>
 		<codi>seu:tenant:show</codi>
-		<descripcio>Access to tenants management window</descripcio>
+		<descripcio>Access to tenants management page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
@@ -1344,7 +1424,7 @@
 
 	<autoritzacio>
 		<codi>seu:attributeTranslation:show</codi>
-		<descripcio>Access to attribute translation window</descripcio>
+		<descripcio>Access to attribute translation page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 

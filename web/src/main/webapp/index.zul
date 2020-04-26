@@ -58,8 +58,6 @@
 		session.removeAttribute("$soffid$target");
 		if (target != null) initialPage = target;
 	</zscript>
-	<style src="/css/localSEU.css"/>
-	<style src="/css/devices.css"/>
 	<application id="app" allowOpenMultipleTabs="true" autoReload="false" favorits="//favorits/favorits"
 	    template="main/application.zul" 
 		initialPage="${initialPage}"

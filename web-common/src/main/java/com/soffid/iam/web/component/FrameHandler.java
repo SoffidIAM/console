@@ -1,6 +1,7 @@
 package com.soffid.iam.web.component;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -11,6 +12,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
@@ -122,12 +124,18 @@ public class FrameHandler extends Frame {
 	}
 	
 	public void delete() throws CommitException {
-		Component lb = getListbox();
-		if (lb instanceof DataTable)
-			((DataTable) lb).delete();
-		if (lb instanceof DataTree2)
-			((DataTree2) lb).delete();
-		hideDetails();
+		Missatgebox.confirmaOK_CANCEL(Labels.getLabel("common.delete"), 
+				(event) -> {
+					if (event.getName().equals("onOK")) {
+						Component lb = getListbox();
+						if (lb instanceof DataTable)
+							((DataTable) lb).delete();
+						if (lb instanceof DataTree2)
+							((DataTree2) lb).delete();
+						hideDetails();
+						
+					}
+				});
 	}
 
 	public void onChangeForm(Event ev) {
@@ -140,7 +148,11 @@ public class FrameHandler extends Frame {
 	
 	public void undo(Event ev) throws CommitException {
 		Component lb = getListbox();
-		Long id = (Long) XPathUtils.getValue( getForm(), "/@id");
+		Long id = null;
+		try {
+			id = (Long) XPathUtils.getValue( getForm(), "/@id");
+		} catch (Exception e) {
+		}
 		int pos[] = null;
 		if (lb instanceof DataTree2)
 			pos = ((DataTree2) lb).getSelectedItem();
@@ -226,5 +238,12 @@ public class FrameHandler extends Frame {
 	
 	public void applyNoClose(Event event) throws CommitException {
 		getModel().commit();
+	}
+
+	
+	public void downloadCsv(Event event) {
+		Component lb = getListbox();
+		if (lb instanceof DataTable)
+			((DataTable) lb).download();
 	}
 }

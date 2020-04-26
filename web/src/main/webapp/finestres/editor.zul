@@ -2,12 +2,12 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<window closable="true" id="top" position="top, center" onCancel="" title="${c:l('editorJS.Titol')}" visible="false" width="90%">
 <zk xmlns:h="http://www.w3.org/1999/xhtml"> 
 
 	<script src='~./js/codemirror/java-classes.js' />
 	<script src='/comu/syncserver-classes.js' />
 
-	<window closable="true" id="top" position="center, center" onCancel="" title="${c:l('editorJS.Titol')}" visible="false" width="90%">
 		<zscript>
 			void cleanWindow()
 			{

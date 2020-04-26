@@ -12,7 +12,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		</menu2>
 
 		<div sclass="col_der help"  onClick="ref:appWindow.help">
-			<image src="/img/question.svg"/>
+			<image src="/img/question-black.svg"/>
 		</div>
 		
 		<image src="anonymous/small-logo.png" sclass="logo col_der"/>
@@ -28,8 +28,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 			<label class="maintitle" id="title" visible="false"/>
 		</div>
 	</div>
-	<div sclass="workarea" style="width: 100%">
-	<div id="workArea" style="width: 100%">
+	<div sclass="workarea" id="workArea" style="width: 100%">
 		<include/>
 		<include/>
 		<include/>
@@ -40,10 +39,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		<include/>
 		<include/>
 	</div>
-	</div>
-	<window id="searchBox" use="com.soffid.iam.web.main.SearchBoxWindow">
-		<datamodel id="model" class="com.soffid.iam.web.main.SmartSearchNode"/>
-		<timer id="timer" running="false" repeats="true" delay="500" />	
-		<datatable id="table" footer="false" dataPath="/appWindow/searchBox/model:/data" />
-	</window>
+	<popup id="searchBox" use="com.soffid.iam.web.main.SearchBoxWindow" sclass="main-search ctxpopup">
+		<timer id="timer" running="false" repeats="true" delay="200" onTimer="ref:searchBox.onTimer"/>	
+	</popup>
 </window>

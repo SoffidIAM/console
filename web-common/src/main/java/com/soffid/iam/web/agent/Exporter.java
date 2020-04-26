@@ -17,12 +17,16 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Text;
 
 import es.caib.seycon.ng.comu.AttributeDirection;
 import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.ObjectMapping;
 import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.ObjectMappingTrigger;
+import com.soffid.iam.api.ReconcileTrigger;
+
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.jxpath.JXPathContext;
@@ -47,6 +51,20 @@ public class Exporter {
 			serializeObjectMapping (doc, rootElement, ctx, p);
 		}
 		
+		for ( Iterator it = ctx.iteratePointers("/reconcileTrigger");
+				it.hasNext();)
+		{
+			Pointer p = (Pointer) it.next();
+			serializeReconcileTrigger (doc, rootElement, ctx, p);
+		}
+
+		for ( Iterator it = ctx.iteratePointers("/metadata");
+				it.hasNext();)
+		{
+			Pointer p = (Pointer) it.next();
+			serializeMetadata(doc, rootElement, ctx, p);
+		}
+
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -92,7 +110,78 @@ public class Exporter {
 			Pointer p2 = (Pointer) it.next();
 			serializeTrigger (doc, e, ctx, p2);
 		}
+
+		for ( Iterator it = ctx.iteratePointers(p.asPath()+"/metadata");
+				it.hasNext();)
+		{
+			Pointer p2 = (Pointer) it.next();
+			serializeMetadata (doc, e, ctx, p2);
+		}
 	}
+
+	private void serializeReconcileTrigger(Document doc, Element rootElement, JXPathContext ctx, Pointer p) {
+		DataNode dn = (DataNode) p.getValue();
+		ReconcileTrigger instance = (ReconcileTrigger) dn.getInstance();
+		
+		Element e = doc.createElement("loadTrigger");
+		e.setAttribute("objectType", instance.getObjectType().getValue());
+		e.setAttribute("trigger", instance.getTrigger().getValue());
+		e.setAttribute("script", instance.getScript());
+		rootElement.appendChild(e);
+	}
+
+	private void serializeMetadata(Document doc, Element rootElement, JXPathContext ctx, Pointer p) {
+		DataNode dn = (DataNode) p.getValue();
+		DataType instance = (DataType) dn.getInstance();
+		
+		if (Boolean.TRUE.equals( instance.getBuiltin() ))
+			return;
+		
+		Element e = doc.createElement("metadata");
+		e.setAttribute("name", instance.getName());
+		e.setAttribute("customObjectType", instance.getCustomObjectType());
+		e.setAttribute("dataObjectType", instance.getDataObjectType());
+		e.setAttribute("filterExpression", instance.getFilterExpression());
+		e.setAttribute("label", instance.getLabel());
+		e.setAttribute("onChangeTrigger", instance.getOnChangeTrigger());
+		e.setAttribute("onFocusTrigger", instance.getOnFocusTrigger());
+		e.setAttribute("onLoadTrigger", instance.getOnLoadTrigger());
+		e.setAttribute("validationExpression", instance.getValidationExpression());
+		e.setAttribute("visibilityExpression", instance.getVisibilityExpression());
+		if (instance.getAdminVisibility() != null)
+			e.setAttribute("adminVisibility", instance.getAdminVisibility().getValue());
+		if (instance.getOperatorVisibility() != null)
+			e.setAttribute("operatorVisibility", instance.getOperatorVisibility().getValue());
+		if (instance.getUserVisibility() != null)
+			e.setAttribute("userVisibility", instance.getUserVisibility().getValue());
+		if (instance.getLetterCase() != null)
+			e.setAttribute("letterCase", instance.getLetterCase().getValue());
+		e.setAttribute("multiValued", Boolean.toString(instance.isMultiValued()));
+		e.setAttribute("required", Boolean.toString(instance.isRequired()));
+		if (instance.getMultiValuedRows() != null)
+			e.setAttribute("multiValuedRows", instance.getMultiValuedRows().toString());
+		e.setAttribute("order", instance.getOrder().toString());
+		if (instance.getScope() != null)
+			e.setAttribute("scope", instance.getScope().getValue());
+		if (instance.getSize() != null)
+			e.setAttribute("size", instance.getSize().toString());
+		if (instance.getType() != null)
+			e.setAttribute("type", instance.getType().getValue());
+		if (instance.getUnique() != null)
+			e.setAttribute("unique", instance.getUnique().toString());
+		rootElement.appendChild(e);
+		if (instance.getValues() != null)
+		{
+			for (String v: instance.getValues())
+			{
+				Element ee = doc.createElement("value");
+				e.appendChild(ee);
+				Text t = doc.createTextNode(v);
+				ee.appendChild(t);
+			}
+		}
+	}
+
 
 	private void serializeProperty(Document doc, Element parent, JXPathContext ctx,
 			Pointer p) {

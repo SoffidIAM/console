@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="importCsv"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window position="top, center"
+	use="com.soffid.iam.web.common.FileUpload2"
+	sizable="true" 
+	style="min-width: 40em;"
+	mode="highlighted"
+	id="file-upload"
+	closable="false"
+	width="650px">
+
+	<fileupload style="width: 650px; height: 120px; padding: 35px 120px 20px 120px"
+		id="${c:l('csvimport.upload') }" 
+		onUpload="ref:file-upload.onUpload"
+		onClose ="ref:file-upload.cancelUpload"
+		mold="compact"/>
+</window>
+

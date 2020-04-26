@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="userType" type="userType">
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findAllUserType">
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.UserType">
+			</new-instance-bean>
+		</finder>
+
+	</datanode>
+	
+	<datanode name="userType">
+		<ejb-handler jndi="java:/module/UserDomainService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+</zkib-model>

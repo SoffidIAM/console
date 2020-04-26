@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="identity" title="Search for identities"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window id="identityWindow" closable="true" position="center, center"
+	use="com.soffid.iam.web.popup.IdentityHandler"
+	sizable="false" 
+	style="min-width: 60em; width:60%"
+	title="${c:l('identity.title')}" 
+	visible="false"
+	onDisplay="ref:identityWindow.start"
+	onClose="ref:identityWindow.onClose">
+
+	<timer id="timer" repeats="true" delay="1000" running="false" onTimer="ref:identityWindow.onTimer">
+	</timer>
+
+	<div style="padding: 3em">
+		<div id="selected" style="display: inline"/>
+		<div>
+		<image src="~./img/soffid-progress.gif" visible="false" style="height: 2em; position:absolute; left: 6px" id="searchProgress"/>
+			<textbox style="display:inline-block; width:100%; min-width: 20em; border: none; border-bottom: solid darkgrey 1px; outline:none; margin-right: 3em" id="textbox"
+				onOK="ref:identityWindow.search"
+				onChanging="ref:identityWindow.search">
+			</textbox>
+		</div>
+		<div id="result" style="max-height:12em; overflow-x:hidden; overflow-y:auto"/>
+	</div>
+	
+	<div style="float: right;">
+		<button label="${c:l('agentsllista.zul.Accepta') }" onClick="ref:identityWindow.accept"/>
+		<button label="${c:l('agentsllista.zul.Cancel·la') }" onClick="ref:identityWindow.cancel"/>
+	</div>
+	
+	<div style="clear: both;"/>
+
+</window>
+

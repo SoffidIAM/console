@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.config.UserTypeHandler" id="frame">
+
+	<datamodel id="model" rootNode="root" src="userTypesDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUserType}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUserType &amp;&amp; canUpdateUserType &amp;&amp; canDeleteUserType}" onClick="ref:frame.importCsv"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/userType"
+			    maxheight="70vh"
+				sortColumn="0" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+		- name: ${c:l('user-type.shortName')}
+		  value: name
+		- name: ${c:l('accounts.description')}
+		  value: description
+		- name: ${c:l('dominiUsuaris.zul.Unmanaged')}
+		  template: ${"${"}unmanaged? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"${"}"}
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${canCreateUserType}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div id="dades">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+					<pager datatable="listbox"/>
+					
+					<menu2>
+						<menu2item if="${canDeleteUserType}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					</menu2>
+					
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				</div>
+				<form id="form" onChangeXPath="ref:frame.onChangeDades"
+					dataPath="/listbox:/." width="100%">
+						<grid sclass="noBorderGrid">
+							<rows>
+								<row>
+									<label value="${c:l('user-type.shortName')} :"/>
+									
+									<textbox sclass="text required" bind="name" readonly="${!canUpdateUserType}" maxlength="10"
+											width="100%" constraint="no empty"/>
+								</row>
+								
+								
+								<row>
+									<label value="${c:l('accounts.description')} :"/>
+									<textbox bind="@description" readonly="${!canUpdateUserType}" maxlength="50"
+											width="100%"/>
+								</row>
+
+								
+								<row>
+									<label value="${c:l('dominiUsuaris.zul.Unmanaged')} :"/>
+									<switch bind="unmanaged" disabled="${!canUpdateUserType }"/>
+								</row>
+
+							</rows>
+						</grid>
+						
+					</form>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					</databutton>
+					<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+		</div>
+	</div>
+</frame>

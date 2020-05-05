@@ -84,6 +84,11 @@ public class MailUtils {
 		            "com.soffid.iam.utils.CustomSSLFactory");
 		    props.put("mail.smtp.socketFactory.fallback", "false");
 		    props.put("mail.smtp.starttls.enable", "true");
+		} 
+		
+		String startTls = ConfigurationCache.getProperty("mail.smtp.starttls.enable");
+		if (startTls != null) {
+			props.put("mail.smtp.starttls.enable", startTls); 
 		}
 		String auth = getConfigValue("mail.auth", "false");
 		if ("true".equals(auth))

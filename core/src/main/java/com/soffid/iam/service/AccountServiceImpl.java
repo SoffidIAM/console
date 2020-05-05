@@ -1450,14 +1450,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					else
 						throw new InternalErrorException(Messages.getString("AccountServiceImpl.AccounNotBounForUser")); //$NON-NLS-1$
 				}
-				else if (ae.getType().equals(AccountType.IGNORED))
+				else if (ae.getType().equals(AccountType.IGNORED) && 
+						! ae.getSystem().getName().equals( ConfigurationCache.getProperty("AutoSSOSystem")) )
 				{
-					throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoAuthorizedChangePassAccDisabled"))); //$NON-NLS-1$
+					throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoAuthorizedChangePassAccDisabled"))); //$NON-NLS-1$
 				}
 				else if (ae.getType().equals(AccountType.SHARED))
 				{
 					if (callerUe == null)
-						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
+						throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
 					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
 					boolean found = false;
 					for (String user : users) {
@@ -1501,7 +1502,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
 		Exception lastException = null;
-		if ( account.getStatus() != AccountStatus.DISABLED)
+		if ( ! account.isDisabled() )
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {

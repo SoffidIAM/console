@@ -50,6 +50,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeExecution;
 import com.soffid.iam.api.AccessTreeExecutionType;
+import com.soffid.iam.api.LaunchType;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.SelfService;
@@ -434,7 +435,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 	}
 
 	private void openAccount(Treeitem selected, Object obj)
-			throws InternalErrorException, NamingException, CreateException {
+			throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException {
 		selected.setSelected(false);
 		com.soffid.iam.api.Account account = (com.soffid.iam.api.Account) obj;
 		String url = account.getLoginUrl();
@@ -442,41 +443,45 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			url = (String) account.getAttributes().get("SSO:URL");
 		if (url != null)
 		{
-			url.replaceAll("'", "\\'");
-			String name = account.getName();
-			if (account.getLoginName() != null && ! account.getLoginName().isEmpty())
-				name = account.getLoginName();
-			com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
-			boolean ssokm = "true".equals(ConfigurationCache.getProperty("soffid.ssokm.enable"));
-			if (password == null || ! ssokm)
-				Clients.evalJavaScript("window.open('"+url+"', '_blank');");
-			else
-			{
-				JSONObject j = new JSONObject();
-				for (String att: account.getAttributes().keySet())
-				{
-					if (att.startsWith("SSO:") &&
-							!att.equals("SSO:URL") && 
-							!att.equals("SSO:Server"))
-					{
-						try {
-							String value = (String) account.getAttributes().get(att);
-							String[] values = value.split("=");
-							if (values.length == 2)
-							{
-								j.put( URLDecoder.decode(values[0], "UTF-8"), 
-										URLDecoder.decode(values[1], "UTF-8"));
-							}
-						} catch (Exception e) {}
-					}
-				}
-				try {
-					j.put("url", url);
-					j.put("account", name);
-					j.put("password", password.getPassword());
-					Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
-				} catch (JSONException e) {
+			if ( account.getLaunchType() == LaunchType.LAUNCH_TYPE_PAM) {
+				openPamEntryPoint(null, account);
+			} else {
+				
+				url.replaceAll("'", "\\'");
+				String name = account.getName();
+				if (account.getLoginName() != null && ! account.getLoginName().isEmpty())
+					name = account.getLoginName();
+				com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
+				if (password == null || account.getLaunchType() != LaunchType.LAUNCH_TYPE_WEBSSO)
 					Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+				else
+				{
+					JSONObject j = new JSONObject();
+					for (String att: account.getAttributes().keySet())
+					{
+						if (att.startsWith("SSO:") &&
+								!att.equals("SSO:URL") && 
+								!att.equals("SSO:Server"))
+						{
+							try {
+								String value = (String) account.getAttributes().get(att);
+								String[] values = value.split("=");
+								if (values.length == 2)
+								{
+									j.put( URLDecoder.decode(values[0], "UTF-8"), 
+											URLDecoder.decode(values[1], "UTF-8"));
+								}
+							} catch (Exception e) {}
+						}
+					}
+					try {
+						j.put("url", url);
+						j.put("account", name);
+						j.put("password", password.getPassword());
+						Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+					} catch (JSONException e) {
+						Clients.evalJavaScript("window.open('"+url+"', '_blank');");
+					}
 				}
 			}
 		}
@@ -545,6 +550,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 		return null;
 	}
+
 	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, List<com.soffid.iam.api.Account> accounts) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
 		Long name = instance.getId();
 		// Get passwords
@@ -563,7 +569,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 		else if (r.size() == 1)
 		{
-			openPamEntryPoint (instance, exe, (com.soffid.iam.api.Account) r.get(0)[2]);
+			openPamEntryPoint (exe, (com.soffid.iam.api.Account) r.get(0)[2]);
 		} else {
 			Window w = (Window) getFellow ("selectAccount");
 			Listbox lb = (Listbox) w.getFellow("accountsListbox");
@@ -590,9 +596,15 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		}
 	}
 	
-	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, com.soffid.iam.api.Account account) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
-		NewPamSession s = EJBLocator.getPamSessionService()
-				.createJumpServerSession(account, exe.getContingut());
+	private void openPamEntryPoint(ExecucioPuntEntrada exe, com.soffid.iam.api.Account account) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		NewPamSession s;
+		if (exe == null || exe.getContingut() == null || exe.getContingut().trim().isEmpty()) {
+			s= EJBLocator.getPamSessionService()
+					.createJumpServerSession(account);
+		} else {
+			s= EJBLocator.getPamSessionService()
+					.createJumpServerSession(account, exe.getContingut());
+		}
 		if (s == null)
 			throw new UiException("Unable to start session");
 		else
@@ -615,6 +627,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 			Clients.evalJavaScript(sb.toString());
 		}
 	}
+
 	
 	public String encodeJS(String url) {
 		return url.replaceAll("\\\\","\\\\\\\\").replaceAll("'", "\\'");
@@ -772,7 +785,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		{
 			Object[] values = (Object[]) selected.getValue();
 			com.soffid.iam.api.Account account = (com.soffid.iam.api.Account) values[2];
-			openPamEntryPoint(currentEntryPoint, currentExecutionMethod, account);
+			openPamEntryPoint(currentExecutionMethod, account);
 		}
 		
 	}

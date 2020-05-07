@@ -49,6 +49,7 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -127,7 +128,12 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			// Now remove unneded roles
 			for (RoleAccountEntity role : roles) {
                 if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
-                    method.revoke(user, role);
+                	if (role.isEnabled() || 
+                			role.getEndDate() == null ||
+                			role.getEndDate().after(new Date()))
+                	{
+                		method.revoke(user, role);
+                	}
                 }
             }
 		} catch (Exception e) {

@@ -16,5 +16,8 @@ public class OTPValidationService {
 	
 	@Operation(grantees= {Tothom.class})
 	public boolean validatePin (Challenge challenge, String pin) {return false;}
+
+	@Operation(grantees= {Tothom.class})
+	public boolean resetFailCount (String account) {return false;}
 }
 

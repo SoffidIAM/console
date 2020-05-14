@@ -36,6 +36,7 @@ import es.caib.seycon.ng.exception.InvalidPasswordException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
@@ -160,4 +161,20 @@ public class PasswordServiceImpl
        	else
        		return ""; //$NON-NLS-1$
 	}
+
+	@Override
+    protected Calendar handleGetPasswordExpiredDate(java.lang.String user, java.lang.String system) throws java.lang.Exception {
+       	AccountEntity acc = getAccountEntityDao().findByNameAndSystem(user, system);
+       	if (acc == null)
+   			throw new InternalErrorException("Account not found "+user+" at "+system);
+       	long userId = 0;
+   		for (UserAccountEntity ua : acc.getUsers()) {
+            userId = ua.getUser().getId();
+            break;
+        }
+   		if (userId==0)
+   			throw new InternalErrorException("Account user not found, account "+user+" at "+system);
+   		return getInternalPasswordService().getPasswordExpiredDate(userId, acc.getSystem().getPasswordDomain().getId());
+    }
+
 }

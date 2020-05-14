@@ -1729,4 +1729,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		return getAccountPasswordsStatus(accountEntity);
 	}
 
+	@Override
+	protected Calendar handleGetPasswordExpiredDate(long user, long passwordDomain) throws Exception {
+		UserEntity ue = getUserEntityDao().load(user);
+		PasswordDomainEntity pde = getPasswordDomainEntityDao().load(passwordDomain);
+		for (PasswordEntity pe : getPasswordEntityDao().findLastByUserDomain(ue, pde)) {
+			if (pe==null || pe.getExpirationDate()==null)
+				return null;
+			Calendar c = Calendar.getInstance();
+			c.setTime(pe.getExpirationDate());
+			return c;
+		}
+		return null;
+	}
 }

@@ -599,7 +599,7 @@ public class SAMLServiceInternal {
 		Signature signature = signatureBuilder.buildObject(Signature.DEFAULT_ELEMENT_NAME);
 		signature.setSigningCredential(cred);
 		signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-		signature.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA);
+		signature.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256);
 		signature.setKeyInfo(generateKeyInfo());
 		req.setSignature(signature);
 		
@@ -682,7 +682,7 @@ public class SAMLServiceInternal {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
         SecureRandom random = new SecureRandom();
 
-        keyGen.initialize(1024, random);
+        keyGen.initialize(2048, random);
         KeyPair pair = keyGen.generateKeyPair();
         // Generar clave raiz
         X509Certificate cert = createCertificate(pair.getPublic(), pair.getPrivate());
@@ -702,7 +702,7 @@ public class SAMLServiceInternal {
         generator.setNotAfter(new Date(l));
         generator.setNotBefore(new Date(now));
         generator.setSerialNumber(BigInteger.valueOf(now));
-        generator.setSignatureAlgorithm("sha1WithRSAEncryption");
+        generator.setSignatureAlgorithm("sha256WithRSAEncryption");
         return generator;
     }
 

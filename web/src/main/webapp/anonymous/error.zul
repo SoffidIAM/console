@@ -42,6 +42,13 @@
 		    	 Throwable root = th;
 		    	 do
 		    	 {
+			    	 if (root instanceof javax.security.auth.login.LoginException)
+			    	 {
+			    		 session.invalidate();
+	 					 closeSession = true;
+			    	 }
+		    		 if (root instanceof OutOfMemoryError)
+		    			 session.invalidate();
 		    		 if (root instanceof javax.ejb.EJBException)
 		    		 {
 		    			 if (root.getCausedByException() == null) break;
@@ -54,30 +61,6 @@
 		    	 } while (true);
 		    	 message = message + " "+root.toString ();
 		    	 log.warn("Error on "+uri+": "+reason+" - "+message, th);
-		    	 if (root instanceof javax.security.auth.login.LoginException)
-		    	 {
-					Execution ex = Executions.getCurrent();
-					javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) ex.getNativeRequest();
-					javax.servlet.http.HttpServletResponse resp = (javax.servlet.http.HttpServletResponse) ex.getNativeResponse();
-					Class c = Class.forName("es.caib.loginModule.util.SessionManager"); //$NON-NLS-1$
-					Object sessionManager = c.newInstance();
-					java.lang.reflect.Method m = c.getMethod("endSession", //$NON-NLS-1$
-						new Class [] {
-							javax.servlet.http.HttpServletRequest.class,
-							javax.servlet.http.HttpServletResponse.class
-						});
-					
-					try {
-						m.invoke(sessionManager, 
-							new Object[] {
-								req,
-								resp
-							});
-					} catch (Exception e) {
-						
-					}
-					closeSession = true;
-		    	 }
 			 }		     
 		    	 
 		     

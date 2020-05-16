@@ -41,6 +41,16 @@ import org.hibernate.type.Type;
  */
 public class CustomSession implements Session
 {
+	Runtime runtime = Runtime.getRuntime();
+	protected void checkMemoryUsage() {
+		long max = runtime.maxMemory();
+		long used = runtime.totalMemory() - runtime.freeMemory();
+		long free = max - used ;
+		long pct = free * 100L / max;
+		if (pct < 15)
+			throw new OutOfMemoryError("System is running out of memory");
+	}
+
 	Log log = LogFactory.getLog(getClass());
 	
 	private Session proxy;
@@ -76,29 +86,35 @@ public class CustomSession implements Session
 	}
 	public List find (String query) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.find(query);
 	}
 	public List find (String query, Object value, Type type) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.find(query, value, type);
 	}
 	public List find (String query, Object[] values, Type[] types)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.find(query, values, types);
 	}
 	public Iterator iterate (String query) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.iterate(query);
 	}
 	public Iterator iterate (String query, Object value, Type type)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.iterate(query, value, type);
 	}
 	public Iterator iterate (String query, Object[] values, Type[] types)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.iterate(query, values, types);
 	}
 	public Collection filter (Object collection, String filter)
@@ -131,11 +147,13 @@ public class CustomSession implements Session
 	}
 	public Query createSQLQuery (String sql, String returnAlias, Class returnClass)
 	{
+		checkMemoryUsage();
 		return proxy.createSQLQuery(sql, returnAlias, returnClass);
 	}
 	public Query createSQLQuery (String sql, String[] returnAliases,
 					Class[] returnClasses)
 	{
+		checkMemoryUsage();
 		return proxy.createSQLQuery(sql, returnAliases, returnClasses);
 	}
 	public void save (Object object, Serializable id) throws HibernateException
@@ -170,9 +188,7 @@ public class CustomSession implements Session
 	}
 	public void flush () throws HibernateException
 	{
-//		long t = System.currentTimeMillis();
 		proxy.flush();
-//		log.info("Flush time: "+(System.currentTimeMillis()-t));
 	}
 	public void setFlushMode (FlushMode flushMode)
 	{
@@ -234,23 +250,28 @@ public class CustomSession implements Session
 	public Object load (Class theClass, Serializable id, LockMode lockMode)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.load(theClass, id, lockMode);
 	}
 	public Object load (String entityName, Serializable id, LockMode lockMode)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.load(entityName, id, lockMode);
 	}
 	public Object load (Class theClass, Serializable id) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.load(theClass, id);
 	}
 	public Object load (String entityName, Serializable id) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.load(entityName, id);
 	}
 	public void load (Object object, Serializable id) throws HibernateException
 	{
+		checkMemoryUsage();
 		proxy.load(object, id);
 	}
 	public void replicate (Object object, ReplicationMode replicationMode)
@@ -360,35 +381,43 @@ public class CustomSession implements Session
 	}
 	public Criteria createCriteria (Class persistentClass)
 	{
+		checkMemoryUsage();
 		return proxy.createCriteria(persistentClass);
 	}
 	public Criteria createCriteria (Class persistentClass, String alias)
 	{
+		checkMemoryUsage();
 		return proxy.createCriteria(persistentClass, alias);
 	}
 	public Criteria createCriteria (String entityName)
 	{
+		checkMemoryUsage();
 		return proxy.createCriteria(entityName);
 	}
 	public Criteria createCriteria (String entityName, String alias)
 	{
+		checkMemoryUsage();
 		return proxy.createCriteria(entityName, alias);
 	}
 	public Query createQuery (String queryString) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.createQuery(queryString);
 	}
 	public SQLQuery createSQLQuery (String queryString) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.createSQLQuery(queryString);
 	}
 	public Query createFilter (Object collection, String queryString)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.createFilter(collection, queryString);
 	}
 	public Query getNamedQuery (String queryName) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.getNamedQuery(queryName);
 	}
 	public void clear ()
@@ -397,20 +426,24 @@ public class CustomSession implements Session
 	}
 	public Object get (Class clazz, Serializable id) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.get(clazz, id);
 	}
 	public Object get (Class clazz, Serializable id, LockMode lockMode)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.get(clazz, id, lockMode);
 	}
 	public Object get (String entityName, Serializable id) throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.get(entityName, id);
 	}
 	public Object get (String entityName, Serializable id, LockMode lockMode)
 					throws HibernateException
 	{
+		checkMemoryUsage();
 		return proxy.get(entityName, id, lockMode);
 	}
 	public String getEntityName (Object object) throws HibernateException

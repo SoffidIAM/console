@@ -26,34 +26,6 @@
 				<textbox id="exception" visible="false" readonly="true" rows="10" width="675px"/>
 			</vbox>
 		</div>		
-		<zscript><![CDATA[
-			void resetSession ()
-			{
-					Executions.sendRedirect(null);
-					Execution ex = Executions.getCurrent();
-					javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) ex.getNativeRequest();
-					javax.servlet.http.HttpServletResponse resp = (javax.servlet.http.HttpServletResponse) ex.getNativeResponse();
-					Class c = Class.forName("es.caib.loginModule.util.SessionManager"); //$NON-NLS-1$
-					Object sessionManager = c.newInstance();
-					java.lang.reflect.Method m = c.getMethod("endSession", //$NON-NLS-1$
-						new Class [] {
-							javax.servlet.http.HttpServletRequest.class,
-							javax.servlet.http.HttpServletResponse.class
-						});
-					
-					try {
-						m.invoke(sessionManager, 
-							new Object[] {
-								req,
-								resp
-							});
-					} catch (Exception e) {
-						
-					}
-					javax.servlet.http.HttpSession httpSession = req.getSession();
-					httpSession.invalidate();
-				}
-		]]></zscript>
 		<separator bar="true" spacing="10px"/>
 		<hbox style="margin-left:auto; margin-right:auto; padding:7px;">
 			<button label="${c:l('error.zul.Tancar')}" id="closeButton" onClick="spaceOwner.detach()"/>
@@ -67,6 +39,7 @@
 				]]>
 				</attribute>
 			</button>
+			<h:input type="button" onClick="location.reload()" value="${c:l('error.zul.Reinicia')}"  id="resetButton3" visible="false"/>
 			<button label="${c:l('error.zul.Reinicia')}" id="resetButton2" visible="false">
 				<attribute name="onClick">
 				<![CDATA[
@@ -77,8 +50,13 @@
 		</hbox>	
 		<zscript>
 		<![CDATA[
-			Object e = requestScope.get("javax.servlet.error.exception");
-			String c;
+  			void resetSession ()
+  			{
+  					Executions.sendRedirect(null);
+  					session.invalidate();
+  			}
+
+		  	Object e = requestScope.get("javax.servlet.error.exception");
 			String msg = null;
 			if (e instanceof Throwable)
 			{
@@ -86,6 +64,13 @@
 			    Throwable original = e;
 			    Throwable cause = null;
 			    do {
+		    	   if (e instanceof OutOfMemoryError)
+		    	   {
+						self.getFellow("closeButton").setVisible(false);
+						self.getFellow("resetButton").setVisible(false);
+						self.getFellow("resetButton3").setVisible(true);
+						session.invalidate();
+		    	   }
 			       if ( e instanceof javax.ejb.EJBException ) 
 			          cause = e.getCausedByException ();
 			       else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
@@ -152,7 +137,10 @@
 						self.getFellow("missatge").value = msg;
 					
 				} 
-				c = es.caib.seycon.ng.exception.SoffidStackTrace.getStackTrace(original);
+				bo = new java.io.ByteArrayOutputStream();
+				es.caib.seycon.ng.exception.SoffidStackTrace.printStackTrace(original, new java.io.PrintStream(bo));
+				bo.close ();
+				c = bo.toString();
  		     	org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("HtmlError");
 				execution = desktop.getExecution ();
 				log.warn (org.zkoss.util.resource.Labels.getLabel("error.NoPrevist")+ " " +desktop.getRequestPath()+" ["+execution.getUserPrincipal().getName()+"] "+

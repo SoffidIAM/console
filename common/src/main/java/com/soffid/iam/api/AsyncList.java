@@ -15,7 +15,7 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 	int size = 0;
 	AsyncList<?> parent = null;
 	private long timeout = 0;
-	
+
 	boolean done = false;
 	boolean cancelled = false;
 	private AsyncList<?> source;
@@ -113,7 +113,9 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 	public synchronized boolean add(E e) {
 		if (timeout != 0 && java.lang.System.currentTimeMillis() > timeout)
 			cancel ();
-			
+
+		checkMemoryUsage();
+
 		Entry<E> entry = new Entry<E>();
 		entry.next = null;
 		entry.element = e;
@@ -126,6 +128,16 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 		if (parent != null)
 			parent.addedOnChild (e);
 		return true;
+	}
+
+	Runtime runtime = Runtime.getRuntime();
+	public void checkMemoryUsage() {
+		long max = runtime.maxMemory();
+		long used = runtime.totalMemory() - runtime.freeMemory();
+		long free = max - used ;
+		long pct = free * 100L / max;
+		if (pct < 15)
+			cancel(new OutOfMemoryError());
 	}
 
 	protected boolean addedOnChild(Object e) {

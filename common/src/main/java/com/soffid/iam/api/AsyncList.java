@@ -136,8 +136,10 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 		long used = runtime.totalMemory() - runtime.freeMemory();
 		long free = max - used ;
 		long pct = free * 100L / max;
-		if (pct < 15)
+		if (pct < 15) {
 			cancel(new OutOfMemoryError());
+			runtime.gc();
+		}
 	}
 
 	protected boolean addedOnChild(Object e) {

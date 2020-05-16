@@ -47,8 +47,10 @@ public class CustomSession implements Session
 		long used = runtime.totalMemory() - runtime.freeMemory();
 		long free = max - used ;
 		long pct = free * 100L / max;
-		if (pct < 15)
+		if (pct < 15) {
+			runtime.gc();
 			throw new OutOfMemoryError("System is running out of memory");
+		}
 	}
 
 	Log log = LogFactory.getLog(getClass());

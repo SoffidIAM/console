@@ -846,6 +846,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 					}
 					if (th.isValidated())
 						updateAccountLastLogin(user, passwordDomain);
+					currentValidationRequests.remove(hash);
 					return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
 				}
 			}
@@ -856,7 +857,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
 			for (UserAccountEntity userAccount : user.getAccounts()) {
 				AccountEntity ae = userAccount.getAccount();
-				if (!ae.isDisabled() && ae.getSystem().getPasswordDomain() == passwordDomain) {
+				if (!ae.isDisabled() && ae.getSystem().getPasswordDomain().getId().equals(passwordDomain.getId())) {
 					PasswordValidation status = validatePasswordOnServer(ae, password);
 					if (status.equals(PasswordValidation.PASSWORD_GOOD)) {
 						updateAccountLastLogin(user, passwordDomain);
@@ -1271,13 +1272,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		if ("S".equals(account.getSystem().getTrusted()) && account.getSystem().getUrl() != null) {
 			try {
+				log.info("Invoking validate account "+account.getName()+" on "+account.getSystem().getName());
 				ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService()
 						.getServerService(ConsoleLogonService.REMOTE_PATH);
 				if (ls != null)
 					return ls.validatePassword(account.getName(), account.getSystem().getName(),
 							password.getPassword());
 			} catch (Exception e) {
-
+				log.info("Failed validate account "+account.getName()+" on "+account.getSystem().getName(), e);
 			}
 		}
 

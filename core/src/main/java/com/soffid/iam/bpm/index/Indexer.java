@@ -65,6 +65,10 @@ public class Indexer {
 
 	public void flush(Session session, long then, long now) throws IOException {
 		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
+		if (DirectoryFactory.isEmpty(session)) {
+			log.info("Index is empty. Regenerating");
+			then = 0;
+		}
 		Collection<ProcessInstance> p = getProcesses (session, then, now);
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;

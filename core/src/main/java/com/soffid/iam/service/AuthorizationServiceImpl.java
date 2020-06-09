@@ -22,10 +22,12 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AuthorizationEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.ApplicationService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.utils.SoffidAuthorization;
@@ -879,6 +881,15 @@ public class AuthorizationServiceImpl extends
 	protected String[] handleGetUserGroupAuthorizationString(String user, String holderGroup) throws Exception {
         Collection c = handleGetUserGroupAuthorizations(user, holderGroup);
         return autoritzacionsToString(c);
+	}
+
+	@Override
+	public SoffidPrincipal handleGetCurrentPrincipal() throws InternalErrorException {
+		SoffidPrincipal current = Security.getSoffidPrincipal();
+		if (current == null)
+			return null;
+		else
+			return new SoffidPrincipalImpl(current);
 	}
 
 }

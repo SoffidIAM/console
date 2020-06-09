@@ -1,12 +1,14 @@
 package com.soffid.iam.security;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.catalina.realm.GenericPrincipal;
 
 import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.utils.Security;
 
 public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrincipal {
 	String fullName;
@@ -99,20 +101,31 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 
 
 	public String[] getGroups() {
-		return groups;
+		return groups.clone();
 	}
 
 
 	public String[] getSoffidRoles() {
-		return soffidRoles;
+		return soffidRoles.clone();
 	}
 
 	public String[] getGroupsAndRoles() {
-		return groupsAndRoles;
+		return groupsAndRoles.clone();
 	}
 
 	@Override
 	public String getUserName() {
 		return userName;
 	}
+
+	public SoffidPrincipalImpl(SoffidPrincipal p)  {
+		this(p.getName(),
+				p.getUserName(),
+				p.getFullName(),
+				p.getHolderGroup(),
+				Arrays.asList(p.getRoles()),
+				Arrays.asList(p.getGroups()),
+				Arrays.asList(p.getSoffidRoles()));
+	}
+	
 }

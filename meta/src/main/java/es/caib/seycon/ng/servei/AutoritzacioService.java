@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.service.TenantService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -19,6 +20,7 @@ import com.soffid.mda.annotation.Service;
 import es.caib.seycon.ng.model.RolEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.UsuariImpressoraEntity;
+import roles.Tothom;
 
 @Service (translatedName="AuthorizationService",
 	translatedPackage="com.soffid.iam.service")
@@ -186,4 +188,9 @@ public abstract class AutoritzacioService {
 	{
 		return true;
 	}
+
+	@Description("Returns current security principal")
+	@Operation( grantees = {Tothom.class})
+	public SoffidPrincipal getCurrentPrincipal() {return null;}
+
 }

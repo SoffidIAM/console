@@ -1,5 +1,6 @@
 package com.soffid.iam.utils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -715,7 +716,15 @@ public class Security {
 	public static void setClientRequest (HttpServletRequest req)
 	{
 		String ip = req.getRemoteAddr();
-		String trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
+		String trustedProxies;
+		try {
+			if ( ! Config.getConfig().isAgent()) 
+				trustedProxies = System.getProperty("soffid.proxy.trustedIps");
+			else
+				trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
+		} catch (IOException e1) {
+			trustedProxies = null;
+		}
 		String forwardedFor = req.getHeader("x-forwarded-for");
 		if (trustedProxies != null)
 		{

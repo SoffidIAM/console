@@ -35,6 +35,8 @@ import org.hibernate.Transaction;
 import org.hibernate.stat.SessionStatistics;
 import org.hibernate.type.Type;
 
+import com.soffid.iam.utils.Security;
+
 /**
  * @author bubu
  *
@@ -42,14 +44,17 @@ import org.hibernate.type.Type;
 public class CustomSession implements Session
 {
 	Runtime runtime = Runtime.getRuntime();
+	
 	protected void checkMemoryUsage() {
-		long max = runtime.maxMemory();
-		long used = runtime.totalMemory() - runtime.freeMemory();
-		long free = max - used ;
-		long pct = free * 100L / max;
-		if (pct < 15) {
-			runtime.gc();
-			throw new OutOfMemoryError("System is running out of memory");
+		if (! Security.isSyncServer()) {
+			long max = runtime.maxMemory();
+			long used = runtime.totalMemory() - runtime.freeMemory();
+			long free = max - used ;
+			long pct = free * 100L / max;
+			if (pct < 15) {
+				runtime.gc();
+				throw new OutOfMemoryError("System is running out of memory");
+			}
 		}
 	}
 

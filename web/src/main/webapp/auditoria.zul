@@ -28,7 +28,19 @@
 				searchBox.addAttribute("calendar").setDateSearchInterval(c.getTime(), null);
 				searchBox.search();
 				h_tornar.setVisible(true);
-			} 
+			} else {
+				qw = esquema.getFellow("queryWindow");
+				searchBox = qw.getFellow("searchBox");
+				java.util.Calendar c = java.util.Calendar.getInstance();
+				Date until = c.getTime();
+				c.set(java.util.Calendar.HOUR, 0);
+				c.set(java.util.Calendar.MINUTE, 0);
+				c.set(java.util.Calendar.SECOND, 0);
+				c.set(java.util.Calendar.MILLISECOND, 0);
+				Date since = c.getTime();
+				att = searchBox.addAttribute("calendar");
+				att.setDateSearchInterval(since,until);
+			}
 		</attribute>
 		
 		<attribute name="onPrepareClose">
@@ -119,7 +131,8 @@
 				<searchbox auto="true" id="searchBox"
 					jsonObject="com.soffid.iam.api.Audit" 
 					defaultAttributes="calendar, author, user, group"
-					dataPath="/model:/auditoria" variableName="query"></searchbox>
+					dataPath="/model:/auditoria" variableName="query">
+				</searchbox>
 
 			</criteris>
 			

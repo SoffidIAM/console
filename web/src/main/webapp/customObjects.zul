@@ -121,8 +121,9 @@
 					listbox="/esquema/lista/listbox"/>
 				<deletebutton listbox="/esquema/lista/listbox" acces="${canDelete}"/> 
 				<commitbutton id="b_commit" datamodel="/model"/>
-				<toolbarbutton id="b_cancel" image="~./img/document-undo.gif"
+				<undobutton id="b_cancel" image="~./img/document-undo.gif"
 					visible="${false}"
+					datamodel="/model" listbox="/esquema/lista/listbox"
 					label="${c:l('grups.zul.CancelChanges')}" />
 			</toolbar>
 			<listbox id="listbox" dataPath="/model:/object" fixedLayout="true" 

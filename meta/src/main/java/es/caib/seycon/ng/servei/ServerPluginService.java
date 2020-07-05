@@ -5,13 +5,18 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.Collection;
+import java.util.Map;
+
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AgentDescriptorWorkflow;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.AgentDescriptor;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 
 @Service (translatedName="ServerPluginService",
@@ -108,4 +113,7 @@ public abstract class ServerPluginService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Operation ( grantees={roles.plugins_query.class})
+	public Collection<AgentDescriptorWorkflow> findAgentDescriptorWorkflows(AgentDescriptor agent) { return null;}
 }

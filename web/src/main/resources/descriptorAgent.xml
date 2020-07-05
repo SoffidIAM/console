@@ -75,11 +75,6 @@
 				method="getAgentDescriptors">  <!--agent:query-->
 			</ejb-finder>
 		</finder>
-		<finder name="pluginNames" type="plugin">
-			<ejb-finder jndi="java:/module/ServerPluginService-v2"
-				method="getAllAgentDescriptorsInfo">  <!--agent:query-->
-			</ejb-finder>
-		</finder>
 		<finder name="dominisUsuari" type="dominiUsuari">
 			<script-finder>
 			   v = new Vector();
@@ -491,7 +486,15 @@
 	</datanode>
 	
 	<datanode name="plugin" transient="true">
+		<finder name="pluginWorkflow" type="pluginWorkflow">
+			<ejb-finder jndi="java:/module/ServerPluginService-v2"
+					method="findAgentDescriptorWorkflows"> 
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
 	</datanode>
+	
+	<datanode name="pluginWorkflow" transient="true"/>
 	
 	<datanode name="grupsAgent">
 		<ejb-handler jndi="java:/module/DispatcherService-v2">

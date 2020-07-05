@@ -8,8 +8,8 @@ package es.caib.seycon.ng.comu;
 import java.util.List;
 
 import com.soffid.iam.api.LetterCaseEnum;
-import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Description;
@@ -30,13 +30,13 @@ public class TipusDada {
 	@Nullable
 	public java.lang.Long id;
 
-	@Column (name="TDA_SCOPE", length=50)
 	@Nullable
 	public MetadataScope scope;
 
-	@Nullable
+	@Attribute (entityAttribute = "objectType.name", synonyms = {"customObjectType"})
 	@Description("Object type acting as owner of the attribute")
-	public String customObjectType;
+	@Nullable //Can be null in account metadata
+	public String objectType;
 
 	@Description("Object type instances acting as value of the attribute, for custom object type attributes")
 	@Nullable
@@ -49,6 +49,10 @@ public class TipusDada {
 	
 	public boolean required;
 	
+	public boolean readOnly;
+	
+	public boolean multiLine;
+
 	public boolean multiValued;
 	
 	@Description("Include field in quick searches")
@@ -60,7 +64,16 @@ public class TipusDada {
 	public Integer multiValuedRows;
 
 	@Nullable
+	@Description("Label for this data type")
 	public String label;
+	
+	@Nullable
+	@Description("User hint")
+	public String hint;
+	
+	@Nullable
+	@Description("Key of the localized label for this data type")
+	public String nlsLabel;
 	
 	@Nullable
 	@Description("List of allowed values")
@@ -96,10 +109,9 @@ public class TipusDada {
 	@Nullable
 	String validationExpression;
 		
-	@Description("Expression to test if the reference object can be selected ")
+	@Description("SCIM Expression to test if the reference object can be selected ")
 	@Nullable
 	String filterExpression;
-
 	
 	@Description("Trigger to run when the data is displayed")
 	@Nullable
@@ -112,6 +124,14 @@ public class TipusDada {
 	@Description("Trigger to run when the field is focused")
 	@Nullable
 	String onFocusTrigger;
+	
+	@Description("Java class to validate field")
+	@Nullable
+	String validator;
+	
+	@Description("Java class to enumerate values")
+	@Nullable
+	String enumeration;
 	
 	@Description("Built-in attribute")
 	@Nullable

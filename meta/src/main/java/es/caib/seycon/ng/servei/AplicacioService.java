@@ -627,8 +627,19 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByJsonQuery(
+	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByJsonQuery(
 			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer first,
+			@Nullable Integer pageSize)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -643,7 +654,7 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByText(
+	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByText(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
@@ -659,8 +670,18 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
+	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
 			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer start,
+			@Nullable Integer pageSize)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -675,7 +696,7 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByText(
+	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByText(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
@@ -691,9 +712,19 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilter(
+	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter,
+			@Nullable Integer first,
+			@Nullable Integer pageSize) {
 		return null;
 	}
 
@@ -707,7 +738,17 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilter(
+	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter,
+			@Nullable Integer first,
+			@Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter) {
 		return null;

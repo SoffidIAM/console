@@ -13,21 +13,29 @@
  */
 package com.soffid.iam.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
@@ -45,6 +53,7 @@ import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 
@@ -150,7 +159,6 @@ public class AdditionalDataServiceImpl extends
 	protected com.soffid.iam.api.DataType handleUpdate(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().trim().length() == 0)
 		{
-			validateUniqueOrderForMetaData(tipusDada);
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
 		
 			if (tipusDadaEntity.getAdminVisibility() == null)
@@ -163,7 +171,6 @@ public class AdditionalDataServiceImpl extends
 			getMetaDataEntityDao().update(tipusDadaEntity);
 			return getMetaDataEntityDao().toDataType(tipusDadaEntity);
 		} else {
-			validateUniqueOrderForAccountMetadata(tipusDada);
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().dataTypeToEntity(tipusDada);
 			
 			if (tipusDadaEntity.getAdminVisibility() == null)
@@ -489,8 +496,7 @@ public class AdditionalDataServiceImpl extends
 		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
 		{
 			MetaDataEntity td = it.next();
-			if ((td.getScope() == null || td.getScope().equals(MetadataScope.USER) ) &&
-					Boolean.TRUE.equals( td.getBuiltin() ) )
+			if (Boolean.TRUE.equals( td.getBuiltin() ) )
 				it.remove();
 		}
 		return getMetaDataEntityDao().toDataTypeList(col);
@@ -548,5 +554,133 @@ public class AdditionalDataServiceImpl extends
 			throws Exception {
 		List<MetaDataEntity> r = getMetaDataEntityDao().findByObjectTypeAndName(objectType, attribute);
 		return getMetaDataEntityDao().toDataTypeList(r);
+	}
+
+	@Override
+	protected void handleRegisterStandardObject(String resourceName, MetadataScope scope, boolean reset)
+			throws Exception {
+		InputStream in = getClass().getClassLoader().getResourceAsStream(resourceName);
+		if (in == null)
+			throw new IOException("Cannot find resource "+resourceName);
+		JSONObject o = new JSONObject(new JSONTokener(in));
+		in.close();
+		
+		String className = o.getString("class");
+
+		JSONArray atts = o.getJSONArray("attributes");
+		List<MetaDataEntity> current = getMetaDataEntityDao().findByObjectTypeAndName(className, null);
+		long last = 0;
+		HashMap<String, MetaDataEntity> map = new HashMap<>();
+		for (Iterator<MetaDataEntity> it = current.iterator(); it.hasNext();) {
+			MetaDataEntity md = it.next();
+			if (reset && md.getBuiltin() != null && md.getBuiltin().booleanValue()) {
+				getMetaDataEntityDao().remove(md);
+				it.remove();
+			} else {
+				map.put(md.getName(), md);
+				if (md.getOrder().longValue() > last)
+					last = md.getOrder().longValue();
+			}
+		}
+		
+		CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(className);
+		if (cot == null) {
+			cot = getCustomObjectTypeEntityDao().newCustomObjectTypeEntity();
+			cot.setBuiltin(true);
+			if (scope != null)
+				cot.setDescription("Builtin "+scope.getValue()+" object");
+			else {
+				String name = className;
+				if (name.contains(".")) name = name.substring(name.lastIndexOf('.')+1);
+				cot.setDescription("Builtin "+name+" object");
+			}
+			cot.setName(className);
+			cot.setBuiltin(true);
+			getCustomObjectTypeEntityDao().create(cot);
+		}
+		
+		for (int i = 0; i < atts.length(); i++) {
+			JSONObject att = atts.getJSONObject(i);
+			String name = att.optString("name");
+			String type = att.optString("type");
+			String lettercase = att.optString("lettercase");
+			boolean required = att.optBoolean("required", false);
+			boolean readonly = att.optBoolean("readonly", false);
+			boolean hidden = att.optBoolean("hidden", false);
+			boolean multiline = att.optBoolean("multiline", false);
+			boolean searchCriteria = att.optBoolean("searchCriteria", false);
+			String separator = att.optString("separator");
+			String validator = att.optString("validator");
+			String length = att.optString("length");
+			String filterExpression = att.optString("filter_expression");
+			String enumeration = att.optString("enumeration");
+			if (separator != null && 
+					!separator.trim().isEmpty() && 
+					! map.containsKey("_"+separator.toUpperCase()+"_")) {
+				MetaDataEntity md = getMetaDataEntityDao().newMetaDataEntity();
+				md.setBuiltin(true);
+				md.setMultiValued(false);
+				md.setMultiLine(multiline);
+				md.setName("_"+separator.toUpperCase()+"_");
+				md.setNlsLabel(className+"."+separator);
+				md.setOrder(last++);
+				md.setRequired(false);
+				md.setScope(scope);
+				md.setObjectType(cot);
+				md.setType(TypeEnumeration.SEPARATOR);
+				getMetaDataEntityDao().create(md);
+				md.setReadOnly(true);
+			}
+			if (! map.containsKey(name) && ! hidden) {
+				MetaDataEntity md = getMetaDataEntityDao().newMetaDataEntity();
+				md.setAdminVisibility( hidden ? AttributeVisibilityEnum.HIDDEN :
+					readonly ? AttributeVisibilityEnum.READONLY :
+						AttributeVisibilityEnum.EDITABLE);
+				md.setBuiltin(true);
+				md.setEnumeration(enumeration);
+				md.setFilterExpression(filterExpression);
+				md.setLetterCase(lettercase != null && lettercase.toLowerCase().startsWith("u") ? LetterCaseEnum.UPPERCASE :
+					lettercase != null && lettercase.toLowerCase().startsWith("l") ? LetterCaseEnum.LOWERCASE:
+						LetterCaseEnum.MIXEDCASE);
+				md.setMultiValued(false);
+				md.setName(name);
+				md.setNlsLabel(className+"."+name);
+				md.setOrder(last++);
+				md.setRequired(required);
+				md.setSearchCriteria(searchCriteria);
+				md.setMultiLine(multiline);
+				md.setScope(scope);
+				md.setObjectType(cot);
+				if (length != null && !length.trim().isEmpty())
+					md.setSize(Integer.parseInt(length));
+				md.setType(guessType (type));
+				md.setValidator(validator);
+				md.setReadOnly(readonly);
+				getMetaDataEntityDao().create(md);
+			}
+		}
+	}
+
+	private TypeEnumeration guessType(String type) throws InternalErrorException {
+		for (String value: (List<String>)TypeEnumeration.literals()) {
+			if ( value.equalsIgnoreCase(type))
+				return TypeEnumeration.fromString(value);
+		}
+
+		int pos = 0;
+		for (String value: (List<String>)TypeEnumeration.names()) {
+			if ( value.equalsIgnoreCase(type+"_TYPE"))
+				return TypeEnumeration.fromString( (String) TypeEnumeration.literals().get(pos));
+			pos ++;
+		}
+
+		pos = 0;
+		for (String value: (List<String>)TypeEnumeration.names()) {
+			if ( value.equalsIgnoreCase(type))
+				return TypeEnumeration.fromString( (String) TypeEnumeration.literals().get(pos));
+			pos ++;
+		}
+		
+		throw new InternalErrorException ("Unknown data type "+type);
 	}
 }

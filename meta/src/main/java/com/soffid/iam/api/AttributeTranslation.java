@@ -1,14 +1,17 @@
 package com.soffid.iam.api;
 
+import com.soffid.iam.model.AttributeTranslationEntity;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.Index;
+import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 
 @ValueObject
+@JsonObject(hibernateClass = AttributeTranslationEntity.class)
 public class AttributeTranslation {
 	@Nullable
 	@Identifier

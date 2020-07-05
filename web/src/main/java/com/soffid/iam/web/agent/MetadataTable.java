@@ -17,11 +17,13 @@ public class MetadataTable extends DataTable {
 	protected JSONObject getClientValue(Object element) throws JSONException {
 		JSONObject o = super.getClientValue(element);
 
-		DataType dt = (DataType) ((DataNode)element).getInstance();
+		DataNode dataNode = (DataNode)element;
+		DataType dt = (DataType) dataNode.getInstance();
 		TypeEnumeration type = dt.getType();
 	 	String s = type == null ? "":
 	 		Labels.getLabel("typeDadaAddicional."+dt.getType().getValue());
 		o.put("typeDescription", s);
+		
 		return o;
 	}
 

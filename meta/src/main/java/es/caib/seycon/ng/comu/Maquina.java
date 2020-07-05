@@ -16,21 +16,26 @@ import es.caib.seycon.ng.model.UsuariEntity;
 public class Maquina {
 
 	@Nullable
+	@Attribute(hidden = true)
 	public java.lang.Long id;
 
-	@Attribute(translated = "name" )
+	@Attribute(translated = "name", searchCriteria = true )
 	public java.lang.String nom;
 
+	@Nullable
+	@Attribute(translated = "description", searchCriteria = true )
+	public java.lang.String descripcio;
+	
+	@Nullable
+	@Attribute(translated = "networkCode" )
+	public java.lang.String codiXarxa;
+	
+	@Nullable
+	@Attribute(translated = "ip", searchCriteria = true )
+	public java.lang.String adreca;
+	
 	@Attribute(translated = "os" )
 	public java.lang.String sistemaOperatiu;
-
-	@Nullable
-	@Attribute(translated = "ip" )
-	public java.lang.String adreca;
-
-	@Nullable
-	@Attribute(translated = "description" )
-	public java.lang.String descripcio;
 
 	@Nullable
 	public java.lang.String dhcp;
@@ -44,10 +49,6 @@ public class Maquina {
 	public java.lang.Boolean ofimatica;
 
 	@Nullable
-	@Attribute(translated = "networkCode" )
-	public java.lang.String codiXarxa;
-
-	@Nullable
 	public java.lang.String mac;
 
 	@Nullable
@@ -59,12 +60,14 @@ public class Maquina {
 	public java.lang.Boolean servidorImpressores;
 
 	@Nullable
+	@Attribute(readonly = true)
 	public java.lang.String serialNumber;
 
 	@Nullable
 	public java.lang.Boolean dynamicIp;
 
 	@Nullable
+	@Attribute(readonly = true)
 	public java.util.Calendar lastSeen;
 
 }

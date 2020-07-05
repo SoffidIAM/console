@@ -72,6 +72,7 @@ public abstract class AbstractTest extends AbstractHibernateTest
 	public AbstractTest()
 	{
 		super();
+		System.out.println("Instantiate abstract test");
 	}
 
 	void deleteDir (File f)
@@ -87,7 +88,7 @@ public abstract class AbstractTest extends AbstractHibernateTest
 	public void setupdb() throws InternalErrorException,
 			NeedsAccountNameException
 	{
-		
+		System.out.println("Configuring initial database");
 		System.setProperty("jboss.home.dir", "target/server");
 		System.setProperty("catalina.home", "target/server");
 		deleteDir (new File("target/docs"));
@@ -209,7 +210,6 @@ public abstract class AbstractTest extends AbstractHibernateTest
 				rol.setDescripcio("SEU Administrator"); //$NON-NLS-1$
 				rol.setGestionableWF(new Boolean(false));
 				rol.setNom("SEU_ADMIN"); //$NON-NLS-1$
-				rol.setDomini(new Domini());
 				rol = appSvc.create(rol);
 			}
 	
@@ -292,15 +292,6 @@ public abstract class AbstractTest extends AbstractHibernateTest
 				grup.setDescripcio("Entrprise Administrators"); //$NON-NLS-1$
 				grup.setObsolet(new Boolean(false));
 				grupSvc.create(grup);
-			}
-	
-			TipusDada td = tdSvc.findTipusDadaByCodi("NIF"); //$NON-NLS-1$
-			if (td == null)
-			{
-				td = new TipusDada();
-				td.setCodi("NIF"); //$NON-NLS-1$
-				td.setOrdre(new Long(1));
-				tdSvc.create(td);
 			}
 	
 			Usuari usu = usuariSvc.findUsuariByCodiUsuari("admin"); //$NON-NLS-1$
@@ -405,10 +396,13 @@ public abstract class AbstractTest extends AbstractHibernateTest
 	@Override
 	protected void setUp() throws Exception
 	{
+		System.out.println("abstracttest: setup");
 		super.setUp();
+		System.out.println("abstracttest: setup 1");
 	
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 		
+		System.out.println("abstracttest: setup 3");
 		ServiceLocator.instance().getTenantService().getMasterTenant();
 		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {

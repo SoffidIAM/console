@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.zkoss.util.TimeZones;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
 import org.zkoss.zk.scripting.Interpreters;
@@ -32,6 +34,7 @@ import com.soffid.iam.web.SecurityFunctionMapper;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.web.ConfiguraSEU;
+import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datamodel.xml.FunctionMapperChain;
 
 /**
@@ -103,13 +106,16 @@ public class WorkflowInterceptor implements Filter {
 				}
 
 				HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-				httpServletResponse.addHeader("X-UA-Compatible", "IE=11;IE=8");
+				httpServletResponse.addHeader("X-UA-Compatible", "IE=Edge");
 				httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
 				
 				
 				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
 				
+				if (sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA) == null)
+					ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
+
 				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
 				if (forcedLocale != null)
 				{
@@ -119,11 +125,6 @@ public class WorkflowInterceptor implements Filter {
 					MessageFactory.setThreadLocale(locale);
 				} else {
 					String lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);			
-					if (lang == null)
-					{
-						ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
-						lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);
-					}
 					if (lang != null)
 					{
 						Locale locale = new Locale (lang);
@@ -131,7 +132,17 @@ public class WorkflowInterceptor implements Filter {
 						MessageFactory.setThreadLocale(locale);
 					}
 				}
-
+				String timezone = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_TIMEZONE);
+				if (timezone != null)
+					TimeZones.setThreadLocal(TimeZone.getTimeZone(timezone));
+				String dateFormat = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_DATEFORMAT);
+				String timeFormat = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_TIMEFORMAT);
+				if (dateFormat != null) {
+					DateFormats.setThreadLocal(new String[] {
+							dateFormat,
+							timeFormat == null ? "HH:mm:ss": timeFormat
+					});
+				}
 				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
 					
 					Security.nestedLogin(nestedPrincipal);
@@ -164,6 +175,8 @@ public class WorkflowInterceptor implements Filter {
 				try {
 					MessageFactory.setThreadLocale(null);
 					org.zkoss.util.Locales.setThreadLocal(null);
+					TimeZones.setThreadLocal(null);
+					DateFormats.setThreadLocal(null);
 					sessionCacheService.clearSession();
 				} catch (InternalErrorException e) {
 					e.printStackTrace();

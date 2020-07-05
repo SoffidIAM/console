@@ -15,14 +15,18 @@ package com.soffid.iam.service;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.model.GroupTypeEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
@@ -130,4 +134,100 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 		}
 		return result;
 	}
+
+	String generateQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		String[] split = text.trim().split(" +");
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
+		{
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("name co \""+t+"\"");
+			sb.append(" or description co \""+t+"\"");
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+
+	@Override
+	protected AsyncList<OUType> handleFindOUTypeByTextAndFilterAsync(String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		final String query = q;
+		final AsyncList<OUType> result = new AsyncList<OUType>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findByJsonQuery(result, query, null, null);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+
+	@Override
+	protected List<OUType> handleFindOUTypeByTextAndFilter(String text, String filter, Integer first, Integer pageSize)
+			throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		AsyncList<OUType> result = new AsyncList<OUType>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findByJsonQuery(result, q, first, pageSize);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+	
+	protected void findByJsonQuery ( AsyncList<OUType> result, String query, Integer first, Integer pageSize) 
+			throws Exception
+	{
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+
+		// Prepare query HQL
+		AbstractExpression expression = ExpressionParser.parse(query);
+		HQLQuery hql = expression.generateHSQLString(OUType.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "(" + qs + ") and o.tenant.id = :tenantId";
+		hql.setWhereString(new StringBuffer(qs));
+
+		// Include HQL parameters
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size() + 1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFetchSize(first);
+		cfg.setMaximumResultSize(pageSize);
+		// Execute HQL and generate result
+		for (GroupTypeEntity ge : getGroupTypeEntityDao().query(hql.toString(), paramArray, cfg )) {
+			if (result.isCancelled())
+				return;
+			OUType g = getGroupTypeEntityDao().toOUType(ge);
+			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
+				result.add(g);
+			}
+		}
+	}
+
 }

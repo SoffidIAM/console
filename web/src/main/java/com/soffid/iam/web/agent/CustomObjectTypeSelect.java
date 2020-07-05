@@ -22,7 +22,6 @@ public class CustomObjectTypeSelect extends Select implements XPathSubscriber {
 	boolean accountMetadata = false;
 
 	private static final long serialVersionUID = 7972552691186027886L;
-	SingletonBinder valueBinder = new SingletonBinder(this);
 
 	public void onCreate() {
 		valueBinder.setDataPath("/");
@@ -57,16 +56,6 @@ public class CustomObjectTypeSelect extends Select implements XPathSubscriber {
 		
 		selectedValue = value;
 		Events.postEvent(new Event("onSelect", this, selectedValue));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.zkoss.zul.Listbox#onInitRender()
-	 */
-	public void onInitRender() {
-		super.onInitRender();
-		syncSelectedItem();
 	}
 
 	public void setPage(Page page) {

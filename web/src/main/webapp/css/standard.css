@@ -1,0 +1,3165 @@
+@font-face {
+	font-family: soffid;
+	src: url(/anonymous/AvenirLTStd-Medium.otf);
+	font-weight: normal;
+}
+@font-face {
+	font-family: soffid;
+	src: url(/anonymous/AvenirLTStd-Black.otf);
+	font-weight: bold;
+}
+@font-face {
+	font-family: soffid;
+	src: url(/anonymous/AvenirLTStd-Light.otf);
+	font-weight: lighter;
+}
+
+div.highlighted {
+	margin: 0;
+	padding: 0;
+	box-shadow: 0px 0px 20px 3px #2b2b2b;
+}
+
+p, div, span, label, a, input, textarea,
+button, input.button, input.file {
+	font-family: inherit;
+	font-size: inherit;
+	word-break: break-all;
+}
+
+span.missatge {
+	word-break: break-word;
+}
+
+
+/* Títol */
+.title td, .title .caption td 
+{
+	font-family: inherit; font-weight: bold;
+	padding-top: 12px; padding-bottom: 3px; margin-bottom: 10px;
+	
+}
+
+body {
+	direction: {DIRECTION};
+	font-size: 12pt;
+	font-family: soffid, Calibri, Arial, sans-serif;
+	margin: 0;
+}
+
+.title td, .title .caption td ,
+td.lwt-modal, td.lwt-highlighted, td.lwt-overlapped,
+td.mwt-modal, td.mwt-highlighted, td.mwt-overlapped,
+td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
+{
+	color: white; border: none;
+	background-color: #2b2b2b; 
+	font-size: 13pt;
+	background-image: none;
+	opacity: 0.8;
+}
+
+
+/* Opcions del manteniment: Afegir nou, Eliminar sel·leccionat i Confirmar canvis */
+.title .caption a, .title .caption a:visited{
+	font-family: inherit;	font-size: inherit; font-weight: bold; color: white;
+}
+
+.title .caption a:hover {
+	text-decoration: underline;
+}
+
+/* Títol azul de les capses */
+.titol_capsa {
+	font-family: inherit;	font-size: 13pt; font-weight: bold; color: {SKY};
+}
+
+/* Títol taronja de tancar la sessió i tornar el menu */
+.titol_tanca {
+	font-family: inherit; 
+	font-size: inherit; 
+	font-weight: bold; 
+	color: #FFF;
+	cursor: pointer;
+	margin-left: 1em;
+}
+/* Lo "destacamos" cuando el ratón se pone encima */
+.titol_tanca:hover {
+
+	text-decoration: underline;
+}
+
+/* Borde dels windows de tipus Llista */
+div.wc-modal, div.wc-modal-none, div.wc-highlighted, div.wc-highlighted-none {
+	border: 2px solid {BLUE}; background: #FFF;
+	padding: 16px;
+}
+
+
+/* Linia superior de l'aplicació */
+.topline {
+	background-color: #2b2b2b; 
+/*	background-image: url(/anonymous/background.svg);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	*/
+	color: {BLUETEXT};
+	margin: 0 0 4px 0;
+	height: 41px;
+	box-shadow: 0px 0px 7px #2b2b2b;
+	width: 100%;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	z-index: +1;
+	overflow: hidden; 
+	text-align: center;
+}
+
+div.topline div.col_der img.logo {
+	height: 37px;
+}
+
+div.topline div.col_der.help {
+	padding: 10px;
+}
+
+div.topline div.col_der img {
+	filter: invert(1);
+	height: 17px;
+}
+
+div.topline div.col_der div.menu2starter:hover,
+div.topline div.col_der.help:hover {
+	background-color: {BLUEDARK};
+}
+
+
+* {margin:0;padding:0;}
+html, body {height: 100%; width: 100%;padding: 0px !important; 	box-sizing: border-box; }
+*, *:before, *:after {  box-sizing: inherit; }
+div.z-loading-indicator {box-sizing: content-box;}
+
+.col_der, .col_izq {
+	height: 100%;
+	cursor: pointer;
+}
+
+.col_der {
+	float: {TEXT_ALIGN_RIGHT}; 
+	text-align: {TEXT_ALIGN_RIGHT};
+	vertical-align:middle;
+	padding: 0px;
+	background-color: #2b2b2b;
+	opacity: 0.8;
+}
+
+.col_der div.menu2starter {
+	padding: 10px;
+}
+
+.col_der img.menu3starter {
+	padding: 10px;
+	vertical-align: middle;
+	height: 24px;
+}
+
+.col_izq {
+	float: {TEXT_ALIGN_LEFT};
+	vertical-align:middle;
+	padding: 0px;
+	background-color: #2b2b2b;
+	opacity: 0.8;
+}
+
+.col_izq img {
+	height: 35px;
+	margin-right: 10px;
+	vertical-align: middle;
+}
+
+.col_cen {
+	vertical-align:middle;
+	white-space: nowrap;
+	max-width: 50%;
+	overflow: hidden;
+	height: auto;
+	display: inline-block;
+	width: 350px;
+	text-align:center;
+	margin-left: 5px;
+	margin-right: 5px;
+	white-space: nowrap;
+	background-color: #2b2b2b;
+	padding-left: 10px;
+	padding-right: 10px;
+	border: solid 2px #c0c0c0;
+	border-radius: 10px;
+}
+
+.col_cen input.searchBox {
+	background-color: #2b2b2b;
+	padding: 4px;
+	color: white;
+	border: none;
+	width: 100%;
+	padding-left: 20px;
+	background-image: url(/img/search.svg);
+	background-position-x: left;
+	background-position-y: center;
+	background-size: 17px;
+	background-repeat: no-repeat;
+}
+
+div.main-search.ctxpopup {
+	background-color: white;
+	width: 330px;
+	border: solid 2px #2b2b2b;
+	box-shadow: 0px 0px 7px #2b2b2b;	
+}
+
+div.main-search.ctxpopup span.search-header {
+	color: {BLUE};
+	display: block;
+	border-top: solid 1px {BLUE};
+}
+
+
+div.main-search.ctxpopup div.search-option {
+	color: {SKY};
+	padding-left: 10px;
+	text-overflow: ellipsis;
+	overflow-y: hidden;
+}
+
+div.main-search.ctxpopup div.search-option span {
+	color: {SKY};
+	text-overflow: ellipsis;
+}
+
+div.main-search.ctxpopup div.search-more {
+	padding-left: 10px;
+}
+
+/* Titol principal */
+.maintitle {
+	font-family: inherit;	
+	font-size: 14pt; 
+	font-weight: bold; 
+	color: #FFF;
+	padding-top: 2px; padding-bottom: 3px; margin-bottom: 10px;
+}
+
+.startmenu {
+	border: 2px solid #70a3cc;
+	-moz-border-radius: 3px; 
+	-webkit-border-radius: 3px;
+	border-radius: 5px;
+	-khtml-border-radius: 3px; 
+	padding: 0 5px 5px 5px;
+	margin-left:5px;
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: #0e5462;
+	white-space: nowrap;
+	text-align:center;
+	z-index: 32768;
+	float: {TEXT_ALIGN_LEFT}; /* per a alinear favorits */
+}
+
+.favorits {
+	float:{TEXT_ALIGN_LEFT};	
+	margin-left: 2px;
+	margin-top: 1px;
+	position: relative;
+	top: -1px;
+	padding-left: 1px;
+	margin-right: 3px;
+}
+
+.inici {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold;
+	color: #FFF;
+}
+
+.benvingutmsg span {
+	font-family: inherit;
+	font-size: 11pt;	
+}
+
+.benvingut {
+	color: #ffffff;	
+}
+
+.codiusuari {
+	font-weight: bold;
+	color: {SKY};	
+	cursor: pointer;
+}
+.codiusuari:hover{
+	text-decoration: underline;
+}
+/* menú de inicio */
+.menuprincipal {
+	{TEXT_ALIGN_LEFT}: 0px !important;
+	border: 1px solid {SKY};
+	max-height: calc(100% - 34px);
+	overflow-y: auto;
+	left: 0;
+	top: 35px !important ;
+}
+
+
+.reloadtasks {
+	cursor: pointer;	
+}
+
+/* Capsa dels criteris de cerca */
+.capsa_cerca {
+	padding: 2px;
+	border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;
+	border-top-style: solid; border-right-style: solid; border-bottom-style: solid;	border-left-style: solid;
+	border-top-color: {BLUE}; border-right-color: {BLUE}; border-bottom-color: {BLUE}; border-left-color: {BLUE};
+	height: 77px; padding-top:5px; padding-bottom:5px; overflow: hidden;
+	margin-bottom: 7px;
+}
+
+/* Capsa del navegador */
+.capsa_navegador {
+	border-top-width: 6px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;
+	border-top-style: solid; border-right-style: solid; border-bottom-style: solid;	border-left-style: solid;
+	border-top-color: {BLUE}; border-right-color: {BLUE}; border-bottom-color: {BLUE}; border-left-color: {BLUE};
+	/*width: 800px;*/ padding-top:0px; padding-bottom:0px; overflow: hidden;
+	margin-bottom: 7px;
+}
+
+/* Capsa dels Detalls */
+.capsa_detalls {
+	border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;
+	border-top-style: solid; border-right-style: solid; border-bottom-style: solid;	border-left-style: solid;
+	border-top-color: {BLUE}; border-right-color: {BLUE}; border-bottom-color: {BLUE}; border-left-color: {BLUE};
+	/*width: 500px;*/ overflow: auto;
+	padding: 0px;
+	margin-bottom: 7px;
+}
+
+/* Entrada de dades: textbox */
+.text, .textbox, .textbox2, .textbox2m {
+	font-family: inherit;
+	font-size: inherit;
+	border: 1px solid #7F9196; /*width: 135px;*/
+	background-image: none;
+}
+
+.textbox2 { width: 98%; width: calc( 100% - 16px);}
+.textbox2m { width: 96%; width: calc( 100% - 48px);},
+	
+input [type="checkbox"] {
+	width: 30px;
+}
+
+/* Entrada de dades: interior dels textbox */
+textarea {
+	font-family: inherit;
+	font-size: inherit; 
+	resize: vertical;
+}
+
+span.label, sapn label {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; margin-left:3px; 
+	color: {BLUE};
+}
+
+span {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; color: black;
+}
+
+.etiqueta {
+	font-family: inherit;
+	font-size: inherit;
+	margin-left:3px; font-weight: normal; 
+	color: {BLUE}; vertical-align: middle;	
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.menuinicial {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: white;	
+}
+
+.menuinicial:hover {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: white;
+	text-decoration: underline; cursor: pointer;
+}
+
+.menuinicialnoclicable {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: #5E5A80;	
+}
+
+.seleccionable {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; margin-left:3px; color: black;	
+}
+
+.seleccionable:hover {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: black;
+	text-decoration: underline; cursor: pointer;
+}
+
+.seleccionable:visited{
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; margin-left:3px; color: black;
+}
+
+/* Botons */
+button, input[type="button"], input[type="submit"] {
+	background-image: linear-gradient(to bottom, {SKY}, {SKYDARK});
+	border: 0px solid transparent;
+	border-radius: 5px;
+	padding: 6px 9px;
+	box-shadow: 2px 2px 7px #808080;
+	cursor: pointer;
+	border-image: none;
+	margin: 3px 4px;
+	color: {SKYTEXT};
+}	
+
+/* Buttons */
+button.small-button:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+	background-image: none;
+	background-color: {SKY};
+	color: {SKYTEXT};
+	box-shadow: none;
+}
+
+/* Barra de botons */
+.toolbar {
+	padding: 2px; border: 1px; background: {BLUE}; 
+}
+
+.toolbar a, .toolbar a:visited, .toolbar a:hover {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; color: #FFF;
+	border: 0px; text-decoration: none; background: {BLUE};
+	white-space:nowrap; 
+} 
+
+.toolbar img
+{
+	margin-left: 5px;
+}
+
+.toolbar-checkbox
+{
+	margin-left: 5px;
+}
+
+.toolbar-checkbox label
+{
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; color: #FFF;
+}
+
+/* Títols de les capceleres dels listbox, trees i grids */
+div.head-cell-inner {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal; color: {GREENTEXT}; text-align: {TEXT_ALIGN_LEFT};
+}
+	
+tr.odd {
+	background: white;
+}
+
+/* LISTBOX */
+div.listbox {
+	font-family: inherit;
+	font-size: inherit;
+	color: black;
+	border: 1px solid #0e5462; margin: 0px;
+}
+
+/* Capçalera del listbox i del tree */
+div.listbox-head th, div.listbox-paging th, 
+div.tree-head th, div.tree-paging th,
+div.listbox-head th span, div.listbox-paging th span,
+div.tree-head th span, div.tree-paging th span  {
+	font-family: inherit;
+	font-size: inherit;
+	color: {GREENTEXT} ;	
+	background: {GREEN};
+	overflow: hidden;
+	border-top: none;
+	border-bottom: none;
+	border-left: 1px solid {GREENDARK} !important;
+	border-right: 1px solid {GREENLIGHT} !important;
+}
+
+div.listbox-head th:last-child, 
+div.listbox-paging th:last-child, 
+div.tree-head th:last-child, 
+div.tree-paging th:last-child {
+/*	background-image:url('../img/bder.gif');
+	background-repeat:repeat-y;
+	background-position: top right*/
+}
+
+div.listbox-head th div, 
+div.listbox-head th.sort div, 
+div.listbox-paging th div,
+div.tree-head th div,
+div.tree-paging th div,
+div.grid-head th div {
+	padding-left: 1px;
+}
+
+div.listbox-head { background-color: {GREEN}; }
+
+/* Font del contingut del listbox i del tree (capçalera i files) */
+div.head-cell-inner, div.cell-inner {
+	font-family: inherit;
+	font-size: inherit;
+	text-align: {TEXT_ALIGN_LEFT};
+}
+
+/* Fila del Listbox amb el cursor damunt (clar) */
+tr.overd  {
+   background: #F0F0F0;
+}
+
+/* Fila del Listbox sel·leccionada i amb el cursor damunt (oscur) */
+tr.seld {
+   background: #DBDBDB;
+   /*text-decoration: underline;*/
+}
+
+table.listbox-btable tr.seld td {
+	background-color: #D3D3D3;
+}	
+
+td.focusd {
+	background-image: none !important; /* evitem una icona que surt en les llistes*/	
+}
+
+
+/* GRID */ 
+div.grid, div.grid-body {
+	font-family: inherit;
+	font-size: inherit;
+	color: black; margin: 0px;
+}
+
+
+div.grid-head th, table.grid th {
+	font-family: inherit;
+	font-size: inherit;
+	color: {GREENTEXT};	
+	background: {GREEN};
+	overflow: hidden;
+	border-top: none;
+	border-bottom: none;
+	border-left: 1px solid #779429 !important;
+	border-right: 1px solid #cfff4e !important;
+}
+
+table.grid th div {
+	padding: 4px;
+}
+
+table.grid  {
+    border-spacing: 0px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+table.grid>tbody>tr.grid:hover, table.grid >tbody> tr.grid:hover>td.gc{
+	background-color: #f0f0f0;
+}
+
+table.grid.grayhover>tbody>tr.grid.grayhover:hover, table.grid.grayhover>tbody>tr.grid.grayhover:hover>td.gc{
+	background-color: #f8f8f8;
+}
+
+/* Files del grid */
+tr.grid td.gc { 
+	font-family: inherit;
+	font-size: inherit;
+	color: black; background: white; 
+	border-bottom: none; border-left: 1px solid #FFF; border-right: 1px solid #606E72; border-top: 1px solid #DDD; 
+	padding: 2px;
+}
+
+/* Bara inicial de seycon-web */
+td.lwt-embedded, td.mwt-embedded, td.rwt-embedded { 
+	background:#BE6200 none repeat scroll 0 0;
+	color:white;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight:bold;
+	padding: 0;
+	border: 0 0 1px 0 solid #8AA3C1;
+}
+
+/* Hacemos que el listbox parezca a los estilos del grid */
+.likeagrid table td {
+	background-color:#EEEEEE;
+	padding:4px 5px;
+	border:1px solid white;
+	border-style:solid solid none none;
+	border-color: #DDDDDD #606E72 #000000 #FFFFFF;
+	cursor: default;
+}
+
+.likeagrid table td div table td {
+	border: none;
+}
+
+.likeagrid {
+	border:1px solid #7F9DB9;
+}
+
+/* centra tots els headers dels listbox o grids */
+.headcentrat  th div {
+	text-align: center;
+}
+
+.label_link {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold;  color: #0e5462;
+	margin: 15px 5px 5px 0; cursor: pointer; display: inline; 
+}
+.label_link:hover {
+	text-decoration:underline; 
+}
+
+/* arreglem problemes que apareixen a IE7, IE8 als listbox de SEU*/
+.listbox-body {
+	min-height: 30px; /*abans 70px */
+	/*max-height: 282px !important;*/
+	height: auto;
+}
+.sort {
+	width: auto;
+}
+
+/* fem que els bordes siguen com a la intranet de la CAIB 
+div.tree {
+	border: 1px solid #70a3cc!important;
+}
+*/
+capsa_navegador div.tree {
+	border: 1px 0 0 0 solid #0e5462 !important;
+}
+
+div.wc-capsa_detalls-none {
+	padding:0px 0 0 0px;
+}
+
+/* fons per defecte del components a blan */
+div.listbox, div.tree, div.grid {
+	background-color: #FFFFFF;
+}
+
+select {
+	font-family: inherit;
+	font-size: inherit;
+}
+
+/* Workflows: nou SEU */
+.workarea {
+	padding: 20px 20px 0px 20px;
+	min-height: calc( 100vh - 40px );
+	oveflow: auto;
+    perspective: calc( 5 * 100vw );
+}
+
+.wf_listbox {
+	border: 2px solid #0e5462;
+	min-width: 740px;
+}
+
+/* perque el contingut de la 1a columna del listbox aparega centrat */
+.centra_primera_col .listbox-body table.listbox-btable tbody tr.item td:first-child div {
+	 text-align:center
+}
+
+
+/* imageclic: enlloc de imagemap */
+img.imageclic, img.search-icon {
+	padding: 4px;
+	width: 32px;
+	cursor: pointer;	
+	vertical-align: top;
+}
+
+img.imageclic:hover, img.search-icon:hover {
+	background-image: url(/img/circle.svg);
+	background-size: cover;
+}
+
+img.imageclic .centre{
+	display: block;
+	margin: 0 auto;
+}
+
+/* arreglem problema que surt a IE7 que mostra un scrolling vertical en els grids */
+.grid .sensescroll div  {
+	overflow:none !important;border: 1px solid transparent;
+}
+
+/* vbox i hbox centrats verticalment */
+table.vcentre td {vertical-align: middle;}
+.vcentre-sp {margin: 0; padding:0; width: 0.3em;}		
+
+
+.dateboxread input, .dateboxreadnoborder input 
+	{background-color:transparent; color: black !important;font-family: inherit;
+	font-size: inherit;
+	border: 1px solid #7F9DB9;}
+.dateboxreadnoborder input {border:none;}
+img.imageclic.centre{
+	display: block;
+	margin: 0 auto;
+}
+
+td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
+
+/* Estil per als combobox */
+.combobox, .comboboxinp {font-family: inherit;
+	font-size: inherit;
+	color: black;}
+
+
+/* Estil per als menubar */
+
+div.menubar{
+	color: #FFF;
+	padding: 1px 1px 1px 0px; border: 0px; 
+	border-top:0.1px solid white; 
+	background-color: {BLUE};
+}
+
+div.menupopup {
+	background-color: #FFF;
+} 
+
+div.menubar td {
+	padding: 0px;
+	border: none;
+}
+
+td.menu1ck {
+	padding-right: 6px;
+	background-image: url('../zkau/web/img/checked.gif');
+	background-repeat: no-repeat;
+}	
+
+
+td.menu1 {
+	background-image: url('../zkau/web/img/unchecked.gif');
+	background-repeat: no-repeat;
+	padding-right: 6px;
+}
+
+div.menubar a {
+	font-family: inherit;
+	font-size: inherit;
+	color: #FFF;
+} 
+
+div.menupopup a  {
+	font-family: inherit;
+	font-size: inherit;
+}
+
+.activafiltre {
+	font-family: inherit;
+	font-size: inherit;
+	text-decoration: none;	
+}
+
+.activafiltre:hover {
+	text-decoration: underline;
+}
+
+.checkbox_border {
+	display: inline;
+	padding: 2px 3px 0 3px;
+	margin-right: 5px;
+}
+
+.checkbox_border input {
+	margin-top: 2px;
+}
+
+
+.outer-frame {padding: 16px 16px 0px 16px;}
+.tabpanel-real {padding: 0px;}
+div.frame-none {width: 100%; padding: 0px; border: none}
+div.frame-vertical-none {width: 100%; padding: 0px; border:none}
+
+div.frame-none div.record-list { width: 100%}
+div.frame-none div.record-list-shrinked { width: 45%; vertical-align: top; display: inline-block;}
+
+div.frame-none div.record-form { width: 50%; vertical-align: top; display: inline-block; margin-left: 5%}
+div.frame-none div.record-form-shrinked { display: none;}
+
+div.frame-vertical-none div.record-list { width: 100% }
+div.frame-vertical-none div.record-list-shrinked { width: 100%;}
+
+div.frame-vertical-none div.record-form { width: 100%;}
+div.frame-vertical-none div.record-form-shrinked { display: none;}
+
+div.listbox-head th.sort div.head-cell-inner,
+div.grid-head th.sort div.head-cell-inner {
+	background: transparent url(../zkau/web/img/sort_hint.png);
+	background-position: {COLSORTER_POSITION} center;
+	background-repeat: no-repeat;
+}
+
+div.listbox-head th.sort-asc div.head-cell-inner, div.grid-head th.sort-asc div.head-cell-inner {
+  background: transparent url(../zkau/web/img/sort_hint_up.png);
+  background-position: {COLSORTER_POSITION} center;
+  background-repeat: no-repeat;
+}
+
+div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner {
+  background: transparent url(../zkau/web/img/sort_hint_down.png);
+  background-position: {COLSORTER_POSITION} center;
+  background-repeat: no-repeat;
+}
+
+.listfilter {background-color: {GREEN}; width:90%; width:calc(100% - 12px); border: white solid 1px;}
+
+
+
+.wc-overlapped {overflow-y: scroll}
+.vbox {margin-top:20px;margin-right:2px;background-color:#EEEEEE}
+button.vbuton {text-align:{TEXT_ALIGN_LEFT};width:130px;margin:0 0 5px 0;padding:1px;}
+.pue_img {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;cursor:pointer;width:30px;}
+.pue_img_noclick {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;width:30px;}
+.pue_noimg {border:1px solid gray;margin:10px 0;padding:3px;background-color:white;width:30px;height:30px;background-color:lightgrey;cursor:pointer}
+.pue_noimg_noclick {border:1px solid gray;margin:10px 0;padding:3px;width:30px;height:30px;background-color:lightgrey;}
+.ticona td {vertical-align:middle;}
+.ticona td.ticona-sp {margin:0;padding-left:0;padding-right:0;adding-top:0;width:0.3em;}
+.click {cursor:pointer}
+.noclick {}
+button.pue {padding: 1px !important;}
+div.modal_mask {background-color: white;}
+div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {BLUE}; background: #FFF;
+	overflow-x: hidden;
+	overflow-y: auto
+}
+.titol_tancar_back {padding: 4px; float:{TEXT_ALIGN_RIGHT}; border: 1px solid #BE6200; background-color:#EEEEEE;}
+.titol_tancar, .titol_tancar_fletxa {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: bold; color: #BE6200; cursor: pointer; 
+}
+.titol_tancar:hover {
+	text-decoration: underline;
+}
+
+.titol_tancar_back:hover {background-color:#FFF7EE;}
+div.head-cell-inner {text-align:{TEXT_ALIGN_LEFT};}
+.dateboxinp  {
+	font-family: inherit;
+	font-size: inherit;
+	padding-left: 2px;
+	padding-right: 24px;
+	width: 140px;
+}
+.dateboxread input {border: 0px !important; font-family: inherit;
+	font-size: inherit;
+	width: 14em !important;}
+.dateboxreadnoborder input {border: 0px !important; font-family: inherit;
+	font-size: inherit;
+	width: 12em !important;}
+span.nomesdata input.nomesdatainp {color:black !important; font-family: inherit;
+	font-size: inherit;
+	border:none;background:transparent;}
+
+.titolperfil {font-family: inherit;
+	font-size: 14px;
+	 !important;color:#8A4700;}
+
+td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
+
+.finestraError{
+	border:3px solid #0e5462;
+	background-color:#FFFFFF;
+}
+
+.finestraTimeout {
+	border:3px double #0e5462;
+	background-color:#FAFAFA;
+}
+
+.finestraTimeout .title td {
+	background-color: #0e5462;
+	color: #AF0000;
+}
+.titolTout {
+	text-align:center;
+	color: #FFF;
+}
+
+.rellotge{
+	background-image: url('../img/noway.png');
+	background-repeat: no-repeat;
+	background-position: 5px 50%;
+	text-align:justify;
+}
+
+/* personalitzem la barra de processant */
+.z-loading {
+	border-color: #0e5462 !important;
+	background-color: #0e5462 !important;
+	border-top-left-radius: 7px;
+	border-bottom-right-radius: 7px;
+	border-width: 2px !important;	
+}
+
+/* intern */
+/* tindre en compte le pre-carrega index... */
+
+.z-loading-indicator {
+    border-color: #0e5462 !important;
+    padding: 20px 25px 10px 25px !important;
+	background-image:url('../img/wait.gif') !important; 
+	background-size: 26px; 
+	background-repeat: no-repeat;
+	background-position: 15px 15px;
+	height: 26px !important;
+	vertical-align: middle;
+	text-indent: 60px;
+	border-top-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+img.z-loading-icon {
+	width: 0px !important;
+	height: 0px !important;
+	border: 0px none transparent !important;
+	background-image: none;	
+}
+
+.headcentrat  th div {
+	text-align: center;
+}
+
+.titolapp {
+    color: #8A4700;
+    font-family: inherit;
+	font-size: 14px;
+	font-weight: normal;
+}
+
+
+
+/* PER A LES TASQUES PENDENTS DE SEYCON */
+
+.seycontask div {
+	text-align: center !important
+}
+
+td.PENDING {
+	background-color: #FFFF00 !important;
+}
+
+td.DONE {
+	background-color: #00FF00 !important;
+}
+
+td.ERROR {
+	background-color: #FF0000 !important;
+}
+
+td.UNKNOWN {
+	background-color: #0000FF !important;
+}
+
+tr.seld td.PENDING {
+	background-color: #B8860B !important;
+}
+
+tr.seld td.DONE {
+	background-color: #00B000 !important;
+}
+
+tr.seld td.ERROR {
+	background-color: #C00000 !important;
+}
+
+tr.seld td.UNKNOWN {
+	background-color: #00B080 !important;
+}
+
+/* FI TASQUES PENDENTS SEYCON */
+
+
+/* Element per a mostrar informació heading */ 
+.titolpagina {
+	padding: 1px 0 5px 0;
+}
+
+.titolpagina span {
+	font-size: 14pt;
+	font-weight: bold;
+	color: {BLUE}
+}
+
+.loginbox {
+	padding: 20px 0 0 0;
+	font-weight: bold;
+	width:340px;
+}
+
+.inputlogin{
+	padding: 0 0 0 10px;
+	text-align: {TEXT_ALIGN_RIGHT};
+	margin-right: 50px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.login{
+	padding: 100px 0 0 10px;
+	width:340px;
+	text-align: center;
+	vertical-align: middle;
+	margin: 0 auto;
+	font-weight:bold; 
+}
+
+.atencio { 
+	color: #a6ff00;
+	width:340px;
+	font-weight:bold; 
+	text-align:center;
+	margin-top: 10px; 
+	margin-bottom: 10px; 
+}
+
+.formCanviContrasenya { 
+	/*border:1px solid #0e5462; */
+	width: 340px; 
+	margin:0 auto;
+ }
+.numUsuari {
+	text-align:center; 
+	font-weight:bold; 
+	/*margin: 1em;
+	background-color:#efefef; 
+	padding:.3em; */
+}
+
+.botonera { 
+	padding:.5em; 
+	text-align:center; 
+	margin: 0.5em;
+}
+
+.senseBorder {
+	border:none;
+}
+
+.senseBorder1 {
+	border:none;
+	background-color:#fafae7;
+}
+
+.senseBorder2 {
+	border:none;
+	background-color:white;
+}
+
+.fons{
+	background-color:#fafae7;
+}
+
+.titolSelf{
+	font-weight:bold;
+	color: {BLUE};
+	font-size: 14pt;
+}
+
+.fonsBlanc{
+	background-color:white;
+}
+
+.workarea {
+	margin-top: 17px;
+}
+
+.startmenu {
+	border: 2px solid #70a3cc;
+	-moz-border-radius: 3px; 
+	-webkit-border-radius: 3px;
+	border-radius: 5px;
+	-khtml-border-radius: 3px; 
+	padding: 0 5px 5px 5px;
+	margin-left:5px;
+	vertical-align: middle;
+	cursor: pointer;
+	background-color: #0e5462;
+	white-space: nowrap;
+	text-align:center;
+	z-index: 32768;
+	float: {TEXT_ALIGN_LEFT}; /* per a alinear favorits */
+}
+/* Titol principal */
+
+.maintitle {
+	font-size: 14pt; 
+	font-weight: bold; 
+	color: #FFF;
+	
+}
+
+.content-title
+{
+	text-align: center;
+}
+
+.main
+{
+	margin:10px;
+}
+
+.section-title
+{
+	font-size:14pt;
+	color:{GREEN};
+	font-weight: bold;
+}
+
+.subsection
+{
+	margin-left: 15px;
+}
+
+.subsection-title
+{
+	font-size:14pt;
+	font-weight: 400;
+	color:rgb(14, 84, 98);
+}
+
+.label_pop{
+	cursor: pointer;
+	text-indent: 8px;
+}
+
+.label_pop:hover {
+	color: white;
+	text-decoration: underline;
+}
+
+.label_pop2{
+	color: red;
+	cursor: pointer;
+	text-indent: 8px;
+}
+
+.label_pop2:hover {
+	color: red;
+	text-decoration: underline;
+}
+
+.xacmlgrid tr.z-row .z-cell {
+    background-color:white;
+    border:none;
+}
+
+.xacmlgrid2 tr.z-row .z-cell {
+    background-color:white;
+    border:none;
+}
+
+.xacmlgrid3 tr.z-row .z-cell {
+    background-color:white;
+    border:none;
+}
+
+.xacmlgrid tr:nth-child(odd){
+    background: #a9bdc7 !important;
+    color: black;
+}
+    
+.xacmlgrid2 tr:nth-child(odd){
+    background: #70a3cc !important;
+    color: black;
+}
+
+.xacmlgrid3 tr:nth-child(odd){
+    background: white;
+    color: black;
+}
+
+.etiquetaxacml {
+	font-family: sans-serif;	
+	font-size: 13pt; 
+	font-weight: bold; 
+	margin-left:350px; 
+	margin-right:auto; 
+	text-align:center; 
+	color: black; 
+	vertical-align: middle;	
+}
+
+.etiquetaxacml2 {
+	font-family: sans-serif;	
+	font-size: 13pt; 
+	font-weight: bold; 
+	color: black; 
+	vertical-align: middle;
+}
+
+.subExpression1 {
+	background:#70a3cc !important;
+	border:1px solid white !important;
+	margin-top:4px;
+	margin-right:4px;
+	margin-left:4px;
+	margin-bottom: 4px;
+	vertical-align: middle;
+	padding: 8px;
+ 	border-radius: 8px;
+}
+
+.subExpression2 {
+	background:#a9bdc7 !important;
+	border:1px solid #a4d100 !important;
+	margin-top:4px;
+	margin-right:4px;
+	margin-left:4px;
+	margin-bottom: 4px;
+	vertical-align: middle;
+	padding: 4px;
+ 	border-radius: 8px;
+}
+
+.subExpression3 {
+	background:#bcc3a4 !important;
+	border:1px solid gray !important;
+	margin-top:4px;
+	margin-right:4px;
+	margin-left:4px;
+	margin-bottom: 4px;
+	vertical-align: middle;
+	padding: 4px;
+ 	border-radius: 8px;
+}
+
+.subExpression3 tr:nth-child(odd){
+    background: #daecfb !important;
+    color: black;
+    text-indent: 20px;
+}
+
+.subExpression2 tr:nth-child(odd){
+    background: #a9bdc7 !important;
+    color: black;
+    text-indent: 20px;
+}
+
+
+table.noBorderGrid {table-layout: fixed;}
+.noBorderGrid tr.z-row td.z-row-inner, tr.z-row .z-cell, div.z-grid { border: none;}
+.noBorderGrid div.grid-body tbody tr td.gc {border: none;}
+tr.noBorderGrid td.gc, tr.noBorderGrid { background-color: white;}  
+
+
+/* Botons */
+button, input[@type='button']{ 
+	height: 32px;
+}
+
+button.small-button {
+	background-color: white;
+	border: 1px solid {SKY};
+	border-image: none;
+	padding: 0px;
+	margin-left: 4px;
+	margin-right: 4px;
+	padding: 2px 10px 2px 10px;
+	color: {SKYTEXT};
+	height: 2em;
+ 	border-radius: 8px;
+ 	font-size: 10pt;
+}	
+
+button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
+	color: white;
+	background-image: none;
+	background-color: #707070;
+	border-color: #707070;
+	box-shadow: none;
+}
+
+
+button:disabled img, input[type="button"]:disabled img, input[type="submit"]:disabled img {
+	visibility: hidden;
+}
+
+button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]:hover:disabled {
+	color: #707070;
+	border-color: white
+}
+
+button img {
+	height: 20px;
+	vertical-align: bottom;
+}
+
+button.small-button img {
+	height: 1em;
+	vertical-align: baseline;
+}
+
+
+span.tree-tee {width: 26px;}
+span.tree-last {width: 26px;}
+
+div.CodeMirror-code   {
+	margin-left: 0px;
+}
+
+
+pre.CodeMirror-line {font-size: 12pt; font-family: monospace, "Courier new"} 
+pre.CodeMirror-line span {font-size: 12pt; font-family: monospace, "Courier new"} 
+div.CodeMirror-linenumber {font-size: 12pt} 
+
+
+.search-background {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: lightblue;
+    height: 100%;
+    z-index: 3;
+    opacity: 0.1;
+}
+
+.search-popup {
+	position: absolute;
+    z-index: 5;
+}
+
+
+.search-popup div.wc-search-popup-none {
+	position: relative; 
+	top: 2em; 
+	background-color:white;
+	border: 1px solid black;
+}
+
+
+.attribute-search-box-remove, div.databox div.container img.remove-icon {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+
+.attribute-search-box-remove:hover, 
+div.databox div.container img.remove-icon:hover {
+	opacity: 1;
+}
+
+.button-container {
+	margin-top: 7px;
+}
+
+.button-container .buttons {
+	text-align: {TEXT_ALIGN_RIGHT};
+}
+
+span.search-box {
+	margin-bottom: 12px;
+	display: inline-block;
+	width: 100%;
+}
+span.search-box ul li {
+	display: inline-block;
+	margin-bottom: 5px
+}
+
+.searchbox-addcriteria {
+	margin-bottom: 5px
+}
+
+a.remove-filter, a.remove-filter:hover, a.remove-filter:active,a.remove-filter:visited,
+a.search-link, a.search-link:hover, a.search-link:active,a.search-link:visited 
+{
+	text-decoration:none
+}
+
+.search-box textarea {
+	width: 70%;
+}
+
+.search-box input.textsearch {
+	padding-top: 9px;
+	width: 70%
+}
+
+.capsa_cerca {
+	height: auto !important;
+	padding-bottom: 0px !important
+}
+
+li.attribute-search-box {
+	background-color: white;
+    border: 1px solid {GREEN};
+    border-image: none;
+    padding: 0px;
+    padding-right: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+    color: {BLUELIGHT};
+}
+
+li.attribute-search-box > button {
+	background-color: transparent;
+    border: none;
+    border-image: none;
+    padding: 4px;
+    margin: 0px;
+    color: {BLUELIGHT};
+    cursor: pointer;
+    background-image: none;
+    box-shadow: none;
+}
+
+li.attribute-search-box:hover {
+	background-color: {GREEN};
+    color: white;
+    cursor: pointer;
+}
+
+li.attribute-search-box:hover > button div span {
+    color: {GREENTEXT};
+}
+
+.search-box ul {
+	display:inline;
+}
+
+img.progress {
+	height: 24px;
+	vertical-align: middle;
+}
+
+div.identity-tag-user {
+    background-color: #8080c0;
+    border-radius: 4px;
+    padding: 4px;
+    color: white;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-user span {
+    color: white;
+    margin-right: 2em;
+}
+
+div.identity-tag-user img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-user img.imageclic:hover {
+	opacity: 1;
+}
+
+div.identity-tag-group {
+    background-color: #80c080;
+    border-radius: 4px;
+    padding: 4px;
+    color: white;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-group span {
+    color: white;
+    margin-right: 2em;
+}
+
+div.identity-tag-group img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-group img.imageclic:hover {
+	opacity: 1;
+}
+
+div.identity-selector {
+	cursor:pointer
+}
+
+div.identity-selector:hover {
+	text-decoration: underline
+}
+
+div.identity-tag-role {
+    background-color: #fff080;
+    border-radius: 4px;
+    padding: 4px;
+    color: black;
+    display: inline-block;
+    margin: 8px;
+}
+
+div.identity-tag-role span {
+    color: black;
+    margin-right: 2em;
+}
+
+div.identity-tag-role img.imageclic {
+	width:1em;
+	opacity:0.2;
+	vertical-align: text-top;
+}
+
+div.identity-tag-role img.imageclic:hover {
+	opacity: 1;
+}
+
+input[type="radio"] {
+    vertical-align: -3px;
+}
+
+div.menupopup {
+	border: 1px solid
+}
+
+div.menupopup table {
+	padding: 5px
+}
+
+div.menupopup td {
+	padding-bottom: 5px;
+	padding-left: 7px
+}
+
+span.highlight {
+	color: #70a3cc;
+}
+
+/* The animation code */
+@keyframes slide-in-r {
+    from {left: 120%; opacity: 0}
+    to {left: 0px; opacity: 1}
+}
+
+@keyframes slide-in-l {
+    from {left: -120%; opacity: 0}
+    to {left: 0px; opacity: 1}
+}
+
+@keyframes slide-out-r {
+    from {left: 0; opacity: 1; }
+    to {left: 120%; opacity: 0;}
+}
+
+@keyframes slide-out-l {
+    from {left: 0; opacity: 1; }
+    to {left: -120%; opacity: 0; }
+}
+
+/* The element to apply the animation to */
+div.hidden {
+	display:none;
+}
+
+div.hideRight {
+	position:absolute;
+	left:150%;
+    animation-name: slide-out-r ;
+    animation-duration: 1s;
+    width: 100%;
+    opacity:0;
+}
+
+div.hideLeft {
+    width: 100%;
+	left:-150%;
+	display:block;
+	position:absolute;
+    animation-name: slide-out-l ;
+    animation-duration: 1s;
+    opacity:0;
+}
+
+div.displayedFromRight {
+    width: 100%;
+	display:block;
+	position:absolute;
+    animation-name: slide-in-r;
+    animation-duration: 1s;
+}
+
+div.displayedFromLeft {
+    width: 100%;
+	display:block;
+	position:absolute;
+    animation-name: slide-in-l;
+    animation-duration: 1s;
+}
+
+/* Styles for the button "Confirm changes" when a page is open directly showing a entity in the detail */
+.toolbarOnlyDetails {
+	background-color:white;
+	height:40px
+}
+.toolbarOnlyDetails a {
+	background-color:white;
+	color:{BLUELIGHT};
+	border:solid 1px {GREEN};
+	padding:7px;
+	margin-left:7px;
+	vertical-align:-26px;
+	text-decoration: none
+}
+.toolbarOnlyDetails a:hover {
+	background-color:{GREEN};
+	color:white
+}
+.toolbarOnlyDetails a img {
+	vertical-align:-3px
+}
+
+
+/** new style **/
+.capsa_cerca {
+	border:none;
+}
+
+.capsa_navegador {
+	border:none;
+}
+
+div.listbox {
+	border: none;
+}
+
+div.listbox-foot, div.grid-foot, div.tree-foot{
+	border-top: none;
+}
+
+
+div.listbox, div.tree, div.grid {
+	background: transparent; border: 0px solid #7F9DB9; overflow: hidden;
+}
+
+div.tree-head th, div.listbox-head th, div.grid-head th
+{
+	overflow: hidden; 
+	border: none;
+	white-space: nowrap; padding: 2px;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: normal;
+	vertical-align: top;
+}
+div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
+{
+	cursor: pointer; padding-right: 9px;
+	background:transparent url(../zkau/web/zul/img/sort/v_hint.gif);
+	background-position: {COLSORTER_POSITION} center;
+	background-repeat: no-repeat;
+}
+
+div.listbox-head th.sort div.head-cell-inner, div.grid-head th.sort div.head-cell-inner
+{
+	cursor: pointer; padding-right: 9px;
+	background:transparent url(../zkau/web/zul/img/sort/v_hint.gif);
+	background-position: {COLSORTER_POSITION} center;
+	background-repeat: no-repeat;
+}
+
+div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.head-cell-inner
+	 {
+	cursor: pointer; padding-right: 9px;
+	background:transparent url(../zkau/web/zul/img/sort/v_dsc.gif);
+	background-position: {COLSORTER_POSITION} center;
+	background-repeat: no-repeat;
+}
+div.tree-body, div.listbox-body, div.grid-body {
+	background: white; border: 0; overflow: auto; width: 100%;
+}
+div.listbox-pgi, div.grid-pgi, div.tree-pgi {
+	border-top: 0px solid #AAB; overflow: hidden;
+}
+div.listbox-pgi-t, div.grid-pgi-t, div.tree-pgi-t {
+	border-bottom: 0px solid #AAB; overflow: hidden;
+}
+tr.grid td.gc { 
+	font-family: inherit;
+	font-size: inherit;
+	color: black; background: white; 
+	border: none; 
+	padding: 2px;
+	vertical-align:top;
+}
+
+
+.text, .textbox, .textbox2, .textbox2m { 
+	box-sizing: content-box; padding: 2px;
+}
+
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, textarea.text {
+    box-sizing: border-box;
+    padding: 2px;
+    border: 4px solid #f0f0f0;
+    background: #f8f8f8;
+    border-radius: 4px;
+}
+
+input.textbox2::placeholder, input.textbox2m::placeholder, input.textbox::placeholder, 
+	input.dateboxinp::placeholder, input.text::placeholder,
+	input.name::placeholder {
+	color: #c0c0c0;
+}
+
+textarea.noborder-textbox, input.noborder-textbox {
+	display: block;
+	width: 100%;
+	height: 32px; 
+	resize: none;
+	border: none;
+	padding: 4px;
+}
+
+input.readonly, input.text-disd {
+	box-sizing: border-box;
+	background: transparent;
+	border: none;
+	color:#000 !important;
+	border-bottom: 1px solid transparent;
+	padding: 4px;
+}
+
+
+/* Hacemos que el listbox parezca a los estilos del grid */
+.likeagrid table td {
+	background-color: transparent;
+	padding:4px 5px;
+	border: none;
+	cursor: default;
+}
+
+.likeagrid table td div table td {
+	border: none;
+}
+
+.likeagrid {
+	border:none;
+}
+
+
+table.listbox-btable tr.seld td, 
+table.listbox-btable tr.seld,
+div.tree-body  table tr.seld {
+	background-color: powderblue;
+}	
+tr.overd {
+	background-color: aliceblue;
+}	
+div.record-form > div > img.imageclic {
+	float: none;
+	margin-left: 10px;
+}
+
+.capsa_detalls {
+	border: none;
+	overflow: auto;
+	padding: 0px;
+	margin-bottom: 7px;
+}
+
+.wf_listbox {
+    border: none;
+}
+
+@keyframes hopin {
+    from {
+    	transform: scaleY(0.0);
+    	opacity: 0.2;
+		height: 0;
+		margin: 0;
+		padding: 0px 0px 0px 10px;
+   	}
+    to {
+    	transform: scaleY(1.0);
+    }
+}
+	    
+@keyframes hopoff {
+    from {
+    	transform: scaleY(1.0);
+    	opacity: 1;
+		height: auto;
+		padding: 5px 0px 5px 10px;
+    }
+    to {
+    	transform: scaleY(0.0);
+    	opacity: 0.2;
+		height: 0;
+		padding: 0px 0px 0px 10px;
+   	}
+}
+
+.tree-body tr.tree-hidden > td > div {
+	height: 0;
+	margin: 0;
+	padding: 0px 0px 0px 10px;
+	opacity: 0;
+	transform: scaleY(0.0);
+	animation-name: hopoff;
+	animation-duration: 0.3s;
+}
+
+.tree-body tr.tree-displayed > td > div {
+	animation-name: hopin;
+	animation-duration: 0.3s;
+}
+
+.rolldown > td > div {
+  	overflow-y: hidden;
+	max-height: 500px; /* approximate max height */
+	animation-name: rolldown;
+	animation-duration: 1s;
+}
+
+.roundedWindow {
+	border-radius: 7px;
+	border: solid {SKY} 7px;
+	background-color: white;
+	animation-name: appear;
+	animation-duration: 0.7s;
+}
+
+a.change-mode-label {
+}
+
+a.change-mode-label-hidden {
+	display:none;
+}
+
+a.change-mode-label-selected {
+	font-weight: bold;
+	text-decoration: none;
+}
+
+span.rbtnbk {
+	background-image: none;
+	border: none;
+}
+
+select {
+    border: 4px solid #f0f0f0;
+    padding: 2px 18px 2px 2px;
+    color: black;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    min-width:80px;
+    padding-right: 16px;
+
+	border-radius: 4px;
+	display: inline-block;
+	font: inherit;
+	
+	margin: 0;      
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: nane;
+	
+	background: #f8f8f8 url(../zkau/web/zul/img/combobtn.gif);
+	background-position:
+	  calc(100% - 4px) calc(50%) ;
+	background-repeat: no-repeat;
+}
+
+select option {
+	padding-top: 4px;
+}
+select::-ms-expand {
+    display: none;
+}
+
+
+select:disabled {
+    background: white;
+    border:none;
+}
+
+select.classic:focus {
+}
+
+
+
+div.attributeSearchPopup {
+    border: solid 2px #AAB;
+    z-index: 10;
+    float: {TEXT_ALIGN_LEFT};
+    margin-top: 20px;
+    position: absolute;
+    min-width: 150px;
+    min-height: 80px;
+    background: white;
+    padding: 8px;
+}
+
+div.inputField {
+	display: table-row
+}
+
+span.inputField_label {
+	display: table-cell;
+	width: 120px;
+	vertical-align: top;
+	padding-top: 4px
+}
+			
+div.inputField_input {
+	display: table-cell;
+	vertical-align: top;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+div.inputField_input .widetextbox {
+	width: 350px;	
+}			
+
+span.inputField_tail {
+	display: table-cell;
+	vertical-align: top;
+	padding-top: 4px
+}
+			
+
+span.separator_label {
+	color: {BLUE};
+	font-weight: bold;
+	padding-top: 15px;
+}
+			
+.appatt {display: table; padding: 0px; width: 100%}
+.appatt_row {display: table-row}
+.appatt_row span {}
+.appatt_label {display: table-cell; width: 202px}
+.appatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.appatt_input table th:first-child {width: 340px;}
+.appatt_input > div.listbox {padding-bottom: 20px;}
+.appatt_input table.listbox-btable tr {height: 20px;}
+
+.roleatt {display: table; padding: 0px; width: 100%}
+.roleatt_row {display: table-row}
+.roleatt_row div {padding-top: 5px}
+.roleatt_label {display: table-cell; width: 200px}
+.roleatt_input {display: table-cell}
+.roleatt_input table th:first-child {width: 340px;}
+.roleatt_input > div.listbox {padding-bottom: 20px;}
+.roleatt_input table.listbox-btable tr {height: 20px;}
+
+.accatt {display: table; padding: 0px; width: 100%}
+.accatt_row {display: table-row}
+.accatt_row span {}
+.accatt_label {display: table-cell; width: 202px}
+.accatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.accatt_input table th:first-child {width: 160px;}
+.accatt_input > div.listbox {padding-bottom: 20px;}
+.accatt_input table.listbox-btable tr {height: 20px;}
+
+.groupatt {display: table; padding: 0px; width: 100%}
+.groupatt_row {display: table-row}
+.groupatt_row span {}
+.groupatt_label {display: table-cell; width: 202px}
+.groupatt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.groupatt_input table th:first-child {width: 160px;}
+.groupatt_input > div.listbox {padding-bottom: 20px;}
+.groupatt_input table.listbox-btable tr {height: 20px;}
+
+.useratt {display: table; padding: 0px; width: 100%}
+.useratt_row {display: table-row}
+.useratt_label {display: table-cell; width: 120px}
+.useratt_input {display: table-cell; padding-bottom:2px; padding-top:2px}
+.useratt_input table th:first-child {width: 160px;}
+.useratt_input > div.listbox {padding-bottom: 20px;}
+.useratt_input table.listbox-btable tr {height: 20px;}
+
+.objectatt {display: table; padding: 0px; width: 100%}
+.objectatt_row {display: table-row;}
+.objectatt_row div {padding-top: 6px}
+.objectatt_label {display: table-cell; width: 15em}
+.objectatt_input {display: table-cell}
+.objectatt_input > div.listbox {padding-bottom: 20px;}
+.objectatt_input table.listbox-btable tr {height: 20px;}
+
+.messagebox {
+    word-break: break-word;
+    overflow: auto;
+}
+
+div.fixedToolbar {
+	position: fixed; width: 100%; left: 0; top: 35px; display: none; z-index: 10;
+    border-top: none;
+    border-bottom: 2px solid white;
+    padding: 0px;
+}
+
+.removeValueIcon {
+	width: 24px; padding: 2px; vertical-align:bottom; opacity:0.5;  cursor:pointer;
+}
+
+.removeValueIcon:hover {
+	opacity:1;
+}
+
+div.errbox
+{
+	color: {GREENTEXT};
+	background-color: {GREENLIGHT}
+}
+
+div.scroll-listbox div.listbox-head {
+	padding-right: 15px;
+}
+
+div.scroll-listbox div.listbox-body {
+	overflow-y: scroll;
+	scrollbar-width: 15px;
+}
+
+
+/*********** DATATABLE ************/
+div.datatable table, div.datatable table td {
+	border: solid 1px #c0c0c0;
+	border-collapse: collapse;
+	min-width: 80px;
+}
+
+div.datatable table.tbody tr td.selector {
+	width: 38px;
+	text-align: center;
+}
+
+div.datatable table.tbody tr.dashed td {
+	text-decoration: line-through;
+}
+
+div.datatable table.thead td {
+	box-sizing: border-box;
+	background-color: {GREEN};
+	color: {GREENTEXT};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;		
+    padding-bottom: 4px;
+    border-left: 1px solid {GREENDARK};
+    border-right: 1px solid {GREENLIGHT}   
+    	}
+div.datatable table.thead td:last-child {
+    border-right: 1px solid #c0c0c0;   
+    	}
+div.datatable .thead td input {
+	width:100%;
+}
+div.datatable div.tfoot {
+	margin-top: 5px;
+	background-color: white;
+	text-align: right;
+	box-sizing: border-box;
+	border: none;
+    width:100%;
+}
+div.datatable div.tfoot a {
+	float: left;
+}
+div.datatable table.thead td.filter-cell {
+	padding-left:10px;
+	padding-right: 10px;
+    text-overflow: clip;
+}
+
+div.datatable {
+	display: block;
+	border-spacing: 0;
+		}
+
+div.datatable table.thead {
+  width:100%;
+  table-layout: fixed;  
+}
+
+div.datatable div.tbodydiv{
+  background-color: white;
+  box-sizing: border-box;
+  width:100%; 
+  overflow-y:auto;
+  overflow-x:clip;
+  border-bottom: 1px solid #c0c0c0;
+}
+
+div.datatable table.tbody{
+  width:100%; 
+}
+
+div.datatable tr{
+  width: 100%;
+}
+
+div.datatable table.tbody td {
+	padding-left:10px;
+	padding-right: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+	margin: 0px;
+}
+
+div.datatable table.tbody tr:hover {
+	background-color: {BLUELIGHT};
+	color: {BLUETEXT};
+}
+
+div.datatable table.tbody tr.selected {
+	background-color: {BLUE};
+	color: {BLUETEXT};
+}
+
+div.datatable table.tbody tr {
+	cursor: pointer;
+}
+
+div.datatable table.thead td:not(.sortable-column) {
+	padding-left:10px;
+	padding-right: 10px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+div.datatable table.thead td {
+	box-sizing: border-box;
+  	}
+
+div.datatable td.sortable-column {
+	cursor: pointer;
+}
+div.datatable td.sortable-column div.sort-indicator {
+	display: inline-block;
+	margin-left: 10px;
+	margin-right: 5px;
+}
+div.datatable td.sortable-column div.sort-indicator div {
+	font-size: 50%;
+}
+div.datatable div.sort-indicator-disabled {
+	visibility: hidden;
+}
+
+/************ SWITCH ***************/		
+.switch, .switch * {
+    box-sizing: content-box;
+    -webkit-border-vertical-spacing: 0px;
+    -webkit-border-horizontal-spacing: 0px;
+}
+
+.switch {
+    color: white;
+    width: 80px;
+    position: relative;
+    font-family: inherit;
+	font-size: inherit;
+    line-height: 1.4;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align:bottom;
+    border: 2px solid transparent;
+}
+
+.switch span { 
+    font-size: 10px;
+}
+
+.switch.disabled {
+    opacity: 0.3;
+}
+
+.switch.outdated,
+.switch.incompatible {
+    width: auto;
+}
+
+/* create a new BFC to have floating label work correctly.
+ * http://colinaarts.com/articles/float-containment/ */
+.switch:before, .switch:after {
+  content    : '';
+  display    : table;
+}
+
+.switch:after {
+  clear: both;
+}
+
+
+.switch * {
+    display: block;
+    user-select: none;
+}
+
+.switch .slider.not-dragging {
+    -webkit-transition: left 0.2s ease-in-out;
+    -moz-transition: left 0.2s ease-in-out;
+    -ms-transition: left 0.2s ease-in-out;
+    -o-transition: left 0.2s ease-in-out;
+    transition: left 0.2s ease-in-out;
+}
+
+.switch .slider {
+    position: absolute;
+    /* (80px / 2) - 2px */
+    width: 38px;
+    top: -2px;
+    bottom: -2px;
+    border: 3px solid {SKY} /*#5f5f5f*/;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.switch .slider .handle {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -5px;
+    margin-top: -4px;
+    width: 2px;
+    height: 8px;
+    border-width: 0 6px 0 2px;
+    border-style: none double none solid;
+    border-color: {SKY};
+}
+
+.switch .off,
+.switch .on,
+.switch.customized .custom-content {
+    font-weight: bold;
+    border-style: solid;
+    border-width: 2px;
+    text-align: center;
+    padding: 3px 0 1px;
+}
+
+.switch .off,
+.switch .on {
+    /* 80px / 2 - 2px */
+    width: 38px;
+}
+
+.slider.not-dragging.slider-on {
+	left: 38px;
+}
+
+.slider.not-dragging.slider-off {
+	left: 0px;
+}
+
+.switch .custom-content {
+    /* To aid with writing style sheets, put the default color styles
+     * in a less specified selector, so they're easily overridden. */
+    display: none;
+
+    /* default colors */
+    background-color: #000000;
+    border-color: #2e3436;
+}
+
+.switch.customized .custom-content {
+    display: block;
+
+    /* 80px - 4px */
+    width: 76px;
+    border-radius: 4px;
+}
+
+.switch.customized .custom-content.outdated,
+.switch.customized .custom-content.incompatible {
+    width: auto;
+}
+
+.switch.customized .custom-content.incompatible {
+    cursor: help;
+}
+
+.switch .off {
+    float: right;
+    border-color: #2e3436;
+    border-left-style: none;
+    border-radius: 0 4px 4px 0;
+    background-color: #606060;
+    color: white;
+}
+
+.switch .on {
+    float: left;
+    border-color: #3465a4;
+    border-right-style: none;
+    border-radius: 4px 0 0 4px;
+    background-color: {GREEN};
+    font-weight: normal;
+    color: {GREENTEXT};
+}
+
+.switch.customized .on,
+.switch.customized .off,
+.switch.customized .slider {
+    display: none;
+}
+		
+
+
+.card,  .single-face-card {
+  width: 100%;
+  height: 100%;
+  min-height: calc( 100vh - 85px );
+  position: relative;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+}
+
+.card__face {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  backface-visibility: hidden;
+  background-color: white;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.card__face--front {
+}
+
+.card__face--back {
+  transform: rotateY( 180deg );
+}
+
+.card.is-flipped {
+  transform: rotateY(180deg);
+}
+		
+div.addButton {
+	display: inline-block;
+	margin: 5px;
+	height: 40px;
+	width: 40px;
+	background-color: {SKY};
+	color: {SKYTEXT};
+	border-radius: 20px;
+	opacity: 0.5;
+	text-align: center;
+	line-height: 40px;
+	cursor: pointer;
+}
+
+div.addButton:hover {
+	margin: 0px;
+	height: 50px;
+	width: 50px;
+	background-color: {SKYLIGHT};
+	border-radius: 25px;
+	opacity: 1;
+	text-align: center;
+	line-height: 50px;
+}
+
+div.addButton span {
+	vertical-align: middle;
+	display: inline-block;
+	color: white;
+	font-size: 35px;
+}
+
+span.link {
+	text-decoration: underline;
+	cursor: pointer;	
+}
+
+div.menu2 {
+	 display: inline-block;
+	 float:right;
+	 font-size: 14px;
+	 width: 20px;
+	 cursor: pointer;
+	 text-align: center;
+}
+
+div.menu2modal {
+	display:none;
+}
+
+div.menu2modal table {
+	width: 100%;
+}
+
+div.menu2modal.open {
+    position: fixed;
+    z-index: +31;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(173, 216, 230);
+    background-color: rgb(173, 216, 230, 0.1);
+    display: block;
+}
+
+div.menu2modal.open div.menu2dropdown {
+	display: block;
+	position: absolute;
+	border: solid 1px #404040;
+	border-radius: 1px;
+	z-index: +1;
+	background: white;
+	text-align: left;
+	box-shadow: 4px 4px #a0a0a0;
+}
+
+div.menu2modal.open div.menu2dropdown table {
+	border-collapse: collapse;
+	border: none;
+}
+
+div.menu2modal.open div.menu2dropdown tr td {
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	cursor: pointer;
+}
+
+div.menu2modal.open div.menu2dropdown tr td img{
+	margin-right: 8px;
+	height: 18px;
+}
+
+div.menu2modal.open div.menu2dropdown tr:hover {
+	color: {BLUETEXT};
+	background-color: {BLUE};
+}
+
+div.menu2 div.menu2starter, button.icon-button {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background-color: transparent;
+	cursor: pointer;
+	padding: 0;
+	border: none;
+	background-image: none;
+	box-shadow: none;
+}
+
+div.menu2 div.menu2starter, div.navigation-bar button.icon-button {
+	float: right;
+}
+
+button.icon-button {
+	margin: 0px 10px;
+}
+
+button.grid-icon-button {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background-color: transparent;
+	cursor: pointer;
+	padding: 0;
+	border: none;
+}
+
+div.menu2 div.menu2starter img, button.icon-button img, grid-icon-button img {
+	width: 25px;
+}
+
+button.icon-button:disabled, button.grid-icon-button:disabled {
+	display: none;
+}
+
+div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-button:hover {
+	background-image: url(/img/circle.svg);
+	background-size: cover;
+}
+
+
+div.navigation-bar span.pager span {
+	color: {GREEN};
+	font-weight: bold;
+}
+
+div.navigation-bar span.pager span:first-child,
+div.navigation-bar span.pager span:last-child {
+	color: {SKY};
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+div.options {
+	text-align: center;
+}
+.options .menuoption {
+	width: 350px;
+	padding: 40px;
+	text-align: center;
+	vertical-align: top;
+	cursor: pointer;
+	display: inline-block;
+}
+
+.options .menuoption img {
+	padding-left: 9px;
+	padding-right: 9px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	width: 100%;
+	opacity: 1;
+	border: solid 1px #c0c0c0;
+	border-radius: 20px;
+	margin-bottom: 18px;
+    transition: padding 0.2s ease-in-out;
+}
+
+.options .menuoption:hover img {
+	width: 100%;
+	box-shadow: 12px 12px 8px {GREEN};
+	padding: 0px;
+	background-color: #e8e8e8;
+}
+
+.options .menuoption .menuoption-title {
+	font-family: inherit;
+	font-size: 15pt;
+	font-weight: lighter;
+	word-break: break-word;
+}
+
+.options .menuoption .menuoption-suboptions {
+	height: 1.2em;
+	overflow-y: hidden;
+	overflow-wrap: break-word;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow-x: hidden;
+}
+
+div.navigation-bar {
+	padding: 10px 0 10px 0;
+	margin-bottom: 10px;
+	background-color: {SKYTEXT};
+	color: {SKY}
+}
+
+div.navigation-bar span {
+	color: {SKY};
+	font-weight: bold;
+}
+
+
+/****************** DATATREE ******************/
+div.datatree div.sortable-column div.sort-indicator {
+	display: inline-block;
+	margin-left: 10px;
+	margin-right: 5px;
+}
+div.datatree div.sortable-column div.sort-indicator div {
+	font-size: 50%;
+}
+div.datatree div.sort-indicator-disabled {
+	visibility: hidden;
+}
+
+div.datatree div.thead {
+	box-sizing: border-box;
+	background-color: {GREEN};
+	color: {GREENTEXT};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;		
+  	}
+
+div.datatree div.thead input {
+	width:100%;
+}
+
+div.datatree div.thead div.filter-cell {
+	padding-left:10px;
+	padding-right: 10px;
+	padding-bottom: 2px;
+    text-overflow: clip;
+    border-bottom: 1px solid #c0c0c0;
+}
+
+div.datatree {
+	display: block;
+	border-spacing: 0;
+}
+
+div.datatree div.thead div.sortable-column {
+	cursor: pointer;
+}
+div.datatree div.tfoot {
+	width:100%;
+	box-sizing: border-box;
+	margin-top: 5px;
+	background-color: white;
+	text-align: right;
+	box-sizing: border-box;
+	border: none;
+}
+		
+
+div.datatree div.tree-collapse {
+    background-image: url(/img/foldBackground.svg);
+    background-size: cover;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    vertical-align: top;
+    padding: 0px;
+    margin-top: 3px;
+	margin-left: 6px;
+	margin-right: 6px;   
+	cursor: pointer;
+}
+
+div.datatree div.tree-collapse img {
+	transition: transform 0.3s ease-in-out;
+    transform: rotate(-90deg) scale(1, 1);
+    width: 18px;
+    height: 18px;
+}
+
+div.datatree div.tree-collapse.open img {
+   	transform: rotate(0deg) scale(1, 1);		
+}
+
+div.datatree div.tbody {
+  border: 1px solid {GREEN};
+  background-image: url(/img/separator.svg);
+  background-color: white;
+  box-sizing: border-box;
+  width:100%; 
+  overflow-y:auto;
+  overflow-x:clip;
+  padding: 0px;
+}
+
+div.tree-collapse {
+	padding-top: 3px;
+	padding-right: 6px;
+}
+
+
+svg.tree-collapse, div.tree-collapse svg{
+	width: 16px;
+	height: 16px;
+	display: inline-block; 
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+    vertical-align: top;
+	transform: scale(0.8, 0.8);		    
+	color: {BLUE};
+	position: relative;
+	top: 3px;
+	margin-left: 6px;
+	margin-right: 6px;   
+}
+
+svg.tree-collapse.open, div.tree-collapse.open svg {
+	transition: transform 0.2s ease-in-out;
+    transform: rotate(90deg) scale(1, 1);	
+	color: {BLUELIGHT};
+}
+
+div.datatree div.tbody div.tree-item {
+	width: calc( 100% - 30px );
+	overflow-x: hidden;
+	display: inline-block; 
+	padding-left: 4px;
+}
+
+div.tree-children.waiting {
+	background-image: url(img/wait.gif); 
+	background-size: 16px 16px;
+	width: 16px;
+	height: 16px;
+}
+
+div.tree-children.waiting div.tree-tail {
+	display: none;
+}
+		
+div.datatree div.tree-itemholder img.tree-icon {
+	width: 1em;
+	height: 1em;
+	margin-right: 4px;			
+}
+
+div.datatree div.tree-label {
+	cursor: pointer;		
+	height: 32px;
+	padding-top: 0px; 
+	overflow: none;
+/*	border-bottom: 1px solid #c0c0c0; 
+	border-left: 1px solid #c0c0c0; */
+}
+div.datatree div.tree-label.dashed {
+	text-decoration: line-through;
+}
+
+div.datatree div.tree-label:hover {
+	background-color: {BLUELIGHT};
+}
+
+div.datatree div.tree-label.selected {
+	background-color: {BLUE};
+	color: {BLUETEXT};
+}
+
+div.datatree. div.tfoot {
+	background-color: white;
+	text-align: right;
+	box-sizing: border-box;
+	border: none;
+}
+
+div.datatree div.thead div.column ,
+div.datatree div.thead div.filter-cell ,
+div.datatree div.tbody div.tree-label div.tree-cell {
+	box-sizing: border-box;
+	display: inline-block;
+	padding-right: 4px;
+	overflow: hidden;
+	height: 24px;
+	white-space: nowrap;
+	text-overflow: clip;
+	border-right: 1px solid #c0c0c0;
+}
+div.datatree div.tbody div.tree-label div.tree-cell {
+	padding-left: 26px;
+	padding-right: 4px;
+	padding-top: 4px;
+	height: 32px;
+}
+
+div.datatree div.thead div.filter-cell input.filter {
+	width: calc( 100% - 20px );
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+div.datatree div.tbody div.tree-children,
+div.datatree div.tbody div.tree-label {
+	width: 100%;
+	overflow: hidden;
+}
+
+/******* END DATATREE **********/
+tr.noBorderGrid td {
+	vertical-align: top;
+}
+
+tr.noBorderGrid > td:first-child {
+	width: 250px;
+}
+
+tr.noBorderGrid td:first-child div.gc.cell-inner span {
+	color: 	{BLUE};
+}
+
+tr.noBorderGrid td div.gc.cell-inner {
+	margin: 4px;
+}
+
+span.welcome {
+	padding: 6px; 
+	display: block;
+	color: {GREEN};
+	font-weight: bold;
+}
+
+input.required {
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='1em' width='1em'><text x='0' y='1em' fill='{URL_SKY}' font-size='11'>*</text></svg>");
+    background-position: top right;
+    background-repeat: no-repeat;
+}
+
+div.menu3modal {
+    position: fixed;
+    z-index: +1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(173, 216, 230);
+    background-color: rgb(173, 216, 230, 0.1);
+    display: block;
+}
+
+div.menu3 {
+	position: absolute;
+	z-index:10;
+	display: block;
+	border: solid 3px {BLUE};	
+	border-radius: 3px;
+	z-index: +1;
+	background: white;
+	text-align: left;
+	box-shadow: 4px 4px #a0a0a0;
+}
+
+div.menu3 div.menu3menu {
+	padding: 6px;
+	width: 100%;
+}
+
+div.menu3 table {
+	border-collapse: collapse;
+	border: none;
+}
+
+div.menu3 tr td {
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	cursor: pointer;
+}
+
+div.menu3 table tr td a,
+div.menu3 table tr td a:visited {
+	color: inherit;
+	text-decoration: none;
+}
+
+div.menu3 table tr td img{
+	margin-right: 8px;
+	height: 18px;
+	width: 27px;
+	vertical-align: middle;
+}
+
+div.menu3 tr:hover {
+	color: {BLUETEXT};
+	background-color: {BLUE};
+}
+
+img.menu3starter {
+	height: 100%;
+	background-color: {SKY};
+	padding: 6px;
+}
+
+img.menu3starter:hover {
+	background-color: {BLUELIGHT};
+}
+
+div.form {
+	height: calc( 100vh - 140px);
+	overflow-y: auto;
+	overflow-x: hidden; 
+}
+
+div.tabpanel {
+	border: none;
+}
+
+div.form > div > div.tabpanels div.tabpanel {
+	height: calc( 100vh - 185px);
+	overflow-y: auto;
+	overflow-x: hidden; 
+	padding: 0;
+}
+
+div.form > div > div.tabpanels div.tabpanel >div.tabpanel-real {
+	padding-top: 8px;
+	width: 100%;
+}
+
+tr.compactGrid td.gc {
+	border: solid 1px {GREEN};
+}
+tr.compactGrid > td.gc, tr.compactGrid > td.gc > div.gc {
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+span.label {
+	color: {BLUE};
+}
+
+div.tree-body td, div.listbox-body td, 
+div.tree-foot td, div.listbox-foot td, 
+tr.item, tr.item a, tr.item a:visited {
+	font-size: inherit; 
+}
+
+div.tree-tail {
+	margin-top: 0px;
+	height: 32px;
+}
+
+div.tree-tail button {
+	border-radius: 5px;
+	padding: 3px 9px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	font-size: 9pt;
+}
+
+
+/** FILE UPLOAD **/
+.inputfile {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+.inputfile + label {
+	background-image: linear-gradient(to bottom, {SKY}, {SKYDARK});
+	border: 0px solid transparent; 
+	border-radius: 5px;
+	padding: 6px 9px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+	box-shadow: 2px 2px 7px #808080; 
+	cursor: pointer;
+	color: {SKYTEXT};
+    display: inline-block;
+    margin: 3px 4px;
+}
+
+
+.inputfile + label:hover {
+	background-image: none;
+	background-color: {SKY};
+}
+
+form.upload-form input[type="submit"] {display:none;}
+form.upload-form input[type="button"] {float: right;}
+
+/************* databox *****************/
+div.databox div.label {
+	display: inline-block;
+	width: 142px;
+	color: 	{BLUE};
+    vertical-align: top;
+    margin-top: 6px;
+	margin-left: 8px;
+}
+
+div.databox.separator div.label {
+	display: inline-block;
+	width: 100%;
+	color: 	{GREEN};
+	margin-left: 0px;
+	margin-top: 16px;
+	margin-bottom: 4px;
+	font-size: 20px;
+    font-weight: bold;
+}
+
+div.databox div.container {
+	display: inline-block;
+	width: calc( 100% - 150px );
+    margin-bottom: 4px;
+    vertical-align: top;
+    position: relative;
+}
+
+div.databox div.container.datebox {
+	width: fit-content;
+}
+
+div.databox div.container.switch {
+	width: 80px;
+}
+
+div.databox div.container input.text ,
+div.databox div.container textarea.text {
+	width: 100%;
+	resize: vertical;
+}
+
+div.databox div.databox-popup {
+   position: absolute;
+   top: 24px;
+   background-color: white;
+   padding: 8px;
+   border: solid 1px {BLUEDARK};
+   border-radius: 3px;
+   width: fit-content;
+   min-width: 150px;
+   z-index: 1;
+   box-shadow: 4px 4px #a0a0a0;
+}
+
+div.databox div.databox-popup div {
+   width: 100%;
+	cursor: pointer;
+}
+
+div.databox div.databox-popup div span.search-match{
+	color: {SKY}
+}
+div.databox div.databox-popup div:hover {
+	background-color: {BLUELIGHT};
+}
+div.databox div.databox-popup div:hover span.search-match{
+	color: black;
+}
+
+div.databox button.icon-button {
+	margin-left: 4px;
+	margin-right: 4px;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	vertical-align: middle;
+}
+
+div.databox img.warning-icon {
+    height: 24px;
+    vertical-align: bottom;
+}
+
+
+div.databox div.warning span {
+    font-weight: bold;
+}
+
+div.databox div.databox-popup img {
+   width: 24px;
+}
+
+div.section {
+	display: inline-block;
+	width: 50% ;
+	padding-right: 24px;
+	vertical-align: top;
+}
+
+@media only screen and (max-width: 1023px) {
+	div.section {
+		display: block;
+		width: 100%;
+		padding-right: 0px;
+	}
+}
+	
+	
+/*** WIZARD **/
+div.wizard-bar {
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-top: -16px;
+    margin-bottom: 16px;
+    height: 52px;
+    width: calc( 100% + 32px );
+    background: #f0f0f0;
+    border-bottom: solid black 1px;
+}
+
+div.wizard-bar div.active-step {
+    background-color: {GREEN};
+    display: inline-block;
+    padding: 16px;
+    vertical-align: bottom;
+}
+
+div.wizard-bar div.active-step span {
+    color: {GREENTEXT};
+}
+
+div.wizard-bar div.previous-step {
+    display: inline-block;
+    padding: 16px;
+    vertical-align: bottom;
+}
+
+div.wizard-bar div.next-step {
+    display: inline-block;
+    padding: 16px;
+    color: #808080;
+    vertical-align: bottom;
+}
+
+div.wizard-bar div.separator-p {
+	height: 100%;
+	width: 26px;
+	display: inline-block;
+	background-image: url(/img/wizard-p.svg);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+div.wizard-bar div.separator-n {
+	display: inline-block;
+	height: 100%;
+	width: 26px;
+	background-image: url(/img/wizard-n.svg);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+div.wizard-bar div.separator-d {
+	display: inline-block;
+	height: 100%;
+	width: 26px;
+	background-image: url(/img/wizard-d.svg);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.UserPreferenceEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -33,7 +34,7 @@ import es.caib.seycon.ng.model.UserAccountEntity;
 @Depends ({es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
-	es.caib.seycon.ng.model.UsuariSEUEntity.class,
+	UserPreferenceEntity.class,
 	es.caib.seycon.ng.model.TipusUsuariEntity.class,
 	es.caib.seycon.ng.model.UsuariWFProcessEntity.class,
 	es.caib.seycon.ng.model.DominiUsuariEntity.class,
@@ -450,30 +451,6 @@ public abstract class UsuariService {
 		return null;
 	}
 
-	@Operation(grantees = { roles.Tothom.class }, translated = "update")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public es.caib.seycon.ng.comu.UsuariSEU update(
-			es.caib.seycon.ng.comu.UsuariSEU usuariSEU)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(grantees = { roles.Tothom.class }, translated = "create")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public es.caib.seycon.ng.comu.UsuariSEU create(
-			es.caib.seycon.ng.comu.UsuariSEU usuari)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
-	@Operation(grantees = { roles.Tothom.class, roles.anonymous.class }, translated = "findConsoleUserByUserName")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public es.caib.seycon.ng.comu.UsuariSEU findUsuariSEUByCodiUsuari(
-			java.lang.String codiUsuari)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
-		return null;
-	}
-
 	@Operation(translated = "getPasswordsUserType")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.EstatContrasenya> getContrasenyesTipusUsuari(
@@ -662,8 +639,17 @@ public abstract class UsuariService {
 
 	@Operation(grantees = { roles.user_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUserByJsonQuery(
+	public java.util.List<es.caib.seycon.ng.comu.Usuari> findUserByJsonQuery(
 			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Usuari> findUserByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer start, @Nullable Integer end)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -693,7 +679,16 @@ public abstract class UsuariService {
 
 	@Operation(grantees = { roles.user_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilter(
+	public java.util.List<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter,
+			@Nullable Integer start, @Nullable Integer end) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter) {
 		return null;

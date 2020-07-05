@@ -263,7 +263,6 @@ public class RoleDependencyTest extends AbstractTest
 			rol.setDescripcio(name); //$NON-NLS-1$
 			rol.setGestionableWF(new Boolean(false));
 			rol.setNom(name); //$NON-NLS-1$
-			rol.setDomini(new Domini());
 			rol = appSvc.create(rol);
 		}
 		return rol;

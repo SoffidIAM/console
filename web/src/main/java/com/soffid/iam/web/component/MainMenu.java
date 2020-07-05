@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.out.AuScript;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -18,6 +20,7 @@ import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.menu.MenuOption;
@@ -55,7 +58,21 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		navigator = (Div) getFirstChild();
 		optionsDiv = (Div) getLastChild();
 		loadMenus();
+		focusSearchbox();
 		super.afterCompose();
+	}
+
+
+	public void focusSearchbox() {
+		Page p = getDesktop().getPageIfAny("index");
+		if (p != null) {
+			Component w = p.getFellowIfAny("appWindow");
+			if (w != null) {
+				Textbox input = (Textbox) w.getFellowIfAny("searchTextbox");
+				if (input != null)
+					input.focus();
+			}
+		}
 	}
 
 	
@@ -178,6 +195,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 				currentOptions = stack.getLast().getOptions();
 			
 			loadMenus();
+			focusSearchbox();
 		}
 	}
 	
@@ -213,6 +231,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			stack.add(option);
 			currentOptions = option.getOptions();
 			loadMenus();
+			focusSearchbox();
 		}
 	}
 }

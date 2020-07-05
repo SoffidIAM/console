@@ -41,15 +41,18 @@ public class RoleDependencyEntityImpl
 		StringBuffer b = new StringBuffer();
 		b.append(getContainer().toString());
 		String tipusDomini = getContainer().getDomainType();
-		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)
+				|| TipusDomini.GROUPS.equals(tipusDomini) || TipusDomini.MEMBERSHIPS.equals(tipusDomini)) {
 			GroupEntity grup = getGranteeGroupDomain();
 			if (grup != null)
 				b.append(" / ").append(grup.getName());
-		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
+		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)
+				|| TipusDomini.APPLICATIONS.equals(tipusDomini)) {
 			InformationSystemEntity app = getGranteeApplicationDomain();
 			if (app != null)
 				b.append(" / ").append(app.getName());
-		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
+		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini) 
+				|| TipusDomini.CUSTOM.equals(tipusDomini)) {
 			DomainValueEntity vd = getGranteeDomainValue();
 			if (vd != null)
 				b.append(" / ").append(vd.getValue());
@@ -59,15 +62,18 @@ public class RoleDependencyEntityImpl
 		b.append(getContained().toString());
 
 		tipusDomini = getContainer().getDomainType();
-		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+		if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)
+				|| TipusDomini.GROUPS.equals(tipusDomini) || TipusDomini.CUSTOM.equals(tipusDomini)) {
 			GroupEntity grup = getDomainGroup();
 			if (grup != null)
 				b.append(" / ").append(grup.getName());
-		} else if (TipusDomini.APLICACIONS.equals(tipusDomini)) {
+		} else if (TipusDomini.APLICACIONS.equals(tipusDomini) 
+				|| TipusDomini.APPLICATIONS.equals(tipusDomini)) {
 			InformationSystemEntity app = getDomainApplication();
 			if (app != null)
 				b.append(" / ").append(app.getName());
-		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)) {
+		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipusDomini)
+				|| TipusDomini.CUSTOM.equals(tipusDomini)) {
 			DomainValueEntity vd = getDomainApplicationValue();
 			if (vd != null)
 				b.append(" / ").append(vd.getValue());

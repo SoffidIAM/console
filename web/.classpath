@@ -22,8 +22,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/iam-common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/iam-core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core-3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/common-3"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

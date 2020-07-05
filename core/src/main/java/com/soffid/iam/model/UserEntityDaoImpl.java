@@ -20,14 +20,15 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.soffid.iam.api.AnonimousUser;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.Identity;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
@@ -50,7 +51,6 @@ import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEmailEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
-import com.soffid.iam.model.UserPreferencesEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
@@ -267,20 +267,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         }
         targetVO.setMailAlias(aliesDeCorreu);
 
-        // OBTENIM EL NIF
-        targetVO.setNationalID(""); //$NON-NLS-1$
-		for (UserDataEntity dadaUsuariEntity: getUserDataEntityDao().findByDataType(targetVO.getUserName(), "NIF")) //$NON-NLS-1$
-        {
-            targetVO.setNationalID(dadaUsuariEntity.getValue());
-        }
-
-        // TELÈFON
-        targetVO.setPhoneNumber(""); //$NON-NLS-1$
-		for (UserDataEntity dadaUsuariEntity: getUserDataEntityDao().findByDataType(targetVO.getUserName(), "PHONE")) //$NON-NLS-1$
-        {
-            targetVO.setPhoneNumber(dadaUsuariEntity.getValue());
-        }
-
         // DATA DE CREACIÓ
         Calendar calendar = GregorianCalendar.getInstance();
         if (sourceEntity.getCreationDate() != null) {
@@ -333,25 +319,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             targetVO.setMailDomain(dominiCorreu.getName());
         }
 
-        // INFORMACIÓ DE SEU
-        try {
-            Collection<UserPreferencesEntity> infoSEU = sourceEntity.getSEUInformation();
-            if (infoSEU != null && infoSEU.size()>0) {
-                ConsoleProperties usuariSEU = getUserPreferencesEntityDao().toConsoleProperties(infoSEU.iterator().next());
-                targetVO.setConsoleProperties(usuariSEU);
-            }
-        } catch (Throwable th) {
-        }
-
-        // DOMINI D'USUARIS
-        // Camps de codi d'usuari als dominis
-        /*
-         * if (sourceEntity.getCodisUsuari() !=null) {
-         * targetVO.setCodisUsuariDomini
-         * (getCodiUsuariEntityDao().toCodiUsuariList
-         * (sourceEntity.getCodisUsuari())); }
-         */
-
         // Tipus d'usuari domini: segons taula
         if (sourceEntity.getUserType() != null) {
             UserType tipusu = getUserTypeEntityDao().toUserType(sourceEntity.getUserType());
@@ -360,10 +327,44 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         
         targetVO.setFullName(sourceEntity.getFullName());
 
+        fetchAccounts (targetVO, sourceEntity);
+        
     }
 
 
-    @Override
+    private void fetchAccounts(User target, UserEntity source) {
+		target.setAttributes(new HashMap<String, Object>());
+		Map<String, Object> attributes = target.getAttributes();
+		for (UserDataEntity att : source.getUserData()) {
+			UserData vd = getUserDataEntityDao().toUserData(att);
+			if (att.getDataType().getMultiValued() != null && att.getDataType().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(vd.getAttribute());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(vd.getAttribute(), r);
+				}
+				if (vd.getDateValue() != null)
+					r.add(vd.getDateValue());
+				else if (vd.getValue() != null)
+					r.add(vd.getValue());
+				else if (vd.getBlobDataValue() != null)
+					r.add(vd.getBlobDataValue());
+			}
+			else
+			{
+				if (vd.getDateValue() != null)
+					attributes.put(vd.getAttribute(), vd.getDateValue());
+				else if (vd.getValue() != null)
+					attributes.put(vd.getAttribute(), vd.getValue());
+				else if (vd.getBlobDataValue() != null)
+					attributes.put(vd.getAttribute(), vd.getBlobDataValue());
+			}
+		}
+	}
+
+	@Override
     public String handleRefreshCanvis(String codiUsuari) throws InternalErrorException {
         UserEntity usuari = findByUserName(codiUsuari);
         createTask(usuari);
@@ -433,7 +434,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             Iterator<RoleAccountEntity> iterator = rolsUsuaris.iterator();
             while (iterator.hasNext()) {
                 RoleAccountEntity rolUsuari = iterator.next();
-                if (TipusDomini.GRUPS_USUARI.equals(rolUsuari.getDomainType())) {
+                if (TipusDomini.GRUPS_USUARI.equals(rolUsuari.getDomainType()) ||
+                		TipusDomini.MEMBERSHIPS.equals(rolUsuari.getDomainType())) {
                     String codiGrupValorDomini = rolUsuari.getGroup().getName();
                     // Mirem que no el tinga com a grup secundari
                     if (codiGrupValorDomini.compareTo(codiGrupPrimari) == 0
@@ -575,62 +577,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             }
         }
 
-        String telefon = sourceVO.getPhoneNumber();
-        if (targetEntity.getId() != null) {
-            if (telefon != null && !telefon.trim().equals("")) { //$NON-NLS-1$
-                /*
-                 * Solo se le inserta directamente el telefono si el usuario ya
-                 * existe dado que el codigo de usuario aun es temporal
-                 */
-            	Collection<UserDataEntity> l = getUserDataEntityDao().findByDataType(sourceVO.getUserName(), TELEFON);
-                UserDataEntity dadaUsuariEntity = l.isEmpty() ? null: l.iterator().next(); 
-                if (dadaUsuariEntity == null) {
-                    /*
-                     * El usuario no tiene telefono, se crea uno nuevo
-                     */
-                    UserData dadaUsuari = new UserData();
-                    dadaUsuari.setAttribute(TELEFON);
-                    dadaUsuari.setUser(sourceVO.getUserName());
-                    dadaUsuari.setValue(sourceVO.getPhoneNumber());
-                    dadaUsuariEntity = getUserDataEntityDao().userDataToEntity(dadaUsuari);
-                    getUserDataEntityDao().create(dadaUsuariEntity);
-                } else {
-                    /*
-                     * El usuario ya teía un teléfono, se actualiza
-                     */
-                    dadaUsuariEntity.setValue(sourceVO.getPhoneNumber());
-                    getUserDataEntityDao().update(dadaUsuariEntity);
-                }
-            } else {
-            	getUserDataEntityDao().remove( getUserDataEntityDao().findByDataType(sourceVO.getUserName(), TELEFON) );
-            }
-
-            String nif = sourceVO.getNationalID();
-            if (nif != null && !nif.trim().equals("")) { //$NON-NLS-1$
-                /*
-                 * El nif no es nulo, hay que actualizarlo o añadirlo si no
-                 * tenía
-                 */
-            	Collection<UserDataEntity> l = getUserDataEntityDao().findByDataType(sourceVO.getUserName(), NIF);
-                UserDataEntity dadaUsuariEntity = l.isEmpty() ? null: l.iterator().next(); 
-                if (dadaUsuariEntity != null) {
-                    /* Actualizar el nif */
-                    dadaUsuariEntity.setValue(nif);
-                } else {
-                    /* Añadir un nif */
-                    /* Si el usuario ya existe... */
-                    MetaDataEntity tipusDada = getMetaDataEntityDao().findDataTypeByName(NIF);
-                    UserData dadaUsuari = new UserData();
-                    dadaUsuari.setAttribute(NIF);
-                    dadaUsuari.setUser(sourceVO.getUserName());
-                    dadaUsuari.setValue(sourceVO.getNationalID());
-                    dadaUsuariEntity = getUserDataEntityDao().userDataToEntity(dadaUsuari);
-                    getUserDataEntityDao().create(dadaUsuariEntity);
-                }
-            } else {
-            	getUserDataEntityDao().remove( getUserDataEntityDao().findByDataType(sourceVO.getUserName(), NIF) );
-            }
-        }
 
     }
 
@@ -1189,15 +1135,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		}
 
 		TaskEntity tasque;
-		if (!oldValue.getHomeServer().equals(usuari.getHomeServer().getName()))
-		{
-		    tasque = getTaskEntityDao().newTaskEntity();
-		    tasque.setDate(new Timestamp(System.currentTimeMillis()));
-		    tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-		    tasque.setFolder(usuari.getUserName());
-		    tasque.setFolderType("U"); //$NON-NLS-1$
-		    getTaskEntityDao().create(tasque);
-		}
 		if (!oldValue.getPrimaryGroup().equals(usuari.getPrimaryGroup().getName())) {
 		    tasque = getTaskEntityDao().newTaskEntity();
 		    tasque.setDate(new Timestamp(System.currentTimeMillis()));

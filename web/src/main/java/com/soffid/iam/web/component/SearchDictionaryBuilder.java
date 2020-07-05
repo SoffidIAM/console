@@ -99,6 +99,8 @@ public class SearchDictionaryBuilder {
 			sd = addAccountAttributes (sd);
 		} else if (clazz.equals("com.soffid.iam.api.System")) {
 			sd = addSystemAttributes (sd);
+		} else if (clazz.equals("com.soffid.iam.api.AttributeTranslation")) {
+			sd = addAttributeTranslationAttributes (sd);
 		}
 		if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
 			sd = addCustomAttributes (sd, MetadataScope.CUSTOM, clazz.substring(COM_SOFFID_IAM_API_CUSTOM_OBJECT.length()));
@@ -439,7 +441,6 @@ public class SearchDictionaryBuilder {
 		return sd2;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static void addServerURL(String name, SearchDictionary sd) throws InternalErrorException, NamingException, CreateException {
 		SearchAttributeDefinition sad = new SearchAttributeDefinition();
 		sad.setLabelName("com.soffid.iam.api.System.url");
@@ -458,6 +459,48 @@ public class SearchDictionaryBuilder {
 			for (Server server: EJBLocator.getDispatcherService().findAllServers()) {
 				listLabels.add(server.getName());
 				valueLabels.add(server.getUrl());
+			}
+		} finally {
+			Security.nestedLogoff();
+		}
+		sad.setLabels(listLabels);
+		sad.setValues(valueLabels);
+		sd.getAttributes().add(sad);
+	}
+
+	private static SearchDictionary addAttributeTranslationAttributes(SearchDictionary sd1) throws InternalErrorException, NamingException, CreateException {
+		SearchDictionary sd2 = new SearchDictionary(sd1);
+		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
+		// Replace domain attribute
+		try {
+			for ( SearchAttributeDefinition sad: sd2.getAttributes())
+			{
+				if (sad.getName().equals("domain"))
+				{
+					sd2.getAttributes().remove(sad);
+					addTranslationAttributeDomain(sad.getName(), sd2);
+				}
+			}
+		} catch (Exception e) {
+			// Cannot retrieve accounts list
+		}
+		return sd2;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void addTranslationAttributeDomain(String name, SearchDictionary sd) throws InternalErrorException, NamingException, CreateException {
+		SearchAttributeDefinition sad = new SearchAttributeDefinition();
+		sad.setLabelName("com.soffid.iam.api.AttributeTranslation.domain");
+		sad.setType(TypeEnumeration.STRING_TYPE);
+		sad.setName(name);
+		sad.setJavaType(String.class);
+		LinkedList<String> listLabels = new LinkedList<String>();
+		LinkedList<String> valueLabels = new LinkedList<String>();
+		Security.nestedLogin(Security.ALL_PERMISSIONS);
+		try {
+			for (String domain: EJBLocator.getAttributeTranslationService().findDomains()) {
+				listLabels.add(domain);
+				valueLabels.add(domain);
 			}
 		} finally {
 			Security.nestedLogoff();

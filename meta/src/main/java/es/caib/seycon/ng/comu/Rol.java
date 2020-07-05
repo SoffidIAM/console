@@ -18,17 +18,17 @@ import es.caib.seycon.ng.model.RolEntity;
 @JsonObject(hibernateClass=RolEntity.class)
 public class Rol {
 
-	@Attribute(translated = "name" )
+	@Attribute(translated = "name", searchCriteria = true )
 	public java.lang.String nom;
 
-	@Attribute(translated = "description" )
+	@Attribute(translated = "description", searchCriteria = true )
 	public java.lang.String descripcio;
 
 	@Nullable
 	public String category;
 	
 	@Nullable
-	@Attribute(translated = "enableByDefault" )
+	@Attribute(translated = "enableByDefault", hidden=true )
 	public java.lang.Boolean defecte;
 
 	@Nullable
@@ -37,41 +37,41 @@ public class Rol {
 	public java.lang.String baseDeDades;
 
 	@Nullable
-	@Attribute(translated = "password" )
+	@Attribute(translated = "password", hidden=true )
 	public java.lang.Boolean contrasenya;
 
 	@JsonAttribute(hibernateAttribute="informationSystem.name")
-	@Attribute(translated = "informationSystemName" )
+	@Attribute(translated = "informationSystemName", searchCriteria = true, type = "APPLICATION" )
 	public java.lang.String codiAplicacio;
 
 	@Nullable
+	@Attribute(hidden=true)
 	public java.lang.Long id;
 
 	@Nullable
 	@Attribute(translated = "domain" )
-	public es.caib.seycon.ng.comu.Domini domini;
+	public String domini;
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute="containerRoles.container")
+	@Attribute(hidden = true)
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> ownerRoles;
 
 	@Nullable
+	@Attribute(hidden = true)
 	@JsonAttribute(hibernateJoin="", hibernateAttribute="containerGroups.group.name")
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> ownerGroups;
 
 	@Nullable
+	@Attribute(hidden = true)
 	@JsonAttribute(hibernateJoin="", hibernateAttribute="containerGroups.group.name")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> granteeGroups;
-
-	@Nullable
-	@Attribute(translated = "indirectAssignment" )
-	public java.lang.String assignacioIndirecta;
 
 	@Nullable
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> ownedRoles;
 
 	@Nullable
-	@Attribute(translated = "bpmEnforced" )
+	@Attribute(translated = "bpmEnabled", synonyms = {"bpmEnforced"} )
 	public java.lang.Boolean gestionableWF;
 
 	@Description("Last modification date")
@@ -84,7 +84,7 @@ public class Rol {
 
 	@Description ("Role custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")
-	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()", hidden = true)
 	@Nullable
 	public Map<String,Object> attributes; 
 }

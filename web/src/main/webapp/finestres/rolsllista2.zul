@@ -8,8 +8,6 @@
 	
 	<zscript>
 		<![CDATA[
-			fileres = es.caib.seycon.ng.web.Custom.FILERES;
-			
 			model.getVariables().declareVariable("queryEnabled", false);
 			model.getVariables().declareVariable("gestionableWF", "N");
 			

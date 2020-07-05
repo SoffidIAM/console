@@ -110,7 +110,8 @@ public class RoleGroupEntityDaoImpl extends
         if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
             tipusDomini = TipusDomini.SENSE_DOMINI;
         }
-        if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
+        if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0 ||
+        		TipusDomini.CUSTOM.equals(tipusDomini)) {
         	DomainValue valorDomini;
             if (sourceEntity.getGrantedDomainValue() != null)
             {
@@ -125,9 +126,13 @@ public class RoleGroupEntityDaoImpl extends
             }
         	targetVO.setDomainValue(valorDomini);
         } else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
-                || tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+                || tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0 ||
+                		TipusDomini.GROUPS.equals(tipusDomini) ||
+                		TipusDomini.MEMBERSHIPS.equals(tipusDomini)) {
             DomainValue valorDomini = new DomainValue();
-            valorDomini.setDomainName(tipusDomini);
+            valorDomini.setDomainName(tipusDomini.compareTo(TipusDomini.GRUPS) == 0
+                    || tipusDomini.compareTo(TipusDomini.GROUPS) == 0 ?
+                    		TipusDomini.GROUPS : TipusDomini.MEMBERSHIPS);
             if (sourceEntity.getGrantedGroupDomain() != null)
             {
             	valorDomini.setDescription(sourceEntity.getGrantedGroupDomain().getDescription());
@@ -135,9 +140,10 @@ public class RoleGroupEntityDaoImpl extends
             }
             valorDomini.setExternalCodeDomain(null);
             targetVO.setDomainValue(valorDomini);
-        } else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
+        } else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0 ||
+        		TipusDomini.APPLICATIONS.equals(tipusDomini)) {
             DomainValue valorDomini = new DomainValue();
-            valorDomini.setDomainName(tipusDomini);
+            valorDomini.setDomainName(TipusDomini.APPLICATIONS);
             if (sourceEntity.getGrantedGroupDomain() != null)
             {
             	valorDomini.setDescription(sourceEntity.getGrantedApplicationDomain().getDescription());
@@ -190,18 +196,22 @@ public class RoleGroupEntityDaoImpl extends
     public void toRoleGrant(RoleGroupEntity source, RoleGrant target) {
         target.setSystem(source.getGrantedRole().getSystem().getName());
         String tipus = source.getGrantedRole().getDomainType();
-        if (TipusDomini.SENSE_DOMINI.equals(tipus)) {
+        if (tipus == null || tipus.trim().isEmpty() ||
+        		TipusDomini.SENSE_DOMINI.equals(tipus)) {
             target.setHasDomain(false);
             target.setDomainValue(null);
-        } else if (TipusDomini.APLICACIONS.equals(tipus) && 
+        } else if ((TipusDomini.APLICACIONS.equals(tipus) ||
+        		TipusDomini.APPLICATIONS.equals(tipus)) && 
         		source.getGrantedApplicationDomain() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedApplicationDomain().getName());
-        } else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)) &&
+        } else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)
+        		|| TipusDomini.GROUPS.equals(tipus) || TipusDomini.MEMBERSHIPS.equals(tipus)) &&
         		source.getGrantedGroupDomain() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedGroupDomain().getName());
-        } else if (TipusDomini.DOMINI_APLICACIO.equals(tipus) && source.getGrantedDomainValue() != null) {
+        } else if ((TipusDomini.DOMINI_APLICACIO.equals(tipus) ||
+        		TipusDomini.CUSTOM.equals(tipus)) && source.getGrantedDomainValue() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedDomainValue().getValue());
         } else {

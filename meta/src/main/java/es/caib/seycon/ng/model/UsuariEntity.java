@@ -18,7 +18,6 @@ import es.caib.seycon.ng.comu.Usuari;
 @Entity(table = "SC_USUARI", translatedName = "UserEntity", translatedPackage = "com.soffid.iam.model")
 @Depends({
 		es.caib.seycon.ng.model.RolsGrupEntity.class,
-		es.caib.seycon.ng.model.UsuariSEUEntity.class,
 		es.caib.seycon.ng.model.TipusUsuariEntity.class,
 		es.caib.seycon.ng.model.ContrasenyaEntity.class,
 		es.caib.seycon.ng.model.DominiUsuariEntity.class,
@@ -147,9 +146,6 @@ public abstract class UsuariEntity {
 
 	@ForeignKey(foreignColumn = "ADM_USUID", translated = "accessHostAsAdministratorAuthorization")
 	public java.util.Collection<es.caib.seycon.ng.model.AutoritzacioAccesHostComAdministradorEntity> autoritzacioAccesHostComAdministrador;
-
-	@ForeignKey(foreignColumn = "USE_USUID", translated = "SEUInformation")
-	public java.util.Collection<es.caib.seycon.ng.model.UsuariSEUEntity> informacioSEU;
 
 	@Column(name = "USU_TUS_ID", translated = "userType")
 	public es.caib.seycon.ng.model.TipusUsuariEntity tipusUsuari;

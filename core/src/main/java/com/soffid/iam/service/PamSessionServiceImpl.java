@@ -39,6 +39,7 @@ import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class PamSessionServiceImpl extends PamSessionServiceBase {
@@ -147,9 +148,11 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throw new InternalErrorException("Cannot retrieve password for account "+entity.getDescription());
 		
 		Account account = getAccountEntityDao().toAccount(entity);
-		PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
-		if (! PasswordValidation.PASSWORD_GOOD.equals(status))
-			throw new InternalErrorException("The password stored is not accepted by the target system");
+		if ( account.getType() != AccountType.IGNORED) {
+			PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
+			if (! PasswordValidation.PASSWORD_GOOD.equals(status))
+				throw new InternalErrorException("The password stored is not accepted by the target system");
+		}
 		URL url2 = new URL(jumpServerGroup.getStoreUrl());
 		String base = url2.getProtocol()+"://"+url2.getHost()+
 				(url2.getPort() == -1 ? "": ":"+url2.getPort());

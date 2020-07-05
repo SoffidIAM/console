@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.servei;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -489,4 +490,23 @@ public abstract class DispatcherService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.agent_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<Dispatcher> findSystemByTextAndFilter(
+			@Nullable String text, 
+			@Nullable String query, 
+			@Nullable Integer first,
+			@Nullable Integer max)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.agent_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<Dispatcher> findSystemByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

@@ -11,11 +11,14 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 
 @ValueObject ( translatedName="DomainValue",
 	 translatedPackage="com.soffid.iam.api")
+@JsonObject(hibernateClass = ValorDominiAplicacioEntity.class)
 public class ValorDomini {
 
+	@Nullable
 	@Description ("Domain value")
 	@Attribute(translated = "value" )
 	public java.lang.String valor;
@@ -30,6 +33,7 @@ public class ValorDomini {
 	public java.lang.String descripcio;
 
 	@Attribute(translated = "domainName" )
+	@Nullable
 	@Description ("Domain name")
 	public java.lang.String nomDomini;
 

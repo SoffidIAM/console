@@ -424,15 +424,18 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         entity.setGroup(ownerGroup);
 
         String nomDomini = ownedRole.getDomainType();
-        if (TipusDomini.APLICACIONS.equals(nomDomini))
+        if (TipusDomini.APLICACIONS.equals(nomDomini) ||
+        		TipusDomini.APPLICATIONS.equals(nomDomini))
         {
         	entity.setGrantedApplicationDomain(getInformationSystemEntityDao().findByCode(grant.getDomainValue()));
         }
-        else if (TipusDomini.GRUPS.equals(nomDomini) || TipusDomini.GRUPS_USUARI.equals(nomDomini))
+        else if (TipusDomini.GRUPS.equals(nomDomini) || TipusDomini.GRUPS_USUARI.equals(nomDomini) ||
+        		TipusDomini.GROUPS.equals(nomDomini) || TipusDomini.MEMBERSHIPS.equals(nomDomini))
         {
         	entity.setGrantedGroupDomain(getGroupEntityDao().findByName(grant.getDomainValue()));
         }
-        else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini))
+        else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini) ||
+        		TipusDomini.CUSTOM.equals(nomDomini))
         {
         	entity.setGrantedDomainValue(
         			getDomainValueEntityDao()
@@ -638,37 +641,20 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		targetVO.setGranteeGroups(granteeGroups);
 
 		String tipusDomini = sourceEntity.getDomainType();
-		if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
-			tipusDomini = TipusDomini.SENSE_DOMINI;
-		}
-		if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
-			ApplicationDomainEntity dominiAplicacioEntity = sourceEntity
-					.getApplicationDomain();
-			Domain domini = getApplicationDomainEntityDao().toDomain(
-					dominiAplicacioEntity);
-			targetVO.setDomain(domini);
-		} else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
-				|| tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-			Domain domini = new Domain();
-			domini.setExternalCode(null);
-			if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0) {
-				domini.setName(TipusDomini.GRUPS);
-				domini.setDescription("Group domain");
-			} else {
-				domini.setName(TipusDomini.GRUPS_USUARI);
-				domini.setDescription("Owned group domain");
-			}
-			targetVO.setDomain(domini);
+		if (tipusDomini == null || tipusDomini.trim().isEmpty() ||
+				TipusDomini.SENSE_DOMINI.equals(tipusDomini)) { //$NON-NLS-1$
+			targetVO.setDomain(null);
+		} else if (TipusDomini.GROUPS.equals(tipusDomini) ||
+				TipusDomini.GRUPS.equals(tipusDomini) ||
+				TipusDomini.MEMBERSHIPS.equals(tipusDomini) ||
+				TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+			targetVO.setDomain(TipusDomini.GROUPS);
 		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
-			Domain domini = new Domain();
-			domini.setName(TipusDomini.APLICACIONS);
-			domini.setDescription("Information system domain");
-			targetVO.setDomain(domini);
-		} else /* tipusDomini == SENSE_DOMINI */{
-			Domain senseDomini = new Domain();
-			senseDomini.setName(TipusDomini.SENSE_DOMINI);
-			senseDomini.setDescription("");
-			targetVO.setDomain(senseDomini);
+			targetVO.setDomain(TipusDomini.APPLICATIONS);
+		} else if (sourceEntity.getApplicationDomain() == null) {
+			targetVO.setDomain(null);
+		} else {
+			targetVO.setDomain(sourceEntity.getApplicationDomain().getName());
 		}
 
 		InformationSystemEntity aplicacioEntity = sourceEntity
@@ -722,10 +708,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			}
 		}
 		targetVO.setOwnedRoles(rolsAtorgatsRol);
-
-		// Indicador de si está otorgado a roles o a grupos (*=true)
-		targetVO.setIndirectAssignment((rolsPosseidorsRol.size() != 0 || grupsPosseidors
-				.size() != 0) ? "*" : ""); //$NON-NLS-1$ //$NON-NLS-2$
 
 		targetVO.setAttributes(new HashMap<String, Object>());
 		Map<String, Object> attributes = targetVO.getAttributes();
@@ -886,16 +868,19 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 						.newRoleGroupEntity();
 				rge.setGrantedRole(targetEntity);
 				rge.setGroup(GroupEntity);
-				Domain domini = sourceVO.getDomain();
 				String nomDomini = targetEntity.getDomainType();
-				if (TipusDomini.APLICACIONS.equals(nomDomini)) {
+				if (TipusDomini.APLICACIONS.equals(nomDomini) ||
+						TipusDomini.APPLICATIONS.equals(nomDomini)) {
 					rge.setGrantedApplicationDomain(getInformationSystemEntityDao()
 							.findByCode(grant.getDomainValue()));
 				} else if (TipusDomini.GRUPS.equals(nomDomini)
-						|| TipusDomini.GRUPS_USUARI.equals(nomDomini)) {
+						|| TipusDomini.MEMBERSHIPS.equals(nomDomini)
+						|| TipusDomini.GRUPS_USUARI.equals(nomDomini)
+						|| TipusDomini.GROUPS.equals(nomDomini)) {
 					rge.setGrantedGroupDomain(getGroupEntityDao().findByName(
 							grant.getDomainValue()));
-				} else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini)) {
+				} else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini)
+						|| TipusDomini.CUSTOM.equals(nomDomini)) {
 					rge.setGrantedDomainValue(getDomainValueEntityDao()
 							.findByApplicationDomainValue(
 									targetEntity.getInformationSystem()
@@ -912,42 +897,34 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
 	private void updateEntityDomainType(com.soffid.iam.api.Role sourceVO,
 			com.soffid.iam.model.RoleEntity targetEntity) {
-		Domain domini = sourceVO.getDomain();
-		String nomDomini = domini.getName();
-		if (nomDomini == null || nomDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
-			nomDomini = TipusDomini.SENSE_DOMINI;
-		}
-		if (domini.getId() == null
-				&& (nomDomini.compareTo(TipusDomini.GRUPS) == 0
-						|| nomDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0
-						|| nomDomini.compareTo(TipusDomini.APLICACIONS) == 0 || nomDomini
-						.compareTo(TipusDomini.SENSE_DOMINI) == 0)) {
+		String nomDomini = sourceVO.getDomain();
+		if (nomDomini == null || nomDomini.trim().isEmpty()) { //$NON-NLS-1$
 			targetEntity.setApplicationDomain(null);
-			targetEntity.setDomainType(nomDomini);
+			targetEntity.setDomainType(null);
+		}
+		else if (TipusDomini.APLICACIONS.equals(nomDomini) ||
+				TipusDomini.APPLICATIONS.equals(nomDomini) ) { //$NON-NLS-1$
+			targetEntity.setApplicationDomain(null);
+			targetEntity.setDomainType(TipusDomini.APPLICATIONS);
+		}
+		else if (TipusDomini.GROUPS.equals(nomDomini) ||
+				TipusDomini.GRUPS_USUARI.equals(nomDomini) || //$NON-NLS-1$
+				TipusDomini.MEMBERSHIPS.equals(nomDomini) || //$NON-NLS-1$
+				TipusDomini.GRUPS.equals(nomDomini) ) { //$NON-NLS-1$
+			targetEntity.setApplicationDomain(null);
+			targetEntity.setDomainType(TipusDomini.GROUPS);
 		} else {
 			ApplicationDomainEntity dominiAplicacioEntity = findDominiByNomAndCodiApliacio(
-					domini.getName(), sourceVO.getInformationSystemName());
+					nomDomini, sourceVO.getInformationSystemName());
 			if (dominiAplicacioEntity != null) {
 				targetEntity.setApplicationDomain(dominiAplicacioEntity);
 				targetEntity.setDomainType(TipusDomini.DOMINI_APLICACIO);
 			} else {
 				throw new SeyconException(String.format(
 						Messages.getString("RoleEntityDaoImpl.19"),
-						domini.getName(), domini.getExternalCode()));
+						nomDomini, sourceVO.getInformationSystemName()));
 			}
 
-			/*
-			 * Si el domini d'aplicació està associat a una aplicació llavors el
-			 * Role ha de pertanyer a l'aplicació
-			 */
-			if (domini != null && domini.getExternalCode() != null) {
-				if (domini.getExternalCode().compareTo(
-						sourceVO.getInformationSystemName()) != 0) {
-					throw new SeyconException(String.format(
-							Messages.getString("RoleEntityDaoImpl.20"),
-							sourceVO.getName(), domini.getName()));
-				}
-			}
 		}
 	}
 

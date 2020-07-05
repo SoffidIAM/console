@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Map;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.UsuariEntity;
@@ -14,107 +16,108 @@ import es.caib.seycon.ng.model.UsuariEntity;
 	 cache=300,
 	 translatedPackage="com.soffid.iam.api")
 public class Usuari {
+	@Nullable
+	@Attribute(hidden=true)
+	public java.lang.Long id;
 
-	@Attribute(translated = "userName" )
+	@Attribute(translated = "userName", separator = "_commonAttributes", searchCriteria = true )
 	public java.lang.String codi;
 
-	@Attribute(translated = "firstName" )
+	@Attribute(translated = "firstName", searchCriteria = true )
 	public java.lang.String nom;
 
-	@Attribute(translated = "lastName" )
+	@Attribute(translated = "lastName", searchCriteria = true )
 	public java.lang.String primerLlinatge;
 
 	@Nullable
-	@Attribute(translated = "shortName" )
+	@Attribute(translated = "middleName", synonyms = {"lastName2"}, searchCriteria = true )
+	public java.lang.String segonLlinatge;
+	
+	@Nullable
+	@Attribute(readonly = true)
+	public java.lang.String fullName;
+	
+//	@Nullable
+	@JsonAttribute(hibernateAttribute="userType.name")
+	@Attribute(translated = "userType", type = "USER_TYPE", separator="_organization" )
+	public java.lang.String tipusUsuari;
+	
+	@Attribute(translated = "primaryGroup", type = "GROUP" )
+	@JsonAttribute(hibernateAttribute="primaryGroup.name")
+	public java.lang.String codiGrupPrimari;
+	
+	@Nullable
+	@Attribute(translated = "primaryGroupDescription", hidden = true )
+	@JsonAttribute(hibernateAttribute="primaryGroup.description")
+	public java.lang.String descripcioGrupPrimari;
+	
+	@JsonAttribute(hibernateAttribute="homeServer.name")
+	@Attribute(translated = "homeServer", type = "HOST", filterExpression = "folders eq \"S\"" )
+	@Nullable
+	public java.lang.String servidorHome;
+	
+	@JsonAttribute(hibernateAttribute="profileServer.name")
+	@Attribute(translated = "profileServer", type = "HOST", filterExpression = "folders eq \"S\"" )
+	@Nullable
+	public java.lang.String servidorPerfil;
+	
+	@Nullable
+	@Attribute(type="EMAIL", separator="_emails")
+	public String email;
+	
+	@Nullable
+	@Attribute(translated = "mailAlias" )
+	public java.lang.String aliesCorreu;
+	
+	@JsonAttribute(hibernateAttribute="mailServer.name")
+	@Nullable
+	@Attribute(translated = "mailServer", filterExpression = "mail eq \"S\"" , type="HOST")
+	public java.lang.String servidorCorreu;
+	
+	@Nullable
+	@Attribute(translated = "shortName", hidden = true )
 	public java.lang.String nomCurt;
-
+	
 	@Nullable
-	@Attribute(translated = "createdDate", synonyms = {"createdOn"} )
-	public java.util.Calendar dataCreacioUsuari;
-
+	@JsonAttribute(hibernateAttribute="mailDomain.name")
+	@Attribute(translated = "mailDomain", hidden = true )
+	public java.lang.String dominiCorreu;
+	
 	@Nullable
-	@Attribute(translated = "createdByUser", synonyms = {"createdBy"} )
-	public java.lang.String usuariCreacio;
-
-	@Nullable
-	@Attribute(translated = "active")
+	@Attribute(translated = "active", separator="_status")
 	@JsonAttribute(hibernateAttribute="-")
 	public java.lang.Boolean actiu;
-
-	@Nullable
-	@Attribute(translated = "middleName", synonyms = {"lastName2"} )
-	public java.lang.String segonLlinatge;
 
 	@Nullable
 	@Attribute(translated = "multiSession" )
 	public java.lang.Boolean multiSessio;
 
 	@Nullable
-	@Attribute(translated = "comments" )
+	@Attribute(translated = "comments", multiline=true )
 	public java.lang.String comentari;
+	
+	@Nullable
+	@Attribute(translated = "createdByUser", synonyms = {"createdBy"}, readonly = true, type = "USER" , separator="_audit")
+	public java.lang.String usuariCreacio;
+	
+	@Nullable
+	@Attribute(translated = "createdDate", readonly = true,
+	synonyms = {"createdOn"},
+	type = "DATE_TIME")
+	public java.util.Calendar dataCreacioUsuari;
 
 	@Nullable
-	@JsonAttribute(hibernateAttribute="userType.name")
-	@Attribute(translated = "userType" )
-	public java.lang.String tipusUsuari;
-
-	@JsonAttribute(hibernateAttribute="profileServer.name")
-	@Attribute(translated = "profileServer" )
-	public java.lang.String servidorPerfil;
-
-	@JsonAttribute(hibernateAttribute="homeServer.name")
-	@Attribute(translated = "homeServer" )
-	public java.lang.String servidorHome;
-
-	@JsonAttribute(hibernateAttribute="mailServer.name")
-	@Attribute(translated = "mailServer" )
-	public java.lang.String servidorCorreu;
-
-	@Nullable
-	public java.lang.Long passwordMaxAge;
-
-	@Attribute(translated = "primaryGroup" )
-	@JsonAttribute(hibernateAttribute="primaryGroup.name")
-	public java.lang.String codiGrupPrimari;
-
-	@Nullable
-	@Attribute(translated = "modifiedDate", synonyms= {"modifiedOn"} )
-	public java.util.Calendar dataDarreraModificacioUsuari;
-
-	@Nullable
-	@Attribute(translated = "modifiedByUser", synonyms= {"modifiedBy"} )
+	@Attribute(translated = "modifiedByUser", synonyms= {"modifiedBy"}, type="USER", readonly=true )
 	public java.lang.String usuariDarreraModificacio;
 
 	@Nullable
-	@Attribute(translated = "nationalID" )
-	public java.lang.String NIF;
+	@Attribute(translated = "modifiedDate", entityAttribute = "lastModificationDate", synonyms= {"modifiedOn"}, type="DATE_TIME", readonly = true )
+	public java.util.Calendar dataDarreraModificacioUsuari;
 
+
+	@Description ("User attributes")
 	@Nullable
-	@Attribute(translated = "phoneNumber" )
-	public java.lang.String telefon;
-
-	@Nullable
-	public java.lang.Long id;
-
-	@Nullable
-	@Attribute(translated = "mailAlias" )
-	public java.lang.String aliesCorreu;
-
-	@Nullable
-	@JsonAttribute(hibernateAttribute="mailDomain.name")
-	@Attribute(translated = "mailDomain" )
-	public java.lang.String dominiCorreu;
-
-	@Nullable
-	@Attribute(translated = "consoleProperties" )
-	public es.caib.seycon.ng.comu.UsuariSEU usuariSEU;
-
-	@Nullable
-	@Attribute(translated = "primaryGroupDescription" )
-	@JsonAttribute(hibernateAttribute="primaryGroup.description")
-	public java.lang.String descripcioGrupPrimari;
-
-	@Nullable
-	public java.lang.String fullName;
-
+	@Attribute(hidden = true)
+	@JsonAttribute(hibernateJoin="userData")
+	Map<String, Object> attributes;
 }

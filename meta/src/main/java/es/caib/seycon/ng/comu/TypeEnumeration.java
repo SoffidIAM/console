@@ -14,6 +14,7 @@ public class TypeEnumeration {
 	public String emailType = "E";
 	public String userType = "U";
 	public String groupType = "G";
+	public String groupTypeType = "GT";
 	public String roleType = "R";
 	public String applicationType = "A";
 	public String hostType = "1";
@@ -24,4 +25,5 @@ public class TypeEnumeration {
 	public String ssoFormType = "F";
 	public java.lang.String html="H";
 	public String separator = "-";
+	public String dateTimeType = "DT";
 }

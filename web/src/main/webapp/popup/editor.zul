@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="editor" title="" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<window xmlns:h="http://www.w3.org/1999/xhtml" closable="false" 
+	id="editorWindow" 
+	position="top, center" onCancel="" title="${c:l('editorJS.Titol')}" width="90%"
+	mode="highlighted"
+	use="com.soffid.iam.web.popup.Editor">
+
+	<script src='~./js/codemirror/java-classes.js' />
+	<script src='/comu/syncserver-classes.js' />
+
+	<codemirror value="" id="editor" linenumbers="true"
+	height="40em"
+	language="java"
+	width="100%"/>
+	<separator spacing="5px"/>
+	
+	<div>
+		Programming reference links:
+	</div>
+	<div style="margin-left: 36px">
+		<h:a href="http://www.soffid.org/doc/console/2.5.0/uml/" target="_blank">Service model</h:a>
+	</div>
+
+	<div style="margin-left: 36px">
+		<h:a href="http://www.soffid.org/doc/console/2.5.0/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</h:a>
+	</div>	
+
+	<separator spacing="5px"/>
+	<div align="right">
+		<button id="finishButton" label="${c:l('editorJS.zul.Accepta')}" onClick="ref:editorWindow.accept"/>
+		<button label="${c:l('editorJS.zul.Cancel·la')}" onClick="ref:editorWindow.cleanWindow"/>
+	</div>								
+</window>

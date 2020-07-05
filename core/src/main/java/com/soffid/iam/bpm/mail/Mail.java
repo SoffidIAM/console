@@ -27,6 +27,7 @@ import com.soffid.iam.service.GroupService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 
 import es.caib.seycon.ng.comu.Usuari;
@@ -45,9 +46,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.ejb.CreateException;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -159,7 +162,7 @@ public class Mail implements ActionHandler {
         initialize();
     }
 
-	public void execute(ExecutionContext executionContext) throws InternalErrorException, IOException, AddressException {
+	public void execute(ExecutionContext executionContext) throws InternalErrorException, IOException, AddressException, NamingException, CreateException {
 		debug(Messages.getString("Mail.ExecuteBegin")); //$NON-NLS-1$
 		this.__processInstanceId = executionContext.getProcessInstance().getId();
 		this.executionContext = executionContext;
@@ -169,7 +172,7 @@ public class Mail implements ActionHandler {
 
 
 	private ThreadLocal<Object> recursiveLock = new ThreadLocal<Object>();
-	public void send() throws InternalErrorException, IOException, AddressException 
+	public void send() throws InternalErrorException, IOException, AddressException, NamingException, CreateException 
 	{
 		// Prevent recursive lock
 		if (recursiveLock.get() != null)
@@ -208,7 +211,7 @@ public class Mail implements ActionHandler {
 	}
 
 	private void sendPredefinedMail(String header) throws IOException,
-			InternalErrorException, UnsupportedEncodingException {
+			InternalErrorException, UnsupportedEncodingException, NamingException, CreateException {
 		
 		Locale previousLocale = MessageFactory.getThreadLocale();
 		Security.nestedLogin("mail-server", new String[] { //$NON-NLS-1$
@@ -224,8 +227,9 @@ public class Mail implements ActionHandler {
 				
 				User usuari = ServiceLocator.instance().getUserService().findUserByUserName(user);
 	
-				if (usuari.getConsoleProperties() != null && usuari.getConsoleProperties().getLanguage() != null)
-					MessageFactory.setThreadLocale(new Locale (usuari.getConsoleProperties().getLanguage()));
+				String lang = EJBLocator.getPreferencesService().findMyPreference("lang");
+				if (lang != null)
+					MessageFactory.setThreadLocale(new Locale (lang));
 				
 				String subject = Messages.getString(header); //$NON-NLS-1$
 				InputStream in = getMailContent();

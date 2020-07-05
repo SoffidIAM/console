@@ -7,6 +7,7 @@ import roles.AttributeTranslationDelete;
 import roles.AttributeTranslationQuery;
 import roles.AttributeTranslationUpdate;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeTranslation;
 import com.soffid.iam.model.AttributeTranslationEntity;
 import com.soffid.mda.annotation.Depends;
@@ -15,7 +16,7 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 @Service (serverPath="/seycon/atributeTranslationService", serverRole="agent")
-@Depends({AttributeTranslationEntity.class})
+@Depends({AttributeTranslationEntity.class, AsyncRunnerService.class})
 public class AttributeTranslationService {
 	@Operation(grantees={AttributeTranslationCreate.class}) 
 	public AttributeTranslation create (AttributeTranslation att) 
@@ -57,7 +58,12 @@ public class AttributeTranslationService {
 	{
 		return null;
 	}
-	
 
+	@Operation(grantees= {AttributeTranslationQuery.class})
+	public AsyncList<AttributeTranslation> findByTextAndJsonQueryAsync(@Nullable String text, @Nullable String query) { return null;}
+
+	@Operation(grantees= {AttributeTranslationQuery.class})
+	public Collection<AttributeTranslation> findByTextAndJsonQuery(@Nullable String text, @Nullable String query,
+			@Nullable Integer start, @Nullable Integer pageSize) { return null;}
 }
 

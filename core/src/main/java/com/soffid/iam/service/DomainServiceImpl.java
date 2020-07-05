@@ -15,24 +15,37 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.System;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.DomainValueEntity;
+import com.soffid.iam.model.DomainValueEntityDao;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
+import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.DominiService
@@ -44,7 +57,12 @@ public class DomainServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.DominiService#create(es.caib.seycon.ng.comu.Domini)
 	 */
 	protected com.soffid.iam.api.Domain handleCreate(com.soffid.iam.api.Domain domini) throws java.lang.Exception {
-		if ((domini.getName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || (domini.getName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
+		if ((domini.getName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
+				(domini.getName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || 
+				(domini.getName().compareToIgnoreCase(TipusDomini.GROUPS) == 0) || 
+				(domini.getName().compareToIgnoreCase(TipusDomini.MEMBERSHIPS) == 0) || 
+				(domini.getName().compareToIgnoreCase(TipusDomini.APPLICATIONS) == 0) || 
+				(domini.getName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
 			throw new SeyconException(
 					Messages.getString("DomainServiceImpl.0")); //$NON-NLS-1$
 		}
@@ -79,7 +97,9 @@ public class DomainServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.DominiService#create(es.caib.seycon.ng.comu.ValorDomini)
 	 */
 	protected com.soffid.iam.api.DomainValue handleCreate(com.soffid.iam.api.DomainValue valorDomini) throws java.lang.Exception {
-		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || (valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || (valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
+		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
+				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || 
+				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
 			throw new SeyconException(
 					Messages.getString("DomainServiceImpl.3")); //$NON-NLS-1$
 		}
@@ -91,10 +111,29 @@ public class DomainServiceImpl extends
 	}
 
 	/**
+	 * @see es.caib.seycon.ng.servei.DominiService#create(es.caib.seycon.ng.comu.ValorDomini)
+	 */
+	protected com.soffid.iam.api.DomainValue handleUpdate(com.soffid.iam.api.DomainValue valorDomini) throws java.lang.Exception {
+		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
+				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || 
+				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
+			throw new SeyconException(
+					Messages.getString("DomainServiceImpl.3")); //$NON-NLS-1$
+		}
+		DomainValueEntity entity = getDomainValueEntityDao().load(valorDomini.getId());
+		getDomainValueEntityDao().domainValueToEntity(valorDomini, entity, false);
+		getDomainValueEntityDao().update(entity);
+		valorDomini = getDomainValueEntityDao().toDomainValue(entity);
+		return valorDomini;
+	}
+
+	/**
 	 * @see es.caib.seycon.ng.servei.DominiService#delete(es.caib.seycon.ng.comu.ValorDomini)
 	 */
 	protected void handleDelete(com.soffid.iam.api.DomainValue valorDomini) throws java.lang.Exception {
-		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || (valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || (valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
+		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
+				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) ||
+				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
 			throw new SeyconException(
 					Messages.getString("DomainServiceImpl.4")); //$NON-NLS-1$
 		}
@@ -114,7 +153,7 @@ public class DomainServiceImpl extends
 	 */
 	protected com.soffid.iam.api.Domain handleFindUserDomainGroup() throws java.lang.Exception {
 		Domain domini = new Domain();
-		domini.setName(TipusDomini.GRUPS_USUARI);
+		domini.setName(TipusDomini.MEMBERSHIPS);
 		return domini;
 	}
 
@@ -123,7 +162,7 @@ public class DomainServiceImpl extends
 	 */
 	protected com.soffid.iam.api.Domain handleFindGroupsDomain() throws java.lang.Exception {
 		Domain domini = new Domain();
-		domini.setName(TipusDomini.GRUPS);
+		domini.setName(TipusDomini.GROUPS);
 		domini.setExternalCode(null);
 		return domini;
 	}
@@ -142,7 +181,8 @@ public class DomainServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.DominiService#findValorsDominiByDomini(es.caib.seycon.ng.comu.Domini)
 	 */
 	protected java.util.Collection<DomainValue> handleFindDomainValuesByFilter(com.soffid.iam.api.Domain domini, String codi, String descripcio, String codiUsuari) throws java.lang.Exception {
-		if (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) {
+		if (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0 ||
+			domini.getName().compareToIgnoreCase(TipusDomini.MEMBERSHIPS) == 0) {
 			String query = "select grp " //$NON-NLS-1$
 					+ "from com.soffid.iam.model.GroupEntity grp " //$NON-NLS-1$
 					+ "join grp.secondaryGroupUsers as sg " //$NON-NLS-1$
@@ -183,14 +223,15 @@ public class DomainServiceImpl extends
 				Iterator<DomainValue> iterator = vdl.iterator();
 				while (iterator.hasNext()) {
 					DomainValue valorDomini = iterator.next();
-					valorDomini.setDomainName(TipusDomini.GRUPS_USUARI);
+					valorDomini.setDomainName(TipusDomini.MEMBERSHIPS);
 					valorDomini.setExternalCodeDomain(codiUsuari);
 				}
 				return vdl;
 			}
 			return new Vector();
 		}
-		if (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) {
+		if (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS) == 0 ||
+				domini.getName().compareToIgnoreCase(TipusDomini.GROUPS) == 0) {
 			List<GroupEntity> valorsDomini = getGroupEntityDao()
 					.findByCriteria(codi, null, null, descripcio, null, null);
 			if (valorsDomini != null) {
@@ -198,14 +239,15 @@ public class DomainServiceImpl extends
 				Iterator<DomainValue> iterator = vdl.iterator();
 				while (iterator.hasNext()) {
 					DomainValue valorDomini = (DomainValue) iterator.next();
-					valorDomini.setDomainName(TipusDomini.GRUPS);
+					valorDomini.setDomainName(TipusDomini.GROUPS);
 					valorDomini.setExternalCodeDomain(null);
 				}
 				return vdl;
 			}
 			return new Vector();
 		}
-		if (domini.getName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0) {
+		if (domini.getName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0 ||
+				domini.getName().compareToIgnoreCase(TipusDomini.APPLICATIONS) == 0) {
 			Collection<InformationSystemEntity> valorsDomini =
 					getInformationSystemEntityDao().findByFilter(
 							codi, descripcio, null, null, null, null, null);
@@ -214,7 +256,7 @@ public class DomainServiceImpl extends
 				Iterator<DomainValue> iterator = vdl.iterator();
 				while (iterator.hasNext()) {
 					DomainValue valorDomini = (DomainValue) iterator.next();
-					valorDomini.setDomainName(TipusDomini.APLICACIONS);
+					valorDomini.setDomainName(TipusDomini.APPLICATIONS);
 					valorDomini.setExternalCodeDomain(null);
 				}
 				return vdl;
@@ -284,4 +326,56 @@ public class DomainServiceImpl extends
 		return new Vector();
 	}
 
+	@Override
+	protected AsyncList<DomainValue> handleFindDomainValueByTextAndFilterAsync(String text, String query)
+			throws Exception {
+		final AsyncList<DomainValue> result = new AsyncList<DomainValue>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindDomainValueByTextAndJsonQuery(text, query, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected Domain handleFindDomainByApplicationAndName(String informationSystem, String name) throws Exception {
+		ApplicationDomainEntity entity = getApplicationDomainEntityDao().findByName(name, informationSystem);
+		if (entity == null)
+			return null;
+		else
+			return getApplicationDomainEntityDao().toDomain(entity);
+	}
+
+	@Override
+	protected List<DomainValue> handleFindDomainValueByTextAndFilter(String text, String query, Integer first,
+			Integer pageSize) throws Exception {
+		final LinkedList<DomainValue> result = new LinkedList<DomainValue>();
+		doFindDomainValueByTextAndJsonQuery(text, query, first, pageSize, result);
+		return result;
+	}
+
+	private void doFindDomainValueByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<DomainValue> result) throws ClassNotFoundException, InternalErrorException, UnsupportedEncodingException, JSONException, EvalException, ParseException, TokenMgrError {
+		final DomainValueEntityDao dao = getDomainValueEntityDao();
+		ScimHelper h = new ScimHelper(DomainValue.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("domain.informationSystem.tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toDomainValue((DomainValueEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
 }

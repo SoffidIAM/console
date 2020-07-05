@@ -18,7 +18,7 @@ import es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity;
 	 translatedPackage="com.soffid.iam.api")
 public class TipusUnitatOrganitzativa {
 
-	@Attribute(translated = "code" )
+	@Attribute(translated = "name", synonyms = {"code"} )
 	public java.lang.String codi;
 
 	@Nullable

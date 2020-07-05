@@ -20,6 +20,7 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
@@ -28,6 +29,7 @@ import com.soffid.iam.api.Tenant;
 import com.soffid.iam.exception.DuplicatedClassException;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -43,6 +45,7 @@ public class PluginHandler extends FrameHandler {
 	private boolean isMaster;
 	private boolean canUpdatePlugins;
 	private boolean canQueryPlugins;
+	private boolean canRestartConsole;
 
 	public PluginHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
@@ -50,7 +53,7 @@ public class PluginHandler extends FrameHandler {
 		isMaster = com.soffid.iam.utils.Security.getCurrentTenantName().equals ( masterTenant.getName() );
 		canUpdatePlugins = isMaster && Security.isUserInRole("plugins:update");
 		canQueryPlugins = isMaster && Security.isUserInRole("plugins:query");;
-		
+		canRestartConsole = isMaster && Security.isUserInRole("console:restart");
 		try
 		{
 			es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource
@@ -65,6 +68,7 @@ public class PluginHandler extends FrameHandler {
 		super.setPage(p);
 		getNamespace().setVariable("canUpdatePlugins", canUpdatePlugins, true);
 		getNamespace().setVariable("canQueryPlugins", canQueryPlugins, true);
+		getNamespace().setVariable("canRestartConsole", canRestartConsole, true);
 	}
 
 	
@@ -81,34 +85,34 @@ public class PluginHandler extends FrameHandler {
 	}
 	
 	public void addNew() throws InternalErrorException, DuplicatedClassException, NamingException, CreateException, InterruptedException, IOException {
-        Media dataSubida = Fileupload.get();
-        if (dataSubida == null) return; //Per si l'usuari pitja en Cancelar
-        if (!dataSubida.isBinary()) {
-            throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
-        }
-        byte data[];
-        if (dataSubida.inMemory()) {
-            data = dataSubida.getByteData();
-        } else {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            InputStream is = dataSubida.getStreamData();
-            byte b[] = new byte[2048];
-            int read = is.read(b);
-            while (read > 0) {
-                os.write(b, 0, read);
-                read = is.read(b);
-            }
-            is.close();
-            os.close();
-            data = os.toByteArray();
-        }
-        EJBLocator.getServerPluginService().deployPlugin(data);
-        getModel().refresh();
+        FileUpload2.get((event) -> {
+        	Media dataSubida = ((UploadEvent)event).getMedia();
+        	if (dataSubida == null) return; //Per si l'usuari pitja en Cancelar
+        	if (!dataSubida.isBinary()) {
+        		throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
+        	}
+        	byte data[];
+        	if (dataSubida.inMemory()) {
+        		data = dataSubida.getByteData();
+        	} else {
+        		ByteArrayOutputStream os = new ByteArrayOutputStream();
+        		InputStream is = dataSubida.getStreamData();
+        		byte b[] = new byte[2048];
+        		int read = is.read(b);
+        		while (read > 0) {
+        			os.write(b, 0, read);
+        			read = is.read(b);
+        		}
+        		is.close();
+        		os.close();
+        		data = os.toByteArray();
+        	}
+        	EJBLocator.getServerPluginService().deployPlugin(data);
+        	getModel().refresh();
+        });
 	}
 	
 	public void showDetails() {
-//		DataTable dt = (DataTable) getListbox();
-		
 		getCard().setSclass ( "card is-flipped" );
 	}
 

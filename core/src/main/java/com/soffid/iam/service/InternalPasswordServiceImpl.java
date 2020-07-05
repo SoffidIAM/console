@@ -1239,13 +1239,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		if ("S".equals(account.getSystem().getTrusted()) && account.getSystem().getUrl() != null) {
 			try {
+				log.info("Checking account in sync server: "+account.getName()+" at "+account.getSystem().getName());
 				ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService()
 						.getServerService(ConsoleLogonService.REMOTE_PATH);
 				if (ls != null)
 					return ls.validatePassword(account.getName(), account.getSystem().getName(),
 							password.getPassword());
 			} catch (Exception e) {
-
+				log.warn("Logon failed in sync server: "+account.getName()+" at "+account.getSystem().getName(), e);
 			}
 		}
 

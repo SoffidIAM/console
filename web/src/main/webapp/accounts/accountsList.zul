@@ -13,8 +13,6 @@
 			import es.caib.zkib.datasource.XPathUtils;
 			import es.caib.seycon.ng.comu.*;
 
-			fileres = es.caib.seycon.ng.web.Custom.FILERES;
-			
 			String mode = "query"; 
 			boolean view_altres = false;
 			model.getJXPathContext().getVariables().declareVariable("queryEnabled", false);

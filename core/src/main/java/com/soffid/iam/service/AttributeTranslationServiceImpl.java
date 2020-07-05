@@ -7,9 +7,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeTranslation;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AttributeTranslationEntity;
 import com.soffid.iam.model.AttributeTranslationEntityDao;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
 public class AttributeTranslationServiceImpl extends
 		AttributeTranslationServiceBase {
@@ -86,6 +89,48 @@ public class AttributeTranslationServiceImpl extends
 		Collections.sort(domains2);
 		
 		return domains2;
+	}
+
+	@Override
+	protected AsyncList<AttributeTranslation> handleFindByTextAndJsonQueryAsync(String text, String jsonQuery) throws Exception {
+		final AsyncList<AttributeTranslation> result = new AsyncList<AttributeTranslation>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					handleFindByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void handleFindByTextAndJsonQueryAsync(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<AttributeTranslation> result) throws Exception {
+		final AttributeTranslationEntityDao dao = getAttributeTranslationEntityDao();
+		ScimHelper h = new ScimHelper(AttributeTranslation.class);
+		h.setPrimaryAttributes(new String[] { "domain", "column1", "column2", "column3", "column4", "column5"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setGenerator((entity) -> {
+			return dao.toAttributeTranslation((AttributeTranslationEntity) entity);
+		});
+		h.setTenantFilter("tenant.id");
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+
+	@Override
+	protected Collection<AttributeTranslation> handleFindByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<AttributeTranslation> result = new LinkedList<AttributeTranslation>();
+		handleFindByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
+		return result;
 	}
 
 }

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="user-account-details"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<zk xmlns:h="http://www.w3.org/1999/xhtml">
+
+	<window closable="true"
+		use="com.soffid.iam.web.user.AccountDetailsHandler"
+		id="window"
+		position="center, center" sizable="true"
+		title="${c:l('user_renameaccount.Titol')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:window.onWindowClose">
+
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<menu2>
+				<menu2item if="${soffid:isUserInRole('user:update')}" image="/img/trash.svg" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:window.delete"/>
+				<menu2item label="${c:l('vault.details')}" onClick="ref:window.doQuery()" 
+					id="detailsButton"/>
+			</menu2>
+		</div>
+
+		<form id="form" width="100%" dataPath="${dataSource }:/">
+			<inputfield3 bind="@system" dataType="STRING" required="true"
+				readonly="true"
+				label="${c:l('accounts.dispatcher')}"/>
+			<inputfield3 bind="@name" maxLength="150" dataType="STRING" required="true"
+				label="${c:l('user_renameaccount.Nom')}"/>
+			<inputfield3 bind="@status" dataType="STRING" required="true"
+				enumeration = "com.soffid.iam.api.AccountStatus"
+				label="${c:l('accounts.status')}"/>
+			<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+				objectType="com.soffid.iam.api.Account" dataPath="/."
+				id="accountAttributes" />
+		</form>
+		<separator spacing="5px" />
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:window.onWindowClose">
+			</button>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
+				datamodel="${dataSource }" 
+				onClick="ref:window.onChange"/>
+		</div>
+	</window>
+	<include src="/popup/agent_objectAttributes.zul" />
+
+</zk>

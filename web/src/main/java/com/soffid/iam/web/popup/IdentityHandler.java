@@ -27,6 +27,9 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.Domain;
+import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.web.component.Identity;
 import com.soffid.iam.web.component.Identity.Type;
@@ -177,7 +180,7 @@ public class IdentityHandler extends Window implements AfterCompose {
 		{
 			com.soffid.iam.api.Role role = (Role) id.getObject(); 
 			if (role.getDomain() == null ||
-					role.getDomain().getName().equals(es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI))
+					role.getDomain().equals(es.caib.seycon.ng.comu.TipusDomini.SENSE_DOMINI))
 				id = new com.soffid.iam.web.component.Identity( role, (com.soffid.iam.api.DomainValue) null);
 			else
 			{
@@ -294,34 +297,39 @@ public class IdentityHandler extends Window implements AfterCompose {
 		
 		if ( currentRole == null || currentRolePrefix == null)
 			searchRoles(t, ids);
-		else if (t.startsWith(currentRolePrefix))
+		else if (t.startsWith(currentRolePrefix) &&
+				currentRole.getDomain() != null && 
+				!DomainType.SENSE_DOMINI.equals(currentRole.getDomain()))
 		{
 
 			String t2 = t.substring(currentRolePrefix.length());
 			searchCriteria = t2;
 			if ( Boolean.TRUE.equals(getPage().getVariable("wildcardDomain")) && 
 					t2.isEmpty() && 
-					! currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.SENSE_DOMINI))
+					! currentRole.getDomain().equals(com.soffid.iam.api.DomainType.SENSE_DOMINI))
 			{
 				com.soffid.iam.web.component.Identity id = new com.soffid.iam.web.component.Identity(currentRole, 
 						new com.soffid.iam.api.DomainValue());
 				ids.add(id);				
 			}
-			if (currentRole.getDomain().getExternalCode() != null)
-			{
-				searchDomainValues (currentRole.getDomain(), t2, ids);
-			}
-			else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.APLICACIONS))
+			if (DomainType.APLICACIONS.equals( currentRole.getDomain()) ||
+					DomainType.APPLICATIONS.equals( currentRole.getDomain()))
 			{
 				searchApplications (t2, ids);
 			}
-			else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.GRUPS))
+			else if (DomainType.GROUPS.equals( currentRole.getDomain()) ||
+					DomainType.GRUPS.equals( currentRole.getDomain()))
 			{
 				searchGroups(t2, ids);
 			}
-			else if (currentRole.getDomain().getName().equals(com.soffid.iam.api.DomainType.GRUPS_USUARI))
+			else if (DomainType.GRUPS_USUARI.equals( currentRole.getDomain()) ||
+					DomainType.MEMBERSHIPS.equals( currentRole.getDomain()))
 			{
 				searchGroups(t2, ids);
+			}
+			else
+			{
+				searchDomainValues (currentRole.getDomain(), t2, ids);
 			}
 		} else {
 			if (currentRolePrefix.startsWith(t))
@@ -340,9 +348,12 @@ public class IdentityHandler extends Window implements AfterCompose {
 		}
 	}
 	                  
-	void searchDomainValues (com.soffid.iam.api.Domain domain, String t, List ids) throws InternalErrorException, NamingException, CreateException {
+	void searchDomainValues (String domain, String t, List ids) throws InternalErrorException, NamingException, CreateException {
 		domainValueListPosition[0] = 0;
-		domainValueList = com.soffid.iam.EJBLocator.getApplicationService().findDomainValueByTextAsync(domain, t);
+		domainValueList = com.soffid.iam.EJBLocator.getDomainService()
+				.findDomainValueByTextAndFilterAsync(t, 
+						"domain.name eq \""+domain.replaceAll("\"", "\\\\\"")+"\" and "
+								+ "domain.informationSystem.name eq \""+ currentRole.getInformationSystemName().replaceAll("\"", "\\\\\"")+"\"");
 		timer.start();
 	}
 

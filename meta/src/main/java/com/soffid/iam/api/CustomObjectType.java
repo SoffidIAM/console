@@ -19,6 +19,7 @@ public class CustomObjectType {
 	public String description;
 
 	@Attribute(defaultValue="MetadataScope.CUSTOM")
+	@Nullable
 	public MetadataScope scope;
 
 	public boolean builtin;

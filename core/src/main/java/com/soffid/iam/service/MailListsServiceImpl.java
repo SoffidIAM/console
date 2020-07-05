@@ -25,7 +25,9 @@ import com.soffid.iam.api.MailListRoleMember;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserMailList;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.EmailDomainEntity;
+import com.soffid.iam.model.EmailDomainEntityDao;
 import com.soffid.iam.model.EmailListContainerEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.ExternEmailEntity;
@@ -622,19 +624,24 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		entity.setRole(role);
 		if (roleMember.getScope() != null && roleMember.getScope().length() > 0)
 		{
-			if (TipusDomini.APLICACIONS.equals(role.getDomainType()))
+			if (TipusDomini.APLICACIONS.equals(role.getDomainType())
+					|| TipusDomini.APPLICATIONS.equals(role.getDomainType()))
 			{
 				entity.setInformationSystemScope(getInformationSystemEntityDao().findByCode(roleMember.getScope()));
 				if (entity.getInformationSystemScope() == null)
 					throw new UnknownApplicationException(roleMember.getScope());
 			}
-			else if (TipusDomini.GRUPS.equals(role.getDomainType()) || TipusDomini.GRUPS_USUARI.equals(role.getDomainType()))
+			else if (TipusDomini.GRUPS.equals(role.getDomainType()) || 
+					TipusDomini.GRUPS_USUARI.equals(role.getDomainType()) ||
+							TipusDomini.GROUPS.equals(role.getDomainType()) ||
+							TipusDomini.MEMBERSHIPS.equals(role.getDomainType()))
 			{
 				entity.setGroupScope(getGroupEntityDao().findByName(roleMember.getScope()));
 				if (entity.getGroupScope() == null)
 					throw new UnknownGroupException(roleMember.getScope());
 			}
-			if (TipusDomini.DOMINI_APLICACIO.equals(role.getDomainType()))
+			if (TipusDomini.DOMINI_APLICACIO.equals(role.getDomainType()) ||
+					TipusDomini.CUSTOM.equals(role.getDomainType()))
 			{
 				entity.setDomainValueScope(getDomainValueEntityDao().findByApplicationDomainValue(role.getInformationSystem().getName(), role.getApplicationDomain().getName(), roleMember.getScope()));
 				if (entity.getDomainValueScope() == null)
@@ -664,11 +671,19 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
                         getMailListRoleMemberEntityDao().remove(member);
                     }
                 } else {
-                    if (TipusDomini.APLICACIONS.equals(role.getDomainType()) && member.getInformationSystemScope() != null && member.getInformationSystemScope().getName().equals(roleMember.getScope())) {
+                    if ((TipusDomini.APLICACIONS.equals(role.getDomainType()) ||
+                    		TipusDomini.APPLICATIONS.equals(role.getDomainType())) && 
+                    		member.getInformationSystemScope() != null && member.getInformationSystemScope().getName().equals(roleMember.getScope())) {
                         getMailListRoleMemberEntityDao().remove(member);
-                    } else if ((TipusDomini.GRUPS.equals(role.getDomainType()) || TipusDomini.GRUPS_USUARI.equals(role.getDomainType())) && member.getGroupScope() != null && member.getGroupScope().getName().equals(roleMember.getScope())) {
+                    } else if ((TipusDomini.GRUPS.equals(role.getDomainType()) || 
+                    		TipusDomini.GRUPS_USUARI.equals(role.getDomainType()) || 
+                    		TipusDomini.GROUPS.equals(role.getDomainType()) || 
+                    		TipusDomini.MEMBERSHIPS.equals(role.getDomainType())) && member.getGroupScope() != null && member.getGroupScope().getName().equals(roleMember.getScope())) {
                         getMailListRoleMemberEntityDao().remove(member);
-                    } else if (TipusDomini.DOMINI_APLICACIO.equals(role.getDomainType()) && member.getDomainValueScope() != null && member.getDomainValueScope().getValue().equals(roleMember.getScope())) {
+                    } else if ((TipusDomini.DOMINI_APLICACIO.equals(role.getDomainType()) ||
+                    		TipusDomini.CUSTOM.equals(role.getDomainType())) && 
+                    		member.getDomainValueScope() != null && 
+                    		member.getDomainValueScope().getValue().equals(roleMember.getScope())) {
                         getMailListRoleMemberEntityDao().remove(member);
                     }
                 }
@@ -833,4 +848,60 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		}, result);
 		return result;
 	}
+
+	@Override
+	protected AsyncList<MailDomain> handleFindMailDomainsByJsonQueryAsync(String query) throws Exception {
+		return handleFindMailDomainsByTextAndFilterAsync(null, query);
+	}
+
+	@Override
+	protected AsyncList<MailDomain> handleFindMailDomainsByTextAndFilterAsync(String text, String query) throws Exception {
+		final AsyncList<MailDomain> result = new AsyncList<MailDomain>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindMailDomainByTextAndJsonQuery(text, query, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected List<MailDomain> handleFindMailDomainsByJsonQuery(String query, Integer first, Integer pageSize)
+			throws Exception {
+		final LinkedList<MailDomain> result = new LinkedList<MailDomain>();
+		doFindMailDomainByTextAndJsonQuery(null, query, first, pageSize, result);
+		return result;
+	}
+
+	@Override
+	protected List<MailDomain> handleFindMailDomainsByTextAndFilter(String text, String query, Integer first,
+			Integer pageSize) throws Exception {
+		final LinkedList<MailDomain> result = new LinkedList<MailDomain>();
+		doFindMailDomainByTextAndJsonQuery(text, query, first, pageSize, result);
+		return result;
+	}
+	
+	private void doFindMailDomainByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<MailDomain> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+		final EmailDomainEntityDao dao = getEmailDomainEntityDao();
+		ScimHelper h = new ScimHelper(MailDomain.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toMailDomain((EmailDomainEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
 }

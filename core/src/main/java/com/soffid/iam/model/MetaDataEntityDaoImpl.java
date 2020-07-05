@@ -53,8 +53,11 @@ public class MetaDataEntityDaoImpl extends
 		super.toDataType(sourceEntity, targetVO);
 		if (sourceEntity.getScope() == null)
 			targetVO.setScope(MetadataScope.USER);
-		if (sourceEntity.getLabel() == null)
-			targetVO.setLabel(sourceEntity.getName());
+		if (sourceEntity.getLabel() == null || ! sourceEntity.getLabel().trim().isEmpty())
+			targetVO.setLabel(sourceEntity.getNlsLabel() == null || sourceEntity.getNlsLabel().trim().isEmpty()?
+					sourceEntity.getName():
+					null);
+		
 		if (sourceEntity.getValues() == null || sourceEntity.getValues().length() == 0)
 			targetVO.setValues ( new LinkedList<String>() );
 		else

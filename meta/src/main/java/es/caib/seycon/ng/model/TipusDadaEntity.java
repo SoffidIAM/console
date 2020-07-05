@@ -58,10 +58,18 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public Boolean required;
 	
+	@Column (name="TDA_RDONLY")
+	@Nullable
+	public Boolean readOnly;
+	
 	@Column(name = "TDA_MULTIV")
 	@Nullable
 	public Boolean multiValued;
 
+	@Column (name="TDA_MLTLIN")
+	@Nullable
+	public Boolean multiLine;
+	
 	@Description("Include field in quick searches")
 	@Column (name="TDA_QUSECR")
 	@Nullable
@@ -81,6 +89,11 @@ public abstract class TipusDadaEntity {
 	@Column (name="TDA_LABEL", length=64)
 	@Nullable
 	public String label;
+	
+	@Nullable
+	@Column (name="TDA_HINT", length=128)
+	@Description("User hint")
+	public String hint;
 	
 	@Description("NLS Label to display")
 	@Column (name="TDA_NLSLAB", length=128)
@@ -140,10 +153,20 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	String onFocusTrigger;
 	
+	@Column (name="TDA_VALCLA", length=100)
+	@Description("Java class to validate field")
+	@Nullable
+	String validator;
+	
+	@Column (name="TDA_ENUM", length=100)
+	@Description("Java class to enumerate values")
+	@Nullable
+	String enumeration;
+	
 	@Column (name="TDA_TEN_ID")
 	TenantEntity tenant;
 
-	@Description("Expression to test if the reference object can be selected ")
+	@Description("SCIM Expression to test if the reference object can be selected ")
 	@Nullable
 	@Column(name="TDA_FILEXP")
 	String filterExpression;

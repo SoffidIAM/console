@@ -3,6 +3,7 @@ package com.soffid.iam.api;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -225,7 +226,7 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 		return true;
 	}
 
-	public Collection<E> get() throws InterruptedException, ExecutionException {
+	public List<E> get() throws InterruptedException, ExecutionException {
 		synchronized (this) {
 			while (true)
 			{

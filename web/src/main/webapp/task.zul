@@ -41,9 +41,6 @@
 		System.out.println("TARGET URL = "+url);
 		]]></zscript>
 
-	<style src="~./styles/estil.css"/>
-	<style src="/css/localSEU.css"/>
-	<style src="/css/devices.css"/>
 	<script src="/js/jquery-1.9.1.min.js" />
 
 	<application id="app" allowOpenMultipleTabs="false"

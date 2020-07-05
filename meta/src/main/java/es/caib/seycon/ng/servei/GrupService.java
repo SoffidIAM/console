@@ -323,7 +323,7 @@ public abstract class GrupService {
 
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByText(
+	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByText(
 			@Nullable String text) {
 		return null;
 	}
@@ -337,9 +337,19 @@ public abstract class GrupService {
 
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilter(
+	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilter(
+			@Nullable String text,
+			@Nullable String filter,
+			@Nullable Integer first,
+			@Nullable Integer pageSize) {
 		return null;
 	}
 
@@ -353,7 +363,16 @@ public abstract class GrupService {
 
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query)
+	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query,
+			@Nullable Integer first,
+			@Nullable Integer pageSize)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

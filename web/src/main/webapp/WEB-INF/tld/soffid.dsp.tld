@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<taglib>
+	<uri>http://www.soffid.com/dsp/web/core</uri>
+	<description>
+	Soffid methods and tags for zul pgaes
+	</description>
+
+	<import>
+		<import-name>ZulFns</import-name>
+		<import-class>com.soffid.iam.web.dsp.ZulFns</import-class>
+	</import>
+
+	<!--                 -->
+	<!-- Class Utilities -->
+	<!--                 -->
+	<function>
+		<name>isUserInRole</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>boolean isUserInRole(java.lang.String role)</function-signature>
+		<description>
+		Checks for user permission.
+		</description>
+	</function>
+</taglib>

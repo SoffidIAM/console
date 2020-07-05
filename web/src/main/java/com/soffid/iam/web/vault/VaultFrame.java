@@ -280,11 +280,6 @@ public class VaultFrame extends Frame {
 								}
 							});
 				}
-			}else if (account.getType().equals(es.caib.seycon.ng.comu.AccountType.SHARED)){
-				newPasswordS.setAttribute("acco", account);
-				newPasswordS.setVisible(true);
-				newPasswordS.setMode("highlighted");
-				((Textbox)newPasswordS.getFellow("p1")).focus();
 			}else if (account.getType().equals(es.caib.seycon.ng.comu.AccountType.PRIVILEGED)){
 				newPassword.setAttribute("acco", account);
 				ctx = XPathUtils.getComponentContext(button);
@@ -299,6 +294,11 @@ public class VaultFrame extends Frame {
 				newPassword.setVisible(true);
 				newPassword.setMode("highlighted");
 				((Textbox)newPassword.getFellow("password")).focus();
+			} else {
+				newPasswordS.setAttribute("acco", account);
+				newPasswordS.setVisible(true);
+				newPasswordS.setMode("highlighted");
+				((Textbox)newPasswordS.getFellow("p1")).focus();
 			}
 		} catch ( InterruptedException e) {	}
 	}

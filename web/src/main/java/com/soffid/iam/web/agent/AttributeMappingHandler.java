@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -23,13 +24,16 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.System;
 import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.web.component.TreeCollapse;
+import com.soffid.iam.web.popup.Editor;
 
 import es.caib.seycon.ng.comu.AttributeDirection;
+import es.caib.seycon.ng.comu.SoffidObjectTrigger;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataGrid;
@@ -45,30 +49,46 @@ public class AttributeMappingHandler extends DataGrid {
 	public void onNewObjectMapping (Event event) {
 		Row r = (Row) event.getData();
 		
-		DataSource model = (DataModel) getFellow("model");
+		DataSource model = (DataModel) Path.getComponent("/model");
 		BindContext ctx = XPathUtils.getComponentContext( getParent() );
 		DataNode dn = (DataNode) XPathUtils.getValue(ctx, ".");
 		
 		System system = (System) dn.getInstance();
 		String value= system.getClassName();
 
-		Div triggersBlock = (Div) r.getFirstChild().getFellow("triggersBlock"); 
-		Div methodsBlock = (Div) r.getFirstChild().getFellow("methodsBlock");
+		Div triggersBlock = (Div) r.getFirstChild().getFellowIfAny("triggersBlock"); 
+		Div methodsBlock = (Div) r.getFirstChild().getFellowIfAny("methodsBlock");
 		
-		methodsBlock.setVisible( getPage().getVariable("methodDescriptor") != null);
+		if (methodsBlock != null)
+			methodsBlock.setVisible( getPage().getVariable("methodDescriptor") != null);
 
-		try {
-			Boolean triggers = (Boolean) XPathUtils.getValue(model, "/plugin[className='"+value+"']/@enableObjectTriggers");
-			triggersBlock.setVisible( Boolean.TRUE.equals(triggers)); 
+		if (triggersBlock != null) {
+			try {
+				Boolean triggers = (Boolean) XPathUtils.getValue(model, "/plugin[className='"+value+"']/@enableObjectTriggers");
+				triggersBlock.setVisible( Boolean.TRUE.equals(triggers)); 
+			}
+			catch (Exception e) { 
+				triggersBlock.setVisible( false ); 
+			}
 		}
-		catch (Exception e) { 
-			triggersBlock.setVisible( false ); 
+		
+		String filterObjectType = (String) getVariable("objectType", false);
+		if (filterObjectType != null) {
+			SoffidObjectType type = (SoffidObjectType) XPathUtils.getValue(r, "@soffidObject");
+			if ( type == null)
+				XPathUtils.setValue(r, "@soffidObject", SoffidObjectType.fromString(filterObjectType));
+			else if ( ! filterObjectType.equals(type.toString()))
+				r.setVisible(false);
 		}
 	}
 
 	public void addObject(Event event) throws Exception {
 		BindContext ctx = XPathUtils.getComponentContext(this);
-		XPathUtils.createPath(ctx.getDataSource(), "/objectMapping");
+		String path = XPathUtils.createPath(ctx.getDataSource(), "/objectMapping");
+		String filterObjectType = (String) getVariable("objectType", false);
+		if (filterObjectType != null)
+			XPathUtils.setValue(ctx.getDataSource(), path+"/soffidObject",
+				SoffidObjectType.fromString(filterObjectType));
 	}
 	
 	public void removeObject(Event event) {
@@ -118,13 +138,8 @@ public class AttributeMappingHandler extends DataGrid {
 	}
 	
 	public void editAttribute (final Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
-	    Events.sendEvent(new Event ("onEdit", 
-	    		getDesktop().getPage("editor").getFellow("top"),
-	    		new Object[] {
-					    event.getTarget().getPreviousSibling(),
-					    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(event.getTarget())
-				}
-	    ));
+		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
+					    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(event.getTarget()));
 	}
 	
 	public void displayTestRow (Event event)
@@ -136,10 +151,14 @@ public class AttributeMappingHandler extends DataGrid {
 		((Textbox)c.getFellow("testRowTextbox1")).setValue("");						
 		((Textbox)c.getFellow("testRowTextbox2")).setValue("");						
 		c.getFellow("testRowButton1").setVisible(false);
-		c.getFellow("testRowButton2").setVisible(true);						
-		c.getFellow("testRowButton3").setVisible(true);						
-		c.getFellow("testRowButton4").setVisible(true);						
-		c.getFellow("testRowButton5").setVisible(true);						
+		Component b2 = c.getFellowIfAny("testRowButton2");
+		Component b3 = c.getFellowIfAny("testRowButton3");
+		Component b4 = c.getFellowIfAny("testRowButton4");
+		Component b5 = c.getFellowIfAny("testRowButton5");
+		if (b2 != null) b2.setVisible(true);						
+		if (b3 != null) b3.setVisible(true);						
+		if (b4 != null) b4.setVisible(true);						
+		if (b5 != null) b5.setVisible(true);						
 		if (type.equals(SoffidObjectType.OBJECT_ACCOUNT))
 		{
 			((Label)c.getFellow("testRowLabel1")).setValue("Account: ");
@@ -208,10 +227,10 @@ public class AttributeMappingHandler extends DataGrid {
 		{
 			c.getFellow("testRowLabel1").setVisible(false);
 			c.getFellow("testRowTextbox1").setVisible(false);						
-			c.getFellow("testRowButton2").setVisible(false);						
-			c.getFellow("testRowButton3").setVisible(false);						
-			c.getFellow("testRowButton4").setVisible(true);						
-			c.getFellow("testRowButton5").setVisible(true);						
+			b2.setVisible(false);						
+			b3.setVisible(false);						
+			b4.setVisible(true);						
+			b5.setVisible(true);						
 		}
 	}
 	
@@ -453,14 +472,48 @@ public class AttributeMappingHandler extends DataGrid {
 	}
 	
 	public void editTrigger(Event event ) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
-	    Events.sendEvent(new Event ("onEdit", 
-	    		getDesktop().getPage("editor").getFellow("top"),
-	    		new Object[] {
-					    event.getTarget().getPreviousSibling(),
-					    new com.soffid.iam.web.agent.ScriptEnviroment().getTriggerVars(event.getTarget())
-				}
-	    ));
+		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
+					    new com.soffid.iam.web.agent.ScriptEnviroment().getTriggerVars(event.getTarget()));
 
 	}
 
+	public void onNewAttributeMapping(Event event) {
+		Row r = (Row) event.getData();
+		String direction = (String) getVariable("direction", false);
+		if (direction != null) {
+			AttributeDirection expected = direction.toUpperCase().startsWith("OUT") ?
+					AttributeDirection.OUTPUT :
+					AttributeDirection.INPUT;
+			AttributeDirection type = (AttributeDirection) XPathUtils.getValue(r, "@direction");
+			if ( type == null)
+				XPathUtils.setValue(r, "@direction", expected);
+			else if ( type != expected)
+				r.setVisible(false);
+		}
+
+	}
+
+	public void onNewProperty(Event event) {
+		Row r = (Row) event.getData();
+		Set<String> filter = (Set<String>) getVariable("propertiesFilter", false);
+		if (filter != null) {
+			String name = (String) XPathUtils.getValue(r, "name");
+			if ( ! filter.contains(name))
+				r.setVisible(false);
+		}
+
+	}
+
+	public void onNewTrigger(Event event) {
+		Row r = (Row) event.getData();
+		String triggerType = (String) getVariable("triggerType", false);
+		if (triggerType != null) {
+			SoffidObjectTrigger tr = SoffidObjectTrigger.fromString(triggerType); 
+			SoffidObjectTrigger type = (SoffidObjectTrigger) XPathUtils.getValue(r, "@trigger");
+			if ( type == null)
+				XPathUtils.setValue(r, "@trigger", tr);
+			else if ( type != tr)
+				r.setVisible(false);
+		}
+	}
 }

@@ -15,23 +15,29 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.ForbiddenWord;
 import com.soffid.iam.api.PasswordDomain;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PasswordPolicyForbbidenWord;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.ForbiddenWordEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.PolicyForbiddenWordEntity;
 import com.soffid.iam.model.UserDomainEntity;
 import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.model.UserTypeEntityDao;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -469,4 +475,48 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 		}
 		return result;
 	}
+	
+	@Override
+	protected AsyncList<UserType> handleFindUserTypeByTextAndFilterAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<UserType> result = new AsyncList<UserType>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindUserTypeByTextAndFilter(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void doFindUserTypeByTextAndFilter(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<UserType> result) throws Exception {
+		final UserTypeEntityDao dao = getUserTypeEntityDao();
+		ScimHelper h = new ScimHelper(UserType.class);
+		h.setPrimaryAttributes(new String[] { "code", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toUserType((UserTypeEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
+	@Override
+	protected List<UserType> handleFindUserTypeByTextAndFilter(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<UserType> result = new LinkedList<UserType>();
+		doFindUserTypeByTextAndFilter(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+
 }

@@ -10,7 +10,6 @@
 	
 	<zscript>
 		<![CDATA[
-			int fileres = es.caib.seycon.ng.web.Custom.FILERES;
 			String mode = "query";
 			boolean view_altres = false;
 			

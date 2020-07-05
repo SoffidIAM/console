@@ -75,6 +75,7 @@ import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.Identity;
+import com.soffid.iam.web.component.ObjectAttributesDiv;
 
 import bsh.EvalError;
 import bsh.TargetError;
@@ -806,9 +807,9 @@ public class InputField2 extends Div implements XPathSubscriber
 					((AttributesDiv) c).adjustVisibility();
 					break;
 				}
-				else if (c instanceof UserAttributesDiv)
+				else if (c instanceof ObjectAttributesDiv)
 				{
-					((UserAttributesDiv) c).adjustVisibility();
+					((ObjectAttributesDiv) c).adjustVisibility();
 					break;
 				}
 				else
@@ -2256,9 +2257,9 @@ public class InputField2 extends Div implements XPathSubscriber
 				((AttributesDiv) c).adjustVisibility();
 				break;
 			}
-			else if (c instanceof UserAttributesDiv)
+			else if (c instanceof ObjectAttributesDiv)
 			{
-				((UserAttributesDiv) c).adjustVisibility();
+				((ObjectAttributesDiv) c).adjustVisibility();
 				break;
 			}
 			else
@@ -2376,8 +2377,8 @@ public class InputField2 extends Div implements XPathSubscriber
 		Object value = null;
 		value = XPathUtils.getValue(ctx, bind);
 		Component grandpa = getParent().getParent();
-		Map attributes = grandpa instanceof UserAttributesDiv ? 
-			((UserAttributesDiv) grandpa).getAttributesMap():
+		Map attributes = grandpa instanceof ObjectAttributesDiv ? 
+			((ObjectAttributesDiv) grandpa).getAttributesMap():
 			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
 		SecureInterpreter i = new SecureInterpreter();
 
@@ -2390,10 +2391,10 @@ public class InputField2 extends Div implements XPathSubscriber
 				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
-			else if (c instanceof UserAttributesDiv)
+			else if (c instanceof ObjectAttributesDiv)
 			{
-				((UserAttributesDiv) c).adjustVisibility();
-				i.set("inputFields", ((UserAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
+				((ObjectAttributesDiv) c).adjustVisibility();
+				i.set("inputFields", ((ObjectAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else
@@ -2445,6 +2446,7 @@ public class InputField2 extends Div implements XPathSubscriber
 			}
 		}
 		i.set("context", ownerContext); //$NON-NLS-1$
+		i.set("requestContext", ownerContext); //$NON-NLS-1$
 		return i;
 	}
 

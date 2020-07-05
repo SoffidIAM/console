@@ -1361,7 +1361,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToQueryPassword")); //$NON-NLS-1$
 		
 
-		return handleQueryAccountPasswordBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_OWNER);
+		AccountAccessLevelEnum level = ae.getType() == AccountType.PRIVILEGED ? 
+				AccountAccessLevelEnum.ACCESS_OWNER :
+				AccountAccessLevelEnum.ACCESS_MANAGER;
+		return handleQueryAccountPasswordBypassPolicy(account.getId(), level);
 	}
 
 	@Override

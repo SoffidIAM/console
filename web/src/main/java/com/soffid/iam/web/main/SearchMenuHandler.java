@@ -71,6 +71,8 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 
 	private boolean matches(String[] terms, String label) {
 		String s = Labels.getLabel(label);
+		if (s == null)
+			return false;
 		for (String term: terms)
 			if ( ! s.toLowerCase().contains(term.toLowerCase()))
 				return false;

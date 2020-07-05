@@ -36,13 +36,12 @@ import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.ConsoleProperties;
+import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.User;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 
 import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.comu.UsuariSEU;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.datamodel.DataModelCollection;
@@ -158,10 +157,10 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 			}
 			
 			if (variableName != null)
-				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? null: q);
+				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? enforcedFilter: q);
 			
 			if (variableNameText != null)
-				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: enforcedFilter);
+				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: null);
 
 			Object v = binder.getValue();
 			if (v instanceof DataModelCollection)
@@ -173,22 +172,29 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					throw new UiException(e);
 				}
 				showForm(modelCollection.getSize() == 1);
-				if (modelCollection.isInProgress())
-				{
-					timer.setDelay(300);
-					timer.start();
-					progressImage.setVisible(true);
-				}
-				else
-				{
-					modelCollection.updateProgressStatus();
-				}
-					
+				updateProgress();
 			}
 			binder.setDataPath(null);
 			try {
 				savePreferences();
 			} catch (Exception e) {
+			}
+		}
+	}
+
+	public void updateProgress() {
+		if (modelCollection.isInProgress())
+		{
+			timer.setDelay(300);
+			timer.start();
+			progressImage.setVisible(true);
+		}
+		else
+		{
+			try {
+				modelCollection.updateProgressStatus();
+			} catch (Exception e) {
+				throw new UiException(e);
 			}
 		}
 	}
@@ -314,33 +320,29 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 			User u = EJBLocator.getUserService().getCurrentUser();
 			if (u != null)
 			{
-				ConsoleProperties us = u.getConsoleProperties();
-				if (us != null)
+				String p = EJBLocator.getPreferencesService().findMyPreference("sb-"+preference);
+				if (p != null)
 				{
-					String p = (String) us.getPreferences().get("sb-"+preference);
-					if (p != null)
+					JSONObject j = new JSONObject(p);
+					int option = j.getInt("type");
+					if (option == TEXT)
+						setTextMode();
+					else if (option == ADVANCED)
+						setAdvancedMode();
+					else
+						setBasicMode();
+					JSONArray l = j.optJSONArray("criteria");
+					if (l != null)
 					{
-						JSONObject j = new JSONObject(p);
-						int option = j.getInt("type");
-						if (option == TEXT)
-							setTextMode();
-						else if (option == ADVANCED)
-							setAdvancedMode();
-						else
-							setBasicMode();
-						JSONArray l = j.optJSONArray("criteria");
-						if (l != null)
+						for (Object child: new LinkedList(getChildren()))
 						{
-							for (Object child: new LinkedList(getChildren()))
-							{
-								if (child instanceof AttributeSearchBox)
-									((AttributeSearchBox) child).detach();
-							}
-							for ( int i = 0; i < l.length(); i++)
-							{
-								String s = l.getString(i);
-								addAttribute(s);
-							}
+							if (child instanceof AttributeSearchBox)
+								((AttributeSearchBox) child).detach();
+						}
+						for ( int i = 0; i < l.length(); i++)
+						{
+							String s = l.getString(i);
+							addAttribute(s);
 						}
 					}
 				}
@@ -354,22 +356,17 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 			User u = EJBLocator.getUserService().getCurrentUser();
 			if (u != null)
 			{
-				ConsoleProperties us = u.getConsoleProperties();
-				if (us != null)
+				JSONObject j = new JSONObject();
+				j.put("type", mode);
+				LinkedList l = new LinkedList<String>();
+				for (Object child: getChildren())
 				{
-					JSONObject j = new JSONObject();
-					j.put("type", mode);
-					LinkedList l = new LinkedList<String>();
-					for (Object child: getChildren())
-					{
-						if (child instanceof AttributeSearchBox)
-							l.add( ((AttributeSearchBox) child).getAttributeDef().getName() );
-					}
-					j.put("criteria", l);
-					String p = j.toString();
-					us.getPreferences().put("sb-"+preference, p);
-					EJBLocator.getUserService().update(us);
+					if (child instanceof AttributeSearchBox)
+						l.add( ((AttributeSearchBox) child).getAttributeDef().getName() );
 				}
+				j.put("criteria", l);
+				String p = j.toString();
+				EJBLocator.getPreferencesService().updateMyPreference("sb-"+preference, p);
 			}
 		}
 	}
@@ -471,6 +468,19 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 
 	public void setDefaultAttributes (String s)
 	{
+		if (s.equals("-auto-")) {
+			s = "";
+			try {
+				for (DataType datatype: EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(getJsonObject(), null)) {
+					if (Boolean.TRUE.equals(datatype.getSearchCriteria()))
+					{
+						if (! s.isEmpty()) s += ", ";
+						s += datatype.getName();
+					}
+				}
+			} catch (Exception e) {
+			}
+		}
 		this.defaultAttributes = s;
 	}
 
@@ -747,7 +757,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 
 	public String getSearchIconUrl()
 	{
-		return Executions.encodeURL("~./img/search.png");
+		return Executions.encodeURL("/img/search2.svg");
 	}
 
 	public boolean isAuto() {

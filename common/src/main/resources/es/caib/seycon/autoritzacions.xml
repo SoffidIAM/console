@@ -1054,6 +1054,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>console:restart</codi>
+		<descripcio>Restart soffid console</descripcio>
+		<ambit>Console</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>authorization:rol:create</codi>
 		<descripcio>Add roles to authorization definitions</descripcio>
 		<ambit>Authorizations</ambit>
@@ -1235,8 +1241,8 @@
 	</autoritzacio>
 
 	<autoritzacio>
-		<codi>seu:dadesAddicionals:show</codi>
-		<descripcio>Access to additional data page</descripcio>
+		<codi>seu:metadata:show</codi>
+		<descripcio>Access to metadata management page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 

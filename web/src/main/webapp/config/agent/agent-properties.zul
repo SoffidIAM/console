@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+<?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window xmlns:h="http://www.w3.org/1999/xhtml"
+	use="com.soffid.iam.web.agent.PropertiesWindow"
+	position="center,center"
+	mode="highlighted"
+	closable="true"
+	mold="soffid"
+	width="80%"
+	height="80vh"
+	title="MappingProperties"
+	id="agentPropertiesWindow">
+
+	<form2 id="form" dataPath="/listbox:/." style="height:400px; height: calc(80vh - 120px)">
+		<grid sclass="grayhover grid" dataPath="/listbox:/objectMapping" id="objectsGrid" 
+		width="100%" fixedLayout="false" mold="table"
+			onNewRow="ref:objectsGrid.onNewObjectMapping"  use="com.soffid.iam.web.agent.AttributeMappingHandler">
+			<columns>
+				<column label="System objects" valign="top">
+				</column>
+				<column label="" width="40px"  valign="top" align="center">
+					<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+						onClick="ref:objectsGrid.addObject" />
+				</column>
+			</columns>
+			<datarow>
+				<window width="100%" >
+					<div>
+						<textbox onChange="" bind="@systemObject" width ="15%" />
+						<label value="based on" width="10%"></label>
+						<select bind="."
+							use="com.soffid.iam.web.agent.CustomObjectTypeSelect" disabled="true"/>
+					</div>
+																										
+					<div 
+						style="width: 90%; float: right; display:block; "
+						visible="true">	
+																						
+						<div style="" id="propertiesDiv"  visible="true">																				
+							<grid sclass="grid compactGrid" 
+								style="width: 100%; width: calc( 100% - 42px )" 
+								mold="table" 
+								onNewRow="ref:objectsGrid.onNewProperty"
+								dataPath="property" fixedLayout="true" id ="propertiesGrid">
+								<columns>
+									<column label="Property" width = "15em">
+									</column>
+									<column label="Value">
+									</column>
+									<column label="" width="30px">
+										<imageclic align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
+										</imageclic>
+									</column>
+								</columns>
+								<datarow>
+									<textbox bind="@property" width="100%" 
+										sclass="noborder-textbox"
+										height="32px"/>
+									<textbox bind="@value" width ="100%"
+										sclass="noborder-textbox" 
+										multiline="true"  height="32px"
+										onFocus="ref:objectsGrid.focusTextarea">
+									</textbox>
+									<imageclic align="middle" src="/img/remove.svg" onClick="ref:objectsGrid.removeProperty" if="${canUpdateAgent }">
+									</imageclic>
+								</datarow>
+							</grid>
+						</div>
+					</div>
+					<div style="height: 20px;" />
+				</window>
+				<imageclic align="center" src="/img/remove.svg" onClick="ref:objectsGrid.removeObject" if="${canUpdateAgent }">
+				</imageclic>
+			</datarow>
+		</grid>
+	</form2>
+</window>

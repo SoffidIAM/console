@@ -16,11 +16,15 @@ import es.caib.seycon.ng.model.DispatcherEntity;
 	 translatedPackage="com.soffid.iam.api")
 public class Dispatcher {
 
-	@Attribute(translated = "name" )
+	@Attribute(translated = "name", searchCriteria = true )
 	public java.lang.String codi;
 
 	@Nullable
-	@Attribute(translated = "className" )
+	@Attribute(searchCriteria = true)
+	public java.lang.String description;
+
+	@Nullable
+	@Attribute(translated = "className", searchCriteria = true )
 	public java.lang.String nomCla;
 
 	@Nullable
@@ -68,6 +72,7 @@ public class Dispatcher {
 	public java.lang.Boolean segur;
 
 	@Nullable
+	@Attribute(hidden = true)
 	public java.lang.Long id;
 
 	@Nullable
@@ -120,9 +125,6 @@ public class Dispatcher {
 
 	@Nullable
 	public java.util.Calendar timeStamp;
-
-	@Nullable
-	public java.lang.String description;
 
 	@Nullable
 	public String authoritativeProcess;

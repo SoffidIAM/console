@@ -22,8 +22,8 @@ import com.soffid.iam.api.Tenant;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.utils.Security;
-import com.soffid.iam.web.common.FileUpload2;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;

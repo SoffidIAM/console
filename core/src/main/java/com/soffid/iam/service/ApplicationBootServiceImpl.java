@@ -124,6 +124,8 @@ public class ApplicationBootServiceImpl extends
 				Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
 
 		ConfigurationCache.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
+		
+		getCrudRegistryService().registerDefaultHandlers();
 
 		configureDatabase();
 
@@ -408,8 +410,8 @@ public class ApplicationBootServiceImpl extends
 			configureDocumentManager();
 			
 			String externalURL = ConfigurationCache.getMasterProperty("AutoSSOURL");
-			if (externalURL != null)
 			{
+				if (externalURL != null && ! tenantName.equals("master"))
 				try {
 					URL u = new URL(externalURL);
 					URL u2 = new URL (u.getProtocol(), tenantName+"."+u.getHost(), u.getPort(), u.getFile());
@@ -445,6 +447,12 @@ public class ApplicationBootServiceImpl extends
 		{
 			configureSSOAttributes();
 			cfg.setValue("105");
+			configSvc.update(cfg);
+		}
+		if (cfg.getValue().equals("105"))
+		{
+			createStandardAttributes();
+			cfg.setValue("200");
 			configSvc.update(cfg);
 		}
 	}
@@ -496,6 +504,7 @@ public class ApplicationBootServiceImpl extends
 		l.add("PASSWORD_WRONG: Invalid");
 		td.setValues(l);
 		td.setOrder(43L);
+		td.setReadOnly(true);
 		td.setRequired(false);
 		td.setScope(MetadataScope.ACCOUNT);
 		td.setSystemName("SSO");
@@ -1172,7 +1181,7 @@ public class ApplicationBootServiceImpl extends
 			rol.setDescription("SOFFID Administrator"); //$NON-NLS-1$
 			rol.setBpmEnforced(new Boolean(false));
 			rol.setName("SOFFID_ADMIN"); //$NON-NLS-1$
-			rol.setDomain(new Domain());
+			rol.setDomain(null);
 			rol = appSvc.create(rol);
 		}
 
@@ -1247,26 +1256,6 @@ public class ApplicationBootServiceImpl extends
 			grupSvc.create(grup);
 		}
 
-		DataType td = tdSvc.findDataTypeByName("NIF"); //$NON-NLS-1$
-		if (td == null) {
-			td = new DataType();
-			td.setCode("NIF"); //$NON-NLS-1$
-			td.setOrder(new Long(1));
-			td.setScope(MetadataScope.USER);
-			td.setType(TypeEnumeration.STRING_TYPE);
-			tdSvc.create(td);
-		}
-
-		td = tdSvc.findDataTypeByName("PHONE"); //$NON-NLS-1$
-		if (td == null) {
-			td = new DataType();
-			td.setCode("PHONE"); //$NON-NLS-1$
-			td.setOrder(new Long(2));
-			td.setScope(MetadataScope.USER);
-			td.setType(TypeEnumeration.STRING_TYPE);
-			tdSvc.create(td);
-		}
-
 		User usu = usuariSvc.findUserByUserName("admin"); //$NON-NLS-1$
 		if (usu == null) {
 			usu = new User();
@@ -1324,10 +1313,8 @@ public class ApplicationBootServiceImpl extends
 		}
 
 		cfg = configSvc.findParameterByNameAndNetworkName("SSOServer", null); //$NON-NLS-1$
-		if (cfg == null) {
-
-			cfg = new Configuration(
-					"SSOServer", System.getProperty("hostName") + "." + System.getProperty("domainName")); //$NON-NLS-1$
+		if (cfg == null && System.getProperty("hostName") != null) {
+			cfg = new Configuration("SSOServer", System.getProperty("hostName")); //$NON-NLS-1$
 			configSvc.create(cfg);
 		}
 
@@ -1340,9 +1327,9 @@ public class ApplicationBootServiceImpl extends
 			configSvc.create( new Configuration("AutoSSOPolicy", "S" )); //$NON-NLS-1$
 
 		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOURL", null); //$NON-NLS-1$
-		if (cfg == null)
+		if (cfg == null && System.getProperty("hostName") != null)
 			configSvc.create( new Configuration("AutoSSOURL", 
-					"http://"+System.getProperty("hostName") + "." + System.getProperty("domainName")+":8080/" )); //$NON-NLS-1$
+					"http://"+System.getProperty("hostName") + ":8080/" )); //$NON-NLS-1$
 
 
 		Configuration cfg2 = configSvc.findParameterByNameAndNetworkName(
@@ -1414,24 +1401,7 @@ public class ApplicationBootServiceImpl extends
 
 	private void createStandardUserAttributes() throws Exception {
 		int i = 0;
-		createStandardField (i++, MetadataScope.USER, User.class, "userName", "SC_USUARI", "USU_CODI", TypeEnumeration.STRING_TYPE, null, true);
-		createStandardField (i++, MetadataScope.USER, User.class, "active", "SC_USUARI", "USU_ACTIU", TypeEnumeration.BOOLEAN_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "comments", "SC_USUARI", "USU_COMENT", TypeEnumeration.STRING_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "createdBy", "SC_USUARI", "USU_USUCRE", TypeEnumeration.USER_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "createdOn", "SC_USUARI", "USU_DATCRE", TypeEnumeration.DATE_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "firstName", "SC_USUARI", "USU_NOM", TypeEnumeration.STRING_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "lastName", "SC_USUARI", "USU_PRILLI", TypeEnumeration.STRING_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "middleName", "SC_USUARI", "USU_SEGLLI", TypeEnumeration.STRING_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "homeServer", "SC_MAQUIN", "MAQ_NOM", TypeEnumeration.HOST_TYPE, null, false);
-		createStandardField2 (i++, MetadataScope.USER, User.class, "mailAlias", TypeEnumeration.STRING_TYPE, null, false, 256, true);
-		createStandardField (i++, MetadataScope.USER, User.class, "mailDomain", "SC_DOMCOR", "DCO_CODI", TypeEnumeration.MAIL_DOMAIN_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "mailServer", "SC_MAQUIN", "MAQ_NOM", TypeEnumeration.HOST_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "modifiedBy", "SC_USUARI", "USU_USUMOD", TypeEnumeration.USER_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "modifiedOn", "SC_USUARI", "USU_DATMOD", TypeEnumeration.DATE_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "primaryGroup", "SC_GRUPS", "GRU_CODI", TypeEnumeration.GROUP_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "profileServer", "SC_MAQUIN", "MAQ_NOM", TypeEnumeration.HOST_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "shortName", "SC_USUARI", "USU_NOMCUR", TypeEnumeration.STRING_TYPE, null, false);
-		createStandardField (i++, MetadataScope.USER, User.class, "userType", "SC_TIPUSU", "TUS_CODI", TypeEnumeration.USER_TYPE_TYPE, null, false);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, false);
 	}
 
 	static Database database = null;
@@ -1454,6 +1424,11 @@ public class ApplicationBootServiceImpl extends
 			if (Boolean.TRUE == dt.getBuiltin() && att.equals(dt.getName()))
 			{
 				dataType = dt;
+				String nlsLabel = class1.getName()+"."+att;
+				if (nlsLabel.equals(dataType.getNlsLabel())) {
+					dataType.setNlsLabel(nlsLabel);
+					getMetaDataEntityDao().update(dataType);
+				}
 				break;
 			}
 		}
@@ -1462,7 +1437,7 @@ public class ApplicationBootServiceImpl extends
 		dataType.setType( type);
 		dataType.setBuiltin(true);
 		dataType.setFilterExpression(filterExpression);
-		dataType.setNlsLabel(class1.toString()+"."+att);
+		dataType.setNlsLabel(class1.getName()+"."+att);
 		if (dataType.getOrder() == null)
 			dataType.setOrder( new Long (order) );
 		dataType.setName(att);

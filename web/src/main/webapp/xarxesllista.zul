@@ -10,8 +10,6 @@
 	
 	<zscript>
 		<![CDATA[
-			fileres = es.caib.seycon.ng.web.Custom.FILERES;
-		
 			mode = "query"; 
 			boolean view_altres = false;
 			model_network.getVariables().declareVariable("queryEnabled", true);

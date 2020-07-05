@@ -6,12 +6,18 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
+
+import es.caib.seycon.ng.comu.ValorDomini;
 
 @Service (translatedName="DomainService",
 	translatedPackage="com.soffid.iam.service")
@@ -22,7 +28,8 @@ import com.soffid.mda.annotation.Service;
 	es.caib.seycon.ng.servei.UsuariService.class,
 	es.caib.seycon.ng.model.GrupEntity.class,
 	es.caib.seycon.ng.model.AplicacioEntity.class,
-	AutoritzacioService.class})
+	AutoritzacioService.class,
+	AsyncRunnerService.class})
 public abstract class DominiService {
 
 	@Operation(grantees = { roles.application_create.class,
@@ -44,6 +51,15 @@ public abstract class DominiService {
 			roles.application_update.class }, translated = "create")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.ValorDomini create(
+			es.caib.seycon.ng.comu.ValorDomini valorDomini)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_create.class,
+			roles.application_update.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public es.caib.seycon.ng.comu.ValorDomini update(
 			es.caib.seycon.ng.comu.ValorDomini valorDomini)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
@@ -119,6 +135,36 @@ public abstract class DominiService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Domini> findDominisByCodiAplicacio(
 			java.lang.String codiAplicacio)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public es.caib.seycon.ng.comu.Domini findDomainByApplicationAndName(
+			java.lang.String codiAplicacio,
+			String name)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<ValorDomini> findDomainValueByTextAndFilter(
+			@Nullable String text, 
+			@Nullable String query, 
+			@Nullable Integer first,
+			@Nullable Integer max)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<ValorDomini> findDomainValueByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

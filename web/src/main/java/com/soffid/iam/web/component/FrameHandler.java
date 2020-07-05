@@ -85,7 +85,12 @@ public class FrameHandler extends Frame {
 	}
 		
 	public void showDetails() {
+		if (isSingleFaceCard()) return;
 		getCard().setSclass ( "card is-flipped" );
+	}
+
+	public boolean isSingleFaceCard() {
+		return getCard().getSclass().equals("single-face-card");
 	}
 	
 	protected HtmlBasedComponent getCard() {
@@ -94,6 +99,9 @@ public class FrameHandler extends Frame {
 
 	public void hideDetails() throws CommitException {
 		getModel().commit();
+		
+		if (isSingleFaceCard()) return;
+
 		getCard().setSclass ( "card" );
 		Component lb = getListbox();
 		if (lb instanceof DataTable)
@@ -142,7 +150,7 @@ public class FrameHandler extends Frame {
 	}
 	
 	public void apply(Event ev) throws CommitException {
-		getModel().commit();
+		applyNoClose(ev);
 		hideDetails();
 	}
 	
@@ -157,6 +165,9 @@ public class FrameHandler extends Frame {
 		if (lb instanceof DataTree2)
 			pos = ((DataTree2) lb).getSelectedItem();
 		getModel().refresh();
+		SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
+		if (sb != null)
+			sb.updateProgress();
 		if (id != null && lb instanceof DataTable)
 		{
 			try {

@@ -1,3 +1,14 @@
+- name: seu.resources
+  img: /img/menu/resources.svg
+  options:
+  - name: seu.usuaris
+    url: /resource/user/user.zul
+    permissions: ["seu:usuaris:show"]
+    img: /img/menu/users.svg
+  - name: seu.grups
+    url: /resource/group/group.zul
+    permissions: ["seu:grups:show"]
+    img: /img/menu/groups.svg
 - name: seu.configuration
   img_old: /img/menu/system-settings.png
   img: /img/menu/toolbox.svg
@@ -25,6 +36,10 @@
     - name: seu.user-types
       url: /config/user-types.zul
       img: /img/menu/user-types.svg
+      permissions: ["seu:metadata:show"]
+    - name: seu.metadata
+      url: /config/metadata.zul
+      img: /img/menu/metadata.svg
       permissions: ["seu:userTypes:show"]
   - name: seu.integration-engine
     img: /img/menu/integration.svg
@@ -45,6 +60,10 @@
       url: /config/userDomains.zul
       permissions: ["seu:usersDomain:show"]
       img: /img/menu/user-domains.svg
+    - name: attributeTranslation.Titol
+      url: /config/attribute-translation.zul
+      permissions: ["seu:attributeTranslation:show"]
+      img: /img/menu/translation-tables.svg
   - name: seu.workflow-settings
     img: /img/menu/workflow.svg
     options:

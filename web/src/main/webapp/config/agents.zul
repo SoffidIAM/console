@@ -5,12 +5,18 @@
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 <?component name="input_password" macro-uri="/comu/input_password.zul"?>
-<?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
+<?component name="accountMetadata" macro-uri="/config/agent/account_metadata.zul"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div"
 	style="position: relative" use="com.soffid.iam.web.agent.AgentHandler"
 	id="frame">
+
+	<script>
+		function diagramAction(action, arg0, arg1, arg2) {
+			zkau.send ({uuid: '${frame.uuid}', cmd: "diagramAction", data: [action, JSON.stringify(arg0), JSON.stringify(arg1), JSON.stringify(arg2)]}, 5);
+		}
+	</script>
 
 	<style>
 		.tcoth div {text-align:center !important;} tr.seld td
@@ -28,8 +34,18 @@
 		div.method-collapse-button-div:hover { background-color:
 		#c0c0c0; }
 
+		.svg-container {
+			display: inline-block;
+			width: 100%
+		}
+		
+		.svg-container svg {
+			width: 100%;
+			max-height: calc( 100vh - 100px );
+		}
 	</style>
 
+	
 	<datamodel id="model" rootNode="agents" src="descriptorAgent.xml" />
 
 	<div sclass="card" id="card">
@@ -40,6 +56,7 @@
 					<menu2item image="/img/add.svg"
 						label="${c:l('agents.zul.Afegeixnou') }"
 						if="${canCreateAgent}" onClick="ref:frame.addNew" />
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
 
@@ -95,6 +112,7 @@
 				<tabbox id="panels" width="100%" onSelect="ref:frame.onChangeTab">
 					<tabs>
 						<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
+						<tab id="r_workflow" label="${c:l('agents.zul.integration-workflows')}"/>
 						<tab id="r_attributeMapping" label="${c:l('agents.zul.AttributeMapping')}"/>
 						<tab id="r_reconcileTriggers" label="${c:l('agents.loadTriggers')}"/>
 						<tab label="${c:l('agents.zul.MassiveActions')}" if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}" id ="r_tasksTab"/>
@@ -255,6 +273,19 @@
 							<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 						</div>
 					</tabpanel>
+						<tabpanel width="100%">
+							<div style="margin-bottom: 10px;">
+								<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+							</div>
+							<datatable
+								onEdit="ref:frame.editWorkflow"
+								id="workflowsGrid" width="100%">
+								<attribute name="columns"><![CDATA[
+- name: ${c:l('seyconserver.zul.Tasca')}
+  template: ${"$"}{name} <button class="small-button" style="position:relative; left: 16px" onclick="zkDatatable.sendClientAction(this, 'onEdit')">${c:l('agents.zul.open-workflow') }</button>
+  ]]> </attribute>
+  							</datatable>
+						</tabpanel>
 					<tabpanel id="tabAttributeMapping">
 						<div style="margin-bottom: 10px;">
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
@@ -290,7 +321,7 @@
 											</div>
 																						
 											<div id="propertiesDiv2"  visible="false">																				
-												<grid sclass="grid compactGrid" style="width: 100%; width: calc( 100% - 26px )"
+												<grid sclass="grid compactGrid" style="width: 100%; width: calc( 100% - 42px )"
 													fixedLayout="true" id="propertiesGrid2"
 													dataPath="property"
 													mold="table"
@@ -319,7 +350,7 @@
 																						
 											<div style="" id="propertiesDiv"  visible="false">																				
 												<grid sclass="grid compactGrid" 
-													style="width: 100%; width: calc( 100% - 26px )" 
+													style="width: 100%; width: calc( 100% - 42px )" 
 													mold="table" 
 													dataPath="property" fixedLayout="true" id ="propertiesGrid">
 													<columns>
@@ -333,8 +364,12 @@
 														</column>
 													</columns>
 													<datarow>
-														<textbox bind="@property" width="95%" onChange="ref:propertiesGrid2.generateGrid"/>
-														<textbox bind="@value" width ="95%" onChange="ref:propertiesGrid2.generateGrid" style="display:block; resize: vertical; height: 1.6em"  multiline="true"  height="1em"
+														<textbox bind="@property" width="100%" 
+															onChange="ref:propertiesGrid2.generateGrid" sclass="noborder-textbox"
+															height="32px"/>
+														<textbox bind="@value" width ="100%" onChange="ref:propertiesGrid2.generateGrid"
+															sclass="noborder-textbox" 
+															multiline="true"  height="32px"
 															onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
 														<imageclic align="middle" src="/img/remove.svg" onClick="ref:objectsGrid.removeProperty" if="${canUpdateAgent }">
@@ -357,7 +392,7 @@
 												<grid sclass="grid compactGrid" 
 													dataPath="attributeMapping" id="attributesGrid" 
 													mold="table"
-													style="width: 100%; width: calc( 100% - 26px )">
+													style="width: 100%; width: calc( 100% - 42px )">
 													<columns>
 														<column label="System attribute">
 														</column>
@@ -375,30 +410,25 @@
 														</column>
 													</columns>
 													<datarow>
-														<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" style="display:block; resize: none" multiline="true" 
-															height="27px" onFocus="ref:objectsGrid.focusTextarea">
+														<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" 
+																sclass="noborder-textbox" multiline="true" 
+															height="32px" onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
 														<imageclic src="/img/pencil.svg" 
 															onClick="ref:objectsGrid.editAttribute">
 														</imageclic>
-														<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection" style="width: 80px; text-align-last: center">
+														<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection" style="width: 80px; text-align-last: center"
+															disabled="false">
 															<dataitem bind="@value">
 																<listcell bind="@literal"/>
 															</dataitem>
 														</listbox>
-														<textbox bind="@soffidAttribute" width ="100%" onChange=""  style="display:block; resize: none" multiline="true"  
-															height="27px" onFocus="ref:objectsGrid.focusTextarea">
+														<textbox bind="@soffidAttribute" width ="100%" onChange=""  
+															sclass="noborder-textbox" multiline="true"  
+															height="32px" onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
-														<imageclic src="/img/pencil.svg" >
-															<attribute name="onClick"><![CDATA[
-															    Events.sendEvent(new Event ("onEdit", 
-															    		desktop.getPage("editor").getFellow("top"),
-															    		new Object[] {
-																			    event.getTarget().getPreviousSibling(),
-																			    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars(self)
-																		}
-															    ));
-															]]></attribute>
+														<imageclic src="/img/pencil.svg" 
+															onClick="ref:objectsGrid.editAttribute">
 														</imageclic>
 														<div>
 															<label multiline="true"/>
@@ -444,7 +474,7 @@
 													fixedLayout="false" 
 													mold="table" 
 													id="triggersGrid" 
-													style="width: 100%; width: calc( 100% - 26px )">
+													style="width: 100%; width: calc( 100% - 42px )">
 													<columns>
 														<column label="Trigger" width="10em" valign="top">
 														</column>
@@ -462,7 +492,9 @@
 																<listcell bind="@literal"/>
 															</dataitem>
 														</listbox>
-														<textbox bind="@script" width ="100%" onOK="" onChange="" style="display:block; resize: none; height: 1.6em" multiline="true" height="1em"
+														<textbox bind="@script" width ="100%" onOK="" onChange="" 
+															sclass="noborder-textbox" 
+															multiline="true" height="24px"
 															onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
 														<imageclic src="/img/pencil.svg" onClick="ref:objectsGrid.editTrigger">
@@ -665,8 +697,27 @@
 			<label value="${c:l('job.status') }: "/>
 			<label id="status"/>
 		</div>
-		<textbox id="log" multiline="true" rows="20" width="100%" readonly="true"/>
+		<datatree2 id="log"
+			header="Test log" 
+			enablefilter="true"
+			sortDirection="0"
+			sortable="false"
+			maxheight="70vh"
+			onAddPolicy="ref:frame.addPolicy"
+			style="height: 500px; min-height: 80vh"
+			onSelect="ref:frame.showDetails">
+			<attribute name="finders">
+			<![CDATA[
+			- path: header
+			  value: header 
+			- path: log
+			  template: <pre ${"${"}style${"}"}>${"${"}log${"}"}</pre>
+			  leaf: true
+			  ]]>
+			</attribute>
+ 			</datatree2>
 		<div style="text-align: right; margin: 2em">
+			<button image="/img/download-r.svg" label="${c:l('contenidoTarea.btnDescargar') }" onClick="ref:frame.downloadPropagateLog"/>
 			<button label="${c:l('error.zul.Tancar')}">
 				<attribute name="onClick">
 					testWindow.setVisible(false);
@@ -676,14 +727,40 @@
 	</window>
 
 	<window closable="true" width="80%" id="logWindow"
+		position="center,top"
 		title=""
 		onClose='self.visible=false; event.stopPropagation();'
 		visible="false">
 		<textbox id="tb" width="100%" height="150px" multiline="true" style="font-family: monospace; resize: vertical"/>
 	</window>
 	
-	<include src="grupsllista.zul"/>
+	<window closable="false" width="80%" id="startTaskWindow"
+		position="center,top"
+		title=""
+		visible="false">
+		${c:l('agents.zul.selectServer') }:
+		<select id="servers"/>
+		<div style="text-align: right; width: 100%">
+			<button label="${c:l('configure.start')}"  onClick="ref:frame.startTask"/>
+			<button label="${c:l('mesg:org.zkoss.zul.mesg.MZul:UPLOAD_CANCEL')}"  onClick="ref:frame.cancelStartTask"/>
+		</div>
+	</window>
+
+
+	<window closable="false" width="100%" id="workflowWindow"
+		position="center,top"
+		title=""
+		visible="false">
+		<div style="width: 100%">
+			<label id="testRowLabel1" visible="false"/>
+			<textbox id="testRowTextbox1" visible="false" onOK="ref:frame.doWorkflowTest"/>
+			<label id="testRowLabel2" style="margin-left: 2em" visible="false"/>
+			<textbox id="testRowTextbox2" visible="false" onOK="ref:frame.doWorkflowTest"/>
+			<button id="testButton" label="${c:l('agents.zul.Test')}"  onClick="ref:frame.doWorkflowTest"/>
+			<button style="float:right" label="${c:l('error.zul.Tancar')}"  onClick="ref:frame.closeWorkflowWindow"/>
+		</div>
+		<html id="content" sclass="svg-container"/>
+	</window>
+
 	<include src="controlAcces.zul"/>
- 	<include src="finestres/editor.zul"/>
- 	<include src="finestres/agent_objectAttributes.zul"/>
 </frame>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.user.UserAccountsHandler" id="handler">
+	<datatree2 dataPath="${arg.listbox}:/" 
+		id="tree"
+		header="${c:l('usuaris.zul.Dominidecontrasenyes')} /  ${c:l('accounts.dispatcher')} "
+		use="com.soffid.iam.web.user.UserColumnsTree" 
+		onSetPassword="ref:handler.openPasswordWindow"
+		onSelect="ref:handler.openAccount"
+		openLevels="2"
+		enablefilter="true">
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('usuaris.zul.Account')}
+		- name: ${c:l('usuaris.zul.DataUpdate')}
+		  width: 150px
+		- name: ${c:l('accounts.lastLogin')}
+		  width: 150px
+		- name: ${c:l('usuaris.zul.DataAssignacia')}
+		  width: 150px
+		- name: ${c:l('usuaris.zul.DataCaducitat')}
+		  width: 150px
+		]]>
+		</attribute>
+		<attribute name="finders"><![CDATA[
+		- path: /domini
+		  template: ${"$"}{name} <button class="small-button" style="position:relative; left: 16px" onclick="zkDatatree2.sendClientAction(this, 'onSetPassword')">${c:l('changepass.CanviPWD') }</button>
+		- path: /policy[1]/account
+		  value: system
+		  leaf: true
+		  columns:
+		  - value: name
+		  - value: lastUpdated
+		  - value: lastLogin
+		  - value: passwordExpiration
+		]]>
+		</attribute>
+	</datatree2>
+
+	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:update')}" >
+		<div class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<!--  Window to set the password -->
+	<window closable="true"
+		id="newPassword2" position="top, center"
+		sizable="true" title="${c:l('accounts.setPassword.title')}"
+		visible="false" width="34em"
+		onClose="ref:handler.onCancelPassword">
+		<vbox width="30em" heights="2em, 2em" style="margin: 4em">
+			<radiogroup id="generationType" width="24em" orient="vertical"
+				onCheck="ref:handler.onChangeSelectedGeneration">
+				<radio label="${c:l('usuaris.zul.radomPassword')}" 
+					id="generationRandom" width="20em" 
+					selected="true" value="random" onSelect=""/>
+				<div>
+					<textbox id="antipasswordsave" disabled="true" 
+						style="border: none; color: white;  background-color: white"/>
+				</div>
+				<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
+					value="set" onSelect="" />
+			</radiogroup>
+			<div style="visibility: hidden" id="passworddiv">
+				<label 
+					value="${c:l('accounts.setPassword.label')}">
+				</label>
+				<textbox style="margin-left: 2em;" disabled="true" 
+					type="password" width="18em" id="password"
+					onOK="ref:handler.onSetPassword">
+				</textbox>
+			</div>
+			<hbox align="center" pack="end" width="26em" style="margin-top: 2em">
+				<button
+					label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="ref:handler.onCancelPassword" />
+				<button id = "setButton"
+				    label="${c:l('accounts.setPassword.OK')}"
+					onClick="ref:handler.onSetPassword" />
+			</hbox>
+		</vbox>
+	</window>
+	
+	<!-- Window to show the random password -->
+	<window closable="true" id="displayNewPassword" position="top,center" sizable="true"
+		title="${c:l('canviPassword.Titol')}" visible="false" width="600px"
+		onClose="ref:handler.onCancelDisplayPassword">
+		
+		<div style="width:100%; margin-bottom: 10px">
+			<label id="lbInfoNouPass" multiline="true" sclass="etiqueta"
+				value="${c:l('canviPassword.zul.Elnoupasswordas')}"/>
+		</div>
+		<div align="center" sclass="titolpagina">
+			<label id="passwordValue" value=""  style="font-family: monospace"/>
+		</div>
+		<div>
+			<label id="popupPwd" multiline="true"/>
+		</div>
+		
+		<separator spacing="10px"/>
+		<separator bar="true" spacing="15px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button label="${c:l('canviPassword.zul.Accepta')}" onClick="ref:handler.onCancelDisplayPassword()"/>
+		</hbox>
+	</window>
+	
+	<include src="/resource/user/user-account-details.zul" dataSource="//user/user_accounts/tree" />
+	<include src="/resource/user/user-account-add.zul" dataSource="//user/user_accounts/tree" userDataSource="${arg.listbox}" />
+</div>

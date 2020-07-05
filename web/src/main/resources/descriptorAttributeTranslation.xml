@@ -2,20 +2,11 @@
 
 <zkib-model>
 	<datanode name="root">
-		<finder name="domain" type="domain" refreshAfterCommit="true"> 
-			<script-finder>
-				return "*";
-			</script-finder>
-			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService"
-				method="findDomains" > 
-			</ejb-finder>
-		</finder>
 		<finder name="translation" type="translation">
 			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AttributeTranslationService"
-				method="findByExample" if = "${queryEnabled}"> <!--agent:query, application:update-->
-				<parameter value="${domain}"/>
-				<parameter value="${column1}"/>
-				<parameter value="${column2}"/>
+				method="findByTextAndJsonQueryAsync" if = "${query != null || textQuery != null}"> <!--agent:query, application:update-->
+				<parameter value="${textQuery}"/>
+				<parameter value="${query}"/>
 			</ejb-finder>
 			<new-instance-bean
 				className="com.soffid.iam.api.AttributeTranslation">

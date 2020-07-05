@@ -38,6 +38,21 @@ public class AttributeValidationServiceImpl extends AttributeValidationServiceBa
 			if (getUserEntityDao().findByUserName( value.toString()) == null)
 				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.6"), value)); //$NON-NLS-1$
 		}
+		if (type == TypeEnumeration.USER_TYPE_TYPE)
+		{
+			if (getUserTypeEntityDao().findByName( value.toString()) == null)
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.7"), value)); //$NON-NLS-1$
+		}
+		if (type == TypeEnumeration.HOST_TYPE)
+		{
+			if (getHostEntityDao().findByName( value.toString()) == null)
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.8"), value)); //$NON-NLS-1$
+		}
+		if (type == TypeEnumeration.NETWORK_TYPE)
+		{
+			if (getNetworkEntityDao().findByName( value.toString()) == null)
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.9"), value)); //$NON-NLS-1$
+		}
 	}
 
 }

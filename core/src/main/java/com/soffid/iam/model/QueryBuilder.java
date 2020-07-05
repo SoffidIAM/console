@@ -52,9 +52,12 @@ public class QueryBuilder {
         	else
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
         }
-        queryObject.setMaxResults(conf.getMaximumResultSize());
-        queryObject.setFirstResult(conf.getFirstResult());
-        queryObject.setFetchSize(conf.getFetchSize());
+        if (conf.getMaximumResultSize() != null)
+        	queryObject.setMaxResults(conf.getMaximumResultSize());
+        if (conf.getFirstResult() != null)
+            queryObject.setFirstResult(conf.getFirstResult());
+        if (conf.getFetchSize() != null)
+            queryObject.setFetchSize(conf.getFetchSize());
         java.util.List results = queryObject.list();
         return results;
 

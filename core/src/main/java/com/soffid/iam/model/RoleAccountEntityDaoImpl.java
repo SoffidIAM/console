@@ -482,40 +482,45 @@ public class RoleAccountEntityDaoImpl
 		if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
 			tipusDomini = TipusDomini.SENSE_DOMINI;
 		}
-		if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
+		if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0  ||
+				TipusDomini.CUSTOM.equals(tipusDomini)) {
 			DomainValueEntity valorDominiEntity = sourceEntity.getDomainValue();
 			DomainValue valorDomini = getDomainValueEntityDao().toDomainValue(
 					valorDominiEntity);
 			targetVO.setDomainValue(valorDomini);
 		} else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
-				|| tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+				|| tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0  ||
+						TipusDomini.GROUPS.equals(tipusDomini)  ||
+						TipusDomini.MEMBERSHIPS.equals(tipusDomini)) {
 			DomainValue valorDomini = new DomainValue();
 			valorDomini
 					.setDescription(sourceEntity.getGroup().getDescription());
-			if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+			if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0 ||
+					TipusDomini.MEMBERSHIPS.equals(tipusDomini) ) {
 				valorDomini.setExternalCodeDomain(usuariEntity == null ? null
 						: usuariEntity.getUserName());
-				valorDomini.setDomainName(TipusDomini.GRUPS_USUARI);
+				valorDomini.setDomainName(TipusDomini.MEMBERSHIPS);
 			} else {
 				valorDomini.setExternalCodeDomain(null);
-				valorDomini.setDomainName(TipusDomini.GRUPS);
+				valorDomini.setDomainName(TipusDomini.GROUPS);
 			}
 			valorDomini.setValue(sourceEntity.getGroup().getName());
 			targetVO.setDomainValue(valorDomini);
-		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
+		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0 ||
+				TipusDomini.APPLICATIONS.equals(tipusDomini) ) {
 			DomainValue valorDomini = new DomainValue();
 			valorDomini.setExternalCodeDomain(null);
 			valorDomini.setDescription(sourceEntity.getInformationSystem()
 					.getDescription());
-			valorDomini.setDomainName(TipusDomini.APLICACIONS);
+			valorDomini.setDomainName(TipusDomini.APPLICATIONS);
 			valorDomini.setValue(sourceEntity.getInformationSystem().getName());
 			targetVO.setDomainValue(valorDomini);
 		} else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
 			DomainValue valorDomini = new DomainValue();
 			valorDomini.setExternalCodeDomain(null);
-			valorDomini.setDescription("");
-			valorDomini.setDomainName(TipusDomini.SENSE_DOMINI);
-			valorDomini.setValue(""); //$NON-NLS-1$
+			valorDomini.setDescription(null);
+			valorDomini.setDomainName(null);
+			valorDomini.setValue(null); //$NON-NLS-1$
 			// targetVO.setValorDomini(valorDomini); // No se muestra
 		}
 
@@ -683,70 +688,70 @@ public class RoleAccountEntityDaoImpl
 		targetEntity.setRole(rol);
 
 		DomainValue valorDomini = sourceVO.getDomainValue();
-		if (valorDomini == null) {
-			valorDomini = new DomainValue();
-			valorDomini.setExternalCodeDomain(null);
-			valorDomini.setDomainName(TipusDomini.SENSE_DOMINI);
-			valorDomini.setValue(TipusDomini.SENSE_DOMINI);
-		}
 		String nomDomini = rol.getDomainType();
-		if (nomDomini.compareTo(TipusDomini.GRUPS) == 0
-				|| nomDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0
-				|| nomDomini.compareTo(TipusDomini.APLICACIONS) == 0
-				|| nomDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
-			if (nomDomini.compareTo(TipusDomini.GRUPS) == 0
-					|| nomDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-				String codiGrup = valorDomini.getValue();
-				GroupEntity grup = null;
-				if (codiGrup != null && codiGrup.trim().compareTo("") != 0) { //$NON-NLS-1$
-					grup = getGroupEntityDao().findByName(codiGrup);
-					if (grup != null) {
-						if (nomDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
-							String codiUsuari = sourceVO.getUserCode();
-							if (codiUsuari != null) {
-								if (!grupPertanyAUsuari(codiGrup, codiUsuari)) {
-									throw new SeyconException(
-											String.format(
-													Messages.getString("RolsUsuarisEntityDaoImpl.9"), codiGrup, codiUsuari)); //$NON-NLS-1$
-								}
-							} else {
+		if ( TipusDomini.GROUPS.equals(nomDomini) ||
+				TipusDomini.MEMBERSHIPS.equals(nomDomini) ||
+				TipusDomini.GRUPS.equals(nomDomini) ||
+				TipusDomini.GRUPS_USUARI.equals(nomDomini)) {
+			String codiGrup = valorDomini == null ? null: valorDomini.getValue();
+			GroupEntity grup = null;
+			if (codiGrup != null && ! codiGrup.trim().isEmpty()) { //$NON-NLS-1$
+				grup = getGroupEntityDao().findByName(codiGrup);
+				if (grup != null) {
+					if (TipusDomini.GRUPS_USUARI.equals(nomDomini) ||
+						TipusDomini.MEMBERSHIPS.equals(nomDomini)) {
+						String codiUsuari = sourceVO.getUserCode();
+						if (codiUsuari != null) {
+							if (!grupPertanyAUsuari(codiGrup, codiUsuari)) {
 								throw new SeyconException(
-										Messages.getString("RolsUsuarisEntityDaoImpl.10")); //$NON-NLS-1$
+										String.format(
+												Messages.getString("RolsUsuarisEntityDaoImpl.9"), codiGrup, codiUsuari)); //$NON-NLS-1$
 							}
+							targetEntity.setGroup(grup);
+							targetEntity.setDomainValue(null);
+							targetEntity.setDomainType(TipusDomini.MEMBERSHIPS);
+							targetEntity.setInformationSystem(null);
+						} else {
+							throw new SeyconException(
+									Messages.getString("RolsUsuarisEntityDaoImpl.10")); //$NON-NLS-1$
 						}
 					} else {
-						throw new SeyconException(
-								String.format(
-										Messages.getString("RolsUsuarisEntityDaoImpl.11"), codiGrup)); //$NON-NLS-1$
+						targetEntity.setGroup(grup);
+						targetEntity.setDomainValue(null);
+						targetEntity.setDomainType(TipusDomini.GROUPS);
+						targetEntity.setInformationSystem(null);
 					}
 				} else {
 					throw new SeyconException(
-							Messages.getString("RolsUsuarisEntityDaoImpl.12")); //$NON-NLS-1$
-
-				}
-				targetEntity.setGroup(grup);
-				targetEntity.setDomainValue(null);
-				targetEntity.setDomainType(nomDomini);
-				targetEntity.setInformationSystem(null);
-			} else if (nomDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
-				String valor = valorDomini.getValue();
-				InformationSystemEntity aplicacioEntity = getInformationSystemEntityDao()
-						.findByCode(valor);
-				if (aplicacioEntity == null) {
-					throw new SeyconException(
 							String.format(
-									Messages.getString("RolsUsuarisEntityDaoImpl.13"), valor)); //"Aplicació amb codi '" + valor + "' no trobada."); //$NON-NLS-1$
+									Messages.getString("RolsUsuarisEntityDaoImpl.11"), codiGrup)); //$NON-NLS-1$
 				}
-				targetEntity.setInformationSystem(aplicacioEntity);
-				targetEntity.setGroup(null);
-				targetEntity.setDomainValue(null);
-				targetEntity.setDomainType(TipusDomini.APLICACIONS);
-			} else if (nomDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
-				targetEntity.setInformationSystem(null);
-				targetEntity.setGroup(null);
-				targetEntity.setDomainValue(null);
-				targetEntity.setDomainType(TipusDomini.SENSE_DOMINI);
+			} else {
+				throw new SeyconException(
+						Messages.getString("RolsUsuarisEntityDaoImpl.12")); //$NON-NLS-1$
+
 			}
+		} else if (TipusDomini.APPLICATIONS.equals(nomDomini) ||
+				TipusDomini.APLICACIONS.equals(nomDomini)) {
+			String valor = valorDomini.getValue();
+			InformationSystemEntity aplicacioEntity = getInformationSystemEntityDao()
+					.findByCode(valor);
+			if (aplicacioEntity == null) {
+				throw new SeyconException(
+						String.format(
+								Messages.getString("RolsUsuarisEntityDaoImpl.13"), valor)); //"Aplicació amb codi '" + valor + "' no trobada."); //$NON-NLS-1$
+			}
+			targetEntity.setInformationSystem(aplicacioEntity);
+			targetEntity.setGroup(null);
+			targetEntity.setDomainValue(null);
+			targetEntity.setDomainType(TipusDomini.APPLICATIONS);
+		} else if (TipusDomini.SENSE_DOMINI.equals(nomDomini) ||
+				nomDomini == null || 
+				rol.getApplicationDomain() == null) {
+			targetEntity.setInformationSystem(null);
+			targetEntity.setGroup(null);
+			targetEntity.setDomainValue(null);
+			targetEntity.setDomainType(null);
 		} else if (rol.getApplicationDomain() != null) {
 			/*
 			 * Domini d'aplicació
@@ -758,7 +763,7 @@ public class RoleAccountEntityDaoImpl
 					nomDomini, codiAplicacio, valor);
 			if (valorDominiAplicacioEntity != null) {
 				targetEntity.setDomainValue(valorDominiAplicacioEntity);
-				targetEntity.setDomainType(TipusDomini.DOMINI_APLICACIO);
+				targetEntity.setDomainType(TipusDomini.CUSTOM);
 				targetEntity.setGroup(null);
 				targetEntity.setInformationSystem(null);
 			} else {
@@ -957,39 +962,35 @@ public class RoleAccountEntityDaoImpl
 		if (tipusDomini == null || tipusDomini.trim().compareTo("") == 0) { //$NON-NLS-1$
 			tipusDomini = TipusDomini.SENSE_DOMINI;
 		}
-		if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0) {
+		if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0 ||
+				TipusDomini.CUSTOM.equals(tipusDomini)) {
 			DomainValueEntity valorDominiEntity = entity.getDomainValue();
 			valorDomini = getDomainValueEntityDao().toDomainValue(
 					valorDominiEntity);
 		} else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
-				|| tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+				|| tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0 ||
+						TipusDomini.MEMBERSHIPS.equals(tipusDomini) ||
+						TipusDomini.GROUPS.equals(tipusDomini)) {
 			valorDomini = new DomainValue();
 			valorDomini.setDescription(entity.getGroup().getDescription());
-			if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+			if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0 ||
+					TipusDomini.MEMBERSHIPS.equals(tipusDomini)) {
 				valorDomini.setExternalCodeDomain(entity.getAccount()
 						.getUsers().iterator().next().getUser().getUserName());
-				valorDomini.setDomainName(TipusDomini.GRUPS_USUARI);
+				valorDomini.setDomainName(TipusDomini.MEMBERSHIPS);
 			} else {
 				valorDomini.setExternalCodeDomain(null);
-				valorDomini.setDomainName(TipusDomini.GRUPS);
+				valorDomini.setDomainName(TipusDomini.GROUPS);
 			}
 			valorDomini.setValue(entity.getGroup().getName());
-		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
+		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0 ||
+				TipusDomini.APPLICATIONS.equals(tipusDomini)) {
 			valorDomini = new DomainValue();
 			valorDomini.setExternalCodeDomain(null);
 			valorDomini.setDescription(entity.getInformationSystem()
 					.getDescription());
-			valorDomini.setDomainName(TipusDomini.APLICACIONS);
+			valorDomini.setDomainName(TipusDomini.APPLICATIONS);
 			valorDomini.setValue(entity.getInformationSystem().getName());
-		} else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
-			/*
-			 * valorDomini = new ValorDomini();
-			 * valorDomini.setCodiExternDomini(null);
-			 * valorDomini.setDescripcio(TipusDomini.Descripcio.SENSE_DOMINI);
-			 * valorDomini.setNomDomini(TipusDomini.SENSE_DOMINI);
-			 * valorDomini.setValor(""); //targetVO.setValorDomini(valorDomini);
-			 * // No se muestra
-			 */
 		}
 
 		// Asignamos el código:
@@ -1099,15 +1100,20 @@ public class RoleAccountEntityDaoImpl
 	@Override
 	public void toRoleGrant(RoleAccountEntity source, RoleGrant target) {
 		String tipus = source.getRole().getDomainType();
-		if (TipusDomini.APLICACIONS.equals(tipus)
+		if ((TipusDomini.APLICACIONS.equals(tipus) || 
+				TipusDomini.APPLICATIONS.equals(tipus))
 				&& source.getInformationSystem() != null) {
 			target.setDomainValue(source.getInformationSystem().getName());
 			target.setHasDomain(true);
-		} else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI
-				.equals(tipus)) && source.getGroup() != null) {
+		} else if ((TipusDomini.GRUPS.equals(tipus) || 
+				TipusDomini.GRUPS_USUARI.equals(tipus) ||
+				TipusDomini.GROUPS.equals(tipus) ||
+				TipusDomini.MEMBERSHIPS.equals(tipus)) && 
+				source.getGroup() != null) {
 			target.setDomainValue(source.getGroup().getName());
 			target.setHasDomain(true);
-		} else if (TipusDomini.DOMINI_APLICACIO.equals(tipus)
+		} else if ((TipusDomini.DOMINI_APLICACIO.equals(tipus) ||
+				TipusDomini.CUSTOM.equals(tipus))
 				&& source.getDomainValue() != null) {
 			target.setDomainValue(source.getDomainValue().getValue());
 			target.setHasDomain(true);

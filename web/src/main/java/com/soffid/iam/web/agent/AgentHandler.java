@@ -5,11 +5,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -17,7 +20,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.jfree.util.Log;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.zkoss.idom.Document;
+import org.zkoss.util.media.AMedia;
+import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.au.AuRequest;
+import org.zkoss.zk.au.Command;
+import org.zkoss.zk.au.ComponentCommand;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -26,6 +37,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Fileupload;
+import org.zkoss.zul.Html;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Label;
@@ -37,12 +49,19 @@ import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.AgentDescriptor;
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.api.Server;
+import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.System;
+import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.doc.exception.DocumentBeanException;
+import com.soffid.iam.service.TaskHandler;
 import com.soffid.iam.service.ejb.DispatcherService;
+import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
@@ -51,14 +70,17 @@ import com.soffid.iam.web.component.FileDump;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.SearchBox;
 
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataDatebox;
 import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
+import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Select;
 import es.caib.zkib.component.Switch;
 import es.caib.zkib.datamodel.DataModelCollection;
+import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datamodel.xml.XmlDataNode;
@@ -82,6 +104,11 @@ public class AgentHandler extends FrameHandler {
 	private Component form;
 	private Timer refreshTasksTimer;
 	private Component missatge;
+	private Window startTaskWindow;
+	private ScheduledTask currentTask;
+	private Tab workflowTab;
+	private String selectedProcess;
+	private DebugTaskResults propagateLog;
 
 	public AgentHandler() throws InternalErrorException {
 		super();
@@ -279,6 +306,9 @@ public class AgentHandler extends FrameHandler {
 		form = getFellow("form");
 		refreshTasksTimer = (Timer) getFellow("refreshTasksTimer");
 		missatge = getFellow("missatge");
+		startTaskWindow = (Window) getFellow("startTaskWindow");
+		workflowTab = (Tab) getFellow("r_workflow");
+
 		getModel().addEventListener("onCommit", 
 				(evt) -> onChangeClass());
 		
@@ -377,6 +407,8 @@ public class AgentHandler extends FrameHandler {
 					}
 				}
 			} else {
+				setVisibleWorkflows(false);
+				setVisibleAttributeMapping(false);
 				select.setDisabled(false);
 			}
 			// Task status
@@ -491,7 +523,8 @@ public class AgentHandler extends FrameHandler {
 		Select cb = (Select) getFellow("cbClassDescription");
 		String value = (String) cb.getSelectedValue();
 		es.caib.zkib.jxpath.JXPathContext ctx = getModel().getJXPathContext ();
-		((Row)getFellow("row_authoritative")).setVisible(false); 
+		Row authoritativeRow = (Row)getFellow("row_authoritative");
+		authoritativeRow.setVisible(false); 
 		boolean isReplica = false;
 		Div customAgentProperties = (Div) getFellow("customAgentProperties");
 		if (value==null || "".equals(value)) 
@@ -502,39 +535,253 @@ public class AgentHandler extends FrameHandler {
 		{
 			customAgentProperties.getChildren().clear ();
 			try {
-				Boolean auth = (Boolean) ctx.getValue("/plugin[className='"+value+"']/@authoritativeSource");
-				((Row)getFellow("row_authoritative")).setVisible( auth != null && auth.booleanValue() ); 
-			}
-			catch (Exception e) { 
-				((Row)getFellow("row_authoritative")).setVisible( false ); 
-			}
-			
-			try {
-				byte[] data = (byte[]) ctx.getValue("/plugin[className='"+value+"']/userInterface");
+				DataNode dn = (DataNode) ctx.getValue("/plugin[className='"+value+"']");
+				if (dn == null) {
+					customAgentProperties.setVisible(true);
+					setVisibleAttributeMapping (false);
+					setVisibleWorkflows(false);
+					authoritativeRow.setVisible( true ); 
+				} else {
+					AgentDescriptor ad = (AgentDescriptor) dn.getInstance();
+					
+					authoritativeRow.setVisible( ad.isAuthoritativeSource() ); 
 
-				// Clear methodDescriptor variable
-				getPage().setVariable("methodDescriptor", null);
-
-				//System.out.println("AgentDescriptor = "+data.getClass().getName());
-				java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(data);
-				Document xmlDoc = new org.zkoss.idom.input.SAXBuilder(false, false).build(in);
-				Executions.getCurrent().createComponentsDirectly(new String(data, "UTF-8"), "zul", customAgentProperties, new java.util.HashMap());
-				customAgentProperties.setVisible(true);
-				Boolean enable = (Boolean) ctx.getValue("/plugin[className='"+value+"']/@enableAttributeMapping");
-				Long agentId = (Long) XPathUtils.getValue(form, "@id");
-				setVisibleAttributeMapping (agentId != null && enable);
+					byte[] data = ad.getUserInterface();
+	
+					// Clear methodDescriptor variable
+					getPage().setVariable("methodDescriptor", null);
+	
+					//System.out.println("AgentDescriptor = "+data.getClass().getName());
+					java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(data);
+					Document xmlDoc = new org.zkoss.idom.input.SAXBuilder(false, false).build(in);
+					Executions.getCurrent().createComponentsDirectly(new String(data, "UTF-8"), "zul", customAgentProperties, new java.util.HashMap());
+					customAgentProperties.setVisible(true);
+					Long agentId = (Long) XPathUtils.getValue(form, "@id");
+					setVisibleAttributeMapping (agentId != null && ad.isEnableAttributeMapping());
+					DataModelCollection coll = dn.getListModel("pluginWorkflow");
+					if (coll == null || coll.getSize() == 0) {
+						setVisibleWorkflows(false);
+					} else {
+						setVisibleWorkflows(true);
+						fillWorkflowsTable (coll);
+					}
+				}
 			}
-			
 			catch (Exception e) {
 				Log.warn("Error generating custom properties page", e);
 				customAgentProperties.setVisible(true);
 				setVisibleAttributeMapping (false);
+				setVisibleWorkflows(false);
 			}
 			setVisibleMetadata (true);
 			
 		}
 	}
 	
+	private void fillWorkflowsTable(DataModelCollection coll) {
+		JSONArray data = new JSONArray();
+		for ( int i = 0; i < coll.getSize(); i++) {
+			DataNode node = (DataNode) coll.getDataModel(i);
+			String name = (String) node.get("name");
+			JSONObject o = new JSONObject();
+			o.put("name", name);
+			data.put(o);
+		}
+		DataTable workflows = (DataTable) getFellow("workflowsGrid");
+		workflows.setData(data);
+	}
+
+	private void setVisibleWorkflows(boolean visible) {
+		if (visible == false && workflowTab.isSelected())
+			basicTab.setSelected(true);
+		workflowTab.setVisible(visible);
+	}
+	
+	
+	public void closeWorkflowWindow(Event event) {
+		Window w = (Window) getFellow("workflowWindow");
+		w.setVisible(false);
+	}
+	
+	public void editWorkflow(Event event) throws UnsupportedEncodingException {
+		DataTable dt = (DataTable) event.getTarget();
+		int pos = dt.getSelectedIndex();
+		String className = (String) XPathUtils.getValue(getForm(), "className");
+		es.caib.zkib.jxpath.JXPathContext ctx = getModel().getJXPathContext ();
+		byte[] image = (byte[]) ctx.getValue("/plugin[className='"+className+"']/pluginWorkflow["+(pos+1)+"]/image");
+		selectedProcess = (String) ctx.getValue("/plugin[className='"+className+"']/pluginWorkflow["+(pos+1)+"]/name");
+		
+		Window workflowWindow = (Window) getFellow("workflowWindow");
+		workflowWindow.setTitle(Labels.getLabel("agents.zul.edit-workflow", new Object[] {selectedProcess}));
+		Html html = (Html) workflowWindow.getFellow("content");
+		html.setContent(new String(image,"UTF-8"));
+		
+		// Set test button
+		workflowWindow.getFellow("testRowLabel1").setVisible(true);
+		workflowWindow.getFellow("testRowTextbox1").setVisible(true);						
+		workflowWindow.getFellow("testButton").setVisible(true);
+		((Textbox)workflowWindow.getFellow("testRowTextbox1")).setValue("");						
+		((Textbox)workflowWindow.getFellow("testRowTextbox2")).setValue("");						
+		if (selectedProcess.equals( "UpdateAccount"))
+		{
+			((Label)workflowWindow.getFellow("testRowLabel1")).setValue("Account: ");
+			workflowWindow.getFellow("testRowLabel2").setVisible(false);						
+			workflowWindow.getFellow("testRowTextbox2").setVisible(false);						
+		}
+		else if (selectedProcess.equals("UpdateUser"))
+		{
+			((Label)workflowWindow.getFellow("testRowLabel1")).setValue("User: ");
+		}
+		else
+		{
+			workflowWindow.getFellow("testRowLabel1").setVisible(false);
+			workflowWindow.getFellow("testRowTextbox1").setVisible(false);						
+			workflowWindow.getFellow("testRowLabel2").setVisible(false);
+			workflowWindow.getFellow("testRowTextbox2").setVisible(false);						
+			workflowWindow.getFellow("testButton").setVisible(false);
+		}
+
+		workflowWindow.doHighlighted();
+	}
+
+	public void doWorkflowTest(Event ev) throws InternalErrorException, NamingException, CreateException, CommitException {
+		getModel().commit();
+		DebugTaskResults r = null;
+		if (selectedProcess.equals( "UpdateAccount"))
+		{
+			Window workflowWindow = (Window) getFellow("workflowWindow");
+			String user = ((Textbox) workflowWindow.getFellow("testRowTextbox1")).getValue();						
+			String system = (String) XPathUtils.getValue(getForm(), "name");
+
+			boolean warnDelete = false;
+			Account acc = EJBLocator.getAccountService().findAccount(user, system);
+			if (acc != null)
+			{
+				if (acc.getStatus() == AccountStatus.REMOVED)
+					warnDelete = true;
+			} else {
+				warnDelete = true;
+			}
+			if (warnDelete)
+				Missatgebox.confirmaYES_NO(Labels.getLabel("agents.zul.warnDelete"), 
+						(event) -> {
+							if (event.getName().equals("onYes")) {
+								testPropagateObject(system, SoffidObjectType.OBJECT_ACCOUNT, user, null);
+							}
+						});
+			else
+				testPropagateObject(system, SoffidObjectType.OBJECT_ACCOUNT, user, null);
+		} else if (selectedProcess.equals( "UpdateUser"))
+		{
+			Window workflowWindow = (Window) getFellow("workflowWindow");
+			String user = ((Textbox) workflowWindow.getFellow("testRowTextbox1")).getValue();						
+			String system = (String) XPathUtils.getValue(getForm(), "name");
+
+			boolean warnDelete = false;
+			Account acc = EJBLocator.getAccountService().findAccount(user, system);
+			if (acc != null)
+			{
+				if (acc.getStatus() == AccountStatus.REMOVED)
+					warnDelete = true;
+			} else {
+				for (UserAccount uacc: EJBLocator.getAccountService().findUsersAccounts(user, system)) {
+					if (uacc.getStatus() == AccountStatus.REMOVED)
+						warnDelete = true;
+				}
+			}
+			if (warnDelete)
+				Missatgebox.confirmaYES_NO(Labels.getLabel("agents.zul.warnDelete"), 
+						(event) -> {
+							if (event.getName().equals("onYes")) {
+								testPropagateObject (system, SoffidObjectType.OBJECT_USER, user, null);
+							}
+						});
+			else
+				testPropagateObject (system, SoffidObjectType.OBJECT_USER, user, null);
+		}
+		
+	}
+	
+	public void downloadPropagateLog (Event event) {
+		AMedia media = new AMedia("Synchronize-log.txt", null, "text/plain", propagateLog.getLog());
+		Filedownload.save(media);
+	}
+	
+	private void testPropagateObject(String system, SoffidObjectType objectType, String object1, String object2) throws InternalErrorException, NamingException, CreateException {
+		propagateLog = EJBLocator.getDispatcherService().testPropagateObject(system, objectType, object1, object2);
+		Window testWindow = (Window) getFellow("testWindow");
+		((Label)testWindow.getFellow("status")).setValue(propagateLog.getStatus());
+		DataTree2 tree = (DataTree2)testWindow.getFellow("log");
+		JSONObject logRoot = new JSONObject();
+		JSONArray children = new JSONArray();
+		logRoot.put("children", children);
+		if (propagateLog.getLog() != null) {
+			int i = 0;
+			int j;
+			Stack<JSONObject> stack = new Stack<JSONObject>();
+			stack.push(logRoot);
+			do {
+				JSONObject log = new JSONObject();
+				children.put(log);
+				log.put("type", "log");
+				
+				j = propagateLog.getLog().indexOf("\n", i);
+				String s;
+				if (j < 0) {
+					s = propagateLog.getLog().substring(i);
+				} else {
+					s =  propagateLog.getLog().substring(i, j);
+					i = j+1;
+				}
+				int n = s.indexOf(" INFO BEGIN ");
+				if (n > 0 && !hasChars(s.substring(0, n))) {
+					children = new JSONArray();
+					log.put("header", s.substring(n+12));
+					log.put("children", children);
+					log.put("type", "header");
+					stack.push(log);
+				} else {
+					if (s.endsWith(" INFO END") &&
+							!hasChars(s.substring(0, s.length()-3)) && 
+							stack.size() > 1 ){
+						JSONObject parent = stack.pop();
+						children = parent.getJSONArray("children");
+					} else {
+						log.put("log", s);
+						if (s.contains(" WARN "))
+						{
+							log.put("style", "style='color: red'");
+							for (JSONObject parents: stack)
+								parents.put("collapsed", false);
+						}
+						else
+							log.put("style", "");
+					}
+				}
+			} while (j >= 0);
+			
+		}
+		tree.setData(logRoot);
+		testWindow.doHighlighted();
+	}
+
+	private boolean hasChars(String substring) {
+		int letters = 0;
+		for (int i = 0; i < substring.length(); i++)
+			if (Character.isAlphabetic(substring.charAt(i)))
+			{
+				if (substring.charAt(i) == 'P' ||
+						substring.charAt(i) == 'A' ||
+						substring.charAt(i) == 'M')
+				{
+					letters ++;
+					if (letters > 2)
+						return true;
+				}
+			}
+		return false;
+	}
+
 	public void hideTestRow (Event event)
 	{
 		Component c = event.getTarget();
@@ -616,28 +863,58 @@ public class AgentHandler extends FrameHandler {
 	}
 
 	public void startReconcile() throws Exception {
-		startTask("reconcileTask");
+		prepareStartTask("reconcileTask");
 	}
 	
 	public void startImportTask() throws Exception {
-		startTask("importTask");
+		prepareStartTask("importTask");
 	}
 
 	public void startImpactTask() throws Exception {
-		startTask("impactTask");
+		prepareStartTask("impactTask");
 	}
 
-	void startTask(String type) throws Exception
+	void prepareStartTask(String type) throws Exception
 	{
-		com.soffid.iam.api.ScheduledTask task = (ScheduledTask) XPathUtils.getValue(form, "tasks[1]/"+type);
+		currentTask = (ScheduledTask) XPathUtils.getValue(form, "tasks[1]/"+type);
+		if (currentTask == null)
+		{
+			throw new InternalErrorException("Cannot find the scheduled task");
+		}
+		startTaskWindow.setTitle(currentTask.getName());
 		
-		com.soffid.iam.EJBLocator.getScheduledTaskService().startNow (task);
+		Select select = (Select) startTaskWindow.getFellow("servers");
+		JSONArray options = new JSONArray();
+		for (Server server: EJBLocator.getDispatcherService().findTenantServers()) {
+			if (server.getType() == ServerType.MASTERSERVER) {
+				JSONObject o = new JSONObject();
+				o.put("key", server.getName());
+				o.put("label", server.getName());
+				options.put(o);
+			}
+		}
+		select.setOptions(options.toString());
+		select.setSelectedValue(currentTask.getServerName());
+		startTaskWindow.doHighlighted();
+	}
+	
+	public void startTask(Event event) throws Exception {
+		Select select = (Select) startTaskWindow.getFellow("servers");
+		currentTask.setServerName((String) select.getSelectedValue());
+		
+		com.soffid.iam.EJBLocator.getScheduledTaskService().update(currentTask);
+		com.soffid.iam.EJBLocator.getScheduledTaskService().startNow (currentTask);
 		
 		Thread.currentThread().sleep(2000);
 		
 		((DataNodeCollection) XPathUtils.getValue(form, "tasks")).refresh();
 
 		onChangeForm(null);
+		startTaskWindow.setVisible(false);
+	}
+	
+	public void cancelStartTask(Event event) {
+		startTaskWindow.setVisible(false);
 	}
 
 	public void onChangeTab(Event evt) {
@@ -765,5 +1042,38 @@ public class AgentHandler extends FrameHandler {
 		}
 	}
 
+	public Command getCommand(String cmdId) {
+		if ("diagramAction".equals(cmdId))
+			return _digramActionCommand ;
+		return super.getCommand(cmdId);
+	}
+	
+	private Command _digramActionCommand = new ComponentCommand("diagramAction", 0) {
+		protected void process(AuRequest request) {
+			Component handler = request.getComponent();
+			Component wf = handler.getFellow("workflowWindow");
+			if ("editMappings".equals(request.getData()[0]))
+			{
+				String type = (String) new JSONTokener(request.getData()[1]).nextValue();
+				String direction = (String) new JSONTokener(request.getData()[2]).nextValue();
+				AttributeMappingWindow.open(wf, type, direction);
+			}
+			if ("editTriggers".equals(request.getData()[0]))
+			{
+				String type = (String) new JSONTokener(request.getData()[1]).nextValue();
+				String event = (String) new JSONTokener(request.getData()[2]).nextValue();
+				OutputTriggerWindow.open(wf, type, event);
+			}
+			if ("editProperties".equals(request.getData()[0]))
+			{
+				String type = (String) new JSONTokener(request.getData()[1]).nextValue();
+				JSONArray array = new JSONArray(request.getData()[2]);
+				String[] props = new String[array.length()];
+				for (int i = 0; i < array.length(); i++)
+					props[i] = array.getString(i); 
+				PropertiesWindow.open(wf, type,  props);
+			}
+		}
+	};
 
 }

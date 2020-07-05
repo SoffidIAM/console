@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="objectAttributes"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<window xmlns:h="http://www.w3.org/1999/xhtml"
+		closable="true" id="window" position="center, center"
+		use="com.soffid.iam.web.popup.ObjectAttributesHandler"
+		sizable="true" title="${c:l('agents.zul.ObjectDetails')}"
+		style="min-width:40em"
+		onStart="ref:window.onStart"
+		visible="false"  onClose="ref:window.onWindowClose">
+	<div id="form">
+		<grid fixedLayout="false" sclass = "noBorderGrid fonsBlanc">
+			<columns>
+				<column width="200px"/>
+				<column />
+			</columns>
+			<rows>
+				<row>
+					<label
+						value="${c:l('user_renameaccount.Nom')}"/>
+					<label id="detall_nom" 
+						multiline="true" />
+
+				</row>
+			</rows>
+		</grid>
+		
+		<div style="max-height: 600px; overflow-y: auto">
+			<grid id ="attributeGrid" sclass="noBorderGrid fonsBlanc"  
+				fixedLayout="false">
+				<columns>
+					<column width="200px"/>
+					<column />
+				</columns>
+				<rows/>
+			</grid>
+		</div>
+
+		<div style="margin-top:16px; margin-bottom: 8px;">
+			<label value="${c:l('job.status') }: "/>
+			<label id="status"/>
+		</div>
+		
+		<textbox id="log" multiline="true" rows="3" readonly="true" width="100%"/>
+	</div>
+	<separator spacing="5px" />
+	<hbox style="margin-left:auto; margin-right:auto">
+		<button label="${c:l('user_renameaccount.Accept')}"
+			onClick="ref:window.cleanWindow()" />
+		<button label="${c:l('user_renameaccount.Load')}"
+			id="loadButton"
+			onClick="ref:window.doLoad()" />
+	</hbox>
+</window>

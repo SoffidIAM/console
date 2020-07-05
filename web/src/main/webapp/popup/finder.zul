@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="finderWizard"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<window id="window" closable="true" position="top, center"
+	use="com.soffid.iam.web.popup.FinderHandler"
+	sizable="true" 
+	style="min-width: 40em;"
+	visible="false"
+	onDisplay="ref:window.start"
+	onClose="ref:window.close" 
+	width="75%">
+
+	<datamodel id="model" rootNode="root" src="descriptorFinder.xml"/>
+	
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:window.changeColumns"/>
+		</menu2>
+		<searchbox auto="true" id="searchBox" 
+				jsonObject="${execution.attributes.className }"
+				defaultAttributes="-auto-"
+				enforcedFilter="${execution.attributes.filter}"
+				preference="${execution.attributes.preferenceName}-query"
+				dataPath="/window/model:/objects" 
+				style="width: calc(100% - 32px)"
+				variableName="query" variableNameText="textQuery">
+		</searchbox>
+	</div>
+	
+	<datatable id="listbox" autocommit="true" 
+		use="com.soffid.iam.web.popup.FinderDatatable"
+		preference="${execution.attributes.preferenceName}-data"
+		dataPath="/window/model:/objects" maxheight="70vh" sortColumn="0"
+		onSelect="ref:window.onSelect" enablefilter="false">
+	</datatable>
+
+	<div align="right">
+		<button id="finishButton" label="${c:l('editorJS.zul.Accepta')}" onClick="ref:window.accept"/>
+		<button label="${c:l('editorJS.zul.Cancel·la')}" onClick="ref:window.close"/>
+	</div>								
+</window>

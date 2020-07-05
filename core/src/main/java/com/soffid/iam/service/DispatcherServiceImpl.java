@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.json.JSONException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -48,6 +49,7 @@ import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.SystemGroup;
 import com.soffid.iam.api.Task;
@@ -95,6 +97,9 @@ import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ServerType;
@@ -1828,7 +1833,7 @@ public class DispatcherServiceImpl extends
 			{
 				p = new Configuration();
 				p.setCode("server.nextRemoteServer");
-				p.setValue("" + System.currentTimeMillis());
+				p.setValue("" + java.lang.System.currentTimeMillis());
 				p = getConfigurationService().create(p);
 			}
 			String assignedName = "s"+p.getValue()+"."+gateway.getName();
@@ -1898,4 +1903,46 @@ public class DispatcherServiceImpl extends
 		h.search(text, jsonQuery, (Collection) result); 
 	}
 
+	@Override
+	protected AsyncList<System> handleFindSystemByTextAndFilterAsync(String text, String query) throws Exception {
+		final AsyncList<System> result = new AsyncList<System>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindSystemByTextAndJsonQuery(text, query, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected List<System> handleFindSystemByTextAndFilter(String text, String query, Integer first,
+			Integer pageSize) throws Exception {
+		final LinkedList<System> result = new LinkedList<System>();
+		doFindSystemByTextAndJsonQuery(text, query, first, pageSize, result);
+		return result;
+	}
+	
+	private void doFindSystemByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<System> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+		final SystemEntityDao dao = getSystemEntityDao();
+		ScimHelper h = new ScimHelper(System.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toSystem((SystemEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
 }

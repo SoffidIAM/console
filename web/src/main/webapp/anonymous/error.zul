@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
-	<style src="~./styles/estil.css" />
-	<style src="/css/localSEU.css" />
-	<style src="/css/devices.css"/>
 		<zscript><![CDATA[
  			closeSession = false;
 		     req = execution.getNativeRequest();

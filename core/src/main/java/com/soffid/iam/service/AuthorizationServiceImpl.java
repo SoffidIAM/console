@@ -301,7 +301,10 @@ public class AuthorizationServiceImpl extends
 	                   		
 	                    	if (compatibleDomain)
 	                        {
-	                            autoRolVO.getUserRoleValueDomain().add(new DomainValue(rg.getDomainValue(), tipusDomini));
+	                    		DomainValue dv = new DomainValue();
+	                    		dv.setValue(rg.getDomainValue());
+	                    		dv.setDomainName(tipusDomini);
+	                            autoRolVO.getUserRoleValueDomain().add(dv);
 	                            if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
 	                                Collection grupsAutoritzacio = null;
 	                                if (Security.AUTO_SCOPE_PARES.equals(autoRolVO.getBusinessGroupScope())) {
@@ -320,12 +323,17 @@ public class AuthorizationServiceImpl extends
 	                                }
 	                                for (Iterator git = grupsAutoritzacio.iterator(); git.hasNext(); ) {
 	                                    String codiGrup = (String) git.next();
-	                                    autoRolVO.getUserRoleValueDomain().add(new DomainValue(codiGrup, tipusDomini));
+	    	                    		DomainValue dv2 = new DomainValue();
+	    	                    		dv.setValue(codiGrup);
+	    	                    		dv.setDomainName(tipusDomini);
+	                                    autoRolVO.getUserRoleValueDomain().add(dv2);
 	                                }
 	                            }
 	                        } else {
-	                            DomainValue estrelleta = new DomainValue("*", TIPUS_DOMINI_ESTRELLETA);
-	                            autoRolVO.getUserRoleValueDomain().add(estrelleta);
+	                    		DomainValue dv = new DomainValue();
+	                    		dv.setValue("*");
+	                    		dv.setDomainName(TIPUS_DOMINI_ESTRELLETA);
+	                            autoRolVO.getUserRoleValueDomain().add(dv);
 	                        }
 	                    }
 	                    autoritzacionsUsuari.add(autoRolVO);

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="group"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.group.GroupHandler" id="frame">
+	<datamodel id="model" rootNode="groups" src="descriptorGroup.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUser &amp;&amp; canUpdateUser &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Group" 
+				defaultAttributes="name, description"
+				preference="com.soffid.iam.api.Group"
+				dataPath="/model:/group" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatree2 id="listbox"
+				width="100%" dataPath="/model:/"
+				header="${c:l('com.soffid.iam.api.Group.name') }" 
+				openLevels="1"
+				enablefilter="false"
+				maxheight="70vh"
+				onAddPolicy="ref:frame.addGroup"
+				onSelect="ref:frame.showDetails">
+				<attribute name="finders">
+				<![CDATA[
+				- path: /group
+				  icon: /img/group.svg
+				  value: name
+				  leaf: false
+				  ]]>
+  				</attribute>
+				<attribute name="columns"><![CDATA[
+				- name: ${c:l('com.soffid.iam.api.Group.description')}
+				  template: ${"$" }{description}
+				]]>
+				</attribute>
+  			</datatree2>
+
+			<div width="100%" style="text-align: right"  if="${canCreateUser}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatree2="listbox"/>
+				
+				<menu2>
+					<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+				
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('agents.zul.Grups')}" if="${soffid:isUserInRole('user:group:delete') }" id="tabgroup"/>
+					<tab label="${c:l('usuaris.zul.Accounts')}" id="tabaccount" />
+					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
+				</tabs>
+				<tabpanels>
+					<tabpanel id="datatab">
+						<div id="dades"> 
+							<form id="form" onChangeXPath="ref:frame.onChangeForm"
+								dataPath="/listbox:/." width="100%">
+								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+									objectType="com.soffid.iam.api.User"
+									dataPath="/." id="userAttributes"/>
+							</form>
+						</div>
+						<div style="text-align: right; width: 100%">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</tabpanel>
+					<tabpanel if="${soffid:isUserInRole('user:group:delete') }" fulfill="tabgroup.onSelect" >
+						<div>
+							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+						</div>
+					</tabpanel>
+					<tabpanel id="account" fulfill="tabaccount.onSelect" >
+						<div>
+							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+						</div>
+					</tabpanel>
+					<tabpanel id="roles" fulfill="tabroles.onSelect" >
+						<div>
+							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+						</div>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</div>
+	</div>
+</frame>

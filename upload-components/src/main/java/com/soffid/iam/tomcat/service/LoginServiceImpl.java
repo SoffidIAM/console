@@ -23,7 +23,6 @@ import org.apache.tomee.catalina.TomcatSecurityService;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
-import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.RoleGrant;
@@ -174,28 +173,6 @@ public class LoginServiceImpl implements LoginService {
 						return null;
 					}
 					
-					if (userName != null)
-					{
-						ConsoleProperties p = ServiceLocator.instance().getUserService().findConsoleUserByUserName(userName);
-						if (p == null)
-						{
-							p = new ConsoleProperties();
-							p.setUserName(userName);
-							p.setLanguage(MessageFactory.getLocale().getLanguage());
-							p.setLastLoginDate(Calendar.getInstance());
-							p.setLastIP( Security.getClientIp() );
-							p.setPreferences(new HashMap<String, String>());
-							p.getPreferences().put("-","-");
-							p.setVersion("LATEST");
-							ServiceLocator.instance().getUserService().create(p);
-						} else {
-							p.setLastLoginDate(Calendar.getInstance());
-							p.setLastIP( Security.getClientIp() );
-							ServiceLocator.instance().getUserService().update(p);
-						}
-						
-					}
-			
 					if ( ! tenants.contains(tenant.getName()))
 					{
 			            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().

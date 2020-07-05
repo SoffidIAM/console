@@ -5,11 +5,18 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
+
+import es.caib.seycon.ng.comu.TipusUsuari;
 
 @Service (translatedName="UserDomainService", 
 	translatedPackage="com.soffid.iam.service")
@@ -21,7 +28,8 @@ import com.soffid.mda.annotation.Service;
 	es.caib.seycon.ng.model.TipusUsuariEntity.class,
 	es.caib.seycon.ng.model.PoliticaContrasenyaEntity.class,
 	es.caib.seycon.ng.model.ParaulesProhibidesEntity.class,
-	es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity.class})
+	es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity.class,
+	AsyncRunnerService.class})
 public abstract class DominiUsuariService {
 
 	@Operation ( grantees={roles.usersDomain_create.class},
@@ -70,6 +78,27 @@ public abstract class DominiUsuariService {
 		es.caib.seycon.ng.comu.TipusUsuari tipusUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	@Operation(grantees = { roles.userType_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<TipusUsuari> findUserTypeByTextAndFilter(
+			@Nullable String text, 
+			@Nullable String query, 
+			@Nullable Integer first,
+			@Nullable Integer max)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.userType_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<TipusUsuari> findUserTypeByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation ( grantees={roles.usersDomain_query.class},
 			translated="findAllUserDomain")
 	@Transactional(rollbackFor={java.lang.Exception.class})

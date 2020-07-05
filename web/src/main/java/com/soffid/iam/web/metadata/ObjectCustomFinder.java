@@ -29,11 +29,6 @@ public class ObjectCustomFinder implements FinderHandler {
 	public Collection find(DataContext ctx) throws Exception {
 		List<CustomObjectType> list = new LinkedList<CustomObjectType>(
 				EJBLocator.getAdditionalDataService().findCustomObjectTypeByJsonQuery(""));
-		for (MetadataScope m: builtinObjects )
-		{
-			CustomObjectType cob = new CustomObjectType(m.getValue(), "Builtin "+m.getValue()+" object", m, true);
-			list.add(cob);
-		}
 		Collections.sort(list, new Comparator<CustomObjectType>() {
 			public int compare(CustomObjectType o1, CustomObjectType o2) {
 				return o1.getName().compareTo(o2.getName());

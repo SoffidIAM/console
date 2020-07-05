@@ -44,7 +44,12 @@ public class ScimHelper {
 		String q2 = generateQuickSearchQuery(textFilter);
 		
 		if (jsonQuery != null && ! jsonQuery.trim().isEmpty())
-			q2 = "( " +q2 + " ) and "+jsonQuery;
+		{
+			if (q2 == null || q2.trim().isEmpty())
+				q2 = jsonQuery;
+			else
+				q2 = "( " +q2 + " ) and "+jsonQuery;
+		}
 		
 		AbstractExpression expr = ExpressionParser.parse(q2);
 		HQLQuery hql = expr.generateHSQLString( objectClass );

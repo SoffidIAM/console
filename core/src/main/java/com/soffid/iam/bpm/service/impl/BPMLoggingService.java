@@ -2,6 +2,8 @@ package com.soffid.iam.bpm.service.impl;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.List;
 
 import org.jbpm.context.log.VariableLog;
 import org.jbpm.graph.log.ActionLog;
@@ -14,12 +16,16 @@ public class BPMLoggingService extends DbLoggingService {
 	public void log(ProcessLog processLog) {
 		if (processLog instanceof ActionLog)
 		{
+			// Ignore
 			ActionLog l = (ActionLog) processLog;
 			if (l.getException() != null && l.getException().length() > 2000)
 			{
 				l.setException(new ExceptionWrapper(l.getException()));
 			}
-			super.log(l);
+			removeChildren(processLog);
+			if (processLog.getChildren() != null &&
+				!processLog.getChildren().isEmpty())
+				super.log(l);
 		}
 		else if ( processLog instanceof VariableLog) {
 			// Ignore variable assignment logs
@@ -27,8 +33,30 @@ public class BPMLoggingService extends DbLoggingService {
 		else if ( processLog instanceof SwimlaneLog) {
 			// Ignore swimlane assignment logs
 		}
-		else
+		else {
+			removeChildren(processLog);
 			super.log(processLog);
+		}
+	}
+
+	private void removeChildren(ProcessLog processLog) {
+		List children = processLog.getChildren();
+				
+		if (children != null) {
+			for(Iterator it = children.iterator(); it.hasNext();) {
+				ProcessLog log = (ProcessLog) it.next();
+				if (log instanceof VariableLog ||
+						log instanceof SwimlaneLog ) {
+					it.remove();
+				} else {
+					removeChildren(log);
+					if (processLog instanceof ActionLog)
+						if (processLog.getChildren() == null ||
+								processLog.getChildren().isEmpty())
+						it.remove();
+				}
+			}
+		}
 	}
 
 }

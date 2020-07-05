@@ -77,6 +77,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -121,7 +122,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return new Boolean(false);
     }
 
-    protected Collection<Session> handleFindSessionsByHostName(String nomMaquina) {
+    protected List<Session> handleFindSessionsByHostName(String nomMaquina) {
         Collection<SessionEntity> sessions = getSessionEntityDao().findSessionsByCriteria(null, null, nomMaquina, null);
         if (sessions != null) {
             return getSessionEntityDao().toSessionList(sessions);
@@ -168,7 +169,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     /**
      * @see es.caib.seycon.ng.servei.XarxaService#getXarxes()
      */
-    protected java.util.Collection<Network> handleGetNetworks() throws java.lang.Exception {
+    protected List<Network> handleGetNetworks() throws java.lang.Exception {
         return getNetworkEntityDao().toNetworkList(getNetworkEntityDao().loadAll());
     }
 
@@ -260,7 +261,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     /**
      * @see es.caib.seycon.ng.servei.XarxaService#getACL(es.caib.seycon.ng.comu.Xarxa)
      */
-    protected java.util.Collection<NetworkAuthorization> handleGetACL(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
+    protected List<NetworkAuthorization> handleGetACL(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
         if (AutoritzacionsUsuari.canCreateAllNetworks() || AutoritzacionsUsuari.canQueryAllNetworks() || AutoritzacionsUsuari.canUpdateAllNetworks() || AutoritzacionsUsuari.canSupportAllNetworks_VNC() || hasNetworkAuthorizations(Security.getCurrentUser(), xarxa.getCode(), new int[]{ADMINISTRACIO, CONSULTA, SUPORT})) {
             NetworkEntity entity = getNetworkEntityDao().networkToEntity(xarxa);
             Collection<NetworkAuthorizationEntity> acls = getNetworkAuthorizationEntityDao().findByNetwork(entity);
@@ -394,15 +395,15 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
     }
 
-    protected Collection<Host> handleGetMailServers() throws java.lang.Exception {
+    protected List<Host> handleGetMailServers() throws java.lang.Exception {
         return findHostByFilter(null, null, null, null, "S", null, null, null, null, null, null, new Boolean(false));
     }
 
-    protected Collection<Host> handleGetProfileServers() throws java.lang.Exception {
+    protected List<Host> handleGetProfileServers() throws java.lang.Exception {
         return findHostByFilter(null, null, null, null, null, "S", null, null, null, null, null, new Boolean(false));
     }
 
-    protected Collection<Host> handleGetHomeServers() throws java.lang.Exception {
+    protected List<Host> handleGetHomeServers() throws java.lang.Exception {
         return findHostByFilter(null, null, null, null, null, "S", null, null, null, null, null, new Boolean(false));
     }
 
@@ -420,15 +421,15 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     // Emprat des de xarxesllista.zul (parametres.zul) i xarxes.zul
-    protected java.util.Collection<Network> handleFindNetworkByFilter(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
-		Collection xarxes = localFindXarxaByFiltre(codi, adreca, descripcio,
+    protected List<Network> handleFindNetworkByFilter(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
+		List<NetworkEntity> xarxes = localFindXarxaByFiltre(codi, adreca, descripcio,
 			mascara, normalitzada, dhcp, maquina);
     	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
     	
     	if (xarxes != null && xarxes.size() != 0)
     	{
-    		Collection<Network> xarxesTrobades = filtraXarxes(getNetworkEntityDao().toNetworkList(xarxes));
-            Collection<Network> res = filtraPerMaquina(xarxesTrobades, maquina);
+    		List<Network> xarxesTrobades = filtraXarxes(getNetworkEntityDao().toNetworkList(xarxes));
+            List<Network> res = filtraPerMaquina(xarxesTrobades, maquina);
             
 			// Check maximum number of results
 			if (res.size() > limitResults)
@@ -447,7 +448,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     /**
      * @see es.caib.seycon.ng.servei.XarxaService#getMaquines()
      */
-    protected java.util.Collection<Host> handleGetHosts() throws java.lang.Exception {
+    protected List<Host> handleGetHosts() throws java.lang.Exception {
         return getHostEntityDao().toHostList(getHostEntityDao().loadAll());
     }
 
@@ -455,12 +456,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      * @see es.caib.seycon.ng.servei.XarxaService#findMaquinaByXarxa(es.caib.seycon.ng.comu.Xarxa)
      */
     @SuppressWarnings(value = "rawtypes")
-    protected java.util.Collection<Host> handleFindHostsByNetwork(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
-        Collection<Host> maquines = findHostByFilter(null, null, null, null, null, null, null, null, null, xarxa.getCode(), null, new Boolean(false));
+    protected List<Host> handleFindHostsByNetwork(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
+        List<Host> maquines = findHostByFilter(null, null, null, null, null, null, null, null, null, xarxa.getCode(), null, new Boolean(false));
         return maquines;
     }
 
-    protected Collection<Host> handleFindHostByFilterUnrestricted(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean filtra) throws Exception {
+    protected List<Host> handleFindHostByFilterUnrestricted(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean filtra) throws Exception {
         if (nom != null && (nom.trim().compareTo("") == 0 || nom.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
             nom = null;
         }
@@ -580,7 +581,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     // Emprar des de maquines.zul per cercar
-    protected Collection<Host> handleFindHostByFilter(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean filtra) throws Exception {
+    protected List<Host> handleFindHostByFilter(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean filtra) throws Exception {
 		Collection<Host> maquines = null;
     	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
     	
@@ -648,7 +649,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         throw new SeyconException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
     }
 
-    protected Collection<Identity> handleFindIdentitiesByName(String codi) throws Exception {
+    protected List<Identity> handleFindIdentitiesByName(String codi) throws Exception {
         // Si pot crear qualsevol xarxa o actualitzar qualsevol xarxa
         if (AutoritzacionsUsuari.canQueryAllNetworks()
                 || AutoritzacionsUsuari.canCreateAllNetworks()
@@ -657,7 +658,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 codi = null;
             }
 
-            Collection<Identity> identitats = new LinkedList<Identity>();
+            List<Identity> identitats = new LinkedList<Identity>();
 
             Collection<User> usuaris = this.getUserService().findUserByCriteria(codi, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, new Boolean(false));
             if (usuaris != null && usuaris.size() > 0) {
@@ -736,7 +737,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      * @see es.caib.seycon.ng.servei.XarxaServiceBase#
      * handleFindNetworkAuthorizationsByCodiGrup(java.lang.String)
      */
-    protected Collection<NetworkAuthorization> handleFindNetworkAuthorizationsByGroupName(String codiGrup) throws Exception {
+    protected List<NetworkAuthorization> handleFindNetworkAuthorizationsByGroupName(String codiGrup) throws Exception {
         Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByGroupName(codiGrup);
         if (xarxesAC != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxesAC);
@@ -745,7 +746,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     // Antic mètode getNetworkAuthorizations(codiUsuari)
-    protected Collection<NetworkAuthorization> handleFindALLNetworkAuthorizationsByUserName(String codiUsuari) throws Exception {
+    protected List<NetworkAuthorization> handleFindALLNetworkAuthorizationsByUserName(String codiUsuari) throws Exception {
         Collection<NetworkAuthorization> xarxes = new LinkedList();
         // acces list per codi d'usuari
         UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
@@ -785,7 +786,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 xarxes.add(newtworkAuthorization);
             }
         }
-        return xarxes;
+        return (List<NetworkAuthorization>) xarxes;
     }
 
     /*
@@ -794,7 +795,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      * @see es.caib.seycon.ng.servei.XarxaServiceBase#
      * handleFindNetworkAuthorizationsByCodiUsuari(java.lang.String)
      */
-    protected Collection<NetworkAuthorization> handleFindNetworkAuthorizationsByUserName(String codiUsuari) throws Exception {
+    protected List<NetworkAuthorization> handleFindNetworkAuthorizationsByUserName(String codiUsuari) throws Exception {
         Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByUserName(codiUsuari);
         if (xarxesAC != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxesAC);
@@ -808,7 +809,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      * @see es.caib.seycon.ng.servei.XarxaServiceBase#
      * handleFindNetworkAuthorizationsByNomRol(java.lang.String)
      */
-    protected Collection<NetworkAuthorization> handleFindNetworkAuthorizationsByRoleName(String nomRol) throws Exception {
+    protected List<NetworkAuthorization> handleFindNetworkAuthorizationsByRoleName(String nomRol) throws Exception {
         Collection<NetworkAuthorizationEntity> xarxesAC = getNetworkAuthorizationEntityDao().findByRoleName(nomRol);
         if (xarxesAC != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxesAC);
@@ -880,7 +881,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return resultats;
     }
 
-    protected Collection<HostAlias> handleFindAliasByHostName(String nomMaquina) throws Exception {
+    protected List<HostAlias> handleFindAliasByHostName(String nomMaquina) throws Exception {
         Collection<HostAliasEntity> alias = getHostAliasEntityDao().findAliasByHostName(nomMaquina);
         return getHostAliasEntityDao().toHostAliasList(alias);
     }
@@ -927,7 +928,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return getHostAdminEntityDao().toAdministratorAuthorizationToAccessHost(entity);
     }
 
-    protected Collection<AdministratorAuthorizationToAccessHost> handleFindAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate(String nomHost, String dataPeticio, String dataCaducitat) throws Exception {
+    protected List<AdministratorAuthorizationToAccessHost> handleFindAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate(String nomHost, String dataPeticio, String dataCaducitat) throws Exception {
 
         Date d_dataPeticio = DateUtils.nullDate;
         Date d_dataCaducitat = DateUtils.nullDate;
@@ -1011,16 +1012,16 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return false;
     }
 
-    private Collection<Network> filtraXarxes(Collection<Network> xarxes) throws Exception {
+    private List<Network> filtraXarxes(List<Network> xarxes) throws Exception {
         if (AutoritzacionsUsuari.canQueryAllNetworks()
                 || AutoritzacionsUsuari.canSupportAllNetworks_VNC()) {
             return xarxes;
         }
         String codiUsuari = Security.getCurrentUser();
-        Collection xarxesPermeses = new LinkedList();
+        List xarxesPermeses = new LinkedList();
         if (codiUsuari != null)
         {
-	        Collection codiXarxes = getCodiXarxesAmbAcces(codiUsuari);
+	        List codiXarxes = getCodiXarxesAmbAcces(codiUsuari);
 	        Iterator iterator = xarxes.iterator();
 	        while (iterator.hasNext()) {
 	            Network xarxa = (Network) iterator.next();
@@ -1102,16 +1103,16 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return false;
     }
 
-    private Collection<String> getCodiXarxesAmbAcces(String codiUsuari) throws Exception {
+    private List<String> getCodiXarxesAmbAcces(String codiUsuari) throws Exception {
         Collection<NetworkAuthorization> networkAuthorizations = findALLNetworkAuthorizationsByUserName(codiUsuari);
-        Collection<String> codiXarxes = new LinkedHashSet(); // perquè no es
+        Set<String> codiXarxes = new LinkedHashSet(); // perquè no es
                                                              // repetisquen
         Iterator iterator = networkAuthorizations.iterator();
         while (iterator.hasNext()) {
             NetworkAuthorization netAuth = (NetworkAuthorization) iterator.next();
             codiXarxes.add(netAuth.getNetworkCode());
         }
-        return codiXarxes;
+        return new LinkedList<String>(codiXarxes);
     }
 
     /**
@@ -1280,7 +1281,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return true;
     }
 
-    private Collection<NetworkEntity> localFindXarxaByFiltre(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
+    private List<NetworkEntity> localFindXarxaByFiltre(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
         XarxaSearchCriteria c = new XarxaSearchCriteria();
         c.setCodi(codi);
         c.setAdreca(adreca);
@@ -1289,12 +1290,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         c.setMascara(mascara);
         c.setDhcp(dhcp);
         
-        Collection<NetworkEntity> xarxesTrobades = getNetworkEntityDao().findByFilter(c);
+        List<NetworkEntity> xarxesTrobades = getNetworkEntityDao().findByFilter(c);
         
         return xarxesTrobades;
     }
 
-    private Collection<Network> filtraPerMaquina(Collection<Network> xarxesTrobades, String maquina) {
+    private List<Network> filtraPerMaquina(List<Network> xarxesTrobades, String maquina) {
         if (maquina != null && maquina.compareTo("") != 0 && maquina.compareTo("%") != 0 //$NON-NLS-1$ //$NON-NLS-2$
                 && xarxesTrobades.size() > 0) {
             String xarxes = ""; //$NON-NLS-1$
@@ -1317,7 +1318,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return xarxesTrobades;
     }
 
-    private Collection<NetworkAuthorization> findNetworkAuthorizationsByRol(Role rol) {
+    private List<NetworkAuthorization> findNetworkAuthorizationsByRol(Role rol) {
         String query = "select xarxaAC from " //$NON-NLS-1$
                 + "com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC where " //$NON-NLS-1$
                 + "xarxaAC.role.name = :nom and " //$NON-NLS-1$
@@ -1347,7 +1348,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         getAuditEntityDao().create(auditoriaEntity);
     }
 
-    protected Collection<Host> handleFindOfficeHostUserByFilter(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean restringeixCerca, String servidorImpressores) throws Exception {
+    protected List<Host> handleFindOfficeHostUserByFilter(String nom, String sistemaOperatiu, String adreca, String dhcp, String correu, String ofimatica, String alias, String mac, String descripcio, String xarxa, String codiUsuari, Boolean restringeixCerca, String servidorImpressores) throws Exception {
     	int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
 
         if (nom != null && (nom.trim().compareTo("") == 0 || nom.trim().compareTo("%") == 0)) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -1831,7 +1832,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 			@Override
 			public void run() {
 				try {
-					handleFindHostByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+					doFindHostByTextAndJsonQuery(text, jsonQuery, null, null, result);
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				
@@ -1849,7 +1850,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 			@Override
 			public void run() {
 				try {
-					handleFindNetworkByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+					doFindNetworkByTextAndJsonQuery(text, jsonQuery, null, null, result);
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				
@@ -1859,7 +1860,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		return result;
 	}
 
-	private void handleFindNetworkByTextAndJsonQueryAsync(String text, String jsonQuery,
+	private void doFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
 			Collection<Network> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final NetworkEntityDao dao = getNetworkEntityDao();
@@ -1876,16 +1877,17 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		h.search(text, jsonQuery, (Collection) result); 
 	}
 	
-	private void handleFindHostByTextAndJsonQueryAsync(String text, String jsonQuery,
+	private void doFindHostByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
 			Collection<Host> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final HostEntityDao dao = getHostEntityDao();
-		ScimHelper h = new ScimHelper(Network.class);
+		ScimHelper h = new ScimHelper(Host.class);
 		h.setPrimaryAttributes(new String[] { "name", "description", "ip"});
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
 		h.setGenerator((entity) -> {
 			return dao.toHost((HostEntity) entity);
 		}); 
@@ -1893,18 +1895,18 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	}
 
 	@Override
-	protected Collection<Host> handleFindHostByTextAndJsonQuery(String text, String jsonQuery,
+	protected List<Host> handleFindHostByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<Host> result = new LinkedList<Host>();
-		handleFindHostByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
+		doFindHostByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 		return result;
 	}
 
 	@Override
-	protected Collection<Network> handleFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
+	protected List<Network> handleFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<Network> result = new LinkedList<Network>();
-		handleFindNetworkByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
+		doFindNetworkByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 		return result;
 	}
 

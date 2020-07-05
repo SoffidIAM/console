@@ -58,6 +58,7 @@ import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.attribute.AttributePersister;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -450,7 +451,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		GroupEntity gp = usuariGrup.getUser().getPrimaryGroup();
 		String codiGrupPrimari = gp != null && gp.getName() != null ? gp.getName() : ""; //$NON-NLS-1$
 		for (RoleAccountEntity rolUsuari : getRoleAccountEntityDao().findByUserName(usuariGrup.getUser().getUserName())) {
-            if (rolUsuari.getDomainType().compareTo(TipusDomini.GRUPS_USUARI) == 0) {
+            if (TipusDomini.GRUPS_USUARI.equals(rolUsuari.getDomainType()) ||
+            		TipusDomini.MEMBERSHIPS.equals(rolUsuari.getDomainType())) {
                 String codiGrupValorDomini = rolUsuari.getGroup().getName();
                 String codiGrupGrupUsuari = usuariGrup.getGroup().getName();
                 if (codiGrupValorDomini.compareTo(codiGrupGrupUsuari) == 0) {
@@ -747,7 +749,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	@Override
-	protected Collection<Group> handleFindGroupByTextAndFilter(String text, String filter) throws Exception {
+	protected List<Group> handleFindGroupByTextAndFilter(String text, String filter) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
@@ -757,7 +759,17 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	@Override
-	protected Collection<Group> handleFindGroupByText(String text) throws Exception {
+	protected List<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindGroupByJsonQuery(q, first, pageSize);
+	}
+
+	@Override
+	protected List<Group> handleFindGroupByText(String text) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		return handleFindGroupByJsonQuery(q);
 	}
@@ -769,8 +781,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 
-
 	protected void findByJsonQuery ( AsyncList<Group> result, String query) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
+	{
+		findByJsonQuery(result, query, null, null);
+	}
+
+	protected void findByJsonQuery ( AsyncList<Group> result, String query, Integer first, Integer pageSize) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
 	{
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
@@ -793,8 +809,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFetchSize(first);
+		cfg.setMaximumResultSize(pageSize);
 		// Execute HQL and generate result
-		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray)) {
+		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray, cfg )) {
 			if (result.isCancelled())
 				return;
 			Group g = getGroupEntityDao().toGroup(ge);
@@ -805,11 +824,23 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			}
 		}
 	}
+
 	@Override
-	protected Collection<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
+	protected List<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
 		findByJsonQuery(result, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
+	@Override
+	protected List<Group> handleFindGroupByJsonQuery(String query, Integer first, Integer pageSize) throws InternalErrorException, Exception {
+		AsyncList<Group> result = new AsyncList<Group>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();

@@ -22,32 +22,34 @@ import es.caib.seycon.ng.model.GrupEntity;
 	 translatedPackage="com.soffid.iam.api")
 public class Grup {
 
-	@Attribute(translated = "name" )
+	@Attribute(translated = "name", searchCriteria = true )
 	public java.lang.String codi;
 
+	@Attribute(translated = "description", searchCriteria = true )
+	public java.lang.String descripcio;
+	
 	@Nullable
+	@Attribute(hidden=true)
 	public java.lang.String quota;
 
 	@Nullable
 	@Attribute(translated = "driveLetter" )
 	public java.lang.String unitatOfimatica;
 
-	@Attribute(translated = "description" )
-	public java.lang.String descripcio;
-
 	@Nullable
-	@Attribute(translated = "parentGroup" )
+	@Attribute(translated = "parentGroup", type="GROUP" )
 	public java.lang.String codiPare;
 
 	@Nullable
-	@Attribute(translated = "type" )
+	@Attribute(translated = "type", type="GROUP_TYPE" )
 	public java.lang.String tipus;
 
 	@Nullable
-	@Attribute(translated = "driveServerName" )
+	@Attribute(translated = "driveServerName", type="HOST" )
 	public java.lang.String nomServidorOfimatic;
 
 	@Nullable
+	@Attribute(hidden = true)
 	public java.lang.Long id;
 
 	@Nullable
@@ -56,17 +58,17 @@ public class Grup {
 	public java.lang.Boolean obsolet;
 
 	@Nullable
-	@Attribute(translated = "organizational" )
+	@Attribute(translated = "organizational", hidden = true )
 	@JsonAttribute(hibernateAttribute="-")
 	public java.lang.Boolean organitzatiu;
 
 	@Nullable
-	@Attribute(translated = "section" )
+	@Attribute(translated = "section", hidden=true )
 	public java.lang.String seccioPressupostaria;
 
 	@Description ("Group custom attributes")
 	@Nullable
 	@JsonAttribute(hibernateJoin="attributes")
-	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()", hidden = true)
 	public Map<String,Object> attributes; 
 }

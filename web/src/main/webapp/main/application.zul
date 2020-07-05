@@ -6,7 +6,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
  use="com.soffid.iam.web.main.MainWindow" >
 	<div sclass="topline">		
 		<menu2 image="/img/gear.svg" sclass="col_der">
-			<label value="${c:l('zkiblaf.lblUsuario')} ${nom } " sclass="welcome"/>
+			<label value="${nom } - ${usuari } " sclass="welcome"/>
 			<menu2item image="/img/power.svg" label="${c:l('zkiblaf.tancarSessio')}" id="logoutButton"/>
 			<menu2item image="/img/profile.svg" onClick='es.caib.zkib.zkiblaf.Application.setPage("perfil/perfil.zul")'   label="${c:l('perfil.Titol') }" />
 		</menu2>
@@ -24,7 +24,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		</div>
 
 		<div sclass="col_cen">
-			<textbox class="searchBox" placeholder="${c:l('adminPersonalConfigs.zul.Cercar') }" onChanging="ref:searchBox.onChanging(event)"/>
+			<textbox id="searchTextbox" class="searchBox" placeholder="${c:l('adminPersonalConfigs.zul.Cercar') }" onChanging="ref:searchBox.onChanging(event)"/>
 			<label class="maintitle" id="title" visible="false"/>
 		</div>
 	</div>

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
@@ -19,6 +21,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.DominiCorreu;
 import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
@@ -379,4 +382,39 @@ public abstract class LlistesDeCorreuService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<DominiCorreu> findMailDomainsByJsonQuery(@Nullable String query, 
+			@Nullable Integer first,
+			@Nullable Integer max)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.DominiCorreu> findMailDomainsByJsonQueryAsync(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<DominiCorreu> findMailDomainsByTextAndFilter(
+			@Nullable String text, 
+			@Nullable String query, 
+			@Nullable Integer first,
+			@Nullable Integer max)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<DominiCorreu> findMailDomainsByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

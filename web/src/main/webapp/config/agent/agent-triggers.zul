@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+<?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window xmlns:h="http://www.w3.org/1999/xhtml"
+	use="com.soffid.iam.web.agent.OutputTriggerWindow"
+	position="center,center"
+	mode="highlighted"
+	closable="true"
+	mold="soffid"
+	width="80%"
+	height="80vh"
+	title="Output triggers"
+	id="agentTriggersWindow">
+
+	<form2 id="form" dataPath="/listbox:/." style="height:400px; height: calc(80vh - 120px)">
+		<grid sclass="grayhover grid" dataPath="/listbox:/objectMapping" id="objectsGrid" 
+		width="100%" fixedLayout="false" mold="table"
+			onNewRow="ref:objectsGrid.onNewObjectMapping"  use="com.soffid.iam.web.agent.AttributeMappingHandler">
+			<columns>
+				<column label="System objects" valign="top">
+				</column>
+				<column label="" width="40px"  valign="top" align="center">
+					<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+						onClick="ref:objectsGrid.addObject" />
+				</column>
+			</columns>
+			<datarow>
+				<window width="100%" >
+					<div>
+						<textbox onChange="" bind="@systemObject" width ="15%" />
+						<label value="based on" width="10%"></label>
+						<select bind="."
+							use="com.soffid.iam.web.agent.CustomObjectTypeSelect" disabled="true"/>
+					</div>
+																										
+					<div 
+						style="width: 90%; float: right; display:block; "
+						visible="true">	
+						<grid sclass="grid compactGrid" 
+							dataPath="objectMappingTrigger" 
+							fixedLayout="false" 
+							mold="table" 
+							onNewRow="ref:objectsGrid.onNewTrigger"
+							id="triggersGrid" 
+							style="width: 100%;">
+							<columns>
+								<column label="Trigger" width="10em" valign="top">
+								</column>
+								<column label="Script" >
+								</column>
+								<column label="" width="40px"/>
+								<column label="" width="40px">
+									<imageclic  align="right" src="/img/add.svg" onClick="ref:objectsGrid.createTrigger">
+									</imageclic>
+								</column>
+							</columns>
+							<datarow>
+								<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" style="vertical-align: top;" disabled="true">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>
+								</listbox>
+								<textbox bind="@script" width ="100%" onOK="" onChange="" 
+									sclass="noborder-textbox" 
+									multiline="true" height="32px"
+									onFocus="ref:objectsGrid.focusTextarea">
+								</textbox>
+								<imageclic src="/img/pencil.svg" onClick="ref:objectsGrid.editTrigger">
+								</imageclic>
+								<imageclic align="right" src="/img/remove.svg" onClick="ref:objectsGrid.removeObject">
+								</imageclic>
+							</datarow>
+						</grid>
+					</div>
+					<div style="height: 20px;" />
+				</window>
+				<imageclic align="center" src="/img/remove.svg" onClick="ref:objectsGrid.removeObject" if="${canUpdateAgent }">
+				</imageclic>
+			</datarow>
+		</grid>
+	</form2>
+</window>

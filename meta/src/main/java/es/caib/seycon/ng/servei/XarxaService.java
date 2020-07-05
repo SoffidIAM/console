@@ -43,7 +43,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.host_all_query.class},
 			translated="getNetworks")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Xarxa> getXarxes()
+	public java.util.List<es.caib.seycon.ng.comu.Xarxa> getXarxes()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -72,7 +72,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.network_all_query.class,roles.Tothom.class},
 			translated="getACL")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> getACL(
+	public java.util.List<es.caib.seycon.ng.comu.NetworkAuthorization> getACL(
 		es.caib.seycon.ng.comu.Xarxa xarxa)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -121,7 +121,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findHostByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinaByFiltre(
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> findMaquinaByFiltre(
 		@Nullable java.lang.String nom, 
 		@Nullable java.lang.String sistemaOperatiu, 
 		@Nullable java.lang.String adreca, 
@@ -141,7 +141,7 @@ public abstract class XarxaService {
 			roles.host_all_query.class,roles.Tothom.class},
 			translated="getHosts")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getMaquines()
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> getMaquines()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -149,7 +149,7 @@ public abstract class XarxaService {
 			roles.network_all_query.class,roles.Tothom.class},
 			translated="findHostsByNetwork")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinesByXarxa(
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> findMaquinesByXarxa(
 		es.caib.seycon.ng.comu.Xarxa xarxa)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -158,7 +158,7 @@ public abstract class XarxaService {
 			roles.host_all_query.class,roles.Tothom.class},
 			translated="getMailServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getServidorsCorreu()
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> getServidorsCorreu()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -166,7 +166,7 @@ public abstract class XarxaService {
 			roles.network_all_query.class,roles.Tothom.class},
 			translated="getProfileServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getServidorsPerfil()
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> getServidorsPerfil()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -174,7 +174,7 @@ public abstract class XarxaService {
 			roles.network_all_query.class,roles.Tothom.class},
 			translated="getHomeServers")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getServidorsHome()
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> getServidorsHome()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
@@ -182,7 +182,7 @@ public abstract class XarxaService {
 			roles.parameter_update.class,roles.Tothom.class},
 			translated="findNetworkByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Xarxa> findXarxaByFiltre(
+	public java.util.List<es.caib.seycon.ng.comu.Xarxa> findXarxaByFiltre(
 		@Nullable java.lang.String codi, 
 		@Nullable java.lang.String adreca, 
 		@Nullable java.lang.String descripcio, 
@@ -223,7 +223,7 @@ public abstract class XarxaService {
 			roles.host_all_query.class},
 			translated="findIdentitiesByName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Identitat> findIdentitatsByCodi(
+	public java.util.List<es.caib.seycon.ng.comu.Identitat> findIdentitatsByCodi(
 		java.lang.String codi)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -251,7 +251,7 @@ public abstract class XarxaService {
 			roles.host_all_query.class},
 			translated="findNetworkAuthorizationsByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByCodiUsuari(
+	public java.util.List<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByCodiUsuari(
 		java.lang.String codiUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -260,7 +260,7 @@ public abstract class XarxaService {
 			roles.network_all_query.class},
 			translated="findNetworkAuthorizationsByRoleName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByNomRol(
+	public java.util.List<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByNomRol(
 		java.lang.String nomRol)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -269,7 +269,7 @@ public abstract class XarxaService {
 			roles.host_all_query.class},
 			translated="findNetworkAuthorizationsByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByCodiGrup(
+	public java.util.List<es.caib.seycon.ng.comu.NetworkAuthorization> findNetworkAuthorizationsByCodiGrup(
 		java.lang.String codiGrup)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -361,7 +361,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findSessionsByHostName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Sessio> findSessionsByNomMaquina(
+	public java.util.List<es.caib.seycon.ng.comu.Sessio> findSessionsByNomMaquina(
 		java.lang.String codiMaquina)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -377,7 +377,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.host_all_query.class,roles.Tothom.class},
 			translated="findAliasByHostName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.AliasMaquina> findAliasByNomMaquina(
+	public java.util.List<es.caib.seycon.ng.comu.AliasMaquina> findAliasByNomMaquina(
 		java.lang.String nomMaquina)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -412,7 +412,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.Tothom.class},
 			translated="findHostByFilterUnrestricted")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinaByFiltreSenseRestriccions(
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> findMaquinaByFiltreSenseRestriccions(
 		@Nullable java.lang.String nom, 
 		@Nullable java.lang.String sistemaOperatiu, 
 		@Nullable java.lang.String adreca, 
@@ -439,7 +439,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.Tothom.class},
 			translated="findAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador> findAutoritzacionsAccesMaquinaComAdministradorByHostAndDataPeticio(
+	public java.util.List<es.caib.seycon.ng.comu.AutoritzacioAccesHostComAdministrador> findAutoritzacionsAccesMaquinaComAdministradorByHostAndDataPeticio(
 		java.lang.String nomHost, 
 		@Nullable java.lang.String dataPeticio, 
 		@Nullable java.lang.String dataCaducitat)
@@ -460,7 +460,7 @@ public abstract class XarxaService {
 			roles.Tothom.class},
 			translated="findOfficeHostUserByFilter")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> findMaquinaOfirmaticaUsuariByFiltre(
+	public java.util.List<es.caib.seycon.ng.comu.Maquina> findMaquinaOfirmaticaUsuariByFiltre(
 		@Nullable java.lang.String nom, 
 		@Nullable java.lang.String sistemaOperatiu, 
 		@Nullable java.lang.String adreca, 
@@ -496,7 +496,7 @@ public abstract class XarxaService {
 	@Operation ( grantees={roles.Tothom.class},
 			translated="findALLNetworkAuthorizationsByUserName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public java.util.Collection<es.caib.seycon.ng.comu.NetworkAuthorization> findALLNetworkAuthorizationsByCodiUsuari(
+	public java.util.List<es.caib.seycon.ng.comu.NetworkAuthorization> findALLNetworkAuthorizationsByCodiUsuari(
 		java.lang.String codiUsuari)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -584,7 +584,7 @@ public abstract class XarxaService {
 	public Xarxa findNetworkByIpAddress(String ipAdress) {return null;}
 
 	@Operation(grantees = { roles.host_all_query.class })
-	public java.util.Collection<Maquina> findHostByTextAndJsonQuery(
+	public java.util.List<Maquina> findHostByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {
@@ -600,7 +600,7 @@ public abstract class XarxaService {
 
 
 	@Operation(grantees = { roles.network_all_query.class })
-	public java.util.Collection<Xarxa> findNetworkByTextAndJsonQuery(
+	public java.util.List<Xarxa> findNetworkByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {

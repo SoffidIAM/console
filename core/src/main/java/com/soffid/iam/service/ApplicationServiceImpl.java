@@ -1862,21 +1862,28 @@ public class ApplicationServiceImpl extends
 
 	
 	private boolean matchesGranteeDomainValue(RolAccountDetail currentRol, RoleDependencyEntity ra) {
-		if (ra.getContainer().getDomainType() == null || ra.getContainer().getDomainType().equals(TipusDomini.SENSE_DOMINI))
+		if (ra.getContainer().getDomainType() == null || 
+				ra.getContainer().getDomainType() == null ||
+				ra.getContainer().getDomainType().equals(TipusDomini.SENSE_DOMINI))
 			return true;
-		else if (ra.getContainer().getDomainType().equals(TipusDomini.APLICACIONS))
+		else if (ra.getContainer().getDomainType().equals(TipusDomini.APLICACIONS) ||
+				ra.getContainer().getDomainType().equals(TipusDomini.APPLICATIONS))
 		{
 			return ra.getGranteeApplicationDomain() == null ||
 					currentRol.qualifierAplicacio == null ||
 					ra.getGranteeApplicationDomain().getId().equals (currentRol.qualifierAplicacio.getId()); 
 		}
-		else if (ra.getContainer().getDomainType().equals(TipusDomini.GRUPS) || ra.getContainer().getDomainType().equals(TipusDomini.GRUPS_USUARI))
+		else if (ra.getContainer().getDomainType().equals(TipusDomini.GRUPS) || 
+				ra.getContainer().getDomainType().equals(TipusDomini.GRUPS_USUARI) ||
+				ra.getContainer().getDomainType().equals(TipusDomini.GROUPS) ||
+				ra.getContainer().getDomainType().equals(TipusDomini.MEMBERSHIPS))
 		{
 			return ra.getGranteeGroupDomain() == null ||
 					currentRol.qualifierGroup == null || 
 					ra.getGranteeGroupDomain().getId().equals (currentRol.qualifierGroup.getId()); 
 		}
-		else if (ra.getContainer().getDomainType().equals(TipusDomini.DOMINI_APLICACIO))
+		else if (ra.getContainer().getDomainType().equals(TipusDomini.DOMINI_APLICACIO)||
+				ra.getContainer().getDomainType().equals(TipusDomini.CUSTOM))
 		{
 			return ra.getGranteeDomainValue() == null ||
 					currentRol.qualifier == null || 
@@ -2628,7 +2635,7 @@ public class ApplicationServiceImpl extends
 	}
 
 
-	private void findRoleByJsonQuery(AsyncList<Role> result, String query) throws Exception {
+	private void findRoleByJsonQuery(AsyncList<Role> result, String query, Integer first, Integer pageSize) throws Exception {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
@@ -2647,8 +2654,11 @@ public class ApplicationServiceImpl extends
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFirstResult(first);
+		cfg.setMaximumResultSize(pageSize);
 		for (RoleEntity ue : getRoleEntityDao().query(hql.toString(),
-				paramArray)) {
+				paramArray, cfg )) {
 			if (result.isCancelled())
 				return;
 			Role u = getRoleEntityDao().toRole(ue);
@@ -2662,7 +2672,7 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected Collection<Role> handleFindRoleByText(String text) throws Exception {
+	protected List<Role> handleFindRoleByText(String text) throws Exception {
 		LinkedList<Role> result = new LinkedList<Role>();
 		TimeOutUtils tou = new TimeOutUtils();
 		for (RoleEntity ue : getRoleEntityDao().findByText(text)) {
@@ -2703,10 +2713,21 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
+	protected List<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
 		AsyncList<Application> result = new AsyncList<Application>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findApplicationByJsonQuery(result, query);
+		findApplicationByJsonQuery(result, query, null, null);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
+	@Override
+	protected List<Application> handleFindApplicationByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
+		AsyncList<Application> result = new AsyncList<Application>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findApplicationByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
@@ -2719,7 +2740,7 @@ public class ApplicationServiceImpl extends
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findApplicationByJsonQuery(result, query);
+					findApplicationByJsonQuery(result, query, null, null);
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -2728,7 +2749,7 @@ public class ApplicationServiceImpl extends
 		return result;
 	}
 
-	protected void findApplicationByJsonQuery ( AsyncList<Application> result, String query) 
+	protected void findApplicationByJsonQuery ( AsyncList<Application> result, String query, Integer first, Integer pageSize) 
 			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
 	{
 
@@ -2753,8 +2774,11 @@ public class ApplicationServiceImpl extends
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFirstResult(first);
+		cfg.setMaximumResultSize(pageSize);
 		// Execute HQL and generate result
-		for (InformationSystemEntity applicationEntity : getInformationSystemEntityDao().query(hql.toString(), paramArray)) {
+		for (InformationSystemEntity applicationEntity : getInformationSystemEntityDao().query(hql.toString(), paramArray, cfg )) {
 			if (result.isCancelled())
 				return;
 			Application ApplicationVO = getInformationSystemEntityDao().toApplication(applicationEntity);
@@ -2805,7 +2829,7 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected Collection<Application> handleFindApplicationByTextAndFilter(String text, String filter) throws Exception {
+	protected List<Application> handleFindApplicationByTextAndFilter(String text, String filter) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
@@ -2815,7 +2839,17 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected Collection<Application> handleFindApplicationByText(String text) throws Exception {
+	protected List<Application> handleFindApplicationByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindApplicationByJsonQuery(q, first, pageSize);
+	}
+
+	@Override
+	protected List<Application> handleFindApplicationByText(String text) throws Exception {
 		return handleFindApplicationByTextAndFilter(text, null);
 	}
 
@@ -3025,20 +3059,25 @@ public class ApplicationServiceImpl extends
 	}
 
 	private void generateGranteeDomainValue(RoleGrant source, RoleDependencyEntity target) {
-		if (source.getOwnerRolDomainValue() != null && target.getContainer() != null)
+		if (source.getOwnerRolDomainValue() != null && target.getContainer() != null && target.getContainer().getDomainType() != null)
 		{
-			if (target.getContainer().getDomainType().equals(DomainType.APLICACIONS))
+			String domainType = target.getContainer().getDomainType();
+			if (domainType.equals(DomainType.APLICACIONS) ||
+					domainType.equals(DomainType.APPLICATIONS))
 			{
 				target.setGranteeApplicationDomain(
 						getInformationSystemEntityDao().findByCode(source.getOwnerRolDomainValue()));
 			}
-			if (target.getContainer().getDomainType().equals(DomainType.GRUPS) ||
-					target.getContained().getDomainType().equals(DomainType.GRUPS_USUARI))
+			if (domainType.equals(DomainType.GRUPS) ||
+					target.getContained().getDomainType().equals(DomainType.GRUPS_USUARI) ||
+					domainType.equals(DomainType.GROUPS) ||
+					domainType.equals(DomainType.MEMBERSHIPS))
 			{
 				target.setGranteeGroupDomain(
 						getGroupEntityDao().findByName(source.getOwnerRolDomainValue()));
 			}
-			if (target.getContainer().getDomainType().equals(DomainType.DOMINI_APLICACIO))
+			if (domainType.equals(DomainType.DOMINI_APLICACIO) ||
+					domainType.equals(DomainType.CUSTOM))
 			{
 				target.setGranteeDomainValue(
 						getDomainValueEntityDao().findByApplicationDomainValue(
@@ -3050,20 +3089,25 @@ public class ApplicationServiceImpl extends
 	}
 
 	private void generateGrantedDomainValue(RoleGrant source, RoleDependencyEntity target) {
-		if (source.getDomainValue() != null && target.getContained() != null)
+		String domainType = target.getContained().getDomainType();
+		if (source.getDomainValue() != null && target.getContained() != null && domainType != null)
 		{
-			if (target.getContained().getDomainType().equals(DomainType.APLICACIONS))
+			if (domainType.equals(DomainType.APLICACIONS) ||
+					domainType.equals(DomainType.APPLICATIONS))
 			{
 				target.setDomainApplication(
 						getInformationSystemEntityDao().findByCode(source.getDomainValue()));
 			}
-			if (target.getContained().getDomainType().equals(DomainType.GRUPS) ||
-					target.getContained().getDomainType().equals(DomainType.GRUPS_USUARI))
+			if (domainType.equals(DomainType.GRUPS) ||
+					domainType.equals(DomainType.GRUPS_USUARI) ||
+					domainType.equals(DomainType.GROUPS) ||
+					domainType.equals(DomainType.MEMBERSHIPS))
 			{
 				target.setDomainGroup(
 						getGroupEntityDao().findByName(source.getDomainValue()));
 			}
-			if (target.getContained().getDomainType().equals(DomainType.DOMINI_APLICACIO))
+			if (domainType.equals(DomainType.DOMINI_APLICACIO) ||
+					domainType.equals(DomainType.CUSTOM))
 			{
 				target.setDomainApplicationValue(
 						getDomainValueEntityDao().findByApplicationDomainValue(
@@ -3370,14 +3414,20 @@ public class ApplicationServiceImpl extends
 			q = filter;
 		return handleFindRoleByJsonQueryAsync(q);
 	}
+
 	@Override
-	public Collection<Role> handleFindRoleByTextAndFilter(String text, String filter) throws Exception {
+	public List<Role> handleFindRoleByTextAndFilter(String text, String filter) throws Exception {
+		return handleFindRoleByTextAndFilter(text, filter, null, null);
+	}
+	
+	@Override
+	public List<Role> handleFindRoleByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
 		String q = generateRoleQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
 		else if ( filter != null && ! filter.trim().isEmpty())
 			q = filter;
-		return handleFindRoleByJsonQuery(q);
+		return handleFindRoleByJsonQuery(q, first, pageSize);
 	}
 
 	@Override
@@ -3386,7 +3436,7 @@ public class ApplicationServiceImpl extends
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findRoleByJsonQuery(result, query);
+					findRoleByJsonQuery(result, query, null, null);
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -3396,10 +3446,21 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected Collection<Role> handleFindRoleByJsonQuery(String query) throws Exception {
+	protected List<Role> handleFindRoleByJsonQuery(String query) throws Exception {
 		AsyncList<Role> result = new AsyncList<Role>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findRoleByJsonQuery(result, query);
+		findRoleByJsonQuery(result, query, null, null);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
+	@Override
+	protected List<Role> handleFindRoleByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
+		AsyncList<Role> result = new AsyncList<Role>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findRoleByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
@@ -3446,11 +3507,14 @@ class RolAccountDetail
 						previous.qualifier.getDomain().getName()))
 			qualifier = previous.qualifier;
 		if (qualifierAplicacio == null && previous != null &&
-				granted.getDomainType().equals(TipusDomini.APLICACIONS))
+				(TipusDomini.APLICACIONS.equals(granted.getDomainType()) ||
+						TipusDomini.APPLICATIONS.equals(granted.getDomainType()) ))
 			qualifierAplicacio = previous.qualifierAplicacio;
 		if (qualifierGroup == null && previous != null &&
-				( granted.getDomainType().equals(TipusDomini.GRUPS) ||
-						granted.getDomainType().equals(TipusDomini.GRUPS_USUARI)))
+				( TipusDomini.GROUPS.equals(granted.getDomainType())  ||
+						TipusDomini.GRUPS.equals(granted.getDomainType())  ||
+						TipusDomini.GRUPS_USUARI.equals(granted.getDomainType()) ||
+						TipusDomini.MEMBERSHIPS.equals(granted.getDomainType()) ))
 			qualifierGroup = previous.qualifierGroup;
 		if (previous != null && previous.granted != null)
 			granteeRol = previous.granted;

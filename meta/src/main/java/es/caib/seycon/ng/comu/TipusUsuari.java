@@ -9,6 +9,7 @@ import com.soffid.mda.annotation.*;
 
 @ValueObject ( translatedName="UserType",
 	 translatedPackage="com.soffid.iam.api")
+@JsonObject(hibernateClass = es.caib.seycon.ng.model.TipusUsuariEntity.class)
 public class TipusUsuari {
 
 	@Nullable

@@ -13,18 +13,25 @@
  */
 package com.soffid.iam.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.resource.spi.SecurityException;
 
 import com.soffid.iam.api.AgentDescriptor;
+import com.soffid.iam.api.AgentDescriptorWorkflow;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
@@ -582,5 +589,35 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
 			spe.setEnabled(plugin.isEnabled());
 			getServerPluginEntityDao().update(spe);
 		}
+	}
+
+	@Override
+	protected Collection<AgentDescriptorWorkflow> handleFindAgentDescriptorWorkflows(AgentDescriptor agent) throws Exception {
+		Collection<AgentDescriptorWorkflow> result = new LinkedList<>();
+		AgentDescriptorEntity agentEntity = getAgentDescriptorEntityDao().load(agent.getId());
+		if (agentEntity == null)
+			return null;
+		ServerPluginModuleEntity module = agentEntity.getModule();
+		byte data[] = module.getContents();
+		ByteArrayInputStream in = new ByteArrayInputStream(data);
+		ZipInputStream zin = new ZipInputStream(in);
+		ZipEntry entry;
+		while ( ( entry = zin.getNextEntry() ) != null ) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			int read;
+			for ( read = zin.read(); read >= 0; read = zin.read()) {
+				out.write(read);
+			}
+			String entryName = entry.getName();
+			if (entryName.startsWith(agentEntity.getDescription()+"/") ||
+					entryName.startsWith(agentEntity.getDescription()+"\\")) {
+				if (entryName.endsWith(".svg")) {
+					String action = entryName.substring(agentEntity.getDescription().length() + 1);
+					action = action.substring(0, action.length()-4);
+					result.add ( new AgentDescriptorWorkflow(action, out.toByteArray()) );
+				}
+			}
+		}
+		return result;
 	}
 }

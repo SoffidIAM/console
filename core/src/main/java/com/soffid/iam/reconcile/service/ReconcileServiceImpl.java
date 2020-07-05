@@ -714,7 +714,7 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
                 else 
                 	role.setInformationSystemName(recRole.getAppName());
                 role.setSystem(recRole.getDispatcher());
-                role.setDomain(new Domain(TipusDomini.SENSE_DOMINI));
+                role.setDomain(null);
                 appService.create(role);
             }
         }

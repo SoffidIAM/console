@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root"> <!--user:query o mail:query, despres es restringeixen-->
+		<finder name="user" type="usuari">
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findUserByJsonQueryAsync" if = "${query != null &amp;&amp; synchro == null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findUserByTextAsync" if = "${textQuery != null &amp;&amp; synchro == null}">
+				<parameter value="${textQuery}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findUserByJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.User">
+			</new-instance-bean>
+		</finder>
+		
+		<finder name="tipusDada" type="tipusUsuari">
+			<ejb-finder jndi="java:/module/AdditionalDataService-v2" method="findDataTypes"
+				if='${isUserInRole("usersDomain:query")}'>
+					<parameter value="${com.soffid.iam.api.MetadataScope.USER}"/>
+			</ejb-finder> 
+		</finder>
+	</datanode>
+	
+	<datanode name="politicaContrasenya">
+		<finder name="account" type ="account" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/AccountService-v2"
+				method="findUserAccountsByDomain" if="${parent.instance.name != null &amp;&amp; parent.parent.instance.userName!=null}">
+					<parameter value="${parent.parent.instance.userName}"/>
+					<parameter value="${parent.instance.name}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.UserAccount">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="dominiContrasenya">
+		<finder name="policy" type ="politicaContrasenya" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findPolicyByTypeAndPasswordDomain">
+					<parameter value="${parent.instance.userType}"/>
+					<parameter value="${instance.name}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="usuari"> 
+		<finder name="domini" type="dominiContrasenya" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/UserDomainService-v2"
+				method="findAllPasswordDomain">
+			</ejb-finder>
+		</finder>
+		<finder name="xarxesAC" type="xarxaAC"> <!-- user:networkAC:query  PENDENT-->
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findXarxesACByCodiUsuari">
+				<parameter value="${instance.userName}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.NetworkAuthorization"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="sessio" type="sessio"> <!-- user:session:query -->
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findSessionsByCodiUsuari" if="${canQueryUserSession}">
+				<parameter value="${instance.userName}" />
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Sessio"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="role" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findUserRolesByUserName" if="${canQueryUserRole}">
+				<parameter value="${instance.userName}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="rolsheredats" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findInformacioTextualJerarquiaRolsUsuariByCodiUsuari"
+				if="${canQueryUserRole}">
+				<parameter value="${instance.userName}"/>
+				<parameter value="S"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.ContenidorRol"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="group" type="grup"> <!-- user:query -->
+			<ejb-finder jndi="java:/module/GroupService-v2"
+				method="findUsersGroupByUserName" if="${canQueryUser}">
+				<parameter value="${instance.userName}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.GroupUser"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="impressora" type="impressora"> <!-- user:query -->
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findUsuariImpressoresByCodiUsuari" if="${canQueryUser}">
+				<parameter value="${instance.userName}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.UsuariImpressora"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="attributes" type="attributes" executeOnNewObjects="true" refreshAfterCommit="true" >  <!-- user:query -->
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findUserAttributes" if="${canQueryUser}">
+				<parameter value="${instance.userName}"/>
+			</ejb-finder>
+		</finder>
+		<!-- 
+		<finder name="accounts" type="account">
+			<ejb-finder jndi="java:/module/AccountService-v2" method="listUserAccounts">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
+		 -->
+		<finder name="processosUsuari" type="processosUsuari">
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findProcessInstanceWFUsuariByCodiUsuari">
+				<parameter value="${instance.userName}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.bpm.vo.ProcessInstance">
+			</new-instance-bean>
+		</finder>
+		<finder name="sharedAccount" type ="account" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/AccountService-v2"
+				method="findSharedAccountsByUser" if="${instance.userName != null}">
+					<parameter value="${instance.userName}"/>
+			</ejb-finder>
+		</finder>
+		<script-handler>
+			<insert-script>
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
+				obj.checkRequiredAttributes(self); 
+			</insert-script>
+			<update-script>
+				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
+				obj.checkRequiredAttributes(self); 
+			</update-script>
+		</script-handler>
+		<ejb-handler jndi="java:/module/UserService-v2">
+			<insert-method method="create" returnBean="true" >  <!-- user:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">    
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> <!-- user:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.firstName}" notNull="true" friendlyName="usuaris.NameValidation"/>
+			<attribute-validator expr="${instance.userName}" notNull="true" friendlyName="usuaris.CodeValidation"/>
+			<attribute-validator expr="${instance.lastName}" notNull="true" friendlyName="usuaris.SurnameValidation"/>
+			<attribute-validator expr="${instance.userType}" notNull="true" friendlyName="usuaris.UserTypeValidation"/>
+			<attribute-validator expr="${instance.primaryGroup}" notNull="true" friendlyName="usuaris.PrimaryGroupValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="tipusDada" transient="true" />
+		
+	<datanode name="attributes">
+		<ejb-handler jndi="java:/module/UserService-v2">
+			<insert-method method="updateUserAttributes"  > <!-- user:metadata:update -->
+				<parameter value="${parent.codi}" />
+				<parameter value="${instance}" />
+			</insert-method>
+			<update-method method="updateUserAttributes"> <!-- user:metadata:update -->
+				<parameter value="${parent.codi}" />
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="account">
+		<script-handler>
+			<update-script>
+				as = com.soffid.iam.EJBLocator.getAccountService();
+				as.updateAccount2(instance);
+			</update-script>
+			<delete-script>
+				as = com.soffid.iam.EJBLocator.getAccountService();
+				as.removeAccount(instance);
+			</delete-script>
+			<insert-script>
+				usuari = parent.parent.parent.instance;
+				ds = com.soffid.iam.EJBLocator.getDispatcherService();
+				dispatcher = ds.findDispatcherByName(instance.system);
+				as = com.soffid.iam.EJBLocator.getAccountService();
+				account = as.createAccount(usuari, dispatcher, instance.name);
+				instance.id = account.id;
+				instance.type = account.type;
+				instance.name = account.name;
+				as.updateAccount2(instance);
+			</insert-script>
+		</script-handler>
+	</datanode>
+
+	<datanode name="sessio" />
+	
+	<datanode name="processosUsuari">
+		<finder name="processDefinition" type="processDefinition">
+			<ejb-finder jndi="java:/module/BPMEngine-v2"
+				method="getProcessDefinition">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.bpm.vo.ProcessDefinition">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="processDefinition"/>
+
+	<datanode name="rol">
+		<script-handler>
+			<insert-script>
+				if (instance.getCodiUsuari() == null)
+				{
+					instance.setCodiUsuari ( parent.getInstance().getCodi ());
+				}
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete" >  <!-- user:role:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> 
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<finder name="holderGroupData" type="group" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/GroupService-v2"
+				method="findGroupByName" if="${canQueryUser &amp;&amp; instance.holderGroup != null}">
+				<parameter value="${instance.holderGroup}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="impressora">
+		<ejb-handler jndi="java:/java:/module/PrinterService-v2">
+			<insert-method method="create"  returnBean="true"> <!-- user:printer:create -->
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete" >  <!-- user:printer:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> <!-- user:custom:update, user:printer:create - establir com a default l'impressora-->
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="grup">
+		<ejb-handler jndi="java:/module/GroupService-v2">
+			<insert-method method="create"  returnBean="true"> <!-- user:group:create -->
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="tipusUsuari">
+<!-- 		<ejb-handler jndi="java:/module/UserDomainService-v2"> -->
+<!-- 			<insert-method method="create" returnBean="true"> -->
+<!-- 				<parameter value="${instance}" /> -->
+<!-- 			</insert-method> -->
+<!-- 			<delete-method method="delete"> -->
+<!-- 				<parameter value="${instance}" /> -->
+<!-- 			</delete-method> -->
+<!-- 			<update-method method="update"> -->
+<!-- 				<parameter value="${instance}" /> -->
+<!-- 			</update-method> -->
+<!-- 		</ejb-handler> -->
+	</datanode>
+	
+	<datanode name="estatContrasenya" />
+	
+	<datanode name="group" transient="true"/>
+
+</zkib-model>

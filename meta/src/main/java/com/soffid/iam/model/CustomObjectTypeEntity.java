@@ -1,12 +1,14 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.api.CustomObjectType;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.Index;
+import com.soffid.mda.annotation.Nullable;
 
 @Entity(table="SC_CUOBTY")
 @Depends({
@@ -22,6 +24,10 @@ public class CustomObjectTypeEntity {
 	
 	@Column(name="COT_DESCR", length=250)
 	public String description;
+
+	@Column(name="COT_SCOPE", length=50)
+	@Nullable
+	public MetadataScope scope;
 
 	@Column(name="COT_BUILTIN")
 	public boolean builtin;

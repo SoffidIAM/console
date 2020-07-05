@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="agents" title="Gestió dels Agents"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+<?component name="input_password" macro-uri="/comu/input_password.zul"?>
+<?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window xmlns:h="http://www.w3.org/1999/xhtml"
+	use="com.soffid.iam.web.agent.AttributeMappingWindow"
+	position="center,center"
+	mode="highlighted"
+	closable="true"
+	mold="soffid"
+	width="80%"
+	height="80vh"
+	title="Attribute mappings"
+	id="agentAttributesWindow">
+
+	<form2 id="form" dataPath="/listbox:/." style="height:400px; height: calc(80vh - 120px)">
+		<grid sclass="grayhover grid" dataPath="/listbox:/objectMapping" id="objectsGrid" 
+		width="100%" fixedLayout="false" mold="table"
+			onNewRow="ref:objectsGrid.onNewObjectMapping"  use="com.soffid.iam.web.agent.AttributeMappingHandler">
+			<columns>
+				<column label="System objects" valign="top">
+				</column>
+				<column label="" width="40px"  valign="top" align="center">
+					<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+						onClick="ref:objectsGrid.addObject" />
+				</column>
+			</columns>
+			<datarow>
+				<window width="100%" >
+					<div>
+						<textbox onChange="" bind="@systemObject" width ="15%" />
+						<label value="based on" width="10%"></label>
+						<select bind="."
+							use="com.soffid.iam.web.agent.CustomObjectTypeSelect" disabled="true"/>
+					</div>
+																										
+					<div 
+						style="width: 90%; float: right; display:block; "
+						visible="true">	
+						<grid sclass="grid compactGrid" 
+							dataPath="attributeMapping" id="attributesGrid" 
+							mold="table"
+							onNewRow="ref:objectsGrid.onNewAttributeMapping"
+							style="width: 100%;">
+							<columns>
+								<column label="System attribute">
+								</column>
+								<column width="40px"/>
+								<column label="Direction" width="100px">
+								</column>
+								<column label="Soffid attribute">
+								</column>
+								<column width="40px"/>
+								<column label="Test result" id="testColumn" visible="false">
+								</column>
+								<column label="" width="30px">
+									<imageclic  align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" >
+									</imageclic>
+								</column>
+							</columns>
+							<datarow>
+								<textbox bind="@systemAttribute" width ="100%" onOK="" onChange="" 
+										sclass="noborder-textbox" multiline="true" 
+									height="32px" onFocus="ref:objectsGrid.focusTextarea">
+								</textbox>
+								<imageclic src="/img/pencil.svg" 
+									onClick="ref:objectsGrid.editAttribute">
+								</imageclic>
+								<listbox bind="@direction" mold="select" dataPath="/model:/attributeDirection" style="width: 80px; text-align-last: center"
+									disabled="true">
+									<dataitem bind="@value">
+										<listcell bind="@literal"/>
+									</dataitem>
+								</listbox>
+								<textbox bind="@soffidAttribute" width ="100%" onChange=""  
+									sclass="noborder-textbox" multiline="true"  
+									height="32px" onFocus="ref:objectsGrid.focusTextarea">
+								</textbox>
+								<imageclic src="/img/pencil.svg" 
+									onClick="ref:objectsGrid.editAttribute">
+								</imageclic>
+								<div>
+									<label multiline="true"/>
+									<imageclic src="/img/exclamation.png" visible="false"/>
+								</div>
+								<imageclic align="right" src="/img/remove.svg" onClick="ref:objectsGrid.removeProperty"
+									if="${canUpdateAgent }">
+								</imageclic>
+							</datarow>
+						</grid>
+						<div id="testRow" style="margin-left: 16px; margin-top: 8px;">
+							<button id="testRowButton1" label="Test" onClick="ref:objectsGrid.displayTestRow" style="margin-left: 0px;"/>
+							<label id="testRowLabel1" visible="false"/>
+							<textbox id="testRowTextbox1" visible="false" onOK="ref:objectsGrid.testRowTextbox1OK"/>
+							<label id="testRowLabel2" style="margin-left: 2em" visible="false"/>
+							<textbox id="testRowTextbox2" visible="false" onOK="ref:objectsGrid.doTest"/>
+							<button id="testRowButton2" label="${c:l('agents.zul.TestExpression') }" 
+							onClick="ref:objectsGrid.doTest" visible="false"/>
+						</div>
+						<div style="height: 20px;" />
+					</div>
+				</window>
+				<imageclic align="center" src="/img/remove.svg" onClick="ref:objectsGrid.removeObject" if="${canUpdateAgent }">
+				</imageclic>
+			</datarow>
+		</grid>
+	</form2>
+</window>

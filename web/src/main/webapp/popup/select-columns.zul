@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="selectColumns"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window id="window" closable="true" position="top, center"
+	use="com.soffid.iam.web.popup.SelectColumnsHandler"
+	title="${c:l('select-columns.title') }"
+	sizable="true" 
+	style="min-width: 40em;"
+	visible="false"
+	onDisplay="ref:window.start"
+	onClose="ref:window.close" 
+	width="650px">
+
+	<datatable id="listbox" multiselect="true" 
+		columns='[{"name":"${c:l("select-columns.columns")}", "value":"name","filter":false,"sort":false}]'
+		reorder="true"
+		onReorder="ref:window.reorder"
+		maxheight="50vh" enablefilter="false">
+	</datatable>
+		
+	<div style="text-align: right; width: 100%">
+		<button label="${c:l('common.undo')}" onClick="ref:window.close" />
+		<button label="${c:l('common.apply')}" onClick="ref:window.end" />
+	</div>
+	
+</window>
+

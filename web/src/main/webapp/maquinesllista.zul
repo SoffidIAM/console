@@ -10,8 +10,6 @@
 	
 	<zscript>
 		<![CDATA[
-			fileres = es.caib.seycon.ng.web.Custom.FILERES;
-			
 			queryWindowMin = "50px";
 			queryWindowMax = "80px";
 		

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root"> <!--user:query o mail:query, despres es restringeixen-->
+		<finder name="objects" type="object">
+			<custom-finder className="com.soffid.iam.web.popup.FinderHandlerModel">
+			</custom-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="object" transient="true"/>
+
+</zkib-model>

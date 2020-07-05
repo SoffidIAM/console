@@ -11,9 +11,8 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item if="${canQueryUserDomain}" image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.export"/>
+					<menu2item if="${canQueryUserDomain}" image="/img/download.svg"  label="${c:l('tenant.zul.export') }" onClick="ref:frame.export"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canModifyUserDomain}" onClick="ref:frame.importCsv"/>
-					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUserDomain}"  onClick="ref:frame.addNew"/>
 				</menu2>
 			</div>

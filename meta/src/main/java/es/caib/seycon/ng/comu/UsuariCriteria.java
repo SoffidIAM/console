@@ -102,10 +102,6 @@ public class UsuariCriteria {
 	public java.lang.String dominiCorreu;
 
 	@Nullable
-	@Attribute(translated = "consoleProperties" )
-	public es.caib.seycon.ng.comu.UsuariSEU usuariSEU;
-
-	@Nullable
 	@Attribute(translated = "primaryGroupDescription" )
 	public java.lang.String descripcioGrupPrimari;
 

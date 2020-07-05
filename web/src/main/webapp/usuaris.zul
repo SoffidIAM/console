@@ -725,7 +725,6 @@
 						</tabs>
 
 						<tabpanels>
-
 							<tabpanel id="basica">
 								<hbox width="100%" widths="*,30px">
 									<vbox width="100%">

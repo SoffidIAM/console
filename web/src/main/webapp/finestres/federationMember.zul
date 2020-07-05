@@ -9,8 +9,6 @@
 	<zscript src="../comu/netejaCriteris.zul"/>
 
 	<zscript>
-	fileres = es.caib.seycon.ng.web.Custom.FILERES;
-
 	mode = "query";
 	view_altres = false;
 	model.getVariables().declareVariable("queryEnabled", false);

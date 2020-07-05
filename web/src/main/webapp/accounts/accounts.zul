@@ -74,8 +74,6 @@
 			    String requestedSystem = Executions.getCurrent().getNativeRequest().getParameter("system");
 				pageScope{"requestedSystem"} = requestedSystem;
 
-				fileres = es.caib.seycon.ng.web.Custom.FILERES;
-				fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
 				try
 				{
 					es.caib.zkib.zkiblaf.Application.setTitle(org.zkoss.util.resource

@@ -32,7 +32,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.SessionFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -42,14 +41,12 @@ import org.json.JSONException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.BpmProcess;
 import com.soffid.iam.api.BpmUserProcess;
-import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.ExtranetCard;
 import com.soffid.iam.api.Group;
@@ -71,9 +68,7 @@ import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
-import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
-import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
@@ -84,11 +79,7 @@ import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordEntity;
 import com.soffid.iam.model.RoleAccountEntity;
-import com.soffid.iam.model.RoleDependencyEntity;
-import com.soffid.iam.model.RoleDependencyEntityDao;
 import com.soffid.iam.model.RoleEntity;
-import com.soffid.iam.model.RoleGroupEntity;
-import com.soffid.iam.model.RoleGroupEntityDao;
 import com.soffid.iam.model.SecretEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -99,12 +90,11 @@ import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserEntityDao;
 import com.soffid.iam.model.UserGroupEntity;
-import com.soffid.iam.model.UserPreferencesEntity;
+import com.soffid.iam.model.UserPreferenceEntity;
 import com.soffid.iam.model.UserPrinterEntity;
 import com.soffid.iam.model.UserProcessEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
-import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.CertificateParser;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -115,8 +105,6 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
-import com.soffid.scimquery.conf.ClassConfig;
-import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
@@ -405,34 +393,17 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		getUserEntityDao().create(usuariEntity);
 
-		/* Una vez creado, se almacena el NIF */
-		UserData dadaUsuari = new UserData();
-		dadaUsuari.setAttribute("NIF"); //$NON-NLS-1$
-		dadaUsuari.setUser(usuari.getUserName());
-		dadaUsuari.setValue(usuari.getNationalID());
-		dadaUsuari.setBlobDataValue(null);
-		UserDataEntity dadaUsuariEntity = getUserDataEntityDao()
-				.userDataToEntity(dadaUsuari);
 		// Comprobamos autorización del usuario
 		if (!getAuthorizationService().hasPermission(Security.AUTO_USER_CREATE, usuariEntity)) {
 			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$
 					"create (Usuari)", "user:create, user:create/*", //$NON-NLS-1$ //$NON-NLS-2$
 					Messages.getString("UsuariServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
 		}
-		getUserDataEntityDao().create(dadaUsuariEntity);
-
-		/* El teléfon es guarda quan ja s'ha creat l'usuari */
-		if (usuari.getPhoneNumber() != null) {
-			UserData telf = new UserData();
-			telf.setAttribute("PHONE"); //$NON-NLS-1$
-			telf.setUser(usuari.getUserName());
-			telf.setValue(usuari.getPhoneNumber());
-			UserDataEntity telfEntity = getUserDataEntityDao()
-					.userDataToEntity(telf);
-			getUserDataEntityDao().create(telfEntity);
-		}
 
 		crearLlistaCorreu(usuari);
+		
+		if (usuari.getAttributes() != null)
+			handleUpdateUserAttributes(usuari.getUserName(), usuari.getAttributes(), false);
 
 		usuari.setId(usuariEntity.getId());
 		/* Se devuelve la instancia de usuario creada */
@@ -660,20 +631,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				usuari.setActive(new Boolean(true));
 				usuari.setMultiSession(new Boolean(false));
 				usuari.setPrimaryGroup("externs"); //$NON-NLS-1$
-				com.soffid.iam.api.Configuration configuracio = getConfigurationService()
-						.findParameterByNameAndNetworkName(
-								"seycon.password.age." + usuari.getUserType(),
-								null);
-				if (configuracio == null) {
-					usuari.setPasswordMaxAge(new Long(45));
-				} else {
-					usuari.setPasswordMaxAge(new Long(Long
-							.parseLong(configuracio.getValue())));
-				}
 				usuari.setUserName(user);
 				usuari.setCreatedDate(GregorianCalendar.getInstance());
 				usuari.setCreatedByUser("SEYCON"); //$NON-NLS-1$
-				usuari.setNationalID(nif);
 
 				// Creem l'usuari
 				UserEntity usuariEntity = getUserEntityDao().userToEntity(
@@ -681,7 +641,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				getUserEntityDao().create(usuariEntity);
 				/* Una vez creado, se almacena el NIF a nivell VO */
 				usuari = getUserEntityDao().toUser(usuariEntity);
-				usuari.setNationalID(nif);
 				// Actualizamos el usuariEntity (NIF)
 				usuariEntity = getUserEntityDao().userToEntity(usuari);
 				getUserEntityDao().update(usuariEntity);
@@ -843,20 +802,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				usuari.setActive(new Boolean(true));
 				usuari.setMultiSession(new Boolean(false));
 				usuari.setPrimaryGroup("externs"); //$NON-NLS-1$
-				com.soffid.iam.api.Configuration configuracio = getConfigurationService()
-						.findParameterByNameAndNetworkName(
-								"seycon.password.age." + usuari.getUserType(),
-								null);
-				if (configuracio == null) {
-					usuari.setPasswordMaxAge(new Long(45));
-				} else {
-					usuari.setPasswordMaxAge(new Long(Long
-							.parseLong(configuracio.getValue())));
-				}
 				usuari.setUserName(user);
 				usuari.setCreatedDate(GregorianCalendar.getInstance());
 				usuari.setCreatedByUser("SEYCON"); //$NON-NLS-1$
-				usuari.setNationalID(nif);
 
 				// Creem l'usuari
 				UserEntity usuariEntity = getUserEntityDao().userToEntity(
@@ -864,7 +812,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				getUserEntityDao().create(usuariEntity);
 				/* Una vez creado, se almacena el NIF a nivell VO */
 				usuari = getUserEntityDao().toUser(usuariEntity);
-				usuari.setNationalID(nif);
 				// Actualizamos el usuariEntity (NIF)
 				usuariEntity = getUserEntityDao().userToEntity(usuari);
 				getUserEntityDao().update(usuariEntity);
@@ -1215,9 +1162,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				getVaultFolderAccessEntityDao().remove(ua);
 			}
-			for (UserPreferencesEntity ua: new LinkedList<UserPreferencesEntity> ( usuariEntity.getSEUInformation()))
+			for (UserPreferenceEntity ua: new LinkedList<UserPreferenceEntity> ( usuariEntity.getPreferences()))
 			{
-				getUserPreferencesEntityDao().remove(ua);
+				getUserPreferenceEntityDao().remove(ua);
 			}
 			for (UserAccountEntity ua: new LinkedList<UserAccountEntity> ( usuariEntity.getAccounts()))
 			{
@@ -1515,60 +1462,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					Messages.getString("UserServiceImpl.UserTypeNotEspecified")); //$NON-NLS-1$
 		}
 
-		// Si sólo puede actualizar datos adicionales (teléfono, actualizamos
-		// sólo eso!!)
 		if (!canUpdateEsteUser) {
-			// Només actualitzem el telèfon (mantenim la resta de dades..)
-			if (usuari.getId() != null) {
-				if (usu != null) {
-					User usuTrobat = getUserEntityDao().toUser(usu);
-					if (usuTrobat.getPhoneNumber() == null
-							&& usuari.getPhoneNumber() != null
-							|| !usuTrobat.getPhoneNumber().equals(
-									usuari.getPhoneNumber())) {
-						// Només si ha canviat el número de telèfon
-						usuTrobat.setModifiedByUser(Security
-								.getCurrentAccount());
-						usuTrobat.setModifiedDate(GregorianCalendar
-								.getInstance());
-						usuTrobat.setPhoneNumber(usuari.getPhoneNumber()); // Guardem
-																			// el
-																			// telèfon
-						UserEntity entity = getUserEntityDao().userToEntity(
-								usuTrobat);
-						if (entity != null) {
-							getUserEntityDao().update(entity);
-							getUserEntityDao().createUpdateTasks(entity,
-									usuTrobat);
-
-							return getUserEntityDao().toUser(entity);
-						}
-					} // Si no ha canviat el telèfon: donem error... no ha de
-						// tindre permis per canviar res més
-					else if (usuTrobat.getComments() == null
-							&& usuari.getComments() != null
-							|| !usuTrobat.getComments().equals(
-									usuari.getComments())) {
-						// Deixem que s'actualitzen les observacions (!!)
-						usuTrobat.setModifiedByUser(Security
-								.getCurrentAccount());
-						usuTrobat.setModifiedDate(GregorianCalendar
-								.getInstance());
-						usuTrobat.setComments(usuari.getComments()); // Guardem
-																		// les
-																		// observacions
-						UserEntity entity = getUserEntityDao().userToEntity(
-								usuTrobat);
-						if (entity != null) {
-							getUserEntityDao().update(entity);
-							getUserEntityDao().createUpdateTasks(entity,
-									usuTrobat);
-							return getUserEntityDao().toUser(entity);
-						}
-					}
-				}
-			}
-			// Donem error si no s'ha trobat (??)
 			throw new SeyconAccessLocalException(
 					"UsuariService", "update (Usuari)", "user:update, user:update/*", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					Messages.getString("UserServiceImpl.NoAuthorizedToUpdate")); //$NON-NLS-1$
@@ -1668,6 +1562,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		UserEntity entity = getUserEntityDao().userToEntity(usuari);
 		if (entity != null) {
 			getUserEntityDao().update(entity);
+			if (usuari.getAttributes() != null)
+				handleUpdateUserAttributes(usuari.getUserName(), usuari.getAttributes(), false);
+			
 			getAccountService().generateUserAccounts(usuari.getUserName());
 			if (revokeHolderGroupRoles)
 				getApplicationService().revokeRolesHoldedOnGroup(
@@ -2044,6 +1941,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 						.findByName(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService()
 						.generateNewPassword(usuari, dominiContrasenyes, true);
+				if (pass == null)
+					throw new InternalErrorException("Unable to generate password. Missing password policy");
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getName());
 				return pass.getPassword();
 			} else {
@@ -2265,42 +2164,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		} catch (Throwable th) {
 
 		}
-		return null;
-	}
-
-
-	/*
-	 * UsuariSEU: guarda informació de l'usuari al programa SEU
-	 */
-	protected ConsoleProperties handleUpdate(ConsoleProperties usuariSEU)
-			throws Exception {
-		UserPreferencesEntity entity = getUserPreferencesEntityDao()
-				.consolePropertiesToEntity(usuariSEU);
-		getUserPreferencesEntityDao().update(entity);
-		return getUserPreferencesEntityDao().toConsoleProperties(entity);
-	}
-
-	/*
-	 * UsuariSEU: guarda informació de l'usuari al programa SEU
-	 */
-	protected ConsoleProperties handleCreate(ConsoleProperties usuari)
-			throws Exception {
-		UserPreferencesEntity entity = getUserPreferencesEntityDao()
-				.consolePropertiesToEntity(usuari);
-		getUserPreferencesEntityDao().create(entity);
-		return getUserPreferencesEntityDao().toConsoleProperties(entity);
-
-	}
-
-	/*
-	 * UsuariSEU: guarda informació de l'usuari al programa SEU
-	 */
-	protected ConsoleProperties handleFindConsoleUserByUserName(
-			String codiUsuari) throws Exception {
-		UserPreferencesEntity entity = getUserPreferencesEntityDao()
-				.findByUserName(codiUsuari);
-		if (entity != null)
-			return getUserPreferencesEntityDao().toConsoleProperties(entity);
 		return null;
 	}
 
@@ -3059,17 +2922,30 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected Collection<User> handleFindUserByJsonQuery(String query)
+	protected List<User> handleFindUserByJsonQuery(String query, Integer start, Integer end)
 			throws InternalErrorException, Exception {
 
 		LinkedList<User> result = new LinkedList<User>();
 
-		internalSearchUsersByJson(query, result);
+		internalSearchUsersByJson(query, result, start, end);
 		
 		return result;
 	}
 
-	private void internalSearchUsersByJson(String query, Collection<User> result)
+	@Override
+	protected List<User> handleFindUserByJsonQuery(String query)
+			throws InternalErrorException, Exception {
+
+		LinkedList<User> result = new LinkedList<User>();
+
+		internalSearchUsersByJson(query, result, null, null);
+		
+		return result;
+	}
+
+
+	private void internalSearchUsersByJson(String query, Collection<User> result,
+			Integer start, Integer end)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
@@ -3093,8 +2969,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		TimeOutUtils tou = new TimeOutUtils();
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFirstResult(start);
+		cfg.setMaximumResultSize(end);
 		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
-				paramArray)) {
+				paramArray, cfg)) {
 			if (result instanceof AsyncList)
 			{
 				if (((AsyncList) result).isCancelled())
@@ -3125,7 +3004,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			@Override
 			public void run() {
 				try {
-					internalSearchUsersByJson(query, result);
+					internalSearchUsersByJson(query, result, null, null);
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				
@@ -3177,13 +3056,24 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected Collection<User> handleFindUserByTextAndFilter(String text, String filter) throws Exception {
+	protected List<User> handleFindUserByTextAndFilter(String text, String filter) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
 		else if ( filter != null && ! filter.trim().isEmpty())
 			q = filter;
 		return handleFindUserByJsonQuery(q);
+	}
+
+	@Override
+	protected List<User> handleFindUserByTextAndFilter(String text, String filter,
+			Integer start, Integer max) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindUserByJsonQuery(q, start, max);
 	}
 
 	@Override
@@ -3269,6 +3159,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	@Override
 	protected void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes) throws Exception {
+		handleUpdateUserAttributes(codiUsuari, attributes, true);
+	}
+
+	public void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes, boolean updateUser)
+			throws InternalErrorException {
 		boolean anyChange = false;
 		UserEntity entity = getUserEntityDao().findByUserName(codiUsuari);
 		if (entity != null)
@@ -3342,9 +3237,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					}
 				}
 			}
-			getRuleEvaluatorService().applyRules(entity);
-			if (anyChange)
-				getUserEntityDao().update(entity);
+			if (updateUser) {
+				getRuleEvaluatorService().applyRules(entity);
+				if (anyChange)
+					getUserEntityDao().update(entity);
+			}
 		}
 	}
 

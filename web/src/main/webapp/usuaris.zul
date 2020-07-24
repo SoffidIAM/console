@@ -2118,7 +2118,10 @@ String nomRolsBorrar = "";
 											<listcell
 												bind="@roleCategory" />
 											<listcell >
-												<label  bind="@nomRol" tooltip="rolsTooltip"></label>
+												<div>
+													<label  bind="@nomRol" tooltip="rolsTooltip" sclass="small-screen"></label>
+													<label  bind="@descripcioRol" sclass="wide-screen"></label>
+												</div>
 												<div style="display:inline" tooltip="domainTooltip">
 													<label value = " / " />
 													<label  bind="valorDomini/@valor" sclass="small-screen"/>

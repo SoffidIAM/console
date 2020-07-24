@@ -64,7 +64,7 @@ public class HostEntityDaoImpl extends
         Collection c_alies = sourceEntity.getHostAlias();
         for (Iterator it = c_alies.iterator(); it.hasNext(); ) {
             HostAliasEntity al = (HostAliasEntity) it.next();
-            alies += al.getAlias() + " ";
+            alies += al.getAlias() + " "; //$NON-NLS-1$
         }
         targetVO.setHostAlias(alies.trim()); // quitamos espacios "extra"
         if (sourceEntity.getLastSeen() == null)
@@ -117,13 +117,13 @@ public class HostEntityDaoImpl extends
 
     private void maquinaToEntityCustom(com.soffid.iam.api.Host sourceVO, com.soffid.iam.model.HostEntity targetEntity) {
         if (sourceVO.getOffice() != null) {
-            targetEntity.setFolders(sourceVO.getOffice().booleanValue() ? "S" : "N"); //$NON-NLS-1$
+            targetEntity.setFolders(sourceVO.getOffice().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setFolders("N"); //$NON-NLS-1$
         }
 
         if (sourceVO.getMail() != null) {
-            targetEntity.setMail(sourceVO.getMail().booleanValue() ? "S" : "N"); //$NON-NLS-1$
+            targetEntity.setMail(sourceVO.getMail().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
         } else {
             targetEntity.setMail("N"); //$NON-NLS-1$
         }
@@ -152,7 +152,7 @@ public class HostEntityDaoImpl extends
                 if (maquinaCompatibleAmbXarxa(sourceVO.getIp(), xarxa.getIp(), xarxa.getMask())) {
                     targetEntity.setNetwork(xarxaEntity);
                 } else {
-                    throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.0"), xarxa.getMask(), xarxa.getIp(), sourceVO.getIp()));
+                    throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.0"), xarxa.getMask(), xarxa.getIp(), sourceVO.getIp())); //$NON-NLS-1$
                 }
             } else {
 				throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.1"), codiXarxa)); //$NON-NLS-1$
@@ -165,7 +165,7 @@ public class HostEntityDaoImpl extends
 		{
 			com.soffid.iam.model.OsTypeEntity os = getOsTypeEntityDao().findOSTypeByName(sourceVO.getOs());
 			if (os == null)
-				throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.InvalidOS"), sourceVO.getOs()));
+				throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.InvalidOS"), sourceVO.getOs())); //$NON-NLS-1$
 			targetEntity.setOperatingSystem(os);
 		}
     }
@@ -257,7 +257,7 @@ public class HostEntityDaoImpl extends
             auditarMaquina("D", nomMaquina); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.2"), maquinaEntity.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.2"), maquinaEntity.getName(), message)); //$NON-NLS-1$
 		}
     }
 
@@ -273,7 +273,7 @@ public class HostEntityDaoImpl extends
             auditarMaquina("C", maquina.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.3"), maquina.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.3"), maquina.getName(), message)); //$NON-NLS-1$
         }
     }
 
@@ -309,35 +309,35 @@ public class HostEntityDaoImpl extends
             getSession().flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.4"), maquina.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.4"), maquina.getName(), message)); //$NON-NLS-1$
         }
     }
 
     public String[] getTasks(String nomMaquina) {
         LinkedList<String> lista = new LinkedList<String>();
     	for (TaskEntity t : getTaskEntityDao().query(
-    			"select tasca from com.soffid.iam.model.TaskEntity as tasca "
-    			+ "where tasca.host=:maquina and tasca.tenant.id = :tenantId", 
+    			"select tasca from com.soffid.iam.model.TaskEntity as tasca " //$NON-NLS-1$
+    			+ "where tasca.host=:maquina and tasca.tenant.id = :tenantId",  //$NON-NLS-1$
     			new Parameter[]{
-    					new Parameter("maquina", nomMaquina),
-    					new Parameter("tenantId", Security.getCurrentTenantId())
+    					new Parameter("maquina", nomMaquina), //$NON-NLS-1$
+    					new Parameter("tenantId", Security.getCurrentTenantId()) //$NON-NLS-1$
     			})) {
             String transaccion = t.getTransaction();
             Timestamp datatime = t.getDate();
             Date data = new Date();
             data.setTime(datatime.getTime());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy kk:mm:ss"); //$NON-NLS-1$
             String dataString = dateFormat.format(data);
             String missatge = t.getMessage();
-            String rol = t.getRole() + "@" + t.getDb();
+            String rol = t.getRole() + "@" + t.getDb(); //$NON-NLS-1$
             StringBuffer agentsPendents = new StringBuffer();
             for (com.soffid.iam.model.TaskLogEntity tl : t.getLogs()) {
-                if ("N".equals(tl.getCompleted())) {
-                    if (agentsPendents.length() > 0) agentsPendents.append(", ");
+                if ("N".equals(tl.getCompleted())) { //$NON-NLS-1$
+                    if (agentsPendents.length() > 0) agentsPendents.append(", "); //$NON-NLS-1$
                     agentsPendents.append(tl.getSystem().getName());
                 }
             }
-            lista.add(transaccion + " # " + dataString + " # " + missatge + " # " + rol + " # " + agentsPendents);
+            lista.add(transaccion + " # " + dataString + " # " + missatge + " # " + rol + " # " + agentsPendents); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         }
         return (String[]) lista.toArray(new String[lista.size()]);
     }

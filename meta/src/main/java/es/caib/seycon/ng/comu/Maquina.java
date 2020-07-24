@@ -17,6 +17,7 @@ public class Maquina {
 	@Attribute(translated = "name" )
 	public java.lang.String nom;
 
+	@Nullable
 	@Attribute(translated = "os" )
 	public java.lang.String sistemaOperatiu;
 

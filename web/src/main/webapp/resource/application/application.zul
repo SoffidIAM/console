@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="application"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.application.ApplicationHandler" id="frame">
+<zscript><![CDATA[
+com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", com.soffid.iam.api.MetadataScope.APPLICATION, true);
+]]></zscript>
+	<datamodel id="model" rootNode="applications" src="descriptorApplication.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('application:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" 
+						if="${soffid:isUserInRole('application:create') &amp;&amp; soffid:isUserInRole('application:update') &amp;&amp; soffid:isUserInRole('application:delete')}" 
+						onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Application" 
+				defaultAttributes="relativeName, description"
+				preference="com.soffid.iam.api.Application"
+				dataPath="/model:/application" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatree2 id="listbox"
+				width="100%" dataPath="/model:/"
+				header="${c:l('com.soffid.iam.api.Application.relativeName') }" 
+				openLevels="1"
+				enablefilter="false"
+				maxheight="70vh"
+				onAddApplicatino="ref:frame.addApplication"
+				onSelect="ref:frame.showDetails">
+				<attribute name="finders">
+				<![CDATA[
+				- path: /application
+				  icon: >-
+				    #{ "container" == type ? "/img/container.svg" :
+				    "business" == type ? "/img/business.svg" :
+				    "application" == type ? "/img/application.svg" :
+				    "/img/"+type+".svg"}
+				  value: relativeName
+				  leaf: false
+				  columns:
+				    - value: description
+				  ${soffid:isUserInRole('application:create') ? "tail":"no-tail"}: >-
+				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddApplication')">${c:l('application.addNew')}</button>
+				  ]]>
+  				</attribute>
+				<attribute name="columns"><![CDATA[
+				- name: ${c:l('com.soffid.iam.api.Application.description')}
+				]]>
+				</attribute>
+  			</datatree2>
+
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('application:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatree2="listbox"/>
+				
+				<menu2>
+					<menu2item if="${soffid:isUserInRole('application:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+				
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+				</tabs>
+				<tabpanels>
+					<tabpanel id="datatab">
+						<div id="dades"> 
+							<form id="form" onChangeXPath="ref:frame.onChangeForm"
+								dataPath="/listbox:/." width="100%">
+								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+									objectType="com.soffid.iam.api.Application"
+									dataPath="/." id="applicationAttributes"/>
+							</form>
+						</div>
+						<div style="text-align: right; width: 100%">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</div>
+	</div>
+</frame>

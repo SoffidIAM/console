@@ -96,7 +96,7 @@ public class MetadataHandler extends Div implements AfterCompose{
 	}
 	
 	public void onChangeDataType() {
-    	TypeEnumeration type = (TypeEnumeration) XPathUtils.getValue(getFellow("metadataGrid"),"type");
+		TypeEnumeration type = (TypeEnumeration) XPathUtils.getValue(getFellow("metadataGrid"),"type");
     	getFellow("metadataWindow").getFellow ("visibility6").setVisible( type == es.caib.seycon.ng.comu.TypeEnumeration.GROUP_TYPE ||
     			type == es.caib.seycon.ng.comu.TypeEnumeration.USER_TYPE);
 	}

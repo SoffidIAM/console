@@ -212,6 +212,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
 
     public void toGroupUser(com.soffid.iam.model.UserGroupEntity sourceEntity, com.soffid.iam.api.GroupUser targetVO) {
         super.toGroupUser(sourceEntity, targetVO);
+        toUsuariGrupCustom(sourceEntity, targetVO);
     }
 
     /**
@@ -226,7 +227,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         targetVO.setUser(sourceEntity.getUser().getUserName());
         targetVO.setGroupDescription(sourceEntity.getGroup().getDescription());
         UserEntity user = sourceEntity.getUser();
-        String nomComplet = user.getFirstName() + " " + user.getLastName() + (user.getMiddleName() != null ? " " + user.getMiddleName() : ""); //$NON-NLS-1$ //$NON-NLS-2$
+        String nomComplet = user.getFullName();
         targetVO.setFullName(nomComplet);
 
         targetVO.setAttributes(new HashMap<String, Object>());
@@ -260,7 +261,6 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
     public com.soffid.iam.api.GroupUser toGroupUser(final com.soffid.iam.model.UserGroupEntity entity) {
         // @todo verify behavior of toUsuariGrup
         GroupUser usuariGrup = super.toGroupUser(entity);
-        toUsuariGrupCustom(entity, usuariGrup);
         return usuariGrup;
     }
 

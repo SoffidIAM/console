@@ -19,6 +19,8 @@ import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Tabpanel;
+import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
@@ -87,6 +89,20 @@ public class FrameHandler extends Frame {
 	public void showDetails() {
 		if (isSingleFaceCard()) return;
 		getCard().setSclass ( "card is-flipped" );
+		focusElement (getCard().getLastChild());
+	}
+
+	private boolean focusElement(Component c) {
+		if (c instanceof Tabpanel && ! ((Tabpanel) c).isSelected())
+			return false;
+		if (c instanceof InputElement) {
+			((InputElement) c).focus();
+			return true;
+		}
+		for (Component cc = c.getFirstChild(); cc != null; cc = cc.getNextSibling())
+			if (focusElement(cc))
+				return true;
+		return false;
 	}
 
 	public boolean isSingleFaceCard() {

@@ -21,12 +21,13 @@ public class DefaultRenderer extends DataTypeRenderer {
 	public JSONObject renderColumn(DataType d) {
 		WebDataType dt = new WebDataType(d);
 		JSONObject o = new JSONObject();
-		o.put("value", dt.getName());
+		String prefix = Boolean.TRUE.equals(d.getBuiltin()) ?  "": "attributes.";
+		o.put("value", prefix+dt.getName());
 		o.put("name", dt.getLabel());
 		if (dt.getType() == TypeEnumeration.DATE_TYPE)
-			o.put("template", "${"+dt.getName()+"_date}");
+			o.put("template", "${"+prefix+dt.getName()+"_date}");
 		if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE)
-			o.put("template", "${"+dt.getName()+"_datetime}");
+			o.put("template", "${"+prefix+dt.getName()+"_datetime}");
 		return o;
 	}
 

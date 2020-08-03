@@ -18,6 +18,7 @@ import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
+import es.caib.seycon.ng.comu.RolGrantHierarchy;
 import es.caib.seycon.ng.comu.TipusUnitatOrganitzativa;
 import es.caib.seycon.ng.comu.UserAccount;
 import es.caib.seycon.ng.comu.Usuari;
@@ -211,11 +212,34 @@ public class RoleDependencyTest extends AbstractTest
 			}
 			
 			assertEquals(grants.size(), 1);
+			
+			System.out.println ("All grants hierarchy");
+			Collection<RolGrantHierarchy> grantsh = appSvc.findRoleGrantHierarchyByUser(u.getId());
+			for (RolGrantHierarchy ru : grantsh)
+			{
+				dump (ru, "> ");
+			}
+
 		} finally {
 			Security.nestedLogoff();
 		}
 	}
 
+	private void dump (RolGrantHierarchy h, String indent) {
+		if (h.getAccountName() != null)
+			System.out.println(indent+"Account "+h.getAccountName());
+		else if (h.getGroupName() != null)
+			System.out.println(indent+"Group "+h.getGroupName());
+		else if (h.getRuleName() != null)
+			System.out.println(indent+"Rule "+h.getRuleName());
+		else if (h.getRolName() != null)
+			System.out.println(indent+"Role "+h.getRolName());
+		if (h.getNested() != null) {
+			for (RolGrantHierarchy hh: h.getNested()) {
+				dump (hh, indent+ "    ");
+			}
+		}
+	}
 	private RolAccount grant (Usuari usu, Rol rol) throws InternalErrorException
 	{
 		return grant (usu, rol, null);

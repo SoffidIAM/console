@@ -20,12 +20,6 @@
 			</new-instance-bean>
 		</finder>
 		
-		<finder name="tipusDada" type="tipusUsuari">
-			<ejb-finder jndi="java:/module/AdditionalDataService-v2" method="findDataTypes"
-				if='${isUserInRole("usersDomain:query")}'>
-					<parameter value="${com.soffid.iam.api.MetadataScope.USER}"/>
-			</ejb-finder> 
-		</finder>
 	</datanode>
 	
 	<datanode name="politicaContrasenya">
@@ -56,20 +50,12 @@
 				method="findAllPasswordDomain">
 			</ejb-finder>
 		</finder>
-		<finder name="xarxesAC" type="xarxaAC"> <!-- user:networkAC:query  PENDENT-->
-			<ejb-finder jndi="java:/module/UserService-v2"
-				method="findXarxesACByCodiUsuari">
-				<parameter value="${instance.userName}"/>
-			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.NetworkAuthorization"> 
-			</new-instance-bean>
-		</finder>
 		<finder name="sessio" type="sessio"> <!-- user:session:query -->
 			<ejb-finder jndi="java:/module/UserService-v2"
-				method="findSessionsByCodiUsuari" if="${canQueryUserSession}">
+				method="findSessionByUserName" if="${canQueryUserSession}">
 				<parameter value="${instance.userName}" />
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Sessio"> 
+			<new-instance-bean className="com.soffid.iam.api.Session"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="role" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
@@ -80,15 +66,12 @@
 			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="rolsheredats" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
+		<finder name="effectiveRole" type="effectiveRole" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
-				method="findInformacioTextualJerarquiaRolsUsuariByCodiUsuari"
+				method="findRoleGrantHierarchyByUser"
 				if="${canQueryUserRole}">
-				<parameter value="${instance.userName}"/>
-				<parameter value="S"/>
+				<parameter value="${instance.id}"/>
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.ContenidorRol"> 
-			</new-instance-bean>
 		</finder>
 		<finder name="group" type="grup"> <!-- user:query -->
 			<ejb-finder jndi="java:/module/GroupService-v2"
@@ -96,14 +79,6 @@
 				<parameter value="${instance.userName}" />
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.GroupUser"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="impressora" type="impressora"> <!-- user:query -->
-			<ejb-finder jndi="java:/module/UserService-v2"
-				method="findUsuariImpressoresByCodiUsuari" if="${canQueryUser}">
-				<parameter value="${instance.userName}"/>
-			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.UsuariImpressora"> 
 			</new-instance-bean>
 		</finder>
 		<finder name="attributes" type="attributes" executeOnNewObjects="true" refreshAfterCommit="true" >  <!-- user:query -->
@@ -121,10 +96,10 @@
 		 -->
 		<finder name="processosUsuari" type="processosUsuari">
 			<ejb-finder jndi="java:/module/UserService-v2"
-				method="findProcessInstanceWFUsuariByCodiUsuari">
+				method="findBpmUserProcessInstanceByUserName">
 				<parameter value="${instance.userName}"/>
 			</ejb-finder>
-			<new-instance-bean className="es.caib.bpm.vo.ProcessInstance">
+			<new-instance-bean className="com.soffid.iam.bpm.api.ProcessInstance">
 			</new-instance-bean>
 		</finder>
 		<finder name="sharedAccount" type ="account" refreshAfterCommit="true">
@@ -163,6 +138,7 @@
 		</validator>
 	</datanode>
 
+	<datanode name="effectiveRole" transient="true"/>
 	<datanode name="tipusDada" transient="true" />
 		
 	<datanode name="attributes">
@@ -218,14 +194,6 @@
 	<datanode name="processDefinition"/>
 
 	<datanode name="rol">
-		<script-handler>
-			<insert-script>
-				if (instance.getCodiUsuari() == null)
-				{
-					instance.setCodiUsuari ( parent.getInstance().getCodi ());
-				}
-			</insert-script>
-		</script-handler>
 		<ejb-handler jndi="java:/module/ApplicationService-v2">
 			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
 				<parameter value="${instance}"/>

@@ -124,7 +124,6 @@ public abstract class TipusDadaEntity {
 	
 	@Description("Object type acting as owner of the attribute")
 	@Column (name="TDA_COT_ID", reverseAttribute="attributes", composition=true)
-	@Nullable
 	CustomObjectTypeEntity objectType;
 
 	@Description("Object type instances acting as value of the attribute, for custom object type attributes")

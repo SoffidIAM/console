@@ -1384,9 +1384,8 @@ public class ApplicationBootServiceImpl extends
 		createStandardApplicationAttributes();
 	}
 
-	private void createStandardApplicationAttributes() {
-		// TODO Auto-generated method stub
-		
+	private void createStandardApplicationAttributes() throws InternalErrorException {
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", MetadataScope.APPLICATION, false);
 	}
 
 	private void createStandardRoleAttributes() {

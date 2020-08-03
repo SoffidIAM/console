@@ -22,12 +22,12 @@
 		</div>
 
 		<form id="form" width="100%" dataPath="${dataSource }:/">
-			<inputfield3 bind="@system" dataType="STRING" required="true"
+			<customfield3 bind="@system" dataType="STRING" required="true"
 				readonly="true"
 				label="${c:l('accounts.dispatcher')}"/>
-			<inputfield3 bind="@name" maxLength="150" dataType="STRING" required="true"
+			<customfield3 bind="@name" maxLength="150" dataType="STRING" required="true"
 				label="${c:l('user_renameaccount.Nom')}"/>
-			<inputfield3 bind="@status" dataType="STRING" required="true"
+			<customfield3 bind="@status" dataType="STRING" required="true"
 				enumeration = "com.soffid.iam.api.AccountStatus"
 				label="${c:l('accounts.status')}"/>
 			<div use="com.soffid.iam.web.component.ObjectAttributesDiv"

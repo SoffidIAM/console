@@ -1132,6 +1132,7 @@ public class RoleAccountEntityDaoImpl
 		target.setId(source.getId());
 		target.setRoleId(source.getRole().getId());
 		target.setRoleName(source.getRole().getName());
+		target.setRoleDescription(source.getRole().getDescription());
 		target.setSystem(source.getRole().getSystem().getName());
 		target.setInformationSystem(source.getRole().getInformationSystem()
 				.getName());

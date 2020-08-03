@@ -42,6 +42,7 @@ import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.User;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -162,7 +163,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (grupEntity == null) {
 			return null;
 		}
-		HostEntity maquinaEntity = grupEntity.getHomeServer();
+		HostEntity maquinaEntity = grupEntity.getDriveServer();
 		if (maquinaEntity == null) {
 			return null;
 		}
@@ -205,10 +206,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		// Verifiquem restriccions:
 		// 1) que tinga pare
 		// 2) que el codi sigui lletres (minuscula) i numeros
-		if (!grup.getName().equals("world") && (grup.getParentGroup() == null || grup.getParentGroup() != null && "".equals(grup.getParentGroup().trim())))
-		{
-                    throw new SeyconException(Messages.getString("GroupServiceImpl.3")); //$NON-NLS-1$
-		}
+//		if (!grup.getName().equals("world") && (grup.getParentGroup() == null || grup.getParentGroup() != null && "".equals(grup.getParentGroup().trim())))
+//		{
+//                    throw new SeyconException(Messages.getString("GroupServiceImpl.3")); //$NON-NLS-1$
+//		}
 		
 		GroupEntity groupsSameCode = getGroupEntityDao().findByName(grup.getName());
 		if(groupsSameCode != null)
@@ -228,10 +229,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (grupEntity == null) {
 			throw new SeyconException("Group not found: " + grup.getName());
 		}
-		if (grupEntity.getParent() == null)
-		{
-			throw new SeyconException("Cannot remove root (world) group");
-		}
+//		if (grupEntity.getParent() == null)
+//		{
+//			throw new SeyconException("Cannot remove root (world) group");
+//		}
 
 		for (UserEntity u: grupEntity.getPrimaryGroupUsers())
 		{
@@ -504,40 +505,50 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	protected GroupUser handleUpdate(GroupUser usuariGrup) throws Exception {
-		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().load(usuariGrup.getId());
-		if ( usuariGrup.getUser().equals(usuariGrupEntity.getUser().getUserName()) && 
-				usuariGrup.getGroup().equals(usuariGrupEntity.getGroup().getName()))
-		{
-			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity) ;
-			return usuariGrup;
-		}
-		else
-		{
-			if (!getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_DELETE, usuariGrupEntity)) {
-				throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:delete", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
+		if (Boolean.TRUE.equals(usuariGrup.getPrimaryGroup())) {
+			User u = getUserService().findUserByUserName(usuariGrup.getUser());
+			if (u == null) {
+				throw new InternalErrorException(String.format("Cannot modify user's primary group. User %s does not exist", usuariGrup.getUser()));
 			}
-			usuariGrup.setEnd(usuariGrupEntity.getEnd());
-			usuariGrup.setStart(usuariGrupEntity.getStart());
-			usuariGrup.setDisabled(usuariGrupEntity.getDisabled());
-			usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
-			new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
-	
-			// En principi no ha d'existir update--- seria un create
-			if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
-	
-				UserEntity usuari = usuariGrupEntity.getUser();
-				usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
-				usuari.setLastUserModification(Security.getCurrentAccount());
-				getUserEntityDao().update(usuari);
-	
-				getUserGroupEntityDao().update(usuariGrupEntity);
-				usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
+			u.setPrimaryGroup(usuariGrup.getGroup());
+			getUserService().update(u);
+			return usuariGrup;
+		} else {
+			UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().load(usuariGrup.getId());
+			if ( usuariGrup.getUser().equals(usuariGrupEntity.getUser().getUserName()) && 
+					usuariGrup.getGroup().equals(usuariGrupEntity.getGroup().getName()))
+			{
+				new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity) ;
 				return usuariGrup;
-			} else {
-				throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:create", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+			else
+			{
+				if (!getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_DELETE, usuariGrupEntity)) {
+					throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:delete", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
-	
+				}
+				usuariGrup.setEnd(usuariGrupEntity.getEnd());
+				usuariGrup.setStart(usuariGrupEntity.getStart());
+				usuariGrup.setDisabled(usuariGrupEntity.getDisabled());
+				usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
+				new UserGroupAttributePersister().updateAttributes(usuariGrup.getAttributes(), usuariGrupEntity);
+		
+				// En principi no ha d'existir update--- seria un create
+				if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
+		
+					UserEntity usuari = usuariGrupEntity.getUser();
+					usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());
+					usuari.setLastUserModification(Security.getCurrentAccount());
+					getUserEntityDao().update(usuari);
+		
+					getUserGroupEntityDao().update(usuariGrupEntity);
+					usuariGrup = getUserGroupEntityDao().toGroupUser(usuariGrupEntity);
+					return usuariGrup;
+				} else {
+					throw new SeyconAccessLocalException("grupService", "update (UsuariGrup)", "user:group:create", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"User's groups-based authorization: probably not authorized to create groups for this user"); //$NON-NLS-1$
+		
+				}
 			}
 		}
 	}
@@ -624,6 +635,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
                 String nomComplet = user.getFullName();
                 GroupUser usugru = new GroupUser(user.getUserName(), user.getPrimaryGroup().getName(), nomComplet);
                 usugru.setInfo(Messages.getString("GroupServiceImpl.PrimaryGroupText"));
+                usugru.setPrimaryGroup(true);
                 result.add(usugru);
             }
         }

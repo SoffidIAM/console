@@ -9,6 +9,10 @@
     url: /resource/group/group.zul
     permissions: ["seu:grups:show"]
     img: /img/menu/groups.svg
+  - name: seu.aplciacions
+    url: /resource/application/application.zul
+    permissions: ["seu:aplicacions:show"]
+    img: /img/menu/applications.svg
 - name: seu.configuration
   img_old: /img/menu/system-settings.png
   img: /img/menu/toolbox.svg

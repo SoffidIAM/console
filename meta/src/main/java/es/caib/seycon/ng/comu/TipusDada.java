@@ -138,6 +138,10 @@ public class TipusDada {
 	@Attribute (defaultValue="false")
 	Boolean builtin;
 	
+	@Description("Bulti-in handler class")
+	@Nullable
+	String bultinHandler;
+	
 	@Description ("Uppercase / lowercase usage")
 	@Nullable
 	@Attribute (defaultValue="com.soffid.iam.api.LetterCaseEnum.MIXEDCASE")

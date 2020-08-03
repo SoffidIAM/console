@@ -41,6 +41,7 @@ public class SearchDictionaryBuilder {
 		 add("com.soffid.iam.api.User.passwordMaxAge");
 		 add("com.soffid.iam.api.User.phoneNumber");
 		 add("com.soffid.iam.api.User.nationalID");
+		 add("com.soffid.iam.api.Application.relativeName");
 		 add("com.soffid.iam.api.Application.source");
 		 add("com.soffid.iam.api.Application.owner");
 		 add("com.soffid.iam.api.Application.executable");
@@ -113,63 +114,66 @@ public class SearchDictionaryBuilder {
 		sd.setAttributes(new LinkedList<SearchAttributeDefinition>());
 		sd.setTimestamp(System.currentTimeMillis());
 		Class<?> cl = Class.forName(clazz);
-		for (Field f: cl.getDeclaredFields())
-		{
-			SearchAttributeDefinition sad = new SearchAttributeDefinition();
-			sad.setName(f.getName());
-			String labelName = clazz+"."+f.getName();
-			try {
-				Labels.getRequiredLabel(labelName);
-				sad.setLabelName(labelName);
-			} catch (Exception e) {
-				sad.setLocalizedName(f.getName());
-			}
-			if (! Modifier.isStatic(f.getModifiers()) && ! f.getName().equals("id") && ! EXCLUSIONS.contains(clazz+"."+f.getName()))
+		do {
+			for (Field f: cl.getDeclaredFields())
 			{
-				Class<?> t = f.getType();
-				sad.setJavaType(t);
-				if (Date.class.isAssignableFrom(t) ||
-						Calendar.class.isAssignableFrom(t))
-				{
-					sad.setType(TypeEnumeration.DATE_TYPE);
+				SearchAttributeDefinition sad = new SearchAttributeDefinition();
+				sad.setName(f.getName());
+				String labelName = clazz+"."+f.getName();
+				try {
+					Labels.getRequiredLabel(labelName);
+					sad.setLabelName(labelName);
+				} catch (Exception e) {
+					sad.setLocalizedName(f.getName());
 				}
-				else if (String.class.isAssignableFrom(t) ||
-						Integer.class.isAssignableFrom(t) || 
-						Long.class.isAssignableFrom(t))
+				if (! Modifier.isStatic(f.getModifiers()) && ! f.getName().equals("id") && ! EXCLUSIONS.contains(clazz+"."+f.getName()))
 				{
-					sad.setType(TypeEnumeration.STRING_TYPE);
-				}
-				else if (Boolean.class.isAssignableFrom(t) || boolean.class.isAssignableFrom(t))
-				{
-					sad.setType(TypeEnumeration.STRING_TYPE);
-					LinkedList<String> l = new LinkedList<String>();
-					l.add("true");
-					l.add("false");
-					sad.setValues(l);
-					l = new LinkedList<String>();
-					l.add("True");
-					l.add("False");
-					sad.setLabels(l);
-				}
-				else 
-				{
-					try {
-						@SuppressWarnings("unchecked")
-						List<String> names = (List<String>) cl.getMethod("names").invoke(null);
-						@SuppressWarnings("unchecked")
-						List<String> values = (List<String>) cl.getMethod("values").invoke(null);
-						sad.setValues(values);
-						sad.setLabels(names);
-						sad.setType(TypeEnumeration.STRING_TYPE);
-					} catch (Exception e) {
-						sad = null;
+					Class<?> t = f.getType();
+					sad.setJavaType(t);
+					if (Date.class.isAssignableFrom(t) ||
+							Calendar.class.isAssignableFrom(t))
+					{
+						sad.setType(TypeEnumeration.DATE_TYPE);
 					}
+					else if (String.class.isAssignableFrom(t) ||
+							Integer.class.isAssignableFrom(t) || 
+							Long.class.isAssignableFrom(t))
+					{
+						sad.setType(TypeEnumeration.STRING_TYPE);
+					}
+					else if (Boolean.class.isAssignableFrom(t) || boolean.class.isAssignableFrom(t))
+					{
+						sad.setType(TypeEnumeration.STRING_TYPE);
+						LinkedList<String> l = new LinkedList<String>();
+						l.add("true");
+						l.add("false");
+						sad.setValues(l);
+						l = new LinkedList<String>();
+						l.add("True");
+						l.add("False");
+						sad.setLabels(l);
+					}
+					else 
+					{
+						try {
+							@SuppressWarnings("unchecked")
+							List<String> names = (List<String>) cl.getMethod("names").invoke(null);
+							@SuppressWarnings("unchecked")
+							List<String> values = (List<String>) cl.getMethod("values").invoke(null);
+							sad.setValues(values);
+							sad.setLabels(names);
+							sad.setType(TypeEnumeration.STRING_TYPE);
+						} catch (Exception e) {
+							sad = null;
+						}
+					}
+					
+					if (sad != null)
+						sd.getAttributes().add(sad);
 				}
-				
-				if (sad != null)
-					sd.getAttributes().add(sad);
 			}
-		}
+			cl = cl.getSuperclass();
+		} while (cl != null);
 		return sd;
 	}
 

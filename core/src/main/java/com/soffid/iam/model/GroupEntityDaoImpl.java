@@ -94,7 +94,7 @@ public class GroupEntityDaoImpl extends
                         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
                         tasque.setGroup(grup.getName());
                         getTaskEntityDao().create(tasque);
-                        if (grup.getHomeServer() != null) {
+                        if (grup.getDriveServer() != null) {
                             tasque = getTaskEntityDao().newTaskEntity();
                             tasque.setDate(new Timestamp(System.currentTimeMillis()));
                             tasque.setTransaction(TaskHandler.CREATE_FOLDER);
@@ -127,7 +127,7 @@ public class GroupEntityDaoImpl extends
             tasque.setTransaction(TaskHandler.UPDATE_GROUP);
             tasque.setGroup(grup.getName());
             getTaskEntityDao().create(tasque);
-            if (grup.getHomeServer() != null) {
+            if (grup.getDriveServer() != null) {
                 tasque = getTaskEntityDao().newTaskEntity();
                 tasque.setDate(new Timestamp(System.currentTimeMillis()));
                 tasque.setTransaction(TaskHandler.CREATE_FOLDER);
@@ -201,7 +201,7 @@ public class GroupEntityDaoImpl extends
                         tasque.setTransaction(TaskHandler.UPDATE_GROUP);
                         tasque.setGroup(grup.getName());
                         getTaskEntityDao().create(tasque);
-                        if (grup.getHomeServer() != null ? old.getHomeServer() == null || !old.getHomeServer().getId().equals(grup.getHomeServer().getId()) : old.getHomeServer() != null) {
+                        if (grup.getDriveServer() != null ? old.getDriveServer() == null || !old.getDriveServer().getId().equals(grup.getDriveServer().getId()) : old.getDriveServer() != null) {
                             tasque = getTaskEntityDao().newTaskEntity();
                             tasque.setDate(new Timestamp(System.currentTimeMillis()));
                             tasque.setTransaction(TaskHandler.CREATE_FOLDER);
@@ -236,7 +236,7 @@ public class GroupEntityDaoImpl extends
 			grup.setParentGroup(codiPare);
 		}
 
-		HostEntity servidorOfimatic = entity.getHomeServer();
+		HostEntity servidorOfimatic = entity.getDriveServer();
 		if (servidorOfimatic != null) {
 			String nomServidorOfimatic = servidorOfimatic.getName();
 			grup.setDriveServerName(nomServidorOfimatic);
@@ -354,13 +354,13 @@ public class GroupEntityDaoImpl extends
 				&& nomServidorOfimatic.trim().compareTo("") != 0) { //$NON-NLS-1$
 			HostEntity servidorOfimatic = getHostEntityDao().findByName(nomServidorOfimatic);
 			if (servidorOfimatic != null) {
-				targetEntity.setHomeServer(servidorOfimatic);
+				targetEntity.setDriveServer(servidorOfimatic);
 			} else {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.5"),  //$NON-NLS-1$
 						nomServidorOfimatic));
 			}
 		} else {
-			targetEntity.setHomeServer(null);
+			targetEntity.setDriveServer(null);
 		}
 
 		String codiTipus = sourceVO.getType(); // Unitat Organizativa

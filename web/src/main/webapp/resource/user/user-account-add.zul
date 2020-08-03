@@ -53,8 +53,8 @@
 					
 		</div>
 		<div id="step2">
-			<inputfield3 id="systemName" label="${c:l('com.soffid.iam.api.Account.system') }" dataType="STRING" readonly="true"/>
-			<inputfield3 id="accountName" label="${c:l('pamSession.accountName') }" dataType="STRING" required="true" onChange="ref:window.checkAccountName"/>
+			<customfield3 id="systemName" label="${c:l('com.soffid.iam.api.Account.system') }" dataType="STRING" readonly="true"/>
+			<customfield3 id="accountName" label="${c:l('pamSession.accountName') }" dataType="STRING" required="true" onChange="ref:window.checkAccountName"/>
 	
 			<div style="text-align: right; width: 100%">
 				<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" onClick="ref:window.back" />
@@ -64,12 +64,12 @@
 		</div>
 		<div>
 			<form width="100%" dataPath="${execution.attributes.dataSource }:/">
-				<inputfield3 bind="@system" dataType="STRING" required="true"
+				<customfield3 bind="@system" dataType="STRING" required="true"
 					readonly="true"
 					label="${c:l('accounts.dispatcher')}"/>
-				<inputfield3 bind="@name" maxLength="150" dataType="STRING" required="true"
+				<customfield3 bind="@name" maxLength="150" dataType="STRING" required="true"
 					label="${c:l('user_renameaccount.Nom')}" readonly="true"/>
-				<inputfield3 bind="@status" dataType="STRING" required="true"
+				<customfield3 bind="@status" dataType="STRING" required="true"
 					enumeration = "com.soffid.iam.api.AccountStatus"
 					label="${c:l('accounts.status')}"/>
 				<div use="com.soffid.iam.web.component.ObjectAttributesDiv"

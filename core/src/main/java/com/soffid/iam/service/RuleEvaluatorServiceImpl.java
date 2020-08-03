@@ -113,7 +113,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				for (RuleAssignedRoleEntity rar : rule.getRoles()) {
                     DomainValueEntity valor = null;
                     String stringValue = null;
-                    if (!rar.getRole().getDomainType().equals(TipusDomini.SENSE_DOMINI)) {
+                    if (rar.getRole().getDomainType() != null && !rar.getRole().getDomainType().equals(TipusDomini.SENSE_DOMINI)) {
                         if (rar.getDomainValue() != null && rar.getDomainValue().length() > 0) {
                             stringValue = rar.getDomainValue();
                         } else if (rar.getBshDomainValueExpression() != null && rar.getBshDomainValueExpression().length() > 0) {

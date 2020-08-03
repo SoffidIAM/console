@@ -3275,7 +3275,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		{
 			if (aae.getDataType().getName().equals(key))
 			{
-				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+				if (aae.getObjectValue() != null && (
+						aae.getObjectValue().equals(o) ||
+						aae.getObjectValue().equals(o.toString())))
 					return aae;
 			}
 		}

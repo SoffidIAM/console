@@ -62,7 +62,7 @@
 		<script-handler>
 			<insert-script>
 				instance.scope = parent.instance.scope;
-				instance.customObjectType = parent.instance.name;
+				instance.objectType = parent.instance.name;
 			</insert-script>
 		</script-handler>
 		<ejb-handler jndi="java:/module/AdditionalDataService-v2">
@@ -76,18 +76,6 @@
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
-		<custom-attribute name="scopeLiteral">
-			if (instance.getScope () == com.soffid.iam.api.MetadataScope.ROLE)
-			    return org.zkoss.util.resource.Labels.getLabel("accounts.role");
-			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.USER)
-			    return org.zkoss.util.resource.Labels.getLabel("accounts.user");
-			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.GROUP)
-			    return org.zkoss.util.resource.Labels.getLabel("accounts.group");
-			else if (instance.getScope () == com.soffid.iam.api.MetadataScope.APPLICATION)
-			    return org.zkoss.util.resource.Labels.getLabel("aplicacionsIntranet.zul.Aplicacia-2");
-			else
-				return "";
-		</custom-attribute>
 		<custom-attribute name="typeDescription">
 			return org.zkoss.util.resource.Labels.getLabel("typeDadaAddicional."+instance.type);
 		</custom-attribute>

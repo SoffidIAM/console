@@ -1,5 +1,6 @@
 package com.soffid.iam.web.user;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.ejb.CreateException;
@@ -28,8 +29,10 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.service.ejb.UserService;
+import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
+import com.soffid.iam.web.popup.SelectColumnsHandler;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -59,17 +62,6 @@ public class UserGroupsHandler extends Div implements AfterCompose {
 		listboxPath = (String) Executions.getCurrent().getArg().get("listbox");
 	}
 	
-	
-	public void openAccount(Event event) {
-//		Object item = ((DataNode) tree.getJXPathContext().getValue("/")).getInstance();
-//		if (item instanceof Account) {
-//			Window w = 
-//					(Window) getDesktop()
-//					.getPage("user-account-details")
-//					.getFellow("window");
-//			Events.postEvent(new Event("onStart", w));
-//		}
-	}
 	
 	public void addNew (Event event) {
 		Window w = (Window) getFellow("add-window");
@@ -183,5 +175,9 @@ public class UserGroupsHandler extends Div implements AfterCompose {
 	
 	public void setListboxPath(String listboxPath) {
 		this.listboxPath = listboxPath;
+	}
+
+	public void changeColumns(Event event) throws IOException {
+		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
 	}
 }

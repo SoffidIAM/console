@@ -403,7 +403,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             	entity.setStatus(RoleDependencyStatus.STATUS_ACTIVE);
             
             getRoleDependencyEntityDao().create(entity);
-	 
+            grant.setId(entity.getId());
+            grant.setStatus(entity.getStatus());
         } else {
 			throw new InternalErrorException(String.format(Messages.getString("RoleEntityDaoImpl.0"),   //$NON-NLS-1$
 					ownedRole.toRoleDescription(), 

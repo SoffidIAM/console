@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.user.UserAccountsHandler" id="handler">
+	<div class="navigation-bar dummy">
+		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+	</div>
+
+	<datatable dataPath="${arg.listbox}:/sharedAccount" 
+		id="tree"
+		use="com.soffid.iam.web.user.UserColumnsTree" 
+		onSetPassword="ref:handler.openPasswordWindow"
+		onSelect="ref:handler.openAccount"
+		openLevels="2"
+		enablefilter="true">
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('accounts.dispatcher')}
+		  value: system
+		- name: ${c:l('usuaris.zul.Account')}
+		  value: name
+		- name: ${c:l('usuaris.zul.DataUpdate')}
+		  width: 150px
+		  value: lastUpdated_datetime
+		- name: ${c:l('accounts.lastLogin')}
+		  width: 150px
+		  value: lastLogin_datetime
+		- name: ${c:l('usuaris.zul.DataAssignacia')}
+		  width: 150px
+		  value: lastPasswordSet_datetime
+		- name: ${c:l('usuaris.zul.DataCaducitat')}
+		  width: 150px
+		  value: passwordExpiration_datetime
+		]]>
+		</attribute>
+	</datatable>
+</div>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.group.GroupUsersHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar">
+		<label bind="//group/listbox:/@name"></label> - <label bind="//group/listbox:/@description"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('user:group:create')}" onClick="ref:handler.importCsv"/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+
+	<datatable id="listbox" autocommit="true" 
+		use="com.soffid.iam.web.group.GroupUserDatatable"
+		preference="group-user"
+		dataPath="${arg.listbox }:/user" maxheight="70vh" sortColumn="0"
+		onSelect="ref:handler.showDetails" enablefilter="true">
+	</datatable>
+
+	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:group:create')}" >
+		<div class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+		position="center, center" sizable="true"
+		title="${c:l('user-groups.details')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
+
+		<div sclass="navigation-bar">
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('user:group:delete')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<form id="form" width="100%" dataPath="../listbox:/">
+			<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+				id="attributes"
+				objectType="com.soffid.iam.api.GroupUser" dataPath="/." />
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:handler.closeDetails">
+			</button>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
+				datamodel="${arg.listbox}" 
+				onClick="ref:handler.onChange"/>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-window"
+		position="top, center" sizable="true"
+		title="${c:l('user-groups.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("user-groups.selectUser")}
+	- ${c:l("user-groups.setProperties")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div id="step1">
+
+				<customfield3 dataType="USER" id="user"
+					label="${c:l('user-groups.selectUser') }"
+					required="true"
+					filterExpression='active eq "S"'>
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.undoAdd" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.setProperties"/>
+				</div>
+						
+			</div>
+			<div>
+				<form width="100%" dataPath="../listbox:/">
+					<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+						id="userGroupAttributes"
+						objectType="com.soffid.iam.api.GroupUser" dataPath="/." />
+				</form>
+				<separator spacing="5px" />
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.backAndRollback" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:handler.applyAdd"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+</div>

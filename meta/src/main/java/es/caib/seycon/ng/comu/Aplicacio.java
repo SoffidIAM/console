@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.comu;
 import java.util.Map;
 
+import com.soffid.iam.api.ApplicationType;
 import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Description;
@@ -19,10 +20,21 @@ import es.caib.seycon.ng.model.AplicacioEntity;
 
 @JsonObject(hibernateClass = AplicacioEntity.class)
 @ValueObject(translatedName = "Application", translatedPackage = "com.soffid.iam.api")
-public class Aplicacio {
+public abstract class Aplicacio {
 
-	@Attribute(translated = "name" )
+	@Description ("Business process or application")
+	@Nullable
+	@Attribute(defaultValue = "com.soffid.iam.api.ApplicationType.APPLICATION")
+	public ApplicationType type;
+	
+	@Attribute(translated = "name", hidden = true )
 	public java.lang.String codi;
+
+	@Attribute(translated = "parent", type = "APPLICATION")
+	@Nullable
+	public java.lang.String parent;
+
+	public java.lang.String relativeName;
 
 	@Attribute(translated = "description" )
 	public java.lang.String nom;
@@ -47,15 +59,16 @@ public class Aplicacio {
 	public java.lang.String bd;
 
 	@Nullable
+	@Attribute(hidden = true)
 	public java.lang.Long id;
 
 	@Description("full name of application responsible")
 	@Nullable
-	@Attribute(translated = "ownerName" )
+	@Attribute(translated = "ownerName", type = "USER" )
 	public java.lang.String nomComplertPersonaContacte;
 
 	@Nullable
-	@Attribute(translated = "bpmEnforced" )
+	@Attribute(translated = "bpmEnabled", synonyms = {"bpmEnforced"} )
 	public java.lang.Boolean gestionableWF;
 
 	@Nullable
@@ -64,10 +77,12 @@ public class Aplicacio {
 
 	@Description ("Approval process needed for workflow managed roles belonging to this application. Null value means no approval process is needed")
 	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.application.RoleApprovalProcessFieldHandler")
 	public String approvalProcess;
 
 	@Description ("Process needed for any change applied to this application roles. Null value means no approval process is needed")
 	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.application.RoleDefinitionProcessFieldHandler")
 	public String roleDefinitionProcess;
 	
 	@Description ("Only one single role can be assigned to each user")
@@ -76,7 +91,7 @@ public class Aplicacio {
 	
 	@Description ("Application custom attributes")
 	@JsonAttribute(hibernateJoin="attributes")
-	@Attribute(defaultValue="new java.util.HashMap<String,Object>()")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()", hidden = true)
 	@Nullable
 	public Map<String,Object> attributes; 
 }

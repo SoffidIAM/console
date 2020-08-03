@@ -25,6 +25,7 @@ button, input.button, input.file {
 	font-family: inherit;
 	font-size: inherit;
 	word-break: break-all;
+	outline: none;
 }
 
 span.missatge {
@@ -1765,9 +1766,8 @@ textarea.noborder-textbox, input.noborder-textbox {
 input.readonly, input.text-disd {
 	box-sizing: border-box;
 	background: transparent;
-	border: none;
+	border: 2px solid transparent;
 	color:#000 !important;
-	border-bottom: 1px solid transparent;
 	padding: 4px;
 }
 
@@ -2094,10 +2094,10 @@ div.datatable table.thead td {
     padding-bottom: 4px;
     border-left: 1px solid {GREENDARK};
     border-right: 1px solid {GREENLIGHT}   
-    	}
+}
 div.datatable table.thead td:last-child {
     border-right: 1px solid #c0c0c0;   
-    	}
+}
 div.datatable .thead td input {
 	width:100%;
 }
@@ -2121,7 +2121,8 @@ div.datatable table.thead td.filter-cell {
 div.datatable {
 	display: block;
 	border-spacing: 0;
-		}
+	overflow-x: hidden;
+}
 
 div.datatable table.thead {
   width:100%;
@@ -2133,7 +2134,6 @@ div.datatable div.tbodydiv{
   box-sizing: border-box;
   width:100%; 
   overflow-y:auto;
-  overflow-x:clip;
   border-bottom: 1px solid #c0c0c0;
 }
 
@@ -2515,7 +2515,7 @@ button.grid-icon-button {
 }
 
 div.menu2 div.menu2starter img, button.icon-button img, grid-icon-button img {
-	width: 25px;
+	width: 20px;
 }
 
 button.icon-button:disabled, button.grid-icon-button:disabled {
@@ -2597,6 +2597,11 @@ div.navigation-bar {
 
 div.navigation-bar span {
 	color: {SKY};
+	font-weight: bold;
+}
+
+div.navigation-bar.dummy span {
+	color: {GREEN};
 	font-weight: bold;
 }
 
@@ -2725,10 +2730,12 @@ div.datatree div.tbody div.tree-item {
 }
 
 div.tree-children.waiting {
-	background-image: url(img/wait.gif); 
+	background-image: url(../img/wait.gif); 
 	background-size: 16px 16px;
 	width: 16px;
-	height: 16px;
+	height: 32px;
+	background-repeat: no-repeat;
+	background-position-y: 8px;
 }
 
 div.tree-children.waiting div.tree-tail {
@@ -2781,8 +2788,9 @@ div.datatree div.tbody div.tree-label div.tree-cell {
 	text-overflow: clip;
 	border-right: 1px solid #c0c0c0;
 }
-div.datatree div.tbody div.tree-label div.tree-cell {
-	padding-left: 26px;
+div.datatree div.tbody div.tree-label div.tree-cell,
+div.datatree div.tbody div.tree-label.no-columns {
+	padding-left: 4px;
 	padding-right: 4px;
 	padding-top: 4px;
 	height: 32px;
@@ -3033,26 +3041,37 @@ div.databox div.container textarea.text {
 }
 
 div.databox div.databox-popup {
-   position: absolute;
-   top: 24px;
+   position: fixed;
+   margin-top: 24px;
    background-color: white;
    padding: 8px;
    border: solid 1px {BLUEDARK};
    border-radius: 3px;
    width: fit-content;
-   min-width: 150px;
+   min-width: 200px;
+   max-width: 800px;
+   max-height: 800px;
    z-index: 1;
    box-shadow: 4px 4px #a0a0a0;
+   overflow-y: auto;
 }
 
 div.databox div.databox-popup div {
-   width: 100%;
-	cursor: pointer;
+    width: 100%;
+    cursor: pointer;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+    height: 20px;
+}
+
+div.databox div.databox-popup div span.name span {
+	font-weight: bold;
 }
 
 div.databox div.databox-popup div span.search-match{
 	color: {SKY}
 }
+
 div.databox div.databox-popup div:hover {
 	background-color: {BLUELIGHT};
 }

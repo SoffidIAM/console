@@ -4,81 +4,88 @@
 
 <window id="window" closable="true" position="top, center"
 	use="com.soffid.iam.web.popup.ImportCsvHandler"
-	sizable="true" 
+	sizable="false" 
 	style="min-width: 40em;"
 	visible="false"
 	onDisplay="ref:window.start"
 	onClose="ref:window.close" 
-	width="650px">
+	width="850px">
 
-	<div id="step1" >
-		<fileupload style="width: 600px; height: 120px; padding: 20px 0px 20px 100px"
-			id="${c:l('csvimport.upload') }" 
-			onUpload="ref:window.onUpload"
-			onClose ="ref:window.cancelUpload"
-			mold="compact"/>
-	</div>
-	<div id="step2" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
-		<grid class="noBorderGrid" fixedLayout="true">
-			<rows>
-				<row>
-					${c:l('csvimport.charset') } :
-					<select id="charsetSelect">
-					<attribute name="options"><![CDATA[
-- label: UTF-16 Low Endian
-  value: UTF-16LE
-- label: UTF-16 Big Endian
-  value: UTF-16LE
-- label: UTF-8
-  value: UTF-8
-- label: Windows legacy
-  value: CP1252
-- label: ISO-8859-1 
-  value: ISO-8859-1
-					]]></attribute>
-					</select>
-				</row>
-				<row>
-					${c:l('csvimport.separator') } :
-					<textbox id="separator" maxlength="2"/>
-				</row>
-				<row>
-					${c:l('csvimport.quoteChar') } :
-					<textbox id="quote" maxlength="1"/>
-				</row>
-				<row>
-					${c:l('csvimport.escapeChar') } :
-					<textbox id="escape" maxlength="1"/>
-				</row>
-				<row>
-					${c:l('csvimport.containsHeader') } :
-					<switch id="containsHeader"/>
-				</row>
-			</rows>
-		</grid>
-		<button image="/img/refresh.svg" label="${c:l('error.btnRecargar') }" onClick="ref:window.reload"/>
-		<datatable id="test-table" footer="false" enablefilter="false" style="margin-top: 25px"/>
-		
-		<div style="text-align: right; width: 100%">
-			<button label="${c:l('user_createaccount.Back')}" onClick="ref:window.step2back" />
-			<button label="${c:l('user_createaccount.Next')}" onClick="ref:window.step2next" />
+	<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("fileupload.selectFile")}
+	- ${c:l("csvimport.check")}
+	- ${c:l("csvimport.select-mappings")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+		<div id="step1" >
+			<fileupload style="width: 600px; height: 120px; padding: 20px 0px 20px 100px"
+				id="${c:l('csvimport.upload') }" 
+				onUpload="ref:window.onUpload"
+				onClose ="ref:window.cancelUpload"
+				mold="compact"/>
 		</div>
-	</div>
-	<div id="step3" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
-		${c:l('csvimport.select-mappings') }
-		<grid class="noBorderGrid" fixedLayout="true" id="columnsGrid">
-			<columns>
-				<column label="${c:l('csvimport.csv-column') }"/>
-				<column label="${c:l('csvimport.meaning') }"/>
-			</columns>
-			<rows/>
-		</grid>
-		
-		<div style="text-align: right; width: 100%">
-			<button label="${c:l('user_createaccount.Back')}" onClick="ref:window.step3back" />
-			<button label="${c:l('tenant.zul.import')}" onClick="ref:window.step3next" />
+		<div id="step2" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
+			<grid class="noBorderGrid" fixedLayout="true">
+				<rows>
+					<row>
+						${c:l('csvimport.charset') } :
+						<select id="charsetSelect">
+						<attribute name="options"><![CDATA[
+	- label: UTF-16 Low Endian
+	  value: UTF-16LE
+	- label: UTF-16 Big Endian
+	  value: UTF-16LE
+	- label: UTF-8
+	  value: UTF-8
+	- label: Windows legacy
+	  value: CP1252
+	- label: ISO-8859-1 
+	  value: ISO-8859-1
+						]]></attribute>
+						</select>
+					</row>
+					<row>
+						${c:l('csvimport.separator') } :
+						<textbox id="separator" maxlength="2"/>
+					</row>
+					<row>
+						${c:l('csvimport.quoteChar') } :
+						<textbox id="quote" maxlength="1"/>
+					</row>
+					<row>
+						${c:l('csvimport.escapeChar') } :
+						<textbox id="escape" maxlength="1"/>
+					</row>
+					<row>
+						${c:l('csvimport.containsHeader') } :
+						<switch id="containsHeader"/>
+					</row>
+				</rows>
+			</grid>
+			<button image="/img/refresh-r.svg" label="${c:l('error.btnRecargar') }" onClick="ref:window.reload"/>
+			<datatable id="test-table" footer="false" enablefilter="false" style="margin-top: 25px"/>
+			
+			<div style="text-align: right; width: 100%">
+				<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step2back" />
+				<button label="${c:l('user_createaccount.Next')}" image="/img/next-r.svg" onClick="ref:window.step2next" />
+			</div>
 		</div>
-	</div>
-	
+		<div id="step3" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
+			${c:l('csvimport.select-mappings') }
+			<grid class="noBorderGrid" fixedLayout="true" id="columnsGrid">
+				<columns>
+					<column label="${c:l('csvimport.csv-column') }"/>
+					<column label="${c:l('csvimport.meaning') }"/>
+				</columns>
+				<rows/>
+			</grid>
+			
+			<div style="text-align: right; width: 100%">
+				<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step3back" />
+				<button label="${c:l('tenant.zul.import')}" image="/img/import-r.svg" onClick="ref:window.step3next" />
+			</div>
+		</div>
+	</wizard>	
 </window>
 

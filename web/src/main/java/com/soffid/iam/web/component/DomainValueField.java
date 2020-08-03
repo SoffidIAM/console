@@ -1,76 +1,34 @@
 package com.soffid.iam.web.component;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
-import java.net.URLDecoder;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
-import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
 
-import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.DataType;
-import com.soffid.iam.api.Group;
-import com.soffid.iam.api.Host;
-import com.soffid.iam.api.MetadataScope;
-import com.soffid.iam.api.Role;
-import com.soffid.iam.api.Task;
-import com.soffid.iam.api.User;
-import com.soffid.iam.api.UserType;
-import com.soffid.iam.bpm.api.ProcessInstance;
-import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
-import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.inputField.ApplicationDataHandler;
-import com.soffid.iam.web.component.inputField.CustomObjectDataHandler;
 import com.soffid.iam.web.component.inputField.DomainValueDataHandler;
 import com.soffid.iam.web.component.inputField.GroupDataHandler;
-import com.soffid.iam.web.component.inputField.HostDataHandler;
 import com.soffid.iam.web.component.inputField.InputFieldDataHandler;
-import com.soffid.iam.web.component.inputField.MailDomainDataHandler;
-import com.soffid.iam.web.component.inputField.NetworkDataHandler;
-import com.soffid.iam.web.component.inputField.RoleDataHandler;
-import com.soffid.iam.web.component.inputField.UserDataHandler;
-import com.soffid.iam.web.popup.FinderHandler;
-import com.soffid.iam.web.users.additionalData.AttributesDiv;
 import com.soffid.iam.web.users.additionalData.SearchFilter;
 
-import bsh.EvalError;
-import bsh.TargetError;
-import es.caib.seycon.ng.comu.Aplicacio;
-import es.caib.seycon.ng.comu.Grup;
-import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.comu.TypeEnumeration;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
-import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.component.Databox;
-import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
-import es.caib.zkib.jxpath.JXPathException;
 
 public class DomainValueField extends Databox
 {

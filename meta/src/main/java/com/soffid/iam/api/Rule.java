@@ -13,6 +13,9 @@ public class Rule {
 	@Nullable
 	public java.lang.Long id;
 
+	public String name;
+	
+	@Nullable
 	public java.lang.String description;
 
 	public java.lang.String bshExpression;

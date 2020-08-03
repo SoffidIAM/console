@@ -45,7 +45,7 @@ public class Grup {
 	public java.lang.String tipus;
 
 	@Nullable
-	@Attribute(translated = "driveServerName", type="HOST" )
+	@Attribute(translated = "driveServerName", type="HOST", entityAttribute = "driveServer.name" )
 	public java.lang.String nomServidorOfimatic;
 
 	@Nullable

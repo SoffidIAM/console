@@ -53,7 +53,7 @@ public class MetaDataEntityDaoImpl extends
 		super.toDataType(sourceEntity, targetVO);
 		if (sourceEntity.getScope() == null)
 			targetVO.setScope(MetadataScope.USER);
-		if (sourceEntity.getLabel() == null || ! sourceEntity.getLabel().trim().isEmpty())
+		if (sourceEntity.getLabel() == null || sourceEntity.getLabel().trim().isEmpty())
 			targetVO.setLabel(sourceEntity.getNlsLabel() == null || sourceEntity.getNlsLabel().trim().isEmpty()?
 					sourceEntity.getName():
 					null);
@@ -141,21 +141,10 @@ public class MetaDataEntityDaoImpl extends
 			targetEntity.setValues(b.toString());
 		}
 		
-		if (sourceVO.getScope() == MetadataScope.CUSTOM)
-		{
-			CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(sourceVO.getCustomObjectType());
-			if (cot == null)
-				throw new RuntimeException("Invalid custom object type "+sourceVO.getCustomObjectType());
-			targetEntity.setObjectType(cot);
-		}
-
-		if (sourceVO.getType() == TypeEnumeration.CUSTOM_OBJECT_TYPE)
-		{
-			CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(sourceVO.getDataObjectType());
-			if (cot == null)
-				throw new RuntimeException("Invalid custom object type "+sourceVO.getCustomObjectType());
-			targetEntity.setDataObjectType(cot);
-		}
+		CustomObjectTypeEntity cot = getCustomObjectTypeEntityDao().findByName(sourceVO.getCustomObjectType());
+		if (cot == null)
+			throw new RuntimeException("Invalid object type "+sourceVO.getCustomObjectType());
+		targetEntity.setObjectType(cot);
 	}
 	
 	public void create(Collection entities) {

@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.model;
 import java.util.Collection;
 
+import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -31,6 +32,10 @@ public abstract class AplicacioEntity {
 
 	@Column (name="APL_CODI", length=100, translated="name")
 	public java.lang.String codi;
+
+	@Column (name="APL_APL_ID", reverseAttribute = "children")
+	@Nullable
+	public AplicacioEntity parent;
 
 	@Column (name="APL_NOM", length=100, translated="description")
 	public java.lang.String nom;
@@ -80,6 +85,11 @@ public abstract class AplicacioEntity {
 	@Nullable
 	public Boolean singleRole;
 	
+	@Column (name="APL_TYPE", length = 20)
+	@Nullable
+	@Description("Type of application: CONTAINER / BUSINESS / APPLICATION")
+	public ApplicationType type;
+
 	/************************** DAOS *********************************************************/
 	
 	@ForeignKey (foreignColumn="SOD_APL_ID")

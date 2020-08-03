@@ -79,7 +79,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 		binder.setDataPath(dataPath);
 	}
 
-	private void updateMetadata() {
+	public void updateMetadata() {
 		try {
 			if (Account.class.getName().equals(objectType)) {
 				try {
@@ -125,7 +125,6 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 			if (arg0 instanceof XPathRerunEvent)
 			{
 				updateMetadata();
-				refresh ();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -133,7 +132,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	}
 	
 	boolean recursive = false;
-	private void refresh() {
+	public void refresh() {
 		if (recursive)
 			return;
 		recursive = true ;
@@ -288,5 +287,23 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	
 	public void setSystem(String system) {
 		this.system = system;
+	}
+
+	
+	public List<DataType> getDataTypes() {
+		return dataTypes;
+	}
+
+	
+	public void setDataTypes(List<DataType> dataTypes) {
+		this.dataTypes = dataTypes;
+	}
+
+	public DataType getDataType(String name) {
+		if (dataTypes == null) return null;
+		for (DataType dt: dataTypes)
+			if (dt.getName().equals(name))
+				return dt;
+		return null;
 	}
 }

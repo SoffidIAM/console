@@ -58,11 +58,11 @@
 			</attribute>
 			<div id="step1">
 
-				<inputfield3 dataType="GROUP" id="group"
+				<customfield3 dataType="GROUP" id="group"
 					label="${c:l('user-groups.selectGroup') }"
 					required="true"
 					filterExpression="obsolete eq false">
-				</inputfield3>		
+				</customfield3>		
 			
 				<div style="text-align: right; width: 100%">
 					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.undoAdd" />

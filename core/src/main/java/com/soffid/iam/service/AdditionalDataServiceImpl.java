@@ -31,12 +31,18 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.LetterCaseEnum;
+import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
@@ -62,18 +68,32 @@ import es.caib.seycon.ng.exception.SeyconException;
  */
 public class AdditionalDataServiceImpl extends
 		com.soffid.iam.service.AdditionalDataServiceBase {
+	Map<String, MetadataScope> scopeForType = new HashMap<>();
+	Map<MetadataScope, String> typeForScope = new HashMap<>();
 
+	private void registerMapping (String name, MetadataScope scope) {
+		scopeForType.put(name, scope);
+		typeForScope.put(scope, name);
+	}
+	public AdditionalDataServiceImpl () {
+		registerMapping(User.class.getName(), MetadataScope.USER);
+		registerMapping(Account.class.getName(), MetadataScope.ACCOUNT);
+		registerMapping(Group.class.getName(), MetadataScope.GROUP);
+		registerMapping(GroupUser.class.getName(), MetadataScope.GROUP_MEMBERSHIP);
+		registerMapping(MailList.class.getName(), MetadataScope.MAIL_LIST);
+		registerMapping(Role.class.getName(), MetadataScope.ROLE);
+	}
 	/**
 	 * @see es.caib.seycon.ng.servei.DadesAddicionalsService#getTipusDades()
 	 */
 	protected java.util.Collection<DataType> handleGetDataTypes() throws java.lang.Exception {
-		List<MetaDataEntity> col = this.getMetaDataEntityDao().loadAll();
-		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
+		CustomObjectTypeEntity user = getCustomObjectTypeEntityDao().findByName(User.class.getName());
+		Collection<MetaDataEntity> col = user.getAttributes();
+		for ( Iterator<MetaDataEntity> iterator = col.iterator(); iterator.hasNext(); )
 		{
-			MetaDataEntity td = it.next();
-			if (td.getScope() != null && ! td.getScope().equals(MetadataScope.USER) ||
-					Boolean.TRUE.equals( td.getBuiltin() ) )
-				it.remove();
+			MetaDataEntity md = iterator.next();
+			if ( Boolean.TRUE.equals(md.getBuiltin()))
+				iterator.remove();
 		}
 		LinkedList <DataType> list = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(col));
 		Collections.sort(list, new Comparator<DataType>() {
@@ -110,23 +130,12 @@ public class AdditionalDataServiceImpl extends
 				return getAccountMetadataEntityDao().toDataType(tipusDadaEntity);
 			}
 		}
-		else if (tipusDada.getScope() == MetadataScope.CUSTOM)
-		{
-			validateUniqueOrderForMetaData(tipusDada);
-			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findByObjectTypeAndName(tipusDada.getCustomObjectType(), tipusDada.getCode());
-			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
-				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
-			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
-			if (tipusDadaEntity != null) {
-				getMetaDataEntityDao().create(tipusDadaEntity);
-				tipusDada.setId(tipusDadaEntity.getId());
-				return getMetaDataEntityDao().toDataType(tipusDadaEntity);
-			}
-		}
 		else
 		{
+			if (tipusDada.getObjectType() == null)
+				tipusDada.setObjectType(typeForScope.get(tipusDada.getScope()));
 			validateUniqueOrderForMetaData(tipusDada);
-			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findDataTypesByScopeAndName(tipusDada.getScope(), tipusDada.getCode());
+			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findByObjectTypeAndName(tipusDada.getCustomObjectType(), tipusDada.getCode());
 			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
@@ -214,9 +223,7 @@ public class AdditionalDataServiceImpl extends
 		if (dataTypeVO.getOrder() == null)
 		{
 			long max = 1;
-			List<MetaDataEntity> dt = dataTypeVO.getScope() == MetadataScope.CUSTOM ?
-					getMetaDataEntityDao().findByObjectTypeAndName(dataTypeVO.getCustomObjectType(), null):
-					getMetaDataEntityDao().findByScope(dataTypeVO.getScope()) ;
+			List<MetaDataEntity> dt = getMetaDataEntityDao().findByObjectTypeAndName(dataTypeVO.getCustomObjectType(), null);
 			for ( MetaDataEntity d: dt)
 				if (d.getOrder() != null && d.getOrder().longValue() >= max)
 					max = d.getOrder().longValue()+1;
@@ -398,11 +405,15 @@ public class AdditionalDataServiceImpl extends
 	@Override
 	protected Collection<DataType> handleFindDataTypes(MetadataScope scope)
 			throws Exception {
-		if ( scope == MetadataScope.USER)
-			return handleGetDataTypes();
 		
+		String name = typeForScope.get(scope);
+		if ( name == null)
+			return new LinkedList<>();
 		
-		List<MetaDataEntity> entities = this.getMetaDataEntityDao().findByScope(scope);
+		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().findByName(name);
+		if (entity == null)
+			return new LinkedList<>();
+		Collection<MetaDataEntity> entities = entity.getAttributes();
 		for ( Iterator<MetaDataEntity> iterator = entities.iterator(); iterator.hasNext(); )
 		{
 			MetaDataEntity md = iterator.next();
@@ -422,27 +433,8 @@ public class AdditionalDataServiceImpl extends
 
 	@Override
 	protected Collection<DataType> handleFindDataTypesByScopeAndName(
-			MetadataScope scope, String name) throws Exception { 
-		List<MetaDataEntity> col = this.getMetaDataEntityDao().findDataTypesByScopeAndName(scope, name);
-		for (MetaDataEntity td: col)
-		{
-			if (td.getScope() == null)
-			{
-				td.setScope(MetadataScope.USER);
-				getMetaDataEntityDao().update(td);
-			}
-		}
-		List<DataType> tipusDadaList = getMetaDataEntityDao().toDataTypeList(col);
-		Collections.sort(tipusDadaList, new Comparator<DataType>() {
-
-			public int compare(DataType o1, DataType o2) {
-				if (o1.getScope() == o2.getScope())
-					return o1.getOrder().compareTo(o2.getOrder());
-				else
-					return o1.getScope().compareTo(o2.getScope());
-			}
-		});
-		return tipusDadaList;
+			MetadataScope scope, String name) throws Exception {
+		return handleFindDataTypesByObjectTypeAndName(typeForScope.get(scope), name);
 	}
 
 	@Override
@@ -521,23 +513,14 @@ public class AdditionalDataServiceImpl extends
 
 	@Override
 	protected Collection<DataType> handleFindDataTypes2(MetadataScope scope) throws Exception {
-		List<MetaDataEntity> entities = this.getMetaDataEntityDao().findByScope(scope);
-		LinkedList <DataType> col = new LinkedList<DataType>( getMetaDataEntityDao().toDataTypeList(entities));
-		Collections.sort(col, new Comparator<DataType>() {
-			@Override
-			public int compare(DataType o1, DataType o2) {
-				return o1.getOrder().compareTo(o2.getOrder());
-			}
-			
-		});
-		return col;
+		return handleFindDataTypesByObjectTypeAndName2(typeForScope.get(scope), null);
 	}
 
 	@Override
 	protected List<DataType> handleFindSystemDataTypes2(String system) throws Exception {
 		SystemEntity de = getSystemEntityDao().findByName(system);
 		if (de == null)
-			return null;
+			return new LinkedList<>();
 		LinkedList <DataType>col = new LinkedList<DataType>( getAccountMetadataEntityDao().toDataTypeList(de.getMetaData()));
 		Collections.sort(col, new Comparator<DataType>() {
 			@Override
@@ -595,8 +578,13 @@ public class AdditionalDataServiceImpl extends
 				cot.setDescription("Builtin "+name+" object");
 			}
 			cot.setName(className);
+			cot.setScope(scope);
 			cot.setBuiltin(true);
 			getCustomObjectTypeEntityDao().create(cot);
+		} else {
+			cot.setScope(scope);
+			cot.setBuiltin(true);
+			getCustomObjectTypeEntityDao().update(cot);
 		}
 		
 		for (int i = 0; i < atts.length(); i++) {

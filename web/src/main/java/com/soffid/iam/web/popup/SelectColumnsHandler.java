@@ -126,7 +126,8 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 
 	public void reorder (ReorderEvent event) {
 		int pos = event.getSrcPosition();
-		int target = event.getInsertBeforePosition();
+		Integer target = event.getInsertBeforePosition();
+		if (target == null) target = cols.length() -1 ;
 		int[] positions = new int[cols.length()];
 		
 		JSONObject srcObject = cols.getJSONObject(pos);

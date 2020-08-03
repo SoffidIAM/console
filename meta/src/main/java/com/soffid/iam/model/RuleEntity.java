@@ -19,6 +19,10 @@ public abstract class RuleEntity {
 	public java.lang.Long id;
 
 	@Column (name="RUL_DESCRI", length=150)
+	public java.lang.String name;
+
+	@Column (name="RUL_COMMEN", length=150)
+	@Nullable
 	public java.lang.String description;
 
 	@Column (name="RUL_EXPRES", length=10000)

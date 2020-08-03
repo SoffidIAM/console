@@ -2,6 +2,9 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <div use="com.soffid.iam.web.user.UserAccountsHandler" id="handler">
+	<div class="navigation-bar dummy">
+		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+	</div>
 	<datatree2 dataPath="${arg.listbox}:/" 
 		id="tree"
 		header="${c:l('usuaris.zul.Dominidecontrasenyes')} /  ${c:l('accounts.dispatcher')} "

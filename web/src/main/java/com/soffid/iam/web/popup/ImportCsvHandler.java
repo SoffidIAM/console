@@ -41,6 +41,7 @@ import org.zkoss.zul.Window;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Select;
 import es.caib.zkib.component.Switch;
+import es.caib.zkib.component.Wizard;
 
 
 public class ImportCsvHandler extends Window implements AfterCompose {
@@ -112,15 +113,13 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 	
 	
 	public void cancelUpload () {
-		if (file == null)
+		if (file == null) 
 			setVisible(false);
 	}
 	
 	private void step1() {
 		file = null;
-		step1.setVisible(true);
-		step2.setVisible(false);
-		step3.setVisible(false);
+		getWizard().start();
 	}
 	
 	public void onUpload( UploadEvent event ) throws IOException {
@@ -161,9 +160,9 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 		separator.setValue(parser.getSeparator());
 		containsHeader.setChecked( parser.isContainsHeaders());
 		
-		step2();
-		
 		updateTable();
+		
+		getWizard().next();
 	}
 
 	public void reload() throws IOException {
@@ -234,22 +233,23 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 		}
 	}
 
-	public void step2() {
-		step1.setVisible(false);
-		step2.setVisible(true);
-		step3.setVisible(false);
-	}
-
 	public void step2back( Event event ) {
-		step1();
+		if (file != null) {
+			file.delete();
+			file = null;
+		}
+
+		getWizard().previous();
 	}
 	
 	public void step2next( Event event ) {
-		step3();
+		guessMappings();
+		loadMappingsGrid();
+		getWizard().next();
 	}
 
 	public void step3back( Event event ) {
-		step2();
+		getWizard().previous();
 	}
 	
 	public void step3next( Event event ) throws Exception {
@@ -268,17 +268,10 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 			else
 					tx.commit();
 		}			
+		file.delete();
+		file = null;
 		setVisible(false);
 	}
-
-	private void step3() {
-		file = null;
-		step1.setVisible(false);
-		step2.setVisible(false);
-		step3.setVisible(true);
-		loadMappingsGrid();
-	}
-	
 
 	private void loadMappingsGrid() {
 		String[][] columns = (String[][]) getPage().getVariable("columns");
@@ -338,6 +331,9 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 			Events.sendEvent(new Event("onDisplay", p.getFellow("window")));
 		}
 	}
-	
+
+	Wizard getWizard() {
+		return (Wizard) getFellow("wizard");
+	}
 }
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -80,6 +81,11 @@ public class CustomField3 extends InputField3 {
 			dataTypeObj.setValidationExpression(validationScript);
 			dataTypeObj.setVisibilityExpression(visibilityScript);
 			dataTypeObj.setEnumeration(enumeration);
+			if (listOfValues != null) {
+				List l = new LinkedList<>();
+				for (String s: listOfValues) l.add(s);
+				dataTypeObj.setValues(l);
+			}
 			setDisabled(dataTypeObj.isReadOnly());
 			setReadonly(dataTypeObj.isReadOnly());
 			refresh ();

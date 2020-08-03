@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="applications">
+
+		<finder name="application" type="application" >
+			<ejb-finder jndi="java:/module/ApplicationService-v2" 
+				method="findApplicationByJsonQueryAsync"
+				if = "${query != null &amp;&amp; query != '' &amp;&amp; synchro == null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByJsonQuery" 
+				if = "${query != null  &amp;&amp; synchro != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
+				if = "${queryText != null  &amp;&amp; queryText != '' &amp;&amp; synchro == null}">
+				<parameter value="${queryText}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
+				if = "${queryText != null &amp;&amp; synchro != null}">
+				<parameter value="${queryText}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
+				if = '${(queryText == null || queryText == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
+				<parameter value=""/>
+				<parameter value="not parent.name pr"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Application"></new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="application"
+		idProperty="name" parentProperty="parent" childProperty="application">
+		<ejb-parent-loader jndi="java:/module/ApplicationService-v2" 
+			method="findApplicationByApplicationName">
+			<parameter value="${instance.parent}"/>
+		</ejb-parent-loader>
+		<finder name="application" type="application">
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationChildren">  <!-- group:query -->
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Application">
+			</new-instance-bean>
+		</finder>
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="groups.DescriptionValidation"/>
+			<attribute-validator expr="${instance.relativeName}" notNull="true" friendlyName="groups.CodeValidation"/>
+		</validator>
+	</datanode>
+
+
+</zkib-model>

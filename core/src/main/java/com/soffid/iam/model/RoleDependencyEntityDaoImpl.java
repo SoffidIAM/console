@@ -214,10 +214,12 @@ public class RoleDependencyEntityDaoImpl extends
         target.setOwnerRoleName(source.getContainer().getName());
         target.setOwnerGroup(null);
         target.setOwnerAccountName(null);
+        target.setOwnerRoleDescription(source.getContainer().getDescription());
         target.setOwnerSystem(source.getContainer().getSystem().getName());
         target.setId(source.getId());
         target.setRoleId(source.getContained().getId());
         target.setRoleName(source.getContained().getName());
+        target.setRoleDescription(source.getContained().getDescription());
         target.setSystem(source.getContained().getSystem().getName());
         target.setInformationSystem(source.getContained().getInformationSystem().getName());
         if (source.getStatus() == null)

@@ -83,8 +83,9 @@ public class InputField3 extends Databox
 	boolean updating = false; 
 	boolean disableRecursive = false;
 	private String ownerContext;
+	InputFieldUIHandler uiHandler = null;
 	InputFieldDataHandler<?> dataHandler = null;
-
+	
 	private SearchFilter filter;
 
 	private AsyncList<?> currentList;
@@ -275,6 +276,13 @@ public class InputField3 extends Databox
 			setReadonly(dataType.isReadOnly());
 			setMultiline(dataType.isMultiLine());
 			setRequired(dataType.isRequired());
+			if (Boolean.TRUE.equals( dataType.getBultinHandler() )) {
+				uiHandler = (InputFieldUIHandler) Class.forName(dataType.getBultinHandler()).newInstance();
+				uiHandler.afterCreate(this);
+			} else {
+				uiHandler = null;
+			}
+			invalidate();
 		} catch (Throwable e) {
 			log.warn(e);
 		} finally {
@@ -284,8 +292,11 @@ public class InputField3 extends Databox
 	}
 
 
-	private void calculateVisibility() throws EvalError, MalformedURLException {
-		if (dataType.getVisibilityExpression() != null && 
+	private void calculateVisibility() throws Exception {
+		if (uiHandler != null && !uiHandler.isVisible(this)) {
+			setVisible(false);
+		} 
+		else if (dataType.getVisibilityExpression() != null &&
 				!dataType.getVisibilityExpression().trim().isEmpty())
 		{
 			SecureInterpreter interp = createInterpreter();
@@ -385,7 +396,6 @@ public class InputField3 extends Databox
 			}
 			else if (c instanceof ObjectAttributesDiv)
 			{
-				((ObjectAttributesDiv) c).adjustVisibility();
 				i.set("inputFields", ((ObjectAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
@@ -553,13 +563,25 @@ public class InputField3 extends Databox
 				}
 			}
 		} catch ( TargetError e) {
+			setWarning(position, "Internal error" );
 			if (e.getTarget() instanceof UiException)
 				throw new UiException(e);
 			else
 				throw new RuntimeException(e.getTarget());
 		} catch ( EvalError e) {
+			setWarning(position, "Internal error" );
 			throw new UiException(e.toString());
 		} catch (MalformedURLException e) {
+			setWarning(position, "Internal error" );
+			throw new UiException (e.toString());
+		}
+		
+		try {
+			if (uiHandler != null && ! uiHandler.validate(this)) {
+				return false;
+			}
+		} catch (Exception e) {
+			setWarning(position, "Internal error" );
 			throw new UiException (e.toString());
 		}
 		setWarning(position, "" );
@@ -752,6 +774,8 @@ public class InputField3 extends Databox
 			} catch (Exception e) {
 				throw new UiException(e);
 			}
+		} else {
+			value = super.parseUiValue(value);
 		}
 		return value;
 	}

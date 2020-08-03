@@ -4,12 +4,7 @@
 
 	<datanode name="groups">
 
-		<finder name="group" type="group" 
-			idProperty="name" parentProperty="parentGroup" childProperty="group">
-			<ejb-parent-loader jndi="java:/module/GroupService-v2" 
-				method="findGroupByGroupName">
-				<parameter value="${instance.parentGroup}"/>
-			</ejb-parent-loader>
+		<finder name="group" type="group" >
 			<ejb-finder jndi="java:/module/GroupService-v2" 
 				method="findGroupByJsonQueryAsync"
 				if = "${query != null &amp;&amp; query != '' &amp;&amp; synchro == null}">
@@ -38,7 +33,12 @@
 		</finder>
 	</datanode>
 
-	<datanode name="group">
+	<datanode name="group"
+		idProperty="name" parentProperty="parentGroup" childProperty="group">
+		<ejb-parent-loader jndi="java:/module/GroupService-v2" 
+			method="findGroupByGroupName">
+			<parameter value="${instance.parentGroup}"/>
+		</ejb-parent-loader>
 		<finder name="group" type="group">
 			<ejb-finder jndi="java:/module/GroupService-v2" method="findSubgroupsByGroupName"
 				if="canQueryGroup">  <!-- group:query -->
@@ -55,7 +55,7 @@
 			</new-instance-bean>
 		</finder>
 		<finder name="grantedRoles" type="role">
-			<ejb-finder jndi="java:/module/GroupService-v2" method="getRolesFromGroupAndParentGroup"
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findRoleGrantsByGroup"
 				if="canQueryGroupRoles"> <!-- group:role:query -->
 				<parameter value="${instance}" />
 			</ejb-finder>
@@ -63,11 +63,11 @@
 			</new-instance-bean>
 		</finder>
 		<finder name="user" type="user">
-			<ejb-finder jndi="java:/module/GroupService-v2" method="findUsuarsBelangtoGroupByGroupNameAsync"
+			<ejb-finder jndi="java:/module/GroupService-v2" method="findUsersBelongtoGroupByGroupName"
 				if="canQueryGroupUsers">  <!-- group:user:query -->
 				<parameter value="${instance.name}" />
 			</ejb-finder>
-			<new-instance-bean className="com.soffid.iam.api.User">
+			<new-instance-bean className="com.soffid.iam.api.GroupUser">
 			</new-instance-bean>
 		</finder>
 
@@ -98,15 +98,39 @@
 			</update-method>
 		</ejb-handler>
 		<validator>
-			<attribute-validator expr="${instance.descripcio}" notNull="true" friendlyName="groups.DescriptionValidation"/>
-			<attribute-validator expr="${instance.codi}" notNull="true" friendlyName="groups.CodeValidation"/>
+			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="groups.DescriptionValidation"/>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="groups.CodeValidation"/>
 		</validator>
 	</datanode>
 
 
-	<datanode name="usuari" />
+	<datanode name="user">
+		<ejb-handler jndi="java:/module/GroupService-v2">
+			<insert-method method="create"  returnBean="true"> <!-- user:group:create -->
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
 
-	<datanode name="rolsAtorgats" />
+	<datanode name="role">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
 
 	<datanode name="usuarisRolGrup" />
 

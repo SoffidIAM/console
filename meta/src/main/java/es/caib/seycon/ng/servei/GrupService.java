@@ -44,7 +44,8 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	AsyncRunnerService.class,
 	GroupAttributeEntity.class,
 	AttributeValidationService.class,
-	TipusDadaEntity.class
+	TipusDadaEntity.class,
+	UsuariService.class
 })
 public abstract class GrupService {
 
@@ -386,4 +387,5 @@ public abstract class GrupService {
 
 	@Transactional(readOnly=true)
 	public Collection<String>findGroupNames () { return null; }
+
 }

@@ -60,7 +60,7 @@
 					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				</div>
 				<form id="form" 
-					onChangeXPath="ref:frame.onChangeAttributeForm"
+					onChangeXPath="ref:frame.onChangeForm()"
 					dataPath="/listbox:/." width="100%">
 					<div>
 						<div>

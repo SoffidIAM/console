@@ -1,36 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
 <?component name="user_accounts" macro-uri="user-accounts.zul"?>
+<?component name="user_shared_accounts" macro-uri="user-shared-accounts.zul"?>
 <?component name="user_groups" macro-uri="user-groups.zul"?>
 <?component name="user_roles" macro-uri="user-roles.zul"?>
+<?component name="user_effective_roles" macro-uri="user-effective-roles.zul"?>
+
 <?page id="user"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.user.UserHandler" id="frame">
-<zscript><![CDATA[
-	com.soffid.iam.ServiceLocator.instance().getAdditionalDataService()
-		.registerStandardObject("com/soffid/iam/api/User.ui.json",
-					com.soffid.iam.api.MetadataScope.USER,
-					true);
-
-	com.soffid.iam.ServiceLocator.instance().getAdditionalDataService()
-		.registerStandardObject("com/soffid/iam/api/Group.ui.json",
-					com.soffid.iam.api.MetadataScope.GROUP,
-					true);
-	com.soffid.iam.ServiceLocator.instance().getAdditionalDataService()
-		.registerStandardObject("com/soffid/iam/api/Host.ui.json",
-					null,
-					true);
-	com.soffid.iam.ServiceLocator.instance().getAdditionalDataService()
-		.registerStandardObject("com/soffid/iam/api/GroupUser.ui.json",
-					com.soffid.iam.api.MetadataScope.GROUP_MEMBERSHIP,
-					true);
-	com.soffid.iam.ServiceLocator.instance().getAdditionalDataService()
-		.registerStandardObject("com/soffid/iam/api/Role.ui.json",
-					com.soffid.iam.api.MetadataScope.ROLE,
-					true);
-]]>
-</zscript>
 	<datamodel id="model" rootNode="root" src="descriptorUser.xml"/>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
@@ -63,11 +43,7 @@
 		<div sclass="card__face card__face--back">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatable="listbox"/>
-				
-				<menu2>
-					<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
-				</menu2>
-				
+								
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
@@ -75,10 +51,17 @@
 					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 					<tab label="${c:l('agents.zul.Grups')}" if="${soffid:isUserInRole('user:group:delete') }" id="tabgroup"/>
 					<tab label="${c:l('usuaris.zul.Accounts')}" id="tabaccount" />
+					<tab label="${c:l('usuaris.zul.SharedAccounts')}" id="tabsharedaccount"/>
 					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
+					<tab label="${c:l('usuaris.zul.RolsHeretats')}" id="tabeffectiveroles" />
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
+						<div class="navigation-bar">
+							<menu2>
+								<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+							</menu2>
+						</div>
 						<div id="dades"> 
 							<form id="form" onChangeXPath="ref:frame.onChangeDades"
 								dataPath="/listbox:/." width="100%">
@@ -94,22 +77,22 @@
 						</div>
 					</tabpanel>
 					<tabpanel if="${soffid:isUserInRole('user:group:delete') }" fulfill="tabgroup.onSelect" >
-						<div>
+						<div class="navigation-bar dummy">
 							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
 						</div>
 						<user_groups listbox="//user/listbox"/>
 					</tabpanel>
 					<tabpanel id="account" fulfill="tabaccount.onSelect" >
-						<div>
-							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
-						</div>
 						<user_accounts listbox="//user/listbox" id="user_accounts"/>
 					</tabpanel>
 					<tabpanel id="roles" fulfill="tabroles.onSelect" >
-						<div>
-							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
-						</div>
 						<user_roles listbox="//user/listbox" id="user_roles"/>
+					</tabpanel>
+					<tabpanel id="effectiveroles" fulfill="tabeffectiveroles.onSelect" >
+						<user_effective_roles listbox="//user/listbox" id="user_effective_roles"/>
+					</tabpanel>
+					<tabpanel id="sharedaccount" fulfill="tabsharedaccount.onSelect" >
+						<user_shared_accounts listbox="//user/listbox" id="user_accounts"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

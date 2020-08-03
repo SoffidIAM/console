@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.bpm.service.BpmEngine;
@@ -124,7 +125,7 @@ public class InformationSystemEntityDaoImpl
     
     private void toAplicacioCustom(com.soffid.iam.model.InformationSystemEntity sourceEntity, com.soffid.iam.api.Application targetVO) {
 		targetVO.setBpmEnforced(new Boolean(sourceEntity.getWfManagement().compareTo("S") == 0)); //$NON-NLS-1$
-		
+
 		targetVO.setAttributes(new HashMap<String, Object>());
 		Map<String, Object> attributes = targetVO.getAttributes();
 		for (ApplicationAttributeEntity att : sourceEntity.getAttributes()) {
@@ -148,6 +149,8 @@ public class InformationSystemEntityDaoImpl
 		{
 			if (o != null && o instanceof List) Collections.sort((List) o);
 		}
+		if (targetVO.getType() == null)
+			targetVO.setType(ApplicationType.APPLICATION);
     }
 
 
@@ -226,6 +229,13 @@ public class InformationSystemEntityDaoImpl
 			targetEntity.setWfManagement(sourceVO.getBpmEnforced().booleanValue() ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			targetEntity.setWfManagement("N"); //$NON-NLS-1$
+		}
+		if (sourceVO.getParent() != null && ! sourceVO.getParent().trim().isEmpty()) {
+			targetEntity.setParent( findByCode(sourceVO.getParent()));
+			if (targetEntity.getParent() == null)
+				throw new RuntimeException("Cannot find parent application "+sourceVO.getParent());
+		} else {
+			targetEntity.setParent(null);
 		}
 		// Verifiquem les adreces de correu per rebre les notificacions
 		if (sourceVO.getNotificationEmails() != null && !"".equals(sourceVO.getNotificationEmails())) { //$NON-NLS-1$

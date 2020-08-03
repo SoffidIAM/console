@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -58,6 +59,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.api.RoleGrantHierarchy;
 import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
@@ -79,6 +81,7 @@ import com.soffid.iam.model.RoleAttributeEntityImpl;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
+import com.soffid.iam.model.RuleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserAccountEntity;
@@ -104,6 +107,8 @@ import com.soffid.scimquery.parser.TokenMgrError;
 import es.caib.bpm.vo.PredefinedProcessType;
 import com.soffid.iam.api.DelegationStatus;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.Rol;
+import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -212,11 +217,28 @@ public class ApplicationServiceImpl extends
      * @see es.caib.seycon.ng.servei.AplicacioService#update(es.caib.seycon.ng.comu.Aplicacio)
      */
     protected void handleUpdate(com.soffid.iam.api.Application aplicacio) throws java.lang.Exception {
+    	if (aplicacio.getName().equals(aplicacio.getParent()))
+    		throw new InternalErrorException(
+    				String.format("The parent application '%s' cannot be the application itself '%s'", 
+    						aplicacio.getParent(), aplicacio.getName()));
+    	
+    	if (aplicacio.getParent() != null && 
+    			!aplicacio.getParent().isEmpty() &&
+    			aplicacio.getParent().startsWith(aplicacio.getName()+"/"))
+    		throw new InternalErrorException(
+    				String.format("The parent application '%s' cannot be a child of the application itself '%s'", 
+    						aplicacio.getParent(), aplicacio.getName()));
 
-        InformationSystemEntity aplEntity = getInformationSystemEntityDao().applicationToEntity(aplicacio);
+    	InformationSystemEntity aplEntity = getInformationSystemEntityDao().load(aplicacio.getId());
+    	String old = aplEntity.getName();
+    	
+    	getInformationSystemEntityDao().applicationToEntity(aplicacio, aplEntity, true);
         if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_UPDATE, aplEntity)) {
             getInformationSystemEntityDao().update(aplEntity);
             updateApplicationAttributes(aplicacio, aplEntity);
+            if ( ! old.equals(aplEntity.getName())) {
+            	recursiveRenameChildren ( aplEntity.getChildren(), aplEntity.getName());            	
+            }
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "update (Aplicacio)", "application:update", //$NON-NLS-1$ //$NON-NLS-2$
@@ -224,7 +246,16 @@ public class ApplicationServiceImpl extends
         }
     }
 
-    /**
+    private void recursiveRenameChildren(Collection<InformationSystemEntity> children, String name) {
+    	for ( InformationSystemEntity child: children) {
+    		String n = child.getName();
+    		int i = n.lastIndexOf('/') + 1;
+    		child.setName(name+"/"+n.substring(i));
+    		getInformationSystemEntityDao().update(child);
+    		recursiveRenameChildren(child.getChildren(), child.getName());
+    	}
+	}
+	/**
      * @see es.caib.seycon.ng.servei.AplicacioService#findAplicacioByCodiAplicacio(java.lang.String)
      */
     protected Application handleFindApplicationByApplicationName(java.lang.String codiAplicacio) throws java.lang.Exception {
@@ -1400,7 +1431,7 @@ public class ApplicationServiceImpl extends
 
 		UserEntity user = getUserEntityDao().load(usuari.getId());
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateRoles(radSet, ALL, user, null);
+		populateRoles(radSet, ALL, user, null, false);
 		LinkedList<ContainerRole> rgl = new LinkedList<ContainerRole>();
 		for (RolAccountDetail rad : radSet) {
             RoleGrant rg = null;
@@ -1761,46 +1792,99 @@ public class ApplicationServiceImpl extends
         }
     }
     
-    private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user, GroupEntity holderGroup) {
+    RolAccountDetail createRuleRoleAccountDetail(Set<RolAccountDetail> rad, RuleEntity rule) {
+    	for (RolAccountDetail s: rad) {
+    		if (s.rule == rule && s.account == null) {
+    			return s;
+    		}
+    	}
+		RoleGrantHierarchy h = new RoleGrantHierarchy();
+		h.setRuleName(rule.getDescription());
+    	RolAccountDetail s = new RolAccountDetail(h, null);
+    	s.rule = rule;
+    	return s;
+    }
+    
+    private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user, GroupEntity holderGroup, boolean hierarchy) {
     	if (type == NONE)
     		return;
 
     	for (AccountEntity account: getAccountEntityDao().findByUser(user.getId()))
     	{
-   			populateAccountRoles (rad, type, account, user, holderGroup);
+    		RolAccountDetail parent = null;
+    		if (hierarchy && ! account.isDisabled()) {
+    			RoleGrantHierarchy h = new RoleGrantHierarchy();
+    			h.setAccountName(account.getName());
+    			h.setSystem(account.getSystem().getName());
+    			h.setAccountDescription(account.getDescription());
+    			RolAccountDetail r = new RolAccountDetail(h, null);
+    			rad.add(r);
+    			populateAccountRoles (rad, type, account, user, holderGroup, true, r);
+    		}
+    		else
+    			populateAccountRoles (rad, type, account, user, holderGroup, false, null);
     	}
     	
     	if (type == INDIRECT || type == ALL)
     	{
-    		if (holderGroup == null || holderGroup  == user.getPrimaryGroup())
-    			populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user);
+    		if (holderGroup == null || holderGroup  == user.getPrimaryGroup()) {
+    			if (hierarchy) 
+    			{
+					RoleGrantHierarchy h = new RoleGrantHierarchy();
+					h.setGroupName(user.getPrimaryGroup().getName());
+					h.setGroupDescription(user.getPrimaryGroup().getDescription());
+					RolAccountDetail r = new RolAccountDetail(h, null);
+					populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user, hierarchy, r);
+    			} else {
+					populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user, hierarchy, null);
+    			}
+    		}
     		for (UserGroupEntity ug : user.getSecondaryGroups()) {
         		if (! Boolean.TRUE.equals(ug.getDisabled()) &&
-        				(holderGroup == null || holderGroup  == ug.getGroup()))
-        			populateGroupRoles(rad, ALL, ug.getGroup(), user);
+        				(holderGroup == null || holderGroup  == ug.getGroup())) {
+    				RoleGrantHierarchy h = new RoleGrantHierarchy();
+    				h.setGroupName(ug.getGroup().getName());
+    				h.setGroupDescription(ug.getGroup().getDescription());
+    				RolAccountDetail r = new RolAccountDetail(h, null);
+    				populateGroupRoles(rad, ALL, ug.getGroup(), user, hierarchy, r);
+        		}
             }
     	}
     	
     }
     
-	private void populateGroupRoles(Set<RolAccountDetail> rad, int type, GroupEntity grup, UserEntity originUser) {
+	private void populateGroupRoles(Set<RolAccountDetail> rad, int type, GroupEntity grup, UserEntity originUser, boolean hierarchy, RolAccountDetail parent) {
 		if (type == NONE)
 			return;
 		
+		if (hierarchy && parent != null)
+			rad.add(parent);
 		for (RoleGroupEntity rg : grup.getGrantedRoles()) {
             for (AccountEntity ae : getAccountsForDispatcher(originUser, null, rg.getGrantedRole().getSystem())) {
                 RolAccountDetail n = new RolAccountDetail(rg, ae);
                 n.granteeGrup = grup;
+                n.parent = parent;
                 if (!rad.contains(n)) {
                     if (type == DIRECT || type == ALL) rad.add(n);
                     if (type == INDIRECT || type == ALL) {
-                        for (AccountEntity acc : getAccountsForDispatcher(originUser, null, rg.getGrantedRole().getSystem())) populateRoleRoles(rad, ALL, n, originUser, acc);
+                        for (AccountEntity acc : getAccountsForDispatcher(originUser, null, rg.getGrantedRole().getSystem())) 
+                        	populateRoleRoles(rad, ALL, n, originUser, acc, hierarchy);
                     }
                 }
             }
         }
-		if (grup.getParent() != null)
-			populateGroupRoles(rad, type, grup.getParent(), originUser);
+		if (grup.getParent() != null) {
+			if (hierarchy) {
+				RoleGrantHierarchy h = new RoleGrantHierarchy();
+				h.setGroupName(grup.getParent().getName());
+				h.setGroupDescription(grup.getParent().getDescription());
+				RolAccountDetail r = new RolAccountDetail(h, parent);
+				populateGroupRoles(rad, type, grup.getParent(), originUser, hierarchy, r);
+			} else {
+				populateGroupRoles(rad, type, grup.getParent(), originUser, hierarchy,  null);
+			}
+			
+		}
 	}
 
 	private List<AccountEntity> getAccountsForDispatcher(UserEntity usuari, AccountEntity account, SystemEntity dispatcher) {
@@ -1834,7 +1918,7 @@ public class ApplicationServiceImpl extends
 		return accounts;
 	}
 	
-	private void populateRoleRoles(Set<RolAccountDetail> rad, int type, RolAccountDetail currentRol, UserEntity originUser, AccountEntity originAccount) {
+	private void populateRoleRoles(Set<RolAccountDetail> rad, int type, RolAccountDetail currentRol, UserEntity originUser, AccountEntity originAccount, boolean hierarchy) {
 		if (type == NONE)
 			return;
 		
@@ -1850,10 +1934,11 @@ public class ApplicationServiceImpl extends
                 for (AccountEntity ae : getAccountsForDispatcher(originUser, originAccount, ra.getContained().getSystem())) {
                     RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
                     n.granteeRol = rol;
+                    n.parent = currentRol;
                     n.generateHash();
                     if (! rad.contains(n)) {
                         if (type == DIRECT || type == ALL) rad.add(n);
-                        if (type == INDIRECT || type == ALL) populateRoleRoles(rad, ALL, n, originUser, originAccount);
+                        if (type == INDIRECT || type == ALL) populateRoleRoles(rad, ALL, n, originUser, originAccount, hierarchy);
                     }
                 }
             }
@@ -1920,16 +2005,21 @@ public class ApplicationServiceImpl extends
 				(e.getEndDate() == null  || today.equals(e.getEndDate()) || today.before(e.getEndDate()));
 	}
 	
-	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user, GroupEntity holderGroup) {
+	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user, GroupEntity holderGroup, 
+			boolean hierarchy, RolAccountDetail parent) {
 		for (RoleAccountEntity ra : account.getRoles()) {
 			if (holderGroup == null || 
 				ra.getHolderGroup() == null ||
 				ra.getHolderGroup() == holderGroup)
 			{
-	            RolAccountDetail n = new RolAccountDetail(ra, account);
+	            RolAccountDetail n = new RolAccountDetail(ra, account, parent);
+	            if (hierarchy && ra.getRule() != null) {
+	            	n.parent = createRuleRoleAccountDetail(rad, ra.getRule());
+	            }
 	            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {
 	                if (type == DIRECT || type == ALL) rad.add(n);
-	                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) populateRoleRoles(rad, ALL, n, user, account);
+	                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) 
+	                	populateRoleRoles(rad, ALL, n, user, account, hierarchy);
 	            }
 			}
         }
@@ -1939,7 +2029,7 @@ public class ApplicationServiceImpl extends
     protected Collection<RoleGrant> handleFindRoleGrantByAccount(Long accountId) throws Exception {
 		AccountEntity account = getAccountEntityDao().load(accountId);
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateAccountRoles(radSet, DIRECT, account, null, null);
+		populateAccountRoles(radSet, DIRECT, account, null, null, false, null);
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             if (rad.granted.getSystem().getId().equals(account.getSystem().getId())) {
@@ -1968,7 +2058,7 @@ public class ApplicationServiceImpl extends
 			return rg;
 		
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateAccountRoles(radSet, DIRECT, account, null, null);
+		populateAccountRoles(radSet, DIRECT, account, null, null, false, null);
 		for (RolAccountDetail rad : radSet) {
             if (rad.granted.getSystem().getId().equals(account.getSystem().getId())) {
                 if (rad.rolAccount != null) rg.add(getRoleAccountEntityDao().toRoleAccount(rad.rolAccount));
@@ -1998,17 +2088,9 @@ public class ApplicationServiceImpl extends
     @Override
     protected Collection<RoleGrant> handleFindEffectiveRoleGrantByUser(long userId) throws Exception {
 		UserEntity user = getUserEntityDao().load(userId);
-		if (user.getUserName().equals(Security.getCurrentUser()) && 
-				! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
-		{
-			for ( RoleAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
-			{
-				getEntitlementDelegationService().acceptDelegation(ra);
-			}
-			getEntitlementDelegationService().revertExpiredDelegations();
-		}
+		finishDelegations(user);
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateRoles(radSet, ALL, user, null);
+		populateRoles(radSet, ALL, user, null, false);
 		LinkedList<RoleGrant> rgl = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             RoleGrant rg = null;
@@ -2029,22 +2111,14 @@ public class ApplicationServiceImpl extends
 	@Override
     protected Collection<RoleGrant> handleFindEffectiveRoleGrantByUserAndHolderGroup(long userId, long groupId) throws Exception {
 		UserEntity user = getUserEntityDao().load(userId);
-		if (user.getUserName().equals(Security.getCurrentUser()) && 
-				! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
-		{
-			for ( RoleAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
-			{
-				getEntitlementDelegationService().acceptDelegation(ra);
-			}
-			getEntitlementDelegationService().revertExpiredDelegations();
-		}
+		finishDelegations(user);
 		GroupEntity group = getGroupEntityDao().load(groupId);
 		if (group == null)
 		{
 			throw new InternalErrorException("Uknown group "+groupId);
 		}
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
-		populateRoles(radSet, ALL, user, group);
+		populateRoles(radSet, ALL, user, group, false);
 		LinkedList<RoleGrant> rgl = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             RoleGrant rg = null;
@@ -2070,12 +2144,12 @@ public class ApplicationServiceImpl extends
 		{
 			for (UserAccountEntity user: account.getUsers())
 			{
-				populateAccountRoles(radSet, ALL, account, user.getUser(), null);
-				populateRoles(radSet, INDIRECT, user.getUser(), null);
+				populateAccountRoles(radSet, ALL, account, user.getUser(), null, false, null);
+				populateRoles(radSet, INDIRECT, user.getUser(), null, false);
 			}
 		}
 		else
-			populateAccountRoles(radSet, ALL, account, null, null);
+			populateAccountRoles(radSet, ALL, account, null, null, false, null);
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             if (rad.account != null && rad.account.getId().longValue() == accountId) {
@@ -2157,9 +2231,9 @@ public class ApplicationServiceImpl extends
             if (rac.isEnabled() && shouldBeEnabled(rac)) {
                 RolAccountDetail rad;
                 if (originalGrant == null) 
-                	rad = new RolAccountDetail(rac, rac.getAccount()); 
+                	rad = new RolAccountDetail(rac, rac.getAccount(), null); 
                 else {
-                    RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount());
+                    RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount(), null);
                     rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, rac.getAccount(), previousRad);
                     rad.granteeRol = rol;
                 }
@@ -2254,7 +2328,7 @@ public class ApplicationServiceImpl extends
 		RolAccountDetail rad;
 		if (originalGrant instanceof RoleAccountEntity) 
 		{
-			rad = new RolAccountDetail((RoleAccountEntity) originalGrant, account);
+			rad = new RolAccountDetail((RoleAccountEntity) originalGrant, account, null);
 		}
 		else if (originalGrant instanceof RoleGroupEntity)
 		{
@@ -3466,6 +3540,203 @@ public class ApplicationServiceImpl extends
 		result.done();
 		return result.get();
 	}
+	
+	@Override
+	protected RoleGrant handleCreate(RoleGrant grant) throws Exception {
+		RoleEntity roleEntity = null;
+		if (grant.getRoleId() != null)
+			roleEntity = getRoleEntityDao().load(grant.getRoleId());
+		else
+			roleEntity = getRoleEntityDao().findByNameAndSystem(grant.getRoleName(), grant.getSystem());
+		
+		if (roleEntity == null)
+			throw new InternalErrorException("Cannot find role to grant");
+		if (grant.getOwnerGroup() != null ) {
+			GroupEntity groupEntity = getGroupEntityDao().findByName(grant.getOwnerGroup());
+			if (groupEntity == null)
+				throw new InternalErrorException("Cannot find group "+grant.getOwnerGroup());
+			
+			StringBuffer path = new StringBuffer();
+	    
+	    	RoleGroupEntity entity = getRoleGroupEntityDao().newRoleGroupEntity();
+	    	
+	        entity.setGrantedRole(roleEntity);
+	        entity.setGroup(groupEntity);
+
+	        String nomDomini = roleEntity.getDomainType();
+	        if (TipusDomini.APLICACIONS.equals(nomDomini) ||
+	        		TipusDomini.APPLICATIONS.equals(nomDomini))
+	        {
+	        	entity.setGrantedApplicationDomain(getInformationSystemEntityDao().findByCode(grant.getDomainValue()));
+	        }
+	        else if (TipusDomini.GRUPS.equals(nomDomini) || TipusDomini.GRUPS_USUARI.equals(nomDomini) ||
+	        		TipusDomini.GROUPS.equals(nomDomini) || TipusDomini.MEMBERSHIPS.equals(nomDomini))
+	        {
+	        	entity.setGrantedGroupDomain(getGroupEntityDao().findByName(grant.getDomainValue()));
+	        }
+	        else if (TipusDomini.DOMINI_APLICACIO.equals(nomDomini) ||
+	        		TipusDomini.CUSTOM.equals(nomDomini))
+	        {
+	        	entity.setGrantedDomainValue(
+	        			getDomainValueEntityDao()
+	        				.findByApplicationDomainValue(
+	        						roleEntity.getInformationSystem().getName(), 
+	        						roleEntity.getApplicationDomain().getName(), 
+	        						grant.getDomainValue()));
+		         }
+
+	        if ( Hibernate.isInitialized(roleEntity.getContainerGroups()))
+	        	roleEntity.getContainerGroups().add(entity);
+	        
+	        if ( Hibernate.isInitialized(groupEntity.getGrantedRoles()))
+	        	groupEntity.getGrantedRoles().add(entity);
+
+	        getRoleGroupEntityDao().create(entity);
+	        
+	        grant = getRoleGroupEntityDao().toRoleGrant(entity);
+		} else {
+			Role role = getRoleEntityDao().toRole(roleEntity);
+			role.getGranteeGroups().add(grant);
+			getRoleEntityDao().update(role, false);
+		}
+		TaskEntity t = getTaskEntityDao().newTaskEntity();
+		t.setTransaction("UpdateRole");
+		t.setRole(roleEntity.getName());
+		t.setSystemName(roleEntity.getSystem().getName());
+		t.setDb(roleEntity.getSystem().getName());
+		getTaskEntityDao().create(t);
+		return grant;
+	}
+	
+	@Override
+	protected void handleDelete(RoleGrant grant) throws Exception {
+		RoleEntity roleEntity = null;
+		if (grant.getOwnerGroup() != null ) {
+			RoleGroupEntity rge = getRoleGroupEntityDao().load(grant.getId());
+			if (rge == null)
+				return ;
+			roleEntity = rge.getGrantedRole();
+			GroupEntity groupEntity = rge.getGroup();
+
+			TaskEntity t = getTaskEntityDao().newTaskEntity();
+			t.setTransaction("UpdateRole");
+			t.setRole(roleEntity.getName());
+			t.setSystemName(roleEntity.getSystem().getName());
+			t.setDb(roleEntity.getSystem().getName());
+			getTaskEntityDao().create(t);
+
+			if ( Hibernate.isInitialized(roleEntity.getContainerGroups()))
+	        	roleEntity.getContainerGroups().remove(rge);
+	        
+	        if ( Hibernate.isInitialized(groupEntity.getGrantedRoles()))
+	        	groupEntity.getGrantedRoles().remove(rge);
+
+	        if (rge != null)
+	        	getRoleGroupEntityDao().remove(rge);
+	        
+		} else {
+			RoleDependencyEntity rde = getRoleDependencyEntityDao().load(grant.getId());
+			if (rde == null)
+				return ;
+			
+			Role role = getRoleEntityDao().toRole(rde.getContainer());
+			for (Iterator<RoleGrant> it = role.getOwnedRoles().iterator(); it.hasNext();) {
+				RoleGrant grant2 = it.next();
+				if (grant2.getId().equals(grant.getId())) it.remove();
+			}
+			getRoleEntityDao().update(role, false);
+		}
+	}
+
+	@Override
+	protected RoleGrant handleUpdate(RoleGrant grant) throws Exception {
+		RoleEntity roleEntity = null;
+		if (grant.getOwnerGroup() != null ) {
+			throw new InternalErrorException("Operation not allowed");
+		} else {
+			RoleDependencyEntity rde = getRoleDependencyEntityDao().load(grant.getId());
+			if (rde == null)
+				return null;
+			
+			Role role = getRoleEntityDao().toRole(rde.getContainer());
+			for (Iterator<RoleGrant> it = role.getOwnedRoles().iterator(); it.hasNext();) {
+				RoleGrant grant2 = it.next();
+				if (grant2.getId().equals(grant.getId())) it.remove();
+			}
+			role.getOwnedRoles().add(grant);
+			getRoleEntityDao().update(role, false);
+		}
+		return grant;
+	}
+
+	@Override
+	protected Collection<RoleGrant> handleFindRoleGrantsByGroup(Group grup) throws Exception {
+		GroupEntity ge = getGroupEntityDao().load(grup.getId());
+		List<RoleGrant> grants = getRoleGroupEntityDao().toRoleGrantList(ge.getGrantedRoles());
+		return grants;
+	}
+	@Override
+	protected List<RoleGrantHierarchy> handleFindRoleGrantHierarchyByUser(long userId) throws Exception {
+		UserEntity user = getUserEntityDao().load(userId);
+		finishDelegations(user);
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+		populateRoles(radSet, ALL, user, null, true);
+		LinkedList<RoleGrantHierarchy> rgl = new LinkedList<RoleGrantHierarchy>();
+
+		// Create role grant objects
+		for (RolAccountDetail rad : radSet) {
+            RoleGrant rg = null;
+            
+            if (rad.hierarchy == null) {
+	            if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) 
+	            	rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
+	            if (rad.rolRol != null) {
+	                rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
+	                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); 
+	                else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); 
+	                else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
+	            }
+	            if (rad.rolGrup != null) 
+	            	rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
+	            if (rg != null) {
+	            	rad.hierarchy = new RoleGrantHierarchy();
+	            	PropertyUtils.copyProperties(rad.hierarchy, rg);
+	            }
+            }
+            
+        }
+		
+		// Build hierarchy
+		for (RolAccountDetail rad : radSet) {
+			if (rad.parent == null) {
+				rgl.add(rad.hierarchy);
+			} else {
+				rad.parent.hierarchy.getNested().add(rad.hierarchy);
+			}
+		}
+		return rgl;
+	}
+	public void finishDelegations(UserEntity user) throws InternalErrorException {
+		if (user.getUserName().equals(Security.getCurrentUser()) && 
+				! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
+		{
+			for ( RoleAccount ra: getEntitlementDelegationService().findDelegationsToAccept())
+			{
+				getEntitlementDelegationService().acceptDelegation(ra);
+			}
+			getEntitlementDelegationService().revertExpiredDelegations();
+		}
+	}
+	
+	@Override
+	protected Collection<Application> handleFindApplicationChildren(String appName) throws Exception {
+		InformationSystemEntity parent = getInformationSystemEntityDao().findByCode(appName);
+		if (parent != null && parent.isAllowed("application:query")) {
+			return getInformationSystemEntityDao().toApplicationList(parent.getChildren());
+		} else {
+			return null;
+		}
+	}
 
 
 }
@@ -3482,6 +3753,9 @@ class RolAccountDetail
 	RoleGroupEntity rolGrup;
 	RoleDependencyEntity rolRol;
 	AccountEntity account;
+	RolAccountDetail parent;
+	RuleEntity rule;
+	RoleGrantHierarchy hierarchy;
 	
 	String hash;
 	public RolAccountDetail(RoleGroupEntity rg, AccountEntity account) {
@@ -3518,37 +3792,56 @@ class RolAccountDetail
 			qualifierGroup = previous.qualifierGroup;
 		if (previous != null && previous.granted != null)
 			granteeRol = previous.granted;
+		parent = previous;
 		rolRol = ra;
 		generateHash();
 	}
 	
-	public RolAccountDetail(RoleAccountEntity ra, AccountEntity account) {
+	public RolAccountDetail(RoleAccountEntity ra, AccountEntity account, RolAccountDetail parent) {
 		this.account = account; 
 		granted = ra.getRole();
 		qualifier = ra.getDomainValue();
 		qualifierAplicacio = ra.getInformationSystem();
 		qualifierGroup = ra.getGroup();
 		rolAccount = ra;
+		this.parent = parent;
 		generateHash();
 	}
 	
+	public RolAccountDetail(RoleGrantHierarchy h, RolAccountDetail parent) {
+		this.hierarchy = h;
+		this.parent = parent;
+		generateHash();
+	}
+
 	public void generateHash ()
 	{
 		StringBuffer b = new StringBuffer ();
-		if (account == null)
-			b.append("?"); //$NON-NLS-1$
-		else
-			b.append(account.getId());
-		b.append(":"); //$NON-NLS-1$
-		b.append(granted.getName());
-		b.append("@"); //$NON-NLS-1$
-		b.append(granted.getSystem().getName());
-		if ( qualifierGroup != null)
-			b.append("/").append(qualifierGroup.getName()); //$NON-NLS-1$
-		if ( qualifierAplicacio != null)
-			b.append("/").append(qualifierAplicacio.getName()); //$NON-NLS-1$
-		if ( qualifier != null)
-			b.append("/").append(qualifier.getValue()); //$NON-NLS-1$
+		if (granted != null) {
+			if (account == null)
+				b.append("?"); //$NON-NLS-1$
+			else
+				b.append(account.getId());
+			b.append(":"); //$NON-NLS-1$
+			b.append(granted.getName());
+			b.append("@"); //$NON-NLS-1$
+			b.append(granted.getSystem().getName());
+			if ( qualifierGroup != null)
+				b.append("/").append(qualifierGroup.getName()); //$NON-NLS-1$
+			if ( qualifierAplicacio != null)
+				b.append("/").append(qualifierAplicacio.getName()); //$NON-NLS-1$
+			if ( qualifier != null)
+				b.append("/").append(qualifier.getValue()); //$NON-NLS-1$
+		}
+		else if (hierarchy != null) { 
+			if (hierarchy.getRuleName() != null)
+				b.append("Rule:").append(hierarchy.getRuleName());
+			if (hierarchy.getGroupName() != null)
+				b.append("Group:").append(hierarchy.getGroupName());
+			if (hierarchy.getAccountName() != null)
+				b.append("Account:").append(hierarchy.getAccountName())
+					.append(" @ ").append(hierarchy.getSystem());
+		} 
 		hash = b.toString();
 	}
 	

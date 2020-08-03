@@ -2,6 +2,8 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <?page id="group"?>
+<?component name="group_users" macro-uri="group-users.zul"?>
+<?component name="group_roles" macro-uri="group-roles.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.group.GroupHandler" id="frame">
 	<datamodel id="model" rootNode="groups" src="descriptorGroup.xml"/>
@@ -28,7 +30,7 @@
 				openLevels="1"
 				enablefilter="false"
 				maxheight="70vh"
-				onAddPolicy="ref:frame.addGroup"
+				onAddGroup="ref:frame.addGroup"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">
 				<![CDATA[
@@ -36,6 +38,9 @@
 				  icon: /img/group.svg
 				  value: name
 				  leaf: false
+				  columns:
+				    - value: description
+				  ${soffid:isUserInRole('group:create') ? "tail":"no-tail"}: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddGroup')">${c:l('group.addNew')}</button>
 				  ]]>
   				</attribute>
 				<attribute name="columns"><![CDATA[
@@ -45,7 +50,7 @@
 				</attribute>
   			</datatree2>
 
-			<div width="100%" style="text-align: right"  if="${canCreateUser}" >
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('group:create')}" >
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -63,9 +68,8 @@
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 				<tabs>
 					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
-					<tab label="${c:l('agents.zul.Grups')}" if="${soffid:isUserInRole('user:group:delete') }" id="tabgroup"/>
-					<tab label="${c:l('usuaris.zul.Accounts')}" id="tabaccount" />
-					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
+					<tab label="${c:l('aplicacions.zul.Usuaris')}" if="${soffid:isUserInRole('user:query') }" id="tabuser"/>
+					<tab if="${soffid:isUserInRole('group:role:query') }" label="${c:l('grups.zul.RolsAtorgats')}" id="tabroles" />
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
@@ -73,8 +77,8 @@
 							<form id="form" onChangeXPath="ref:frame.onChangeForm"
 								dataPath="/listbox:/." width="100%">
 								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
-									objectType="com.soffid.iam.api.User"
-									dataPath="/." id="userAttributes"/>
+									objectType="com.soffid.iam.api.Group"
+									dataPath="/." id="groupAttributes"/>
 							</form>
 						</div>
 						<div style="text-align: right; width: 100%">
@@ -83,20 +87,11 @@
 							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 						</div>
 					</tabpanel>
-					<tabpanel if="${soffid:isUserInRole('user:group:delete') }" fulfill="tabgroup.onSelect" >
-						<div>
-							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
-						</div>
-					</tabpanel>
-					<tabpanel id="account" fulfill="tabaccount.onSelect" >
-						<div>
-							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
-						</div>
+					<tabpanel if="${soffid:isUserInRole('user:query') }" fulfill="tabuser.onSelect" >
+						<group_users listbox="//group/listbox" id="group_users"/>
 					</tabpanel>
 					<tabpanel id="roles" fulfill="tabroles.onSelect" >
-						<div>
-							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
-						</div>
+						<group_roles listbox="//group/listbox" id="group_roles"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

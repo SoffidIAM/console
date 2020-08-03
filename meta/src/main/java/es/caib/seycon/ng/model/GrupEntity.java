@@ -37,7 +37,7 @@ public abstract class GrupEntity {
 	@Column (name="GRU_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
-	@Column (name="GRU_UNIOFI", length=2, translated="homeDrive")
+	@Column (name="GRU_UNIOFI", length=2, translated="driveLetter")
 	@Nullable
 	public java.lang.String unitatOfimatica;
 
@@ -51,7 +51,7 @@ public abstract class GrupEntity {
 	@ForeignKey (foreignColumn="UGR_IDGRU", translated="secondaryGroupUsers")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariGrupEntity> usuarisGrupSecundari;
 
-	@Column (name="GRU_IDMAQ", translated="homeServer")
+	@Column (name="GRU_IDMAQ", translated="driveServer")
 	@Nullable
 	public es.caib.seycon.ng.model.MaquinaEntity servidorOfimatic;
 
@@ -150,7 +150,7 @@ public abstract class GrupEntity {
 			+ "where (:name is null or grup.name like :name) and "
 			+ "(:description is null or grup.description like :description) and "
 			+ "(:type is null or tipus.name like :type) and "
-			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
+			+ "(:homeDrive is null or grup.driveLetter like :homeDrive) and "
 			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
 			+ "(:obsolete is null or grup.obsolete = :obsolete) and "
 			+ "grup.tenant.id = :tenantId "
@@ -213,11 +213,11 @@ public abstract class GrupEntity {
 			+ "from com.soffid.iam.model.GroupEntity grup "
 			+ "left join grup.parent parent "
 			+ "left join grup.unitType tipus "
-			+ "left join grup.homeServer servofim  "
+			+ "left join grup.driveServer servofim  "
 			+ "where (:name is null or grup.name like :name) and "
 			+ "(:description is null or grup.description like :description) and "
 			+ "(:type is null or tipus.name like :type) and "
-			+ "(:homeDrive is null or grup.homeDrive like :homeDrive) and "
+			+ "(:homeDrive is null or grup.driveLetter like :homeDrive) and "
 			+ "(:parent is null or (:parent is not null and parent.name like :parent)) and "
 			+ "(:obsolete is null or grup.obsolete = :obsolete) and "
 			+ "(:homeServer is null or servofim.name like :homeServer) and "

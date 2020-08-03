@@ -112,7 +112,7 @@ public class FinderHandler extends Window implements AfterCompose {
 			Component invoker, 
 			boolean multi,
 			String filter,
-			EventListener listener) throws IOException, InternalErrorException, NamingException, CreateException {
+			EventListener listener) throws Exception {
 		Page p = invoker.getDesktop().getPageIfAny("finderWizard");
 		if ( p == null) {
 			Include i = new Include("/popup/finder.zul");

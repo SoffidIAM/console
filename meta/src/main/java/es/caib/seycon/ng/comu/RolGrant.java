@@ -13,7 +13,7 @@ import com.soffid.mda.annotation.*;
 @ValueObject ( translatedName="RoleGrant",
 	 translatedPackage="com.soffid.iam.api")
 public class RolGrant {
-
+	@Nullable
 	public java.lang.Long id;
 
 	@Attribute(translated = "roleId" )
@@ -22,9 +22,13 @@ public class RolGrant {
 	@Attribute(translated = "roleName" )
 	public java.lang.String rolName;
 
+	@Nullable
+	String roleDescription;
+	
 	@Attribute(translated = "system" )
 	public java.lang.String dispatcher;
 	
+	@Nullable
 	public java.lang.String informationSystem;
 
 	@Description("true if the grant has domain or scope")
@@ -57,6 +61,10 @@ public class RolGrant {
 	@Nullable
 	@Attribute(translated = "ownerRoleName" )
 	public java.lang.String ownerRolName;
+
+	@Nullable
+	@Attribute(translated = "ownerRoleDescription" )
+	public java.lang.String ownerRolDescription;
 
 	@Nullable
 	public java.lang.String user;

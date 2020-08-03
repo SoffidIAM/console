@@ -19,6 +19,7 @@
 			background-image: url(/anonymous/background.svg);
 			background-repeat: no-repeat;
 			background-size: cover;
+			overflow: hidden;
 		}
 		div.login {
 			font-size: 12pt;

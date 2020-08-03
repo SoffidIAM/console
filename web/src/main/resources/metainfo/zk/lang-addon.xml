@@ -116,7 +116,7 @@
 	</component>
 
 	<component>
-		<component-name>inputfield3</component-name>
+		<component-name>customfield3</component-name>
 		<component-class>com.soffid.iam.web.component.CustomField3</component-class>
 	</component>
 

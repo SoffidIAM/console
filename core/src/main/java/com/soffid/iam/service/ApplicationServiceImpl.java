@@ -1920,7 +1920,7 @@ public class ApplicationServiceImpl extends
 				ra.getHolderGroup() == holderGroup)
 			{
 	            RolAccountDetail n = new RolAccountDetail(ra, account);
-	            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {
+	            if (!rad.contains(n) && !ra.isApprovalPending() && shouldBeEnabled(ra) && ra.isEnabled()) {
 	                if (type == DIRECT || type == ALL) rad.add(n);
 	                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) populateRoleRoles(rad, ALL, n, user, account);
 	            }

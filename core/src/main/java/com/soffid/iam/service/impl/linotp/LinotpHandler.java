@@ -1,5 +1,7 @@
 package com.soffid.iam.service.impl.linotp;
 
+import java.io.InputStream;
+import java.security.SecureRandom;
 import java.util.Random;
 
 import javax.ws.rs.core.Cookie;
@@ -19,6 +21,7 @@ import org.json.JSONTokener;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Challenge;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.User;
 import com.soffid.iam.service.impl.OTPHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 
@@ -122,48 +125,64 @@ public class LinotpHandler implements OTPHandler {
 					.form(new Form()
 						.param("user", linOtpUser)
 						.param("session", getSessionId()));
-        if ( response.getStatus() != HttpStatus.SC_OK)
-          throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
-        
-        log.debug(response.getHeaderString("Content-Type"));
-        log.debug(response.getStatus());
-        log.debug(response.getStatusInfo().getReasonPhrase());
-        JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
-        JSONObject r;
-        if ( (r = result.optJSONObject("result")) != null)
-        {
-          if (r.getBoolean("status")) {
-            JSONArray data = r.getJSONObject("value").getJSONArray("data");
-            for (int i = 0; i< data.length(); i++)
-            {
-              JSONObject token = data.optJSONObject(i);
-              if (token != null)
-              {
-                if (!token.getBoolean("LinOtp.Isactive"))
-                  throw new InternalErrorException("The token is not active");
-
-                if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail"))
-                  throw new InternalErrorException("The token is locked");
-
-                challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
-                challenge.setCell("Value");
-                if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
-
-                  String pass = "";
-                  String realm = "";
-
-                  Response response2 =
-                      WebClient
-											.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
-											.accept(MediaType.APPLICATION_JSON)
-											.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
-											.form(new Form()
-													.param("user", linOtpUser)
-													.param("pass", "")
-													.param("realm", "")
-													.param("session", getSessionId()));
+				if ( response.getStatus() != HttpStatus.SC_OK)
+					throw new InternalErrorException("Error invoking lintop web service: "+response.getStatusInfo().getReasonPhrase());
+				log.debug(response.getHeaderString("Content-Type"));
+				log.debug(response.getStatus());
+				log.debug(response.getStatusInfo().getReasonPhrase());
+				JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( String.class   ) ) );
+				JSONObject r;
+				if ( (r = result.optJSONObject("result")) != null)
+				{
+					if (r.getBoolean("status")) {
+						JSONArray data = r.getJSONObject("value").getJSONArray("data");
+						for (int i = 0; i< data.length(); i++)
+						{
+							JSONObject token = data.optJSONObject(i);
+							if (token != null && token.getBoolean("LinOtp.Isactive"))
+							{
+								if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail")) {
+									// Skip. The token is locked
+								} else {
+									challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
+									challenge.setCell("Value");
+									if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
+										
+										String pass = "";
+										String realm = "";
+										
+										log.debug("validate/smspin");
+										log.debug("- getUser()="+getUser());
+//										log.debug("- getPassword().getPassword()="+getPassword().getPassword());
+										log.debug("- user="+linOtpUser);
+										log.debug("- pass()="+pass);
+										log.debug("- realm()="+realm);
+										log.debug("- session="+getSessionId());
+										
+										Response response2 =
+												WebClient
+												.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
+												.accept(MediaType.APPLICATION_JSON)
+												.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
+												.form(new Form()
+														.param("user", linOtpUser)
+														.param("pass", "")
+														.param("realm", "")
+														.param("session", getSessionId()));
+									}
+									return challenge;
 								}
-								return challenge;
+							}
+						}
+						for (int i = 0; i< data.length(); i++)
+						{
+							JSONObject token = data.optJSONObject(i);
+							if (token != null)
+							{
+								if (!token.getBoolean("LinOtp.Isactive"))
+									throw new InternalErrorException("The token is not active");
+								if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail"))
+									throw new InternalErrorException("The token is locked");
 							}
 						}
 					}
@@ -236,7 +255,7 @@ public class LinotpHandler implements OTPHandler {
 						}
 						else
 						{
-							JSONObject error = r.optJSONObject("error");
+							JSONObject error = r.getJSONObject("error");
 							if (error != null)
 							{
 								String message = error.getString("message");
@@ -254,6 +273,7 @@ public class LinotpHandler implements OTPHandler {
 		
 		return false;
 	}
+
 
 	@Override
 	public boolean resetFailCount(String account) throws IllegalArgumentException, InternalErrorException {

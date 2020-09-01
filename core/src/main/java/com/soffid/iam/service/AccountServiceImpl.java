@@ -2012,6 +2012,34 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 	}
 
+	@Override
+	protected void handleCheckinHPAccounts() throws Exception {
+		List<AccountEntity> accounts = getAccountEntityDao().query(""
+				+ "select acc\n" + 
+				"from   com.soffid.iam.model.AccountEntity as acc\n" + 
+				"join   acc.system as dispatcher\n" + 
+				"join   acc.users as uac\n" + 
+				"join   uac.user as user\n" + 
+				"where acc.type='P' and dispatcher.tenant.id=:tenantId\n" + 
+				"order by dispatcher.name, acc.name, acc.loginName",
+				new Parameter[] {
+						new Parameter("tenantId", Security.getCurrentTenantId())
+				});
+
+		Date now = new Date();
+		for (AccountEntity account: accounts) {
+			for (UserAccountEntity uae: new LinkedList<UserAccountEntity>(account.getUsers()))
+			{
+				if (uae.getUntilDate().before(now)) {
+					getUserAccountEntityDao().remove(uae);
+					audit("R", account); //$NON-NLS-1$
+					Password p = getInternalPasswordService().generateFakeAccountPassword(account);
+					getInternalPasswordService().storeAndForwardAccountPassword(account, p, false, null);
+				}
+			}
+		}
+	}
+
 	private boolean isGreaterOrIqualThan (AccountAccessLevelEnum first, AccountAccessLevelEnum second)
 	{
 		if (first.equals(second))

@@ -762,6 +762,14 @@ public class ApplicationBootServiceImpl extends
 			getScheduledTaskService().create(handler);
 		}
 
+		if (!handlers
+				.containsKey(SystemScheduledTasks.RELEASE_PRIVILEGED_ACCOUNTS)) {
+			ScheduledTaskHandler handler = new ScheduledTaskHandler();
+			handler.setClassName("com.soffid.iam.service.cron.ReleasePrivilegedAccountsTask"); //$NON-NLS-1$
+			handler.setName(SystemScheduledTasks.RELEASE_PRIVILEGED_ACCOUNTS);
+			getScheduledTaskService().create(handler);
+		}
+
 		for (ScheduledTask task : getScheduledTaskService().listTasks()) {
 			String id = task.getHandlerName();
 			if (task.getParams() != null)
@@ -856,6 +864,19 @@ public class ApplicationBootServiceImpl extends
 			task.setMinutesPattern("*/5");
 			task.setMonthsPattern("*");
 			task.setName("Feed statistic tables");
+			getScheduledTaskService().create(task);
+		}
+
+		if (!tasks.containsKey(SystemScheduledTasks.RELEASE_PRIVILEGED_ACCOUNTS)) {
+			ScheduledTask task = new ScheduledTask();
+			task.setActive(false);
+			task.setDayOfWeekPattern("*");
+			task.setDayPattern("*");
+			task.setHandlerName(SystemScheduledTasks.RELEASE_PRIVILEGED_ACCOUNTS);
+			task.setHoursPattern("*");
+			task.setMinutesPattern("5");
+			task.setMonthsPattern("*");
+			task.setName("Release privileged accounts");
 			getScheduledTaskService().create(task);
 		}
 	}

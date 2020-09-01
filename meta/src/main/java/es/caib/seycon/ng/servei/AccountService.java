@@ -489,7 +489,9 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
-
+	@Description("Unlocks expired high privileged accounts")
+	public void checkinHPAccounts() {}
+	
 	@Description("Gets the current privileged account owner")
 	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})

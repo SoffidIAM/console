@@ -10,6 +10,8 @@ import com.soffid.iam.api.Challenge;
 import com.soffid.iam.service.impl.OTPHandler;
 import com.soffid.iam.service.impl.linotp.LinotpHandler;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 	List <OTPHandler> handlers = new LinkedList<OTPHandler>();
 	Log log = LogFactory.getLog(getClass());
@@ -36,16 +38,18 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 	protected Challenge handleSelectToken(Challenge challenge) throws Exception {
 		for ( OTPHandler handler: handlers)
 		{
-      try {
-        Challenge ch = handler.selectToken(challenge);
-        if (ch.getCardNumber() != null)
-        {
-          ch.setOtpHandler(handler.getClass().getName());
-          return ch;
-        }
-      } catch (Throwable th) {
-        log.warn(th);
-      }
+			try {
+				Challenge ch = handler.selectToken(challenge);
+				if (ch.getCardNumber() != null)
+				{
+					ch.setOtpHandler(handler.getClass().getName());
+					return ch;
+				}
+			} catch (InternalErrorException th) {
+				throw th;
+			} catch (Throwable th) {
+				log.warn(th);
+			}
 		}
 		return challenge;
 	}

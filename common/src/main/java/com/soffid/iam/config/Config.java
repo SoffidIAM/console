@@ -454,6 +454,8 @@ public class Config {
         Config config = getConfig();
         String[] split = getSeyconServerHostList();
         String firstHost = split[0];
+        if (firstHost.contains(":"))
+        	firstHost = firstHost.substring(0, firstHost.indexOf(':'));
         if (firstHost.equals(config.getHostName()))
             return true;
         else

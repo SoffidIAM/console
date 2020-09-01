@@ -141,7 +141,7 @@ public class LinotpHandler implements OTPHandler {
 							JSONObject token = data.optJSONObject(i);
 							if (token != null && token.getBoolean("LinOtp.Isactive"))
 							{
-								if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail")) {
+								if (token.getInt("LinOtp.FailCount") >= token.getInt("LinOtp.MaxFail")) {
 									// Skip. The token is locked
 								} else {
 									challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
@@ -181,7 +181,7 @@ public class LinotpHandler implements OTPHandler {
 							{
 								if (!token.getBoolean("LinOtp.Isactive"))
 									throw new InternalErrorException("The token is not active");
-								if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail"))
+								if (token.getInt("LinOtp.FailCount") >= token.getInt("LinOtp.MaxFail"))
 									throw new InternalErrorException("The token is locked");
 							}
 						}

@@ -20,7 +20,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		<div sclass="col_izq">
 			<image src="/img/menu/ninedots.svg" onClick="ref:appWindow.menu" sclass="menu3starter"/>
 			<menu3 id="menu3" style="display: inline-block"/>			
-			<image src="icons/logo-letras.png" id="logo"/>
+			<image src="icons/logo-letras-color.png" id="logo"/>
 		</div>
 
 		<div sclass="col_cen">
@@ -42,4 +42,11 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 	<popup id="searchBox" use="com.soffid.iam.web.main.SearchBoxWindow" sclass="main-search ctxpopup">
 		<timer id="timer" running="false" repeats="true" delay="200" onTimer="ref:searchBox.onTimer"/>	
 	</popup>
+	<script src="/js/ssokm.js"/>
+	<h:div id="soffidAraleExtensionDetector"/>
+	<html><![CDATA[
+	<form id="pamLauncherForm" action="/" target="_blank" method="POST">
+		<input type="hidden" id="pamLauncherFormSessionId" name="sessionId"/>
+	</form>	
+	]]></html>
 </window>

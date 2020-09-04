@@ -140,7 +140,7 @@ public class TipusDada {
 	
 	@Description("Bulti-in handler class")
 	@Nullable
-	String bultinHandler;
+	String builtinHandler;
 	
 	@Description ("Uppercase / lowercase usage")
 	@Nullable

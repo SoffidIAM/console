@@ -5,8 +5,13 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.ImpressoraEntity;
+
+@JsonObject(hibernateClass = ImpressoraEntity.class )
 @ValueObject ( translatedName="Printer",
 	 translatedPackage="com.soffid.iam.api")
 public class Impressora {
@@ -14,8 +19,11 @@ public class Impressora {
 	@Nullable
 	public java.lang.String model;
 
-	@Attribute(translated = "code" )
+	@Attribute(translated = "name", synonyms = {"code"} )
 	public java.lang.String codi;
+
+	@Attribute( )
+	public java.lang.String description;
 
 	@Nullable
 	@Attribute(translated = "hostName" )
@@ -27,4 +35,9 @@ public class Impressora {
 	@Nullable
 	public java.lang.Long id;
 
+	@Nullable
+	List<String> users;
+
+	@Nullable
+	List<String> groups;
 }

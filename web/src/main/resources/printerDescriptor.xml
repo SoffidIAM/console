@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="printer" type="printer">
+			<ejb-finder jndi="java:/module/PrinterService-v2"
+				method="findPrinterByTextAndJsonQueryAsync" if = "${query != null &amp;&amp; synchro == null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/PrinterService-v2"
+				method="findPrinterByTextAndJsonQueryAsync" if = "${textQuery != null &amp;&amp; synchro == null}">
+				<parameter value="${textQuery}"/>
+				<parameter value=""/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/PrinterService-v2"
+				method="findPrinterByJsonQueryAndJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Printer"/>
+		</finder>
+	</datanode>
+	
+	<datanode name="printer">
+		<ejb-handler jndi="java:/module/PrinterService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>			
+			</update-method>
+		</ejb-handler>
+	</datanode>
+</zkib-model>

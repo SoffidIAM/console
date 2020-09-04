@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -18,6 +19,7 @@ import java.util.Set;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
 import org.jbpm.logging.exe.LoggingInstance;
+import org.json.JSONException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -43,6 +45,7 @@ import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.model.AuthenticationLog;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -69,6 +72,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
@@ -78,9 +82,12 @@ import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import bsh.EvalError;
 import es.caib.bpm.vo.PredefinedProcessType;
@@ -320,18 +327,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(account.getGrantedGroups() != null && !account.getGrantedGroups().isEmpty()))
 				throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
 					
-			User owner = account.getOwnerUsers().iterator().next();
+			String owner = account.getOwnerUsers().iterator().next();
 			
-			UserEntity ue = getUserEntityDao().load(owner.getId());
+			UserEntity ue = getUserEntityDao().findByUserName(owner);
 			UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
 			uae.setAccount(acc);
 			uae.setUser(ue);
 			getUserAccountEntityDao().create(uae);
 			
-			account.setDescription(owner.getFullName());
+			account.setDescription(ue.getFullName());
 			
 			com.soffid.iam.api.System dispatcher = getDispatcherService().findDispatcherByName(account.getSystem());
-			account.setDisabled(!getDispatcherService().isUserAllowed(dispatcher, owner.getUserName()));
+			account.setDisabled(!getDispatcherService().isUserAllowed(dispatcher, owner));
 			
 			createUserTask(ue);
 				
@@ -488,7 +495,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		throw new InternalErrorException(String.format("Unable to find metadada for attribute %s", key));
 	}
 
-	private Collection<Group> getAclGrupCollectionForLevel(Account account, AccountAccessLevelEnum level) {
+	private Collection<String> getAclGrupCollectionForLevel(Account account, AccountAccessLevelEnum level) {
 		if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
 			return account.getManagerGroups();
 		else if (level == AccountAccessLevelEnum.ACCESS_USER)
@@ -497,7 +504,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return account.getOwnerGroups();
 	}
 
-	private Collection<User> getAclUsuariCollectionForLevel(Account account, AccountAccessLevelEnum level) {
+	private Collection<String> getAclUsuariCollectionForLevel(Account account, AccountAccessLevelEnum level) {
 		if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
 			return account.getManagerUsers();
 		else if (level == AccountAccessLevelEnum.ACCESS_USER)
@@ -506,7 +513,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return account.getOwnerUsers();
 	}
 
-	private Collection<Role> getAclRolCollectionForLevel(Account account, AccountAccessLevelEnum level) {
+	private Collection<String> getAclRolCollectionForLevel(Account account, AccountAccessLevelEnum level) {
 		if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
 			return account.getManagerRoles();
 		else if (level == AccountAccessLevelEnum.ACCESS_USER)
@@ -541,11 +548,17 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (account.getOwnerRoles() == null)
 			account.setOwnerRoles(Collections.EMPTY_LIST);
 		@SuppressWarnings(value = "unchecked")
-        List<Group>[] newgrups = new List[]{new LinkedList<Group>(account.getGrantedGroups()), new LinkedList<Group>(account.getManagerGroups()), new LinkedList<Group>(account.getOwnerGroups())};
+        List<String>[] newgrups = new List[]{new LinkedList<String>(account.getGrantedGroups()), 
+        		new LinkedList<String>(account.getManagerGroups()), 
+        		new LinkedList<String>(account.getOwnerGroups())};
 		@SuppressWarnings(value = "unchecked")
-        List<Role>[] newroles = new List[]{new LinkedList<Role>(account.getGrantedRoles()), new LinkedList<Role>(account.getManagerRoles()), new LinkedList<Role>(account.getOwnerRoles())};
+        List<String>[] newroles = new List[]{new LinkedList<String>(account.getGrantedRoles()), 
+        		new LinkedList<String>(account.getManagerRoles()), 
+        		new LinkedList<String>(account.getOwnerRoles())};
 		@SuppressWarnings(value = "unchecked")
-        List<User>[] newusers = new List[]{new LinkedList<User>(account.getGrantedUsers()), new LinkedList<User>(account.getManagerUsers()), new LinkedList<User>(account.getOwnerUsers())};
+        List<String>[] newusers = new List[]{new LinkedList<String>(account.getGrantedUsers()), 
+        		new LinkedList<String>(account.getManagerUsers()), 
+        		new LinkedList<String>(account.getOwnerUsers())};
 		// Remove grants
 		for (Iterator<AccountAccessEntity> aclIterator = acc.getAcl().iterator(); aclIterator.hasNext(); ) {
             AccountAccessEntity access = aclIterator.next();
@@ -555,25 +568,25 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                if (levels[index] == access.getLevel()) {
 	                    boolean found = false;
 	                    if (access.getGroup() != null) {
-	                        for (Iterator<Group> it = newgrups[index].iterator(); !found && it.hasNext(); ) {
-	                            Group g = it.next();
-	                            if (g.getId().equals(access.getGroup().getId())) {
+	                        for (Iterator<String> it = newgrups[index].iterator(); !found && it.hasNext(); ) {
+	                            String g = it.next();
+	                            if (g.equals(access.getGroup().getName())) {
 	                                it.remove();
 	                                found = true;
 	                            }
 	                        }
 	                    } else if (access.getRole() != null) {
-	                        for (Iterator<Role> it = newroles[index].iterator(); !found && it.hasNext(); ) {
-	                            Role r = it.next();
-	                            if (r.getId().equals(access.getRole().getId())) {
+	                        for (Iterator<String> it = newroles[index].iterator(); !found && it.hasNext(); ) {
+	                            String r = it.next();
+	                            if (r.equals(access.getRole().getName()+"@"+access.getRole().getSystem().getName())) {
 	                                it.remove();
 	                                found = true;
 	                            }
 	                        }
 	                    } else if (access.getUser() != null) {
-	                        for (Iterator<User> it = newusers[index].iterator(); !found && it.hasNext(); ) {
-	                            User u = it.next();
-	                            if (u.getId().equals(access.getUser().getId())) {
+	                        for (Iterator<String> it = newusers[index].iterator(); !found && it.hasNext(); ) {
+	                            String u = it.next();
+	                            if (u.equals(access.getUser().getUserName())) {
 	                                it.remove();
 	                                found = true;
 	                            }
@@ -604,8 +617,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         }
 		// Add new groups
 		for (int index = 0; index < levels.length; index++) {
-            for (Group g : newgrups[index]) {
-                GroupEntity ge = getGroupEntityDao().load(g.getId());
+            for (String g : newgrups[index]) {
+                GroupEntity ge = getGroupEntityDao().findByName(g);
                 if (ge != null) {
 					anyChange = true;
 
@@ -620,8 +633,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     notifyAccountPasswordChange(acc, ge, null, null);
                 }
             }
-            for (Role r : newroles[index]) {
-                RoleEntity re = getRoleEntityDao().load(r.getId());
+            for (String r : newroles[index]) {
+                RoleEntity re = getRoleEntityDao().findByShortName(r);
                 if (re != null) {
 					anyChange = true;
 
@@ -636,8 +649,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     notifyAccountPasswordChange(acc, null, re, null);
                 }
             }
-            for (User u : newusers[index]) {
-                UserEntity ue = getUserEntityDao().load(u.getId());
+            for (String u : newusers[index]) {
+                UserEntity ue = getUserEntityDao().findByUserName(u);
                 if (ue != null) {
 					anyChange = true;
 
@@ -689,9 +702,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			anyChange = true;
 			if (ae.getType().equals(AccountType.USER))
 			{
-				account.setOwnerUsers(new LinkedList<User>());
+				account.setOwnerUsers(new LinkedList<String>());
 				for (UserAccountEntity ua : ae.getUsers()) {
-                    User u = getUserService().getUserInfo(ua.getUser().getUserName());
+                    String u = (ua.getUser().getUserName());
                     getUserAccountEntityDao().remove(ua);
                     account.getOwnerUsers().add(u);
                 }
@@ -710,18 +723,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					!account.getGrantedGroups().isEmpty())
 					throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
 				
-				User owner = account.getOwnerUsers().iterator().next();
+				String owner = account.getOwnerUsers().iterator().next();
 				
-				UserEntity ue = getUserEntityDao().load(owner.getId());
+				UserEntity ue = getUserEntityDao().findByUserName(owner);
 				UserAccountEntity uae = getUserAccountEntityDao().newUserAccountEntity();
 				uae.setAccount(ae);
 				uae.setUser(ue);
 				getUserAccountEntityDao().create(uae);
 				
-				account.setDescription(owner.getFullName());
+				account.setDescription(ue.getFullName());
 				
 				com.soffid.iam.api.System dispatcher = getDispatcherService().findDispatcherByName(account.getSystem());
-				account.setDisabled(!getDispatcherService().isUserAllowed(dispatcher, owner.getUserName()));
+				account.setDisabled(!getDispatcherService().isUserAllowed(dispatcher, owner));
 				
 				createUserTask(ue);
 
@@ -923,7 +936,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (SystemEntity disEntity : disDao.loadAll()) {
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
                 for (AccountEntity acc : accounts) if (acc.getSystem() == disEntity) {
-                    if (acc.getStatus() == AccountStatus.DISABLED && "S".equals(ue.getActive())) {
+                    if ((acc.getStatus() == AccountStatus.LOCKED || acc.getStatus() == AccountStatus.DISABLED) && 
+                    		"S".equals(ue.getActive())) {
                         acc.setDisabled(false);
 						acc.setStatus(AccountStatus.ACTIVE);
                         getAccountEntityDao().update(acc);
@@ -972,7 +986,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 } else if (!accs.isEmpty()) {
                     for (AccountEntity acc : accs) {
                     	if (! "S".equals(ue.getActive()) && acc.getStatus() == AccountStatus.FORCED_ACTIVE ||
-                    			acc.getStatus() == AccountStatus.ACTIVE)
+                    			acc.getStatus() == AccountStatus.ACTIVE )
                     	{
                             acc.setDisabled(true);
     						acc.setStatus(AccountStatus.DISABLED);
@@ -1381,7 +1395,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (ServerEntity se : dao.loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
                 try {
-                    RemoteServiceLocator rsl = new RemoteServiceLocator(se.getName());
+                    RemoteServiceLocator rsl = new RemoteServiceLocator(se.getUrl());
                     rsl.setAuthToken(se.getAuth());
                     SyncStatusService sss = rsl.getSyncStatusService();
                     Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
@@ -1486,7 +1500,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		/// Now, do the job
 		if (password == null)
 		{
-			result = ips.generateNewAccountPassword(ae, temporary);
+			result = ips.generateFakeAccountPassword(ae);
+	        sendPasswordNow (ae, result, temporary);
 		}
 		else
 		{
@@ -1510,7 +1525,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {
 	            	SyncStatusService sss = null;
 	                try {
-	                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getName());
+	                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getUrl());
 	                    rsl.setAuthToken(se.getAuth());
 	                    sss = rsl.getSyncStatusService();
 	                } catch (Exception e) {
@@ -2262,7 +2277,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			Account u = getAccountEntityDao().toAccount(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
-						Security.AUTO_USER_QUERY, ue)) {
+						Security.AUTO_ACCOUNT_QUERY, ue)) {
 					result.add(u);
 				}
 			}
@@ -2498,7 +2513,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (ServerEntity se : getServerEntityDao().loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
                 try {
-                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getName());
+                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getUrl());
                     rsl.setAuthToken(se.getAuth());
                     SyncStatusService sss = rsl.getSyncStatusService();
                     PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
@@ -2526,4 +2541,58 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return false;
 	}
 
+	@Override
+	protected AsyncList<Account> handleFindAccountByTextAndJsonQueryAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<Account> result = new AsyncList<Account>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindAccountByTextAndJsonQuery(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void doFindAccountByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<Account> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, 
+				EvalException, JSONException, ParseException, TokenMgrError {
+		final AccountEntityDao dao = getAccountEntityDao();
+		final AuthorizationService authorizationService = getAuthorizationService();
+		ScimHelper h = new ScimHelper(Account.class);
+		h.setPrimaryAttributes(new String[] { "name", "description", "loginName", "system"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("system.tenant.id");
+		h.setGenerator((entity) -> {
+			Account u = dao.toAccount((AccountEntity) entity);
+			try {
+				if (authorizationService.hasPermission(
+						Security.AUTO_ACCOUNT_QUERY, (AccountEntity) entity)) {
+					return u;
+				} else {
+					return null;
+				}
+			} catch (InternalErrorException e) {
+				return null;
+			}
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+
+	@Override
+	protected List<Account> handleFindAccountByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<Account> result = new LinkedList<Account>();
+		doFindAccountByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
 }

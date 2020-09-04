@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?page id="menu"?>
+<?component name="menu_acl" macro-uri="menu-acl.zul"?>
+<?component name="menu_executions" macro-uri="menu-executions.zul"?>
+<?component name="menu_sso" macro-uri="menu-sso.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.menu.MenuEditorHandler" id="frame">
+	
+	<datamodel id="model" rootNode="root" src="menuDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('sso:createSharedFolders')}"  onClick="ref:frame.addNew"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.AccessTree" 
+				defaultAttributes="name, description"
+				dataPath="/model:/app" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatree2 id="listbox"
+				width="100%" dataPath="/model:/"
+				header="${c:l('com.soffid.iam.api.Account.name') }" 
+				openLevels="1"
+				enablefilter="false"
+				maxheight="70vh"
+				onAdd="ref:frame.addNew"
+				onSelect="ref:frame.showDetails">
+				<attribute name="finders">
+				<![CDATA[
+				- path: /app
+				  icon: #{menu? "/img/container-green.svg": "/img/link-green.svg"} 
+				  value: name
+				  tail: >-
+				    #{menu ? '
+				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, &quot;onAdd&quot;)">${c:l('menu.add')}</button>
+				    ': ''}
+				  leaf: #{!menu}
+				  ]]>
+  				</attribute>
+  			</datatree2>
+
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('sso:createSharedFolders')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatree2="listbox"/>
+								
+				<imageclic src="/img/wait.gif" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
+
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<menu2>
+					<menu2item image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+			</div>
+			<div id="dades">
+				<form2 id="form" onChangeXPath="ref:frame.onChangeForm" dataPath="/listbox:/" width="100%">
+					<tabbox>
+						<tabs>
+							<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+							<tab id="p_autoritzacions"   label="${c:l('aplicacionsIntranet.zul.Autoritzacions')}"/>
+							<tab id="p_execucions"  label="${c:l('aplicacionsIntranet.zul.Execucions')}"/>
+							<tab id="p_xml" label="${c:l('aplicacionsIntranet.zul.Mazinger')}"/> 
+						</tabs>
+						<tabpanels>
+							<tabpanel>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.menu') }" bind="menu" dataType="BOOLEAN" id="menu" onChange="ref:frame.onChangeMenu"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.name') }" bind="name" required="true" dataType="STRING"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.code') }" bind="code" dataType="STRING" maxlength="20"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.informationSystem') }" bind="informationSystem" dataType="APPLICATION"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.system') }" bind="system" 
+									dataType="STRING"  id="system"
+									uiHandler="com.soffid.iam.web.menu.SystemFieldHandler"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.menuType') }" bind="menuType" dataType="STRING" id="menuType" listOfValues="L: List, I: Icons, T: Tree"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.publicAccess') }" bind="publicAccess" dataType="BOOLEAN"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.visible') }" bind="visible" dataType="BOOLEAN"/>
+								<div style="text-align: right; width: 100%">
+									<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+									</databutton>
+									<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+								</div>					
+							</tabpanel>
+							<tabpanel fulfill="p_autoritzacions.onSelect" id="tp_autoritzacions">
+								<menu_acl listbox="//menu/listbox"/>
+							</tabpanel>
+							<tabpanel fulfill="p_execucions.onSelect" id="tp_executions">
+								<menu_executions listbox="//menu/listbox"/>
+							</tabpanel>
+							<tabpanel fulfill="p_xml.onSelect" id="tp_xml">
+								<menu_sso listbox="//menu/listbox"/>
+							</tabpanel>
+						</tabpanels>
+					</tabbox>
+				</form2>
+			</div>
+		</div>
+	</div>
+</frame>

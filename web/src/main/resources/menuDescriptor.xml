@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="mimetype" transient="true">
+	</datanode>
+	
+	<datanode name="root">
+		<finder name="app" type="app" refreshAfterCommit="false">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				if="${(textQuery != null &amp;&amp; textQuery != '') || (query != null &amp;&amp; query != '')}"
+				method="findAccessTreeByTextAndJsonQueryAsync">
+				<parameter value="${textQuery}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				method="findRoot" if="${(textQuery == null || textQuery=='') &amp;&amp; (query == null || query == '')}">
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.AccessTree" />
+		</finder>
+		<finder name="mimeType" type="java.util.Collection">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				if="${queryEnabled}" method="getAllMimeTypeExecution" />
+		</finder>
+		<finder name="aplicacions" type="java.util.Collection">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				method="getAllApplications">
+				<parameter value="${false}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="app">
+		<finder name="app" type="app">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				method="findChildren">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.AccessTree" />
+		</finder>
+		<finder name="auth" type="auth"
+			refreshAfterCommit="true">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				method="getAuthorizationsApplicationAcessTree">
+				<parameter value="${instance}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.AccessTreeAuthorization" />
+		</finder>
+		<finder name="execution" type="execution">  <!-- intranetMenus:query -->
+			<custom-finder className="com.soffid.iam.web.menu.ExecutionFinder" />
+		</finder>
+
+		<ejb-handler jndi="java:/module/EntryPointService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+
+	</datanode>
+
+	<datanode name="java.util.Collection" />
+	<datanode name="java.lang.String" />
+
+	<datanode name="auth">
+		<ejb-handler jndi="java:/module/EntryPointService-v2">
+			<insert-method method="createAuthorization" returnBean="true">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="deleteAuthorization">
+				<parameter value="${parent.instance}" />
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="execution">
+		<custom-handler className="com.soffid.iam.web.menu.ExecutionHandler"/>
+	</datanode>
+
+</zkib-model>

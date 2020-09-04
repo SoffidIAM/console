@@ -1207,6 +1207,18 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:networks:show</codi>
+		<descripcio>Access to networks page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:hosts:show</codi>
+		<descripcio>Access to hosts page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>seu:aplicacions:show</codi>
 		<descripcio>Access to applications page</descripcio>
 		<tipusDomini>APLICACIONS</tipusDomini>

@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Execution;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -18,6 +22,7 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
+import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
@@ -143,9 +148,15 @@ public class UserHandler extends FrameHandler {
 	}
 
 	@Override
-	public void applyNoClose(Event event) throws CommitException {
-		ObjectAttributesDiv att = (ObjectAttributesDiv) getFellow("userAttributes");
-		if (att.validate())
-			super.applyNoClose(event);
+	public void afterCompose() {
+		super.afterCompose();
+		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		String user = req.getParameter("userName");
+		if (user != null) {
+			SearchBox sb = (SearchBox) getFellow("searchBox");
+			sb.setBasicMode();
+			sb.addAttribute("userName").setSearchFilter(user);
+			sb.search();
+		}
 	}
 }

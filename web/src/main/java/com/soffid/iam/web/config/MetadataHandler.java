@@ -14,9 +14,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
+
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -30,6 +35,7 @@ import org.zkoss.zul.Window;
 
 import com.google.common.collect.Lists;
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
@@ -40,6 +46,7 @@ import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.popup.CsvParser;
+import com.soffid.iam.web.popup.Editor;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 import com.soffid.iam.web.util.RemoveOnCloseStream;
 
@@ -128,7 +135,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		
 		String title = Labels.getLabel("tenant.zul.import");
 		ImportCsvHandler.startWizard(title, data, this, 
-				parser -> importAttributeCsv(parser));
+				parser -> importAttributeCsv(parser),
+				false);
 	}
 
 	private void importAttributeCsv(CsvParser parser) throws UiException {
@@ -155,8 +163,16 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 						if (s.equals("values") && value != null) {
 							String[] array = value.split("[ ,]+");
 							PropertyUtils.setProperty(dt, s, Lists.newArrayList(array));
+						} else if (s.equals("type") && value != null) {
+							dt.setType(TypeEnumeration.fromString(value));
+						} else if (s.equals("adminVisibility") && value != null) {
+							dt.setAdminVisibility(AttributeVisibilityEnum.fromString(value));
+						} else if (s.equals("operatorVisibility") && value != null) {
+							dt.setOperatorVisibility(AttributeVisibilityEnum.fromString(value));
+						} else if (s.equals("userVisibility") && value != null) {
+							dt.setUserVisibility(AttributeVisibilityEnum.fromString(value));
 						} else if (value != null && !value.trim().isEmpty()) {
-							PropertyUtils.setProperty(dt, s, value);
+							BeanUtils.setProperty(dt, s, value);
 						}
 					}
 					names.add(name);
@@ -472,6 +488,11 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 							metadataWindow.setVisible(false);
 						}
 					});
+	}
+	
+	public void editScript(Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
+		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
+				new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
 	}
 	
 

@@ -489,7 +489,6 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
-
 	@Description("Gets the current privileged account owner")
 	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -603,6 +602,22 @@ public abstract class AccountService {
 	public AsyncList<es.caib.seycon.ng.comu.Account> findAccountByTextAsync(
 			@Nullable String text)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+
+	@Operation(grantees = { roles.account_query.class })
+	public java.util.List<Account> findAccountByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.account_query.class })
+	public AsyncList<Account> findAccountByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
 		return null;
 	}
 

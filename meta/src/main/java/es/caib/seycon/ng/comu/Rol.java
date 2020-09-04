@@ -68,6 +68,7 @@ public class Rol {
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> granteeGroups;
 
 	@Nullable
+	@Attribute(hidden = true)
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> ownedRoles;
 
 	@Nullable
@@ -75,11 +76,13 @@ public class Rol {
 	public java.lang.Boolean gestionableWF;
 
 	@Description("Last modification date")
+	@Attribute(readonly = true)
 	@Nullable
 	public Date approvalStart;
 
 	@Description("Approval date")
 	@Nullable
+	@Attribute(readonly = true)
 	public Date approvalEnd;
 
 	@Description ("Role custom attributes")

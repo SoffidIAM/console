@@ -28,6 +28,7 @@ public abstract class AutoritzacioAccesHostComAdministradorEntity {
 	public es.caib.seycon.ng.model.MaquinaEntity host;
 
 	@Column (name="ADM_IDWF", translated="processWFID")
+	@Nullable
 	public java.lang.Long idProcesWorkflow;
 
 	@Column (name="ADM_DATINI", translated="requestDate")

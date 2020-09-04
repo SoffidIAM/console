@@ -124,6 +124,10 @@ public class AttributeSearchBox extends XulElement {
 					sb.append("(not ")
 						.append(attributeDef.getName())
 						.append(" pr)");
+				} else if ( attributeDef.getJavaType() == Boolean.class ){
+					sb.append(attributeDef.getName())
+					.append(" eq ")
+					.append(escape(value));
 				} else {
 					sb.append(attributeDef.getName())
 					.append(" eq ")

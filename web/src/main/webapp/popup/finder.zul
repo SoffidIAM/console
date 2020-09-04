@@ -33,6 +33,7 @@
 		use="com.soffid.iam.web.popup.FinderDatatable"
 		preference="${execution.attributes.preferenceName}-data"
 		dataPath="/window/model:/objects" maxheight="70vh" sortColumn="0"
+		multiselect="${execution.attributes.multi}"
 		onSelect="ref:window.onSelect" enablefilter="false">
 	</datatable>
 

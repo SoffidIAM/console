@@ -50,6 +50,8 @@ import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
+import com.soffid.iam.utils.IPAddress;
+import com.soffid.iam.utils.InvalidIPException;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.parser.ParseException;
@@ -70,6 +72,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -305,12 +308,14 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		getHostEntityDao().hostToEntity(maquina, old, true);
                 old.setDeleted(new Boolean(false));
                 getHostEntityDao().update(old);
+                updateHostAlias(old, maquina.getHostAlias());
 	            return getHostEntityDao().toHost(old);                
         	} else {
 	            HostEntity entity = getHostEntityDao().hostToEntity(maquina);
 	            entity.setDeleted(new Boolean(false));
 	            getHostEntityDao().create(entity);
 	            maquina.setId(entity.getId());
+	            updateHostAlias(entity, maquina.getHostAlias());
 	            return getHostEntityDao().toHost(entity);
         	}
         }
@@ -322,7 +327,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      */
     protected void handleUpdate(com.soffid.iam.api.Host maquina) throws java.lang.Exception {
         if (teAccesEscripturaMaquina(maquina)) {
-            getHostEntityDao().update(getHostEntityDao().hostToEntity(maquina));
+            HostEntity hostEntity = getHostEntityDao().hostToEntity(maquina);
+			getHostEntityDao().update(hostEntity);
+            updateHostAlias(hostEntity, maquina.getHostAlias());
         } else {
             // Comprovem permís per actualitzar el SO de la màquina
             if (AutoritzacionsUsuari.canUpdateHostOS()) {
@@ -357,7 +364,23 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
     }
 
-    /**
+    private void updateHostAlias(HostEntity host, List<String> hostAlias) {
+    	HashSet<String> l = new HashSet<>(hostAlias);
+    	for (HostAliasEntity hae: new LinkedList<HostAliasEntity>(host.getHostAlias())) {
+    		if (l.contains(hae.getAlias()))
+    			l.remove(hae.getAlias());
+    		else
+    			getHostAliasEntityDao().remove(hae);
+    	}
+    	for (String s: l) {
+    		HostAliasEntity ha = getHostAliasEntityDao().newHostAliasEntity();
+    		ha.setHost(host);
+    		ha.setAlias(s);
+    		getHostAliasEntityDao().create(ha);
+    	}
+	}
+
+	/**
      * @see es.caib.seycon.ng.servei.XarxaService#delete(es.caib.seycon.ng.comu.Maquina)
      */
     protected void handleDelete(com.soffid.iam.api.Host maquina) throws java.lang.Exception {
@@ -831,8 +854,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         if (xarxaEntity != null) {
             Network xarxa = getNetworkEntityDao().toNetwork(xarxaEntity);
             if (teAccesLecturaXarxa(xarxa)) {
-                Long count = getNetworkEntityDao().getUsedIPs(xarxaEntity.getAddress(), xarxaEntity.getMask());
-                return count;
+    	        return getNetworkEntityDao().countByNetwork(codiXarxa);
             }
             throw new SeyconException(String.format(
                     Messages.getString("NetworkServiceImpl.NoReadNetPermission"), codiXarxa)); //$NON-NLS-1$
@@ -843,10 +865,17 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     protected Long handleGetAvailableIPs(String codiXarxa) throws Exception {
         NetworkEntity xarxaEntity = getNetworkEntityDao().findByName(codiXarxa);
         if (xarxaEntity != null) {
-            Network xarxa = getNetworkEntityDao().toNetwork(xarxaEntity);
-            if (teAccesLecturaXarxa(xarxa)) {
-                Long count = getNetworkEntityDao().getVoidIPs(xarxaEntity.getAddress(), xarxaEntity.getMask());
-                return count;
+        	Network xarxa = getNetworkEntityDao().toNetwork(xarxaEntity);
+        	if (teAccesLecturaXarxa(xarxa)) {
+	            try 
+	            {
+	    	        IPAddress ip = new IPAddress(xarxaEntity.getAddress(), xarxaEntity.getMask());
+	    	        int total = ip.networkSize() ;
+	    	        total = total - getNetworkEntityDao().countByNetwork(codiXarxa).intValue();
+	    	        return new Long(total);
+	    		} catch (InvalidIPException e) {
+	    			throw new RuntimeException("Invalid IP", e);
+	    		}
             }
             throw new SeyconException(String.format(
                     Messages.getString("NetworkServiceImpl.NoReadNetPermission"), codiXarxa)); //$NON-NLS-1$
@@ -1244,41 +1273,37 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     private boolean maquinesIguals(Host maquinaA, Host maquinaB) {
-        return (!(((maquinaA.getName() == null && maquinaB.getName() != null) || (maquinaA.getName() != null && maquinaB.getName() == null)) && ((maquinaA.getOs() == null || maquinaB.getOs() != null) || (maquinaA.getOs() != null || maquinaB.getOs() == null)) && ((maquinaA.getIp() == null && maquinaB.getIp() != null) || (maquinaA.getIp() != null && maquinaB.getIp() == null)) && ((maquinaA.getDescription() == null && maquinaB.getDescription() != null) || (maquinaA.getDescription() != null && maquinaB.getDescription() == null)) && ((maquinaA.getDhcp() == null && maquinaB.getDhcp() != null) || (maquinaA.getDhcp() != null && maquinaB.getDhcp() == null)) && ((maquinaA.getMail() == null && maquinaB.getMail() != null) || (maquinaA.getMail() != null && maquinaB.getMail() == null)) && ((maquinaA.getOffice() == null && maquinaB.getOffice() != null) || (maquinaA.getOffice() != null && maquinaB.getOffice() == null)) && ((maquinaA.getHostAlias() == null && maquinaB.getHostAlias() != null) || (maquinaA.getHostAlias() != null && maquinaB.getHostAlias() == null)) && ((maquinaA.getNetworkCode() == null && maquinaB.getNetworkCode() != null) || (maquinaA.getNetworkCode() != null && maquinaB.getNetworkCode() == null)) && ((maquinaA.getMac() == null && maquinaB.getMac() != null) || (maquinaA.getMac() != null && maquinaB.getMac() == null)) && ((maquinaA.getPrintersServer() == null && maquinaB.getPrintersServer() != null) || (maquinaA.getPrintersServer() != null && maquinaB.getPrintersServer() == null)))) && (((maquinaA.getName() == null && maquinaB.getName() == null) || (maquinaA.getName().compareTo(maquinaB.getName()) == 0)) && ((maquinaA.getOs() == null || maquinaB.getOs() == null) || (maquinaA.getOs().compareTo(maquinaB.getOs()) == 0)) && ((maquinaA.getIp() == null && maquinaB.getIp() == null) || (maquinaA.getIp().compareTo(maquinaB.getIp()) == 0)) && ((maquinaA.getDescription() == null && maquinaB.getDescription() == null) || (maquinaA.getDescription().compareTo(maquinaB.getDescription()) == 0)) && ((maquinaA.getDhcp() == null && maquinaB.getDhcp() == null) || (maquinaA.getDhcp().compareTo(maquinaB.getDhcp()) == 0)) && ((maquinaA.getMail() == null && maquinaB.getMail() == null) || (maquinaA.getMail().compareTo(maquinaB.getMail()) == 0)) && ((maquinaA.getOffice() == null && maquinaB.getOffice() == null) || (maquinaA.getOffice().compareTo(maquinaB.getOffice()) == 0)) && ((maquinaA.getHostAlias() == null && maquinaB.getHostAlias() == null) || (sonAliasIguales(maquinaA.getHostAlias(), maquinaB.getHostAlias()))) && ((maquinaA.getNetworkCode() == null && maquinaB.getNetworkCode() == null) || (maquinaA.getNetworkCode().compareTo(maquinaB.getNetworkCode()) == 0)) && ((maquinaA.getMac() == null && maquinaB.getMac() == null) || (maquinaA.getMac().compareTo(maquinaB.getMac()) == 0)) && ((maquinaA.getPrintersServer() == null && maquinaB.getPrintersServer() == null) || (maquinaA.getPrintersServer().compareTo(maquinaB.getPrintersServer()) == 0)));
+        return (!(((maquinaA.getName() == null && maquinaB.getName() != null) || (maquinaA.getName() != null && maquinaB.getName() == null)) && 
+        		((maquinaA.getOs() == null || maquinaB.getOs() != null) || (maquinaA.getOs() != null || maquinaB.getOs() == null)) && 
+        		((maquinaA.getIp() == null && maquinaB.getIp() != null) || (maquinaA.getIp() != null && maquinaB.getIp() == null)) && 
+        		((maquinaA.getDescription() == null && maquinaB.getDescription() != null) || (maquinaA.getDescription() != null && maquinaB.getDescription() == null)) && 
+        		((maquinaA.getDhcp() == null && maquinaB.getDhcp() != null) || (maquinaA.getDhcp() != null && maquinaB.getDhcp() == null)) && 
+        		((maquinaA.getMail() == null && maquinaB.getMail() != null) || (maquinaA.getMail() != null && maquinaB.getMail() == null)) && 
+        		((maquinaA.getOffice() == null && maquinaB.getOffice() != null) || (maquinaA.getOffice() != null && maquinaB.getOffice() == null)) && 
+        		((maquinaA.getHostAlias() == null && maquinaB.getHostAlias() != null) || (maquinaA.getHostAlias() != null && maquinaB.getHostAlias() == null)) &&
+        		((maquinaA.getNetworkCode() == null && maquinaB.getNetworkCode() != null) || (maquinaA.getNetworkCode() != null && maquinaB.getNetworkCode() == null)) && 
+        		((maquinaA.getMac() == null && maquinaB.getMac() != null) || (maquinaA.getMac() != null && maquinaB.getMac() == null)) && 
+        		((maquinaA.getPrintersServer() == null && maquinaB.getPrintersServer() != null) || (maquinaA.getPrintersServer() != null && maquinaB.getPrintersServer() == null)))) && 
+        		(((maquinaA.getName() == null && maquinaB.getName() == null) || (maquinaA.getName().compareTo(maquinaB.getName()) == 0)) && 
+        				((maquinaA.getOs() == null || maquinaB.getOs() == null) || (maquinaA.getOs().compareTo(maquinaB.getOs()) == 0)) && 
+        				((maquinaA.getIp() == null && maquinaB.getIp() == null) || (maquinaA.getIp().compareTo(maquinaB.getIp()) == 0)) && 
+        				((maquinaA.getDescription() == null && maquinaB.getDescription() == null) || (maquinaA.getDescription().compareTo(maquinaB.getDescription()) == 0)) && 
+        				((maquinaA.getDhcp() == null && maquinaB.getDhcp() == null) || (maquinaA.getDhcp().compareTo(maquinaB.getDhcp()) == 0)) && 
+        				((maquinaA.getMail() == null && maquinaB.getMail() == null) || (maquinaA.getMail().compareTo(maquinaB.getMail()) == 0)) && 
+        				((maquinaA.getOffice() == null && maquinaB.getOffice() == null) || (maquinaA.getOffice().compareTo(maquinaB.getOffice()) == 0)) && 
+        				((maquinaA.getHostAlias() == null && maquinaB.getHostAlias() == null) || (sonAliasIguales(maquinaA.getHostAlias(), maquinaB.getHostAlias()))) && 
+        				((maquinaA.getNetworkCode() == null && maquinaB.getNetworkCode() == null) || (maquinaA.getNetworkCode().compareTo(maquinaB.getNetworkCode()) == 0)) && 
+        				((maquinaA.getMac() == null && maquinaB.getMac() == null) || (maquinaA.getMac().compareTo(maquinaB.getMac()) == 0)) && 
+        				((maquinaA.getPrintersServer() == null && maquinaB.getPrintersServer() == null) || (maquinaA.getPrintersServer().compareTo(maquinaB.getPrintersServer()) == 0)));
     }
 
-    private boolean sonAliasIguales(String alias1, String alias2) {
-        if ((alias1 == null && alias2 != null) || (alias1 != null && alias2 == null))
+    private boolean sonAliasIguales(List<String> v_alias1, List<String> v_alias2) {
+        if ((v_alias1 == null && v_alias2 != null) || (v_alias1 != null && v_alias2 == null))
             return false; // solo 1 nulo
-        if (alias1 == null && alias2 == null)
+        if (v_alias2 == null && v_alias1 == null)
             return true; // ambos nulos
-        HashSet h_alias1 = new HashSet();
-        HashSet h_alias2 = new HashSet();
-        // alias1 y alias2 NO son nulos
-        String[] v_alias1 = alias1.split(" "); //$NON-NLS-1$
-        String[] v_alias2 = alias2.split(" "); //$NON-NLS-1$
-        // Los guardamos en los sets
-        if (v_alias1 != null)
-            for (int i = 0; i < v_alias1.length; i++) {
-                String act = v_alias1[i];
-                if (act != null && !"".equals(act.trim())) //$NON-NLS-1$
-                    h_alias1.add(act);
-            }
-        if (v_alias2 != null)
-            for (int i = 0; i < v_alias2.length; i++) {
-                String act = v_alias2[i];
-                if (act != null && !"".equals(act.trim())) //$NON-NLS-1$
-                    h_alias2.add(act);
-            }
-        if (h_alias1.size() != h_alias2.size())
-            return false; // No tienen el mismo tamaño
-        // Los comparamos buscando todos los del primero en el segundo:
-        for (Iterator it = h_alias1.iterator(); it.hasNext();) {
-            String elem = (String) it.next();
-            if (!h_alias2.contains(elem))
-                return false;
-        }
-        return true;
+        
+        return new HashSet<String>(v_alias1).equals( new HashSet<String>(v_alias2));
     }
 
     private List<NetworkEntity> localFindXarxaByFiltre(java.lang.String codi, java.lang.String adreca, java.lang.String descripcio, java.lang.String mascara, java.lang.String normalitzada, java.lang.String dhcp, String maquina) throws java.lang.Exception {
@@ -1862,7 +1887,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 
 	private void doFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<Network> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+			Collection<Network> result) throws TokenMgrError, Exception {
 		final NetworkEntityDao dao = getNetworkEntityDao();
 		ScimHelper h = new ScimHelper(Network.class);
 		h.setPrimaryAttributes(new String[] { "name", "description", "address"});
@@ -1871,8 +1896,24 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
 		h.setTenantFilter("tenant.id");
+
+		final boolean any = AutoritzacionsUsuari.canQueryAllNetworks()
+                || AutoritzacionsUsuari.canSupportAllNetworks_VNC();
+		final List<String> networks = new LinkedList<>();
+        if (!any) {
+	        String codiUsuari = Security.getCurrentUser();
+	        if (codiUsuari != null)
+	        {
+	        	networks.addAll( getCodiXarxesAmbAcces(Security.getCurrentUser()) );
+	        }
+        }
+
 		h.setGenerator((entity) -> {
-			return dao.toNetwork((NetworkEntity) entity);
+			NetworkEntity ne = (NetworkEntity) entity;
+			if (any || networks.contains( ne.getName()))
+				return dao.toNetwork((NetworkEntity) entity);
+			else 
+				return null;
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
 	}

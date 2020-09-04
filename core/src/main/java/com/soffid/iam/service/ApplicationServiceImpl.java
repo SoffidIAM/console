@@ -15,6 +15,7 @@ package com.soffid.iam.service;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -2469,6 +2470,20 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
+    protected Role handleFindRoleByShortName(String name) throws Exception {
+        RoleEntity rolEntity = getRoleEntityDao().findByShortName(name);
+        if (rolEntity == null)
+        	return null;
+        if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
+		{
+            return getRoleEntityDao().toRole(rolEntity);
+        } else {
+			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+					Security.getCurrentAccount(), name));
+        }
+	}
+
+	@Override
     protected Collection<RoleAccount> handleFindUserRolesByInformationSystem(String informationSystem) throws Exception {
 		return getRoleAccountEntityDao().toRoleAccountList(getRoleAccountEntityDao().findByInformationSystem(informationSystem));
 	}
@@ -2998,7 +3013,7 @@ public class ApplicationServiceImpl extends
 					findEffectiveRoleGrantsRecursively(rg.getContained(), rg.getDomainApplicationValue().getValue(), roleToModify, radSet);
 				else if (rg.getDomainGroup() != null)
 					findEffectiveRoleGrantsRecursively(rg.getContained(), rg.getDomainGroup().getName(), roleToModify, radSet);
-				else if (rg.getContained().getDomainType().equals(r.getDomainType()) )
+				else if (rg.getContained().getDomainType() != null && rg.getContained().getDomainType().equals(r.getDomainType()) )
 					findEffectiveRoleGrantsRecursively(rg.getContained(), domainValue, roleToModify, radSet);
 				else
 					findEffectiveRoleGrantsRecursively(rg.getContained(), null, roleToModify, radSet);
@@ -3678,9 +3693,55 @@ public class ApplicationServiceImpl extends
 	@Override
 	protected List<RoleGrantHierarchy> handleFindRoleGrantHierarchyByUser(long userId) throws Exception {
 		UserEntity user = getUserEntityDao().load(userId);
+		if (user == null)
+			return new LinkedList<>();
 		finishDelegations(user);
 		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
 		populateRoles(radSet, ALL, user, null, true);
+		LinkedList<RoleGrantHierarchy> rgl = generateHierarchy(radSet);
+		return rgl;
+	}
+
+	@Override
+	protected List<RoleGrantHierarchy> handleFindRoleGrantHierarchyByAccount(long userId) throws Exception {
+		AccountEntity account = getAccountEntityDao().load(userId);
+		if (account == null)
+			return new LinkedList<>();
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+		
+		if (account.getType().equals(AccountType.USER))
+		{
+			UserEntity user = account.getUsers().iterator().next().getUser();
+			finishDelegations(user);
+			populateRoles(radSet, ALL, user, null, true);
+		}
+		else {
+			RoleGrantHierarchy h = new RoleGrantHierarchy();
+			h.setAccountName(account.getName());
+			h.setSystem(account.getSystem().getName());
+			h.setAccountDescription(account.getDescription());
+			RolAccountDetail r = new RolAccountDetail(h, null);
+			radSet.add(r);
+			populateAccountRoles (radSet, ALL, account, null, null, true, r);
+		}
+
+		LinkedList<RoleGrantHierarchy> rgl = generateHierarchy(radSet);
+		pruneBySystem (rgl, account.getSystem().getName());
+		
+		return rgl;
+	}
+	
+	private void pruneBySystem(List<RoleGrantHierarchy> rgl, String system) {
+		for (RoleGrantHierarchy rg: new LinkedList<RoleGrantHierarchy>(rgl)) {
+			if ( rg.getNested() != null)
+				pruneBySystem(rg.getNested(), system);
+			if ( !system.equals(rg.getSystem())  && (rg.getNested() == null || rg.getNested().isEmpty()))
+				rgl.remove(rg);
+		}
+	}
+	
+	public LinkedList<RoleGrantHierarchy> generateHierarchy(HashSet<RolAccountDetail> radSet)
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		LinkedList<RoleGrantHierarchy> rgl = new LinkedList<RoleGrantHierarchy>();
 
 		// Create role grant objects
@@ -3716,6 +3777,7 @@ public class ApplicationServiceImpl extends
 		}
 		return rgl;
 	}
+
 	public void finishDelegations(UserEntity user) throws InternalErrorException {
 		if (user.getUserName().equals(Security.getCurrentUser()) && 
 				! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))

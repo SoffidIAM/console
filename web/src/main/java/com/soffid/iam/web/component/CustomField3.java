@@ -1,26 +1,23 @@
 package com.soffid.iam.web.component;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
-import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.web.WebDataType;
+
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathRerunEvent;
 
@@ -42,6 +39,8 @@ public class CustomField3 extends InputField3 {
 	boolean raisePrivileges = false;
 	boolean noLabel = false;
 	String enumeration = null;
+	String metadata = null;
+	String uiHandler = null;
 	
 	private List<TipusDada> dataTypes;
 
@@ -51,20 +50,44 @@ public class CustomField3 extends InputField3 {
 
 	private String filterExpression;
 
-	public void updateMetadata() {
+	public void updateMetadata()  {
+		if (metadata != null && metadata.contains(".")) 
+		{
+			int i = metadata.lastIndexOf('.');
+			Collection<DataType> md;
+			try {
+				md = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(metadata.substring(0,i), metadata.substring(i+1));
+			} catch (InternalErrorException | NamingException | CreateException e) {
+				throw new UiException(e);
+			}
+			if (!md.isEmpty()) {
+				dataTypeObj = new WebDataType( md.iterator().next() );
+				if (!dataTypeObj.isReadOnly())
+					dataTypeObj.setReadOnly(isReadonly());
+				if (binder.isVoid()) {
+					if (Boolean.TRUE.equals( dataTypeObj.getBuiltin()))
+						setBind(metadata.substring(i+1));
+					else
+						setBind("/attributes[@name='"+metadata.substring(i+1)+"']");
+				}
+				refresh ();
+			}
+		}
 		if (dataTypeName != null)
 		{
 			dataTypeObj = new DataType();
 			dataTypeObj.setDataObjectType(dataObjectType);
+			dataTypeObj.setMultiLine(isMultiline());
 			dataTypeObj.setMultiValued(multiValue);
 			dataTypeObj.setReadOnly(isReadonly());
 			dataTypeObj.setScope(null);
 			dataTypeObj.setSize(maxLength);
 			dataTypeObj.setRequired(required);
 			dataTypeObj.setFilterExpression(filterExpression);
+			dataTypeObj.setBuiltinHandler(uiHandler);
 			if (listOfValues != null)
 				dataTypeObj.setValues(Arrays.asList(listOfValues));
-	
+			
 			List names = TypeEnumeration.names();
 			for ( int i = 0; i < names.size(); i++)
 			{
@@ -88,6 +111,8 @@ public class CustomField3 extends InputField3 {
 			}
 			setDisabled(dataTypeObj.isReadOnly());
 			setReadonly(dataTypeObj.isReadOnly());
+			if (this.placeholder != null)
+				super.setPlaceholder(this.placeholder);
 			refresh ();
 		}
 	}
@@ -123,6 +148,7 @@ public class CustomField3 extends InputField3 {
 			} catch (Exception e) {
 				throw new UiException(e);
 			};
+			runOnLoadTrigger();
 			adjustVisibility();
 		}
 	}
@@ -227,6 +253,7 @@ public class CustomField3 extends InputField3 {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+		super.setRequired(required);
 	}
 
 	public boolean isHideUserName() {
@@ -282,12 +309,32 @@ public class CustomField3 extends InputField3 {
 	
 	public void setLabel(String label) {
 		super.setLabel(label+" :");
-		setPlaceholder(label);
+		super.setPlaceholder(label);
 	}
 	
 	public void afterCompose() {
 		updateMetadata();
 		super.afterCompose();
+	}
+
+	
+	public String getMetadata() {
+		return metadata;
+	}
+
+	
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
+	}
+
+	
+	public String getUiHandler() {
+		return uiHandler;
+	}
+
+	
+	public void setUiHandler(String uiHandler) {
+		this.uiHandler = uiHandler;
 	}
 	
 }

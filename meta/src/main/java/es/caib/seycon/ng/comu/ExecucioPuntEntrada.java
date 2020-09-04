@@ -17,12 +17,15 @@ public class ExecucioPuntEntrada {
 	@Attribute(translated = "scope" )
 	public java.lang.String ambit;
 
+	@Nullable
 	@Attribute(translated = "content" )
 	public java.lang.String contingut;
 
+	@Nullable
 	@Attribute(translated = "executionTypeCode" )
 	public java.lang.String codiTipusExecucio;
 
+	@Nullable
 	@Attribute(translated = "typeMimeExecution" )
 	public java.lang.String tipusMimeExecucio;
 

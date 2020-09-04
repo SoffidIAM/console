@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -32,6 +33,7 @@ import com.soffid.iam.web.component.SearchBox;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.binder.list.ModelProxy;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.jxpath.JXPathContext;
@@ -140,6 +142,7 @@ public class FinderHandler extends Window implements AfterCompose {
 				FinderDatatable table = (FinderDatatable) h.getFellow("listbox");
 				table.setClassName(className);
 				table.setPreference(className+"-data");
+				table.setMultiselect(multi);
 				table.invalidate();
 				
 				DataModel model = (DataModel) h.getFellow("model");
@@ -154,6 +157,7 @@ public class FinderHandler extends Window implements AfterCompose {
 			Button finishButton = (Button) h.getFellow("finishButton");
 			finishButton.setVisible(multi);
 			
+			h.setTitle(title);
 			h.filter = filter;
 			h.listener = listener;
 			h.multi = multi;
@@ -177,22 +181,7 @@ public class FinderHandler extends Window implements AfterCompose {
 			DynamicColumnsDatatable lb = getListbox();
 			String path = lb.getSelectedItemXPath();
 			if (path != null) {
-				JXPathContext ds = lb.getDataSource().getJXPathContext();
-				path = lb.getXPath()+path;
-				String name = null;
-				try {
-					name = (String) ds.getValue(path+"/userName");
-				} catch (Exception e) {}
-				if (name == null) {
-					try {
-						name = (String) ds.getValue(path+"/name");
-					} catch (Exception e) {}
-				}
-				if (name == null) {
-					try {
-						name = (String) ds.getValue(path+"/code");
-					} catch (Exception e) {}
-				}
+				String name = getNameForPath(lb, path);
 				if (name != null) {
 					try {
 						listener.onEvent(new Event("onSelect", lb, name));
@@ -203,6 +192,63 @@ public class FinderHandler extends Window implements AfterCompose {
 				} else {
 					Missatgebox.avis("Internal error: Cannot get object name");
 				}
+			}
+		}
+	}
+
+
+	public String getNameForPath(DynamicColumnsDatatable lb, String path) {
+		JXPathContext ds = lb.getDataSource().getJXPathContext();
+		path = lb.getXPath()+path;
+		String name = null;
+		if (className.equals("com.soffid.iam.api.Role")) 
+		{
+			name = (String) ds.getValue(path+"/name");
+			String system = (String) ds.getValue(path+"/system");
+			name = name +"@"+system;
+		} else {
+			try {
+				name = (String) ds.getValue(path+"/userName");
+			} catch (Exception e) {}
+			if (name == null) {
+				try {
+					name = (String) ds.getValue(path+"/name");
+				} catch (Exception e) {}
+			}
+			if (name == null) {
+				try {
+					name = (String) ds.getValue(path+"/code");
+				} catch (Exception e) {}
+			}
+		}
+		return name;
+	}
+
+	public void accept(Event ev) throws Exception {
+		if (!multi)
+			onSelect(ev);
+		else
+		{
+			DynamicColumnsDatatable lb = getListbox();
+			int[] items = lb.getSelectedIndexes();
+			if (items != null && items.length > 0) {
+				List<String> values = new LinkedList<>();
+				JXPathContext ds = lb.getDataSource().getJXPathContext();
+				for (int item: items) {
+					String path = ((ModelProxy) lb.getModel()).getBind(item);
+					String name = getNameForPath(lb, path);
+					if (name != null) {
+						try {
+							values.add(name);
+						} catch (Exception e) {
+							throw new UiException(e);
+						}
+						setVisible(false);
+					} else {
+						Missatgebox.avis("Internal error: Cannot get object name");
+					}
+				}
+				listener.onEvent(new Event("onSelect", lb, values));
 			}
 		}
 	}

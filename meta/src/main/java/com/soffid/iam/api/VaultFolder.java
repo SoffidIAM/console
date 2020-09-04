@@ -1,15 +1,20 @@
 package com.soffid.iam.api;
 
+import com.soffid.iam.model.VaultFolderEntity;
+import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 
+@JsonObject(hibernateClass = VaultFolderEntity.class)
 @ValueObject(cache=100, cacheTimeout=30000)
 public class VaultFolder 
 {
 	@Nullable
+	@Attribute(hidden = true)
 	Long id;
 	
 	String name;
@@ -26,51 +31,63 @@ public class VaultFolder
 
 	@Description("Groups that can use the account using SSO")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Grup> grantedGroups;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> grantedGroups;
 
 	@Description("Users that can use the account using SSO")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> grantedUsers;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> grantedUsers;
 
 	@Description("Roles that can use the account using SSO")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Rol> grantedRoles;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> grantedRoles;
 
 	@Description("Groups that can use the account using SSO & Self Service")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Grup> managerGroups;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> managerGroups;
 
 	@Description("Users that can use the account using SSO & Self Service")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> managerUsers;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> managerUsers;
 
 	@Description("Roles that can use the account using SSO & Self Service")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Rol> managerRoles;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> managerRoles;
 
 	@Description("Groups that can manage the account using SSO & Self Service & Console")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Grup> ownerGroups;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> ownerGroups;
 
 	@Description("Users that can use the account using SSO & Self Service & Console")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Usuari> ownerUsers;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> ownerUsers;
 
-	@Description("Roles that can use the account using SSO & Self Service & Console")
+	@Description("Roles that can use the account using SSO & Self Serva	ice & Console")
 	@Nullable
-	public java.util.Collection<es.caib.seycon.ng.comu.Rol> ownerRoles;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> ownerRoles;
 
 	@Description("Groups that can navigate")
 	@Nullable
-	public java.util.Collection<Long> navigateGroups;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> navigateGroups;
 
 	@Description("Users that can navigate")
 	@Nullable
-	public java.util.Collection<Long> navigateUsers;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> navigateUsers;
 
 	@Description("Roles that can use the account using SSO & Self Service & Console")
 	@Nullable
-	public java.util.Collection<Long> navigateRoles;
+	@Attribute(defaultValue = "new java.util.LinkedList<String>()")
+	public java.util.Collection<String> navigateRoles;
 
 	@Description("Effective access level")
 	@Nullable

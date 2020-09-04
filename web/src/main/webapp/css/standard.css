@@ -181,6 +181,7 @@ div.z-loading-indicator {box-sizing: content-box;}
 	vertical-align: middle;
 }
 
+
 .col_cen {
 	vertical-align:middle;
 	white-space: nowrap;
@@ -239,6 +240,13 @@ div.main-search.ctxpopup div.search-option span {
 	color: {SKY};
 	text-overflow: ellipsis;
 }
+
+div.main-search.ctxpopup div.search-option:hover,
+div.main-search.ctxpopup div.search-option:hover span {
+	color: {BLUETEXT};
+	background-color: {BLUE}
+}
+
 
 div.main-search.ctxpopup div.search-more {
 	padding-left: 10px;
@@ -446,7 +454,8 @@ button, input[type="button"], input[type="submit"] {
 }	
 
 /* Buttons */
-button.small-button:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+button.small-button:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover,
+button.small-button:focus, button:focus, input[type="button"]:focus, input[type="submit"]:focus {
 	background-image: none;
 	background-color: {SKY};
 	color: {SKYTEXT};
@@ -1382,15 +1391,30 @@ div.CodeMirror-linenumber {font-size: 12pt}
 
 
 .attribute-search-box-remove, div.databox div.container img.remove-icon {
+    margin-left: 8px;
 	width:1em;
 	opacity:0.2;
 	vertical-align: text-top;
+	cursor: pointer;
 }
 
 
 .attribute-search-box-remove:hover, 
 div.databox div.container img.remove-icon:hover {
 	opacity: 1;
+}
+
+div.databox div.datahtml {
+	background: transparent;
+	width: 100%
+} 
+div.databox div.container, div.databox div.container span {
+	white-space: pre;
+}
+
+div.databox div.container input.name {
+	width: 30%;
+	min-width: 250px;
 }
 
 .button-container {
@@ -1740,7 +1764,7 @@ tr.grid td.gc {
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, textarea.text {
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text {
     box-sizing: border-box;
     padding: 2px;
     border: 4px solid #f0f0f0;
@@ -1750,6 +1774,7 @@ input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, in
 
 input.textbox2::placeholder, input.textbox2m::placeholder, input.textbox::placeholder, 
 	input.dateboxinp::placeholder, input.text::placeholder,
+	input.description::placeholder,
 	input.name::placeholder {
 	color: #c0c0c0;
 }
@@ -1890,12 +1915,12 @@ span.rbtnbk {
 
 select {
     border: 4px solid #f0f0f0;
-    padding: 2px 18px 2px 2px;
+    padding: 2px;
     color: black;
     margin-top: 2px;
     margin-bottom: 2px;
     min-width:80px;
-    padding-right: 16px;
+    padding-right: 24px;
 
 	border-radius: 4px;
 	display: inline-block;
@@ -1923,9 +1948,10 @@ select::-ms-expand {
 }
 
 
-select:disabled {
+select:disabled, select.readonly {
     background: white;
-    border:none;
+    border: 4px solid transparent;
+    color: black;
 }
 
 select.classic:focus {
@@ -2075,12 +2101,17 @@ div.datatable table, div.datatable table td {
 	min-width: 80px;
 }
 
+div.datatable.fixedlayout table {
+	table-layout: fixed;
+}
+
 div.datatable table.tbody tr td.selector {
 	width: 38px;
 	text-align: center;
 }
 
-div.datatable table.tbody tr.dashed td {
+div.datatable table.tbody tr.dashed td,
+div.databox.dashed select {
 	text-decoration: line-through;
 }
 
@@ -2484,7 +2515,7 @@ div.menu2modal.open div.menu2dropdown tr:hover {
 	background-color: {BLUE};
 }
 
-div.menu2 div.menu2starter, button.icon-button {
+div.menu2 div.menu2starter, button.icon-button, span.zbtnbk {
 	display: inline-block;
 	height: 25px;
 	width: 25px;
@@ -2494,6 +2525,23 @@ div.menu2 div.menu2starter, button.icon-button {
 	border: none;
 	background-image: none;
 	box-shadow: none;
+}
+
+div.navigation-bar img.progress {
+	display: inline-block;
+	height: 25px;
+	width: 25px;
+	background-color: transparent;
+	cursor: pointer;
+	padding: 0;
+	border: none;
+	background-image: none;
+	box-shadow: none;
+	float: right;
+}
+
+span.zbtnbk {
+	padding: 2px;
 }
 
 div.menu2 div.menu2starter, div.navigation-bar button.icon-button {
@@ -2514,7 +2562,7 @@ button.grid-icon-button {
 	border: none;
 }
 
-div.menu2 div.menu2starter img, button.icon-button img, grid-icon-button img {
+div.menu2 div.menu2starter img, button.icon-button img, grid-icon-button img, span.zbtnbk img {
 	width: 20px;
 }
 
@@ -2522,7 +2570,7 @@ button.icon-button:disabled, button.grid-icon-button:disabled {
 	display: none;
 }
 
-div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-button:hover {
+div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-button:hover, span.zbtnbk:hover {
 	background-image: url(/img/circle.svg);
 	background-size: cover;
 }
@@ -2543,6 +2591,7 @@ div.navigation-bar span.pager span:last-child {
 div.options {
 	text-align: center;
 }
+
 .options .menuoption {
 	width: 350px;
 	padding: 40px;
@@ -2550,6 +2599,10 @@ div.options {
 	vertical-align: top;
 	cursor: pointer;
 	display: inline-block;
+}
+
+.options.options-small .menuoption {
+	width: 150px;
 }
 
 .options .menuoption img {
@@ -2565,6 +2618,14 @@ div.options {
     transition: padding 0.2s ease-in-out;
 }
 
+.options.options-small .menuoption img {
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	border-radius: 8px;
+}
+
 .options .menuoption:hover img {
 	width: 100%;
 	box-shadow: 12px 12px 8px {GREEN};
@@ -2572,11 +2633,19 @@ div.options {
 	background-color: #e8e8e8;
 }
 
+.options.options-small .menuoption:hover img {
+	box-shadow: 6px 6px 4px {GREEN};
+}
+
 .options .menuoption .menuoption-title {
 	font-family: inherit;
 	font-size: 15pt;
 	font-weight: lighter;
 	word-break: break-word;
+}
+
+.options.options-small .menuoption .menuoption-title {
+	font-size: 12pt;
 }
 
 .options .menuoption .menuoption-suboptions {
@@ -2591,11 +2660,11 @@ div.options {
 div.navigation-bar {
 	padding: 10px 0 10px 0;
 	margin-bottom: 10px;
-	background-color: {SKYTEXT};
-	color: {SKY}
+	color: {SKY};
+	min-height: 36px;
 }
 
-div.navigation-bar span {
+div.navigation-bar span.link {
 	color: {SKY};
 	font-weight: bold;
 }
@@ -2686,7 +2755,6 @@ div.datatree div.tree-collapse.open img {
 
 div.datatree div.tbody {
   border: 1px solid {GREEN};
-  background-image: url(/img/separator.svg);
   background-color: white;
   box-sizing: border-box;
   width:100%; 
@@ -2741,7 +2809,12 @@ div.tree-children.waiting {
 div.tree-children.waiting div.tree-tail {
 	display: none;
 }
-		
+
+div.datatree div.tree-itemholder {
+  background-image: url(/img/separator.svg);
+	
+}
+	
 div.datatree div.tree-itemholder img.tree-icon {
 	width: 1em;
 	height: 1em;
@@ -2889,8 +2962,7 @@ div.menu3 table tr td a:visited {
 
 div.menu3 table tr td img{
 	margin-right: 8px;
-	height: 18px;
-	width: 27px;
+	height: 20px;
 	vertical-align: middle;
 }
 
@@ -2996,18 +3068,18 @@ div.tree-tail button {
 
 form.upload-form input[type="submit"] {display:none;}
 form.upload-form input[type="button"] {float: right;}
-
-/************* databox *****************/
-div.databox div.label {
+	
+	/************* databox *****************/
+div.databox div.label, span.label {
 	display: inline-block;
-	width: 142px;
+	width: 192px;
 	color: 	{BLUE};
     vertical-align: top;
     margin-top: 6px;
 	margin-left: 8px;
 }
 
-div.databox.separator div.label {
+div.databox.separator div.label, span.separator {
 	display: inline-block;
 	width: 100%;
 	color: 	{GREEN};
@@ -3020,7 +3092,7 @@ div.databox.separator div.label {
 
 div.databox div.container {
 	display: inline-block;
-	width: calc( 100% - 150px );
+	width: calc( 100% - 200px );
     margin-bottom: 4px;
     vertical-align: top;
     position: relative;
@@ -3040,8 +3112,28 @@ div.databox div.container textarea.text {
 	resize: vertical;
 }
 
+div.databox[selecticon] div.container textarea.text {
+	width: calc( 100% - 30px );
+}
+
+div.databox[selecticon] div.container button.icon-button {
+	vertical-align: top
+}
+
+div.databox div.container input.description,
+div.databox[multivalue='true'] div.container input.text ,
+div.databox[multivalue='true'] div.container textarea.text {
+	width: 90%;
+	width: calc( 100% - 1em - 2px );
+}
+
+div.databox[multivalue='true'] div.container input.description {
+	width: 90%;
+	width: calc( 100% - 2em - 4px );
+}
+
 div.databox div.databox-popup {
-   position: fixed;
+   position: absolute;
    margin-top: 24px;
    background-color: white;
    padding: 8px;
@@ -3059,7 +3151,7 @@ div.databox div.databox-popup {
 div.databox div.databox-popup div {
     width: 100%;
     cursor: pointer;
-    overflow-y: hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
     height: 20px;
 }
@@ -3075,11 +3167,11 @@ div.databox div.databox-popup div span.search-match{
 div.databox div.databox-popup div:hover {
 	background-color: {BLUELIGHT};
 }
-div.databox div.databox-popup div:hover span.search-match{
+div.databox div.databox-popup div:hover span.search-match {
 	color: black;
 }
 
-div.databox button.icon-button {
+div.databox button.icon-button, span.zbtnbk {
 	margin-left: 4px;
 	margin-right: 4px;
 	margin-top: 3px;
@@ -3124,9 +3216,11 @@ div.wizard-bar {
     margin-top: -16px;
     margin-bottom: 16px;
     height: 52px;
-    width: calc( 100% + 32px );
+    width: 1000%;
     background: #f0f0f0;
     border-bottom: solid black 1px;
+    overflow: hidden;
+    position: relative;
 }
 
 div.wizard-bar div.active-step {
@@ -3181,4 +3275,12 @@ div.wizard-bar div.separator-d {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
+}
+
+
+@media only screen and (max-width: 600px) {
+	.col_izq img.menu3starter,
+	div.col_der.help {
+		 display:none;
+	}
 }

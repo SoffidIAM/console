@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.config.GroupTypeHandler" id="frame">
+
+	<datamodel id="model" rootNode="root" src="ouTypesDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('organizationalUnit:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('organizationalUnit:create') &amp;&amp; soffid:isUserInRole('organizationalUnit:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/ouType"
+			    maxheight="70vh"
+				sortColumn="0" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+- name: ${c:l('com.soffid.iam.api.OUType.name')}
+  value: name
+- name: ${c:l('com.soffid.iam.api.OUType.description')}
+  value: description
+- name: ${c:l('com.soffid.iam.api.OUType.roleHolder')}
+  template: #{roleHolder? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('organizationalUnit:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div id="dades">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+					<pager datatable="listbox"/>
+					
+					<menu2>
+						<menu2item if="${soffid:isUserInRole('organizationalUnit:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					</menu2>
+					
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				</div>
+				<form id="form" onChangeXPath="ref:frame.onChangeDades"
+					dataPath="/listbox:/." width="100%">
+					<customfield3 label="${c:l('com.soffid.iam.api.OUType.name')}"
+						readonly="${! soffid:isUserInRole('organizationalUnit:update') }"
+						required="true"
+						dataType="string"
+						bind="name"
+						maxlength="10"/>
+								
+					<customfield3 label="${c:l('com.soffid.iam.api.OUType.description')}" 
+						readonly="${! soffid:isUserInRole('organizationalUnit:update') }"
+						required="true"
+						dataType="string"
+						bind="description"
+						maxlength="50"/>
+
+					<customfield3 label="${c:l('com.soffid.iam.api.OUType.roleHolder')}"
+						readonly="${! soffid:isUserInRole('organizationalUnit:update') }"
+						dataType="boolean"
+						bind="roleHolder"
+						maxlength="10"/>
+				</form>
+			</div>
+			<div style="text-align: right; width: 100%">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+			</div>
+		</div>
+	</div>
+</frame>

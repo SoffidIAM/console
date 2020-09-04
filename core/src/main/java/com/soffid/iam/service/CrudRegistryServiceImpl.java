@@ -1,14 +1,11 @@
 package com.soffid.iam.service;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.xalan.xsltc.compiler.util.InternalError;
-
-import java.util.HashMap;
-
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.CrudHandler;
-import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
@@ -19,6 +16,8 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.api.VaultFolder;
+import com.soffid.iam.service.crud.CrudAccountHandler;
 import com.soffid.iam.service.crud.CrudApplicationHandler;
 import com.soffid.iam.service.crud.CrudDomainValueHandler;
 import com.soffid.iam.service.crud.CrudGroupHandler;
@@ -30,6 +29,7 @@ import com.soffid.iam.service.crud.CrudRoleHandler;
 import com.soffid.iam.service.crud.CrudSystemHandler;
 import com.soffid.iam.service.crud.CrudUserHandler;
 import com.soffid.iam.service.crud.CrudUserTypeHandler;
+import com.soffid.iam.service.crud.CrudVaultFolderHandler;
 
 public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 	Map<String, CrudHandler<?>> registry = new HashMap<String,CrudHandler<?>>();
@@ -52,6 +52,8 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(System.class.getName(), new CrudSystemHandler());
 		registry.put(DomainValue.class.getName(), new CrudDomainValueHandler());
 		registry.put(OUType.class.getName(), new CrudOUTypeHandler());
+		registry.put(VaultFolder.class.getName(), new CrudVaultFolderHandler());
+		registry.put(Account.class.getName(), new CrudAccountHandler());
 	}
 
 	@Override

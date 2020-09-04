@@ -8,11 +8,14 @@ package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.ExecucioPuntEntradaEntity;
+import es.caib.seycon.ng.model.PuntEntradaEntity;
 
 @ValueObject ( translatedName="AccessTree",
 	 translatedPackage="com.soffid.iam.api")
+@JsonObject(hibernateClass = PuntEntradaEntity.class)
 public class PuntEntrada {
 
+	@Attribute(hidden=true)
 	@Nullable
 	public java.lang.Long id;
 
@@ -23,42 +26,42 @@ public class PuntEntrada {
 	@Attribute(translated = "name" )
 	public java.lang.String nom;
 
-	public java.lang.String visible;
+	public boolean visible;
 
-	public java.lang.String menu;
+	public boolean menu;
 
 	@Nullable
 	@Attribute(translated = "columnsNumber" )
-	public java.lang.String numColumnes;
+	public Long numColumnes;
 
-	@Attribute(translated = "isPublic" )
-	public java.lang.String esPublic;
+	@Attribute(translated = "publicAccess" )
+	public boolean esPublic;
 
 	@Nullable
-	@Attribute(translated = "typeMenu" )
+	@Attribute(translated = "menuType" )
 	public java.lang.String tipusMenu;
 
 	@Nullable
-	@Attribute(translated = "authorizations" )
+	@Attribute(translated = "authorizations", hidden=true )
 	public java.util.Collection<AutoritzacioPuntEntrada> autoritzacions;
 
 	@Nullable
-	@Attribute(translated = "executions" )
+	@Attribute(translated = "executions", hidden=true )
 	public java.util.Collection<ExecucioPuntEntrada> execucions;
 
 	@Nullable
-	@Attribute(translated = "icon1Image" )
+	@Attribute(translated = "icon1Image", hidden=true )
 	public byte[] imgIcona1;
 
 	@Nullable
-	@Attribute(translated = "icon2Image" )
+	@Attribute(translated = "icon2Image", hidden=true )
 	public byte[] imgIcona2;
 
-	@Attribute(translated = "applicationId" )
-	public java.lang.Long idAplicacio;
+	@Nullable
+	public String informationSystem;
 
 	@Nullable
-	@Attribute(translated = "parentId" )
+	@Attribute(translated = "parentId",hidden=true )
 	public java.lang.Long idPare;
 
 	@Nullable
@@ -66,21 +69,17 @@ public class PuntEntrada {
 	public java.lang.String ordre;
 
 	@Nullable
-	@Attribute(translated = "icon1Id" )
+	@Attribute(translated = "icon1Id", hidden=true )
 	public java.lang.Long idIcona1;
 
 	@Nullable
-	@Attribute(translated = "icon2Id" )
+	@Attribute(translated = "icon2Id", hidden=true )
 	public java.lang.Long idIcona2;
 
 	@Nullable
-	@Attribute(translated = "xmlAccessTree" )
+	@Attribute(translated = "xmlAccessTree", hidden=true )
 	public java.lang.String xmlPUE;
 
-	@Nullable
-	@Attribute(translated = "treeRoute" )
-	public java.lang.String rutaArbre;
-	
 	@Nullable
 	public java.lang.String system;
 

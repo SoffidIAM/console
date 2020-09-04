@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.application.ApplicationDomainHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar dummy">
+		<label bind="${arg.listbox}:/@name"></label> - <label bind="${arg.listbox}:/@description"/>
+		<menu2>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('user:group:create')}" onClick="ref:handler.importCsv"/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+	<datatree2 id="listbox"
+		width="100%" dataPath="${arg.listbox}:/"
+		header="${c:l('aplicacions.zul.Domini')} / ${c:l('aplicacions.zul.Valor')}" 
+		openLevels="1"
+		enablefilter="false"
+		maxheight="70vh"
+		onAddDomain="ref:handler.addNew"
+		onAddDomainValue="ref:handler.addNewValue"
+		onSelect="ref:handler.showDetails">
+		<attribute name="finders">
+		<![CDATA[
+		- path: /domain
+		  icon: /img/container-black.svg
+		  value: name
+		  leaf: false
+		  columns:
+		    - value: description
+		  ${soffid:isUserInRole('application:update') ? "tail":"no-tail"}: >-
+		    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddDomainValue')">${c:l('application.addDomainValue')}</button>
+		- path: /domainValue
+		  value: value
+		  leaf: true
+		  columns:
+		    - value: description
+		  ]]>
+				</attribute>
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('com.soffid.iam.api.Application.description')}
+		]]>
+		</attribute>
+			</datatree2>
+
+	<div width="100%" if="${soffid:isUserInRole('application:update')}" >
+		<div style="float: right"  class="addButton" onClick="ref:handler.addNew">+</div>
+		<label style="margin-top: 20px; word-break: break-word" multiline="true" value ="&#x0a;${c:l('application.domainExplanation') }" />
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+	    onOK="ref:handler.onChangeDomain"
+		position="top, center" sizable="false"
+		title="${c:l('application.changeDomain')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDomainDetails()">
+
+		<div sclass="navigation-bar">
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('application:update')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<customfield3 dataType="STRING" bind="../listbox:@name" id='name'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Domini') }"
+			required="true" >
+		</customfield3>		
+			
+		<customfield3 dataType="STRING" bind="../listbox:@description" id='description'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Descripcia') }"
+			required="true" >
+		</customfield3>		
+	
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:handler.closeDomainDetails">
+			</button>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
+				datamodel="${arg.listbox}" 
+				onClick="ref:handler.onChangeDomain"/>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add_domain_window"
+	    onOK="ref:handler.applyAddDomain"
+		position="top, center" sizable="false"
+		title="${c:l('application.addDomain')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<customfield3 dataType="STRING" bind="../listbox:@name" id='name'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Domini') }"
+			required="true" >
+		</customfield3>		
+			
+		<customfield3 dataType="STRING" bind="../listbox:@description" id='description'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Descripcia') }"
+			required="true" >
+		</customfield3>		
+	
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+				onClick="ref:handler.backAndRollbackDomain" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:handler.applyAddDomain"/>
+		</div>
+	</window>
+	
+	<window 
+	    closable="false"
+	    onOK="ref:handler.onChangeValue"
+		id="modify-value-window"
+		position="top, center" sizable="false"
+		title="${c:l('application.changeValue')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeValueDetails()">
+
+		<div sclass="navigation-bar">
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('application:update')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<customfield3 dataType="STRING" bind="../listbox:@value" id='name'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Valor') }"
+			required="true" >
+		</customfield3>		
+			
+		<customfield3 dataType="STRING" bind="../listbox:@description" id='description'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Descripcia') }"
+			required="true" >
+		</customfield3>		
+	
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:handler.closeValueDetails">
+			</button>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
+				datamodel="${arg.listbox}" 
+				onClick="ref:handler.onChangeValue"/>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+	    onOK="ref:handler.onApplyAddValue"
+		id="add_value_window"
+		position="top, center" sizable="false"
+		title="${c:l('application.addDomainValue')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<customfield3 dataType="STRING" bind="../listbox:@value" id='name'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Valor') }"
+			required="true" >
+		</customfield3>		
+			
+		<customfield3 dataType="STRING" bind="../listbox:@description" id='description'
+			maxlength="150"
+			label="${c:l('aplicacions.zul.Descripcia') }"
+			required="true" >
+		</customfield3>		
+	
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+				onClick="ref:handler.backAndRollbackValue" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:handler.applyAddValue"/>
+		</div>
+	</window>
+	
+</div>

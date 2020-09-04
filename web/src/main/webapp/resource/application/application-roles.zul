@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.application.ApplicationRoleHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<style>
+		div.datatable.roleGrant table tr td:nth-child(4),
+		div.datatable.roleGrant table tr td:nth-child(9)
+		 {
+			width: 24px;
+			min-width: 24px;
+			padding: 0px;
+			text-align: center
+		}
+		div.datatable.roleGrant table tr td:nth-child(8) {
+			text-align: center;
+		}
+		div.datatable.groupGrant table tr td:nth-child(2),
+		div.datatable.groupGrant table tr td:nth-child(7)
+		 {
+			width: 24px;
+			min-width: 24px;
+			padding: 0px;
+			text-align: center
+		}
+		div.datatable.groupGrant table tr td:nth-child(6) {
+			text-align: center;
+		}
+	</style>
+	<div sclass="navigation-bar dummy">
+		<label bind="${arg.listbox}:/@name"></label> - <label bind="${arg.listbox}:/@description"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('user:group:create')}" onClick="ref:handler.importCsv"/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+	<datatable id="listbox" autocommit="true" 
+		use="com.soffid.iam.web.application.RoleDatatable"
+		preference="role"
+		dataPath="${arg.listbox}:/role" maxheight="60vh" sortColumn="0"
+		onSelect="ref:handler.showDetails" enablefilter="true">
+	</datatable>
+
+	<div width="100%" if="${soffid:isUserInRole('application:update')}" >
+		<div style="float: right"  class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+		position="top center" sizable="true"
+		title="${c:l('application.roleDetails')}" visible="false"
+		style="width: 80%; min-width: 600px" onClose="ref:handler.closeDetails()">
+
+		<div sclass="navigation-bar dummy">
+			<label bind="${arg.listbox }:/name"/> - <label bind="${arg.listbox }:/description"/> 
+			<pager datatable="../listbox"/>
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('user:group:delete')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<tabbox>
+			<tabs>
+				<tab
+					label="${c:l('application.roleDetails')}" />
+				<tab
+					label="${c:l('aplica_rolinfo.zul.Rolsquetaatorgats')}" />
+				<tab
+					label="${c:l('aplica_rolinfo.zul.Rolsqueeltenenatorga')}" />
+				<tab
+					label="${c:l('aplica_rolinfo.zul.Grupsqueeltenenatorg')}" />
+			</tabs>
+			<tabpanels>
+				<tabpanel>
+					<form id="form" width="100%" dataPath="../listbox:/">
+						<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+							id="attributes"
+							objectType="com.soffid.iam.api.Role" dataPath="/." />
+					</form>
+				</tabpanel>
+				<tabpanel>
+					<datatable id="ownedRoles" autocommit="false" 
+					    sclass="datatable roleGrant"
+					    onSetMandatory="ref:handler.setMandatoryGranted"
+					    onRemove="ref:handler.removeGranted"
+						dataPath="../listbox:/ownedRoles" maxheight="60vh" sortColumn="0"
+						enablefilter="true">
+					<attribute name="columns"><![CDATA[
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: ownerRoleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: ownerSystem
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: ownerRolDomainValue
+- name: ""
+  width: 24px
+  sort: false
+  filter: false
+  template: <img src="/img/next.svg">
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  value: mandatory
+  filter: false
+  template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
+- name: ""
+  filter: false
+  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="/img/trash.svg"> </button>
+					]]></attribute>
+					</datatable>
+					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div style="float: right"  class="addButton" onClick="ref:handler.addNewGranted">+</div>
+					</div>
+				</tabpanel>
+				<tabpanel>
+					<datatable id="ownerRoles" autocommit="false" 
+					    sclass="datatable roleGrant"
+					    onSetMandatory="ref:handler.setMandatoryGrantee"
+					    onRemove="ref:handler.removeGrantee"
+						dataPath="../listbox:/ownerRoles" maxheight="60vh" sortColumn="0"
+						enablefilter="true">
+					<attribute name="columns"><![CDATA[
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: ownerRoleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: ownerSystem
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: ownerRolDomainValue
+- name: ""
+  width: 24px
+  sort: false
+  filter: false
+  template: <img src="/img/next.svg">
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  value: mandatory
+  filter: false
+  template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
+- name: ""
+  filter: false
+  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="/img/trash.svg"> </button>
+					]]></attribute>
+					</datatable>
+					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div style="float: right"  class="addButton" onClick="ref:handler.addNewGrantee">+</div>
+					</div>
+				</tabpanel>
+				<tabpanel>
+					<datatable id="ownerGroups" autocommit="false" 
+					    sclass="datatable groupGrant"
+					    onSetMandatory="ref:handler.setMandatoryGroup"
+					    onRemove="ref:handler.removeGroup"
+						dataPath="../listbox:/granteeGroups" maxheight="60vh" sortColumn="0"
+						enablefilter="true">
+					<attribute name="columns"><![CDATA[
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: ownerGroup
+- name: ""
+  width: 24px
+  sort: false
+  filter: false
+  template: <img src="/img/next.svg">
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  value: mandatory
+  filter: false
+  template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
+- name: ""
+  filter: false
+  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="/img/trash.svg"> </button>
+					]]></attribute>
+					</datatable>
+					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div style="float: right"  class="addButton" onClick="ref:handler.addNewGroup">+</div>
+					</div>
+				</tabpanel>
+			</tabpanels>
+		</tabbox>
+		<div style="width: 100%">
+			<button label="${c:l('rules.preview')}" onClick="ref:handler.preview">
+			</button>
+			<div style="text-align: right; width: 100%">
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+					onClick="ref:handler.closeDetails">
+				</button>
+				<button image="/img/save-r.svg" label="${c:l('common.apply') }" 
+					onClick="ref:handler.onChange"/>
+			</div>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-granted-window"
+		position="top, center" sizable="false"
+		title="${c:l('user-roles.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l('application.sourceDomain') }
+	- ${c:l("user-roles.selectRole")}
+	- ${c:l("user-roles.selectDomain")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div id="step0">
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="sourceDomainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div id="step1">
+				<customfield3 dataType="ROLE" id="role"
+					label="${c:l('user-roles.selectRole') }"
+					required="true" >
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-roles.selectDomainValue')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div >
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="domainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div>
+				<form width="100%" dataPath="../listbox:/">
+					<customfield3 label="${c:l('application.grantee') }" dataType="SEPARATOR" />
+					<customfield3 label="${c:l('application.granteeRole') }" dataType="ROLE" 
+						id="granteeRole"  readonly="true"/>
+					<customfield3 label="${c:l('aapplication.granteeScope') }" readonly="true"
+						use="com.soffid.iam.web.component.DomainValueField" 
+						multiValue="true" 
+						id="granteeScope"/>
+					<customfield3 label="${c:l('application.granted') }" dataType="SEPARATOR" />
+					<customfield3 label="${c:l('application.grantedRole') }" dataType="ROLE" 
+						id="grantedRole"  readonly="true"/>
+					<customfield3 label="${c:l('aapplication.grantedScope') }" 
+						use="com.soffid.iam.web.component.DomainValueField" 
+						multiValue="true" readonly="true"
+						id="grantedScope"/>
+				</form>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:handler.wizardApply"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-grantee-window"
+		position="top, center" sizable="false"
+		title="${c:l('user-roles.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("user-roles.selectRole")}
+	- ${c:l('application.sourceDomain') }
+	- ${c:l("user-roles.selectDomain")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div>
+				<customfield3 dataType="ROLE" id="role"
+					label="${c:l('user-roles.selectRole') }"
+					required="true" >
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-roles.selectDomainValue')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div id="step0">
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="sourceDomainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div >
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="domainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div>
+				<form width="100%" dataPath="../listbox:/">
+					<customfield3 label="${c:l('application.grantee') }" dataType="SEPARATOR" />
+					<customfield3 label="${c:l('application.granteeRole') }" dataType="ROLE" 
+						id="granteeRole"  readonly="true"/>
+					<customfield3 label="${c:l('aapplication.granteeScope') }" readonly="true"
+						use="com.soffid.iam.web.component.DomainValueField" 
+						multiValue="true" 
+						id="granteeScope"/>
+					<customfield3 label="${c:l('application.granted') }" dataType="SEPARATOR" />
+					<customfield3 label="${c:l('application.grantedRole') }" dataType="ROLE" 
+						id="grantedRole"  readonly="true"/>
+					<customfield3 label="${c:l('aapplication.grantedScope') }" 
+						use="com.soffid.iam.web.component.DomainValueField" 
+						multiValue="true" readonly="true"
+						id="grantedScope"/>
+				</form>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:handler.wizardApply"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-group-window"
+		position="top, center" sizable="false"
+		title="${c:l('user-roles.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("application.selectGroup")}
+	- ${c:l("user-roles.selectDomain")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div>
+				<customfield3 dataType="GROUP" id="group"
+					label="${c:l('application.groupName') }"
+					required="true" >
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-roles.selectDomainValue')}" onClick="ref:handler.wizardNext"/>
+				</div>
+						
+			</div>
+			<div >
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="domainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.wizardNext"/>
+				</div>
+			</div>
+			<div>
+				<form width="100%" dataPath="../listbox:/">
+					<customfield3 label="${c:l('application.grantee') }" dataType="SEPARATOR" />
+					<customfield3 label="${c:l('application.groupName') }" dataType="GROUP" 
+						id="granteeRole"  readonly="true"/>
+					<customfield3 label="${c:l('application.granted') }" dataType="SEPARATOR" />
+					<customfield3 label="${c:l('application.grantedRole') }" dataType="ROLE" 
+						id="grantedRole"  readonly="true"/>
+					<customfield3 label="${c:l('aapplication.grantedScope') }" 
+						use="com.soffid.iam.web.component.DomainValueField" 
+						multiValue="true" readonly="true"
+						id="grantedScope"/>
+				</form>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.wizardBack" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:handler.wizardApply"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+
+	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}" onClick="ref:handler.closePreview"/>
+			<button label="${c:l('rules.apply')}" onClick="ref:handler.applyPreview">
+			</button>
+		</div>
+		
+	</window>
+</div>

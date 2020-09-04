@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="network" type="network">
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findNetworkByTextAndJsonQueryAsync" if = "${query != null &amp;&amp; synchro == null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findNetworkByTextAndJsonQueryAsync" if = "${textQuery != null &amp;&amp; synchro == null}">
+				<parameter value="${textQuery}"/>
+				<parameter value=""/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findNetworkByJsonQueryAndJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Network">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="network">
+		<finder name="acl" type="acl">
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="getACL">  <!-- network:query -->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.NetworkAuthorization"> 
+			</new-instance-bean>
+		</finder>						
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>			
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="networks.CodeValidation"/>
+			<attribute-validator expr="${instance.ip}" notNull="true" friendlyName="networks.AddressValidation"/>
+			<attribute-validator expr="${instance.mask}" notNull="true" friendlyName="networks.MaskValidation"/>
+			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="networks.DescriptionValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="identitat">
+	</datanode>
+	
+	<datanode name="acl">	
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>			
+			</update-method>
+		</ejb-handler>
+	</datanode>
+		
+</zkib-model>

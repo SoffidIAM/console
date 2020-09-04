@@ -123,7 +123,7 @@ public abstract class DominiService {
 		return null;
 	}
 
-	@Operation(translated = "update")
+	@Operation(translated = "update", grantees= {roles.application_update.class})
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.Domini update(
 			es.caib.seycon.ng.comu.Domini domini)

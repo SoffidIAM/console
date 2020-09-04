@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.application.ApplicationUserHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar dummy">
+		<label bind="${arg.listbox}:/@name"></label> - <label bind="${arg.listbox}:/@description"/>
+		<menu2>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+					<datatable id="listbox" autocommit="false" 
+						dataPath="${arg.listbox }:/user" maxheight="60vh" sortColumn="0"
+						enablefilter="true">
+					<attribute name="columns"><![CDATA[
+- name: ${c:l('aplicacions.zul.Codi-2')}
+  value: accountName
+- name: ${c:l('aplicacions.zul.Nomcomplert')}
+  value: userFullName
+- name: ${c:l('aplicacions.zul.Grup')}
+  value: userGroupCode
+- name: ${c:l('aplicacions.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplicacions.zul.Bbdd')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('usuaris.zul.recertification')}
+  value: certificationDate_date
+]]></attribute>
+	</datatable>
+
+</div>

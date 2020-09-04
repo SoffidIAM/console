@@ -340,6 +340,7 @@ public class ComparisonExpression extends AbstractExpression {
 			{
 				if (ctx.objectCondition != null)
 					query.getWhereString().append("(").append(ctx.objectCondition);
+				
 				if ("eq".equalsIgnoreCase(operator))
 				{
 					query.getWhereString().append(ctx.objectName);
@@ -457,6 +458,13 @@ public class ComparisonExpression extends AbstractExpression {
 				query.getParameters().put(param, value2);
 			else
 				query.getParameters().put(param, Integer.parseInt(value2.toString()));
+		}
+		else if (String.class.isAssignableFrom(hibernateClass) && value != null && value instanceof Boolean)
+		{
+			if (Boolean.TRUE.equals(value2))
+				query.getParameters().put(param, "S");
+			else
+				query.getParameters().put(param, "N");
 		}
 		else
 		{

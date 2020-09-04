@@ -1136,26 +1136,6 @@ public class ApplicationBootServiceImpl extends
 			disSso = dispatcherSvc.create(disSso);
 
 			DataType td = new DataType();
-			td.setCode("SSO:Server");
-			td.setLabel("Server");
-			td.setOrder(1L);
-			td.setRequired(false);
-			td.setScope(MetadataScope.ACCOUNT);
-			td.setSystemName(disSso.getName());
-			td.setType(TypeEnumeration.STRING_TYPE);
-			getAdditionalDataService().create(td);
-
-			td = new DataType();
-			td.setCode("SSO:URL");
-			td.setLabel("URL");
-			td.setOrder(2L);
-			td.setRequired(false);
-			td.setScope(MetadataScope.ACCOUNT);
-			td.setSystemName(disSso.getName());
-			td.setType(TypeEnumeration.STRING_TYPE);
-			getAdditionalDataService().create(td);
-
-			td = new DataType();
 			td.setCode("SSO:1");
 			td.setLabel("Form data");
 			td.setOrder(3L);
@@ -1378,28 +1358,12 @@ public class ApplicationBootServiceImpl extends
 	}
 
 	private void createStandardAttributes() throws Exception {
-		createStandardUserAttributes();
-		createStandardAccountAttributes();
-		createStandardRoleAttributes();
-		createStandardApplicationAttributes();
-	}
-
-	private void createStandardApplicationAttributes() throws InternalErrorException {
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Group.ui.json", MetadataScope.GROUP, false);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/GroupUser.ui.json", MetadataScope.GROUP_MEMBERSHIP, false);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Host.ui.json", null, false);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", MetadataScope.APPLICATION, false);
-	}
-
-	private void createStandardRoleAttributes() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void createStandardAccountAttributes() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void createStandardUserAttributes() throws Exception {
-		int i = 0;
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Role.ui.json", MetadataScope.ROLE, false);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, false);
 	}
 
@@ -1495,13 +1459,10 @@ public class ApplicationBootServiceImpl extends
 
 		List<OsType> osList = new LinkedList<OsType>();
 
-		osList.add(new OsType(null, "WNT", "Windows NT")); //$NON-NLS-1$ //$NON-NLS-2$
+		osList.add(new OsType(null, "WNT", "Windows Desktop")); //$NON-NLS-1$ //$NON-NLS-2$
 		osList.add(new OsType(null, "LIN", "Linux")); //$NON-NLS-1$ //$NON-NLS-2$
-		osList.add(new OsType(null, "W95", "Windows 95")); //$NON-NLS-1$ //$NON-NLS-2$
-		osList.add(new OsType(null, "ALT", "Alternative OS")); //$NON-NLS-1$ //$NON-NLS-2$
-		osList.add(new OsType(null, "SOL", "Solaris")); //$NON-NLS-1$ //$NON-NLS-2$
-		osList.add(new OsType(null, "NTS", "NT Server")); //$NON-NLS-1$ //$NON-NLS-2$
-		osList.add(new OsType(null, "WTS", "Windows Terminal Server")); //$NON-NLS-1$ //$NON-NLS-2$
+		osList.add(new OsType(null, "ALT", "Unknown OS")); //$NON-NLS-1$ //$NON-NLS-2$
+		osList.add(new OsType(null, "NTS", "Windows Server")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (OsType os : osList) {
 			// Check existing OS

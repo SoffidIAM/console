@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="host"?>
+
+<?component name="host_sessions" macro-uri="host-sessions.zul"?>
+<?component name="host_acl" macro-uri="host-acl.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.host.HostHandler" id="frame">
+ 	<style>
+		div.datatable.aliases table tr td:nth-child(2)
+		 {
+			width: 24px;
+			min-width: 24px;
+			padding: 0px;
+			text-align: center
+		}
+ 	</style>
+	<datamodel id="model" rootNode="root" src="hostDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('host:all:create') &amp;&amp; soffid:isUserInRole('network:all:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Host" 
+				defaultAttributes="name, description, ip"
+				preference="hosts"
+				dataPath="/model:/host" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.host.HostDatatable"
+				preference="host"
+				dataPath="/model:/host" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('network:all:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+								
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('xarxes.zul.Controldaccas')}" id="tabacl" if="${soffid:isUserInRole('network:all:update') }"/>
+					<tab label="${c:l('maquines.zul.Sessions')}" id="tabsessions"/>
+				</tabs>
+				<tabpanels>
+					<tabpanel id="datatab">
+						<div class="navigation-bar">
+							<menu2>
+								<menu2item id="deleteHost" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+								<menu2item id="assignIp" image="/img/network.svg" label="${c:l('host.assignIpAddress') }" onClick="ref:frame.assignIpAddress"/>
+								<menu2item id="getPassword" image="/img/password.svg" label="${c:l('maquines.zul.Veurecontrasenya')}" onClick="ref:frame.getAdminPassword"/>
+							</menu2>
+						</div>
+						<div id="dades"> 
+							<form id="form" onChangeXPath="ref:frame.onChangeForm"
+								dataPath="/listbox:/." width="100%">
+								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+									objectType="com.soffid.iam.api.Host"
+									dataPath="/." id="attributes"/>
+							</form>
+						</div>
+						<div style="text-align: right; width: 100%">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</tabpanel>
+					<tabpanel if="${soffid:isUserInRole('network:all:update') }" fulfill="tabacl.onSelect" >
+ 						<host_acl listbox="//host/listbox" id="host_acl"/>
+					</tabpanel>
+					<tabpanel id="sessions" fulfill="tabsessions.onSelect" >
+						<host_sessions listbox="//host/listbox" id="host_sessions"/>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</div>
+	</div>
+</frame>

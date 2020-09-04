@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div id="handler" use="com.soffid.iam.web.menu.MenuAclHandler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar">
+		<label bind="${arg.listbox }:/name"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('user:group:create')}" onClick="ref:handler.importCsv"/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+
+	<datatable id="listbox" autocommit="true" 
+		dataPath="${arg.listbox }:/auth" maxheight="70vh" sortColumn="0"
+		onSelect="ref:handler.showDetails" enablefilter="true">
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('aplicacionsIntranet.zul.Nivell')}
+		  template: #{authorizationLevelDescription=='admin'? '${c:l('aplicacionsIntranet.zul.Administrador')}': '${c:l('aplicacionsIntranet.zul.Autoritzat')}'}
+		- name: ${c:l('aplicacionsIntranet.zul.Propietari')}
+		  template: <img src="/img/#{authorizationEntityType}-green.svg" style='width:1em; margin-right: 1em; vertical-align: text-bottom'/>#{authorizedEntityCode}
+		- name: ${c:l('com.soffid.iam.api.Account.description')}
+		  value: authorizedEntityDescription
+		]]>
+		</attribute>
+	</datatable>
+
+	<div width="100%" style="text-align: right" >
+		<div class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+		position="center, center" sizable="true"
+		title="${c:l('user-groups.details')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails">
+
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('network:all:update')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<form id="form" width="100%" dataPath="../listbox:/">
+			<customfield3 dataType="String" bind="${arg.listbox }:/name" readonly="true"
+				label="${c:l('aplica_permisosRol.zul.entryPoint') }"/>
+
+			<customfield3 dataType="USER" id="user3"
+				label="${c:l('aplicaIntranet_autoritzacio.User')}"
+				bind="authorizedEntityCode"
+				readonly="true" />
+		
+			<customfield3 dataType="GROUP" id="group3"
+				label="${c:l('aplicaIntranet_autoritzacio.Group')}"
+				bind="authorizedEntityCode"
+				readonly="true" />
+
+			<customfield3 dataType="ROLE" id="role3"
+				bind="authorizedEntityCode"
+				label="${c:l('aplicaIntranet_autoritzacio.Role')}"
+				readonly="true" />
+				
+			<customfield3 dataType="ACCOUNT" id="account3"
+				bind="authorizedEntityCode"
+				label="${c:l('auditoria.zul.account')}"
+				readonly="true" />
+
+			<customfield3 dataType="STRING" id="level3"
+				bind="authorizationLevelDescription"
+				label="${c:l('network-acl.selectLevel')}"
+				listOfValues="admin: ${c:l('aplicacionsIntranet.zul.Administrador')}, exec: ${c:l('aplicacionsIntranet.zul.Autoritzat')}"
+				readonly="true" />
+
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:handler.closeDetails">
+			</button>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
+				datamodel="${arg.listbox}" 
+				onClick="ref:handler.onChange"/>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-window"
+		position="top, center" sizable="false"
+		title="${c:l('xarxesACL.Titol')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("network-acl.selectType")}
+	- ${c:l("network-acl.selectGrantee")}
+	- ${c:l("network-acl.selectLevel")}
+			</attribute>
+			<div id="step1">
+
+				<customfield3 dataType="String" id="type"
+					label="${c:l('network-acl.type') }"
+					required="true"
+					listOfValues="user: ${c:l('aplicaIntranet_autoritzacio.User')}, group: ${c:l('aplicaIntranet_autoritzacio.Group') }, role: ${c:l('aplicaIntranet_autoritzacio.Role') }, account: ${c:l('auditoria.zul.account') }">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.undoAdd" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.selectType"/>
+				</div>
+						
+			</div>
+			<div>
+
+				<customfield3 dataType="USER" id="user"
+					label="${c:l('aplicaIntranet_autoritzacio.User')}"
+					required="true" />
+			
+				<customfield3 dataType="GROUP" id="group"
+					label="${c:l('aplicaIntranet_autoritzacio.Group')}"
+					required="true" />
+
+				<customfield3 dataType="ROLE" id="role"
+					label="${c:l('aplicaIntranet_autoritzacio.Role')}"
+					required="true" />
+
+				<customfield3 dataType="ACCOUNT" id="account"
+					label="${c:l('auditoria.zul.account')}"
+					filterExpression='not type eq "U"'
+					required="true" />
+	
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.previous" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.selectObject"/>
+				</div>
+						
+			</div>
+			<div>
+				<customfield3 dataType="NETWORK" bind="${arg.listbox }:/name" readonly="true"
+					label="${c:l('com.soffid.iam.api.Host.networkCode') }"/>
+				<customfield3 dataType="USER" id="user2"
+					label="${c:l('aplicaIntranet_autoritzacio.User')}"
+					readonly="true" />
+			
+				<customfield3 dataType="GROUP" id="group2"
+					label="${c:l('aplicaIntranet_autoritzacio.Group')}"
+					readonly="true" />
+
+				<customfield3 dataType="ROLE" id="role2"
+					label="${c:l('aplicaIntranet_autoritzacio.Role')}"
+					readonly="true" />
+					
+				<customfield3 dataType="ACCOUNT" id="account2"
+					label="${c:l('auditoria.zul.account')}"
+					readonly="true" />
+	
+				<customfield3 dataType="STRING" id="level"
+					label="${c:l('network-acl.selectLevel')}"
+					listOfValues="admin: ${c:l('aplicacionsIntranet.zul.Administrador')}, exec: ${c:l('aplicacionsIntranet.zul.Autoritzat')}"
+					required="true" />
+
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.backAndRollback" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:handler.applyAdd"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+</div>

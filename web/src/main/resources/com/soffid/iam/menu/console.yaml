@@ -1,108 +1,150 @@
-- name: seu.resources
-  img: /img/menu/resources.svg
+- name: inbox.lblFiltroTareas1
+  img: /img/menu/tasks.svg
+  url: /resource/business/tasks.zul
+- name: soffid.admin
+  img: /img/menu/matrix.svg
   options:
-  - name: seu.usuaris
-    url: /resource/user/user.zul
-    permissions: ["seu:usuaris:show"]
-    img: /img/menu/users.svg
-  - name: seu.grups
-    url: /resource/group/group.zul
-    permissions: ["seu:grups:show"]
-    img: /img/menu/groups.svg
-  - name: seu.aplciacions
-    url: /resource/application/application.zul
-    permissions: ["seu:aplicacions:show"]
-    img: /img/menu/applications.svg
-- name: seu.configuration
-  img_old: /img/menu/system-settings.png
-  img: /img/menu/toolbox.svg
-  options:
-  - name: seu.settings
-    img_old: /img/menu/settings.png
-    img: /img/menu/gear.svg
-    options:
-    - name: seu.tenants
-      url: /config/tenants.zul
-      permissions: ["seu:tenant:show"]
-      img: /img/menu/tenants.svg
-    - name: seu.plugins
-      url: /config/plugins.zul
-      img: /img/menu/plugins.svg
-      permissions: ["seu:plugins:show"]
-    - name: seu.lookAndFeel
-      img: /img/menu/lookAndFeel.svg
-      url: /config/lookAndFeel.zul
-      permissions: ["seu:parametres:show"]
-    - name: seu.parametres
-      url: /config/parameters.zul
-      img: /img/menu/parameters.svg
-      permissions: ["seu:parametres:show"]
-    - name: seu.user-types
-      url: /config/user-types.zul
-      img: /img/menu/user-types.svg
-      permissions: ["seu:metadata:show"]
-    - name: seu.metadata
-      url: /config/metadata.zul
-      img: /img/menu/metadata.svg
-      permissions: ["seu:userTypes:show"]
-  - name: seu.integration-engine
-    img: /img/menu/integration.svg
-    options:
-    - name: seu.sync-server-engine  
-      url: /config/integration-engine.zul
-      img: /img/menu/integration-engine.svg
-      permissions: ["seu:parametres:show"]
-    - name: seu.agents
-      url: /config/agents.zul
-      permissions: ["seu:agents:show"]
-      img: /img/menu/agents.svg
-    - name: seu.syncservers
-      img: /img/menu/sync-servers.svg
-      url: /config/syncservers.zul
-      permissions: ["seu:agents:show"]
-    - name: seu.user-domains
-      url: /config/userDomains.zul
-      permissions: ["seu:usersDomain:show"]
-      img: /img/menu/user-domains.svg
-    - name: attributeTranslation.Titol
-      url: /config/attribute-translation.zul
-      permissions: ["seu:attributeTranslation:show"]
-      img: /img/menu/translation-tables.svg
-  - name: seu.workflow-settings
-    img: /img/menu/workflow.svg
-    options:
-    - name: main.lblAdminBPM
-      img: /img/menu/workflow-engine.svg
-      url: /wf/configure-index.zul
-      permissions: ["workflow:admin"]
-    - name: main.lblDeploy
-      img: /img/menu/business-process.svg
-      url: /wf/despliegue.zul
-      permissions: ["workflow:admin"]
-  - name: seu.security
-    img: /img/menu/security.svg
-    options:
-    - name: seu.autoritzacions
-      url: /config/authorizations.zul
-      img: /img/menu/authorizations.svg
-      permissions: ["seu:autoritzacions:show"]
-    - name: seu.authentication
-      url: /config/authentication.zul
-      img: /img/menu/authentication.svg
-      permissions: ["seu:parametres:show"]
-    - name: seu.pam_config
-      img: /img/menu/pam-servers.svg
-      url: /vault/pam_config.zul
-      permissions: ["seu:pamSessionConfigure"]
-    - name: seu.password-policies
-      url: /config/password-policies.zul
-      img: /img/menu/password-policy.svg
-      permissions: ["seu:userTypes:show"]
-- name: seu.monitoritzacio
-  permissions: ["seu:tenant:show"]
-  img: /img/menu/monitor.svg
-  options:
-  - name: seu.seyconserver
-    url: /seyconserver.zul
-    permissions: ["seu:monitor:show"]
-    img: /img/menu/monitor-sync.svg
+      - name: seu.resources
+        img: /img/menu/resources.svg
+        options:
+        - name: seu.usuaris
+          url: /resource/user/user.zul
+          permissions: ["seu:usuaris:show"]
+          img: /img/menu/users.svg
+        - name: seu.grups
+          url: /resource/group/group.zul
+          permissions: ["seu:grups:show"]
+          img: /img/menu/groups.svg
+        - name: seu.aplciacions
+          url: /resource/application/application.zul
+          permissions: ["seu:aplicacions:show"]
+          img: /img/menu/applications.svg
+        - name: seu.xarxes
+          url: /resource/network/network.zul
+          permissions: ["seu:networks:show"]
+          img: /img/menu/networks.svg
+        - name: seu.maquines
+          url: /resource/host/host.zul
+          permissions: ["seu:hosts:show"]
+          img: /img/menu/hosts.svg
+        - name: seu.impressores
+          url: /resource/printer/printer.zul
+          permissions: ["seu:impressores:show"]
+          img: /img/menu/printers.svg
+        - name: seu.accounts
+          url: /resource/account/account.zul
+          permissions: ["seu:accounts:show"]
+          img: /img/menu/accounts.svg
+        - name: seu.vault
+          url: /resource/account/vault.zul
+          permissions: ["sso:manageAccounts"]
+          img: /img/menu/vault.svg
+        - name: seu.adminintranet
+          url: /resource/menu/menu.zul
+          img: /img/menu/launcher-editor.svg
+          permissions: ["seu:menusIntranet:show"]
+        - name: seu.dominiscorreu
+          url: /resource/maildomain/mail-domain.zul
+          img: /img/menu/mail-domain.svg
+          permissions: ["seu:dominiscorreu:show"]
+        - name: seu.llistescorreu
+          url: /resource/maillist/mail-lists.zul
+          img: /img/menu/mail-lists.svg
+          permissions: ["seu:dominiscorreu:show"]
+      - name: seu.configuration
+        img_old: /img/menu/system-settings.png
+        img: /img/menu/toolbox.svg
+        options:
+        - name: seu.settings
+          img_old: /img/menu/settings.png
+          img: /img/menu/gear.svg
+          options:
+          - name: seu.tenants
+            url: /config/tenants.zul
+            permissions: ["seu:tenant:show"]
+            img: /img/menu/tenants.svg
+          - name: seu.plugins
+            url: /config/plugins.zul
+            img: /img/menu/plugins.svg
+            permissions: ["seu:plugins:show"]
+          - name: seu.lookAndFeel
+            img: /img/menu/lookAndFeel.svg
+            url: /config/lookAndFeel.zul
+            permissions: ["seu:parametres:show"]
+          - name: seu.parametres
+            url: /config/parameters.zul
+            img: /img/menu/parameters.svg
+            permissions: ["seu:parametres:show"]
+          - name: seu.user-types
+            url: /config/user-types.zul
+            img: /img/menu/user-types.svg
+            permissions: ["seu:metadata:show"]
+          - name: seu.tipusuorg
+            url: /config/group-types.zul
+            img: /img/menu/group-types.svg
+            permissions: ["seu:tipusUO:show"]
+          - name: seu.metadata
+            url: /config/metadata.zul
+            img: /img/menu/metadata.svg
+            permissions: ["seu:userTypes:show"]
+        - name: seu.integration-engine
+          img: /img/menu/integration.svg
+          options:
+          - name: seu.sync-server-engine  
+            url: /config/integration-engine.zul
+            img: /img/menu/integration-engine.svg
+            permissions: ["seu:parametres:show"]
+          - name: seu.agents
+            url: /config/agents.zul
+            permissions: ["seu:agents:show"]
+            img: /img/menu/agents.svg
+          - name: seu.syncservers
+            img: /img/menu/sync-servers.svg
+            url: /config/syncservers.zul
+            permissions: ["seu:agents:show"]
+          - name: seu.user-domains
+            url: /config/userDomains.zul
+            permissions: ["seu:usersDomain:show"]
+            img: /img/menu/user-domains.svg
+          - name: attributeTranslation.Titol
+            url: /config/attribute-translation.zul
+            permissions: ["seu:attributeTranslation:show"]
+            img: /img/menu/translation-tables.svg
+        - name: seu.workflow-settings
+          img: /img/menu/workflow.svg
+          options:
+          - name: main.lblAdminBPM
+            img: /img/menu/workflow-engine.svg
+            url: /wf/configure-index.zul
+            permissions: ["workflow:admin"]
+          - name: main.lblDeploy
+            img: /img/menu/business-process.svg
+            url: /wf/despliegue.zul
+            permissions: ["workflow:admin"]
+        - name: seu.security
+          img: /img/menu/security.svg
+          options:
+          - name: seu.autoritzacions
+            url: /config/authorizations.zul
+            img: /img/menu/authorizations.svg
+            permissions: ["seu:autoritzacions:show"]
+          - name: seu.authentication
+            url: /config/authentication.zul
+            img: /img/menu/authentication.svg
+            permissions: ["seu:parametres:show"]
+          - name: seu.pam_config
+            img: /img/menu/pam-servers.svg
+            url: /vault/pam_config.zul
+            permissions: ["seu:pamSessionConfigure"]
+          - name: seu.password-policies
+            url: /config/password-policies.zul
+            img: /img/menu/password-policy.svg
+            permissions: ["seu:userTypes:show"]
+      - name: seu.monitoritzacio
+        permissions: ["seu:tenant:show"]
+        img: /img/menu/monitor.svg
+        options:
+        - name: seu.seyconserver
+          url: /seyconserver.zul
+          permissions: ["seu:monitor:show"]
+          img: /img/menu/monitor-sync.svg

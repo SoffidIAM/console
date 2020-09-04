@@ -96,9 +96,11 @@ public class EntryPointEntityDaoImpl extends
 	}
 
 	private void toPuntEntradaCustom(com.soffid.iam.model.EntryPointEntity source, com.soffid.iam.api.AccessTree target) {
-		
+		target.setMenu("S".equals(source.getMenu()));
+		target.setPublicAccess("S".equals(source.getPublicAccess()));
+		target.setVisible("S".equals(source.getVisible()));
 		// Núm de columnes
-		if (source.getNumberOfColumns() != null) target.setColumnsNumber(source.getNumberOfColumns().toString());
+		if (source.getNumberOfColumns() != null) target.setColumnsNumber(source.getNumberOfColumns());
 		
 		if (source.getSystem() == null)
 			target.setSystem(null);
@@ -168,38 +170,20 @@ public class EntryPointEntityDaoImpl extends
 		}
 		
 		target.setXmlAccessTree(source.getXmlEntryPoint());
+		
+		if (source.getInformationSystem() == null)
+			target.setInformationSystem(null);
+		else
+			target.setInformationSystem(source.getInformationSystem().getName());
 	}
 
 	private void puntEntradaToEntityCustom(com.soffid.iam.api.AccessTree source, com.soffid.iam.model.EntryPointEntity target) {
-		
-		// Los valores S/N
-		if (source.getVisible() != null) {
-			target.setVisible(source.getVisible());
-		} else
-			target.setVisible("N"); //$NON-NLS-1$
-		if ("S".equals(source.getMenu()) ) { //$NON-NLS-1$
-			target.setMenu("S"); //$NON-NLS-1$
-			target.setMenuType(source.getTypeMenu());
-		} else {
-			target.setMenu("N"); //$NON-NLS-1$
-			target.setMenuType(null);
-		}
-		if (source.getIsPublic() != null) {
-			target.setPublicAccess(source.getIsPublic());
-		} else
-			target.setPublicAccess("N"); //$NON-NLS-1$
+		target.setVisible(source.isVisible()?"S":"N");
+		target.setMenu(source.isMenu()?"S":"N");
+		target.setPublicAccess(source.isPublicAccess()?"S": "N");
 
 		//Núm. de columnes
-		String numCol = source.getColumnsNumber();
-		if (numCol!=null && !"".equals(numCol.trim())) { //$NON-NLS-1$
-			try {
-				Long cols = Long.getLong(numCol);
-				target.setNumberOfColumns(cols);
-			} catch(Exception ex) {
-				target.setNumberOfColumns(null);
-			}
-		} else 
-			target.setNumberOfColumns(null);
+		target.setNumberOfColumns( source.getColumnsNumber() );
 		
 		// Métodes Execució
 		if (source.getExecutions() != null) {
@@ -246,6 +230,16 @@ public class EntryPointEntityDaoImpl extends
 			if (d == null)
 				throw new RuntimeException ("System not found: "+source.getSystem());
 			target.setSystem( d);
+		}
+
+		if ( source.getInformationSystem() == null || source.getInformationSystem().isEmpty())
+			target.setInformationSystem(null);
+		else
+		{
+			InformationSystemEntity d = getInformationSystemEntityDao().findByCode(source.getInformationSystem());
+			if (d == null)
+				throw new RuntimeException ("Information system not found: "+source.getSystem());
+			target.setInformationSystem( d );
 		}
 	}
 

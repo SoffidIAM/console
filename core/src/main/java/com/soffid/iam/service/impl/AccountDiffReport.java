@@ -120,7 +120,7 @@ public class AccountDiffReport {
 			}
 			else if (acc.getType().equals(AccountType.USER) && 
 					acc.getOwnerUsers().size() == 1 &&
-					acc.getOwnerUsers().iterator().next().getId().equals(u.getId()))
+					acc.getOwnerUsers().iterator().next().equals(u.getUserName()))
 			{
 				acc.setStatus(AccountStatus.ACTIVE);
 				accountService.updateAccount(acc);

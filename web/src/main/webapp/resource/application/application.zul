@@ -2,11 +2,13 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <?page id="application"?>
+
+<?component name="application_domains" macro-uri="application-domains.zul"?>
+<?component name="application_roles" macro-uri="application-roles.zul"?>
+<?component name="application_users" macro-uri="application-users.zul"?>
+
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.application.ApplicationHandler" id="frame">
-<zscript><![CDATA[
-com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", com.soffid.iam.api.MetadataScope.APPLICATION, true);
-]]></zscript>
 	<datamodel id="model" rootNode="applications" src="descriptorApplication.xml"/>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
@@ -25,24 +27,24 @@ com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStan
 				jsonObject="com.soffid.iam.api.Application" 
 				defaultAttributes="relativeName, description"
 				preference="com.soffid.iam.api.Application"
-				dataPath="/model:/application" variableName="query" variableNameText="textQuery"></searchbox>
+				dataPath="/model:/application" variableName="query" variableNameText="queryText"></searchbox>
 
 			<datatree2 id="listbox"
 				width="100%" dataPath="/model:/"
 				header="${c:l('com.soffid.iam.api.Application.relativeName') }" 
 				openLevels="1"
 				enablefilter="false"
-				maxheight="70vh"
-				onAddApplicatino="ref:frame.addApplication"
+				maxheight="65vh"
+				onAddApplication="ref:frame.addApplication"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">
 				<![CDATA[
 				- path: /application
 				  icon: >-
-				    #{ "container" == type ? "/img/container.svg" :
-				    "business" == type ? "/img/business.svg" :
-				    "application" == type ? "/img/application.svg" :
-				    "/img/"+type+".svg"}
+				    #{ "container" == type ? "/img/container-black.svg" :
+				    "business" == type ? "/img/business-black.svg" :
+				    "application" == type ? "/img/application-black.svg" :
+				    "/img/"+type+"-black.svg"}
 				  value: relativeName
 				  leaf: false
 				  columns:
@@ -66,18 +68,24 @@ com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStan
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatree2="listbox"/>
 				
-				<menu2>
-					<menu2item if="${soffid:isUserInRole('application:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
-				</menu2>
 				
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 				<tabs>
 					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('aplicacions.zul.Dominis')}" id="domainTab" />
+					<tab label="${c:l('aplicacions.zul.Rols')}" id="roleTab" />
+					<tab id="usersTab" label="${c:l('aplicacions.zul.Usuaris')}"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
+						<div sclass="navigation-bar">
+							<menu2>
+								<menu2item if="${soffid:isUserInRole('application:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+							</menu2>
+						</div>
+					
 						<div id="dades"> 
 							<form id="form" onChangeXPath="ref:frame.onChangeForm"
 								dataPath="/listbox:/." width="100%">
@@ -91,6 +99,15 @@ com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStan
 							</databutton>
 							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 						</div>
+					</tabpanel>
+					<tabpanel fulfill="domainTab.onSelect">
+						<application_domains listbox="//application/listbox" id="application_domains"/>
+					</tabpanel>
+					<tabpanel fulfill="roleTab.onSelect">
+						<application_roles listbox="//application/listbox" id="application_roles"/>
+					</tabpanel>
+					<tabpanel fulfill="usersTab.onSelect">
+						<application_users listbox="//application/listbox"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

@@ -151,8 +151,8 @@ public class LoginServiceImpl implements LoginService {
 					List<String> soffidRoles = getUserRoles(acc, holderGroup);
 					List<String> roles = getRoles(acc, holderGroup);
 					
-					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next().getUserName() : null;
-					String fullName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next().getFullName() : acc.getDescription();
+					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next() : null;
+					String fullName = acc.getDescription();
 					
 					if (samlAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
@@ -206,7 +206,7 @@ public class LoginServiceImpl implements LoginService {
     	List<String> result = new LinkedList<String>();
     	if (acc.getType().equals(AccountType.USER))
     	{
-    		User u = acc.getOwnerUsers().iterator().next();
+    		User u = ServiceLocator.instance().getUserService().findUserByUserName( acc.getOwnerUsers().iterator().next() );
     		Collection<Group> groups;
 			if (holderGroup == null)
     			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId());
@@ -224,7 +224,7 @@ public class LoginServiceImpl implements LoginService {
     	Collection<RoleGrant> groups;
     	if (acc.getType().equals(AccountType.USER) && acc.getOwnerUsers().size() == 1)
     	{
-    		User u = acc.getOwnerUsers().iterator().next();
+    		User u = ServiceLocator.instance().getUserService().findUserByUserName( acc.getOwnerUsers().iterator().next() );
     		result.add(u.getUserName());
 			if (holderGroup == null)
     			groups = ServiceLocator.instance().getApplicationService().findEffectiveRoleGrantByUser(u.getId());

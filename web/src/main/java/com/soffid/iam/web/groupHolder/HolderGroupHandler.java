@@ -70,11 +70,13 @@ public class HolderGroupHandler extends Div implements RawId {
 			Account acc = ServiceLocator.instance().getAccountService().findAccount(account, soffid.getName());
 			if (acc != null && acc.getType().equals(AccountType.USER) && acc.getOwnerUsers().size() == 1)
 			{
-				User user = acc.getOwnerUsers().iterator().next();
+				String user = acc.getOwnerUsers().iterator().next();
 				if (user != null)
 				{
-					addGroup (user.getPrimaryGroup(), r);
-					for (GroupUser sg: groupService.findUsersGroupByUserName(user.getUserName()))
+					User u = userService.findUserByUserName(user);
+					if (u != null)
+						addGroup (u.getPrimaryGroup(), r);
+					for (GroupUser sg: groupService.findUsersGroupByUserName(user))
 					{
 						addGroup (sg.getGroup(), r);
 					}

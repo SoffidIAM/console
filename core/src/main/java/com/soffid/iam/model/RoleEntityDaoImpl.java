@@ -957,10 +957,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		String nomRol = source.getName();
 		InformationSystemEntity aplicacio = source.getInformationSystem();
 		SystemEntity dispatcher = source.getSystem();
-		target.setRoleName(nomRol + "@" + dispatcher.getName() + ">"
-				+ aplicacio.getName());
-		target.setIdentityCode(nomRol + "@" + dispatcher.getName() + ">"
-				+ aplicacio.getName());
+		target.setRoleName(nomRol + "@" + dispatcher.getName() );
+		target.setIdentityCode(nomRol + "@" + dispatcher.getName());
 		String descripcio = source.getDescription();
 		target.setDescription(descripcio);
 	}
@@ -1679,5 +1677,16 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				.append(")");
 		}
 		return query(sb.toString(), params);
+	}
+
+	@Override
+	public RoleEntity findByShortName(CriteriaSearchConfiguration criteria, String shortName) {
+		int i = shortName.lastIndexOf('@');
+		if (i < 0)
+			return null;
+		
+		String name = shortName.substring(0, i);
+		String system = shortName.substring(i+1);
+		return findByNameAndSystem(criteria, name, system);
 	}
 }

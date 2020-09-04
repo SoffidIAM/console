@@ -20,7 +20,9 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 
 	SearchHandler[] handlers = {
 			new SearchMenuHandler(),
-			new SearchUserHandler()};
+			new SearchUserHandler(),
+			new SearchGroupHandler(),
+			new SearchApplicationHandler()};
 	
 	@Override
 	public void afterCompose() {

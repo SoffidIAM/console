@@ -1,12 +1,9 @@
 package com.soffid.iam.web.component;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,26 +12,22 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
-import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Div;
-import org.zkoss.zul.Label;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.DataType;
-import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.web.WebDataType;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
-import es.caib.zkib.datamodel.DataModelNode;
-import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.xml.XmlDataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -87,11 +80,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 				} catch (Exception e) {}
 			}
 			
-			if (system != null)
-				dataTypes = new LinkedList<DataType>(
-						EJBLocator.getAdditionalDataService()
-							.findSystemDataTypes(system));
-			else  if (objectType != null)
+			if (objectType != null)
 				dataTypes = new LinkedList<DataType>(
 					EJBLocator.getAdditionalDataService()
 					.findDataTypesByObjectTypeAndName2(objectType, null));
@@ -103,6 +92,26 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 					return o1.getOrder().compareTo(o2.getOrder());
 				}
 			});
+			if (system != null) {
+				List<DataType> dataTypes2 = 
+						EJBLocator.getAdditionalDataService()
+						.findSystemDataTypes(system);
+				if (dataTypes2 != null) {
+					Collections.sort(dataTypes2, new Comparator<DataType>() {
+						public int compare(DataType o1, DataType o2) {
+							return o1.getOrder().compareTo(o2.getOrder());
+						}
+					});
+					if (!dataTypes2.isEmpty() && dataTypes2.get(0).getType() != TypeEnumeration.SEPARATOR)
+					{
+						DataType dt = new DataType();
+						dt.setType(TypeEnumeration.SEPARATOR);
+						dt.setLabel(Labels.getLabel("com.soffid.iam.api.Account._custom"));
+						dataTypes.add(dt);
+					}
+					dataTypes.addAll(dataTypes2);
+				}
+			}
 		} catch (Exception e) {
 			throw new UiException(e);
 		}
@@ -119,15 +128,22 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	}
 
 
-	public void onUpdate(XPathEvent arg0) 
+	public void onUpdate(XPathEvent event) 
 	{
 		try {
-			if (arg0 instanceof XPathRerunEvent)
-			{
-				updateMetadata();
+			if (binder.isValid() && binder.getValue() != null) {
+				if (event instanceof XPathRerunEvent)
+				{
+					updateMetadata();
+				}
+				else
+				{
+					adjustVisibility();
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new UiException("Error generating user interface", e);
 		}
 	}
 	
@@ -137,6 +153,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 			return;
 		recursive = true ;
 		Div section = null;
+		boolean emptySection = true;
 		try {
 			while (getFirstChild() != null)
 				removeChild(getFirstChild());
@@ -157,9 +174,12 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 					inputField.setReadonly(readonly);
 					inputField.setOwnerObject(ownerObject);
 					if ( att.getType() == TypeEnumeration.SEPARATOR) {
+						if (section != null && emptySection)
+							section.setVisible(false);
 						section = new Div();
 						section.setSclass("section");
 						appendChild(section);
+						emptySection = true;
 					}
 					if (section == null)
 						appendChild(inputField);
@@ -178,10 +198,12 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 							
 						}
 					});
-					inputField.setVisible(inputField.attributeVisible());
-					if ( att.getType() == TypeEnumeration.SEPARATOR && 
-							!inputField.isVisible()) {
-						section.setVisible(false);
+					boolean visible = inputField.attributeVisible();
+					inputField.setVisible(visible);
+					if ( att.getType() == TypeEnumeration.SEPARATOR) {
+						if (!visible) section.setVisible(false);
+					} else {
+						if (visible) emptySection = false;
 					}
 					fields.add(inputField);
 				}
@@ -194,14 +216,29 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	}
 
 	public void adjustVisibility() {
+		InputField3 container = null;
+		boolean visible = false;
 		for (InputField3 input : fields)
 		{
-			input.setOwnerObject(ownerObject);
+			if (input.getDataType() != null && input.getDataType().getType() == TypeEnumeration.SEPARATOR) {
+				if (container != null) {
+					container.setVisible(visible);
+					container.getParent().setVisible(visible);
+				}
+				container = input;
+				visible = false;
+			}
+			input.setOwnerObject(ownerObject); 
 			input.setOwnerContext(ownerContext);
-			input.setVisible(input.attributeVisible());
+			boolean v = input.attributeVisible();
+			if (input != container && container != null && v) visible = true;
+			input.setVisible(v);
+		}
+		if (container != null) {
+			container.setVisible(visible);
+			container.getParent().setVisible(visible);
 		}
 	}
-
 	
 	public DataSource getDataSource() {
 		return binder.getDataSource();
@@ -247,7 +284,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 
 	public Map<String,Object> getAttributesMap ()
 	{
-		Object obj = (List<XmlDataNode>) binder.getValue();
+		Object obj = binder.getValue();
 		try {
 			return (Map<String, Object>) PropertyUtils.getProperty(obj, "attributes");
 		} catch (Exception e) {

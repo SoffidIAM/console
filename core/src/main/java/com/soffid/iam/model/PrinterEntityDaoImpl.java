@@ -31,8 +31,10 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * @see es.caib.seycon.ng.model.ImpressoraEntity
@@ -118,6 +120,18 @@ public class PrinterEntityDaoImpl extends
         } else {
             targetVO.setLocal(new Boolean(false));
         }
+        
+        targetVO.setUsers(new LinkedList<String>());
+        for (UserPrinterEntity u: sourceEntity.getUsers())
+        	targetVO.getUsers().add(u.getUser().getUserName());
+        
+        Collections.sort(targetVO.getUsers());
+
+        targetVO.setGroups(new LinkedList<String>());
+        for (PrinterGroupEntity u: sourceEntity.getGroups())
+        	targetVO.getGroups().add(u.getGroup().getName());
+        
+        Collections.sort(targetVO.getGroups());
     }
 
     /**

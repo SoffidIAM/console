@@ -25,6 +25,7 @@ public class AutoritzacioAccesHostComAdministrador {
 	public java.util.Calendar dataCaducitatAutoritzacioAcces;
 
 	@Attribute(translated = "bpmProcessId" )
+	@Nullable
 	public java.lang.Long idProcesWorkflow;
 
 	@Nullable

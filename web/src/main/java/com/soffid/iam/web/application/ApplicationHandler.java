@@ -2,6 +2,9 @@ package com.soffid.iam.web.application;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -27,8 +30,6 @@ public class ApplicationHandler extends FrameHandler {
 		super();
 	}
 
-	
-	
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
@@ -36,7 +37,14 @@ public class ApplicationHandler extends FrameHandler {
 		DataModel model = getModel();
 		Variables vars = model.getJXPathContext().getVariables();
 
+
+		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		String name = req.getParameter("name");
 		SearchBox sb = (SearchBox) getFellow("searchBox");
+		if (name != null) {
+			sb.addAttribute("name").setSearchFilter(name);
+			sb.search();
+		}
 		sb.search();
 	}
 	

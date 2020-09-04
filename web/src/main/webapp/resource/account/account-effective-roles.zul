@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div id="handler">
+	<div class="navigation-bar dummy">
+		<label bind="${arg.listbox }:/@name"></label> - <label bind="${arg.listbox }:/@description"/>
+		<menu2>
+		</menu2>
+	</div>
+	<datatree2 dataPath="${arg.listbox}:/" 
+		id="tree"
+		header="${c:l('user.zul.objectType')} /  ${c:l('com.soffid.iam.api.Role.name')} "
+		openLevels="99"
+		enablefilter="true">
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('accounts.dispatcher')}
+		  width: 200px
+		- name: ${c:l('com.soffid.iam.api.Role.description')}
+		]]>
+		</attribute>
+		<attribute name="finders"><![CDATA[
+        - path: /effectiveRole
+          icon: >-
+            #{accountName != null ? "/img/account-green.svg": 
+              groupName != null ? "/img/group-green.svg": 
+              ruleName != null ? "/img/rule-green.svg":
+              "/img/role-green.svg"}
+          template: >-
+             #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}
+             #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}
+             #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", ruleName): ""}
+             #{roleName != null ? c:cat4("${c:l('accounts.role')} ", roleName, " @ ",system): ""}
+          columns:
+          - value: system
+          - template: >-
+                #{accountName != null ? accountDescription: ""}
+                #{groupName != null ? groupDescription: ""}
+                #{ruleName != null ? "": ""}
+                #{roleName != null ? roleDescription: ""}
+        - path: /nested
+          icon: >-
+            #{accountName != null ? "/img/account-green.png": 
+            groupName != null ? "/img/group-green.svg": 
+            ruleName != null ? "/img/rule-green.svg":
+            "/img/role-green.svg"}
+          template: >-
+             #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}
+             #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}
+             #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", ruleName): ""}
+             #{roleName != null ? c:cat3("${c:l('accounts.role')} <b>", roleName, " </b> "): ""}
+          columns:
+          - value: system
+          - template: >-
+                #{accountName != null ? accountDescription: ""}
+                #{groupName != null ? groupDescription: ""}
+                #{ruleName != null ? "": ""}
+                #{roleName != null ? roleDescription: ""}
+		]]>
+		</attribute>
+	</datatree2>
+</div>

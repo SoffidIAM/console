@@ -27,12 +27,12 @@
 	</script>
 	<div>
 		<div width="400px" style="display: inline-block">
-			<label value="Header:" style="display: inline-block; width: 100px"></label>
+			<label value="Buttons:" style="display: inline-block; width: 100px"></label>
 			<textbox value="${color3 }" id="color3tb" action="onInput:onChangeTBColor('color3Selector',this.value)"/> 
 			<h:input type='color' id="color3Selector" value="${color3 }" onChange="onChangeColor('${color3tb.uuid }', this.value)"></h:input >
 		</div>
 		<div width="400px" style="display: inline-block">
-			<label value="Header text:"  style="display: inline-block; width: 100px"></label>
+			<label value="Buttons text:"  style="display: inline-block; width: 100px"></label>
 			<textbox value="${color3text }" id="color3Texttb" action="onInput:onChangeTBColor('color3TextSelector',this.value)"/> 
 			<h:input type='color' id="color3TextSelector" value="${color3text }" onChange="onChangeColor('${color3Texttb.uuid }', this.value)"></h:input >
 		</div>
@@ -44,7 +44,7 @@
 			<h:input type='color' id="color2Selector" value="${color2 }" onChange="onChangeColor('${color2tb.uuid }', this.value)"></h:input >
 		</div>
 		<div width="400px" style="display: inline-block">
-			<label value="Toolbar text:" style="display: inline-block; width: 100px"></label>
+			<label value="Toolbar background:" style="display: inline-block; width: 100px"></label>
 			<textbox value="${color2text }" id="color2Texttb" action="onInput:onChangeTBColor('color2TextSelector',this.value)"  onChange=""/> 
 			<h:input type='color' id="color2TextSelector" value="${color2text }" onChange="onChangeColor('${color2Texttb.uuid }', this.value)"></h:input >
 		</div>

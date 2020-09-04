@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -20,7 +19,6 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -32,8 +30,7 @@ import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
-import com.soffid.iam.api.Host;
-import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.OsType;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
@@ -41,6 +38,7 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.inputField.AccountDataHandler;
 import com.soffid.iam.web.component.inputField.ApplicationDataHandler;
 import com.soffid.iam.web.component.inputField.CustomObjectDataHandler;
 import com.soffid.iam.web.component.inputField.GroupDataHandler;
@@ -51,7 +49,7 @@ import com.soffid.iam.web.component.inputField.NetworkDataHandler;
 import com.soffid.iam.web.component.inputField.OUTypeDataHandler;
 import com.soffid.iam.web.component.inputField.RoleDataHandler;
 import com.soffid.iam.web.component.inputField.UserDataHandler;
-import com.soffid.iam.web.popup.FinderHandler;
+import com.soffid.iam.web.popup.Editor;
 import com.soffid.iam.web.users.additionalData.AttributesDiv;
 import com.soffid.iam.web.users.additionalData.SearchFilter;
 
@@ -64,7 +62,6 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
-import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datasource.CommitException;
@@ -85,6 +82,7 @@ public class InputField3 extends Databox
 	private String ownerContext;
 	InputFieldUIHandler uiHandler = null;
 	InputFieldDataHandler<?> dataHandler = null;
+	boolean readonly = false;
 	
 	private SearchFilter filter;
 
@@ -110,6 +108,20 @@ public class InputField3 extends Databox
 	public void onCreate () throws NamingException, CreateException, InternalErrorException, IOException
 	{
 		createField();
+	}
+
+	public ObjectAttributesDiv getObjectContainer () {
+		Component c = this;
+		do
+		{
+			if (c instanceof ObjectAttributesDiv)
+			{
+				return ((ObjectAttributesDiv) c);
+			}
+			else
+				c = c.getParent();
+		} while (c != null);
+		return null;
 	}
 	
 	protected void onItemChange(Object value, Integer pos) {
@@ -140,8 +152,8 @@ public class InputField3 extends Databox
 		XPathUtils.getComponentContext(this).getDataSource().commit();
 	}
 
-	public synchronized void createField() throws NamingException, CreateException, InternalErrorException, IOException{
 		
+	public synchronized void createField() throws NamingException, CreateException, InternalErrorException, IOException{
 		if (getPage() == null)
 			return;	
 		
@@ -155,18 +167,25 @@ public class InputField3 extends Databox
 		
 		try
 		{
+			if (dataType.getBuiltinHandler() != null && ! dataType.getBuiltinHandler().trim().isEmpty()) {
+				uiHandler = (InputFieldUIHandler) Class.forName(dataType.getBuiltinHandler()).newInstance();
+			} else {
+				uiHandler = null;
+			}
 			calculateVisibility();
-			setMultiValue(dataType.isMultiValued());
+			super.setMultiValue(dataType.isMultiValued());
 			if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.GROUP_TYPE_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.USER_TYPE_TYPE) ||
+								dataType.getType().equals(TypeEnumeration.ACCOUNT_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.USER_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.ROLE_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.NETWORK_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.HOST_TYPE) ||
-								dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE) )
+								dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE) ||
+								dataType.getType().equals(TypeEnumeration.OS_TYPE) )
 				
 			{
 				if (hideUserName)
@@ -195,6 +214,9 @@ public class InputField3 extends Databox
 				} else if ( dataType.getType().equals(TypeEnumeration.ROLE_TYPE)) {
 					dataHandler = new RoleDataHandler(dataType);
 					setSelectIcon("/img/role.svg");
+				} else if ( dataType.getType().equals(TypeEnumeration.ACCOUNT_TYPE)) {
+					dataHandler = new AccountDataHandler(dataType);
+					setSelectIcon("/img/account.svg");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE))
 					dataHandler = new MailDomainDataHandler(dataType);
@@ -221,6 +243,27 @@ public class InputField3 extends Databox
 						Security.nestedLogoff();
 					}
 				}
+				else if (dataType.getType().equals(TypeEnumeration.OS_TYPE)) {
+					List<String> values = new LinkedList<String>();
+					Security.nestedLogin(Security.ALL_PERMISSIONS);
+					try {
+						List<OsType> allOperatingSystems = new LinkedList<OsType> 
+							(EJBLocator.getNetworkService().findAllOSTypes());
+						Collections.sort(allOperatingSystems, new Comparator<OsType>() {
+							@Override
+							public int compare(OsType o1, OsType o2) {
+								return o1.getName().compareTo(o2.getName());
+							}
+						});
+						for (OsType ut: allOperatingSystems ) {
+							values.add(ut.getName()+":"+ut.getDescription());
+						}
+						setType(Databox.Type.LIST);
+						setValues(values);
+					} finally {
+						Security.nestedLogoff();
+					}
+				}
 			}
 			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE)
 				setVisible(false);
@@ -230,11 +273,13 @@ public class InputField3 extends Databox
 			{
 				setType(Databox.Type.DATE);
 				setFormat(  DateFormats.getDateTimeFormatString());
+				setCalendarIcon("/img/calendar.svg");
 			}
 			else if (dataType.getType() == TypeEnumeration.DATE_TYPE)
 			{
 				setType(Databox.Type.DATE);
 				setFormat( DateFormats.getDateFormatString());
+				setCalendarIcon("/img/calendar.svg");
 			}
 			else if (dataType.getType() == TypeEnumeration.EMAIL_TYPE)
 			{
@@ -265,23 +310,27 @@ public class InputField3 extends Databox
 			}
 			if (dataType.getLabel() != null) {
 				if ( dataType.getType() == TypeEnumeration.SEPARATOR)
-					setLabel(dataType.getLabel());
+					super.setLabel(dataType.getLabel());
 				else {
-					setLabel(dataType.getLabel()+" :");
+					super.setLabel(dataType.getLabel()+" :");
 					setPlaceholder(dataType.getLabel());
 				}
 			}
 			if (dataType.getSize() != null)
 				setMaxlength(dataType.getSize());
-			setReadonly(dataType.isReadOnly());
+			setReadonly(this.readonly || dataType.isReadOnly());
 			setMultiline(dataType.isMultiLine());
 			setRequired(dataType.isRequired());
-			if (Boolean.TRUE.equals( dataType.getBultinHandler() )) {
-				uiHandler = (InputFieldUIHandler) Class.forName(dataType.getBultinHandler()).newInstance();
-				uiHandler.afterCreate(this);
-			} else {
-				uiHandler = null;
+
+			if ( uiHandler != null) {
+				try {
+					uiHandler.beforeCreate(this);
+				} catch (Exception e) {
+					log.info("Error loading field "+dataType.getName(), e);
+					setVisible(false);
+				}			
 			}
+
 			invalidate();
 		} catch (Throwable e) {
 			log.warn(e);
@@ -351,37 +400,46 @@ public class InputField3 extends Databox
 
 	public boolean attributeVisible()
 	{
-		if (dataType.getVisibilityExpression() == null ||
-				dataType.getVisibilityExpression().isEmpty())
-			return true;
-		
 		try {
-			SecureInterpreter i = createInterpreter();
-			Object o = i.eval(dataType.getVisibilityExpression());
-			if (o == null)
-				throw new UiException(String.format("Visibility expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
-			if (o != null && o instanceof Boolean)
-				return ((Boolean) o).booleanValue();
-			else
-				throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode())); //$NON-NLS-1$
-		} catch ( TargetError e) {
-			throw new UiException(e.getTarget());
-		} catch ( EvalError e) {
-			throw new UiException(e.toString(), e);
-		} catch (MalformedURLException e) {
-			throw new UiException (e.toString());
-		} catch (JXPathException e) {
-			return false;
+			if (uiHandler != null && !  uiHandler.isVisible(this))
+				return false;
+		} catch (Exception e) {
+			throw new UiException(String.format("Visibility expression for attribute %s has generated an error condition", dataType.getCode()),
+					e); //$NON-NLS-1$
 		}
+
+		if (dataType.getVisibilityExpression() != null &&
+				! dataType.getVisibilityExpression().trim().isEmpty()) {
+			try {
+				SecureInterpreter i = createInterpreter();
+				Object o = i.eval(dataType.getVisibilityExpression());
+				if (o == null)
+					throw new UiException(String.format("Visibility expression for attribute %s has returned a null value: %s", dataType.getCode(), dataType.getVisibilityExpression())); //$NON-NLS-1$
+				if (o != null && o instanceof Boolean)
+					return ((Boolean) o).booleanValue();
+				else
+					throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode())); //$NON-NLS-1$
+			} catch ( TargetError e) {
+				throw new UiException(e.getTarget());
+			} catch ( EvalError e) {
+				throw new UiException(e.toString(), e);
+			} catch (MalformedURLException e) {
+				throw new UiException (e.toString());
+			} catch (JXPathException e) {
+				return false;
+			}
+		}
+
+
+		return true;
 	}
 
 	private SecureInterpreter createInterpreter() throws EvalError {
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = null;
 		value = getValue();
-		Component grandpa = getParent().getParent();
-		Map attributes = grandpa instanceof ObjectAttributesDiv ? 
-			((ObjectAttributesDiv) grandpa).getAttributesMap():
+		ObjectAttributesDiv grandpa = getObjectContainer();
+		Map attributes = grandpa != null ? ((ObjectAttributesDiv) grandpa).getAttributesMap():
 			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
 		SecureInterpreter i = new SecureInterpreter();
 
@@ -460,7 +518,7 @@ public class InputField3 extends Databox
 
 	public boolean attributeValidateAll() {
 		boolean ok = true;
-		if(dataType != null && ! isReadonly()) {
+		if(dataType != null && ! super.isReadonly()) {
 			Object value = getValue();
 			if (dataType.isMultiValued())
 			{
@@ -528,7 +586,8 @@ public class InputField3 extends Databox
 			}
 		}
 		
-		if ( currentValue != null && 
+		if ( currentValue != null &&
+				! currentValue.toString().trim().isEmpty() &&
 				(getType().equals(Databox.Type.NAME_DESCRIPTION.toString()) ||
 				 getType().equals(Databox.Type.DESCRIPTION.toString()))) {
 			String d;
@@ -544,36 +603,34 @@ public class InputField3 extends Databox
 			}
 		}
 
-		if (dataType.getValidationExpression() == null ||
-				dataType.getValidationExpression().isEmpty())
+		if (dataType.getValidationExpression() != null &&
+				! dataType.getValidationExpression().isEmpty())
 		{
-			setWarning(position, "" );
-			return true;		
-		}
-		try {
-			SecureInterpreter i = createInterpreter();
-			Object o = i.eval(dataType.getValidationExpression());
-			if (o == null)
-				throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
-			if (o != null && ! Boolean.TRUE.equals(o))
-			{
-				if  (!((Boolean) o).booleanValue()) {
-					setWarning(position, o instanceof String ? (String) o: "Wrong value"); //$NON-NLS-1$
-					return false;
+			try {
+				SecureInterpreter i = createInterpreter();
+				Object o = i.eval(dataType.getValidationExpression());
+				if (o == null)
+					throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
+				if (o != null && ! Boolean.TRUE.equals(o))
+				{
+					if  (!((Boolean) o).booleanValue()) {
+						setWarning(position, o instanceof String ? (String) o: "Wrong value"); //$NON-NLS-1$
+						return false;
+					}
 				}
+			} catch ( TargetError e) {
+				setWarning(position, "Internal error" );
+				if (e.getTarget() instanceof UiException)
+					throw new UiException(e);
+				else
+					throw new RuntimeException(e.getTarget());
+			} catch ( EvalError e) {
+				setWarning(position, "Internal error" );
+				throw new UiException(e.toString());
+			} catch (MalformedURLException e) {
+				setWarning(position, "Internal error" );
+				throw new UiException (e.toString());
 			}
-		} catch ( TargetError e) {
-			setWarning(position, "Internal error" );
-			if (e.getTarget() instanceof UiException)
-				throw new UiException(e);
-			else
-				throw new RuntimeException(e.getTarget());
-		} catch ( EvalError e) {
-			setWarning(position, "Internal error" );
-			throw new UiException(e.toString());
-		} catch (MalformedURLException e) {
-			setWarning(position, "Internal error" );
-			throw new UiException (e.toString());
 		}
 		
 		try {
@@ -607,6 +664,13 @@ public class InputField3 extends Databox
 				throw new UiException (e.toString());
 			}
 
+		}
+		if ( uiHandler != null) {
+			try {
+				uiHandler.onChange(this);
+			} catch (Exception e) {
+				throw new UiException("Error loading field "+dataType.getName(), e);
+			}			
 		}
 	}
 
@@ -650,6 +714,13 @@ public class InputField3 extends Databox
 			}
 
 		}
+		if ( uiHandler != null) {
+			try {
+				uiHandler.afterCreate(this);
+			} catch (Exception e) {
+				throw new UiException("Error loading field "+dataType.getName(), e);
+			}			
+		}
 	}
 
 	public void onFocus(Event ev) 
@@ -682,7 +753,7 @@ public class InputField3 extends Databox
 		if (dataHandler == null || name == null || name.toString().trim().isEmpty())
 			return null;
 		else {
-			String d = dataHandler.getDescription((String)name, dataType.getFilterExpression());
+			String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
 			return d;
 		}
 	}
@@ -713,29 +784,31 @@ public class InputField3 extends Databox
 	
 	private List<String[]> fetchObjects() throws Throwable {
 		List<String[]> result = null;
-		Iterator<?> it = currentList.iterator();
-		if ( (currentList.isDone() &&  currentPosition == currentList.size()) || currentList.isCancelled())
-		{
-			Throwable th = currentList.getExceptionToThrow();
-			currentList.clearExceptionToThrow();
-			if (th != null)
+		if (currentList != null) {
+			Iterator<?> it = currentList.iterator();
+			if ( (currentList.isDone() &&  currentPosition == currentList.size()) || currentList.isCancelled())
 			{
-				throw th; 
-			}
-		} else if (currentList.size() > currentPosition) {
-			int i = 0;
-			result = new LinkedList();
-			while (it.hasNext())
-			{
-			    Object o = it.next();
-				if (i++ >= currentPosition)
+				Throwable th = currentList.getExceptionToThrow();
+				currentList.clearExceptionToThrow();
+				if (th != null)
 				{
-					String[] row = ((InputFieldDataHandler<Object>)dataHandler).toNameDescription(o);
-					result.add(row);
-					currentPosition ++;
+					throw th; 
 				}
-			}
-		} 
+			} else if (currentList.size() > currentPosition) {
+				int i = 0;
+				result = new LinkedList();
+				while (it.hasNext())
+				{
+				    Object o = it.next();
+					if (i++ >= currentPosition)
+					{
+						String[] row = ((InputFieldDataHandler<Object>)dataHandler).toNameDescription(o);
+						result.add(row);
+						currentPosition ++;
+					}
+				}
+			} 
+		}
 		return result;
 	}
 	
@@ -751,13 +824,20 @@ public class InputField3 extends Databox
 				throw new UiException(e);
 			}
 		}
+		else if (isMultiline()) {
+			Editor.edit(this, "{}");
+		}
 	}
 
 	class FinderListener implements EventListener {
 		@Override
 		public void onEvent(Event event) throws Exception {
 			if (dataType.isMultiValued()) {
-				
+				List values = (List) event.getData();
+				for (Object value: values) {
+					onItemChange(value, collectionValue.size());
+				}
+				refreshValue();
 			} else {
 				onItemChange(event.getData(), 0);
 				refreshValue();
@@ -805,4 +885,55 @@ public class InputField3 extends Databox
 			}
 		}
 	}
+	
+	public Object getValueObject() throws Exception {
+		if (isMultiValue())
+			throw new RuntimeException("Input field is multivalued");
+		else if (dataHandler == null)
+			return null;
+		else {
+			Object value = getValue();
+			if (value == null) return null;
+			else return dataHandler.getObject(value.toString(), dataType.getFilterExpression());
+		}
+	}
+
+	public List<Object> getValueObjects() throws Exception {
+		if (! isMultiValue())
+			throw new RuntimeException("Input field is singlevalued");
+		else if (dataHandler == null)
+			return null;
+		else {
+			List<Object> values = (List<Object>) getValue();
+			if (values == null) return null;
+			else {
+				List<Object> r = new LinkedList<>();
+				for (Object value: values)
+					r.add ( dataHandler.getObject(value.toString(), dataType.getFilterExpression()) );
+				return r;
+			}
+		}
+	}
+
+	
+	public boolean isReadonly() {
+		return readonly;
+	}
+
+	
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
+		super.setReadonly(readonly);
+	}
+
+	
+	public InputFieldDataHandler<?> getDataHandler() {
+		return dataHandler;
+	}
+
+	
+	public void setDataHandler(InputFieldDataHandler<?> dataHandler) {
+		this.dataHandler = dataHandler;
+	}
+
 }

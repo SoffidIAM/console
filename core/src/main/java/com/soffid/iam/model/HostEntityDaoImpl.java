@@ -32,6 +32,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -60,13 +61,12 @@ public class HostEntityDaoImpl extends
         targetVO.setMail(new Boolean(sourceEntity.getMail().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setPrintersServer(new Boolean(sourceEntity.getPrintersServer().compareTo("S") == 0)); //$NON-NLS-1$
 
-        String alies = ""; //$NON-NLS-1$
-        Collection c_alies = sourceEntity.getHostAlias();
-        for (Iterator it = c_alies.iterator(); it.hasNext(); ) {
-            HostAliasEntity al = (HostAliasEntity) it.next();
-            alies += al.getAlias() + " ";
+        List<String> alias = new LinkedList<>();
+        for (HostAliasEntity ha: sourceEntity.getHostAlias()) {
+        	alias.add(ha.getAlias());
         }
-        targetVO.setHostAlias(alies.trim()); // quitamos espacios "extra"
+        Collections.sort(alias);
+        targetVO.setHostAlias(alias);
         if (sourceEntity.getLastSeen() == null)
             targetVO.setLastSeen(null);
         else

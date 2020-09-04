@@ -77,8 +77,9 @@ public abstract class PuntEntradaEntity {
 	@Nullable
 	public java.lang.Long icona2;
 
-	@Column(name = "PUE_IDAPL", translated = "applicationID")
-	public java.lang.Long idAplicacio;
+	@Column(name = "PUE_IDAPL")
+	@Nullable
+	public AplicacioEntity informationSystem;
 
 	@ForeignKey(foreignColumn = "PPE_IDPEFI", translated = "parentEntryPointTree")
 	public java.util.Collection<es.caib.seycon.ng.model.ArbrePuntEntradaEntity> arbrePuntEntradaSocFill;

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.MaquinaEntity;
@@ -27,18 +29,18 @@ public class Maquina {
 	public java.lang.String descripcio;
 	
 	@Nullable
-	@Attribute(translated = "networkCode" )
+	@Attribute(translated = "networkCode", type = "NETWORK" )
 	public java.lang.String codiXarxa;
 	
 	@Nullable
-	@Attribute(translated = "ip", searchCriteria = true )
+	public java.lang.String dhcp;
+	
+	@Nullable
+	@Attribute(translated = "ip", searchCriteria = true, customUiHandler = "com.soffid.iam.web.host.IPHandler" )
 	public java.lang.String adreca;
 	
-	@Attribute(translated = "os" )
+	@Attribute(translated = "os", type = "OS" )
 	public java.lang.String sistemaOperatiu;
-
-	@Nullable
-	public java.lang.String dhcp;
 
 	@Nullable
 	@Attribute(translated = "mail" )
@@ -52,20 +54,20 @@ public class Maquina {
 	public java.lang.String mac;
 
 	@Nullable
-	@Attribute(translated = "hostAlias" )
-	public java.lang.String aliasMaquina;
+	@Attribute(translated = "hostAlias", defaultValue = "new java.util.LinkedList<String>()", multivalue = true )
+	public List<java.lang.String> aliasMaquina;
 
 	@Nullable
 	@Attribute(translated = "printersServer" )
 	public java.lang.Boolean servidorImpressores;
 
 	@Nullable
-	@Attribute(readonly = true)
-	public java.lang.String serialNumber;
-
-	@Nullable
 	public java.lang.Boolean dynamicIp;
 
+	@Nullable
+	@Attribute(readonly = true)
+	public java.lang.String serialNumber;
+	
 	@Nullable
 	@Attribute(readonly = true)
 	public java.util.Calendar lastSeen;

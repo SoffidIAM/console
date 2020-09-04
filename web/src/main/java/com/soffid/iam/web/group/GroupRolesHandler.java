@@ -50,17 +50,6 @@ public class GroupRolesHandler extends Div implements AfterCompose {
 	}
 	
 	
-	public void openAccount(Event event) {
-//		Object item = ((DataNode) tree.getJXPathContext().getValue("/")).getInstance();
-//		if (item instanceof Account) {
-//			Window w = 
-//					(Window) getDesktop()
-//					.getPage("user-account-details")
-//					.getFellow("window");
-//			Events.postEvent(new Event("onStart", w));
-//		}
-	}
-	
 	public void addNew (Event event) {
 		Window w = (Window) getFellow("add-window");
 		getWizard().setSelected(0);

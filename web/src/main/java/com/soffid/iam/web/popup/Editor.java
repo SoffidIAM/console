@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -15,16 +16,18 @@ import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
+import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.codemirror.Codemirror;
+import com.soffid.iam.web.component.InputField3;
 
 public class Editor extends Window implements AfterCompose {
 	EventListener listener;
 	private String vars;
-	private Textbox textbox;
+	private InputElement textbox;
 	private Codemirror editor;
 	
-	public static void edit ( Textbox textbox, String vars) {
+	public static void edit ( InputElement textbox, String vars) {
 		Page p = textbox.getPage();
 		Editor editorWindow = (Editor) p.getFellowIfAny("editorWindow");
 		if (editorWindow == null) {
@@ -37,7 +40,7 @@ public class Editor extends Window implements AfterCompose {
 			editorWindow.textbox = textbox;
 			editorWindow.vars = vars;
 			editorWindow.editor.setGlobalVars(vars);
-			editorWindow.editor.setValue( textbox.getValue() );
+			editorWindow.editor.setValue( textbox.getText() );
 			editorWindow.doHighlighted();
 			editorWindow.editor.focus();
 		}
@@ -48,7 +51,7 @@ public class Editor extends Window implements AfterCompose {
 		super.setPage(page);
 		Execution ex = Executions.getCurrent();
 		Map args = ex.getArg();
-		this.textbox = (Textbox) args.get("textbox");
+		this.textbox = (InputElement) args.get("textbox");
 		this.vars = (String) args.get("vars");
 	}
 	
@@ -58,7 +61,7 @@ public class Editor extends Window implements AfterCompose {
 	}
 
 	public void accept(Event event) {
-		textbox.setValue(editor.getValue());
+		textbox.setText(editor.getValue());
 		cleanWindow(event);
 	}
 
@@ -66,7 +69,8 @@ public class Editor extends Window implements AfterCompose {
 	public void afterCompose() {
 		editor = (Codemirror) getFellow("editor");
 		editor.setGlobalVars(vars);
-		editor.setValue( textbox.getValue() );
+		editor.setValue( textbox.getText() );
 		editor.focus();
 	}
+
 }

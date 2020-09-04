@@ -24,6 +24,7 @@ public class AutoritzacioPuntEntrada {
 	@Attribute(translated = "authorizationEntityType" )
 	public java.lang.String tipusEntitatAutoritzada;
 
+	@Nullable
 	@Attribute(translated = "authorizationEntityId" )
 	public java.lang.Long idEntitatAutoritzada;
 

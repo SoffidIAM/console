@@ -2,6 +2,9 @@ package com.soffid.iam.web.group;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -37,7 +40,13 @@ public class GroupHandler extends FrameHandler {
 		Variables vars = model.getJXPathContext().getVariables();
 		vars.declareVariable("canQueryGroupRoles", Security.isUserInRole("group:role:query"));
 
+		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		String name = req.getParameter("name");
 		SearchBox sb = (SearchBox) getFellow("searchBox");
+		if (name != null) {
+			sb.addAttribute("name").setSearchFilter(name);
+			sb.search();
+		}
 		sb.search();
 	}
 	

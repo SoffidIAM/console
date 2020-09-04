@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
@@ -29,7 +30,7 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
@@ -41,7 +42,7 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 	}
 
 	@Override
-	public AsyncList<Application> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<Application> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -56,12 +57,24 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 
 	@Override
 	public void followLink(String value) {
-		// TODO Auto-generated method stub
+		Executions.getCurrent().sendRedirect("/resource/application/application.zul?name="+value, "_blank");
 	}
 
 	@Override
 	public String[] toNameDescription(Application o) {
 		return new String[] {o.getName(), o.getDescription()};
+	}
+
+	@Override
+	public Application getObject(String name, String filter) throws Exception {
+		String q = "name eq \"" + quote(name)+ "\" ";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<Application> r = handler.read(null, q, null, null);
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 

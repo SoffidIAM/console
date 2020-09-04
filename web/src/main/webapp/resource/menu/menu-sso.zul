@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div id="handler" use="com.soffid.iam.web.menu.MenuSsoHandler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar">
+		<label bind="${arg.listbox }:/name"/>
+	</div>
+
+	<codemirror  value="&lt;Mazinger/&gt;" width="100%" linenumbers="true" onChange="" id="content_xml" language="xml" 
+		height="70vh" bind="${arg.listbox }:/xmlAccessTree" />
+	<div align="right">
+		<button id="bt_xml" image="/img/save-r.svg" label="${c:l('aplicacionsIntranet.zul.Valida')}" onClick="handler.validaXML()"/>
+	</div>
+</div>

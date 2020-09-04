@@ -25,8 +25,12 @@ public abstract class ImpressoraEntity {
 	@Nullable
 	public java.lang.String model;
 
-	@Column (name="IMP_CODI", length=12, translated="name")
+	@Column (name="IMP_CODI", length=20, translated="name")
 	public java.lang.String codi;
+
+	@Column (name="IMP_DESCR", length=50)
+	@Nullable
+	public java.lang.String description;
 
 	@Column (name="IMP_LOCAL", length=1)
 	@Nullable

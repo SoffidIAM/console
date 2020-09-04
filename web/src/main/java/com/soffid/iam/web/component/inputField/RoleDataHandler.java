@@ -28,7 +28,7 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		int i = name.lastIndexOf('@');
 		String roleName = i < 0 ? name: name.substring(0,  i);
 		String systemName = i < 0 ? "soffid": name.substring(i+1);
@@ -43,7 +43,7 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 	}
 
 	@Override
-	public AsyncList<Role> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<Role> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -63,6 +63,21 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 	@Override
 	public String[] toNameDescription(Role o) {
 		return new String[] {o.getName()+"@"+o.getSystem(), o.getDescription()};
+	}
+
+	@Override
+	public Role getObject(String name, String filter) throws Exception {
+		int i = name.lastIndexOf('@');
+		String roleName = i < 0 ? name: name.substring(0,  i);
+		String systemName = i < 0 ? "soffid": name.substring(i+1);
+		String q = "name eq \"" + quote(roleName)+ "\" and system eq \""+quote(systemName)+"\"";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<Role> r = handler.read(null, q, null, null);
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 }

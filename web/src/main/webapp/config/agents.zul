@@ -123,9 +123,9 @@
 						<tabpanel id="basica" width="100%">
 						<grid width="99%" sclass="noBorderGrid" fixedLayout="true" mold="table">
 							<rows>
-								<row id="serverStatusRow">
-									<label style="color:#8A4700" value="${c:l('parametres.zul.taskMode') }:"/>
-									<label style="color:#8A4700" value="" id="serverStatusMessage"/>
+								<row id="serverStatusRow" >
+									<label style="color:#8A4700" value="${c:l('parametres.zul.taskMode') }:" />
+									<label style="color:#8A4700" value="" id="serverStatusMessage" />
 								</row>
 								<row>
 									<label value="${c:l('agents.zul.Codi')}"/>
@@ -694,8 +694,8 @@
 		closable="true"
 		onClose="self.setVisible(false); event.stopPropagation();">
 		<div>
-			<label value="${c:l('job.status') }: "/>
-			<label id="status"/>
+			<label class = "separator_label" value="${c:l('job.status') }: "/>
+			<label class = "separator_label" id="status"/>
 		</div>
 		<datatree2 id="log"
 			header="Test log" 

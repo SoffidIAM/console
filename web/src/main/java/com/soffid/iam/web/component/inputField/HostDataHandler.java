@@ -28,7 +28,7 @@ public class HostDataHandler extends InputFieldDataHandler<Host> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
@@ -41,7 +41,7 @@ public class HostDataHandler extends InputFieldDataHandler<Host> {
 	}
 
 	@Override
-	public AsyncList<Host> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<Host> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -62,6 +62,19 @@ public class HostDataHandler extends InputFieldDataHandler<Host> {
 	@Override
 	public String[] toNameDescription(Host o) {
 		return new String[] {o.getName(), o.getDescription()};
+	}
+
+	@Override
+	public Host getObject(String name, String filter) throws Exception {
+		String q = "name eq \"" + quote(name)+ "\" ";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<Host> r = handler.read(null, q, null, null);
+		
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 }

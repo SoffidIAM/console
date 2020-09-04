@@ -18,8 +18,9 @@ public abstract class InputFieldDataHandler<E> {
 		this.dataType = dataType;
 	}
 	
-	public abstract String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException;
-	public abstract AsyncList<E> search(String text, String filter) throws InternalErrorException, NamingException, CreateException; 
+	public abstract E getObject(String name, String filter) throws Exception;
+	public abstract String getDescription(String name, String filter) throws Exception;
+	public abstract AsyncList<E> search(String text, String filter) throws Exception; 
 	public abstract void openFinder(String filter, boolean multiple, Databox databox, EventListener listener) throws Exception;
 	public abstract void followLink(String value);
 	

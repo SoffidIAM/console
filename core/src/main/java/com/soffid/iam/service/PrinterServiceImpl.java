@@ -15,16 +15,21 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.api.Printer;
 import com.soffid.iam.api.PrinterGroup;
 import com.soffid.iam.api.PrinterUser;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PrinterEntity;
+import com.soffid.iam.model.PrinterEntityDao;
 import com.soffid.iam.model.PrinterGroupEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserPrinterEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.NetworkServiceImpl;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -36,9 +41,11 @@ import es.caib.seycon.ng.exception.SeyconException;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,6 +73,7 @@ public class PrinterServiceImpl extends
 			throw new SeyconException(String.format(Messages.getString("PrinterServiceImpl.CodePrinterExists"), impressora.getCode())); 
         PrinterEntity entity = getPrinterEntityDao().printerToEntity(impressora);
         getPrinterEntityDao().create(entity);
+        updateUsersAndGroups(entity, impressora);
         impressora.setId(entity.getId());
         impressora = getPrinterEntityDao().toPrinter(entity);
         return impressora;
@@ -76,8 +84,9 @@ public class PrinterServiceImpl extends
      */
     protected void handleDelete(com.soffid.iam.api.Printer impressora) throws java.lang.Exception {
         PrinterEntity entity = getPrinterEntityDao().printerToEntity(impressora);
-        if(!entity.getGroups().isEmpty() || !entity.getUsers().isEmpty())
-        	throw new SeyconException(String.format(Messages.getString("ImpressoraService.IntegrityExceptionGrups"), new Object[]{entity.getName()})); //$NON-NLS-1$
+        
+        getPrinterGroupEntityDao().remove(entity.getGroups());
+        getUserPrinterEntityDao().remove(entity.getUsers());
         getPrinterEntityDao().remove(entity);
     }
 
@@ -88,11 +97,67 @@ public class PrinterServiceImpl extends
 
         PrinterEntity entity = getPrinterEntityDao().printerToEntity(impressora);
         getPrinterEntityDao().update(entity);
+        updateUsersAndGroups(entity, impressora);
         impressora = getPrinterEntityDao().toPrinter(entity);
         return impressora;
     }
 
-    protected Collection<Printer> handleFindPrintersByPrinterName(String codiImpressora) throws Exception {
+    private void updateUsersAndGroups(PrinterEntity entity, Printer impressora) throws InternalErrorException {
+    	updateUsers(entity, impressora);
+    	updateGroups(entity, impressora);
+	}
+
+	public void updateUsers(PrinterEntity entity, Printer impressora) throws InternalErrorException {
+		Set<String> u = new HashSet<String>();
+    	if (impressora.getUsers() != null) u.addAll(impressora.getUsers());
+    	
+    	for (UserPrinterEntity up: new LinkedList<UserPrinterEntity>(entity.getUsers())) {
+    		if (u.contains(up.getUser().getUserName()))
+    			u.remove(up.getUser().getUserName());
+    		else {
+    			getUserPrinterEntityDao().remove(up);
+    			entity.getUsers().remove(up);
+    		}
+    	}
+    	
+    	for ( String uu: u) {
+    		UserEntity user = getUserEntityDao().findByUserName(uu);
+    		if (user == null)
+    			throw new InternalErrorException ("Unable to find user "+uu);
+    		UserPrinterEntity upe = getUserPrinterEntityDao().newUserPrinterEntity();
+    		upe.setOrder(2L);
+    		upe.setPrinter(entity);
+    		upe.setUser(user);
+    		getUserPrinterEntityDao().create(upe);
+    	}
+	}
+
+	public void updateGroups(PrinterEntity entity, Printer impressora) throws InternalErrorException {
+		Set<String> g = new HashSet<String>();
+    	if (impressora.getGroups() != null) g.addAll(impressora.getGroups());
+    	
+    	for (PrinterGroupEntity pg: new LinkedList<PrinterGroupEntity>(entity.getGroups())) {
+    		if (g.contains(pg.getGroup().getName()))
+    			g.remove(pg.getGroup().getName());
+    		else {
+    			getPrinterGroupEntityDao().remove(pg);
+    			entity.getGroups().remove(pg);
+    		}
+    	}
+    	
+    	for ( String uu: g) {
+    		GroupEntity group = getGroupEntityDao().findByName(uu);
+    		if (group == null)
+    			throw new InternalErrorException ("Unable to find group "+uu);
+    		PrinterGroupEntity upe = getPrinterGroupEntityDao().newPrinterGroupEntity();
+    		upe.setOrder(2L);
+    		upe.setPrinter(entity);
+    		upe.setGroup(group);
+    		getPrinterGroupEntityDao().create(upe);
+    	}
+	}
+
+	protected Collection<Printer> handleFindPrintersByPrinterName(String codiImpressora) throws Exception {
         return findPrintersByFilter(codiImpressora, null, null, null);
     }
 
@@ -384,5 +449,54 @@ public class PrinterServiceImpl extends
         grupImpressora = getPrinterGroupEntityDao().toPrinterGroup(grupImpressoraEntity);
         return grupImpressora;
     }
+
+	@Override
+	protected AsyncList<Printer> handleFindPrinterByTextAndJsonQueryAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<Printer> result = new AsyncList<Printer>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindPrinterByTextAndJsonQuery(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void doFindPrinterByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<Printer> result) throws Exception {
+		final PrinterEntityDao dao = getPrinterEntityDao();
+		ScimHelper h = new ScimHelper(Printer.class);
+		h.setPrimaryAttributes(new String[] { "name", "description", "model"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+
+		final List<String> printers = new LinkedList<>();
+
+		h.setGenerator((entity) -> {
+			PrinterEntity ne = (PrinterEntity) entity;
+			return dao.toPrinter((PrinterEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
+
+	@Override
+	protected List<Printer> handleFindPrinterByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<Printer> result = new LinkedList<Printer>();
+		doFindPrinterByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+
 
 }

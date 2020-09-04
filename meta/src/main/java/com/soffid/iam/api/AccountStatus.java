@@ -9,4 +9,5 @@ public class AccountStatus {
 	public static String FORCED_ACTIVE = "FA";
 	public static String FORCED_DISABLED = "FD";
 	public static String REMOVED = "r";
+	public static String LOCKED = "l";
 }

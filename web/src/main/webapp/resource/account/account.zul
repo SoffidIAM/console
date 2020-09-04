@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?component name="account_roles" macro-uri="account-roles.zul"?>
+<?component name="account_effective_roles" macro-uri="account-effective-roles.zul"?>
+
+<?page id="account"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.account.AccountHandler" id="frame">
+<!-- 
+ 	<zscript><![CDATA[
+com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", com.soffid.iam.api.MetadataScope.ACCOUNT, true);
+	]]></zscript>
+ -->
+	<datamodel id="model" rootNode="root" src="accountDescriptor.xml"/>
+	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('account:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('account:create') &amp;&amp; soffid:isUserInRole('account:update') &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Account" 
+				defaultAttributes="name, description, system, type"
+				preference="users"
+				dataPath="/model:/account" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.account.AccountDatatable"
+				preference="account"
+				dataPath="/model:/account" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('account:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+								
+				<imageclic src="/img/wait.gif" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
+
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
+					<tab label="${c:l('usuaris.zul.RolsHeretats')}" id="tabeffectiveroles" />
+				</tabs>
+				<tabpanels>
+					<tabpanel id="datatab">
+						<div class="navigation-bar">
+							<menu2>
+								<menu2item if="${soffid:isUserInRole('account:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+								<menu2item if="${soffid:isUserInRole('account:update')}" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
+							</menu2>
+						</div>
+						<div id="dades"> 
+							<form id="form" onChangeXPath="ref:frame.onChangeForm"
+								dataPath="/listbox:/." width="100%">
+								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+									objectType="com.soffid.iam.api.Account"
+									dataPath="/." id="userAttributes"/>
+							</form>
+						</div>
+						<div style="text-align: right; width: 100%">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</tabpanel>
+					<tabpanel id="roles" fulfill="tabroles.onSelect" >
+						<account_roles listbox="//account/listbox" id="user_roles"/>
+					</tabpanel>
+					<tabpanel id="effectiveroles" fulfill="tabeffectiveroles.onSelect" >
+						<account_effective_roles listbox="//account/listbox" id="user_effective_roles"/>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</div>
+	</div>
+
+	<!--  Window to set the password -->
+	<window closable="true"
+		id="newPassword2" position="top, center"
+		sizable="true" title="${c:l('accounts.setPassword.title')}"
+		visible="false" width="34em"
+		onClose="ref:frame.onCancelPassword">
+		<vbox width="30em" heights="2em, 2em" style="margin: 4em">
+			<radiogroup id="generationType" width="24em" orient="vertical"
+				onCheck="ref:frame.onChangeSelectedGeneration">
+				<radio label="${c:l('usuaris.zul.radomPassword')}" 
+					id="generationRandom" width="20em" 
+					selected="true" value="random" onSelect=""/>
+				<div>
+					<textbox id="antipasswordsave" disabled="true" 
+						style="border: none; color: white;  background-color: white"/>
+				</div>
+				<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
+					value="set" onSelect="" />
+			</radiogroup>
+			<div style="visibility: hidden" id="passworddiv">
+				<label 
+					value="${c:l('accounts.setPassword.label')}">
+				</label>
+				<textbox style="margin-left: 2em;" disabled="true" 
+					type="password" width="18em" id="password"
+					onOK="ref:frame.onSetPassword">
+				</textbox>
+			</div>
+			<hbox align="center" pack="end" width="26em" style="margin-top: 2em">
+				<button
+					label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="ref:frame.onCancelPassword" />
+				<button id = "setButton"
+				    label="${c:l('accounts.setPassword.OK')}"
+					onClick="ref:frame.onSetPassword" />
+			</hbox>
+		</vbox>
+	</window>
+	
+	<!-- Window to show the random password -->
+	<window closable="true" id="displayNewPassword" position="top,center" sizable="true"
+		title="${c:l('canviPassword.Titol')}" visible="false" width="600px"
+		onClose="ref:frame.onCancelDisplayPassword">
+		
+		<div style="width:100%; margin-bottom: 10px">
+			<label id="lbInfoNouPass" multiline="true" sclass="etiqueta"
+				value="${c:l('canviPassword.zul.Elnoupasswordas')}"/>
+		</div>
+		<div align="center" sclass="titolpagina">
+			<label id="passwordValue" value=""  style="font-family: monospace"/>
+		</div>
+		<div>
+			<label id="popupPwd" multiline="true"/>
+		</div>
+		
+		<separator spacing="10px"/>
+		<separator bar="true" spacing="15px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button label="${c:l('canviPassword.zul.Accepta')}" onClick="ref:frame.onCancelDisplayPassword()"/>
+		</hbox>
+	</window>
+	
+</frame>

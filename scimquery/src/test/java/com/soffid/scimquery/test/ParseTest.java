@@ -199,4 +199,9 @@ public class ParseTest extends TestCase {
 				false);
 		
 	}
+
+	public void testBoolean() throws UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException,
+	ParseException, TokenMgrError {
+		expressionTester("active eq true", User.class);
+	}
 }

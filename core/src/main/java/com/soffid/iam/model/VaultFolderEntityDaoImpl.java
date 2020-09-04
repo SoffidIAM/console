@@ -59,49 +59,49 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 		}
 
 		// Set ACLs
-		Collection<Group> grups = new LinkedList<Group>();
-		Collection<Role> roles = new LinkedList<Role>();
-		Collection<User> usuaris = new LinkedList<User>();
-		Collection<Group> managerGrups = new LinkedList<Group>();
-		Collection<Role> managerRoles = new LinkedList<Role>();
-		Collection<User> managerUsers = new LinkedList<User>();
-		Collection<Group> ownerGrups = new LinkedList<Group>();
-		Collection<Role> ownerRoles = new LinkedList<Role>();
-		Collection<User> ownerUsers = new LinkedList<User>();
-		Collection<Long> navGrups = new LinkedList<Long>();
-		Collection<Long> navRoles = new LinkedList<Long>();
-		Collection<Long> navUsers = new LinkedList<Long>();
+		Collection<String> grups = new LinkedList<String>();
+		Collection<String> roles = new LinkedList<String>();
+		Collection<String> usuaris = new LinkedList<String>();
+		Collection<String> managerGrups = new LinkedList<String>();
+		Collection<String> managerRoles = new LinkedList<String>();
+		Collection<String> managerUsers = new LinkedList<String>();
+		Collection<String> ownerGrups = new LinkedList<String>();
+		Collection<String> ownerRoles = new LinkedList<String>();
+		Collection<String> ownerUsers = new LinkedList<String>();
+		Collection<String> navGrups = new LinkedList<String>();
+		Collection<String> navRoles = new LinkedList<String>();
+		Collection<String> navUsers = new LinkedList<String>();
 
 		for (VaultFolderAccessEntity acl: source.getAcl())
 		{
 			// Users
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				grups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+				grups.add(acl.getGroup().getName());
 			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				roles.add(getRoleEntityDao().toRole(acl.getRole()));
+				roles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_USER))
-				usuaris.add(getUserEntityDao().toUser(acl.getUser()));
+				usuaris.add(acl.getUser().getUserName());
 			// Managers
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+				managerGrups.add(acl.getGroup().getName());
 			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+				managerRoles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_MANAGER))
-				managerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+				managerUsers.add(acl.getUser().getUserName());
 			// Users
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+				ownerGrups.add(acl.getGroup().getName());
 			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+				ownerRoles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_OWNER))
-				ownerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+				ownerUsers.add(acl.getUser().getUserName());
 			// Navigate
 			if (acl.getGroup() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_NAVIGATE))
-				navGrups.add(acl.getGroup().getId());
+				navGrups.add(acl.getGroup().getName());
 			if (acl.getRole() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_NAVIGATE))
-				navRoles.add(acl.getRole().getId());
+				navRoles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 			if (acl.getUser() != null & acl.getLevel().equals ( AccountAccessLevelEnum.ACCESS_NAVIGATE))
-				navUsers.add(acl.getUser().getId());
+				navUsers.add(acl.getUser().getUserName());
 		}
 
 		target.setGrantedGroups(grups);
@@ -121,7 +121,7 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 		target.setNavigateUsers(navUsers);
 
 		try {
-			target.setAccessLevel(getAccessLevel(target));
+			target.setAccessLevel(getAccessLevel(source));
 		} catch (InternalErrorException e) {
 			LogFactory.getLog(getClass()).warn("Error gerating ACL for "+target, e);
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
@@ -139,29 +139,6 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 	}
 
 	private AccountAccessLevelEnum getAccessLevel (VaultFolderEntity source) throws InternalErrorException {
-		String u = Security.getCurrentUser();
-		if ( u != null)
-		{
-			UserEntity ue = getUserEntityDao().findByUserName(u);
-			if (ue != null)
-			{
-				for (AccountAccessLevelEnum al: new AccountAccessLevelEnum [] {
-						AccountAccessLevelEnum.ACCESS_OWNER,
-						AccountAccessLevelEnum.ACCESS_MANAGER,
-						AccountAccessLevelEnum.ACCESS_USER,
-						AccountAccessLevelEnum.ACCESS_NAVIGATE
-						})
-				{
-					AccessControlList acl = generateAcl (source, al);
-					if ( getACLService().isUserIncluded(ue.getId(), acl))
-						return al;
-				}
-			}			
-		}
-		return AccountAccessLevelEnum.ACCESS_NONE;
-	}
-
-	private AccountAccessLevelEnum getAccessLevel (VaultFolder source) throws InternalErrorException {
 		User u = getUserService().getCurrentUser();
 		if ( u != null)
 		{
@@ -180,6 +157,25 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 		return AccountAccessLevelEnum.ACCESS_NONE;
 	}
 
+/*	private AccountAccessLevelEnum getAccessLevel (VaultFolder source) throws InternalErrorException {
+		User u = getUserService().getCurrentUser();
+		if ( u != null)
+		{
+			for (AccountAccessLevelEnum al: new AccountAccessLevelEnum [] {
+					AccountAccessLevelEnum.ACCESS_OWNER,
+					AccountAccessLevelEnum.ACCESS_MANAGER,
+					AccountAccessLevelEnum.ACCESS_USER,
+					AccountAccessLevelEnum.ACCESS_NAVIGATE
+					})
+			{
+				AccessControlList acl = generateAcl (source, al);
+				if ( getACLService().isUserIncluded(u.getId(), acl))
+					return al;
+			}
+		}
+		return AccountAccessLevelEnum.ACCESS_NONE;
+	}
+*/
 	protected AccessControlList generateAcl(VaultFolderEntity source,
 			AccountAccessLevelEnum al) {
 		AccessControlList acl = new AccessControlList();
@@ -198,12 +194,14 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 		return acl;
 	}
 
-	protected AccessControlList generateAcl(VaultFolder source,
+/*
+  	protected AccessControlList generateAcl(VaultFolder source,
+ 
 			AccountAccessLevelEnum al) {
 		AccessControlList acl = new AccessControlList();
 		if (al == AccountAccessLevelEnum.ACCESS_OWNER)
 		{
-			for ( User u: source.getOwnerUsers())
+			for ( String u: source.getOwnerUsers())
 				acl.getUsers().add(u.getId());
 			for ( Group g: source.getOwnerGroups())
 				acl.getGroups().add(g.getId());
@@ -239,5 +237,6 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 		}
 		return acl;
 	}
+*/
 }
 

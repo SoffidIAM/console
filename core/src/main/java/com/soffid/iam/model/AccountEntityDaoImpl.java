@@ -129,18 +129,18 @@ public class AccountEntityDaoImpl extends
 			target.setPasswordStatus(source.getPasswordStatus() == null ? 
 				null:
 				PasswordValidation.valueOf(source.getPasswordStatus()));
-			Collection<Group> grups = new LinkedList<Group>();
-			Collection<Role> roles = new LinkedList<Role>();
-			Collection<User> usuaris = new LinkedList<User>();
-			Collection<Group> managerGrups = new LinkedList<Group>();
-			Collection<Role> managerRoles = new LinkedList<Role>();
-			Collection<User> managerUsers = new LinkedList<User>();
-			Collection<Group> ownerGrups = new LinkedList<Group>();
-			Collection<Role> ownerRoles = new LinkedList<Role>();
-			Collection<User> ownerUsers = new LinkedList<User>();
+			Collection<String> grups = new LinkedList<String>();
+			Collection<String> roles = new LinkedList<String>();
+			Collection<String> usuaris = new LinkedList<String>();
+			Collection<String> managerGrups = new LinkedList<String>();
+			Collection<String> managerRoles = new LinkedList<String>();
+			Collection<String> managerUsers = new LinkedList<String>();
+			Collection<String> ownerGrups = new LinkedList<String>();
+			Collection<String> ownerRoles = new LinkedList<String>();
+			Collection<String> ownerUsers = new LinkedList<String>();
 			if (source.getType().equals(AccountType.USER)) {
 				for (com.soffid.iam.model.UserAccountEntity uae : source.getUsers()) {
-					ownerUsers.add(getUserEntityDao().toUser(uae.getUser()));
+					ownerUsers.add(uae.getUser().getUserName());
 				}
 			} else {
 				for (com.soffid.iam.model.AccountAccessEntity acl : source.getAcl()) {
@@ -149,40 +149,39 @@ public class AccountEntityDaoImpl extends
 						if (acl.getGroup() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_USER))
-							grups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+							grups.add(acl.getGroup().getName());
 						if (acl.getRole() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_USER))
-							roles.add(getRoleEntityDao().toRole(acl.getRole()));
+							roles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 						if (acl.getUser() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_USER))
-							usuaris.add(getUserEntityDao().toUser(acl.getUser()));
+							usuaris.add(acl.getUser().getUserName());
 						if (acl.getGroup() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_MANAGER))
-							managerGrups.add(getGroupEntityDao()
-									.toGroup(acl.getGroup()));
+							managerGrups.add(acl.getGroup().getName());
 						if (acl.getRole() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_MANAGER))
-							managerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+							managerRoles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 						if (acl.getUser() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_MANAGER))
-							managerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+							managerUsers.add(acl.getUser().getUserName());
 						if (acl.getGroup() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_OWNER))
-							ownerGrups.add(getGroupEntityDao().toGroup(acl.getGroup()));
+							ownerGrups.add(acl.getGroup().getName());
 						if (acl.getRole() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_OWNER))
-							ownerRoles.add(getRoleEntityDao().toRole(acl.getRole()));
+							ownerRoles.add(acl.getRole().getName()+"@"+acl.getRole().getSystem().getName());
 						if (acl.getUser() != null
 								& acl.getLevel().equals(
 										AccountAccessLevelEnum.ACCESS_OWNER))
-							ownerUsers.add(getUserEntityDao().toUser(acl.getUser()));
+							ownerUsers.add(acl.getUser().getUserName());
 					}
 				}
 			}
@@ -269,8 +268,14 @@ public class AccountEntityDaoImpl extends
 			if (source.getJumpServerGroup() != null)
 				target.setJumpServerGroup(source.getJumpServerGroup().getName());
 			
+			if (target.getLoginName() == null || target.getLoginName().trim().isEmpty())
+				target.setLoginName(target.getName());
+				
 			storeCacheEntry(source, target);
 	
+			if (source.getType() == AccountType.PRIVILEGED) 
+				for (UserAccountEntity ua: source.getUsers())
+					target.setLockedBy(ua.getUser().getUserName());
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
@@ -331,6 +336,8 @@ public class AccountEntityDaoImpl extends
 		target.setVaultFolderId(entry.account.getVaultFolderId());
 		target.setLoginName(entry.account.getLoginName());
 		target.setLoginUrl(entry.account.getLoginUrl());
+		target.setServerName(entry.account.getServerName());
+		target.setServerType(entry.account.getServerType());
 		String currentUser = Security.getCurrentAccount();
 		if (entry.ownerAcl.contains(currentUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
@@ -343,6 +350,7 @@ public class AccountEntityDaoImpl extends
 		target.setLaunchType(entry.account.getLaunchType());
 		target.setJumpServerGroup(entry.account.getJumpServerGroup());
 		target.setPasswordExpiration(entry.account.getPasswordExpiration());
+		target.setLockedBy(entry.account.getLockedBy());
 	}
 
 
@@ -435,6 +443,9 @@ public class AccountEntityDaoImpl extends
 								source.getJumpServerGroup()));
 			target.setJumpServerGroup(jsg);
 		}
+		if (target.getLoginName() == null || target.getLoginName().trim().isEmpty() ||
+				target.getLoginName().equals(target.getOldName()))
+			target.setLoginName(source.getName());
 	}
 
 	@SuppressWarnings(value = "unchecked")
@@ -526,6 +537,8 @@ public class AccountEntityDaoImpl extends
 				.append(" or upper(u.description) like :param")
 				.append(i)
 				.append(" or upper(u.system.name) like :param")
+				.append(i)
+				.append(" or upper(u.loginName) like :param")
 				.append(i)
 				.append(")");
 		}

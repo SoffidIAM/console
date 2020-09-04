@@ -50,6 +50,10 @@
   render: renderName
 - name: ${c:l('deploy.lblVersion')}
   render: renderVersion
+- name: ${c:l('deploy.DeployedBy')}
+  value: author
+- name: ${c:l('deploy.Date')}
+  value: deployed_datetime
 					]]>
 				</attribute>
 			</datatable>

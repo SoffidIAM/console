@@ -77,6 +77,9 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	static int BASIC = 1;
 	static int ADVANCED = 2;
 	int mode = BASIC;
+	boolean enableQuick = true;
+	boolean enableBasic = true;
+	boolean enableAdvanced = true;
 	
 	public String getJsonObject() {
 		return jsonObject;
@@ -171,7 +174,6 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 				} catch (Exception e) {
 					throw new UiException(e);
 				}
-				showForm(modelCollection.getSize() == 1);
 				updateProgress();
 			}
 			binder.setDataPath(null);
@@ -183,7 +185,9 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	}
 
 	public void updateProgress() {
-		if (modelCollection.isInProgress())
+		if (modelCollection == null)
+			return;
+		else if (modelCollection.isInProgress())
 		{
 			timer.setDelay(300);
 			timer.start();
@@ -196,6 +200,8 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 			} catch (Exception e) {
 				throw new UiException(e);
 			}
+			if (modelCollection.getSize() == 1)
+				Events.postEvent("onSingleRecord",  this, null);
 		}
 	}
 
@@ -375,6 +381,10 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		
 		getChildren().clear();
 		
+		if ( mode == TEXT && ! enableQuick) mode = BASIC;
+		if ( mode == BASIC &&  ! enableBasic) mode = TEXT;
+		if ( mode == ADVANCED && ! enableAdvanced) mode = enableBasic ? BASIC: TEXT;
+		
 		progressImage = new Image("~./img/soffid-progress.gif");
 		progressImage.setVisible(false);
 		progressImage.setSclass("progress");
@@ -396,6 +406,8 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					{
 						timer.stop();
 						progressImage.setVisible(false);
+						if (modelCollection.getSize() == 1)
+							Events.postEvent("onSingleRecord",  SearchBox.this, null);
 					}
 				}
 			}
@@ -798,7 +810,10 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	}
 	
 	public String getTextStyle () {
-		if (variableNameText == null)
+		if ( !enableQuick || 
+				!enableBasic && !enableAdvanced)
+			return "change-mode-label-hidden";
+		else if (variableNameText == null)
 			return "change-mode-label-hidden";
 		else if (mode == TEXT)
 			return "change-mode-label-selected";
@@ -806,13 +821,19 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 			return "change-mode-label";
 	}
 	public String getBasicStyle () {
-		if (mode == BASIC)
+		if ( !enableBasic || 
+				!enableAdvanced && !enableQuick)
+			return "change-mode-label-hidden";
+		else if (mode == BASIC)
 			return "change-mode-label-selected";
 		else
 			return "change-mode-label";
 	}
 	public String getAdvancedStyle () {
-		if (mode == ADVANCED)
+		if ( !enableAdvanced || 
+				!enableBasic && !enableQuick)
+			return "change-mode-label-hidden";
+		else if (mode == ADVANCED)
 			return "change-mode-label-selected";
 		else
 			return "change-mode-label";
@@ -824,5 +845,35 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 
 	public void setEnforcedFilter(String enforcedFilter) {
 		this.enforcedFilter = enforcedFilter;
+	}
+
+	
+	public boolean isEnableQuick() {
+		return enableQuick;
+	}
+
+	
+	public void setEnableQuick(boolean enableQuick) {
+		this.enableQuick = enableQuick;
+	}
+
+	
+	public boolean isEnableBasic() {
+		return enableBasic;
+	}
+
+	
+	public void setEnableBasic(boolean enableBasic) {
+		this.enableBasic = enableBasic;
+	}
+
+	
+	public boolean isEnableAdvanced() {
+		return enableAdvanced;
+	}
+
+	
+	public void setEnableAdvanced(boolean enableAdvanced) {
+		this.enableAdvanced = enableAdvanced;
 	}
 }

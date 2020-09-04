@@ -141,33 +141,48 @@ public class LinotpHandler implements OTPHandler {
 							JSONObject token = data.optJSONObject(i);
 							if (token != null && token.getBoolean("LinOtp.Isactive"))
 							{
-								challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
-								challenge.setCell("Value");
-								if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
-									
-									String pass = "";
-									String realm = "";
-									
-									log.debug("validate/smspin");
-									log.debug("- getUser()="+getUser());
-									log.debug("- getPassword().getPassword()="+getPassword().getPassword());
-									log.debug("- user="+linOtpUser);
-									log.debug("- pass()="+pass);
-									log.debug("- realm()="+realm);
-									log.debug("- session="+getSessionId());
-									
-									Response response2 =
-											WebClient
-											.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
-											.accept(MediaType.APPLICATION_JSON)
-											.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
-											.form(new Form()
-													.param("user", linOtpUser)
-													.param("pass", "")
-													.param("realm", "")
-													.param("session", getSessionId()));
+								if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail")) {
+									// Skip. The token is locked
+								} else {
+									challenge.setCardNumber(token.getString("LinOtp.TokenSerialnumber"));
+									challenge.setCell("Value");
+									if ( "sms".equalsIgnoreCase(token.optString("LinOtp.TokenType"))) {
+										
+										String pass = "";
+										String realm = "";
+										
+										log.debug("validate/smspin");
+										log.debug("- getUser()="+getUser());
+//										log.debug("- getPassword().getPassword()="+getPassword().getPassword());
+										log.debug("- user="+linOtpUser);
+										log.debug("- pass()="+pass);
+										log.debug("- realm()="+realm);
+										log.debug("- session="+getSessionId());
+										
+										Response response2 =
+												WebClient
+												.create(getUrl("/validate/smspin"), getUser(), getPassword().getPassword(), null)
+												.accept(MediaType.APPLICATION_JSON)
+												.cookie(new Cookie("admin_session", getSessionId(), null, null, 0))
+												.form(new Form()
+														.param("user", linOtpUser)
+														.param("pass", "")
+														.param("realm", "")
+														.param("session", getSessionId()));
+									}
+									return challenge;
 								}
-								return challenge;
+							}
+						}
+						for (int i = 0; i< data.length(); i++)
+						{
+							JSONObject token = data.optJSONObject(i);
+							if (token != null)
+							{
+								if (!token.getBoolean("LinOtp.Isactive"))
+									throw new InternalErrorException("The token is not active");
+								if (token.getInt("LinOtp.FailCount") > token.getInt("LinOtp.MaxFail"))
+									throw new InternalErrorException("The token is locked");
 							}
 						}
 					}

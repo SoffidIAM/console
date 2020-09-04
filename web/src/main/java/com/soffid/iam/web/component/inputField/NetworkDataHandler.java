@@ -28,7 +28,7 @@ public class NetworkDataHandler extends InputFieldDataHandler<Network> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
@@ -40,7 +40,7 @@ public class NetworkDataHandler extends InputFieldDataHandler<Network> {
 	}
 
 	@Override
-	public AsyncList<Network> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<Network> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -60,6 +60,18 @@ public class NetworkDataHandler extends InputFieldDataHandler<Network> {
 	@Override
 	public String[] toNameDescription(Network o) {
 		return new String[] {o.getCode(), o.getDescription()};
+	}
+
+	@Override
+	public Network getObject(String name, String filter) throws Exception {
+		String q = "name eq \"" + quote(name)+ "\" ";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<Network> r = handler.read(null, q, null, null);
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 }

@@ -125,6 +125,17 @@ public abstract class AccountEntity {
 	@Nullable
 	com.soffid.iam.api.LaunchType launchType;
 	
+	@Description("Server type for password synchronization")
+	@Nullable
+	@Column(name="ACC_SRVTYP")
+	String serverType;
+
+	@Description("Server name. Used for SSO accounts")
+	@Nullable
+	@Column(name="ACC_SRVNAM")
+	String serverName;
+
+
 	@Column (name="ACC_JSG_ID")
 	@Nullable
 	JumpServerGroupEntity jumpServerGroup;

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.host.HostAclHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	
+	<listener bind="${arg.listbox }:/" onUpdate="ref:handler.setPermissions"/>
+	
+	<div class="navigation-bar dummy">
+		<label bind="${arg.listbox }:/@name"></label> - <label bind="${arg.listbox }:/@description"/>
+		<menu2>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }"  onClick="ref:handler.addNew" id="addbutton"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }"  onClick="ref:handler.importCsv" id='importbutton'/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+			<menu2item id="getPassword" image="/img/password.svg" label="${c:l('maquines.zul.Veurecontrasenya')}" onClick="ref:frame.getAdminPassword"/>
+		</menu2>
+	</div>
+	
+	<datatable id="listbox" autocommit="true" 
+		dataPath="${arg.listbox }:/manager" maxheight="70vh" sortColumn="0"
+		onSelect="ref:handler.showDetails"
+		enablefilter="true">
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('maquines.zul.Usuari-2')}
+		  value: userCode
+		- name: ${c:l('maquines.zul.Nom-2')}
+		  value: userName
+		- name: ${c:l('maquines.zul.DataPeticia')}
+		  value: requestDate_datetime
+		- name: ${c:l('maquines.zul.DataCaducitat')}
+		  value: authorizationAccessExpirationDate_datetime
+		- name: ""
+		  value: domainValue/value
+		]]>
+		</attribute>
+	</datatable>
+
+	<div width="100%" style="text-align: right"  id="addbutton2" >
+		<div class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+		position="center, center" sizable="true"
+		title="${c:l('user-roles.header')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
+
+		<div sclass="navigation-bar dummy">
+			<label bind="${arg.listbox }:/@name"></label> - <label bind="${arg.listbox }:/@description"/>
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('user:group:delete')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<form id="form" width="100%" dataPath="../listbox:/">
+			<customfield3 label="${c:l('maquines.zul.Usuari-2') }" dataType="USER" readonly="true"
+				bind="userCode"/>
+			<customfield3 label="${c:l('maquines.zul.DataPeticia') }" dataType="DATE_TIME" readonly="true"
+				bind="requestDate"/>
+			<customfield3 label="${c:l('maquines.zul.DataCaducitat') }" dataType="DATE_TIME" readonly="true"
+				bind="authorizationAccessExpirationDate"/>
+			<customfield3 label="${c:l('deploy.lblIdProceso') }" dataType="STRING" readonly="true"
+				bind="bpmProcessId"/>
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
+				onClick="ref:handler.closeDetails">
+			</button>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-window"
+		position="top, center" sizable="true"
+		title="${c:l('user-roles.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("host.explanationHeader")}
+	- ${c:l("host.addNewAuthorization")}
+			</attribute>
+			<div>
+				<label multiline="true" value="${c:l('host.explanation') }" style="word-break: break-word"/>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.undoAdd" />
+					<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onClick="ref:handler.next"/>
+				</div>
+						
+			</div>
+			<div >
+
+				<customfield3 label="${c:l('maquines.zul.Usuari-2') }" dataType="USER" readonly="false"
+					required="true" id="newUser" />
+				<customfield3 label="${c:l('maquines.zul.DataCaducitat') }" dataType="DATE_TIME" readonly="false"
+					required="true" id="newExpirationDate" />
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.back" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:handler.applyAdd"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+</div>

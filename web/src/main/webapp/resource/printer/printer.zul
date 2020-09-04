@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="printer"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.printer.PrinterHandler" id="frame">
+	<datamodel id="model" rootNode="root" src="printerDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('printer:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('printer:create') &amp;&amp; soffid:isUserInRole('printer:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Printer" 
+				defaultAttributes="name, description, model"
+				preference="printers"
+				dataPath="/model:/printer" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				dataPath="/model:/printer" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+			<attribute name="columns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.Printer.name') }
+  value: name
+- name: ${c:l('impressores.zul.Description')}
+  value: description
+- name: ${c:l('com.soffid.iam.api.Printer.model')}
+  value: model
+- name: ${c:l('impressores.zul.ServImpressia-2')}
+  value: hostName
+- name: ${c:l('impressores.zul.Usuaris') }
+  value: users
+- name: ${c:l('com.soffid.iam.api.System.groups') }
+  value: groups
+			]]></attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('printer:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+								
+				<menu2>
+					<menu2item if="${soffid:isUserInRole('printer:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<div id="dades"> 
+				<form id="form" onChangeXPath="ref:frame.onChangeForm"
+					dataPath="/listbox:/." width="100%">
+					<customfield3
+						label="${c:l('com.soffid.iam.api.Printer.name') }"
+						dataType="string"
+						required="true"
+						bind="name"
+						maxlength="20"/>
+					<customfield3
+						label="${c:l('impressores.zul.Description') }"
+						dataType="string"
+						required="true"
+						bind="description"
+						maxlength="50"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.Printer.model') }"
+						dataType="string"
+						required="true"
+						bind="model"
+						maxlength="50"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.Printer.hostName') }"
+						filterExpression="printersServer eq true"
+						dataType="host"
+						required="true"
+						bind="hostName"/>
+					<customfield3
+						label="${c:l('impressores.zul.Restringida') }"
+						dataType="boolean"
+						bind="local" />
+					<customfield3
+						label="${c:l('impressores.zul.Usuaris') }"
+						dataType="user"
+						bind="users"
+						multiValue="true" />
+					<customfield3
+						label="${c:l('com.soffid.iam.api.System.groups') }"
+						dataType="group"
+						bind="groups"
+						multiValue="true"/>
+			</form>
+			</div>
+			<div style="text-align: right; width: 100%">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+			</div>
+		</div>
+	</div>
+</frame>

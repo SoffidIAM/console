@@ -24,12 +24,14 @@ import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
+import com.soffid.iam.web.users.additionalData.AttributesDiv;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
+import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.Form;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
@@ -78,6 +80,18 @@ public class FrameHandler extends Frame {
 
 		Application.registerPage(this);
 		super.afterCompose();
+		
+		SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
+		if (sb != null)
+			sb.addEventListener("onSingleRecord", event -> {
+				Component lb = getListbox();
+				if (lb instanceof DataTable) {
+					if (((DataTable) lb).getSelectedIndex() < 0) {
+						((DataTable) lb).setSelectedIndex(0);
+						showDetails();
+					}
+				}
+			});
 	}
 
 
@@ -166,8 +180,8 @@ public class FrameHandler extends Frame {
 	}
 	
 	public void apply(Event ev) throws CommitException {
-		applyNoClose(ev);
-		hideDetails();
+		if (applyNoClose(ev))
+			hideDetails();
 	}
 	
 	public void undo(Event ev) throws CommitException {
@@ -263,14 +277,40 @@ public class FrameHandler extends Frame {
 
 	}
 	
-	public void applyNoClose(Event event) throws CommitException {
-		getModel().commit();
+	public boolean applyNoClose(Event event) throws CommitException {
+		if (validateAttributes ((Component) getForm())) {
+			getModel().commit();
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	
+	private boolean validateAttributes(Component form) {
+		if (form == null || !form.isVisible()) return true;
+		if (form instanceof ObjectAttributesDiv) {
+			return ((ObjectAttributesDiv) form).validate();
+		}
+		if (form instanceof InputField3) {
+			InputField3 inputField = (InputField3)form;
+			if (inputField.isReadonly() || inputField.isDisabled())
+				return true;
+			else
+				return inputField.attributeValidateAll();
+		}
+		boolean ok = true;
+		for (Component child = form.getFirstChild(); child != null; child = child.getNextSibling())
+			if (! validateAttributes(child))
+				ok = false;
+		return ok;
+	}
+
 	public void downloadCsv(Event event) {
 		Component lb = getListbox();
 		if (lb instanceof DataTable)
 			((DataTable) lb).download();
+		if (lb instanceof DataTree2)
+			((DataTree2) lb).download();
 	}
 }

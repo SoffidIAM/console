@@ -51,9 +51,9 @@
 					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 					<tab label="${c:l('agents.zul.Grups')}" if="${soffid:isUserInRole('user:group:delete') }" id="tabgroup"/>
 					<tab label="${c:l('usuaris.zul.Accounts')}" id="tabaccount" />
-					<tab label="${c:l('usuaris.zul.SharedAccounts')}" id="tabsharedaccount"/>
 					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
 					<tab label="${c:l('usuaris.zul.RolsHeretats')}" id="tabeffectiveroles" />
+					<tab label="${c:l('usuaris.zul.SharedAccounts')}" id="tabsharedaccount"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">

@@ -79,6 +79,7 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 			page.setVariable("invoker", args.get("invoker"));
 			page.setVariable("consumer", args.get("consumer"));
 			page.setVariable("visible", args.get("visible"));
+			page.setVariable("newTransaction", args.get("newTransaction"));
 		}
 	}
 	
@@ -255,19 +256,23 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 	public void step3next( Event event ) throws Exception {
 		Consumer<CsvParser> consumer = (Consumer<CsvParser>) getPage().getVariable("consumer");
 		parser.setMappings ( columnMappings );
-		UserTransaction tx =  (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
-		tx.begin();
-		try {
-			consumer.accept(parser);
-		} catch (Exception e) {
-			tx.setRollbackOnly();
-			throw e;
-		} finally {
-			if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK)
-				tx.rollback();
-			else
+		if (Boolean.TRUE.equals(getPage().getVariable("newTransaction"))) {
+			UserTransaction tx =  (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
+			tx.begin();
+			try {
+				consumer.accept(parser);
+			} catch (Exception e) {
+				tx.setRollbackOnly();
+				throw e;
+			} finally {
+				if (tx.getStatus() == Status.STATUS_MARKED_ROLLBACK)
+					tx.rollback();
+				else
 					tx.commit();
-		}			
+			}			
+		} else {
+			consumer.accept(parser);
+		}
 		file.delete();
 		file = null;
 		setVisible(false);
@@ -316,6 +321,12 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 	public static void startWizard (String title, String[][] columns,
 			Component invoker,
 			Consumer<CsvParser> consumer) throws IOException {
+		startWizard(title, columns, invoker, consumer, true);
+	}
+	
+	public static void startWizard (String title, String[][] columns,
+			Component invoker,
+			Consumer<CsvParser> consumer, boolean newTransaction) throws IOException {
 		Page p = invoker.getDesktop().getPageIfAny("importCsv");
 		if ( p == null) {
 			Include i = new Include("/popup/importCsv.zul");
@@ -323,11 +334,13 @@ public class ImportCsvHandler extends Window implements AfterCompose {
 			i.setDynamicProperty("title", title);
 			i.setDynamicProperty("columns", columns);
 			i.setDynamicProperty("visible", true);
+			i.setDynamicProperty("newTransaction", newTransaction);
 			i.setPage(invoker.getPage());
 		} else {
 			p.setVariable("title", title);
 			p.setVariable("consumer", consumer);
 			p.setVariable("columns", columns);
+			p.setVariable("newTransaction", newTransaction);
 			Events.sendEvent(new Event("onDisplay", p.getFellow("window")));
 		}
 	}

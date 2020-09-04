@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.host.HostSessionHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<div class="navigation-bar dummy">
+		<label bind="${arg.listbox }:/@name"></label> - <label bind="${arg.listbox }:/@description"/>
+		<menu2>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+	<timer running="true" repeats="true" delay="5000" onTimer="ref:handler.refresh" /> 	
+	<datatable id="listbox" autocommit="true" 
+		dataPath="${arg.listbox }:/session" maxheight="70vh" sortColumn="0"
+		enablefilter="true">
+		<attribute name="Columns"><![CDATA[
+		- name: ${c:l('maquines.zul.Usuari-2')}
+		  value: userName
+		- name: ${c:l('maquines.zul.Usuari-2')}
+		  value: userFullName
+		- name: ${c:l('maquines.zul.Client')}
+		  value: clientHostName
+		- name: ${c:l('maquines.zul.Port')}
+		  value: port
+		- name: ${c:l('maquines.zul.Data')}
+		  value: startDate
+		]]>
+		</attribute>
+	</datatable>
+</div>

@@ -7,12 +7,16 @@
 package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.EntryPointAccountEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
@@ -34,6 +38,7 @@ import roles.Tothom;
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	DispatcherService.class,
 	AplicacioService.class,
+	AsyncRunnerService.class,
 	GrupEntity.class, RolEntity.class,
 	AccountService.class,
 	EntryPointAccountEntity.class,
@@ -208,6 +213,7 @@ public abstract class PuntEntradaService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation(translated="findMenuChildren")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.PuntEntrada> findMenuChildren(
@@ -271,4 +277,21 @@ public abstract class PuntEntradaService {
 
 	@Operation (grantees = {Tothom.class})
 	public String getScopeForAddress(@Nullable String address) {return null;}
+	
+
+	@Operation(grantees = { Tothom.class })
+	public java.util.List<PuntEntrada> findAccessTreeByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { Tothom.class })
+	public AsyncList<PuntEntrada> findAccessTreeByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
+		return null;
+	}
+
 }

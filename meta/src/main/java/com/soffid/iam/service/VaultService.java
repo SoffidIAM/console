@@ -4,6 +4,8 @@ import java.util.List;
 
 import roles.Tothom;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.api.VaultFolderPermissions;
 import com.soffid.iam.model.VaultFolderAccessEntity;
@@ -34,7 +36,7 @@ import es.caib.seycon.ng.servei.UsuariService;
 	RolEntity.class,
 	GrupEntity.class,
 	TasqueEntity.class,
-	
+	AsyncRunnerService.class,
 	UsuariService.class
 })
 public class VaultService {
@@ -78,4 +80,38 @@ public class VaultService {
 
 	@Operation(grantees={Tothom.class})
 	public List<Account> findAccounts (@Nullable String filter){ return null; }
+
+	@Operation(grantees={Tothom.class})
+	public List<VaultElement> findVaultElementByText (@Nullable String filter){ return null;}
+
+	@Operation(grantees = { Tothom.class })
+	public java.util.List<VaultFolder> findFolderByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.network_all_query.class })
+	public AsyncList<VaultFolder> findFolderByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
+		return null;
+	}
+
+	@Operation(grantees={Tothom.class})
+	public VaultElement create (VaultElement folder) { return null; }
+
+	@Operation(grantees={Tothom.class})
+	public VaultElement update (VaultElement folder) { return null; }
+
+	@Operation(grantees={Tothom.class})
+	public void remove (VaultElement folder) { return; }
+
+	@Operation(grantees={Tothom.class})
+	public VaultElement findVaultElement (long id) { return null; }
+
+	@Operation(grantees={Tothom.class})
+	public List<VaultElement> getChildren (VaultElement parent)  {return null;}
+
 }

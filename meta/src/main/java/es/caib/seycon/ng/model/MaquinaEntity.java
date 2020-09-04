@@ -164,11 +164,13 @@ public abstract class MaquinaEntity {
 		@Nullable java.lang.String hostIP) {
 	 return null;
 	}
+	
 	@DaoFinder
 	public es.caib.seycon.ng.model.MaquinaEntity findBySerialNumber(
 		java.lang.String serialNumber) {
 	 return null;
 	}
+	
 }
 
 @Index (name="MAQ_UK_IP",	unique=false,

@@ -233,7 +233,8 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		Collection<AccessTree> puntsOriginal = pes.findChildren(puntEntrada);
 		String ambit = getAmbit ();
 		for (AccessTree p : puntsOriginal) {
-            if (p.getMenu().equals("S")) punts.add(p); else {
+            if (p.isMenu()) punts.add(p); 
+            else {
                 if (!pes.canExecute(p)) {
                     p.getExecutions().clear();
                 } else {
@@ -242,7 +243,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
                         if (!epe.getScope().equals(ambit)) it.remove();
                     }
                 }
-                if (!p.getExecutions().isEmpty() || p.getVisible().equals("S")) punts.add(p);
+                if (!p.getExecutions().isEmpty() || p.isVisible()) punts.add(p);
             }
         }
 		return punts;

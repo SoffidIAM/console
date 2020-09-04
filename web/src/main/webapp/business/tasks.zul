@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="autoritzacions" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?page title="Gestió d'autoritzacions" ?>
+<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml"
+	id="frame"
+	use="com.soffid.iam.web.tasks.TasksHandler">
+	
+	<datamodel id="model" rootNode="tasks"
+		src="descriptorTasks.xml"/>
+		
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" >
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateParameter}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+				
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/autoritzacio"
+			    maxheight="70vh"
+				use="com.soffid.iam.web.config.AuthorizationTable"
+				sortColumn="0" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+					- name: ${c:l('autoritzacions.zul.Ambit')}
+					  value: ambit
+					- name: ${c:l('autoritzacions.zul.codi')}
+					  value: name
+					- name: ${c:l('autoritzacions.zul.Description')}
+					  value: description
+					- name: ${c:l('aplicacions.zul.Rols') }
+					  value: roles
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${canCreateParameter}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+				
+				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				
+			</div>
+			<form2 id="form" onChangeXPath="ref:frame.onChangeForm()"
+				dataPath="listbox:/">
+				
+				<label bind="/@name"/> : <label bind="@description"/>
+				<datatable id="rolesTable" autocommit="false" dataPath="/autoritzacioRol"
+					onRemove="ref:frame.rolesTableAction"
+					sortColumn="0" onSelect="ref:frame.showDetails" sclass="datatable roles">
+					<attribute name="columns">
+						<![CDATA[
+						- name: ${c:l('autoritzacions.zul.Rol')}
+						  value: role.name
+						- name: ${c:l('autoritzacions.zul.Bbdd')}
+						  value: role.description
+						- name: ${c:l('autoritzacions.zul.Aplicacia')}
+						  value: role.informationSystemName
+						- name: ${c:l('autoritzacions.zul.Domini')}
+						  value: role.domain.name
+						- name: ""
+						  template: <img src='/img/remove.svg' class='imageclic' onClick='zkDatatable.sendClientAction(this,"onRemove")' />
+						  sort: false
+						  filter: false
+						]]>
+					</attribute>
+				</datatable>
+				<div width="100%" style="text-align: right"  if="${canCreateRolAutoritzacion}" >
+					<div class="addButton" onClick="ref:frame.addNew">+</div>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					</databutton>
+					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+			</form2>
+		</div>
+	</div>
+	<include src="rolsllista.zul"/>
+</frame>

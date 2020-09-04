@@ -55,7 +55,7 @@ public abstract class CSSTranslator extends HttpServlet {
 		String blueText = ConfigurationCache.getProperty("soffid.ui.text2");
 		if (blueText == null) blueText = "white";
 
-		String skyText = ConfigurationCache.getProperty("soffid.ui.text2");
+		String skyText = ConfigurationCache.getProperty("soffid.ui.text3");
 		if (skyText == null) skyText = "white";
 
 		String t = getText();
@@ -102,9 +102,11 @@ public abstract class CSSTranslator extends HttpServlet {
 	}
 
 	private String generateString(Color color) {
-		return "#" + Long.toString( ((long)color.getRed()) << 16 |
-									((long)color.getGreen()) << 8 |
-									((long)color.getBlue()), 16);
+		String s = Long.toString( ((long)color.getRed()) << 16 |
+				((long)color.getGreen()) << 8 |
+				((long)color.getBlue()), 16);
+		while (s.length() < 6) s = "0"+s;
+		return "#" + s;
 	}
 
 	private String enlight(String green) {

@@ -2,137 +2,24 @@
 
 <zkib-model>
 	<datanode name="root">
-		<finder name="folder" type="folder"> <!-- intranetMenus:query -->
+		<finder name="vault" type="vault">
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				 method="findFolders" if="${enabled &amp;&amp; !directFilter}">
-				<parameter value="${filter}" />
+				method="findVaultElementByText" >
+				<parameter value="${textQuery}" />
 			</ejb-finder>
-			<new-instance-script>
-				bean = new com.soffid.iam.api.VaultFolder();
-				bean.setGrantedUsers ( new LinkedList()) ;
-				bean.setGrantedRoles (new LinkedList());
-				bean.setGrantedGroups (new LinkedList());
-				bean.setManagerUsers ( new LinkedList()) ;
-				bean.setManagerRoles (new LinkedList());
-				bean.setManagerGroups (new LinkedList());
-				bean.setOwnerUsers ( new LinkedList()) ;
-				bean.setOwnerRoles (new LinkedList());
-				bean.setOwnerGroups (new LinkedList());
-				return bean;
-			</new-instance-script>
-		</finder>
-		<finder name="account" type="account">
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				method="findAccounts"  if="${enabled &amp;&amp; !directFilter}" > <!--agent:query, application:update -->
-				<parameter value="${filter}" />
-			</ejb-finder>
-			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
-				method="findAccount" if="${enabled &amp;&amp; directFilter}"> <!--agent:query, application:update -->
-				<parameter value="${account}" />
-				<parameter value="${system}" />
-			</ejb-finder>
-			<new-instance-script>
-				bean = new com.soffid.iam.api.Account();
-				bean.setType(es.caib.seycon.ng.comu.AccountType.IGNORED);
-				bean.setGrantedUsers ( new LinkedList()) ;
-				bean.setGrantedRoles (new LinkedList());
-				bean.setGrantedGroups (new LinkedList());
-				bean.setManagerUsers ( new LinkedList()) ;
-				bean.setManagerRoles (new LinkedList());
-				bean.setManagerGroups (new LinkedList());
-				bean.setOwnerUsers ( new LinkedList()) ;
-				bean.setOwnerRoles (new LinkedList());
-				bean.setOwnerGroups (new LinkedList());
-				return bean;
-			</new-instance-script>
-		</finder>
-		<finder name="type" type="type">
-			<script-finder>
-				list = new java.util.LinkedList();
-				list.add (new String(""));
-				for (l: es.caib.seycon.ng.comu.AccountType.literals())
-				{
-					list.add (l);
-				}
-				return list;
-			</script-finder>
-		</finder>
-		<finder name="launchType" type="launchType">
-			<script-finder>
-				list = new java.util.LinkedList();
-				for (l: com.soffid.iam.api.LaunchType.literals())
-				{
-					list.add (l);
-				}
-				return list;
-			</script-finder>
-		</finder>
-		<finder name="jumpServerGroup" type="jumpServerGroup">
-			<script-finder>
-			    s = new com.soffid.iam.api.JumpServerGroup();
-			    s.name = "";
-			    return s;
-			</script-finder>
-			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.PamSessionService" method="findJumpServerGroups">
-			</ejb-finder>
-		</finder>
-		<finder name="dispatcher" type="dispatcher">
-			<script-finder>
-				es.caib.seycon.ng.comu.Dispatcher dis = new es.caib.seycon.ng.comu.Dispatcher();
-				return dis;
-			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DispatcherEJB" method="findDispatchersByFiltre">
-				<parameter value="${null}" />
-				<parameter value="${null}" />
-				<parameter value="${null}" />
-				<parameter value="${null}" />
-				<parameter value="${null}" />
-				<parameter value="${null}" />
-			</ejb-finder>
-		</finder>
-		<finder name="tipusUsuari" type="tipusUsuari">
-			<script-finder>
-				obj = new es.caib.seycon.ng.comu.TipusUsuari();
-				obj.descripcio = " - Select user type - ";
-				return obj;
-			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/DominiUsuariEJB" method="findAllTipusUsuari">
-			</ejb-finder>
-		</finder>		
-		<finder name="folder2" type="folder2"> <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				 method="findFolders">
-				<parameter value="${null}" />
-			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.VaultElement"/> 
 		</finder>
 		
-		<finder name="pamServerGroup" type="pamServerGroup">
-			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.PamSessionService"
-				 method="findJumpServerGroups">
-			</ejb-finder>
-			<new-instance-bean className="com.soffid.iam.api.JumpServerGroup"> 
-			</new-instance-bean>
-		</finder>
 	</datanode>
  
 
-	<datanode name="pamServerGroup">
-		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.PamSessionService">
-			<insert-method method="create" returnBean="true" >  <!-- user:create -->
-				<parameter value="${instance}"/>
-			</insert-method>
-			<delete-method method="remove">    
-				<parameter value="${instance}" />
-			</delete-method>
-			<update-method method="update"> <!-- user:update -->
-				<parameter value="${instance}" />
-			</update-method>
-		
-		</ejb-handler>
-	</datanode>
-
-	<datanode name="folder">
-		<ejb-handler jndi="java:comp/env/ejb/VaultServiceEJB">
+	<datanode name="vault"
+		idProperty="id" parentProperty="parentId" childProperty="vault">
+		<ejb-parent-loader jndi="java:/module/VaultService-v2" 
+			method="findVaultElement">
+			<parameter value="${instance.parentId}"/>
+		</ejb-parent-loader>
+		<ejb-handler jndi="java:/module/VaultService-v2">
 			<insert-method method="create" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
 			</insert-method>
@@ -145,49 +32,31 @@
 		
 		</ejb-handler>
 
-		<finder name="folder" type="folder">  <!-- intranetMenus:query -->
+		<finder name="vault" type="vault">  <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
 				method="getChildren">
 				<parameter value="${instance}" />
 			</ejb-finder>
-			<new-instance-script>
-				bean = new com.soffid.iam.api.VaultFolder();
-				bean.setGrantedUsers ( new LinkedList()) ;
-				bean.setGrantedRoles (new LinkedList());
-				bean.setGrantedGroups (new LinkedList());
-				bean.setManagerUsers ( new LinkedList()) ;
-				bean.setManagerRoles (new LinkedList());
-				bean.setManagerGroups (new LinkedList());
-				bean.setOwnerUsers ( new LinkedList()) ;
-				bean.setOwnerRoles (new LinkedList());
-				bean.setOwnerGroups (new LinkedList());
-				return bean;
-			</new-instance-script>
+			<new-instance-bean className="com.soffid.iam.api.VaultElement"/> 
 		</finder>
-		<finder name="account" type="account">  <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
-				method="list">
-				<parameter value="${instance}" />
+		
+		<finder name="role" type="role" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findRoleAccountByAccount"
+				if="${instance.type='account'}">
+				<parameter value="${instance.id}"/>
 			</ejb-finder>
-			<new-instance-script>
-				bean = new com.soffid.iam.api.Account();
-				bean.setType(es.caib.seycon.ng.comu.AccountType.IGNORED);
-				bean.setGrantedUsers ( new LinkedList()) ;
-				bean.setGrantedRoles (new LinkedList());
-				bean.setGrantedGroups (new LinkedList());
-				bean.setManagerUsers ( new LinkedList()) ;
-				bean.setManagerRoles (new LinkedList());
-				bean.setManagerGroups (new LinkedList());
-				bean.setOwnerUsers ( new LinkedList()) ;
-				bean.setOwnerRoles (new LinkedList());
-				bean.setOwnerGroups (new LinkedList());
-				return bean;
-			</new-instance-script>
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 
+			</new-instance-bean>
 		</finder>
-		<validator>
-			<attribute-validator expr="${instance.name}" notNull="true" maxLength="256" friendlyName="vault.folder.name"/>
-			<attribute-validator expr="${instance.description}" notNull="true" maxLength="1024" friendlyName="vault.folder.description"/>
-		</validator>
+		<finder name="effectiveRole" type="effectiveRole" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findRoleGrantHierarchyByAccount" 
+				if="${instance.type='account'}">
+				<parameter value="${instance.id}"/>
+			</ejb-finder>
+		</finder>
+		
 	</datanode>
 
 	<datanode name="folder2">
@@ -199,228 +68,31 @@
 		</finder>
 	</datanode>
 
-	<datanode name="jumpServerGroup" transient="true"/>
+	<datanode name="effectiveRole" transient="true"/>
 
-	<datanode name="type" transient="true">
-		<custom-attribute name="literal">
-			if (instance.length() == 0)
-				return "";
-			else
-				return org.zkoss.util.resource.Labels.getLabel("accountType."+instance);
-		</custom-attribute>
-		<custom-attribute name="value">
-			if (instance.length() == 0)
-				return null;
-			else
-				return es.caib.seycon.ng.comu.AccountType.fromString(instance);
-		</custom-attribute>
-
-	</datanode>
-	
-	<datanode name="launchType" transient="true">
-		<custom-attribute name="literal">
-			if (instance.length() == 0)
-				return "";
-			else
-			{
-				return org.zkoss.util.resource.Labels.getLabel("launchType."+instance);
-			}
-		</custom-attribute>
-		<custom-attribute name="value">
-			if (instance.length() == 0)
-				return null;
-			else
-				return com.soffid.iam.api.LaunchType.fromString(instance);
-		</custom-attribute>
-
-	</datanode>
-
-	<datanode name="dispatcher" transient="true"/>
-	
-	<datanode name="account">
-		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService">
-			<insert-method method="createAccount2" returnBean="true" >  <!-- user:create -->
-				<parameter value="${instance}"/>
-			</insert-method>
-			<delete-method method="removeAccount">    
-				<parameter value="${instance}" />
-			</delete-method>
-			<update-method method="updateAccount2"> <!-- user:update -->
-				<parameter value="${instance}" />
-			</update-method>
-		
-		</ejb-handler>
-		<finder name="rol" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
-			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
-				method="findRolAccountByAccount">
-				<parameter value="${instance.id}"/>
-			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.RolAccount"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="rolsheredats" type="rolheredat"> <!-- user:role:query -->
-			<ejb-finder jndi="java:comp/env/ejb/AplicacioEJB"
-				method="findEffectiveRolGrantByAccount">
-				<parameter value="${instance.id}"/>
-			</ejb-finder>
-		</finder>
-		<finder name="grantedUsers" type ="grantedUser" refreshAfterCommit="true">
-			<collection-finder collection="${instance.grantedUsers}"/>
-			<new-instance-bean className="com.soffid.iam.api.User"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="grantedGroups" type ="grantedGroup"  refreshAfterCommit="true">
-			<collection-finder collection="${instance.grantedGroups}"/>
-			<new-instance-bean className="com.soffid.iam.api.Groups"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="grantedRoles" type ="grantedRole"  refreshAfterCommit="true">
-			<collection-finder collection="${instance.grantedRoles}"/>
-			<new-instance-bean className="com.soffid.iam.api.Role"> 
-			</new-instance-bean>
-		</finder>
-
-		<finder name="ownerUsers" type ="ownerUser"  refreshAfterCommit="true">
-			<collection-finder collection="${instance.ownerUsers}"/>
-			<new-instance-bean className="com.soffid.iam.api.User"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="ownerGroups" type ="ownerGroup"  refreshAfterCommit="true">
-			<collection-finder collection="${instance.ownerGroups}"/>
-			<new-instance-bean className="com.soffid.iam.api.Group"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="ownerRoles" type ="ownerRole"  refreshAfterCommit="true">
-			<collection-finder collection="${instance.ownerRoles}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
-			</new-instance-bean>
-		</finder>
-
-		<finder name="managerUsers" type ="managerUser"  refreshAfterCommit="true">
-			<collection-finder collection="${instance.managerUsers}"/>
-			<new-instance-bean className="com.soffid.iam.api.User"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="managerGroups" type ="managerGroup" refreshAfterCommit="true">
-			<collection-finder collection="${instance.managerGroups}"/>
-			<new-instance-bean className="com.soffid.iam.api.Group"> 
-			</new-instance-bean>
-		</finder>
-		<finder name="managerRoles" type ="managerRole" refreshAfterCommit="true">
-			<collection-finder collection="${instance.managerRoles}"/>
-			<new-instance-bean className="es.caib.seycon.ng.comu.Rol"> 
-			</new-instance-bean>
-		</finder>
-		
-		<finder name="attribute" type ="attribute" refreshAfterCommit="true">
-			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
-				method="getAccountAttributes">
-				<parameter value="${instance}"/>
-			</ejb-finder>
-		</finder>
-		
-		<finder name="owner" type="void">
-			<ejb-finder jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService"
-				method="getHPAccountOwner">
-				<parameter value="${instance}"/>
-			</ejb-finder>
-		</finder>
-
-		<validator>
-			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="accounts.nameValidation"/>
-			<attribute-validator expr="${instance.system}" notNull="true" friendlyName="accounts.dispatcherValidation"/>
-			<attribute-validator expr="${instance.passwordPolicy}" notNull="true" friendlyName="accounts.passwordPolicyValidation"/>
-		</validator>
-	</datanode>
-	
-	<datanode name="void" />
-	
-	<datanode name="grantedUser">
-		<collection-handler collection="${self.instance.grantedUsers}"/>
-	</datanode>
-	
-	<datanode name="grantedRole">
-		<collection-handler collection="${self.instance.grantedRoles}"/>
-	</datanode>
-
-	<datanode name="grantedGroup">
-		<collection-handler collection="${self.instance.grantedGroups}"/>
-	</datanode>
-
-	<datanode name="ownerUser">
-		<collection-handler collection="${self.instance.ownerUsers}"/>
-	</datanode>
-	
-	<datanode name="ownerRole">
-		<collection-handler collection="${self.instance.ownerRoles}"/>
-	</datanode>
-
-	<datanode name="ownerGroup">
-		<collection-handler collection="${self.instance.ownerGroups}"/>
-	</datanode>
-
-	<datanode name="managerUser">
-		<collection-handler collection="${self.instance.managerUsers}"/>
-	</datanode>
-	
-	<datanode name="managerRole">
-		<collection-handler collection="${self.instance.managerRoles}"/>
-	</datanode>
-
-	<datanode name="managerGroup">
-		<collection-handler collection="${self.instance.managerGroups}"/>
-	</datanode>
-
-	<datanode name="rol">
-		<ejb-handler jndi="java:comp/env/ejb/AplicacioEJB">
+	<datanode name="role">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
 			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
 				<parameter value="${instance}"/>
 			</insert-method>
 			<delete-method method="delete" >  <!-- user:role:delete -->
 				<parameter value="${instance}" />
 			</delete-method>
-			<!--update-method method="update"> // en principi no s'utilitza 
-				<parameter value="${instance}" />
-			</update-method-->
-		</ejb-handler>
-	</datanode>
-	
-	<datanode name="rolheredat">
-		<custom-attribute name="origin">
-			if (instance.ownerAccountName != null)
-				return String.format(org.zkoss.util.resource.Labels.getLabel("accounts.fromAccount"),
-					new Object[]{instance.ownerAccountName, instance.ownerDispatcher});
-			else if (instance.ownerGroup != null)
-				return String.format(org.zkoss.util.resource.Labels.getLabel("accounts.fromGroup"),
-					new Object[]{instance.ownerGroup});
-			else if (instance.ownerRolName != null)
-				return String.format(org.zkoss.util.resource.Labels.getLabel("accounts.fromRol"),
-					new Object[] {instance.ownerRolName, instance.ownerDispatcher});
-			else
-				return "???";
-		</custom-attribute>
-	</datanode>
-	
-	<datanode name="tipusUsuari" />
- 	
-	<datanode name="attribute">
-		<script-handler>
-			<insert-script>
-				instance.accountName = parent.instance.name;
-				instance.systemName = parent.instance.system;
-			</insert-script>
-		</script-handler>
-		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.AccountService">
-			<insert-method method="createAccountAttribute" returnBean="true" > <!-- user:role:create -->
-				<parameter value="${instance}"/>
-			</insert-method>
-			<delete-method method="deleteAccountAttribute" >  <!-- user:role:delete -->
-				<parameter value="${instance}" />
-			</delete-method>
-			<update-method method="updateAccountAttribute">  
+			<update-method method="update"> 
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
+		<finder name="holderGroupData" type="group" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/GroupService-v2"
+				method="findGroupByName" if="${canQueryUser &amp;&amp; instance.holderGroup != null}">
+				<parameter value="${instance.holderGroup}" />
+			</ejb-finder>
+		</finder>
 	</datanode>
+	
+	<datanode name="tipusUsuari">
+	</datanode>
+	
+
 
 </zkib-model>

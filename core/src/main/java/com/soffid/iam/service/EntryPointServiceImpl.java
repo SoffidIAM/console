@@ -15,6 +15,7 @@ package com.soffid.iam.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -29,12 +30,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.ejb.CreateException;
 import javax.ejb.RemoveException;
 
 import org.apache.commons.jcs.access.behavior.ICacheAccess;
 import org.dom4j.Document;
+import org.json.JSONException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -45,15 +48,18 @@ import com.soffid.iam.api.AccessTreeExecution;
 import com.soffid.iam.api.AccessTreeExecutionType;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EntryPointAccountEntity;
 import com.soffid.iam.model.EntryPointEntity;
+import com.soffid.iam.model.EntryPointEntityDao;
 import com.soffid.iam.model.EntryPointExecutableEntity;
 import com.soffid.iam.model.EntryPointExecutionTypeEntity;
 import com.soffid.iam.model.EntryPointGroupEntity;
@@ -64,12 +70,17 @@ import com.soffid.iam.model.EntryPointUserEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -127,8 +138,8 @@ public class EntryPointServiceImpl extends
 		// Si el nou node és de tipus menú, verifiquem que tinga indicat el
 		// tipus de menu
 		// i esborrem les execucions (si existeixen)
-		if ("S".equals(puntEntrada.getMenu())) { //$NON-NLS-1$
-			if (puntEntrada.getTypeMenu() == null)
+		if ("S".equals(puntEntrada.isMenu())) { //$NON-NLS-1$
+			if (puntEntrada.getMenuType() == null)
 				throw new CreateException(
 						Messages.getString("EntryPointServiceImpl.MenuTypeMessage")); //$NON-NLS-1$
 			puntEntrada.setExecutions(new HashSet()); // esborrem execucions
@@ -218,10 +229,6 @@ public class EntryPointServiceImpl extends
 			res.setIcon2Image(icona2.getIcon());
 		}
 
-		// Posem la ruta que s'ha obtingut en el ZUL a partir del pare
-		if (puntEntrada.getTreeRoute() != null)
-			res.setTreeRoute(puntEntrada.getTreeRoute());
-
 		auditarPuntEntrada(
 				"C", res.getName() + Messages.getString("EntryPointServiceImpl.15") + pareE.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -269,7 +276,7 @@ public class EntryPointServiceImpl extends
 		}
 
 		// Si és e tipus menú, esborrem execucions:
-		if ("S".equals(puntEntrada.getMenu())) { //$NON-NLS-1$
+		if (puntEntrada.isMenu()) { //$NON-NLS-1$
 			entity.setExecutionMethod(new HashSet<EntryPointExecutableEntity>()); // esborrem
 																					// execucions
 		}
@@ -479,11 +486,8 @@ public class EntryPointServiceImpl extends
 			root.setCode(ROOT_TAG);
 			root.setPublicAccess("S"); //$NON-NLS-1$
 			InformationSystemEntity app = getInformationSystemEntityDao()
-					.findByCode("SEU"); //$NON-NLS-1$
-			if (app == null)
-				root.setApplicationID(new Long(0));
-			else
-				root.setApplicationID(app.getId());
+					.findByCode("SOFFID"); //$NON-NLS-1$
+			root.setInformationSystem(app);
 			root.setMenu("S"); //$NON-NLS-1$
 			root.setName("Acme Company"); //$NON-NLS-1$
 			root.setMenuType("L"); //$NON-NLS-1$
@@ -523,11 +527,7 @@ public class EntryPointServiceImpl extends
 	                // moure'l)
 	                pue.setParentId(a.getParent().getId());
 	                pue.setOrder("" + a.getOrder());		//pue.setOrdre(a.getOrdre()); //$NON-NLS-1$
-	                // Formen la ruta a partir del pare
-	                String rutaPare = puntEntrada.getTreeRoute() != null ? puntEntrada.getTreeRoute()
-	                        + " > " : ""; //$NON-NLS-1$ //$NON-NLS-2$
-	                pue.setTreeRoute(rutaPare + puntEntrada.getName());
-					                     fills.add(pue);
+	                fills.add(pue);
                 }
 			}
             Collections.sort(fills, new Comparator<AccessTree>() {
@@ -640,7 +640,7 @@ public class EntryPointServiceImpl extends
 	protected boolean handleCanQuery(AccessTree puntEntrada) throws Exception {
 		// return publicAccess || authorized (entityContext,
 		// Authorization.query);
-		if ("S".equals(puntEntrada.getIsPublic())
+		if (puntEntrada.isPublicAccess()
 				|| AutoritzacionsUsuari.canQueryAllMenusIntranet()
 				|| isAuthorized(puntEntrada,
 						TipusAutoritzacioPuntEntrada.NIVELL_QUERY_DESCRIPCIO))
@@ -1100,7 +1100,7 @@ public class EntryPointServiceImpl extends
 		// SIEMPRE es un
 		// menú
 		// 1) Verifiquem que el destí siga de tipus menú
-		if (!"S".equals(puntEntradaMenuDesti.getMenu())) //$NON-NLS-1$
+		if (!puntEntradaMenuDesti.isMenu()) //$NON-NLS-1$
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.EntryPointTypeError")); //$NON-NLS-1$
 
@@ -1146,7 +1146,7 @@ public class EntryPointServiceImpl extends
 
 		// Si el origen NO es menú tiene que tener permisos en el menú
 		// contenedor padre del origen (para mover)
-		if (!"S".equals(puntEntradaMoure.getMenu()) && !canAdmin(pareOrigen)) //$NON-NLS-1$
+		if (!puntEntradaMoure.isMenu() && !canAdmin(pareOrigen)) //$NON-NLS-1$
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.NotAuthorizedToMoveEntryPointNoPermission")); //$NON-NLS-1$
 
@@ -1267,7 +1267,7 @@ public class EntryPointServiceImpl extends
 		nouPUEClonat.setPublicAccess(pueClonar.getPublicAccess());
 		nouPUEClonat.setIcon1(icona1);
 		nouPUEClonat.setIcon2(icona2);
-		nouPUEClonat.setApplicationID(pueClonar.getApplicationID());
+		nouPUEClonat.setInformationSystem(pueClonar.getInformationSystem());
 		nouPUEClonat.setXmlEntryPoint(pueClonar.getXmlEntryPoint());
 		getEntryPointEntityDao().create(nouPUEClonat);
 
@@ -1371,7 +1371,7 @@ public class EntryPointServiceImpl extends
 	protected boolean handleCopyApplicationAccess(AccessTree puntEntradaCopiar,
 			AccessTree puntEntradaMenuDesti) throws Exception {
 		// 1) Verifiquem que el destí siga de tipus menú
-		if (!"S".equals(puntEntradaMenuDesti.getMenu())) //$NON-NLS-1$
+		if (!puntEntradaMenuDesti.isMenu()) //$NON-NLS-1$
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.EntryPointTypeError")); //$NON-NLS-1$
 
@@ -1441,7 +1441,7 @@ public class EntryPointServiceImpl extends
 		// SIEMPRE es un
 		// menú
 		// 1) Verifiquem que el destí siga de tipus menú
-		if (!"S".equals(puntEntradaMenuDesti.getMenu())) //$NON-NLS-1$
+		if (!puntEntradaMenuDesti.isMenu()) //$NON-NLS-1$
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.EntryPointTypeError")); //$NON-NLS-1$
 
@@ -1483,7 +1483,7 @@ public class EntryPointServiceImpl extends
 				pareOrigenE);
 		// Si el origen NO es menú tiene que tener permisos en el menú
 		// contenedor padre del origen (para copiar)
-		if (!"S".equals(puntEntradaCopiar.getMenu()) && !canAdmin(pareOrigen)) //$NON-NLS-1$
+		if (!puntEntradaCopiar.isMenu() && !canAdmin(pareOrigen)) //$NON-NLS-1$
 			throw new SeyconException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToCopyEntryPointNoPermission")); //$NON-NLS-1$
 
@@ -1558,8 +1558,7 @@ public class EntryPointServiceImpl extends
 		}
 
 		if (autoritzacio.getAuthorizationEntityId() == null)
-			throw new SeyconException(
-					Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
+			idEntitat = guessGranteeId(autoritzacio);
 		else
 			idEntitat = autoritzacio.getAuthorizationEntityId();
 
@@ -1664,6 +1663,50 @@ public class EntryPointServiceImpl extends
 		return null;
 	}
 
+	public Long guessGranteeId(AccessTreeAuthorization autoritzacio) throws InternalErrorException {
+		Long idEntitat = null;
+		String grantee = autoritzacio.getAuthorizedEntityCode();
+		if ( "user". equals(autoritzacio.getAuthorizationEntityType()))
+		{
+			UserEntity user = getUserEntityDao().findByUserName(grantee);
+			if (user == null)
+				throw new SeyconException(
+						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
+			idEntitat = user.getId();
+		}
+		else if ( "role". equals(autoritzacio.getAuthorizationEntityType()))
+		{
+			RoleEntity role = getRoleEntityDao().findByShortName(grantee);
+			if (role == null)
+				throw new SeyconException(
+						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
+			idEntitat = role.getId();
+		}
+		else if ( "account". equals(autoritzacio.getAuthorizationEntityType()))
+		{
+			int i = grantee.lastIndexOf('@');
+			String name = i > 0 ? grantee.substring(0, i): grantee;
+			String system = i > 0 ? grantee.substring(i+1): getDispatcherService().findSoffidDispatcher().getName();
+			AccountEntity account = getAccountEntityDao().findByNameAndSystem(name, system);
+			if (account == null)
+				throw new SeyconException(
+						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
+			idEntitat = account.getId();
+		}
+		else if ( "group". equals(autoritzacio.getAuthorizationEntityType()))
+		{
+			GroupEntity group = getGroupEntityDao().findByName(grantee);
+			if (group == null)
+				throw new SeyconException(
+						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
+			idEntitat = group.getId();
+		} else {
+			throw new SeyconException(
+					Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
+		}
+		return idEntitat; 
+	}
+
 	protected void handleDeleteAuthorization(AccessTree puntEntrada,
 			AccessTreeAuthorization autoritzacio) throws Exception {
 
@@ -1732,7 +1775,7 @@ public class EntryPointServiceImpl extends
 		}
 
 		// Les aplicacions de tipus menu no tenen execucions
-		if ("S".equals(puntEntrada.getMenu())) { //$NON-NLS-1$
+		if (puntEntrada.isMenu()) { //$NON-NLS-1$
 			return execucio; // No la creem
 		}
 
@@ -1786,8 +1829,7 @@ public class EntryPointServiceImpl extends
 	protected AccessTreeExecution handleUpdateExecution(AccessTree puntEntrada,
 			AccessTreeExecution execucio) throws Exception {
 		if (puntEntrada == null || puntEntrada.getId() == null)
-			throw new SeyconException(
-					Messages.getString("EntryPointServiceImpl.NoAssignedEntryPoint")); //$NON-NLS-1$
+			return handleCreateExecution(puntEntrada, execucio);
 
 		// Verificamos autoritzación
 		if (!isAuthorized(puntEntrada,
@@ -1901,7 +1943,7 @@ public class EntryPointServiceImpl extends
 						a.getChild());
 				pue.setParentId(a.getParent().getId());
 				pue.setOrder("" + a.getOrder());
-				if ("S".equals(pue.getMenu()) && canAdmin(pue))
+				if (pue.isMenu() && canAdmin(pue))
 					fills.add(pue);
 			}
 			return fills;
@@ -2010,7 +2052,7 @@ public class EntryPointServiceImpl extends
 				for (Iterator<EntryPointEntity> it = cerca.iterator(); it
 						.hasNext();) {
 					EntryPointEntity pue = it.next();
-					if (pue.getApplicationID().equals(aplicacio.getId()))
+					if (pue.getInformationSystem().equals(aplicacio))
 						resFiltrats.add(pue);
 				}
 				cerca = resFiltrats; // Filtrem
@@ -2362,6 +2404,50 @@ public class EntryPointServiceImpl extends
     		return "W";
 	}
 
+	@Override
+	protected AsyncList<AccessTree> handleFindAccessTreeByTextAndJsonQueryAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<AccessTree> result = new AsyncList<AccessTree>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindAccessTreeByTextAndJsonQuery(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void doFindAccessTreeByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<AccessTree> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, 
+				EvalException, JSONException, ParseException, TokenMgrError {
+		final EntryPointEntityDao dao = getEntryPointEntityDao();
+		ScimHelper h = new ScimHelper(AccessTree.class);
+		h.setPrimaryAttributes(new String[] { "name", "code"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toAccessTree((EntryPointEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+
+	@Override
+	protected List<AccessTree> handleFindAccessTreeByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<AccessTree> result = new LinkedList<AccessTree>();
+		doFindAccessTreeByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+
 }
 
 class PermissionsCache {
@@ -2408,6 +2494,7 @@ class PermissionsCache {
 		this.rolsUsuariPUE = rolsUsuariPUE;
 	}
 
+	
 }
 class EntryPointCache {
 	public long timeout;

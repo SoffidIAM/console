@@ -247,6 +247,14 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
+	public es.caib.seycon.ng.comu.Rol findRoleByShortName(
+			java.lang.String name)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation(grantees = { roles.application_create.class,
 			roles.application_update.class }, translated = "create")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
@@ -575,6 +583,14 @@ public abstract class AplicacioService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrantHierarchy> findRoleGrantHierarchyByUser(
 			long userId)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolGrantHierarchy> findRoleGrantHierarchyByAccount(
+			long accountId)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

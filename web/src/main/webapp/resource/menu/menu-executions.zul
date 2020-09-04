@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div id="handler" use="com.soffid.iam.web.menu.MenuExecutionsHandler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar">
+		<label bind="${arg.listbox }:/name"/>
+	</div>
+
+	<datadiv dataPath="${arg.listbox }:/execution" onNewRow="ref:handler.initMethod">
+		<div sclass="section" style="padding-bottom: 2em">
+			<label bind='label' sclass="separator"/>
+			<customfield3 dataType="BOOLEAN" label="${c:l('com.soffid.iam.api.User.active') }" bind="enabled" 
+				onChange="ref:handler.enable"/>
+			<customfield3 dataType="STRING" label="${c:l('aplicacionsIntranet.zul.Tipus')}"  uiHandler="com.soffid.iam.web.menu.MimeTypeHandler"
+				required="true" bind="exec/executionTypeCode"/>
+			<customfield3 dataType="STRING" label="${c:l('aplicacionsIntranet.zul.Contingut')}" multiline="true"
+				required="true" bind="exec/content"
+				selectIcon="/img/pencil.svg"/>
+			<customfield3 dataType="HTML" multiline="true"
+			    disabled="true"
+				readonly="true" bind="explanation" />
+			<button label="${c:l('agents.zul.Test') } " image="/img/link-r.svg" onClick="ref:handler.test"/>
+		</div>
+	</datadiv>
+</div>

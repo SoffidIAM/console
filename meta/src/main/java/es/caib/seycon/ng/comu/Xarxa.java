@@ -15,7 +15,7 @@ import es.caib.seycon.ng.model.XarxaEntity;
 	 translatedPackage="com.soffid.iam.api")
 public class Xarxa {
 
-	@Attribute(translated = "code" )
+	@Attribute(translated = "name", synonyms = {"code"} )
 	public java.lang.String codi;
 
 	@Attribute(translated = "ip" )

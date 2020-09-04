@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="ouType" type="ouType">
+			<ejb-finder jndi="java:/module/OrganizationalUnitTypeService-v2"
+				method="findOrganizationalUnitByJsonQuery">
+				<parameter value=""/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.OUType">
+			</new-instance-bean>
+		</finder>
+
+	</datanode>
+	
+	<datanode name="ouType">
+		<ejb-handler jndi="java:/module/OrganizationalUnitTypeService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+</zkib-model>

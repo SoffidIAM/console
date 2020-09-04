@@ -100,6 +100,11 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public String nlsLabel;
 
+	@Description("Bulti-in handler class")
+	@Column (name="TDA_UIHANDL", length=128)
+	@Nullable
+	String builtinHandler;
+	
 	@Description("Administrator visibility")
 	@Column (name="TDA_ADMVIS", length=1)
 	@Nullable

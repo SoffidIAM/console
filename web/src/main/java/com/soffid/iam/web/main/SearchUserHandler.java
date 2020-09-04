@@ -36,7 +36,7 @@ public class SearchUserHandler extends SearchHandler<User> {
 		Div d = new Div();
 		d.appendChild(new Label(s));
 		d.setSclass("search-option");
-		d.setAttribute("url", "/user/user.zul?userName="+next.getUserName());
+		d.setAttribute("url", "/resource/user/user.zul?userName="+next.getUserName());
 		d.addEventHandler("onClick",
 			new EventHandler(ZScript.parseContent("ref:searchBox.onNavigate"), null));
 		parentDiv.appendChild(d);

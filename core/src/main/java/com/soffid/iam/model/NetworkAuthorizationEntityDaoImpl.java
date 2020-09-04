@@ -272,18 +272,13 @@ public class NetworkAuthorizationEntityDaoImpl extends
 		}
 
 		if (nomRol != null) {
-			String codiAplicacio = null;
 			String nomRolReal = null;
 			String codiBbdd = null;
-			String partDeAplicacio = null;
 			String[] partsDeRol = nomRol.split("@"); //$NON-NLS-1$
 			nomRolReal = partsDeRol[0];
-			partDeAplicacio = partsDeRol[1];
-			String partsDeAplicacio[] = partDeAplicacio.split(">"); //$NON-NLS-1$
-			codiBbdd = partsDeAplicacio[0];
-			codiAplicacio = partsDeAplicacio[1];
+			codiBbdd = partsDeRol[1];
 
-			RoleEntity rolEntity = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(nomRolReal, codiAplicacio, codiBbdd);
+			RoleEntity rolEntity = getRoleEntityDao().findByNameAndSystem(nomRolReal, codiBbdd);
 			if (rolEntity == null) {
 				throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.roleNotFound"), nomRol)); //$NON-NLS-1$
 			}

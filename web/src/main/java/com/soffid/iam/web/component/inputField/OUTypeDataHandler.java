@@ -29,7 +29,7 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
@@ -41,7 +41,7 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 	}
 
 	@Override
-	public AsyncList<OUType> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<OUType> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -62,6 +62,18 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 	@Override
 	public String[] toNameDescription(OUType o) {
 		return new String[] {o.getName(), o.getDescription()};
+	}
+
+	@Override
+	public OUType getObject(String name, String filter) throws Exception {
+		String q = "name eq \"" + quote(name)+ "\" ";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<OUType> r = handler.read(null, q, null, null);
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 }

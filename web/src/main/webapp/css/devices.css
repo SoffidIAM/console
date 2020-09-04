@@ -71,13 +71,20 @@ div.listbox-head th, div.listbox-head th div{white-space:pre-line; word-wrap:bre
 div.clean-tabs {
 	border-bottom: 1px solid {BLUEDARK};
 	width: 100%;
+	overflow-x: auto;
 }
 .clean-tab, .clean-tab a, .clean-tabsel, .clean-tabsel a {
 	font-weight:bold;
 	text-decoration: none;
 }
-.clean-tab a{color:{SKY}}
-.clean-tabsel a{color: {GREEN};}
+.clean-tab a{
+	color:{SKY};
+	word-break: keep-all;
+}
+.clean-tabsel a{
+	color: {GREEN};
+	word-break: keep-all;
+}
 .clean-tabsel {
 	border-bottom: 4px solid {GREEN};
 	padding: 5px 10px 1px 10px;

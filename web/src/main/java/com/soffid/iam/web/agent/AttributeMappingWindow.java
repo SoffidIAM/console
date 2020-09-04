@@ -63,7 +63,7 @@ public class AttributeMappingWindow extends Window implements AfterCompose {
 				}
 			}
 		}
-		Executions.getCurrent().createComponents("/config/agent-attributes.zul", handler, arg);
+		Executions.getCurrent().createComponents("/config/agent/agent-attributes.zul", handler, arg);
 	}
 
 	@Override

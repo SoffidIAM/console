@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="host" type="host">
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findHostByTextAndJsonQueryAsync" if = "${query != null &amp;&amp; synchro == null}">
+				<parameter value=""/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findHostByTextAndJsonQueryAsync" if = "${textQuery != null &amp;&amp; synchro == null}">
+				<parameter value="${textQuery}"/>
+				<parameter value=""/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Host">
+			</new-instance-bean>
+		</finder>
+
+	</datanode>
+
+	<datanode name="host">
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<finder name="session" type="session">
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="findSessionsByHostName">  <!-- host:query -->
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+		</finder>
+		<finder name="alias" type="alias">
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="findAliasByHostName">  <!-- host:query -->
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.HostAlias" />
+		</finder>
+		<finder name="manager" type="manager">
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate"> <!--host:admin:query -->
+				<parameter value="${instance.name}" />
+				<parameter value="" />
+				<parameter value="hui" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.AdministratorAuthorizationToAccessHost" />
+		</finder>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="hosts.nameValidation2"/>
+			<attribute-validator expr="${instance.os}" notNull="true" friendlyName="hosts.OSValidation2"/>
+		</validator>
+	</datanode>
+
+	<datanode name="manager" >
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="revokeAdministratorAccessHost">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="session" />
+
+	<datanode name="alias">  <!-- host:update, host:create i host:delete -->
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

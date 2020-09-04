@@ -127,6 +127,8 @@ public class DispatcherServiceImpl extends
 		String t = getTaskEntityDao().startVirtualSourceTransaction();
 		try
 		{
+			if (dispatcher.getName().contains("@"))
+				throw new IllegalArgumentException("A target system name should not contain the at (@) sign");
 	    	soffidDispatcher = null;
 			// Check dispatcher type
 			if (dispatcher.getClassName().isEmpty()) {
@@ -271,10 +273,13 @@ public class DispatcherServiceImpl extends
 		String t = getTaskEntityDao().startVirtualSourceTransaction();
 		try
 		{
+			if (dispatcher.getName().contains("@"))
+				throw new IllegalArgumentException("A target system name should not contain the at (@) sign");
 	    	soffidDispatcher = null;
 			// Obtenim el anterior per comparar els grups i els tipus d'usuari
-			SystemEntity entityOld = getSystemEntityDao().findByName(
-					dispatcher.getName());
+			SystemEntity entityOld = dispatcher.getId() == null ? 
+					getSystemEntityDao().findByName(dispatcher.getName()) :
+					getSystemEntityDao().load(dispatcher.getId());
 	
 			// fem còpia dels antics per comparar
 			Collection<UserTypeSystemEntity> tipusUsuariOld = new java.util.HashSet<com.soffid.iam.model.UserTypeSystemEntity>(

@@ -46,6 +46,25 @@
 			<new-instance-bean className="com.soffid.iam.api.Application">
 			</new-instance-bean>
 		</finder>
+		<finder name="domain" type="domain">
+			<ejb-finder jndi="java:/module/DomainService-v2" method="findApplicationDomainsByApplicationName"> <!-- application:query -->
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Domain">
+			</new-instance-bean>
+		</finder> 
+		<finder name="role" type="role" refreshAfterCommit="true">  <!-- application:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findRolesByApplicationName">  <!-- group:query -->
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Role">
+			</new-instance-bean>
+		</finder>
+		<finder name="user" type="userRole">
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findUserRolesByInformationSystem">
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+		</finder>
 		<ejb-handler jndi="java:/module/ApplicationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
@@ -63,5 +82,64 @@
 		</validator>
 	</datanode>
 
+	<datanode name="userRole" transient="true" />
+	
+	<datanode name="domain">
+		<finder name="domainValue" type="domainValue">
+			<ejb-finder jndi="java:/module/DomainService-v2" method="findDomainValuesByFilter">
+				<parameter value="${instance}" />
+				<parameter value="" />
+				<parameter value="" />
+				<parameter value="" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.DomainValue">
+			</new-instance-bean>
+		</finder>
+		<ejb-handler jndi="java:/module/DomainService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}" />
+			</update-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+		<script-handler>
+			<update-script>null;</update-script>
+		</script-handler>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="applications.domainNameValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="domainValue">
+		<ejb-handler jndi="java:/module/DomainService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}" />
+			</update-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="role">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create2" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update2">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
 
 </zkib-model>

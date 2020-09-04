@@ -31,8 +31,6 @@
 
 	<zscript>
 		<![CDATA[
-			fileres = es.caib.seycon.ng.web.Custom.FILERES;
-			fileresO = es.caib.seycon.ng.web.Custom.FILERES_OBRIR;
 			int refreshPageTime = 5000; 
 			boolean refreshPage = true;
 			

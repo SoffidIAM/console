@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
@@ -28,7 +29,7 @@ public class GroupDataHandler extends InputFieldDataHandler<Group> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
@@ -40,7 +41,7 @@ public class GroupDataHandler extends InputFieldDataHandler<Group> {
 	}
 
 	@Override
-	public AsyncList<Group> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<Group> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -55,12 +56,24 @@ public class GroupDataHandler extends InputFieldDataHandler<Group> {
 
 	@Override
 	public void followLink(String value) {
-		// TODO Auto-generated method stub
+		Executions.getCurrent().sendRedirect("/resource/group/group.zul?name="+value, "_blank");
 	}
 
 	@Override
 	public String[] toNameDescription(Group o) {
 		return new String[] {o.getName(), o.getDescription()};
+	}
+
+	@Override
+	public Group getObject(String name, String filter) throws Exception {
+		String q = "name eq \"" + quote(name)+ "\" ";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<Group> r = handler.read(null, q, null, null);
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 }

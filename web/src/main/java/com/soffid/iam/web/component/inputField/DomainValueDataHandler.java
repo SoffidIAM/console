@@ -33,7 +33,7 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 	}
 
 	@Override
-	public String getDescription(String name, String filter) throws InternalErrorException, NamingException, CreateException {
+	public String getDescription(String name, String filter) throws Exception {
 		String q = "name eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+app+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
@@ -45,7 +45,7 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 	}
 
 	@Override
-	public AsyncList<DomainValue> search(String text, String filter) throws InternalErrorException, NamingException, CreateException {
+	public AsyncList<DomainValue> search(String text, String filter) throws Exception {
 		return handler.readAsync(text, filter);
 	}
 
@@ -69,6 +69,18 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 	@Override
 	public String[] toNameDescription(DomainValue o) {
 		return new String[] {o.getValue(), o.getDescription()};
+	}
+
+	@Override
+	public DomainValue getObject(String name, String filter) throws Exception {
+		String q = "name eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+app+"\"";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		List<DomainValue> r = handler.read(null, q, null, null);
+		if (! r.isEmpty())
+			return r.iterator().next();
+		else
+			return null;
 	}
 
 

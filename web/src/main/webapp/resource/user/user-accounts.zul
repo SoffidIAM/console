@@ -6,6 +6,7 @@
 		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
 	</div>
 	<datatree2 dataPath="${arg.listbox}:/" 
+	    style="min-width: 950px"
 		id="tree"
 		header="${c:l('usuaris.zul.Dominidecontrasenyes')} /  ${c:l('accounts.dispatcher')} "
 		use="com.soffid.iam.web.user.UserColumnsTree" 

@@ -73,26 +73,16 @@ public abstract class XarxaEntity {
 		java.lang.String mascara) {
 	 return null;
 	}
-	@Operation(translated="getVoidIPs")
-	@DaoFinder("- CUSTOM -")
-	public java.lang.Long getIPsBuides(
-		java.lang.String ipXarxa, 
-		java.lang.String mascara) {
-	 return null;
-	}
-	@Operation(translated="getUsedIPs")
-	@DaoFinder("- CUSTOM -")
-	public java.lang.Long getIPsOcupades(
-		java.lang.String ipXarxa, 
-		java.lang.String mascara) {
-	 return null;
-	}
 	@Operation(translated="findByAddress")
 	@DaoFinder
 	public es.caib.seycon.ng.model.XarxaEntity findByAdreca(
 		java.lang.String address) {
 	 return null;
 	}
+	
+	@DaoFinder("select count(*) from com.soffid.iam.model.HostEntity as h where h.network.name=:network and h.deleted = false and h.tenant.id=:tenantId")
+	public Long countByNetwork(String network) { return null; }
+
 }
 
 

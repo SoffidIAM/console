@@ -48,11 +48,13 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 		{
 			JSONObject o = new JSONObject();
 			JSONObject colDef = cols.getJSONObject(i);
-			o.put("name", colDef.getString("name"));
-			o.put("sort", false);
-			if (colDef.optBoolean("enabled"))
-				selected.add(new Integer(i));
-			data.put(o);
+			if (colDef.optString("name", null) != null) {
+				o.put("name", colDef.getString("name"));
+				o.put("sort", false);
+				if (colDef.optBoolean("enabled"))
+					selected.add(new Integer(i));
+				data.put(o);
+			}
 		}
 		listbox.setData(data);
 		

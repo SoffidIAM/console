@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?component name="account_roles" macro-uri="account-roles.zul"?>
+<?component name="account_effective_roles" macro-uri="account-effective-roles.zul"?>
+
+<?page id="vault"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.account.VaultHandler" id="frame">
+	<script>
+	function doCopy (uuid) {
+		document.getElementById(uuid).style.display="inline"; 
+		document.getElementById(uuid).focus(); 
+		document.getElementById(uuid).select();
+		document.execCommand('copy');
+		document.getElementById(uuid).setSelectionRange (0,0); 
+		document.getElementById(uuid).style.display="none"; 
+	}
+	function doView (uuid1, uuid2) {
+		document.getElementById(uuid2).style.display="inline"; 
+		document.getElementById(uuid1).style.display="none"; 
+	}
+	</script>
+	
+	<datamodel id="model" rootNode="root" src="descriptorVault.xml"/>
+	<timer onTimer="ref:frame.updateStatus" running="false" delay="5000" repeats="true" />
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('sso:createSharedFolders')}"  onClick="ref:frame.addNew"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Account" 
+				defaultAttributes="name, description"
+				enableBasic="false" enableAdvanced="false"
+				dataPath="/model:/vault" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatree2 id="listbox"
+				width="100%" dataPath="/model:/"
+				header="${c:l('com.soffid.iam.api.Account.name') }" 
+				openLevels="1"
+				enablefilter="false"
+				maxheight="70vh"
+				onAddFolder="ref:frame.addFolder"
+				onAddAccount="ref:frame.addAccount"
+				onSelect="ref:frame.showDetails">
+				<attribute name="finders">
+				<![CDATA[
+				- path: /vault
+				  icon: #{type=='account'? "/img/account-green.svg": "/img/container-green.svg"}
+				  template: #{type=='account'? (account.loginName == null ? account.name: account.loginName) : folder.name}
+				  tail: >-
+				    #{type == 'account' ? '': '
+				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, &quot;onAddFolder&quot;)">${c:l('vault.createFolder')}</button>
+				    <button class="small-button"onclick="zkDatatree2.sendClientAction(this, &quot;onAddAccount&quot;)">${c:l('vault.createAccount')}</button>
+				    '}
+				  leaf: #{type == 'account'}
+				  columns:
+				  - template: #{type=='account'? account.description: folder.description}
+				  ]]>
+  				</attribute>
+				<attribute name="columns"><![CDATA[
+				- name: ${c:l('com.soffid.iam.api.Account.description')}
+				]]>
+				</attribute>
+  			</datatree2>
+
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('sso:createSharedFolders')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatree2="listbox"/>
+								
+				<imageclic src="/img/wait.gif" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
+
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<menu2>
+					<menu2item if="${soffid:isUserInRole('account:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					<menu2item if="${soffid:isUserInRole('account:update')}" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
+				</menu2>
+			</div>
+			<div id="dades">
+				<form2 id="form" onChangeXPath="ref:frame.onChangeForm" dataPath="/listbox:/" width="100%">
+					<form2 id="accountProperties" dataPath="/account" width="100%">
+						<tabbox>
+							<tabs>
+								<tab label="${c:l('vault.actions')}" />
+								<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+							</tabs>
+							<tabpanels>
+								<tabpanel>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.name" />
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.description" />
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.system" />
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginName" />
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginUrl" />
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.lockedBy" />
+									<div sclass="options options-small">
+										<div sclass="menuoption" id="launch_button" onClick="ref:frame.launch"> 
+											<image src="/img/link.svg"/>
+											<label sclass='menuoption-title' value="${c:l('vault.launch')}" />
+										</div> 
+										<div sclass="menuoption" id="view_password_button" onClick="ref:frame.viewPassword">
+											<image src="/img/search2.svg"/>
+											<label sclass='menuoption-title' value="${c:l('vault.account.view')}" />
+										</div> 
+										<div sclass="menuoption" id="set_password_button" onClick="ref:frame.setPassword">
+											<image src="/img/password.svg"/>
+											<label sclass='menuoption-title' value="${c:l('accounts.setPassword')}" />
+										</div> 
+										<div sclass="menuoption" id="unlock_button" onClick="ref:frame.unlockAccount">
+											<image src="/img/unlock.svg"/>
+											<label sclass='menuoption-title' value="${c:l('vault.unlockAccount')}" />
+										</div> 
+									</div>
+								</tabpanel>
+								<tabpanel>
+									<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+										objectType="com.soffid.iam.api.Account"
+										dataPath="/." id="userAttributes"/>
+									<div style="text-align: right; width: 100%">
+										<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+										</databutton>
+										<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+									</div>					
+								</tabpanel>
+							</tabpanels>
+						</tabbox>
+					</form2>
+					<form2 id="folderProperties" dataPath="/folder" width="100%">
+						<div sclass="section">
+							<customfield3 label="${c:l('com.soffid.iam.api.VaultFolder._details') }" dataType="SEPARATOR"/>
+							<customfield3 bind="name"  id="folder_name"
+								label="${c:l('com.soffid.iam.api.Account.name') }" 
+								dataType="STRING" required="true" />
+							<customfield3 bind="description" label="${c:l('com.soffid.iam.api.Account.description') }" dataType="STRING" multiline="true" required="true"  id="folder_description"/>
+						</div>
+						<div sclass="section" id="folder_acl1">
+							<customfield3 label="${c:l('com.soffid.iam.api.Account._owners') }" dataType="SEPARATOR" />
+							<customfield3 bind="ownerUsers" label="${c:l('com.soffid.iam.api.Account.ownerUsers') }" dataType="USER" multiValue="true" multiline="true"  />
+							<customfield3 bind="ownerGroups" label="${c:l('com.soffid.iam.api.Account.ownerGroups') }" dataType="GROUP" multiValue="true" multiline="true"  />
+							<customfield3 bind="ownerRoles" label="${c:l('com.soffid.iam.api.Account.ownerRoles') }" dataType="ROLE" multiValue="true" multiline="true"  />
+						</div>
+						<div sclass="section" id="folder_acl2">
+							<customfield3 label="${c:l('com.soffid.iam.api.Account._managers') }" dataType="SEPARATOR" />
+							<customfield3 bind="managerUsers" label="${c:l('com.soffid.iam.api.Account.managerUsers') }" dataType="USER" multiValue="true" multiline="true"  />
+							<customfield3 bind="managerGroups" label="${c:l('com.soffid.iam.api.Account.managerGroups') }" dataType="GROUP" multiValue="true" multiline="true"  />
+							<customfield3 bind="managerRoles" label="${c:l('com.soffid.iam.api.Account.managerRoles') }" dataType="ROLE" multiValue="true" multiline="true"  />
+						</div>
+						<div sclass="section" id="folder_acl3">
+							<customfield3 label="${c:l('com.soffid.iam.api.Account._sso') }" dataType="SEPARATOR" />
+							<customfield3 bind="grantedUsers" label="${c:l('com.soffid.iam.api.Account.grantedUsers') }" dataType="USER" multiValue="true" multiline="true"  />
+							<customfield3 bind="grantedGroups" label="${c:l('com.soffid.iam.api.Account.grantedGroups') }" dataType="GROUP" multiValue="true" multiline="true"  />
+							<customfield3 bind="grantedRoles" label="${c:l('com.soffid.iam.api.Account.grantedRoles') }" dataType="ROLE" multiValue="true" multiline="true"  />
+						</div>
+						<div sclass="section" id="folder_acl4">
+							<customfield3 label="${c:l('com.soffid.iam.api.VaultFolder._navigate') }" dataType="SEPARATOR" />
+							<customfield3 bind="navigateUsers" label="${c:l('com.soffid.iam.api.VaultFolder.navigateUsers') }" dataType="USER" multiValue="true" multiline="true"  />
+							<customfield3 bind="navigateGroups" label="${c:l('com.soffid.iam.api.VaultFolder.navigateGroups') }" dataType="GROUP" multiValue="true" multiline="true"  />
+							<customfield3 bind="navigateRoles" label="${c:l('com.soffid.iam.api.VaultFolder.navigateRoles') }" dataType="ROLE" multiValue="true" multiline="true"  />
+						</div>
+						<div style="text-align: right; width: 100%">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</form2>
+				</form2>
+			</div>
+		</div>
+	</div>
+
+	<!--  Window to set the password -->
+	<window closable="true"
+		id="newPassword2" position="top, center"
+		sizable="true" title="${c:l('accounts.setPassword.title')}"
+		visible="false" width="34em"
+		onClose="ref:frame.onCancelPassword">
+		<vbox width="30em" heights="2em, 2em" style="margin: 4em">
+			<radiogroup id="generationType" width="24em" orient="vertical"
+				onCheck="ref:frame.onChangeSelectedGeneration">
+				<radio label="${c:l('usuaris.zul.radomPassword')}" 
+					id="generationRandom" width="20em" 
+					selected="true" value="random" onSelect=""/>
+				<div>
+					<textbox id="antipasswordsave" disabled="true" 
+						style="border: none; color: white;  background-color: white"/>
+				</div>
+				<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
+					value="set" onSelect="" />
+			</radiogroup>
+			<div style="visibility: hidden" id="passworddiv">
+				<label 
+					value="${c:l('accounts.setPassword.label')}">
+				</label>
+				<textbox style="margin-left: 2em;" disabled="true" 
+					type="password" width="18em" id="password"
+					onOK="ref:frame.onSetPassword">
+				</textbox>
+			</div>
+			<hbox align="center" pack="end" width="26em" style="margin-top: 2em">
+				<button
+					label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="ref:frame.onCancelPassword" />
+				<button id = "setButton"
+				    label="${c:l('accounts.setPassword.OK')}"
+					onClick="ref:frame.onSetPassword" />
+			</hbox>
+		</vbox>
+	</window>
+	
+	<!-- Window to show the random password -->
+	<window closable="true" id="displayNewPassword" position="top,center" sizable="true"
+		title="${c:l('canviPassword.Titol')}" visible="false" width="600px"
+		onClose="ref:frame.onCancelDisplayPassword">
+		
+		<div style="width:100%; margin-bottom: 10px">
+			<label id="lbInfoNouPass" multiline="true" sclass="etiqueta"
+				value="${c:l('canviPassword.zul.Elnoupasswordas')}"/>
+		</div>
+		<div align="center" sclass="titolpagina">
+			<label id="passwordValue" value=""  style="font-family: monospace"/>
+		</div>
+		<div>
+			<label id="popupPwd" multiline="true"/>
+		</div>
+		
+		<separator spacing="10px"/>
+		<separator bar="true" spacing="15px"/>
+		<hbox style="margin-left:auto; margin-right:auto">
+			<button label="${c:l('canviPassword.zul.Accepta')}" onClick="ref:frame.onCancelDisplayPassword()"/>
+		</hbox>
+	</window>
+	
+	<window id="newPasswordPriv" closable="false" 
+			position="top, center" sizable="true"
+			title="${c:l('selfService.NewPassword')}" visible="false" width="31em" >
+		<div width="100%">
+			<textbox id="antipasswordsave" disabled="true" style="border: none; color: white; background-color: white"/>
+			<h:form style="display:inline">
+				<customfield3 dataType="PASSWORD" label="${c:l('accounts.setPassword.label')}" id="password" onOK="ref:frame:onPrivSetPassword();" required='true'/>
+			</h:form>
+			<customfield3 dataType="DATE_TIME" label="${c:l('selfService.Valid')}" id="timepwd" required="true"/>
+			<customfield3 dataType="BOOLEAN" label="${c:l('selfService.Force')}" id="checkpwd"/>
+			<label value="${c:l('com.soffid.iam.api.Account.passwordPolicy') } : &#x0a;" multiline="true" />
+			<label id="policy_text" multiline="true"/>
+			<div align="center">
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="ref:frame.onPrivSetPassword()" />
+				<space width="1em" />
+				<button label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="ref:frame.onPrivCancelPassword()" />
+			</div>
+		</div>
+	</window>
+	<window id="showPassword" closable="false"
+		position="top, center" sizable="false"
+		title="${c:l('selfService.QueryPasswords')}" visible="false" width="40em">
+		<popup id="toolPwd">
+			<vbox>
+				<label id="popupPwd" multiline="true"/>
+			</vbox>
+		</popup>
+		<div style="margin: 2em">
+			<div>
+				<label value="${c:l('com.soffid.iam.api.Account.loginName') } : " sclass="label" />
+				<textbox bind="/listbox:/account/@loginName" disabled="true" readonly="true" />
+				<textbox bind="/listbox:/account/@loginName" id="loginName" readonly="true" style="display: none"/>
+				<imageclic src="/img/copy.svg" action="onClick: doCopy('${loginName.uuid}')"
+					title="${c:l('vault.account.copy')}"/>
+			</div>
+			<div>
+				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}" sclass="label"/>
+				<textbox readonly="true" 
+					id="fakeqpassword" value="****************"/> 
+				<textbox readonly="true" style="display:none;" 
+					id="qpassword" tooltip="toolPwd"/>
+				<imageclic id="viewImage" src="/img/search2.svg" action="onMouseOver: doView('${fakeqpassword.uuid}','${qpassword.uuid}');
+					onMouseLeave: doView('${qpassword.uuid}','${fakeqpassword.uuid}')"
+					tooltip="toolPwd"
+				/>
+				<imageclic src="/img/copy.svg" action="onClick: doCopy('${qpassword.uuid}')"
+					title="${c:l('vault.account.copy')}"/>
+			</div>
+			<div style="margin-top: 2em; text-align:center">
+				<button label="${c:l('selfService.Close')}"
+					onClick="ref:frame.closeShowPassword()" />
+			</div>
+		</div>
+	</window>
+</frame>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root"> <!--user:query o mail:query, despres es restringeixen-->
+		<finder name="account" type="account">
+			<ejb-finder jndi="java:/module/AccountService-v2"
+				method="findAccountByJsonQueryAsync" if = "${query != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/AccountService-v2"
+				method="findAccountByTextAsync" if = "${textQuery != null}">
+				<parameter value="${textQuery}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Account">
+			</new-instance-bean>
+		</finder>
+		
+	</datanode>
+	
+	<datanode name="account"> 
+		<finder name="role" type="role" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findRoleAccountByAccount">
+				<parameter value="${instance.id}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 
+			</new-instance-bean>
+		</finder>
+		<finder name="effectiveRole" type="effectiveRole" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findRoleGrantHierarchyByAccount" >
+				<parameter value="${instance.id}"/>
+			</ejb-finder>
+		</finder>
+		<script-handler>
+			<update-script>
+				as = com.soffid.iam.EJBLocator.getAccountService();
+				as.updateAccount2(instance);
+			</update-script>
+			<delete-script>
+				as = com.soffid.iam.EJBLocator.getAccountService();
+				as.removeAccount(instance);
+			</delete-script>
+			<insert-script>
+				usuari = parent.parent.parent.instance;
+				ds = com.soffid.iam.EJBLocator.getDispatcherService();
+				dispatcher = ds.findDispatcherByName(instance.system);
+				as = com.soffid.iam.EJBLocator.getAccountService();
+				account = as.createAccount(usuari, dispatcher, instance.name);
+				instance.id = account.id;
+				instance.type = account.type;
+				instance.name = account.name;
+				as.updateAccount2(instance);
+			</insert-script>
+		</script-handler>
+	</datanode>
+
+	
+	<datanode name="effectiveRole" transient="true"/>
+
+	<datanode name="role">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true" > <!-- user:role:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete" >  <!-- user:role:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> 
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<finder name="holderGroupData" type="group" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/GroupService-v2"
+				method="findGroupByName" if="${canQueryUser &amp;&amp; instance.holderGroup != null}">
+				<parameter value="${instance.holderGroup}" />
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="tipusUsuari">
+	</datanode>
+	
+
+</zkib-model>

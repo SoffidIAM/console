@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?component name="network_acl" macro-uri="network-acl.zul"?>
+<?page id="network"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.network.NetworkHandler" id="frame">
+	<datamodel id="model" rootNode="root" src="networkDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('network:all:create') &amp;&amp; soffid:isUserInRole('network:all:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Network" 
+				defaultAttributes="name, description, ip"
+				preference="networks"
+				dataPath="/model:/network" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+				preference="network"
+				dataPath="/model:/network" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+			<attribute name="allColumns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.Network.name') }
+  value: name
+  default: true
+- name: ${c:l('com.soffid.iam.api.Network.description')}
+  value: description
+  default: true
+- name: ${c:l('com.soffid.iam.api.Network.ip')}
+  value: ip
+  default: true
+- name: ${c:l('com.soffid.iam.api.Network.mask')}
+  value: mask
+- name: ${c:l('com.soffid.iam.api.Network.lanAccess')}
+  template: #{lanAccess? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+- name: ${c:l('com.soffid.iam.api.Network.dhcpSupport')}
+  template: #{dhcpSupport? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+- name: ${c:l('com.soffid.iam.api.Network.dhcp')}
+  value: dhcp
+			]]></attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('network:all:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+								
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
+				<tabs>
+					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+					<tab label="${c:l('xarxes.zul.Controldaccas')}" id="tabacl" if="${soffid:isUserInRole('network:all:update') }"/>
+				</tabs>
+				<tabpanels>
+					<tabpanel id="datatab">
+						<div class="navigation-bar">
+							<menu2>
+								<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+							</menu2>
+						</div>
+						<div id="dades"> 
+							<form id="form" onChangeXPath="ref:frame.onChangeDades"
+								dataPath="/listbox:/." width="100%">
+								<customfield3
+									label="${c:l('com.soffid.iam.api.Network.name') }"
+									dataType="string"
+									required="true"
+									bind="name"
+									maxlength="10"/>
+								<customfield3
+									label="${c:l('com.soffid.iam.api.Network.description') }"
+									dataType="string"
+									required="true"
+									bind="description"
+									maxlength="50"/>
+								<customfield3
+									use="com.soffid.iam.web.network.IpField"
+									label="${c:l('com.soffid.iam.api.Network.ip') }"
+									dataType="string"
+									required="true"
+									bind="ip"
+									maxlength="50"/>
+								<customfield3
+									use="com.soffid.iam.web.network.MaskField"
+									label="${c:l('com.soffid.iam.api.Network.mask') }"
+									dataType="string"
+									required="true"
+									bind="mask"
+									maxlength="50"/>
+								<customfield3
+									label="${c:l('com.soffid.iam.api.Network.lanAccess') }"
+									dataType="boolean"
+									bind="lanAccess"
+									maxlength="50"/>
+								<customfield3
+									label="${c:l('com.soffid.iam.api.Network.dhcpSupport') }"
+									dataType="boolean"
+									bind="dhcpSupport"
+									maxlength="50"/>
+								<customfield3
+									label="${c:l('com.soffid.iam.api.Network.dhcp') }"
+									dataType="string"
+									required="false"
+									bind="dhcp"
+									maxlength="50"/>
+								<customfield3
+									label="${c:l('xarxes.zul.Nivelldocupacia') }"
+									dataType="string"
+									readonly="true"
+									id="busy"
+									maxlength="50"/>
+						</form>
+						</div>
+						<div style="text-align: right; width: 100%">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</tabpanel>
+					<tabpanel if="${soffid:isUserInRole('network:all:update') }" fulfill="tabacl.onSelect" >
+						<network_acl listbox="//network/listbox" id="network_acl"/>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</div>
+	</div>
+</frame>

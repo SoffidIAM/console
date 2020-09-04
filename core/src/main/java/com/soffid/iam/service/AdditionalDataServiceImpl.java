@@ -15,6 +15,7 @@ package com.soffid.iam.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -597,6 +598,8 @@ public class AdditionalDataServiceImpl extends
 			boolean hidden = att.optBoolean("hidden", false);
 			boolean multiline = att.optBoolean("multiline", false);
 			boolean searchCriteria = att.optBoolean("searchCriteria", false);
+			boolean multivalue = att.optBoolean("multivalue", false);
+			String customUiHandler = att.optString("custom_ui_handler");
 			String separator = att.optString("separator");
 			String validator = att.optString("validator");
 			String length = att.optString("length");
@@ -630,7 +633,7 @@ public class AdditionalDataServiceImpl extends
 				md.setLetterCase(lettercase != null && lettercase.toLowerCase().startsWith("u") ? LetterCaseEnum.UPPERCASE :
 					lettercase != null && lettercase.toLowerCase().startsWith("l") ? LetterCaseEnum.LOWERCASE:
 						LetterCaseEnum.MIXEDCASE);
-				md.setMultiValued(false);
+				md.setMultiValued(multivalue);
 				md.setName(name);
 				md.setNlsLabel(className+"."+name);
 				md.setOrder(last++);
@@ -644,6 +647,16 @@ public class AdditionalDataServiceImpl extends
 				md.setType(guessType (type));
 				md.setValidator(validator);
 				md.setReadOnly(readonly);
+				md.setBuiltinHandler(customUiHandler);
+				JSONArray values = att.optJSONArray("listOfValues");
+				if (values != null) {
+					StringBuffer sb = new StringBuffer();
+					for (int j = 0; j < values.length(); j++) {
+						if (sb.length() > 0) sb.append(" ");
+						sb.append (URLEncoder.encode(values.optString(j) , "UTF-8"));
+					}
+					md.setValues(sb.toString());
+				}
 				getMetaDataEntityDao().create(md);
 			}
 		}

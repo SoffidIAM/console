@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <zkib-model>
-	<datanode name="cerca">
-		<finder name="aplicacionsCerca" type="java.util.Collection"> <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
-				if="${queryEnabled}" method="getAllAplicacions">
-				<parameter value="${true}" />
-			</ejb-finder>
-		</finder>
-	</datanode>
 	<datanode name="tipusmime">
 		<finder name="tipusmime" type="java.util.Collection">  <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
 				if="${queryEnabled}" method="getAllTipusMimeExecucio" />
 		</finder>
 	</datanode>
 	<datanode name="appsintranet">
 		<finder name="app" type="app" refreshAfterCommit="false">  <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/PuntEntradaServiceEJB"
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
 				if="${queryEnabled}" method="findPuntsEntrada">
 				<parameter value="${nom}" />
 				<parameter value="${codi}" />

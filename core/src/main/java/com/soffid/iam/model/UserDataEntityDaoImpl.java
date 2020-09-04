@@ -58,7 +58,8 @@ public class UserDataEntityDaoImpl
 				for (UserDataEntity du: findByTypeAndValue(dadaUsuari.getDataType().getName(), 
 						dadaUsuari.getValue()))
 				{
-					throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.6"),  //$NON-NLS-1$
+					if ( dadaUsuari.getValue().equals(du.getValue()))
+						throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.6"),  //$NON-NLS-1$
 							du.getValue(), du.getUser().getUserName())); 
 				}
 	    	}

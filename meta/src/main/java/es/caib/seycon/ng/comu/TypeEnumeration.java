@@ -12,6 +12,7 @@ public class TypeEnumeration {
 	public String photoType = "P";
 	public String dateType = "D";
 	public String emailType = "E";
+	public String accountType = "AC";
 	public String userType = "U";
 	public String groupType = "G";
 	public String groupTypeType = "GT";
@@ -26,4 +27,5 @@ public class TypeEnumeration {
 	public java.lang.String html="H";
 	public String separator = "-";
 	public String dateTimeType = "DT";
+	public String osType = "1T";
 }

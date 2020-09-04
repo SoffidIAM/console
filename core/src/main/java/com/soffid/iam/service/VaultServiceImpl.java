@@ -10,12 +10,15 @@ import java.util.List;
 import java.util.Vector;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
+import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.api.VaultFolderAccountPermissions;
 import com.soffid.iam.api.VaultFolderPermissions;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -24,6 +27,8 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
+import com.soffid.iam.model.VaultFolderEntityDao;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -461,7 +466,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 		AccountAccessLevelEnum levels[] = new AccountAccessLevelEnum[] {
 				AccountAccessLevelEnum.ACCESS_USER,
 				AccountAccessLevelEnum.ACCESS_MANAGER, 
-				AccountAccessLevelEnum.ACCESS_OWNER
+				AccountAccessLevelEnum.ACCESS_OWNER,
+				AccountAccessLevelEnum.ACCESS_NAVIGATE
 		};
 		if (folder.getGrantedGroups() == null || personal)
 			folder.setGrantedGroups(Collections.EMPTY_LIST);
@@ -473,9 +479,15 @@ public class VaultServiceImpl extends VaultServiceBase {
 			folder.setGrantedUsers(Collections.EMPTY_LIST);
 		if (folder.getManagerUsers() == null  || personal)
 			folder.setManagerUsers(Collections.EMPTY_LIST);
-		if (personal)
+		if (folder.getNavigateGroups() == null  || personal)
+			folder.setNavigateGroups(Collections.EMPTY_LIST);
+		if (folder.getNavigateRoles() == null  || personal)
+			folder.setNavigateRoles(Collections.EMPTY_LIST);
+		if (folder.getNavigateUsers() == null  || personal)
+			folder.setNavigateUsers(Collections.EMPTY_LIST);
+		if (personal && Security.getCurrentUser() != null)
 		{
-			folder.setOwnerUsers(Collections.singleton(getUserService().getCurrentUser()));
+			folder.setOwnerUsers(Collections.singleton(Security.getCurrentUser()));
 		}
 		else if (folder.getOwnerUsers() == null)
 			folder.setOwnerUsers(Collections.EMPTY_LIST);
@@ -486,22 +498,25 @@ public class VaultServiceImpl extends VaultServiceBase {
 		if (folder.getOwnerRoles() == null  || personal)
 			folder.setOwnerRoles(Collections.EMPTY_LIST);
 		@SuppressWarnings("unchecked")
-		List<Group> newgrups []= new List[] {
-			new LinkedList<Group>(folder.getGrantedGroups()),
-			new LinkedList<Group>(folder.getManagerGroups()),
-			new LinkedList<Group>(folder.getOwnerGroups())
+		List<String> newgrups []= new List[] {
+			new LinkedList<String>(folder.getGrantedGroups()),
+			new LinkedList<String>(folder.getManagerGroups()),
+			new LinkedList<String>(folder.getOwnerGroups()),
+			new LinkedList<String>(folder.getNavigateGroups())
 		};
 		@SuppressWarnings("unchecked")
-		List<Role> newroles []= new List[] {
-			new LinkedList<Role>(folder.getGrantedRoles()),
-			new LinkedList<Role>(folder.getManagerRoles()),
-			new LinkedList<Role>(folder.getOwnerRoles())
+		List<String> newroles []= new List[] {
+			new LinkedList<String>(folder.getGrantedRoles()),
+			new LinkedList<String>(folder.getManagerRoles()),
+			new LinkedList<String>(folder.getOwnerRoles()),
+			new LinkedList<String>(folder.getNavigateRoles())
 		};
 		@SuppressWarnings("unchecked")
-		List<User> newusers []= new List[] {
-			new LinkedList<User>(folder.getGrantedUsers()),
-			new LinkedList<User>(folder.getManagerUsers()),
-			new LinkedList<User>(folder.getOwnerUsers())
+		List<String> newusers []= new List[] {
+			new LinkedList<String>(folder.getGrantedUsers()),
+			new LinkedList<String>(folder.getManagerUsers()),
+			new LinkedList<String>(folder.getOwnerUsers()),
+			new LinkedList<String>(folder.getNavigateUsers())
 		};
 		// Remove grants
 		for (Iterator<VaultFolderAccessEntity> aclIterator = entity.getAcl().iterator(); aclIterator.hasNext();)
@@ -514,10 +529,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 					boolean found = false;
 					if (access.getGroup() != null)
 					{
-						for (Iterator<Group> it = newgrups[index].iterator(); !found && it.hasNext();)
+						for (Iterator<String> it = newgrups[index].iterator(); !found && it.hasNext();)
 						{
-							Group g = it.next();
-							if (g.getId().equals (access.getGroup().getId()))
+							String g = it.next();
+							if (g.equals (access.getGroup().getName()))
 							{
 								it.remove();
 								found = true;
@@ -526,10 +541,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 					}
 					else if (access.getRole() != null)
 					{
-						for (Iterator<Role> it = newroles[index].iterator(); !found && it.hasNext();)
+						for (Iterator<String> it = newroles[index].iterator(); !found && it.hasNext();)
 						{
-							Role r = it.next();
-							if (r.getId().equals (access.getRole().getId()))
+							String r = it.next();
+							if (r.equals (access.getRole().getName()+"@"+access.getRole().getSystem().getName()))
 							{
 								it.remove();
 								found = true;
@@ -538,10 +553,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 					}
 					else if (access.getUser() != null)
 					{
-						for (Iterator<User> it = newusers[index].iterator(); !found && it.hasNext();)
+						for (Iterator<String> it = newusers[index].iterator(); !found && it.hasNext();)
 						{
-							User u = it.next();
-							if (u.getId().equals (access.getUser().getId()))
+							String u = it.next();
+							if (u.equals (access.getUser().getUserName()))
 							{
 								it.remove();
 								found = true;
@@ -561,8 +576,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Add new groups
 		for (int index = 0 ; index < levels.length; index++)
 		{
-			for (Group g: newgrups[index]) {
-				GroupEntity ge = getGroupEntityDao().load(g.getId());
+			for (String g: newgrups[index]) {
+				GroupEntity ge = getGroupEntityDao().findByName(g);
 				if (ge != null)
 				{
 					VaultFolderAccessEntity access = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
@@ -576,8 +591,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 				}
 			}
 			// Add new roles
-			for (Role r: newroles[index]) {
-				RoleEntity re = getRoleEntityDao().load(r.getId());
+			for (String r: newroles[index]) {
+				RoleEntity re = getRoleEntityDao().findByShortName(r);
 				if (re != null)
 				{
 					VaultFolderAccessEntity access = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
@@ -591,8 +606,8 @@ public class VaultServiceImpl extends VaultServiceBase {
 				}
 			}
 			// Add new users
-			for (User u: newusers[index]) {
-				UserEntity ue = getUserEntityDao().load(u.getId());
+			for (String u: newusers[index]) {
+				UserEntity ue = getUserEntityDao().findByUserName(u);
 				if (ue != null)
 				{
 					VaultFolderAccessEntity access = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
@@ -961,9 +976,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		else
 		{
 			LinkedList<Account> list = new LinkedList<Account>();
-			AccountCriteria criteria = new AccountCriteria();
-			criteria.setDescription("%"+filter.replace('*', '%')+"%");
-			for (AccountEntity entity: getAccountEntityDao().findByCriteria(criteria))
+			for (AccountEntity entity: getAccountEntityDao().findByText(filter))
 			{
 				if (entity.getFolder() != null)
 				{
@@ -1009,4 +1022,164 @@ public class VaultServiceImpl extends VaultServiceBase {
 		
 		return folders;
 	}
+	
+	@Override
+	protected AsyncList<VaultFolder> handleFindFolderByTextAndJsonQueryAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<VaultFolder> result = new AsyncList<VaultFolder>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindFolderByTextAndJsonQuery(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private void doFindFolderByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<VaultFolder> result) throws Exception {
+		final VaultFolderEntityDao dao = getVaultFolderEntityDao();
+		ScimHelper h = new ScimHelper(VaultFolder.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+
+		h.setGenerator((entity) -> {
+			VaultFolder folder =  dao.toVaultFolder((VaultFolderEntity) entity);
+			if (folder.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_NONE))
+				return null;
+			else
+				return folder;
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
+	@Override
+	protected List<VaultFolder> handleFindFolderByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<VaultFolder> result = new LinkedList<VaultFolder>();
+		doFindFolderByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
+		return result;
+	}
+
+	@Override
+	protected List<VaultElement> handleFindVaultElementByText(String filter) throws Exception {
+		LinkedList<VaultElement> l = new LinkedList<>();
+		for (VaultFolder v: handleFindFolders(filter)) {
+			VaultElement ve = new VaultElement();
+			ve.setType("folder");
+			ve.setFolder(v);
+			ve.setId(v.getId());
+			ve.setParentId(v.getParentId());
+			l.add(ve);
+		}
+		if (filter != null && !filter.trim().isEmpty())
+		{
+			for (Account a: handleFindAccounts(filter)) {
+				VaultElement ve = new VaultElement();
+				ve.setType("account");
+				ve.setAccount(a);
+				ve.setId(a.getId());
+				ve.setParentId(a.getVaultFolderId());
+				l.add(ve);
+			}
+		}
+		return l;
+	}
+
+	@Override
+	protected VaultElement handleCreate(VaultElement folder) throws Exception {
+		if ("account".equals(folder.getType())) {
+			folder.setAccount( getAccountService().createAccount(folder.getAccount()) );
+			folder.setId(folder.getAccount().getId());
+			folder.setParentId(folder.getAccount().getVaultFolderId());
+		}
+		if ("folder".equals(folder.getType())) {
+			folder.setFolder( handleCreate(folder.getFolder()) );
+			folder.setId(folder.getFolder().getId());
+			folder.setParentId(folder.getFolder().getParentId());
+		}
+		return folder;
+	}
+
+	@Override
+	protected VaultElement handleUpdate(VaultElement folder) throws Exception {
+		if ("account".equals(folder.getType())) {
+			folder.setAccount( getAccountService().updateAccount(folder.getAccount()) );
+			folder.setParentId(folder.getAccount().getVaultFolderId());
+		}
+		if ("folder".equals(folder.getType())) {
+			folder.setFolder( handleUpdate(folder.getFolder()) );
+			folder.setParentId(folder.getFolder().getParentId());
+		}
+		return folder;
+	}
+
+	@Override
+	protected void handleRemove(VaultElement folder) throws Exception {
+		if ("account".equals(folder.getType())) {
+			getAccountService().removeAccount(folder.getAccount());
+		}
+		if ("folder".equals(folder.getType())) {
+			handleRemove(folder.getFolder());
+		}
+	}
+
+	@Override
+	protected VaultElement handleFindVaultElement(long id) throws Exception {
+		VaultFolder v = handleFindFolder(id);
+		if (v == null)
+		{
+			Account a = getAccountService().findAccountById(id);
+			if (a == null)
+				return null;
+			VaultElement ve = new VaultElement();
+			ve.setType("account");
+			ve.setAccount(a);
+			ve.setId(a.getId());
+			ve.setParentId(a.getVaultFolderId());
+			return ve;
+		} else {
+			VaultElement ve = new VaultElement();
+			ve.setType("folder");
+			ve.setFolder(v);
+			ve.setId(v.getId());
+			ve.setParentId(v.getParentId());
+			return ve;
+		}
+	}
+
+	@Override
+	protected List<VaultElement> handleGetChildren(VaultElement parent) throws Exception {
+		LinkedList<VaultElement> l = new LinkedList<>();
+		if (! parent.getType().equals("folder"))
+			return l;
+		for (VaultFolder v: handleGetChildren(parent.getFolder())) {
+			VaultElement ve = new VaultElement();
+			ve.setType("folder");
+			ve.setFolder(v);
+			ve.setId(v.getId());
+			ve.setParentId(v.getParentId());
+			l.add(ve);
+		}
+		for (Account a: handleList(parent.getFolder())) {
+			VaultElement ve = new VaultElement();
+			ve.setType("account");
+			ve.setAccount(a);
+			ve.setId(a.getId());
+			ve.setParentId(a.getVaultFolderId());
+			l.add(ve);
+		}
+		return l;
+	}
+	
 }

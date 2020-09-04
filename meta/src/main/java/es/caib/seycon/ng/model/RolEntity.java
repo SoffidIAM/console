@@ -330,6 +330,11 @@ public abstract class RolEntity {
 		return null;
 	}
 
+	@DaoFinder("select r from com.soffid.iam.model.RoleEntity as r where name = :shortName")
+	public es.caib.seycon.ng.model.RolEntity findByShortName(
+		java.lang.String shortName) {
+	 return null;
+	}
 
 }
 

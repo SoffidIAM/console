@@ -722,7 +722,6 @@ public class AgentHandler extends FrameHandler {
 			stack.push(logRoot);
 			do {
 				JSONObject log = new JSONObject();
-				children.put(log);
 				log.put("type", "log");
 				
 				j = propagateLog.getLog().indexOf("\n", i);
@@ -735,18 +734,22 @@ public class AgentHandler extends FrameHandler {
 				}
 				int n = s.indexOf(" INFO BEGIN ");
 				if (n > 0 && !hasChars(s.substring(0, n))) {
+					children.put(log);
 					children = new JSONArray();
 					log.put("header", s.substring(n+12));
 					log.put("children", children);
 					log.put("type", "header");
+					log.put("collapsed", true);
 					stack.push(log);
 				} else {
 					if (s.endsWith(" INFO END") &&
-							!hasChars(s.substring(0, s.length()-3)) && 
+							!hasChars(s.substring(0, s.length()-8)) && 
 							stack.size() > 1 ){
-						JSONObject parent = stack.pop();
+						stack.pop();
+						JSONObject parent = stack.peek();
 						children = parent.getJSONArray("children");
-					} else {
+					} else if (!s.trim().isEmpty()) {
+						children.put(log);
 						log.put("log", s);
 						if (s.contains(" WARN "))
 						{

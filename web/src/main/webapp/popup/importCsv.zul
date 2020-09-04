@@ -5,11 +5,10 @@
 <window id="window" closable="true" position="top, center"
 	use="com.soffid.iam.web.popup.ImportCsvHandler"
 	sizable="false" 
-	style="min-width: 40em;"
 	visible="false"
 	onDisplay="ref:window.start"
 	onClose="ref:window.close" 
-	width="850px">
+	style="min-width: 40em; width: 80%">
 
 	<wizard id="wizard">
 			<attribute name="steps">

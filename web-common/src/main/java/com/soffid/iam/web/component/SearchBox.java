@@ -157,10 +157,10 @@ public class SearchBox extends HtmlBasedComponent {
 			}
 			
 			if (variableName != null)
-				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? null: q);
+				ds.getJXPathContext().getVariables().declareVariable(variableName, mode == TEXT? enforcedFilter: q);
 			
 			if (variableNameText != null)
-				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: enforcedFilter);
+				ds.getJXPathContext().getVariables().declareVariable(variableNameText, mode == TEXT ? lastQuery: null);
 
 			Object v = binder.getValue();
 			if (v instanceof DataModelCollection)

@@ -1864,13 +1864,13 @@ String nomRolsBorrar = "";
 											Long rule = XPathUtils.getValue(ctx, "@ruleId");
 											if (rule != null)
 											{
-												Listcell cell = listcells.get(9);
+												Listcell cell = listcells.get(10);
 												if (cell.getChildren().size() > 0 )
 												{
 													cell.getChildren().get(0).visible = false;
 													cell.getChildren().get(1).visible = true;
 												}
-												cell = event.data.getChildren().get(10);
+												cell = event.data.getChildren().get(11);
 												if (cell.getChildren().size() > 0 )
 													cell.getChildren().get(0).visible = false;
 											}
@@ -1893,7 +1893,7 @@ String nomRolsBorrar = "";
 											Long parentGrant = XPathUtils.getValue(ctx, "@parentGrant");
 											if (parentGrant != null)
 											{
-												Listcell cell = listcells.get(9);
+												Listcell cell = listcells.get(10);
 												if (cell.getChildren().size() > 0 )
 													cell.getChildren().get(1).visible = true;
 											}
@@ -1918,10 +1918,10 @@ String nomRolsBorrar = "";
 													c.getChildren().get(1).visible = false;
 											}
 											startbox = null;
-											if (!listcells.get(6).getChildren ().isEmpty ())
-												startbox = listcells.get(6).getChildren().get(0);
 											if (!listcells.get(7).getChildren ().isEmpty ())
-												endbox = listcells.get(7).getChildren().get(0);
+												startbox = listcells.get(7).getChildren().get(0);
+											if (!listcells.get(8).getChildren ().isEmpty ())
+												endbox = listcells.get(8).getChildren().get(0);
 											if (XPathUtils.getValue(ctx,"id") != null)
 											{
 												if (starbox != null)
@@ -1983,7 +1983,7 @@ String nomRolsBorrar = "";
 									}
 									
 									void createHolderGroupListbox(Listitem row) {
-										Listcell cell = row.getChildren().get(8);
+										Listcell cell = row.getChildren().get(9);
 										if (! cell.getChildren().isEmpty())
 										{
 											cell.getChildren().get(0).visible = false;
@@ -1994,7 +1994,7 @@ String nomRolsBorrar = "";
 									}
 									
 									void createHolderGroupListbox(Listitem row, boolean name) {
-										Listcell cell = row.getChildren().get(8);
+										Listcell cell = row.getChildren().get(9);
 										es.caib.zkib.component.DataListbox lb = new es.caib.zkib.component.DataListbox ();
 										lb.setMold("select");
 										lb.setParent(cell);
@@ -2058,6 +2058,10 @@ String nomRolsBorrar = "";
 												<textboxfilter bind="@nomRol"/>
 											</listheader>
 											<listheader
+												label="${c:l('aplica_rolinfo.zul.Descripcia')}" sort="auto" width="30%" >
+												<textboxfilter bind="@descripcioRol"/>
+											</listheader>
+											<listheader
 												label="${c:l('usuaris.zul.Bbdd')}" sort="auto" width="10%" >
 												<listboxfilter bind="@baseDeDades"/>
 											</listheader>
@@ -2119,14 +2123,15 @@ String nomRolsBorrar = "";
 												bind="@roleCategory" />
 											<listcell >
 												<div>
-													<label  bind="@nomRol" tooltip="rolsTooltip" sclass="small-screen"></label>
-													<label  bind="@descripcioRol" sclass="wide-screen"></label>
+													<label  bind="@nomRol" tooltip="rolsTooltip"></label>
 												</div>
 												<div style="display:inline" tooltip="domainTooltip">
 													<label value = " / " />
 													<label  bind="valorDomini/@valor" sclass="small-screen"/>
 													<label  bind="valorDomini/@descripcio" sclass="wide-screen"/>
 												</div>
+											</listcell>
+											<listcell  bind="@descripcioRol">
 											</listcell>
 											<listcell
 												bind="@baseDeDades" />

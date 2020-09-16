@@ -81,8 +81,7 @@ public class AsyncList<E> implements Collection<E>, java.util.concurrent.Future<
 	}
 
 	public Iterator<E> iterator() {
-		AsyncIterator<E> it = new AsyncIterator<E>();
-		it.next = first;
+		AsyncIterator<E> it = new AsyncIterator<E>(this);
 		return it;
 	}
 
@@ -313,7 +312,15 @@ class Entry<E> {
 
 class AsyncIterator<E> implements Iterator<E>
 {
+	AsyncList list;
 	Entry<E> next;
+	Entry<E> current = null;
+	Entry<E> previous = null;
+	protected AsyncIterator(AsyncList l) {
+		list = l;
+		next = list.first;
+		current = previous = null;
+	}
 	
 	@Override
 	public boolean hasNext() {
@@ -324,14 +331,20 @@ class AsyncIterator<E> implements Iterator<E>
 	public E next() {
 		if (next == null)
 			return null;
-		E e = next.element;
+		previous = current;
+		current = next;
 		next = next.next;
-		return e;
+		return current.element;
 	}
 
 	@Override
 	public void remove() {
-		throw new IllegalStateException("Cannot remove elements");
+		synchronized (list) {
+			if (previous == null)
+				list.first = next;
+			else
+				previous.next = next;
+		}
 	}
 	
 }

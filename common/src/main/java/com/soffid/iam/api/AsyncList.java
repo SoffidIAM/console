@@ -316,6 +316,7 @@ class AsyncIterator<E> implements Iterator<E>
 	Entry<E> next;
 	Entry<E> current = null;
 	Entry<E> previous = null;
+	boolean deleted;
 	protected AsyncIterator(AsyncList l) {
 		list = l;
 		next = list.first;
@@ -331,7 +332,8 @@ class AsyncIterator<E> implements Iterator<E>
 	public E next() {
 		if (next == null)
 			return null;
-		previous = current;
+		if (!deleted)
+			previous = current;
 		current = next;
 		next = next.next;
 		return current.element;
@@ -344,6 +346,9 @@ class AsyncIterator<E> implements Iterator<E>
 				list.first = next;
 			else
 				previous.next = next;
+			if (next == null)
+				list.last = previous;
+			deleted = true;
 		}
 	}
 	

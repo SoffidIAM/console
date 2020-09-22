@@ -2210,6 +2210,8 @@ public class InputField2 extends Div implements XPathSubscriber
 			return true;		
 		try {
 			SecureInterpreter i = createInterpreter();
+			i.set("value", currentValue);
+			
 			Object o = i.eval(dataType.getValidationExpression());
 			if (o == null)
 				throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$

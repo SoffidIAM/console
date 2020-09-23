@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.catalina.realm.GenericPrincipal;
 
@@ -19,6 +20,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private String[] soffidRoles;
 	private String[] groupsAndRoles;
 	private String userName;
+	private Map<String, SoffidPrincipal> holderGroupMap;
 	
 	public SoffidPrincipalImpl(String name,
 			String userName,
@@ -34,6 +36,24 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.holderGroup = holderGroup;
 		this.fullName = fullName;
 		this.userName = userName;
+	}
+
+	public SoffidPrincipalImpl(String name,
+			String userName,
+			String fullName,
+			String holderGroup,
+			List<String> permissions,
+			List<String> groups,
+			List<String> soffidRoles,
+			Map<String, SoffidPrincipal> holderGroupMap) {
+		super(name, "*", permissions);
+		init (name, 
+				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
+				soffidRoles == null ? new String[0]: soffidRoles.toArray(new String[soffidRoles.size()]) );
+		this.holderGroup = holderGroup;
+		this.fullName = fullName;
+		this.userName = userName;
+		this.holderGroupMap = holderGroupMap;
 	}
 
 	public SoffidPrincipalImpl(String name,  
@@ -101,16 +121,25 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 
 
 	public String[] getGroups() {
-		return groups.clone();
+		if (holderGroup != null && holderGroupMap != null)
+			return holderGroupMap.get(holderGroup).getGroups();
+		else
+			return groups.clone();
 	}
 
 
 	public String[] getSoffidRoles() {
-		return soffidRoles.clone();
+		if (holderGroup != null && holderGroupMap != null)
+			return holderGroupMap.get(holderGroup).getSoffidRoles();
+		else
+			return soffidRoles.clone();
 	}
 
 	public String[] getGroupsAndRoles() {
-		return groupsAndRoles.clone();
+		if (holderGroup != null && holderGroupMap != null)
+			return holderGroupMap.get(holderGroup).getGroupsAndRoles();
+		else
+			return groupsAndRoles.clone();
 	}
 
 	@Override
@@ -126,6 +155,40 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 				Arrays.asList(p.getRoles()),
 				Arrays.asList(p.getGroups()),
 				Arrays.asList(p.getSoffidRoles()));
+	}
+
+	@Override
+	public List<String> getHolderGroups() {
+		if (holderGroupMap == null && holderGroupMap != null)
+			return null;
+		else
+			return new LinkedList<String>( holderGroupMap.keySet() );
+	}
+
+	@Override
+	public void setHolderGroup(String holderGroup) {
+		if (holderGroupMap == null && holderGroupMap != null)
+			throw new SecurityException("Not authorized to change holder group");
+		else if (holderGroupMap.containsKey(holderGroup))
+			this.holderGroup = holderGroup;
+		else
+			throw new SecurityException("Not authorized to set holder group "+holderGroup);
+	}
+
+	@Override
+	public String[] getRoles() {
+		if (holderGroup != null && holderGroupMap != null)
+			return holderGroupMap.get(holderGroup).getRoles();
+		else
+			return super.getRoles();
+	}
+
+	@Override
+	public boolean hasRole(String role) {
+		if (holderGroup != null && holderGroupMap != null) 
+			return holderGroupMap.get(holderGroup).hasRole(role);
+		else
+			return super.hasRole(role);
 	}
 	
 }

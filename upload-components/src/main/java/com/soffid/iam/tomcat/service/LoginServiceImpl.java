@@ -25,12 +25,16 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.ConsoleProperties;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.OUType;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.lang.MessageFactory;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
@@ -41,6 +45,7 @@ import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.tomcat.LoginService;
 import com.soffid.iam.tomcat.SoffidRealm;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -122,21 +127,6 @@ public class LoginServiceImpl implements LoginService {
 						log.info("Login rejected: username and/or credentials are empty");
 						return null;
 					}
-					if (acc == null) 
-					{
-						int idx = account.indexOf("\\");
-						if (idx > 0)
-						{
-							holderGroup = account.substring(0, idx);
-							account = account.substring(idx+1);
-							try {
-								acc = as.findAccount(account, dispatcher);
-							} catch (IllegalArgumentException e) {
-								log.info("Login rejected: username and/or credentials are empty");
-								return null;
-							}
-						}
-					}
 					if (acc == null) {
 						log.info(username + " login rejected. Unknown account");
 						return null;
@@ -148,27 +138,32 @@ public class LoginServiceImpl implements LoginService {
 	
 					SoffidPrincipal principal;
 					String passwordDomain = ps.getDefaultDispatcher();
-					List<String> groups = getUserGroups (acc, holderGroup);
-					List<String> soffidRoles = getUserRoles(acc, holderGroup);
-					List<String> roles = getRoles(acc, holderGroup);
+					List<String> groups = getUserGroups (acc, null);
+					List<String> soffidRoles = getUserRoles(acc, null);
+					List<String> roles = getRoles(acc, null);
+					Map<String, SoffidPrincipal> holder =  new HashMap<String, SoffidPrincipal>();
 					
 					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next().getUserName() : null;
 					String fullName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next().getFullName() : acc.getDescription();
-					
+
 					if (samlAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
 							credentials), true, false)) {
 						roles.add("PASSWORD:VALID");
+						holderGroup = getHolderGroups(acc, holder, "PASSWORD:VALID");
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account,
 								userName, fullName, holderGroup,
-								roles, groups, soffidRoles);
+								roles, groups, soffidRoles,
+								holder);
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
 						roles.add("PASSWORD:EXPIRED");
+						holderGroup = getHolderGroups(acc, holder, "PASSWORD:EXPRIED");
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
 								userName, fullName, holderGroup,
 								roles,
-								groups, soffidRoles);
+								groups, soffidRoles,
+								holder);
 					} else {
 						log.info(username + " login rejected. Invalid password");
 						return null;
@@ -225,7 +220,64 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	
-    private List<String> getUserGroups(Account acc, String holderGroup) throws InternalErrorException, UnknownUserException {
+    private String getHolderGroups(Account acc, Map<String, SoffidPrincipal> r, String passwordRole) throws InternalErrorException, UnknownUserException {
+    	if (acc.getType() != AccountType.USER)
+    		return null;
+    	
+    	if (! "true".equals(ConfigurationCache.getProperty("soffid.selfservice.groupHolderFilter")))
+    		return null;
+    	
+    	String holderGroup = null;
+    	
+    	User user = acc.getOwnerUsers().iterator().next();
+    
+    	if (isHolderGroup(user.getPrimaryGroup())) {
+    		holderGroup = user.getPrimaryGroup();
+			List<String> groups = getUserGroups (acc, user.getPrimaryGroup());
+			List<String> soffidRoles = getUserRoles(acc, user.getPrimaryGroup());
+			List<String> roles = getRoles(acc, user.getPrimaryGroup());
+			roles.add(passwordRole);
+			String userName = user.getUserName();
+			String fullName = user.getFullName();
+
+			SoffidPrincipalImpl principal = new SoffidPrincipalImpl(Security.getCurrentTenantName() + "\\" + acc.getName(),
+						userName, fullName, user.getPrimaryGroup(),
+						roles, groups, soffidRoles);
+
+			r.put(user.getPrimaryGroup(), principal); 
+    	}
+    	
+		for (GroupUser ug: ServiceLocator.instance().getGroupService().findUsersGroupByUserName(user.getUserName())) {
+    		if (!r.containsKey(ug.getGroup()) && isHolderGroup(ug.getGroup())) {
+    			if (holderGroup == null) holderGroup = ug.getGroup();
+    			List<String> groups = getUserGroups (acc, ug.getGroup());
+    			List<String> soffidRoles = getUserRoles(acc, ug.getGroup());
+    			List<String> roles = getRoles(acc, ug.getGroup());
+    			roles.add(passwordRole);
+    			String userName = user.getUserName();
+    			String fullName = user.getFullName();
+
+    			SoffidPrincipalImpl principal = new SoffidPrincipalImpl(Security.getCurrentTenantName() + "\\" + acc.getName(),
+    						userName, fullName, ug.getGroup(),
+    						roles, groups, soffidRoles);
+
+    			r.put(ug.getGroup(), principal); 
+    			
+    		}
+    	}
+		
+		return holderGroup;
+	}
+
+	private boolean isHolderGroup(String groupName) throws InternalErrorException {
+		Group g = ServiceLocator.instance().getGroupService().findGroupByGroupName(groupName);
+		if (g == null || g.getType() == null)
+			return false;
+		OUType gc = ServiceLocator.instance().getOrganizationalUnitTypeService().findOUTypeByName(g.getType());
+		return gc != null && gc.isRoleHolder();
+	}
+
+	private List<String> getUserGroups(Account acc, String holderGroup) throws InternalErrorException, UnknownUserException {
     	List<String> result = new LinkedList<String>();
     	if (acc.getType().equals(AccountType.USER))
     	{

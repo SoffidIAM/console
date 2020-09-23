@@ -2134,7 +2134,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		binder.setValue(URLEncoder.encode(values[0], "UTF-8") //$NON-NLS-1$
 				+ "=" //$NON-NLS-1$
 				+URLEncoder.encode(values[1], "UTF-8")); //$NON-NLS-1$
-		attributeValidate( null, null );
+		attributeValidate( null, binder.getValue() );
 
 		Component c = this;
 		do
@@ -2360,12 +2360,12 @@ public class InputField2 extends Div implements XPathSubscriber
 					int i;
 					for ( i = 0; i < l.size(); i++)
 					{
-						attributeValidate(new Integer(i), null);
+						attributeValidate(new Integer(i), l.get(i));
 					}
 				}
 			}
 			else
-				attributeValidate(null, null);
+				attributeValidate(null, value);
 		}
 		return true;
 	}

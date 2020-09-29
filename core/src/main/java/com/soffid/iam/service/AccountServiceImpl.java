@@ -21,6 +21,7 @@ import org.jbpm.logging.exe.LoggingInstance;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountHistory;
@@ -30,6 +31,7 @@ import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PasswordValidation;
@@ -52,6 +54,7 @@ import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleEntity;
@@ -69,6 +72,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
@@ -2238,20 +2242,35 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws InternalErrorException, Exception {
 		AsyncList<Account> result = new AsyncList<Account>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findByJsonQuery(result, query);
+		findByJsonQuery(result, query, null);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
 		return result.get();
 	}
 	
+
+	@Override
+	protected PagedResult handleFindAccountByJsonQuery(String query, Integer first, Integer max) throws InternalErrorException, Exception {
+		AsyncList<Account> result = new AsyncList<Account>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		CriteriaSearchConfiguration cs = new CriteriaSearchConfiguration();
+		cs.setFirstResult(first);
+		cs.setMaximumResultSize(max);
+		PagedResult<Account> r = findByJsonQuery(result, query, cs);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return r;
+	}
+
 	@Override
 	protected AsyncList<Account> handleFindAccountByJsonQueryAsync(final String query) throws Exception {
 		final AsyncList<Account> result = new AsyncList<Account>();
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findByJsonQuery(result, query);
+					findByJsonQuery(result, query, new CriteriaSearchConfiguration());
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -2260,7 +2279,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return result;
 	}
 	
-	protected void findByJsonQuery ( AsyncList<Account> result, String query) 
+	protected PagedResult<Account> findByJsonQuery ( AsyncList<Account> result, String query,
+			CriteriaSearchConfiguration cs) 
 			throws Exception
 	{
 		// Register virtual attributes for additional data
@@ -2281,18 +2301,45 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		for (AccountEntity ue : getAccountEntityDao().query(hql.toString(),
-				paramArray)) {
+		
+		
+		@SuppressWarnings("unchecked")
+		List <AccountEntity> r = ( List <AccountEntity>) new QueryBuilder()
+				.query(hql.toString(), 
+						paramArray,
+						cs.getFirstResult(), 
+						cs.getMaximumResultSize());
+		PagedResult<Account> pagedResult = new PagedResult<Account>();
+		int totalResults = 0;
+		for (AccountEntity ue :r) {
 			if (result.isCancelled())
-				return;
+				return null;
 			Account u = getAccountEntityDao().toAccount(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
 						Security.AUTO_USER_QUERY, ue)) {
+					totalResults ++;
 					result.add(u);
 				}
 			}
 		}
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( cs.getFirstResult() != null ? cs.getFirstResult(): 0);
+		pagedResult.setItemsPerPage( cs.getMaximumResultSize());
+		if ( cs.getMaximumResultSize()  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query(hql.toCountString(), 
+							paramArray,
+							null, 
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	@Override

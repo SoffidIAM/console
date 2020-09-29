@@ -11,6 +11,7 @@ import java.util.Collection;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -635,6 +636,16 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult findRoleByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public AsyncList<es.caib.seycon.ng.comu.Rol> findRoleByJsonQueryAsync(
 			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -661,6 +672,16 @@ public abstract class AplicacioService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
 			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult findApplicationByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

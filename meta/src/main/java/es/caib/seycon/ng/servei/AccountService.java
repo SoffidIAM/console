@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
@@ -580,6 +581,15 @@ public abstract class AccountService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Account> findAccountByJsonQuery(
 			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { account_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult findAccountByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer first, @Nullable Integer num)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

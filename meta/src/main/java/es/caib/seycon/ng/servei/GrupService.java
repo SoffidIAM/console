@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -354,6 +355,15 @@ public abstract class GrupService {
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult findGroupByJsonQuery(@Nullable String query,
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

@@ -43,6 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
@@ -56,6 +57,7 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Printer;
@@ -83,6 +85,7 @@ import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordEntity;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleDependencyEntityDao;
@@ -3059,17 +3062,33 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
+	protected PagedResult handleFindUserByJsonQuery(String query, Integer startIndex, Integer count)
+			throws InternalErrorException, Exception {
+
+		LinkedList<User> result = new LinkedList<User>();
+
+		CriteriaSearchConfiguration sc = new CriteriaSearchConfiguration();
+		sc.setFirstResult(startIndex);
+		sc.setMaximumResultSize(count);
+		
+		PagedResult<User>  r = internalSearchUsersByJson(query, result, sc);
+		
+		return r;
+	}
+
+	@Override
 	protected Collection<User> handleFindUserByJsonQuery(String query)
 			throws InternalErrorException, Exception {
 
 		LinkedList<User> result = new LinkedList<User>();
 
-		internalSearchUsersByJson(query, result);
+		internalSearchUsersByJson(query, result, new CriteriaSearchConfiguration());
 		
 		return result;
 	}
 
-	private void internalSearchUsersByJson(String query, Collection<User> result)
+
+	private PagedResult<User> internalSearchUsersByJson(String query, Collection<User> result, CriteriaSearchConfiguration cs)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
@@ -3093,12 +3112,20 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 		TimeOutUtils tou = new TimeOutUtils();
-		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
-				paramArray)) {
+
+		List <UserEntity> users = ( List <UserEntity>) new QueryBuilder()
+				.query(hql.toString(), 
+						paramArray,
+						cs.getFirstResult(), 
+						cs.getMaximumResultSize());
+
+		PagedResult<User> pagedResult = new PagedResult<User>();
+		int totalResults = 0;
+		for (UserEntity ue : users) {
 			if (result instanceof AsyncList)
 			{
 				if (((AsyncList) result).isCancelled())
-					return;
+					return null;
 			}
 			else
 			{
@@ -3108,10 +3135,28 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
 						Security.AUTO_USER_QUERY, ue)) {
+					totalResults ++;
 					result.add(u);
 				}
 			}
 		}
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( cs.getFirstResult() != null ? cs.getFirstResult(): 0);
+		pagedResult.setItemsPerPage( cs.getMaximumResultSize());
+		if ( cs.getMaximumResultSize()  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query(hql.toCountString(), 
+							paramArray,
+							null, 
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	@Override
@@ -3125,7 +3170,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			@Override
 			public void run() {
 				try {
-					internalSearchUsersByJson(query, result);
+					internalSearchUsersByJson(query, result, new CriteriaSearchConfiguration());
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				

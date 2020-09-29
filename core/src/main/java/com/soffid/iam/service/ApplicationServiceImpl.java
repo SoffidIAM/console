@@ -54,6 +54,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.NetworkAuthorization;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleDependencyStatus;
@@ -73,6 +74,7 @@ import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntityImpl;
@@ -2628,7 +2630,7 @@ public class ApplicationServiceImpl extends
 	}
 
 
-	private void findRoleByJsonQuery(AsyncList<Role> result, String query) throws Exception {
+	private PagedResult<Role> findRoleByJsonQuery(AsyncList<Role> result, String query, CriteriaSearchConfiguration cs) throws Exception {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
@@ -2647,10 +2649,16 @@ public class ApplicationServiceImpl extends
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		for (RoleEntity ue : getRoleEntityDao().query(hql.toString(),
-				paramArray)) {
+		@SuppressWarnings("unchecked")
+		List <RoleEntity> roles = ( List <RoleEntity>) new QueryBuilder()
+				.query(hql.toString(), 
+						paramArray,
+						cs.getFirstResult(), 
+						cs.getMaximumResultSize());
+		int totalResults = 0;
+		for (RoleEntity ue : roles) {
 			if (result.isCancelled())
-				return;
+				return null;
 			Role u = getRoleEntityDao().toRole(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
@@ -2659,6 +2667,24 @@ public class ApplicationServiceImpl extends
 				}
 			}
 		}
+		PagedResult<Role> pagedResult = new PagedResult<Role>();
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( cs.getFirstResult() != null ? cs.getFirstResult(): 0);
+		pagedResult.setItemsPerPage( cs.getMaximumResultSize());
+		if ( cs.getMaximumResultSize()  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query(hql.toCountString(), 
+							paramArray,
+							null, 
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	@Override
@@ -2706,7 +2732,7 @@ public class ApplicationServiceImpl extends
 	protected Collection<Application> handleFindApplicationByJsonQuery(String query) throws Exception {
 		AsyncList<Application> result = new AsyncList<Application>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findApplicationByJsonQuery(result, query);
+		findApplicationByJsonQuery(result, query, new CriteriaSearchConfiguration());
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
@@ -2714,12 +2740,27 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
+	protected PagedResult<Application> handleFindApplicationByJsonQuery(String query, Integer startIndex, Integer count) throws Exception {
+		AsyncList<Application> result = new AsyncList<Application>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		CriteriaSearchConfiguration sc = new CriteriaSearchConfiguration();
+		sc.setFirstResult(startIndex);
+		sc.setMaximumResultSize(count);
+		PagedResult<Application> pr = findApplicationByJsonQuery(result, query, sc);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return pr;
+	}
+
+
+	@Override
 	protected AsyncList<Application> handleFindApplicationByJsonQueryAsync(final String query) throws Exception {
 		final AsyncList<Application> result = new AsyncList<Application>();
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findApplicationByJsonQuery(result, query);
+					findApplicationByJsonQuery(result, query, new CriteriaSearchConfiguration());
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -2728,7 +2769,7 @@ public class ApplicationServiceImpl extends
 		return result;
 	}
 
-	protected void findApplicationByJsonQuery ( AsyncList<Application> result, String query) 
+	protected PagedResult<Application> findApplicationByJsonQuery ( AsyncList<Application> result, String query, CriteriaSearchConfiguration cs) 
 			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
 	{
 
@@ -2754,16 +2795,42 @@ public class ApplicationServiceImpl extends
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
 		// Execute HQL and generate result
+		@SuppressWarnings("unchecked")
+		List <InformationSystemEntity> apps = ( List <InformationSystemEntity>) new QueryBuilder()
+				.query(hql.toString(), 
+						paramArray,
+						cs.getFirstResult(), 
+						cs.getMaximumResultSize());
+		int totalResults = 0;
 		for (InformationSystemEntity applicationEntity : getInformationSystemEntityDao().query(hql.toString(), paramArray)) {
 			if (result.isCancelled())
-				return;
+				return null;
 			Application ApplicationVO = getInformationSystemEntityDao().toApplication(applicationEntity);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(ApplicationVO)) {
 				if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_QUERY, applicationEntity)) {
+					totalResults ++;
 					result.add(ApplicationVO);
 				}
 			}
 		}
+		PagedResult<Application> pagedResult = new PagedResult<Application>();
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( cs.getFirstResult() != null ? cs.getFirstResult(): 0);
+		pagedResult.setItemsPerPage( cs.getMaximumResultSize());
+		if ( cs.getMaximumResultSize()  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query(hql.toCountString(), 
+							paramArray,
+							null, 
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	String generateQuickSearchQuery (String text) {
@@ -3386,7 +3453,7 @@ public class ApplicationServiceImpl extends
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findRoleByJsonQuery(result, query);
+					findRoleByJsonQuery(result, query, new CriteriaSearchConfiguration());
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -3399,12 +3466,27 @@ public class ApplicationServiceImpl extends
 	protected Collection<Role> handleFindRoleByJsonQuery(String query) throws Exception {
 		AsyncList<Role> result = new AsyncList<Role>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findRoleByJsonQuery(result, query);
+		findRoleByJsonQuery(result, query, new CriteriaSearchConfiguration());
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
 		return result.get();
 	}
+
+	@Override
+	protected PagedResult<Role> handleFindRoleByJsonQuery(String query, Integer startIndex, Integer count) throws Exception {
+		AsyncList<Role> result = new AsyncList<Role>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		CriteriaSearchConfiguration sc = new CriteriaSearchConfiguration();
+		sc.setFirstResult(startIndex);
+		sc.setMaximumResultSize(count);
+		PagedResult<Role> pr = findRoleByJsonQuery(result, query, sc);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return pr;
+	}
+
 
 
 }

@@ -208,6 +208,7 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 				dv.setValue(domain);
 				ra.setDomainValue(dv);
 				DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue((DataSource)usersListbox, "/role");				
+				coll.add(ra);
 			}
 		}
 		groupsDataSource.commit();

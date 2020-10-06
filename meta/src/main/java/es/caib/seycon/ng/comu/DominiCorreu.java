@@ -7,15 +7,18 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.DominiCorreuEntity;
+
 @ValueObject ( translatedName="MailDomain",
 	 translatedPackage="com.soffid.iam.api")
+@JsonObject(hibernateClass = DominiCorreuEntity.class)
 public class DominiCorreu {
 
-	@Attribute(translated = "code" )
+	@Attribute(translated = "name", synonyms = {"code"}, searchCriteria = true )
 	public java.lang.String codi;
 
 	@Nullable
-	@Attribute(translated = "description" )
+	@Attribute(translated = "description", searchCriteria = true )
 	public java.lang.String descripcio;
 
 	@Nullable

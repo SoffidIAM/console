@@ -168,10 +168,10 @@ public class NetworkHandler extends FrameHandler {
 	public void afterCompose() {
 		super.afterCompose();
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
-		String user = req.getParameter("userName");
+		String user = req.getParameter("name");
 		if (user != null) {
 			SearchBox sb = (SearchBox) getFellow("searchBox");
-			sb.addAttribute("userName").setSearchFilter(user);
+			sb.addAttribute("name").setSearchFilter(user);
 			sb.search();
 		}
 	}

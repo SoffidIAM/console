@@ -1,18 +1,19 @@
 @font-face {
 	font-family: soffid;
-	src: url(/anonymous/AvenirLTStd-Medium.otf);
+	src: url(/soffid/anonymous/AvenirLTStd-Medium.otf);
 	font-weight: normal;
 }
 @font-face {
 	font-family: soffid;
-	src: url(/anonymous/AvenirLTStd-Black.otf);
+	src: url(/soffid/anonymous/AvenirLTStd-Black.otf);
 	font-weight: bold;
 }
 @font-face {
 	font-family: soffid;
-	src: url(/anonymous/AvenirLTStd-Light.otf);
+	src: url(/soffid/anonymous/AvenirLTStd-Light.otf);
 	font-weight: lighter;
 }
+
 
 div.highlighted {
 	margin: 0;
@@ -100,7 +101,7 @@ div.wc-modal, div.wc-modal-none, div.wc-highlighted, div.wc-highlighted-none {
 /* Linia superior de l'aplicació */
 .topline {
 	background-color: #2b2b2b; 
-/*	background-image: url(/anonymous/background.svg);
+/*	background-image: url(/soffid/anonymous/background.svg);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -208,7 +209,7 @@ div.z-loading-indicator {box-sizing: content-box;}
 	border: none;
 	width: 100%;
 	padding-left: 20px;
-	background-image: url(/img/search.svg);
+	background-image: url(/soffid/img/search.svg);
 	background-position-x: left;
 	background-position-y: center;
 	background-size: 17px;
@@ -278,55 +279,6 @@ div.main-search.ctxpopup div.search-more {
 	float: {TEXT_ALIGN_LEFT}; /* per a alinear favorits */
 }
 
-.favorits {
-	float:{TEXT_ALIGN_LEFT};	
-	margin-left: 2px;
-	margin-top: 1px;
-	position: relative;
-	top: -1px;
-	padding-left: 1px;
-	margin-right: 3px;
-}
-
-.inici {
-	font-family: inherit;
-	font-size: inherit;
-	font-weight: bold;
-	color: #FFF;
-}
-
-.benvingutmsg span {
-	font-family: inherit;
-	font-size: 11pt;	
-}
-
-.benvingut {
-	color: #ffffff;	
-}
-
-.codiusuari {
-	font-weight: bold;
-	color: {SKY};	
-	cursor: pointer;
-}
-.codiusuari:hover{
-	text-decoration: underline;
-}
-/* menú de inicio */
-.menuprincipal {
-	{TEXT_ALIGN_LEFT}: 0px !important;
-	border: 1px solid {SKY};
-	max-height: calc(100% - 34px);
-	overflow-y: auto;
-	left: 0;
-	top: 35px !important ;
-}
-
-
-.reloadtasks {
-	cursor: pointer;	
-}
-
 /* Capsa dels criteris de cerca */
 .capsa_cerca {
 	padding: 2px;
@@ -362,6 +314,13 @@ div.main-search.ctxpopup div.search-more {
 	font-size: inherit;
 	border: 1px solid #7F9196; /*width: 135px;*/
 	background-image: none;
+}
+
+div.text {
+	border: none;
+	background: transparent;
+	text-color: black;
+	padding-top: 6px;
 }
 
 .textbox2 { width: 98%; width: calc( 100% - 16px);}
@@ -478,6 +437,7 @@ button.small-button:focus, button:focus, input[type="button"]:focus, input[type=
 .toolbar img
 {
 	margin-left: 5px;
+	width: 20px;
 }
 
 .toolbar-checkbox
@@ -531,9 +491,6 @@ div.listbox-head th:last-child,
 div.listbox-paging th:last-child, 
 div.tree-head th:last-child, 
 div.tree-paging th:last-child {
-/*	background-image:url('../img/bder.gif');
-	background-repeat:repeat-y;
-	background-position: top right*/
 }
 
 div.listbox-head th div, 
@@ -726,7 +683,7 @@ img.imageclic, img.search-icon {
 }
 
 img.imageclic:hover, img.search-icon:hover {
-	background-image: url(/img/circle.svg);
+	background-image: url(/soffid/img/circle.svg);
 	background-size: cover;
 }
 
@@ -1390,7 +1347,7 @@ div.CodeMirror-linenumber {font-size: 12pt}
 }
 
 
-.attribute-search-box-remove, div.databox div.container img.remove-icon {
+.attribute-search-box-remove, div.databox img.remove-icon {
     margin-left: 8px;
 	width:1em;
 	opacity:0.2;
@@ -1400,7 +1357,7 @@ div.CodeMirror-linenumber {font-size: 12pt}
 
 
 .attribute-search-box-remove:hover, 
-div.databox div.container img.remove-icon:hover {
+div.databox img.remove-icon:hover {
 	opacity: 1;
 }
 
@@ -1437,6 +1394,14 @@ span.search-box ul li {
 
 .searchbox-addcriteria {
 	margin-bottom: 5px
+}
+
+a.shylink, a.shylink:active, a.shylink:visited {
+	text-decoration:none;
+	color: black;
+}
+a.shylink:hover {
+	text-decoration:underline;
 }
 
 a.remove-filter, a.remove-filter:hover, a.remove-filter:active,a.remove-filter:visited,
@@ -2000,12 +1965,6 @@ span.inputField_tail {
 }
 			
 
-span.separator_label {
-	color: {BLUE};
-	font-weight: bold;
-	padding-top: 15px;
-}
-			
 .appatt {display: table; padding: 0px; width: 100%}
 .appatt_row {display: table-row}
 .appatt_row span {}
@@ -2101,6 +2060,10 @@ div.datatable table, div.datatable table td {
 	min-width: 80px;
 }
 
+div.datatable table tr td.selector {
+	width: 50px;
+	min-width: 50px;
+}
 div.datatable.fixedlayout table {
 	table-layout: fixed;
 }
@@ -2113,6 +2076,17 @@ div.datatable table.tbody tr td.selector {
 div.datatable table.tbody tr.dashed td,
 div.databox.dashed select {
 	text-decoration: line-through;
+}
+div.datatable table.tbody tr.bold td,
+div.databox.bold select {
+	font-weight: bold;
+}
+div.datatable table.tbody tr.approval-pending td {
+	color: #808080;
+}
+
+div.datatable table.tbody tr.rule td {
+	color: {GREEN};
 }
 
 div.datatable table.thead td {
@@ -2182,6 +2156,24 @@ div.datatable table.tbody td {
 	padding-top: 3px;
 	padding-bottom: 3px;
 	margin: 0px;
+}
+
+div.datatable table.tbody td.green {
+	background-color: green;
+	color: white;
+	text-align: center;
+	width: 100px;
+}
+div.datatable table.tbody td.red {
+	background-color: red;
+	text-align: center;
+	width: 100px;
+}
+div.datatable table.tbody td.yellow {
+	background-color: yellow;
+	color: black;
+	text-align: center;
+	width: 100px;
 }
 
 div.datatable table.tbody tr:hover {
@@ -2260,7 +2252,7 @@ div.datatable div.sort-indicator-disabled {
  * http://colinaarts.com/articles/float-containment/ */
 .switch:before, .switch:after {
   content    : '';
-  display    : table;
+  display    : inline-block;
 }
 
 .switch:after {
@@ -2390,7 +2382,8 @@ div.datatable div.sort-indicator-disabled {
   min-height: calc( 100vh - 85px );
   position: relative;
   transition: transform 1s;
-  transform-style: preserve-3d;
+  transform-style: preserve-3d ;
+  opacity: 1;
 }
 
 .card__face {
@@ -2571,7 +2564,7 @@ button.icon-button:disabled, button.grid-icon-button:disabled {
 }
 
 div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-button:hover, span.zbtnbk:hover {
-	background-image: url(/img/circle.svg);
+	background-image: url(/soffid/img/circle.svg);
 	background-size: cover;
 }
 
@@ -2602,7 +2595,8 @@ div.options {
 }
 
 .options.options-small .menuoption {
-	width: 150px;
+	width: 90px;
+	padding: 10px;
 }
 
 .options .menuoption img {
@@ -2645,7 +2639,7 @@ div.options {
 }
 
 .options.options-small .menuoption .menuoption-title {
-	font-size: 12pt;
+	font-size: 10pt;
 }
 
 .options .menuoption .menuoption-suboptions {
@@ -2728,8 +2722,8 @@ div.datatree div.tfoot {
 }
 		
 
-div.datatree div.tree-collapse {
-    background-image: url(/img/foldBackground.svg);
+div.datatree div.tree-collapse, div.collapser {
+    background-image: url(/soffid/img/foldBackground.svg);
     background-size: cover;
     display: inline-block;
     width: 18px;
@@ -2742,14 +2736,14 @@ div.datatree div.tree-collapse {
 	cursor: pointer;
 }
 
-div.datatree div.tree-collapse img {
+div.datatree div.tree-collapse img, div.collapser img {
 	transition: transform 0.3s ease-in-out;
     transform: rotate(-90deg) scale(1, 1);
     width: 18px;
     height: 18px;
 }
 
-div.datatree div.tree-collapse.open img {
+div.datatree div.tree-collapse.open img, div.collapser.open img {
    	transform: rotate(0deg) scale(1, 1);		
 }
 
@@ -2798,7 +2792,7 @@ div.datatree div.tbody div.tree-item {
 }
 
 div.tree-children.waiting {
-	background-image: url(../img/wait.gif); 
+	background-image: url(/soffid/img/wait.gif); 
 	background-size: 16px 16px;
 	width: 16px;
 	height: 32px;
@@ -2811,11 +2805,12 @@ div.tree-children.waiting div.tree-tail {
 }
 
 div.datatree div.tree-itemholder {
-  background-image: url(/img/separator.svg);
+  background-image: url(/soffid/img/separator.svg);
 	
 }
 	
-div.datatree div.tree-itemholder img.tree-icon {
+div.datatree div.tree-itemholder img.tree-icon,
+img.small-icon {
 	width: 1em;
 	height: 1em;
 	margin-right: 4px;			
@@ -3079,7 +3074,8 @@ div.databox div.label, span.label {
 	margin-left: 8px;
 }
 
-div.databox.separator div.label, span.separator {
+div.databox.separator div.label, span.separator,
+span.separator_label {
 	display: inline-block;
 	width: 100%;
 	color: 	{GREEN};
@@ -3124,16 +3120,16 @@ div.databox div.container input.description,
 div.databox[multivalue='true'] div.container input.text ,
 div.databox[multivalue='true'] div.container textarea.text {
 	width: 90%;
-	width: calc( 100% - 1em - 2px );
+	width: calc( 100% - 1em - 8px );
 }
 
 div.databox[multivalue='true'] div.container input.description {
 	width: 90%;
-	width: calc( 100% - 2em - 4px );
+	width: calc( 100% - 2em - 8px );
 }
 
 div.databox div.databox-popup {
-   position: absolute;
+   position: fixed;
    margin-top: 24px;
    background-color: white;
    padding: 8px;
@@ -3251,7 +3247,7 @@ div.wizard-bar div.separator-p {
 	height: 100%;
 	width: 26px;
 	display: inline-block;
-	background-image: url(/img/wizard-p.svg);
+	background-image: url(/soffid/img/wizard-p.svg);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -3261,7 +3257,7 @@ div.wizard-bar div.separator-n {
 	display: inline-block;
 	height: 100%;
 	width: 26px;
-	background-image: url(/img/wizard-n.svg);
+	background-image: url(/soffid/img/wizard-n.svg);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -3271,7 +3267,7 @@ div.wizard-bar div.separator-d {
 	display: inline-block;
 	height: 100%;
 	width: 26px;
-	background-image: url(/img/wizard-d.svg);
+	background-image: url(/soffid/img/wizard-d.svg);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: cover;

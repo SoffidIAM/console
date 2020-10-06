@@ -9,6 +9,8 @@ import com.soffid.iam.api.Rule;
 import com.soffid.iam.model.RuleEntity;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.RolEntity;
+
 import java.io.File;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	com.soffid.iam.service.SoffidEventListener.class,
-	es.caib.seycon.ng.model.TasqueEntity.class})
+	es.caib.seycon.ng.model.TasqueEntity.class,
+	RolEntity.class})
 public abstract class RuleEvaluatorService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

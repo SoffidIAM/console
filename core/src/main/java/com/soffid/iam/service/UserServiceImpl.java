@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
@@ -60,6 +61,7 @@ import com.soffid.iam.api.PrinterUser;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Session;
+import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserCriteria;
@@ -85,6 +87,8 @@ import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.TaskLogEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
@@ -97,6 +101,7 @@ import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.CertificateParser;
+import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
@@ -3324,6 +3329,178 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			return true;
 		else
 			return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.AccountServiceBase#handleIsUpdatePending(es.caib.seycon.ng.comu.Account)
+	 */
+	@Override
+	protected int handleIsUpdatePendingExtended (String userName) throws Exception
+	{
+		int status = 0;
+		UserEntity user = getUserEntityDao().findByUserName(userName);
+		if (user == null)
+			return 0;
+
+
+		for ( AccountEntity account: getAccountEntityDao().findByUser(user.getId())) 
+		{
+			if (account.getSystem().getUrl() != null &&
+					account.getType() != AccountType.IGNORED &&
+					Boolean.FALSE.equals(account.getPasswordPolicy().getUnmanaged())) {
+				List<TaskEntity> coll = getTaskEntityDao().findByAccount(account.getName(), account.getSystem().getName());
+				for (TaskEntity tasque : coll) {
+					if (tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT) || tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_ACCOUNT_PASSWORD)) {
+						if ("X".equals( tasque.getStatus()) && status < 1)
+							status = 1;
+						else if ("E".equals( tasque.getStatus()) && status < 3)
+							status = 3;
+						else if (status < 2) 
+							status = 2;
+					}
+				}
+			}
+		}
+
+        List<TaskEntity> coll = getTaskEntityDao().findByUser(userName);
+        for (TaskEntity tasque : coll) {
+            if (tasque.getTransaction().equals(TaskHandler.UPDATE_USER) || 
+            		tasque.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || 
+            		tasque.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD)) {
+            	if ("X".equals( tasque.getStatus()))
+            	{
+            		if (status < 1) status = 1;
+            	} else {
+            		if (status < 2) status = 2 ;
+            		boolean found = false;
+                    for (TaskLogEntity tl : tasque.getLogs()) {
+                        if (!"S".equals(tl.getCompleted())) {
+                        	if (tl.getExecutionsNumber() != null && tl.getExecutionsNumber().longValue() > 1L && status < 3)
+                        		status = 3;
+                        }
+                    }
+            	}
+            }
+        }
+
+        return status;
+	}
+
+	@Override
+	protected Collection<SyncAgentTaskLog> handleGetActiveTasks(String userName) throws Exception {
+		List<SyncAgentTaskLog> r = new LinkedList<>();
+		UserEntity user = getUserEntityDao().findByUserName(userName);
+		if (user == null)
+			return r;
+
+		List<AccountEntity> accounts = getAccountEntityDao().findByUser(user.getId());
+		for ( AccountEntity account: accounts) 
+		{
+			if (account.getSystem().getUrl() != null &&
+					account.getType() != AccountType.IGNORED &&
+					Boolean.FALSE.equals(account.getPasswordPolicy().getUnmanaged())) {
+				List<TaskEntity> coll = getTaskEntityDao().findByAccount(account.getName(), account.getSystem().getName());
+				for (TaskEntity task : coll) {
+					SyncAgentTaskLog tl;
+					tl = new SyncAgentTaskLog();
+					tl.setTaskId(task.getId());
+					tl.setAgentCode(account.getSystem().getName());
+					tl.setComplete( "X".equals(task.getStatus()) ? "ON HOLD": "PENDING");
+					tl.setCreationDate(Calendar.getInstance());
+					tl.getCreationDate().setTime(task.getDate());
+					tl.setExecutionsNumber(0L);
+					tl.setPriority(task.getPriority());
+					tl.setTaskDescription(task.toString());
+					for ( TaskLogEntity tle: task.getLogs()) {
+						if (tle.getLastExecution() != null) {
+							tl.setLastExecution(tle.getLastExecution());
+							tl.setLastExecutionDate(Calendar.getInstance());
+							tl.getLastExecutionDate().setTime(new Date(tle.getLastExecution()));
+						}
+						if (tle.getNextExecution() != null) {
+							tl.setNextExecution(tle.getNextExecution());
+							tl.setNextExecutionDate(Calendar.getInstance());
+							tl.getNextExecutionDate().setTime(new Date(tle.getNextExecution()));	        								
+						}
+						if ("S".equals(tle.getCompleted())) {
+							tl.setComplete("DONE");
+						} else if (tle.getMessage() != null) {
+							tl.setComplete("ERROR");
+							tl.setMessage(tle.getMessage());
+						}
+						tl.setExecutionsNumber(tle.getExecutionsNumber());
+	                } 
+					r.add(tl);
+				}
+			}
+		}
+
+        List<TaskEntity> coll = getTaskEntityDao().findByUser(userName);
+        for (TaskEntity task : coll) {
+            if (task.getTransaction().equals(TaskHandler.UPDATE_USER) || 
+            		task.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || 
+            		task.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD)) {
+            	if ("X".equals( task.getStatus()))
+            	{
+    				SyncAgentTaskLog tl;
+    				tl = new SyncAgentTaskLog();
+    				tl.setTaskId(task.getId());
+    				tl.setComplete( "ON HOLD");
+    				tl.setCreationDate(Calendar.getInstance());
+    				tl.getCreationDate().setTime(task.getDate());
+    				tl.setExecutionsNumber(0L);
+    				tl.setPriority(task.getPriority());
+    				tl.setTaskDescription(task.toString());
+    				r.add(tl);
+            	} else {
+            		for (AccountEntity account: accounts) {
+            			if (account.getSystem().getUrl() != null &&
+            					account.getType() != AccountType.IGNORED &&
+            					Boolean.FALSE.equals(account.getPasswordPolicy().getUnmanaged())) {
+	        				SyncAgentTaskLog tl;
+	        				tl = new SyncAgentTaskLog();
+	        				tl.setTaskId(task.getId());
+	        				tl.setComplete( "PENDING");
+	        				tl.setAgentCode(account.getSystem().getName());
+	        				tl.setCreationDate(Calendar.getInstance());
+	        				tl.getCreationDate().setTime(task.getDate());
+	        				tl.setExecutionsNumber(0L);
+	        				tl.setPriority(task.getPriority());
+	        				tl.setTaskDescription(task.toString());
+	        				boolean add = true;
+	        				for (TaskLogEntity tle : task.getLogs()) {
+	        					if (tle.getSystem() == account.getSystem()) {
+	        						if ("S".equals(tle.getCompleted())) add = false;
+	        						else {
+	        							if (tle.getLastExecution() != null) {
+	        								tl.setLastExecution(tle.getLastExecution());
+	        								tl.setLastExecutionDate(Calendar.getInstance());
+	        								tl.getLastExecutionDate().setTime(new Date(tle.getLastExecution()));
+	        							}
+	        							if (tle.getNextExecution() != null) {
+	        								tl.setNextExecution(tle.getNextExecution());
+	        								tl.setNextExecutionDate(Calendar.getInstance());
+	        								tl.getNextExecutionDate().setTime(new Date(tle.getNextExecution()));	        								
+	        							}
+        								if ("S".equals(tle.getCompleted())) {
+        									tl.setComplete("DONE");
+        									add = false;
+        								} else if (tle.getMessage() != null) {
+        									tl.setComplete("ERROR");
+        									tl.setMessage(tle.getMessage());
+        								}
+	        							tl.setExecutionsNumber(tle.getExecutionsNumber());
+	        						}
+	        					}
+	        				}
+	        				if ( add )
+	        					r.add(tl);
+            			}
+            		}
+            	}
+            }
+        }
+        return r;
 	}
 
 }

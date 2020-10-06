@@ -7,6 +7,10 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.RegistreAccesEntity;
+
+
+@JsonObject(hibernateClass = RegistreAccesEntity.class)
 @ValueObject ( translatedName="AccessLog",
 	 translatedPackage="com.soffid.iam.api")
 public class RegistreAcces {
@@ -33,14 +37,17 @@ public class RegistreAcces {
 	public java.lang.String informacio;
 
 	@Nullable
-	@Attribute(translated = "userCode" )
+	@JsonAttribute(hibernateAttribute = "user.userName")
+	@Attribute(translated = "userName", synonyms = {"userCode"} )
 	public java.lang.String codiUsuari;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "server.name")
 	@Attribute(translated = "serverName" )
 	public java.lang.String nomServidor;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "client.name")
 	@Attribute(translated = "clientName" )
 	public java.lang.String nomClinet;
 
@@ -49,6 +56,7 @@ public class RegistreAcces {
 	public java.lang.String tipusAcces;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "protocol.name")
 	@Attribute(translated = "accessProtocol" )
 	public java.lang.String protocolAcces;
 

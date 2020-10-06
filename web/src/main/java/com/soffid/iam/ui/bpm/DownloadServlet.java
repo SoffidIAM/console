@@ -15,17 +15,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.bpm.api.TaskInstance;
+import com.soffid.iam.bpm.attachment.AbstractAttachmentManager;
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
+import com.soffid.iam.web.bpm.attachment.ProcessAttachmentManager;
+import com.soffid.iam.web.bpm.attachment.TaskAttachmentManager;
 
-import es.caib.bpm.attachment.AbstractAttachmentManager;
-import es.caib.bpm.attachment.ProcessAttachmentManager;
-import es.caib.bpm.attachment.TaskAttachmentManager;
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.vo.ProcessInstance;
-import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class DownloadServlet extends HttpServlet {
@@ -58,7 +58,7 @@ public class DownloadServlet extends HttpServlet {
 			path = path.substring(1);
 		String split[] = path.split("/+"); //$NON-NLS-1$
 		try {
-			BpmEngine engine = EJBContainer.getEJBContainer(req.getSession()).getEngine();
+			BpmEngine engine = EJBLocator.getBpmEngine();
 			Long id = new Long(split[0]);
 			AbstractAttachmentManager am = null;
 			TaskInstance task = engine.getTask(id.longValue());

@@ -9,8 +9,8 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateParameter}"  onClick="ref:frame.addNew"/>
-					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateParameter &amp;&amp; canUpdateParameter &amp;&amp; canDeleteParameter}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('parameter:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('paramoter:create') || soffid:isUserInRole('parameter:update')}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
@@ -30,7 +30,7 @@
 					]]>
 				</attribute>
 			</datatable>
-			<div width="100%" style="text-align: right"  if="${canCreateParameter}" >
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('parameter:create')}" >
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -41,7 +41,7 @@
 					<pager datatable="listbox"/>
 					
 					<menu2>
-						<menu2item if="${canDeleteParameter}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+						<menu2item if="${soffid:isUserInRole('parameter:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 					</menu2>
 					
 					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>

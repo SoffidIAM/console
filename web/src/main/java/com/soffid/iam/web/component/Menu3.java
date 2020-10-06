@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xml.HTMLs;
@@ -24,7 +25,7 @@ import es.caib.zkib.zkiblaf.Application;
 public class Menu3 extends Div implements AfterCompose {
 	private static final String SELECT_EVENT = "onSelect";
 	List<MenuOption> options;
-	public Menu3() throws IOException {
+	public Menu3() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 		options = new MenuParser().parse("console.yaml");
 	}
 
@@ -37,11 +38,26 @@ public class Menu3 extends Div implements AfterCompose {
 		for (MenuOption option: options)
 		{
 			JSONObject o = new JSONObject();
-			o.put("label", Labels.getLabel(option.getLabel()));
-			o.put("img", option.getImg());
-			if (option.getOptions() != null && !option.getOptions().isEmpty())
-				o.put("options", generateJsonMenu(option.getOptions()));
+			if (option.getLiteral() != null)
+				o.put("label", option.getLiteral());
+			else
+				o.put("label", Labels.getLabel(option.getLabel()));
+			o.put("img", getDesktop().getExecution().getContextPath()+option.getImg());
 			o.put("url", option.getUrl());
+			o.put("full_url", getDesktop().getExecution().getContextPath()+option.getUrl());
+			if (option.getHandler() != null) {
+				List<MenuOption> options2 = option.getHandler().getOptions();
+				if (options2 != null && options2.isEmpty()) {
+					continue; // Skip empty menu
+				} else {
+					option.setOptions(options2);
+				}
+				String tip = option.getHandler().getTip();
+				if (tip != null)
+					o.put("tip", tip);
+			}
+			if (option.getOptions() != null && !option.getOptions().isEmpty()) 
+				o.put("options", generateJsonMenu(option.getOptions()));
 			array.put(o);
 		}
 		return array;

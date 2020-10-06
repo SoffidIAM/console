@@ -379,7 +379,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 	 */
 	@Override
 	protected List handleSearchProcessInstances(String query, String processID,
-			String startDate, String endDate, boolean finished)
+			Date sinceStartDate, Date untilStartDate,
+			Date sinceEndDate, Date untilEndDate, boolean finished)
 			throws Exception {
 		JbpmContext context = getContext();
 		LinkedList resultado = new LinkedList();
@@ -414,59 +415,62 @@ public class BpmEngineImpl extends BpmEngineBase {
 					q = new MatchAllDocsQuery();
 
 				// Verifiquem el format de les dates
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd"); //$NON-NLS-1$
-				String dataInici = null, dataFi = null;
-				if (startDate != null && !"".equals(startDate)) { //$NON-NLS-1$
-					dataInici = startDate;
-				} else {
-					Calendar dataIniciWF = Calendar.getInstance();
-					dataIniciWF.set(2005, 1, 1); // data d'inici 1 de gener de
-													// 2005
-					dataInici = sdf.format(dataIniciWF.getTime());
-				}
-				if (endDate != null && !"".equals(endDate)) { //$NON-NLS-1$
-					dataFi = endDate;
-				} else {
-					// Posem com a limit superior demà:
-					// dataIni > hui
-					if (dataInici != null) {
-						try {
-							Date d_dataInici = sdf.parse(dataInici);
-							Calendar dema = Calendar.getInstance();
-							dema.set(Calendar.HOUR_OF_DAY, 0);
-							dema.set(Calendar.MINUTE, 0);
-							dema.set(Calendar.SECOND, 0);
-							dema.set(Calendar.MILLISECOND, 0);
-							dema.add(Calendar.DATE, 1);
-							if (d_dataInici.getTime() >= dema.getTimeInMillis()) {
-								throw new BPMException(
-										Messages.getString("BpmEngineImpl.StartDateError"), //$NON-NLS-1$
-										-1);
-							}
-						} catch (java.text.ParseException ex) {
-
-						}
-					}
-					Calendar dema = Calendar.getInstance();
-					dema.add(Calendar.DATE, 2); // afegim 2 dies
-					dataFi = sdf.format(dema.getTime());
-				}
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm"); //$NON-NLS-1$
+				String dataInici0 = null, dataFi = null;
 
 				TopDocs hits;
 				BooleanFilter b = new BooleanFilter();
 				boolean complexQuery = false;
-				if (startDate != null && !"".equals(startDate)) { //$NON-NLS-1$
+
+				// Start date
+				if (sinceStartDate != null && untilStartDate != null) { //$NON-NLS-1$
 					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
-							new BytesRef(dataInici), 
-							new BytesRef(dataFi), true, true); // inclusiu
+							new BytesRef(sdf.format(sinceStartDate)), 
+							new BytesRef(sdf.format(untilStartDate)), 
+							true, true); // inclusiu
 					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
-				if (endDate != null && !"".equals(endDate)) { //$NON-NLS-1$
-					TermRangeFilter fend = new TermRangeFilter("$endDate", //$NON-NLS-1$
-							new BytesRef(dataInici), 
-							new BytesRef(dataFi), true, true); // inclusiu
-					b.add(new FilterClause(fend, BooleanClause.Occur.MUST));
+				else if (sinceStartDate != null) { //$NON-NLS-1$
+					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
+							new BytesRef(sdf.format(sinceStartDate)), 
+							new BytesRef("9999"), 
+							true, true); // inclusiu
+					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
+					complexQuery = true;
+				}
+				else if (untilStartDate != null) { //$NON-NLS-1$
+					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
+							new BytesRef("000"), 
+							new BytesRef(sdf.format(untilStartDate)),
+							true, true); // inclusiu
+					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
+					complexQuery = true;
+				}
+
+				// End date
+				if (sinceEndDate != null && untilEndDate != null) { //$NON-NLS-1$
+					TermRangeFilter fEnd = new TermRangeFilter("$endDate", //$NON-NLS-1$
+							new BytesRef(sdf.format(sinceEndDate)), 
+							new BytesRef(sdf.format(untilEndDate)), 
+							true, true); // inclusiu
+					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
+					complexQuery = true;
+				}
+				else if (sinceEndDate != null) { //$NON-NLS-1$
+					TermRangeFilter fEnd = new TermRangeFilter("$endDate", //$NON-NLS-1$
+							new BytesRef(sdf.format(sinceEndDate)), 
+							new BytesRef("9999"), 
+							true, true); // inclusiu
+					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
+					complexQuery = true;
+				}
+				else if (untilEndDate != null) { //$NON-NLS-1$
+					TermRangeFilter fEnd = new TermRangeFilter("$endDate", //$NON-NLS-1$
+							new BytesRef("000"), 
+							new BytesRef(sdf.format(untilEndDate)),
+							true, true); // inclusiu
+					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 
@@ -2273,6 +2277,35 @@ public class BpmEngineImpl extends BpmEngineBase {
 			else
 				return fileDefinition.getBytes("processimage.jpg"); //$NON-NLS-1$
 
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected byte[] handleGetProcessDefinitionIcon(Long definitionId)
+			throws Exception {
+		JbpmContext context = getContext();
+
+		byte[] resultado = null;
+
+		try {
+			org.jbpm.graph.def.ProcessDefinition definition = context
+					.getGraphSession().getProcessDefinition(definitionId);
+
+			FileDefinition fileDefinition = definition.getFileDefinition();
+			if (fileDefinition == null)
+				return null;
+			else if (fileDefinition.hasFile("icon.svg"))
+				return fileDefinition.getBytes("icon.svg"); //$NON-NLS-1$
+			else if (fileDefinition.hasFile("icon.jpge"))
+				return fileDefinition.getBytes("icon.jpeg"); //$NON-NLS-1$
+			else if (fileDefinition.hasFile("icon.png"))
+				return fileDefinition.getBytes("icon.png"); //$NON-NLS-1$
+			else
+				return null;
 		} catch (RuntimeException ex) {
 			throw ex;
 		} finally {

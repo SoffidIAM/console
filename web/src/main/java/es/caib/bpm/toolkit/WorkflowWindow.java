@@ -3,6 +3,9 @@ package es.caib.bpm.toolkit;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.ui.Component;
@@ -14,6 +17,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.web.bpm.WorkflowWindowInterface;
 import com.soffid.iam.web.users.additionalData.CustomField;
 
 import es.caib.bpm.servei.ejb.BpmEngine;
@@ -21,6 +25,7 @@ import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.bpm.toolkit.exception.WorkflowException;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
+import es.caib.seycon.ng.EJBLocator;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.events.SerializableEventListener;
 
@@ -29,7 +34,7 @@ import es.caib.zkib.events.SerializableEventListener;
  * 
  * @author Pablo Hern�n Gim�nez.
  */
-public class WorkflowWindow extends Window {
+public class WorkflowWindow extends Window implements WorkflowWindowInterface {
     public static final String LOAD_EVENT = "onLoad"; //$NON-NLS-1$
 
     public static final String SAVE_EVENT = "onSave"; //$NON-NLS-1$
@@ -41,8 +46,6 @@ public class WorkflowWindow extends Window {
 	public static final String DELEGATION_INIT_EVENT = "onInitDelegation"; //$NON-NLS-1$
 
 	public static final String TAB_SELECTED_EVENT = "onTabSelected"; //$NON-NLS-1$
-
-    private SignaturaHandler signatureHandler;
 
     private boolean allowDelegate = true;
     private boolean showAttachments = true;
@@ -65,24 +68,26 @@ public class WorkflowWindow extends Window {
         this.canDeleteAttachments = canDeleteAttachments;
     }
 
-    public WorkflowWindow() {
+    public WorkflowWindow() throws NamingException, CreateException
+    {
     	Execution exe = Executions.getCurrent();
     	if (exe == null)
     		throw new UiException("Cannot get current execution");
 		Map arguments = exe.getArg();
-		processInstance = (ProcessInstance) arguments.get("processInstance"); //$NON-NLS-1$
+		com.soffid.iam.bpm.api.ProcessInstance po = (com.soffid.iam.bpm.api.ProcessInstance) arguments.get("processInstance"); 
+		processInstance = ProcessInstance.toProcessInstance(po) ; //$NON-NLS-1$
 		if (processInstance == null) {
 			processInstance = new ProcessInstance();
 			processInstance.setVariables(new HashMap());
 		}
 
-		taskInstance = (TaskInstance) arguments.get("taskInstance"); //$NON-NLS-1$
+		taskInstance = TaskInstance.toTaskInstance( (com.soffid.iam.bpm.api.TaskInstance) arguments.get("taskInstance")); //$NON-NLS-1$
 		if (taskInstance == null) {
 			taskInstance = new TaskInstance();
 			taskInstance.setVariables(processInstance.getVariables());
 		}
 
-        engine = (BpmEngine) arguments.get("engine"); //$NON-NLS-1$
+        engine = EJBLocator.getBpmEngine();
         this.addEventListener(PREPARE_TRANSITION_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {
@@ -184,14 +189,6 @@ public class WorkflowWindow extends Window {
     protected void save() throws WorkflowException {
     }
 
-    public SignaturaHandler getSignatureHandler() {
-        return signatureHandler;
-    }
-
-    public void setSignatureHandler(SignaturaHandler signatureHandler) {
-        this.signatureHandler = signatureHandler;
-    }
-
     public boolean isAllowDelegate() {
         return allowDelegate;
     }
@@ -222,5 +219,15 @@ public class WorkflowWindow extends Window {
     public void onTaskTabSelected(String selectedId){
     	
     }
+
+	@Override
+	public void setTask(com.soffid.iam.bpm.api.TaskInstance task) {
+		setTask ( TaskInstance.toTaskInstance(task));
+	}
+
+	@Override
+	public void setProcessInstance(com.soffid.iam.bpm.api.ProcessInstance instance) {
+		setProcessInstance(ProcessInstance.toProcessInstance(instance));
+	}
     
 }

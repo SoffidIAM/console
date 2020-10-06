@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.json.JSONException;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Listbox;
@@ -69,7 +70,7 @@ public class IntegrationEngineHandler extends FrameHandler {
 		}
 	}
 
-	public void updateTaskEngine() throws InternalErrorException, NamingException, CreateException, IOException {
+	public void updateTaskEngine() throws InternalErrorException, NamingException, CreateException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 
 		updateAttribute("soffid.task.mode", (String) taskMode.getSelectedItem().getValue(), "Task operation mode");
 		updateAttribute("soffid.task.limit", taskLimit.getText(), "Maximum number of tasks per transaction");

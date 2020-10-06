@@ -2,8 +2,9 @@ package es.caib.bpm.handler;
 
 import java.util.Collection;
 
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.BPMApplication;
+import com.soffid.iam.web.bpm.BPMApplication;
+
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
 import es.caib.zkib.datamodel.DataContext;
 import es.caib.zkib.datamodel.xml.handler.FinderHandler;
 

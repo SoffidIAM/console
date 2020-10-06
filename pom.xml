@@ -464,7 +464,7 @@
    			<module>common</module>
    			<module>core</module>
    			<module>tomee</module>
-   			<module>weblogout</module>
+   			<module>web-root</module>
    			<module>web</module>
    			<module>webservice</module>
    			<module>upload-components</module>
@@ -484,7 +484,7 @@
     		<module>tomee</module>
     		<module>core</module>
     		<module>bpm-sar</module>
-    		<module>weblogout</module>
+    		<module>web-root</module>
     		<module>web</module>
     		<module>webservice</module>
     		<module>upload-components</module>

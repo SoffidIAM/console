@@ -16,6 +16,8 @@ public class SeyconTask implements Serializable, Comparable {
 
 	// El estat d'execució de la tasca als diferents agents
 	String[] estatExecucioAgents;
+	String[] message;
+	String[] exception;
 	
 	String status;
 	
@@ -96,11 +98,11 @@ public class SeyconTask implements Serializable, Comparable {
 		return id;
 	}
 
-	public String getDescripcioTasca() {
+	public String getTaskName() {
 		return descripcioTasca;
 	}
 
-	public void setDescripcioTasca(String descripcioTasca) {
+	public void setTaskName(String descripcioTasca) {
 		this.descripcioTasca = descripcioTasca;
 	}
 
@@ -113,9 +115,9 @@ public class SeyconTask implements Serializable, Comparable {
 	}
 
 	public int compareTo(Object o) {
-		if (o instanceof SeyconTask && getDescripcioTasca() != null)
-			return getDescripcioTasca().compareTo(
-					((SeyconTask) o).getDescripcioTasca());
+		if (o instanceof SeyconTask && getTaskName() != null)
+			return getTaskName().compareTo(
+					((SeyconTask) o).getTaskName());
 		return 0;
 	}
 
@@ -141,6 +143,22 @@ public class SeyconTask implements Serializable, Comparable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String[] getMessage() {
+		return message;
+	}
+
+	public void setMessage(String[] message) {
+		this.message = message;
+	}
+
+	public String[] getException() {
+		return exception;
+	}
+
+	public void setException(String[] exception) {
+		this.exception = exception;
 	}
 
 }

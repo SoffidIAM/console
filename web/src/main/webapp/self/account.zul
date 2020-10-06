@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="process" macroURI="process.zul"?>
+
+<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	id="frame" title="${c:l('selfService.MyProcess')}"
+	mold="div"
+	use="com.soffid.iam.web.self.MyAccountsHandler">
+		
+	<datamodel id="model" rootNode="root" src="myAccountsDescriptor.xml"/>
+
+	<script>
+	function doCopy (uuid) {
+		document.getElementById(uuid).style.display="inline"; 
+		document.getElementById(uuid).focus(); 
+		document.getElementById(uuid).select();
+		document.execCommand('copy');
+		document.getElementById(uuid).setSelectionRange (0,0); 
+		document.getElementById(uuid).style.display="none"; 
+	}
+	function doView (uuid1, uuid2) {
+		document.getElementById(uuid2).style.display="inline"; 
+		document.getElementById(uuid1).style.display="none"; 
+	}
+	</script>
+
+	<div sclass="single-face-card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+	
+			<datatable enablefilter="true" id="listbox" 
+			    dataPath="/model:/account" 
+			    onSetPassword="ref:frame.setPassword"
+			    onQueryPassword="ref:frame.viewPassword"
+			    use="com.soffid.iam.web.self.AccountsTable">
+			<attribute name="columns"><![CDATA[
+- name: ${c:l('accounts.dispatcher')}
+  value: system
+- name: ${c:l('accounts.dispatcher')} 
+  value: systemDescription
+- name: ${c:l('accounts.name')}
+  value: loginName
+- name: ${c:l('selfService.QueryPasswords')}
+  template: <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)"><img src="${execution.contextPath }/img/password-r.svg"/>${c:l('self_account.setPassword')}</button>
+- name: ${c:l('selfService.ChangePassword')}
+  template: <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)"><img src="${execution.contextPath }/img/search2-r.svg"/>${c:l('self_account.queryPassword')}</button>
+			]]></attribute>
+			</datatable>
+		</div>
+	</div>
+
+	<style>
+	div.databox.policy textarea {
+		height: 200px;
+	}
+	</style>
+	<window id="newPassword" closable="false" 
+		position="center, top" sizable="true"
+		title="${c:l('selfService.NewPassword')}" visible="false" width="50em">
+		<databox type="PASSWORD" label="${c:l('accounts.setPassword.label')}" id="p1" onOK="ref:frame.nextPassword();"/>
+		<databox type="PASSWORD" label="${c:l('accounts.setPassword.label')}" id="p2" 
+				onOK="ref:frame.onSetPassword();" />
+		<databox type="STRING" label="${c:l('accounts.policy') }" sclass="databox policy"
+			multiline="true" id="policy" readonly="true" disabled="true"/>
+		<div align="center">
+			<button label="${c:l('accounts.setPassword.OK')}"
+				onClick="ref:frame.onSetPassword()" />
+			<space width="1em" />
+			<button label="${c:l('accounts.setPassword.Cancel')}"
+				onClick="ref:frame.onCancelPassword()" />
+		</div>
+		<databox id="notice" label="${c:l('self_account.affectedSystems') }" type="STRING" multiline="true" readonly="true" disabled="true" />
+	</window>
+
+	<window id="showPassword" closable="false"
+		position="top, center" sizable="false"
+		title="${c:l('selfService.QueryPasswords')}" visible="false" width="40em">
+		<popup id="toolPwd">
+			<vbox>
+				<label id="popupPwd" multiline="true"/>
+			</vbox>
+		</popup>
+		<div style="margin: 2em">
+			<div>
+				<label value="${c:l('com.soffid.iam.api.Account.loginName') } : " sclass="label" />
+				<textbox bind="/listbox:/@loginName" disabled="true" readonly="true" />
+				<textbox bind="/listbox:/@loginName" id="loginName" readonly="true" style="display: none"/>
+				<imageclic src="/img/copy.svg" action="onClick: doCopy('${loginName.uuid}')"
+					title="${c:l('vault.account.copy')}"/>
+			</div>
+			<div>
+				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}" sclass="label"/>
+				<textbox readonly="true" 
+					id="fakeqpassword" value="****************"/> 
+				<textbox readonly="true" style="display:none;" 
+					id="qpassword" tooltip="toolPwd"/>
+				<imageclic id="viewImage" src="/img/search2.svg" action="onMouseOver: doView('${fakeqpassword.uuid}','${qpassword.uuid}');
+					onMouseLeave: doView('${qpassword.uuid}','${fakeqpassword.uuid}')"
+					tooltip="toolPwd"
+				/>
+				<imageclic src="/img/copy.svg" action="onClick: doCopy('${qpassword.uuid}')"
+					title="${c:l('vault.account.copy')}"/>
+			</div>
+			<div style="margin-top: 2em; text-align:center">
+				<button label="${c:l('selfService.Close')}"
+					onClick="ref:frame.closeShowPassword()" />
+			</div>
+		</div>
+	</window>
+
+</frame>
+

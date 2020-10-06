@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<div style="width: 100%">
+	<custom-attributes serverId="${arg.id }" serverUrl="${arg.url }"/>
+	<div style="width: 100%">
+		<label value="${arg.url }" sclass="separator"/>
+	</div>
+	<div style="width:100%">
+         <iframe src="/graph/graph.html?data=syncserver_status/${arg.id }"> </iframe>
+		
+		<div sclass="options options-small" style="display: inline-block; width: calc(100% - 210px); text-align: left">
+			<div sclass="menuoption" onClick="ref:frame.viewAgents">
+				<image src="/img/engine.svg"/>
+				<label sclass='menuoption-title' value="${c:l('seyconserver.zul.VeureAgents')}" />
+			</div> 
+			<div sclass="menuoption" onClick="ref:frame.viewTasks">
+				<image src="/img/grid.svg"/>
+				<label sclass='menuoption-title' value="${c:l('seyconserver.zul.VeureTasques')}" />
+			</div> 
+			<div sclass="menuoption" id="set_password_button" onClick="ref:frame.getLog">
+				<image src="/img/download.svg"/>
+				<label sclass='menuoption-title' value="${c:l('seyconserver.Log')}" />
+			</div> 
+			<div sclass="menuoption" id="unlock_button" onClick="ref:frame.stats">
+				<image src="/img/graph.svg"/>
+				<label sclass='menuoption-title' value="${c:l('seyconserver.zul.stats')}" />
+			</div> 
+			<div sclass="menuoption" id="view_password_button" onClick="ref:frame.restart">
+				<image src="/img/restart.svg"/>
+				<label sclass='menuoption-title' value="${c:l('seyconserver.Reiniciar')}" />
+			</div> 
+			<div sclass="menuoption" onClick="ref:frame.info"> 
+				<image src="/img/info.svg"/>
+				<label sclass='menuoption-title' value="${c:l('seyconserver.Informacio')}" />
+			</div> 
+		</div>
+	</div>
+</div>

@@ -56,8 +56,8 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 		
 	}
 	@Override
-	public void followLink(String value) {
-		// TODO Auto-generated method stub
+	public String followLink(String value) {
+		return null;
 	}
 
 	@Override

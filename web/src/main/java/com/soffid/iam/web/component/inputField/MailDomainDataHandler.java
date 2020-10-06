@@ -1,5 +1,7 @@
 package com.soffid.iam.web.component.inputField;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -54,8 +56,8 @@ public class MailDomainDataHandler extends InputFieldDataHandler<MailDomain> {
 	}
 
 	@Override
-	public void followLink(String value) {
-		// TODO Auto-generated method stub
+	public String followLink(String value) throws UnsupportedEncodingException {
+		return "/soffid/resource/maildomain/mail-domain.zul?name="+URLEncoder.encode(value,"UTF-8"); 
 	}
 
 	@Override

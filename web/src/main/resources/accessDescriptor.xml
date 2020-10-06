@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="accessLog" type="accessLog">
+			<ejb-finder jndi="java:/module/AccessLogService-v2"
+				method="findAccessLogByJsonQueryAsync" if="${query != null}">  <!-- accessRegister:query --> 
+				<parameter value="${query}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="accessLog" />
+
+</zkib-model>

@@ -33,19 +33,17 @@
 			</row>	
 		</rows>
 	</grid>
-	<grid dataPath="BPMdata:/taskInstance/log" fixedLayout="true" id="logs" width="100%">
-		<columns>
-			<column label="${c:l('task.data')}" width="15%"/>
-			<column label="${c:l('task.autor')}" width="20%"/>
-			<column label="${c:l('task.accio')}" width="60%"/>
-		</columns>
-
-		<datarow>
-			<label bind="@date"/>
-			<label bind="@user"/>
-			<label bind="@action" multiline="true"/>
-		</datarow>
-	</grid>
+	<datatable dataPath="model:/taskInstance/log" id="logs" width="100%">
+	<attribute name="columns"><![CDATA[
+- name: ${c:l('task.data')}
+  value: date
+  template: #{date_datetime }
+- name: ${c:l('task.autor')}
+  value: user
+- name: ${c:l('task.accio')}
+  value: action
+	]]></attribute>
+	</datatable>
   <window border="normal" closable="true" id="visorProcesoWnd" title="${c:l('process.wndDiagrama')}" visible="false">
 	<image id="visorProceso"/>
   </window>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="account" type="account">
+			<ejb-finder jndi="java:/module/SelfService-v2"
+				method="getUserAccounts">
+			</ejb-finder>
+		</finder> 
+	</datanode>
+	
+	<datanode name="account" transient="true">
+		<finder name="estatContrasenya" type="void">
+			<ejb-finder jndi="java:/module/SelfService-v2" 
+				method="passwordsStatus">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
+		<finder name="dispatcherInformation" type="dispatcherInformation">
+			<ejb-finder jndi="java:/module/SelfService-v2"
+				method="getDispatcherInformation">
+				<parameter value="${instance.system}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="dispatcherInformation" transient="true"/>
+	
+</zkib-model>

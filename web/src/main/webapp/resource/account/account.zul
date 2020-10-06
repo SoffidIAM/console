@@ -9,11 +9,6 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.account.AccountHandler" id="frame">
-<!-- 
- 	<zscript><![CDATA[
-com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", com.soffid.iam.api.MetadataScope.ACCOUNT, true);
-	]]></zscript>
- -->
 	<datamodel id="model" rootNode="root" src="accountDescriptor.xml"/>
 	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />
 	<div sclass="card" id="card">
@@ -48,8 +43,7 @@ com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStan
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatable="listbox"/>
 								
-				<imageclic src="/img/wait.gif" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
-
+				<imageclic src="/img/sync.svg" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
@@ -61,11 +55,11 @@ com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStan
 				<tabpanels>
 					<tabpanel id="datatab">
 						<div class="navigation-bar">
-							<menu2>
+							<menu2> 
 								<menu2item if="${soffid:isUserInRole('account:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 								<menu2item if="${soffid:isUserInRole('account:update')}" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
 							</menu2>
-						</div>
+						</div> 
 						<div id="dades"> 
 							<form id="form" onChangeXPath="ref:frame.onChangeForm"
 								dataPath="/listbox:/." width="100%">
@@ -154,3 +148,4 @@ com.soffid.iam.ServiceLocator.instance().getAdditionalDataService().registerStan
 	</window>
 	
 </frame>
+

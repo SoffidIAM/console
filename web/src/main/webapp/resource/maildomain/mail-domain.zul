@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.mail.MailDomainHandler" id="frame">
+
+	<datamodel id="model" rootNode="root" src="mailDomainDescriptor.xml"/>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('mail:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('mail:create') || soffid:isUserInRole('mail:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/mailDomain"
+			    maxheight="70vh"
+				sortColumn="0" onSelect="ref:frame.showDetails"
+				use='com.soffid.iam.web.mail.MailDomainDatatable'>
+				<attribute name="columns">
+					<![CDATA[
+		- name: ${c:l('dominisCorreu.zul.Codi')}
+		  value: name
+		- name: ${c:l('dominisCorreu.zul.Descripcia')}
+		  value: description
+		- name: ${c:l('dominisCorreu.zul.Obsolet-2')}
+		  template: #{obsolete? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('mail:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div id="dades">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+					<pager datatable="listbox"/>
+					
+					<menu2>
+						<menu2item if="${soffid:isUserInRole('mail:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					</menu2>
+					
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				</div>
+				<form id="form" onChangeXPath="ref:frame.onChangeForm"
+					dataPath="/listbox:/." width="100%">
+					<customfield3 dataType="STRING" bind="name" maxlength="50" required="true" label=" ${c:l('dominisCorreu.zul.Codi')}"/>
+					<customfield3 dataType="STRING" bind="description" maxlength="50" required="true" label="${c:l('dominisCorreu.zul.Descripcia')}"/>
+					<customfield3 dataType="BOOLEAN" bind="obsolete" label="${c:l('dominisCorreu.zul.Obsolet-2')}"/>
+				</form>
+			</div>
+			<div style="text-align: right; width: 100%">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+			</div>
+		</div>
+	</div>
+</frame>

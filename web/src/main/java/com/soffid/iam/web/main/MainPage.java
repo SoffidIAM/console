@@ -18,8 +18,9 @@ public class MainPage extends Div implements AfterCompose {
 		Execution exec = Executions.getCurrent();
 		HttpServletRequest req = (HttpServletRequest) exec.getNativeRequest();
 		String target = (String) req.getAttribute("$soffid$target");
-		if (target != null) initialPage = target;
+//		if (target != null) initialPage = target;
 		page.setVariable("initialPage", initialPage);
+		getDesktop().getSession().setAttribute("paginaActual", target);
 	}
 
 	@Override

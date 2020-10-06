@@ -53,6 +53,8 @@ public class UserDatatable extends DatatypeColumnsDatatable {
 		User u = (User) ((DataNode)element).getInstance();
 		if (Boolean.FALSE.equals(u.getActive()))
 			s.put("$class", "dashed");
+		else
+			s.put("$class", "std");
 		return s;
 	}
 

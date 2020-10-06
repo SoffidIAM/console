@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.model;
 
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
 
 @Entity(table = "SC_TASKLOG", translatedName = "TaskLogEntity", translatedPackage = "com.soffid.iam.model")
@@ -41,7 +43,7 @@ public abstract class TaskLogEntity {
 	@Nullable
 	public java.lang.String stackTrace;
 
-	@Column(name = "TLO_IDTASQUE", translated = "task")
+	@Column(name = "TLO_IDTASQUE", translated = "task", reverseAttribute = "taskLogs")
 	public es.caib.seycon.ng.model.TasqueEntity tasca;
 
 	@Column(name = "TLO_ID")
@@ -94,4 +96,24 @@ public abstract class TaskLogEntity {
 			java.lang.String server, java.lang.String system) {
 		return null;
 	}
+	
+	@DaoFinder("select system.name, count(*) from \n"
+			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
+			+ "where task.tenant.id = :tenantId and completed='S'  \n"
+			+ "group by system.name \n"
+			+ "order by system.name")
+	public Collection<Object[]> countTasksBySystem() {
+		return null;
+	}
+
+	@DaoFinder("select system.name, count(*) from \n"
+			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
+			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server \n"
+			+ "group by system.name \n"
+			+ "order by system.name")
+	public Collection<Object[]> countTasksByServerAndSystem(String server) {
+		return null;
+	}
+
+
 }

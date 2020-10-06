@@ -10,7 +10,11 @@ public class AccountOwnerHandler extends InputFieldUIHandler {
 
 	@Override
 	public boolean isVisible(InputField3 field) throws Exception {
-		return XPathUtils.getValue(field, "type") != AccountType.USER;
+		try {
+			return XPathUtils.getValue(field, "type") != AccountType.USER;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 }

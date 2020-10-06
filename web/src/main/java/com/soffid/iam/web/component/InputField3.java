@@ -18,6 +18,8 @@ import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.xml.HTMLs;
+import org.zkoss.xml.XMLs;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -45,6 +47,7 @@ import com.soffid.iam.web.component.inputField.GroupDataHandler;
 import com.soffid.iam.web.component.inputField.HostDataHandler;
 import com.soffid.iam.web.component.inputField.InputFieldDataHandler;
 import com.soffid.iam.web.component.inputField.MailDomainDataHandler;
+import com.soffid.iam.web.component.inputField.MailListDataHandler;
 import com.soffid.iam.web.component.inputField.NetworkDataHandler;
 import com.soffid.iam.web.component.inputField.OUTypeDataHandler;
 import com.soffid.iam.web.component.inputField.RoleDataHandler;
@@ -185,6 +188,7 @@ public class InputField3 extends Databox
 								dataType.getType().equals(TypeEnumeration.NETWORK_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.HOST_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE) ||
+								dataType.getType().equals(TypeEnumeration.MAIL_LIST_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.OS_TYPE) )
 				
 			{
@@ -197,31 +201,55 @@ public class InputField3 extends Databox
 				{
 					dataHandler = new UserDataHandler(dataType);
 					setSelectIcon("/img/user.svg");
+					setHyperlink(true);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE))
+				{
 					dataHandler = new ApplicationDataHandler(dataType);
+					setHyperlink(true);
+				}
 				else if ( dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE)) {
 					dataHandler = new CustomObjectDataHandler(dataType);
+					setHyperlink(true);
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new OUTypeDataHandler(dataType);
+					setHyperlink(true);
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new GroupDataHandler(dataType);
+					setHyperlink(true);
 				} else if ( dataType.getType().equals(TypeEnumeration.HOST_TYPE)) {
 					setSelectIcon("/img/host.svg");
 					dataHandler = new HostDataHandler(dataType);
+					setHyperlink(true);
 				} else if ( dataType.getType().equals(TypeEnumeration.ROLE_TYPE)) {
 					dataHandler = new RoleDataHandler(dataType);
 					setSelectIcon("/img/role.svg");
+					setHyperlink(true);
 				} else if ( dataType.getType().equals(TypeEnumeration.ACCOUNT_TYPE)) {
 					dataHandler = new AccountDataHandler(dataType);
 					setSelectIcon("/img/account.svg");
+					setHyperlink(true);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE))
+				{
 					dataHandler = new MailDomainDataHandler(dataType);
+					setSelectIcon("/img/maildomain.svg");
+					setHyperlink(true);
+				}
+				else if ( dataType.getType().equals(TypeEnumeration.MAIL_LIST_TYPE))
+				{
+					dataHandler = new MailListDataHandler(dataType);
+					setHyperlink(true);
+					setSelectIcon("/img/maillist.svg");
+				}
 				else if ( dataType.getType().equals(TypeEnumeration.NETWORK_TYPE))
+				{
 					dataHandler = new NetworkDataHandler(dataType);
+					setSelectIcon("/img/network.svg");
+					setHyperlink(true);
+				}
 				else if (dataType.getType().equals(TypeEnumeration.USER_TYPE_TYPE)) {
 					List<String> values = new LinkedList<String>();
 					Security.nestedLogin(Security.ALL_PERMISSIONS);
@@ -754,6 +782,12 @@ public class InputField3 extends Databox
 			return null;
 		else {
 			String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+			String link = dataHandler.followLink(name.toString());
+			if (link != null) {
+				d = "<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>";
+			} else {
+				d = XMLs.encodeAttribute(d);
+			}
 			return d;
 		}
 	}

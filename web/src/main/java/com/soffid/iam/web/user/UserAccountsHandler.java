@@ -40,6 +40,11 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 	
 	private UserService userService;
 	
+	public void updateStatus(Event event) {
+		UserAccountsTree tree = (UserAccountsTree) getFellow("tree");
+		tree.updateClient();
+	}
+	
 	public UserAccountsHandler() throws NamingException, CreateException {
 		userService = EJBLocator.getUserService();
 	}

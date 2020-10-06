@@ -23,6 +23,7 @@ public class TypeEnumeration {
 	public String userTypeType = "T";
 	public String customObjectType = "C";
 	public String mailDomainType = "M";
+	public String mailListType = "ML";
 	public String ssoFormType = "F";
 	public java.lang.String html="H";
 	public String separator = "-";

@@ -1,8 +1,6 @@
 package es.caib.bpm.ui.admin;
 
 
-import java.awt.Desktop;
-import java.awt.geom.Path2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
@@ -19,27 +17,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Fileupload;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 
+import com.soffid.iam.bpm.api.ProcessDefinition;
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
+import com.soffid.iam.web.bpm.BPMApplication;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.BPMApplication;
-import es.caib.bpm.vo.ProcessDefinition;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.events.SerializableEventListener;
-import es.caib.zkib.zkiblaf.Frame;
 
 public class DespliegueUI extends FrameHandler 
 {
@@ -227,27 +224,30 @@ public class DespliegueUI extends FrameHandler
 	public void upload() throws LoginException, CreateException,
 		NamingException, InternalErrorException 
 	{
+		
+		
+		FileUpload2.get((event) -> {
+			doUpload((UploadEvent) event);
+		});
+	}
+
+	public void doUpload(UploadEvent event) throws CreateException, NamingException, InternalErrorException {
 		this.getDesktop().getSession();
 		BpmEngine engine= BPMApplication.getEngine();
-		Media dataSubida= null;
+		byte[] buffer= new byte[4096];
 		InputStream streamLectura= null;
 		int leidos= 0;
-		byte[] buffer= new byte[4096];
-		Textbox resultadoDespliegue= null;
-		
+		Textbox resultadoDespliegue= (Textbox)this.getFellow("txtResultadoDespliegue"); //$NON-NLS-1$
 		try 
 		{
-			resultadoDespliegue= (Textbox)this.getFellow("txtResultadoDespliegue"); //$NON-NLS-1$
-			
-			dataSubida = Fileupload.get();
-			
+			Media dataSubida = event.getMedia();
 			if(dataSubida!= null)
 			{
 				resultadoDespliegue.setText(Labels.getLabel("deploy.msgDesplegandoProceso")); //$NON-NLS-1$
 				
 				streamLectura= dataSubida.getStreamData();
 				
-	            log.debug(Messages.getString("DespliegueUI.OpenTransfer")); //$NON-NLS-1$
+				log.debug(Messages.getString("DespliegueUI.OpenTransfer")); //$NON-NLS-1$
 				engine.openDeployParDefinitionTransfer();
 				
 				log.debug(Messages.getString("DespliegueUI.SendPackages")); //$NON-NLS-1$
@@ -269,11 +269,12 @@ public class DespliegueUI extends FrameHandler
 				b.append(dataDesplegament+": "+Labels.getLabel("deploy.msgProcesoDesplegadoCorrectamente")); //$NON-NLS-1$ //$NON-NLS-2$
 				for (int i = 0; i < messages.length; i++)
 				{
-				    b.append ('\n');
-				    b.append (messages[i]);
+					b.append ('\n');
+					b.append (messages[i]);
 				}
 				resultadoDespliegue.setText(b.toString());
 			}
+			onCheck(event);
 		}
 		catch (BPMException e) 
 		{
@@ -359,4 +360,13 @@ public class DespliegueUI extends FrameHandler
 		}
 		return false;
 	}
+	
+	public void onCheck(Event ev) throws LoginException, RemoteException, CreateException, NamingException, InternalErrorException {
+		Checkbox todos = (Checkbox) getFellow("todos");
+		if (todos.isChecked())
+			cargarListadoProcesos();
+		else
+			cargarProcesosHabilitados();
+	}
+	
 }

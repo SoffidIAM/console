@@ -2,6 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <div use="com.soffid.iam.web.user.UserAccountsHandler" id="handler">
+	<timer onTimer="ref:handler.updateStatus" running="true" delay="5000" repeats="true" />
 	<div class="navigation-bar dummy">
 		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
 	</div>
@@ -9,7 +10,7 @@
 	    style="min-width: 950px"
 		id="tree"
 		header="${c:l('usuaris.zul.Dominidecontrasenyes')} /  ${c:l('accounts.dispatcher')} "
-		use="com.soffid.iam.web.user.UserColumnsTree" 
+		use="com.soffid.iam.web.user.UserAccountsTree" 
 		onSetPassword="ref:handler.openPasswordWindow"
 		onSelect="ref:handler.openAccount"
 		openLevels="2"
@@ -28,7 +29,7 @@
 		</attribute>
 		<attribute name="finders"><![CDATA[
 		- path: /domini
-		  template: ${"$"}{name} <button class="small-button" style="position:relative; left: 16px" onclick="zkDatatree2.sendClientAction(this, 'onSetPassword')">${c:l('changepass.CanviPWD') }</button>
+		  template: #{name} <button class="small-button" style="position:relative; left: 16px" onclick="zkDatatree2.sendClientAction(this, 'onSetPassword')">${c:l('changepass.CanviPWD') }</button>
 		- path: /policy[1]/account
 		  value: system
 		  leaf: true
@@ -37,6 +38,8 @@
 		  - value: lastUpdated
 		  - value: lastLogin
 		  - value: passwordExpiration
+		  icon: #{ soffid:getStatusIcon( instance ) }
+		  icon2: /img/account.svg
 		]]>
 		</attribute>
 	</datatree2>
@@ -109,4 +112,5 @@
 	
 	<include src="/resource/user/user-account-details.zul" dataSource="//user/user_accounts/tree" />
 	<include src="/resource/user/user-account-add.zul" dataSource="//user/user_accounts/tree" userDataSource="${arg.listbox}" />
+	
 </div>

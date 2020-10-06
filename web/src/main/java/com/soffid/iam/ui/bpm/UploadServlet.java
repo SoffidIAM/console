@@ -6,7 +6,6 @@ import java.io.InputStream;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
-import javax.ejb.RemoveException;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,15 +14,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.zkoss.zk.ui.Executions;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.bpm.api.TaskInstance;
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
+import com.soffid.iam.web.bpm.TaskUI;
+import com.soffid.iam.web.bpm.attachment.TaskAttachmentManager;
 
-import es.caib.bpm.attachment.TaskAttachmentManager;
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.EJBContainer;
-import es.caib.bpm.ui.task.TaskUI;
-import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class UploadServlet extends HttpServlet {
@@ -45,7 +44,7 @@ public class UploadServlet extends HttpServlet {
 			TaskUI taskUI = (TaskUI) Executions.getCurrent().getDesktop().getComponentByUuid(taskUUID);
 			TaskInstance task = taskUI.getCurrentTask();
 			//obtenim l'engine
-			BpmEngine engine = EJBContainer.getEJBContainer(req.getSession()).getEngine();
+			BpmEngine engine = EJBLocator.getBpmEngine();
         	
             if (task == null)
             {
@@ -118,9 +117,6 @@ public class UploadServlet extends HttpServlet {
 			//TaskUI taskUI = (TaskUI) Executions.getCurrent().getDesktop().getComponentByUuid(taskUUID);
 			//TaskInstance task = taskUI.getCurrentTask();
 			TaskInstance task = (TaskInstance)req.getSession().getAttribute("ZKActualTask-"+taskId); //$NON-NLS-1$
-			
-			
-			EJBContainer.getEJBContainer(req.getSession()).getEngine();
 			
 			
 			if (task == null) {

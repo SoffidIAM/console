@@ -11,9 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.EJBLocator;
 
 public class ServerLogServlet extends HttpServlet {
 
@@ -44,7 +43,7 @@ public class ServerLogServlet extends HttpServlet {
 			}
 			
 			String urlServer = req.getParameter("urlserver"); //$NON-NLS-1$
-			InputStream in = EJBLocator.getSeyconServerService().getSeyconServerLog(urlServer);
+			InputStream in = EJBLocator.getSyncServerService().getSeyconServerLog(urlServer);
 			
 			if (in==null) {
 				resp.sendRedirect(req.getContextPath()+"/getlogmsg.zul?why=cannot_connect"); //$NON-NLS-1$

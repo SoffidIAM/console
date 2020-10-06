@@ -18,6 +18,7 @@ import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.servei.AplicacioService;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +59,8 @@ public abstract class BpmEngine {
 	public java.util.List<ProcessInstance> searchProcessInstances(
 		@Nullable java.lang.String query, 
 		@Nullable java.lang.String processID, 
-		@Nullable java.lang.String startDate, 
-		@Nullable java.lang.String endDate, 
+		@Nullable Date sinceStartDate, @Nullable Date untilStartDate, 
+		@Nullable Date sinceEndDate, @Nullable Date untilEndDate,
 		boolean finished)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
@@ -279,7 +280,13 @@ public abstract class BpmEngine {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public byte[] getProcessDefinitionImage(
-		es.caib.bpm.vo.ProcessDefinition def)
+			es.caib.bpm.vo.ProcessDefinition def)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public byte[] getProcessDefinitionIcon(
+			Long definitionId)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

@@ -21,4 +21,41 @@
 		Checks for user permission.
 		</description>
 	</function>
+
+	<function>
+		<name>isUpdatePending</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>boolean isUpdatePending(com.soffid.iam.api.Account account)</function-signature>
+		<description>
+		Checks for account status.
+		</description>
+	</function>
+
+	<function>
+		<name>getStatusIcon</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String getStatusIcon(com.soffid.iam.api.Account account)</function-signature>
+		<description>
+		Checks for account status.
+		</description>
+	</function>
+
+	<function>
+		<name>dateformat</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String getDateFormat()</function-signature>
+		<description>
+		Gets date format.
+		</description>
+	</function>
+
+	<function>
+		<name>datetimeformat</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String getDateTimeFormat()</function-signature>
+		<description>
+		Gets date &amp; time format.
+		</description>
+	</function>
+	
 </taglib>

@@ -10,6 +10,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailDomain;
+import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.api.Role;
@@ -23,6 +24,7 @@ import com.soffid.iam.service.crud.CrudDomainValueHandler;
 import com.soffid.iam.service.crud.CrudGroupHandler;
 import com.soffid.iam.service.crud.CrudHostHandler;
 import com.soffid.iam.service.crud.CrudMailDomainHandler;
+import com.soffid.iam.service.crud.CrudMailListHandler;
 import com.soffid.iam.service.crud.CrudNetworkHandler;
 import com.soffid.iam.service.crud.CrudOUTypeHandler;
 import com.soffid.iam.service.crud.CrudRoleHandler;
@@ -54,6 +56,7 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(OUType.class.getName(), new CrudOUTypeHandler());
 		registry.put(VaultFolder.class.getName(), new CrudVaultFolderHandler());
 		registry.put(Account.class.getName(), new CrudAccountHandler());
+		registry.put(MailList.class.getName(), new CrudMailListHandler());
 	}
 
 	@Override

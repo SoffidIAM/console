@@ -1,0 +1,4 @@
+com/soffid/iam/init/web/LogoutServlet.class
+com/soffid/iam/init/web/Messages.class
+com/soffid/iam/init/web/LoginFilter.class
+com/soffid/iam/init/Configuration.class

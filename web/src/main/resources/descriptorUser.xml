@@ -60,7 +60,7 @@
 		</finder>
 		<finder name="role" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
-				method="findUserRolesByUserName" if="${canQueryUserRole}">
+				method="findUserRolesByUserNameNoRules" if="${canQueryUserRole}">
 				<parameter value="${instance.userName}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 
@@ -87,13 +87,6 @@
 				<parameter value="${instance.userName}"/>
 			</ejb-finder>
 		</finder>
-		<!-- 
-		<finder name="accounts" type="account">
-			<ejb-finder jndi="java:/module/AccountService-v2" method="listUserAccounts">
-				<parameter value="${instance}"/>
-			</ejb-finder>
-		</finder>
-		 -->
 		<finder name="processosUsuari" type="processosUsuari">
 			<ejb-finder jndi="java:/module/UserService-v2"
 				method="findBpmUserProcessInstanceByUserName">
@@ -144,11 +137,11 @@
 	<datanode name="attributes">
 		<ejb-handler jndi="java:/module/UserService-v2">
 			<insert-method method="updateUserAttributes"  > <!-- user:metadata:update -->
-				<parameter value="${parent.codi}" />
+				<parameter value="${parent.userName}" />
 				<parameter value="${instance}" />
 			</insert-method>
 			<update-method method="updateUserAttributes"> <!-- user:metadata:update -->
-				<parameter value="${parent.codi}" />
+				<parameter value="${parent.userName}" />
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>

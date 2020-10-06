@@ -7,10 +7,15 @@
 package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
+
+import es.caib.seycon.ng.comu.RegistreAcces;
+import es.caib.seycon.ng.comu.Xarxa;
 
 @Service (translatedName="AccessLogService",
 	translatedPackage="com.soffid.iam.service")
@@ -19,7 +24,7 @@ import com.soffid.mda.annotation.Service;
 	es.caib.seycon.ng.model.RegistreAccesEntity.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
 	es.caib.seycon.ng.model.ServeiEntity.class,
-	
+	AsyncRunnerService.class,
 	AutoritzacioService.class})
 public abstract class RegistreAccesService {
 
@@ -114,5 +119,19 @@ public abstract class RegistreAccesService {
 		es.caib.seycon.ng.comu.RegistreAcces registre)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
+	}
+
+
+	@Operation(grantees = { roles.user_accessRegister_query.class })
+	public java.util.List<RegistreAcces> findAccessLogByJsonQuery(
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_accessRegister_query.class })
+	public AsyncList<RegistreAcces> findAccessLogByJsonQueryAsync(
+			@Nullable String jsonQuery) {
+		return null;
 	}
 }

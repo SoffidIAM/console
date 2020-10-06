@@ -1,5 +1,7 @@
 package com.soffid.iam.web.component.inputField;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -53,9 +55,10 @@ public class NetworkDataHandler extends InputFieldDataHandler<Network> {
 	}
 
 	@Override
-	public void followLink(String value) {
-		// TODO Auto-generated method stub
+	public String followLink(String value) throws UnsupportedEncodingException {
+		return "/soffid/resource/network/network.zul?name="+URLEncoder.encode(value,"UTF-8"); 
 	}
+
 
 	@Override
 	public String[] toNameDescription(Network o) {

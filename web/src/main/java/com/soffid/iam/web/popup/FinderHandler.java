@@ -206,6 +206,11 @@ public class FinderHandler extends Window implements AfterCompose {
 			name = (String) ds.getValue(path+"/name");
 			String system = (String) ds.getValue(path+"/system");
 			name = name +"@"+system;
+		} else if (className.equals("com.soffid.iam.api.MailList")) 
+		{
+			name = (String) ds.getValue(path+"/name");
+			String domain = (String) ds.getValue(path+"/domainName");
+			name = name +"@"+domain;
 		} else {
 			try {
 				name = (String) ds.getValue(path+"/userName");

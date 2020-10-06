@@ -28,6 +28,10 @@ public abstract class RuleEntity {
 	@Column (name="RUL_EXPRES", length=10000)
 	public java.lang.String bshExpression;
 	
+	@Column (name="RUL_BSHROL", length=10000)
+	@Nullable
+	public java.lang.String bshRoles;
+	
 	@Column (name="RUL_TEN_ID")
 	public TenantEntity tenant;
 

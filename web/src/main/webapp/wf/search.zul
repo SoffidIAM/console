@@ -1,87 +1,89 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
-<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?component name="process" macroURI="process.zul"?>
+
+<frame id="frame"
+   xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:zk="http://www.zkoss.org/2005/zk"
-	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-	<frame id="observacion" saveContent="true" title="${c:l('main.lblSearch')}"
-		use="es.caib.bpm.ui.inbox.Search" width="99%">
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	mold="div"
+	use="com.soffid.iam.web.bpm.search.Search">
 		
-		<zscript>
-			void activaFi (Checkbox cb)
-			{
-				endDate.setDisabled(!cb.isChecked());
-				if (!cb.isChecked()) {
-					endDate.setValue(null);
-				}
-			}
-		</zscript>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+	
+			<div id="query-box">
+				<databox label="${c:l('observacion.lblTextToSearch')}" id="txt" onOK="ref:frame.buscar"
+					type="STRING" selectIcon="/img/help.gif" onOpen="ref:frame.onOpenHelp"/>
+					
+				<databox label="${c:l('observacion.lblIdProceso')}" onOK="ref:frame.buscar"
+					type="STRING" maxlength="15" selectIcon=""
+					id="txtProcessID"/>
+				
+				<databox label="${c:l('observacion.lblFechaInicio')}"  onOK="ref:frame.buscar"
+					type="DATE" maxlength="15" selectIcon=""
+					style="display: inline-block; width: 50%; min-width: 400px"
+					format="${soffid:dateformat() }"
+					id="startDate"/>
+	
+				<databox label="${c:l('attributeQuery.Until')}"  onOK="ref:frame.buscar"
+					type="DATE" maxlength="15" selectIcon=""
+					style="display: inline-block; width: 50%; min-width: 400px"
+					format="${soffid:dateformat() }"
+					id="startDate2"/>
+
+				<databox label="${c:l('observacion.lblFinalizada')}" onOK="ref:frame.buscar"
+					type="BOOLEAN" selectIcon=""
+					id="txtFinalizada" onChange="ref:frame.activaFi"/>
+	
+				<div style="width:100%" id="enddateblock" visible="false">
+					<databox label="${c:l('observacion.lblFechaFinalizacion')}"  onOK="ref:frame.buscar"
+						type="DATE" maxlength="15" selectIcon=""
+						style="display: inline-block; width: 50%; min-width: 400px"
+						format="${soffid:dateformat() }"
+						id="endDate" />
 		
-		<hbox>
-			<grid>
-				<columns>
-					<column width="15em"/>
-					<column width="50em"/>
-				</columns>
-				<rows>
-					<row>
-						<label sclass="label" value="${c:l('observacion.lblTextToSearch')}"/>
-						<hbox>
-							<textbox id="txt" onOK="observacion.buscar()" width="40em"/>
-							<popup id="help-tooltip">
-								<label value="${c:l('observacion.help')}"/>
-							</popup>
-<!-- 							<image height="18px" onClick="execution.sendRedirect(&quot;http://lucene.apache.org/java/3_0_1/queryparsersyntax.html&quot;, &quot;_new&quot;)" src="/images/help-taronja.png" style="cursor:help" tooltip="help-tooltip" width="18px"/> -->
-							<image height="18px" src="/images/help-taronja.png"
-								style="cursor:help" tooltip="help-tooltip" width="18px"
-								onClick="execution.sendRedirect(&quot;queryparsersyntax.html&quot;, &quot;_new&quot;)"/>
-						</hbox>
-					</row>
-					
-					<row>
-						<label sclass="label" value="${c:l('observacion.lblIdProceso')}"/>
-						<hbox>
-							<textbox id="txtProcessID" onOK="observacion.buscar()" width="10.5em"/>
-						</hbox>
-					</row>
-					
-					<row>
-						<label sclass="label" value="${c:l('observacion.lblFechaInicio')}"/>
-						<hbox>
-							<label style="font-size:1.2em">
-								<attribute name="value"><![CDATA[>=]]></attribute>
-							</label>
-							<datebox format="dd/MM/yyyy" id="startDate"/>
-						</hbox>
-					</row>
-					<row>
-						<label sclass="label" value="${c:l('observacion.lblFechaFinalizacion')}"/>
-						<hbox>
-							<label style="font-size:1.2em">
-								<attribute name="value"><![CDATA[<=]]></attribute>
-							</label>
-							<datebox disabled="true" format="dd/MM/yyyy" id="endDate"/>
-						</hbox>
-					</row>
-					
-					<row>
-						<label sclass="label" value="${c:l('observacion.lblFinalizada')}"/>
-						<checkbox id="txtFinalizada" onCheck="activaFi(self)"/>
-					</row>
-				</rows>
-			</grid>
-			<button label="${c:l('observacion.btnBuscar')}" onClick="observacion.buscar()"/>
-		</hbox>
-		<label value=""/>
-		<label sclass="label" style="margin:10px;" value="${c:l('observacion.lblResultadoBusqueda')}"/>
-		<listbox fixedLayout="true" id="resultadoBusqueda" mold="paging" onSelect="observacion.seleccionarProceso(self)" pageSize="25">
-				<listhead>
-					<listheader label="${c:l('observacion.lblIdProceso')}" sort="auto" width="10%"/>
-					<listheader label="${c:l('observacion.lblProceso')}" sort="auto" width="25%"/>
-					<listheader label="${c:l('observacion.lblTarea')}" sort="auto" width="25%"/>
-					<listheader label="${c:l('observacion.lblFechaInicio')}" sort="auto" width="20%"/>
-					<listheader label="${c:l('observacion.lblFechaFinalizacion')}" sort="auto" width="20%"/>
-				</listhead>
-		</listbox>
-	</frame>
-</zk>
+					<databox label="${c:l('attributeQuery.Until')}"  onOK="ref:frame.buscar"
+						type="DATE" maxlength="15" selectIcon=""
+						style="display: inline-block; width: 50%; min-width: 400px"
+						format="${soffid:dateformat() }"
+						id="endDate2" />
+				</div>
+				<div style="width: 100%; text-align: right; margin-bottom: 16px">
+					<button label="${c:l('observacion.btnBuscar')}" onClick="ref:frame.buscar()" image="/img/search2-r.svg"/>
+				</div>
+			</div>
+	
+			<datatable id="listbox"  onSelect="ref:frame.openProcess">
+			<attribute name="columns"><![CDATA[
+- name: ${c:l('observacion.lblIdProceso')}
+  value: id
+- name: ${c:l('observacion.lblProceso')}
+  value: description
+- name: ${c:l('observacion.lblTarea')}
+  value: task
+- name: ${c:l('observacion.lblFechaInicio')}
+  value: start
+  template: #{start_datetime}
+- name: ${c:l('observacion.lblFechaFinalizacion')}
+  value: end
+  template: #{end_datetime}
+			]]></attribute>
+			</datatable>
+		</div>
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>								
+			</div>
+ 			<process id="process"/>
+		</div>
+	</div>
+</frame>

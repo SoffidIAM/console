@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Component;
@@ -52,7 +53,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			currentOptions = options;
 			if (option != null)
 				searchOption(options, option);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		navigator = (Div) getFirstChild();
@@ -117,6 +118,8 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		for ( MenuOption option: currentOptions) {
 			if (isAllowed (option))
 			{
+				String tip = null;
+				
 				Div d = new Div();
 				d.setSclass("menuoption");
 				d.addEventHandler("onClick", new EventHandler(ZScript.parseContent("ref:"+getId()+".openMenu"), null));
@@ -132,6 +135,20 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 					l.setSclass("menuoption-title");
 					d.appendChild(l);
 				}
+				if (option.getLiteral() != null) {
+					Label l = new Label( option.getLiteral());
+					l.setSclass("menuoption-title");
+					d.appendChild(l);
+				}
+				if (option.getHandler() != null) {
+					List<MenuOption> options2 = option.getHandler().getOptions();
+					if (options2 != null && options2.isEmpty()) {
+						continue; // Skip empty menu
+					} else {
+						option.setOptions(options2);
+					}
+					tip = option.getHandler().getTip();
+				}
 				if (!option.getOptions().isEmpty()) {
 					Div d2 = new Div ();
 					d2.setSclass("menuoption-suboptions");
@@ -144,7 +161,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 							if (!first)
 								d2.appendChild(new Label(", "));
 							first = false;
-							Label l = new Label( Labels.getLabel(suboption.getLabel()));
+							Label l = new Label( suboption.getLiteral() != null ? suboption.getLiteral(): Labels.getLabel( suboption.getLabel()));
 							l.setSclass("menusuboption-title");
 							d2.appendChild(l);
 						}

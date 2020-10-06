@@ -24,7 +24,7 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 		
 	@Override
 	protected void addElement(MenuOption next) {
-		String s = Labels.getLabel(next.getLabel());
+		String s = next.getLiteral() == null ? Labels.getLabel(next.getLabel()) : next.getLiteral();
 		if (parentDiv.getChildren().isEmpty())
 		{
 			Label l = new Label( Labels.getLabel("seu.menu-options"));
@@ -59,18 +59,22 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 			return null;
 		for ( MenuOption option: options)
 		{
-			if (matches(terms, option.getLabel())) 
+			String s = option.getLiteral() == null ? Labels.getLabel(option.getLabel()) : option.getLiteral();
+			if (matches(terms, s)) 
 			{
 				addElement (option);
 			}
-			findMenu (option.getOptions(), terms);
+			List<MenuOption> options2 = option.getOptions();
+			if (option.getHandler() != null) {
+				options2 = option.getHandler().getOptions();
+			}
+			findMenu (options2, terms);
 		}
 		return null;
 	}
 
 
-	private boolean matches(String[] terms, String label) {
-		String s = Labels.getLabel(label);
+	private boolean matches(String[] terms, String s) {
 		if (s == null)
 			return false;
 		for (String term: terms)

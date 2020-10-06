@@ -61,6 +61,8 @@ public class AccountDatatable extends DatatypeColumnsDatatable {
 		Account a = (Account) ((DataNode)element).getInstance();
 		if (a.isDisabled())
 			s.put("$class", "dashed");
+		else
+			s.put("$class", "std");
 		return s;
 	}
 

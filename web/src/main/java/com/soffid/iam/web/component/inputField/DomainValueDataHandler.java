@@ -1,6 +1,8 @@
 package com.soffid.iam.web.component.inputField;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -62,8 +64,8 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 	}
 
 	@Override
-	public void followLink(String value) {
-		// TODO Auto-generated method stub
+	public String followLink(String value) throws UnsupportedEncodingException {
+		return null;
 	}
 
 	@Override

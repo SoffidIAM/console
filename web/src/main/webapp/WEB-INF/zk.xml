@@ -102,11 +102,11 @@ zk.error = function (msg) {
 		<max-upload-size>40480</max-upload-size>
 	</system-config>
 	<zscript-config>
-		<language-name>Java</language-name>
-		<interpreter-class>es.caib.seycon.ng.web.component.BSHInterpreter</interpreter-class>
+		<language-name>java</language-name>
+		<interpreter-class>com.soffid.iam.web.interp.RefInterpreter</interpreter-class>
 	</zscript-config>
 	<zscript-config>
 		<language-name>ref</language-name>
-		<interpreter-class>es.caib.seycon.ng.web.component.RefInterpreter</interpreter-class>
+		<interpreter-class>com.soffid.iam.web.interp.RefInterpreter</interpreter-class>
 	</zscript-config>
 </zk>

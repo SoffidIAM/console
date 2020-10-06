@@ -31,6 +31,7 @@
 				enumeration = "com.soffid.iam.api.AccountStatus"
 				label="${c:l('accounts.status')}"/>
 			<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+				hidebuiltin="true"
 				objectType="com.soffid.iam.api.Account" dataPath="/."
 				id="accountAttributes" />
 		</form>

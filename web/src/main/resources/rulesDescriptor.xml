@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="rule" type="rule">
+			<ejb-finder jndi="java:/module/RulesService-v2"
+				method="findRules" > <!--agent:query, application:update-->
+				<parameter value="${null}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.Rule">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="rule">
+		<ejb-handler jndi="java:/module/RulesService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<finder name="ruleAssignedRole" type="ruleAssignedRole">
+			<ejb-finder jndi="java:/module/RulesService-v2"
+				method="findRuleAssignments"> <!--agent:query, application:update-->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.RuleAssignedRole">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	
+	<datanode name="ruleAssignedRole">
+		<script-handler>
+			<insert-script>
+				instance.ruleId = parent.instance.id;
+			</insert-script>
+		</script-handler>
+		<ejb-handler jndi="java:/module/RulesService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<finder name="role" type="role">
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findRolById"> <!--agent:query, application:update-->
+				<parameter value="${instance.roleId}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="role" />
+</zkib-model>

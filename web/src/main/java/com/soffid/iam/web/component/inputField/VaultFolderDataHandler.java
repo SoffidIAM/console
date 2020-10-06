@@ -69,8 +69,8 @@ public class VaultFolderDataHandler extends InputFieldDataHandler<VaultFolder> {
 	}
 
 	@Override
-	public void followLink(String value) {
-		Executions.getCurrent().sendRedirect("/resource/group/group.zul?name="+value, "_blank");
+	public String followLink(String value) {
+		return null;
 	}
 
 	@Override

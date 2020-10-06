@@ -33,6 +33,7 @@ public class SvgFilter extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		boolean original = false;
 		String originalGreen = "#9ec73c";
 		String originalBlue = "#637792";
 		String originalSky = "#22B9D8";
@@ -46,8 +47,13 @@ public class SvgFilter extends HttpServlet {
 		String sky = ConfigurationCache.getProperty("soffid.ui.color3");
 		if (sky == null) sky = originalSky;
 
-		String uri = req.getRequestURI();
-		if (uri.endsWith("-r.svg")) {
+		String uri = req.getServletPath();
+//		uri = req.getPathInfo();
+		
+		if (uri.endsWith("-orig.svg")) {
+			original = true;
+			uri = uri.substring(0, uri.length()-9)+".svg";
+		} else if (uri.endsWith("-r.svg")) {
 			uri = uri.substring(0, uri.length()-6)+".svg";
 			originalBlue = "#ffffff";
 			blue = sky;
@@ -67,38 +73,41 @@ public class SvgFilter extends HttpServlet {
 		if (t == null) {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		} else {
-			Color originalGreenRgb = toColor ( originalGreen);
-			Color originalBlueRgb = toColor ( originalBlue);
-			Color originalSkyRgb = toColor ( originalSky);
-			Color newGreenRgb = toColor ( green);
-			Color newBlueRgb = toColor ( blue);
-			Color newSkyRgb = toColor ( sky);
-			
-			HSLColor originalGreenHsl = new HSLColor(originalGreenRgb);
-			HSLColor originalBlueHsl = new HSLColor(originalBlueRgb);
-			HSLColor originalSkyHsl = new HSLColor(originalSkyRgb);
-			HSLColor newGreenHsl = new HSLColor(newGreenRgb);
-			HSLColor newBlueHsl = new HSLColor(newBlueRgb);
-			HSLColor newSkyHsl = new HSLColor(newSkyRgb);
-			
-			
-			for (int pos = t.indexOf("#"); pos >= 0; pos = t.indexOf("#", pos+1))
-			{
-				if ( pos < t.length() - 6)
+			if ( ! original ) {
+				Color originalGreenRgb = toColor ( originalGreen);
+				Color originalBlueRgb = toColor ( originalBlue);
+				Color originalSkyRgb = toColor ( originalSky);
+				Color newGreenRgb = toColor ( green);
+				Color newBlueRgb = toColor ( blue);
+				Color newSkyRgb = toColor ( sky);
+				
+				HSLColor originalGreenHsl = new HSLColor(originalGreenRgb);
+				HSLColor originalBlueHsl = new HSLColor(originalBlueRgb);
+				HSLColor originalSkyHsl = new HSLColor(originalSkyRgb);
+				HSLColor newGreenHsl = new HSLColor(newGreenRgb);
+				HSLColor newBlueHsl = new HSLColor(newBlueRgb);
+				HSLColor newSkyHsl = new HSLColor(newSkyRgb);
+				
+				
+				for (int pos = t.indexOf("#"); pos >= 0; pos = t.indexOf("#", pos+1))
 				{
-					String color = t.substring(pos+1, pos+7);
-					if (isHex(color))
+					if ( pos < t.length() - 6)
 					{
-						Color c = toColor("#"+color);
-						HSLColor hslColor = new HSLColor(c);
-						if ( sameColor (originalGreenHsl, hslColor ))
-							replaceColor (t, pos, originalGreenHsl, newGreenHsl, hslColor);
-						else if ( sameColor (originalBlueHsl, hslColor ))
-							replaceColor (t, pos, originalBlueHsl, newBlueHsl, hslColor);
-						else if ( sameColor (originalSkyHsl, hslColor ))
-							replaceColor (t, pos, originalSkyHsl, newSkyHsl, hslColor);
+						String color = t.substring(pos+1, pos+7);
+						if (isHex(color))
+						{
+							Color c = toColor("#"+color);
+							HSLColor hslColor = new HSLColor(c);
+							if ( sameColor (originalGreenHsl, hslColor ))
+								replaceColor (t, pos, originalGreenHsl, newGreenHsl, hslColor);
+							else if ( sameColor (originalBlueHsl, hslColor ))
+								replaceColor (t, pos, originalBlueHsl, newBlueHsl, hslColor);
+							else if ( sameColor (originalSkyHsl, hslColor ))
+								replaceColor (t, pos, originalSkyHsl, newSkyHsl, hslColor);
+						}
 					}
 				}
+				
 			}
 			byte[] b = t.toString().getBytes("UTF-8");
 			resp.setStatus(200);

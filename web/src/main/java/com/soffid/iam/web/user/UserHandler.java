@@ -4,31 +4,38 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Configuration;
+import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
-import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
-import com.soffid.iam.web.popup.SelectColumnsHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datasource.CommitException;
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class UserHandler extends FrameHandler {
@@ -62,6 +69,7 @@ public class UserHandler extends FrameHandler {
 		
 
 	public void onChangeDades() {
+		updateStatus();
 	}
 	
 	public void importCsv () throws IOException, CommitException {
@@ -139,10 +147,6 @@ public class UserHandler extends FrameHandler {
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
 	}
 	
-	public void changeColumns(Event event) throws IOException {
-		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
-	}
-	
 	public void addNew() throws Exception {
 		super.addNew();
 	}
@@ -158,5 +162,48 @@ public class UserHandler extends FrameHandler {
 			sb.addAttribute("userName").setSearchFilter(user);
 			sb.search();
 		}
+	}
+	
+	public void updateStatus() {
+		Button b = (Button) getFellow("pendingTasksButton");
+		try {
+			String userName = (String) XPathUtils.getValue(getForm(), "userName");
+			int i = EJBLocator.getUserService().isUpdatePendingExtended(userName);
+			if ( i == 0 ) b.setVisible( false );
+			else {
+				b.setVisible(true);
+				b.setImage(i == 1 ? "/img/held.svg" :
+					i == 2 ? "/img/sync.svg" :
+						"/img/warning.svg");
+			}
+		} catch (Exception e) {
+			b.setVisible(false);
+		}
+	}
+
+	@Override
+	public boolean applyNoClose(Event event) throws CommitException {
+		boolean b = super.applyNoClose(event);
+		updateStatus();
+		return b;
+	}
+	
+	public void viewTasks (Event event) throws InternalErrorException, NamingException, CreateException {
+		String userName = (String) XPathUtils.getValue(getForm(), "userName");
+
+		Window w = (Window) getFellow("tasksWindow");
+		DataTable dt = (DataTable) w.getFellow("tasks");
+		JSONArray array = new JSONArray();
+		for (SyncAgentTaskLog tl: EJBLocator.getUserService().getActiveTasks(userName)) {
+			JSONObject j = dt.wrap(tl);
+			array.put(j);
+		}
+		dt.setData(array);
+		w.doHighlighted();
+	}
+
+	public void closeTaskWindow(Event event) {
+		Window w = (Window) getFellow("tasksWindow");
+		w.setVisible(false);
 	}
 }

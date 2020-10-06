@@ -232,7 +232,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	}
 
 	private void selectFirstRow(Component parent) {
-		if (parent.getChildren().size() >= 2)
+		if (parent.getChildren().size() >= 2) 
 		{
 			Component listHolder = (Component) parent.getChildren().get(1);
 			if (listHolder != null)
@@ -268,7 +268,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		textSearchBox.setFocus(true);
 	}
 
-	private void setAdvancedMode() {
+	public void setAdvancedMode() {
 		mode = ADVANCED;
 		StringBuffer sb = new StringBuffer();
 		for (AttributeSearchBox asb: getAttributeSearchBoxes())
@@ -287,6 +287,9 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		advancedSearch.setFocus(true);
 	}
 
+	public void setAdvancedSearchFilter(String q) {
+		advancedSearch.setValue(q);
+	}
 
 	public void setBasicMode() {
 		mode = BASIC;

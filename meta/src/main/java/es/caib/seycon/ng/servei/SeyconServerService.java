@@ -7,11 +7,16 @@
 package es.caib.seycon.ng.servei;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.soffid.iam.api.StatsSample;
+import com.soffid.iam.model.StatsEntity;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.service.StatsService;
 import com.soffid.iam.ui.SeyconTask;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -25,8 +30,18 @@ import es.caib.seycon.ng.model.ConfiguracioEntity;
 @Service(translatedName = "SyncServerService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.TasqueEntity.class, es.caib.seycon.ng.model.TaskLogEntity.class,
 		es.caib.seycon.ng.model.DispatcherEntity.class, es.caib.seycon.ng.model.ServerEntity.class, TenantEntity.class,
-		ConfiguracioService.class, ConfiguracioEntity.class })
+		ConfiguracioService.class, ConfiguracioEntity.class ,
+		DispatcherService.class,
+		StatsService.class,
+		StatsEntity.class})
 public abstract class SeyconServerService {
+
+	@Operation(grantees = { roles.monitor_server_list.class }, translated = "getSyncServers")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Server> getSyncServers()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 
 	@Operation(grantees = { roles.monitor_server_list.class }, translated = "getSyncServersStatus")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
@@ -42,6 +57,21 @@ public abstract class SeyconServerService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.monitor_agent_list.class }, translated = "getServerAgentStatus")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getServerAgentStatus()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.monitor_agent_list.class }, translated = "getPendingTasksStats")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Description ("Returns a map with a list of pairs date - long for each agent. The key is the agent name. An special agent named 'Unscheduled' holds the not scheduled tasks")
+	public Map<String, Vector<Object[]>> getPendingTasksStats()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+	
 	@Operation(grantees = { roles.monitor_server_list.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public Collection<SeyconTask> findUnscheduledTasks() {
@@ -59,6 +89,13 @@ public abstract class SeyconServerService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.SeyconAgentTaskLog> getAgentTasks(java.lang.String url,
 			java.lang.String agentCodi) throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.monitor_agent_list.class }, translated = "getAgentTasks")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public es.caib.seycon.ng.comu.SeyconAgentTaskLog getAgentTask(java.lang.String url,
+			java.lang.String agentName, Long taskId) throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
 
@@ -140,4 +177,5 @@ public abstract class SeyconServerService {
 	@Operation(grantees = { roles.monitor_server_list.class })
 	public Map<String,int[]> getStats ( String server, String metric, int seconds, int step ) { return null;}
 
+	public void updatePendingTasks() {};
 }

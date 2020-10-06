@@ -1,0 +1,4 @@
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/Configuration.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/LogoutServlet.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/LoginFilter.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/Messages.java

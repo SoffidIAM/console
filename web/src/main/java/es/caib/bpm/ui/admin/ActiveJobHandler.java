@@ -2,8 +2,6 @@ package es.caib.bpm.ui.admin;
 
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -22,15 +20,14 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.bpm.api.Job;
+import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
+import com.soffid.iam.web.bpm.BPMApplication;
+import com.soffid.iam.web.bpm.ListitemCreator;
+
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.BPMApplication;
-import es.caib.bpm.ui.inbox.ListitemCreator;
-import es.caib.bpm.vo.Job;
-import es.caib.bpm.vo.ProcessInstance;
-import es.caib.bpm.vo.TaskInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.component.DataListbox;
 import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Frame;

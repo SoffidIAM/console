@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?page id="syncserver"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.audit.AuditHandler" id="frame">
+
+	<datamodel id="model" rootNode="root" src="auditDescriptor.xml"/>
+	
+	<div sclass="single-face-card" id="card">
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<menu2>
+				<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+				<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+			</menu2>
+		</div>
+
+		<searchbox auto="true" id="searchBox"
+			jsonObject="com.soffid.iam.api.Audit" 
+			defaultAttributes="calendar, author, user, group"
+			dataPath="/model:/audit" variableName="query"></searchbox>
+
+		<datatable id="listbox" autocommit="true" 
+			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+			preference="audit"
+			dataPath="/model:/audit" maxheight="70vh" 
+			enablefilter="true" >
+		<attribute name="allColumns">
+<![CDATA[
+- name: ${c:l('auditoria.zul.Data/Hora')}
+  default: true
+  value: calendar_datetime
+- name: ${c:l('auditoria.zul.Autor-2')}
+  default: true
+  value: author
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(author)}" target="_blank" class="shylink">#{author }</a>
+- name:	${c:l('com.soffid.iam.api.Audit.sourceIp')}
+  value: sourceId
+  default: true
+- name: ${c:l('auditoria.zul.Objecte-2')}
+  value: object
+- name: ${c:l('auditoria.zul.Usuari')}
+  value: user
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(user)}" target="_blank" class="shylink">#{user }</a>
+- name: ${c:l('auditoria.zul.Aplicacia')}
+  value: application
+- name: ${c:l('auditoria.zul.Rol')}
+  value: role
+- name: ${c:l('auditoria.zul.account')}
+  value: account
+  template: <a href="/soffid/resource/account/account.zul?name=#{encodeURIComponent(account)}&system=#{encodeURIComponent(database)}" target="_blank" class="shylink">#{account }</a>
+- name: ${c:l('auditoria.zul.Bbdd')}
+  value: database
+- name: ${c:l('auditoria.zul.Grup')}
+  value: group
+- name: ${c:l('auditoria.zul.Xarxa')}
+  value: network
+- name: ${c:l('auditoria.zul.Maquina')}
+  value: host
+- name: ${c:l('auditoria.zul.Impressora')}
+  value: printer
+- name: ${c:l('auditoria.zul.Domini')}
+  value: domain
+- name: ${c:l('auditoria.zul.Valordomini')}
+  value: domainValue
+- name: ${c:l('auditoria.zul.Dominicorreu')}
+  value: mailDomain
+- name: ${c:l('auditoria.zul.Llistacorreu')}
+  value: mailList
+- name: ${c:l('auditoria.zul.Llistacorreupertany')}
+  value: mailListBelong
+- name: ${c:l('auditoria.zul.Dominicorreupertany')}
+  value: mailDomainBelogns
+- name: ${c:l('auditoria.zul.Parametre')}
+  value: configurationParameter
+- name: ${c:l('auditoria.zul.Fitxer')}
+  value: fileName
+- name: ${c:l('auditoria.zul.Autoritzacia')}
+  value: authorization
+- name: ${c:l('auditoria.zul.Federacia')}
+  value: identityFederation
+- name: ${c:l('auditoria.zul.Dominiusuaris')}
+  value: userDomain
+- name: ${c:l('auditoria.zul.Dominicontrasenyes')}
+  value: passwordDomain
+- name: ${c:l('auditoria.zul.jumpservergroup')}
+  value: jumpServerGroup
+- name: ${c:l('auditoria.zul.pamsession')}
+  value: pamSessionId
+- name: ${c:l('auditoria.zul.Accia-2')}
+  value: message
+  default: true
+		]]>
+		</attribute>
+		</datatable>
+	</div>
+
+</frame>

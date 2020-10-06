@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xel.fn.CommonFns;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 
@@ -14,6 +17,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.service.ejb.OrganizationalUnitTypeService;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
@@ -102,5 +106,17 @@ public class GroupTypeHandler extends FrameHandler {
 		
 		getModel().refresh();
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
+	}
+
+	@Override
+	public void afterCompose() {
+		super.afterCompose();
+		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		String user = req.getParameter("name");
+		if (user != null) {
+			SearchBox sb = (SearchBox) getFellow("searchBox");
+			sb.addAttribute("name").setSearchFilter(user);
+			sb.search();
+		}
 	}
 }

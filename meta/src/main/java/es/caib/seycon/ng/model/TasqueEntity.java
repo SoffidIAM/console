@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.model;
 
+import java.util.Collection;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -147,6 +149,43 @@ public abstract class TasqueEntity {
 		return null;
 	}
 
+	@DaoFinder("select count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server is not null and tasques.tenant.id = :tenantId " )
+	public Long countTasks() {
+		return null;
+	}
+
+	@DaoFinder("select count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server = :server and tasques.tenant.id = :tenantId " )
+	public Long countTasksByServer(String server) {
+		return null;
+	}
+
+	@DaoFinder("select count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server is null and tasques.tenant.id = :tenantId " )
+	public Long countUnscheduledTasks() {
+		return null;
+	}
+
+	@DaoFinder("select systemName, count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server is not null and tasques.tenant.id = :tenantId \n"
+			+ "group by systemName" )
+	public Collection<Object[]> countTasksBySystem() {
+		return null;
+	}
+
+	@DaoFinder("select systemName, count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server = :server and tasques.tenant.id = :tenantId \n"
+			+ "group by systemName" )
+	public Collection<Object[]> countTasksBySystem(String server) {
+		return null;
+	}
+
 	@DaoFinder("select tasques from \n"
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
 			+ "where tasques.server=:server and "
@@ -259,6 +298,8 @@ public abstract class TasqueEntity {
 	public void cancelUnscheduledCopies(TasqueEntity entity)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	public String toString() {return null;}
 }
 
 

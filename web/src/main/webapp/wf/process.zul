@@ -3,29 +3,20 @@
 <?component name="processInfo" macroURI="process/processInfo.zul" inline="true"?>
 <?component name="attachments" macroURI="process/attachments.zul" inline="true"?>
 <?component name="comments" macroURI="process/comments.zul" inline="true"?>
-<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" id="ui" use="es.caib.bpm.ui.process.ProcessUI" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-		<style>
-			/*Tabla: Mis Tareas*/
-			.classThree, .classFour, .classFive{display:block;}
-
-		</style>
-		<datamodel class="es.caib.bpm.datamodel.BPMDataNode" id="BPMdata"/>
-		<hbox width="100%">
-			<grid width="100%">
-				<rows>
-					<row>
-						<label sclass="label" value="${c:l('process.lblProceso')}"/>
-						<label id="txtIdProceso"/>
-						<label id="txtProceso"/>
-					</row>
-				</rows>
-			</grid>
-			<popup id="ButtonHelp">
-				<label value="${c:l('inbox.lblRecargar')}"/>
-			</popup>
-			<image onClick="ui.refresh()" sclass="reloadtasks" src="/images/reload-petit.png" tooltip="ButtonHelp"/>				
-		</hbox>
-		<tabbox id="tabbox" width="98%">
+<frame xmlns="http://www.zkoss.org/2005/zul" 
+	xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:zk="http://www.zkoss.org/2005/zk" 
+	id="frame" use="com.soffid.iam.web.bpm.process.ProcessUI" 
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+		<datamodel class="com.soffid.iam.web.bpm.BPMDataNode" id="model"/>
+		<div width="100%">
+			<label sclass="label" value="${c:l('process.lblProceso')}"/>
+			<label id="txtIdProceso"/>
+			<label id="txtProceso" style="margin-left: 2em"/>
+			<databutton image="/img/restart.svg" onClick="ref:frame.refresh" onlyIcon="true" label="${c:l('seyconserver.Refresca') }" id="pendingTasksButton" style="float:right"/>
+		</div>
+		<tabbox id="tabbox" style="width: 100%; height: 70vh">
 			<tabs>
 				<tab label="${c:l('inbox.lblProceso')}"/>
 				<tab label="${c:l('process.lblTareas')}"/>
@@ -35,28 +26,56 @@
 			</tabs>
 			<tabpanels width="100%">
 				<tabpanel id="proceso" style="min-height:30em;overflow:auto" width="100%">
-					<form dataPath="BPMdata:/processInstance/variables" width="100%">
+					<form2 dataPath="model:/processInstance/variables"  style="width:100%; height: calc( 100vh - 340px )">
 						 
-						<vbox id="datosElementoWorkflow" width="100%">
+						<div id="datosElementoWorkflow" width="100%">
 					
-						</vbox>
-					</form>
+						</div>
+					</form2>
 				</tabpanel>
 				<tabpanel id="tareas" style="overflow:auto"> 
-					<tree id="listadoTareas" width="100%" style="min-height: 0">
-							<treecols>
-								<treecol label="${c:l('process.lblIdentificador')}" />
-								<treecol label="${c:l('llistesCorreu.zul.Descripcia-2')}" />
-								<treecol label="${c:l('inbox.lblFecha')}" />
-								<treecol label="${c:l('process.lblEstado')}" />
-								<treecol label="${c:l('inbox.lblActoresAsignados')}" />
-							</treecols>
-							<treechildren></treechildren>
-					</tree>
+					<datatree2 id="listadoTareas" width="100%" style="min-height: 0"
+						header="${c:l('process.lblIdentificador')}"
+						onSelect="ref:frame.openTree">
+					<attribute name="finders">
+					<![CDATA[
+- path: process
+  icon: /img/engine-green.svg
+  value: id
+  leaf: false
+  columns:
+    - value: description
+    - value: startDate
+    - value: currentTask
+    - value: ""
+- path: task
+  icon: /img/user-green.svg
+  value: id
+  leaf: true
+  columns:
+    - value: description
+    - value: startDate
+    - value: status
+    - value: actor
+- path: job
+  icon: /img/engine-green.svg
+  value: id
+  leaf: true
+  columns:
+    - value: description
+    - value: startDate
+    - value: status
+    - value: ""
+				  		]]></attribute>
+						<attribute name="columns"><![CDATA[
+- name: ${c:l('llistesCorreu.zul.Descripcia-2')}
+- name: ${c:l('inbox.lblFecha')}
+- name: ${c:l('process.lblEstado')}
+- name: ${c:l('inbox.lblActoresAsignados')}
+						]]></attribute>
+					</datatree2>
 				</tabpanel>
 				<tabpanel style="overflow:auto;min-height:30em;" width="100%">
-				<!-- 
-					 -->
 					<processInfo/>
 				</tabpanel>
 				<tabpanel style="overflow:auto;min-height:30em;" width="100%">
@@ -74,12 +93,12 @@
 		
 	    <hbox width="98%">
 			<hbox style="float:left;">
-				<button id="btnCerrar" label="${c:l('task.btnCerrar')}" onClick="ui.cerrar()"/>
+				<button id="btnCerrar" label="${c:l('task.btnCerrar')}" onClick="ref:frame.cerrar()"/>
 			</hbox>
 
 			<hbox style="float:right;">
-				<button id="btnCancel" label="${c:l('process.btnCancel')}" onClick="ui.cancel()"/>
-				<button id="btnUpgrade" label="${c:l('process.btnUpgrade')}" onClick="ui.upgrade()"/>
+				<button id="btnCancel" label="${c:l('process.btnCancel')}" onClick="ref:frame.cancel()"/>
+				<button id="btnUpgrade" label="${c:l('process.btnUpgrade')}" onClick="ref:frame.upgrade()"/>
 			</hbox>
 		</hbox>
 </frame>

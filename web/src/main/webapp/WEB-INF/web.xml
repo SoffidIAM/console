@@ -260,7 +260,7 @@
 			<![CDATA[Soffid Error Servlet]]>
 		</description>
 		<servlet-name>soffidErrorServlet</servlet-name>
-		<servlet-class>com.soffid.iam.web.ErrorServlet</servlet-class>
+		<servlet-class>com.soffid.iam.web.error.ErrorServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>soffidErrorServlet</servlet-name>

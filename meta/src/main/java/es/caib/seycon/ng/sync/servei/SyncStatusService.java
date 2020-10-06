@@ -17,6 +17,7 @@ import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PasswordValidation;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.servei.DispatcherService;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
+	DispatcherService.class,
 	es.caib.seycon.ng.sync.servei.ServerService.class})
 public abstract class SyncStatusService {
 

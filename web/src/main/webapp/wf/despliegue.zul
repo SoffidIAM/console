@@ -18,22 +18,11 @@
 			</div>
 			<toolbar>
 				<checkbox id="todos" label="${c:l('deploy.btnReloadTodos')}"
-					visible="true" class="toolbar-checkbox" checked="false">
-					<attribute name="onCheck">
-						if (todos.checked)
-							ui.cargarListadoProcesos();
-						else
-							ui.cargarProcesosHabilitados();
-					</attribute>
+					visible="true" class="toolbar-checkbox" checked="false" style="float: right">
+					<attribute name="onCheck" >ref:ui.onCheck</attribute>
 				</checkbox>
-				<toolbarbutton image="/img/upload.png" label="${c:l('deploy.btnDeploy')}">
-					<attribute name="onClick">
-						ui.upload();
-						if (todos.checked)
-							ui.cargarListadoProcesos();
-						else
-							ui.cargarProcesosHabilitados();
-					</attribute>
+				<toolbarbutton image="/img/upload.svg" label="${c:l('deploy.btnDeploy')}"
+					onClick="ref:ui.upload">
 				</toolbarbutton>
 			</toolbar>
 			<listbox id="listbox" fixedLayout="true" mold="paging"

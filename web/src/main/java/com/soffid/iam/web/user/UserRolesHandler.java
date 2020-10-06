@@ -76,6 +76,9 @@ public class UserRolesHandler extends Div implements AfterCompose {
 	public void showDetails(Event event) {
 		Window w = getWindowModify();
 		w.doHighlighted();
+		Component trash = w.getFellow("trash");
+		Object ruleId = getListbox().getJXPathContext().getValue("ruleId");
+		trash.setVisible(ruleId == null);
 	}
 	
 	public void closeDetails(Event event) {
@@ -270,6 +273,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 				dv.setValue(domain);
 				ra.setDomainValue(dv);
 				DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue((DataSource)usersListbox, "/role");				
+				coll.add(ra);
 			}
 		}
 		groupsDataSource.commit();

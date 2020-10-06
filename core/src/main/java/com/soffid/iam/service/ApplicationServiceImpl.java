@@ -1803,6 +1803,7 @@ public class ApplicationServiceImpl extends
 		h.setRuleName(rule.getDescription());
     	RolAccountDetail s = new RolAccountDetail(h, null);
     	s.rule = rule;
+    	rad.add(s);
     	return s;
     }
     
@@ -3798,6 +3799,26 @@ public class ApplicationServiceImpl extends
 		} else {
 			return null;
 		}
+	}
+	
+	@Override
+	protected Collection<RoleAccount> handleFindRoleAccountByAccountNoRule(long accountId) throws Exception {
+		Collection<RoleAccount> r = handleFindRoleAccountByAccount(accountId);
+		for (Iterator<RoleAccount> it = r.iterator(); it.hasNext(); ) {
+			if (it.next().getRuleId() != null)
+				it.remove();
+		}
+		return r;
+	}
+	
+	@Override
+	protected Collection<RoleAccount> handleFindUserRolesByUserNameNoRules(String codiUsuari) throws Exception {
+		Collection<RoleAccount> r = handleFindUserRolesByUserName(codiUsuari);
+		for (Iterator<RoleAccount> it = r.iterator(); it.hasNext(); ) {
+			if (it.next().getRuleId() != null)
+				it.remove();
+		}
+		return r;
 	}
 
 

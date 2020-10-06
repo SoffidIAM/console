@@ -28,9 +28,9 @@ import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.service.workflow.JbpmSchedulerServiceInterface;
+import com.soffid.iam.web.bpm.BPMApplication;
 import com.soffid.iam.web.component.FrameHandler;
 
-import es.caib.bpm.toolkit.BPMApplication;
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Configuracio;
 import es.caib.seycon.ng.exception.InternalErrorException;

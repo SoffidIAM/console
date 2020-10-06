@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PasswordValidation;
+import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import roles.account_attribute_query;
@@ -529,6 +531,21 @@ public abstract class AccountService {
 	 return false;
 	}
 	
+	@Description("Identifies if there is any pending change. 0 means no change pending, 1 task is on hald, 2 means synchronization in progress, 3 means error")
+	@Operation ( grantees={roles.user_query.class,roles.account_query.class,
+			roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public int isUpdatePendingExtended(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return 0;
+	}
+	
+	public Collection<SeyconAgentTaskLog> getActiveTasks(Account account) {
+		return null;
+	}
+
+
 	@Description("Updates account password set and expiration")
 	@Operation (translated="updateAccountPasswordDate2")
 	@Transactional(rollbackFor={java.lang.Exception.class})

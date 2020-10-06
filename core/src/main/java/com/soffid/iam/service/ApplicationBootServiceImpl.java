@@ -1365,6 +1365,7 @@ public class ApplicationBootServiceImpl extends
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Role.ui.json", MetadataScope.ROLE, false);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, false);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/MailList.ui.json", MetadataScope.MAIL_LIST, false);
 	}
 
 	static Database database = null;

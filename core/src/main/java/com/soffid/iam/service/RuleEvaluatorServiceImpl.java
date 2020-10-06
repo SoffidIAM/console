@@ -11,11 +11,14 @@ package com.soffid.iam.service;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import bsh.ParseException;
+import bsh.TargetError;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.DelegationStatus;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.Task;
@@ -49,6 +52,7 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -123,6 +127,57 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                     }
                     assignRole(rule, roles, user, rar.getRole(), stringValue, method);
                 }
+				
+				if ( rule.getBshExpression() != null)
+				{
+					Object o = evaluate(rule.getBshRoles(), env);
+					if (o != null) {
+						if (! (o instanceof Collection))
+							throw new InternalErrorException(
+									String.format("Rule %s has a roles expression, but it has returned an object of class %s when it should be a Collection",
+											rule.getName(), o.getClass().toString()));
+						for (Object grant: (Collection)o) {
+							RoleEntity r;
+							String domainValue = null;
+							if (grant != null) {
+								if (grant instanceof RoleAccount) {
+									if (((RoleAccount) grant).getId() != null)
+										r = getRoleEntityDao().load(((RoleAccount) grant).getId());
+									else
+										r = getRoleEntityDao().findByNameAndSystem(((RoleAccount) grant).getRoleName(), ((RoleAccount) grant).getSystem());
+									if (((RoleAccount) grant).getDomainValue() != null)
+										domainValue = ((RoleAccount) grant).getDomainValue().getValue();
+								}
+								else if (grant instanceof Role) {
+									if (((Role) grant).getId() != null)
+										r = getRoleEntityDao().load(((RoleAccount) grant).getId());
+									else
+										r = getRoleEntityDao().findByNameAndSystem(((Role) grant).getName(), ((Role) grant).getSystem());
+								}
+								else if (grant instanceof String) {
+									String grantString = (String) grant;
+									int at = grantString.lastIndexOf('@');
+									int slash = at >= 0 ? grantString.indexOf('/', at) :
+										grantString.lastIndexOf('/');
+									if (slash > 0) {
+										domainValue = grantString.substring(slash + 1);
+										grantString = grantString.substring(0, slash);
+									}
+									r = getRoleEntityDao().findByShortName(grantString);
+								} else {
+									throw new InternalErrorException(
+											String.format("Rule %s has a roles expression, but it has returned a collection with an object of class %s when it should be one out of Role, RoleAccount or String",
+													rule.getName(), grant.getClass().toString()));
+								}
+								if (r == null)
+									throw new InternalErrorException(
+											String.format("Rule %s has a roles expression, but it has returned an unknown role",
+													rule.getName()));
+			                    assignRole(rule, roles, user, r, domainValue, method);
+							}
+						}
+					}
+				}
 			}
 			// Now remove unneded roles
 			for (RoleAccountEntity role : roles) {
@@ -290,10 +345,32 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		}
 	}
 
-	private Object evaluate (String expression, InterpreterEnvironment env) throws EvalError
+	private Object evaluate (String expression, InterpreterEnvironment env) throws EvalError, InternalErrorException
 	{
-		Interpreter interpreter = env.getInterpeter();
-		return interpreter.eval(expression);
+		try {
+			Interpreter interpreter = env.getInterpeter();
+			return interpreter.eval(expression);
+		} catch (ParseException e) {
+			throw new InternalErrorException("Error parsing custom script "+cut(expression)+": "+e.getMessage());
+		} catch (TargetError e) {
+			throw new InternalErrorException ("Error executing custom script "+cut(expression)+" at "+e.getScriptStackTrace(),
+					e.getTarget());
+		} catch (EvalError e) {
+			String msg;
+			try {
+				msg = e.getMessage() + "[ "+ e.getErrorText()+"] ";
+			} catch (Exception e2) {
+				msg = e.getMessage();
+			}
+			throw new InternalErrorException ("Error parsing custom script "+cut (expression)+": "+msg);
+		}
+	}
+
+	private String cut(String expression) {
+		if (expression.length() > 80)
+			return expression.substring(0, 80);
+		else
+			return expression;
 	}
 
 	/**

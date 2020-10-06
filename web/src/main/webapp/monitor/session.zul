@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?page id="syncserver"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.audit.SessionHandler" id="frame">
+
+	<datamodel id="model" rootNode="root" src="sessionDescriptor.xml"/>
+	
+	<div sclass="single-face-card" id="card">
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<menu2>
+				<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+				<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+			</menu2>
+		</div>
+
+		<datatable id="listbox" autocommit="true" 
+			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+			preference="session"
+			dataPath="/model:/session" maxheight="70vh" 
+			enablefilter="true" >
+		<attribute name="allColumns">
+<![CDATA[
+- name: ${c:l('registreAcces.zul.Usuari-2')}
+  value: userName
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(userName)}" target="_blank" class="shylink">#{userName }</a>
+  default: true
+-name: ${c:l('usuaris.zul.Maquinaservidora')}
+-name: ${c:l('usuaris.zul.Maquinaservidora')}
+			width="*" />
+		<column label="${c:l('usuaris.zul.Maquinaclient')}"
+			width="*" />
+		<column label="${c:l('usuaris.zul.Port')}" width="120px"/>
+		<column label="${c:l('usuaris.zul.DataInici')}"
+			width="140px" />
+		<column label="${c:l('usuaris.zul.VNC')}" width="60px" />
+		]]>
+		</attribute>
+		</datatable>
+	</div>
+
+</frame>

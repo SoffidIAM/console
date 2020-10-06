@@ -66,7 +66,7 @@ zkMenu3.open=function(ed, parent, options, first) {
 		} else {
 			od.setAttribute("class", "menu3item");
 			var a = document.createElement("a");
-			a.href = option.url;
+			a.href = option.full_url;
 			a.appendChild(document.createTextNode(option.label));
 			zk.listen(a, "click", zkMenu3.prevent);
 			od.appendChild(a);

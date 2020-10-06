@@ -1,5 +1,7 @@
 package com.soffid.iam.web.component.inputField;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
@@ -22,7 +24,7 @@ public abstract class InputFieldDataHandler<E> {
 	public abstract String getDescription(String name, String filter) throws Exception;
 	public abstract AsyncList<E> search(String text, String filter) throws Exception; 
 	public abstract void openFinder(String filter, boolean multiple, Databox databox, EventListener listener) throws Exception;
-	public abstract void followLink(String value);
+	public abstract String followLink(String value) throws UnsupportedEncodingException;
 	
 	String buildJsonFilter (String attribute, String value, String filter) {
 		String q = attribute+" eq \""+escapeJson(value)+"\""; //$NON-NLS-1$ //$NON-NLS-2$

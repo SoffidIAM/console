@@ -12,28 +12,47 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.naming.NamingException;
+import javax.net.ssl.HttpsURLConnection;
+
+import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AgentStatusInfo;
-import com.soffid.iam.api.Configuration;
+import com.soffid.iam.api.Server;
 import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.api.SyncServerInfo;
-import com.soffid.iam.api.Task;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.lang.MessageFactory;
-import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.StatsEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.TaskLogEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.model.TenantServerEntity;
-import com.soffid.iam.remote.RemoteInvokerFactory;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.remote.URLManager;
-import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.ssl.ConnectionFactory;
-import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncServerStatsService;
 import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.ui.SeyconTask;
@@ -44,29 +63,6 @@ import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.util.Base64;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.naming.NamingException;
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @see es.caib.seycon.ng.servei.SeyconServerService
@@ -109,7 +105,12 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
                             }
                         }
                     }
-                    serversInfo.add(new SyncServerInfo(m.getServerURL().toString(), "", "-", "ERROR", "ERROR", "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR"));
+                    SyncServerInfo si = new SyncServerInfo();
+                    si.setConnectedAgents(0);
+                    si.setNumberOfAgents( getDispatcherService().findDispatchersByFilter(null, null, null, null, null, Boolean.TRUE).size() );
+                    si.setStatus("ERROR");
+                    si.setUrl(server);
+                    serversInfo.add(si);
                 }
             }
             return serversInfo;
@@ -132,10 +133,16 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             try {
                 SyncStatusService status = rsl.getSyncStatusService();
                 SyncServerInfo info = status.getSyncServerStatus(Security.getCurrentTenantName());
-                info.setNumberOfPendingTasks("" + numTasquesPendents);
+                info.setNumberOfPendingTasks(numTasquesPendents);
                 serversInfo.add(info);
             } catch (Throwable e) {
-                serversInfo.add(new SyncServerInfo(m.getServerURL().toString(), "", "-", "ERROR", "ERROR", "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR"));
+                SyncServerInfo si = new SyncServerInfo();
+                si.setConnectedAgents(0);
+                si.setNumberOfAgents( getDispatcherService().findDispatchersByFilter(null, null, null, null, null, Boolean.TRUE).size() );
+                si.setStatus("ERROR");
+                si.setUrl(server);
+                si.setNumberOfPendingTasks(numTasquesPendents);
+                serversInfo.add(si);
             }
         }
 
@@ -185,6 +192,30 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             	agentstatus = new LinkedList<AgentStatusInfo>();
 			else
 				agentstatus = new LinkedList<AgentStatusInfo> (agentstatus0);
+			
+			String server;
+			try { server = new URL(url).getHost(); } catch (Exception e) {server = url;}
+			
+			List<AgentStatusInfo> m = new LinkedList<>();
+
+			Collection<Object[]> tasks = getTaskEntityDao().countTasksBySystem(server);
+			Collection<Object[]> tl = getTaskLogEntityDao().countTasksByServerAndSystem(server);
+
+			for ( AgentStatusInfo as: agentstatus) {
+				as.setPendingTasks(0);
+				for (Object[] tll: tasks) {
+					if ( tll[0] == null || tll[0].toString().trim().isEmpty() ||
+							tll[0].equals(as.getAgentName())) {
+						as.setPendingTasks( as.getPendingTasks() + ((Long) tll[1]).intValue());
+					}
+				}
+				for (Object[] tll: tl) {
+					if ( as.getAgentName().equals(tll[0])) {
+						as.setPendingTasks( as.getPendingTasks() - ((Long) tll[1]).intValue());
+					}
+				}
+			}
+
             Collections.sort(agentstatus, new Comparator<AgentStatusInfo>() {
 				@Override
 				public int compare(AgentStatusInfo o1, AgentStatusInfo o2) {
@@ -245,18 +276,34 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
                     // d'aquest server per optimitzar les consultes sql (encara
                     // que sobrecarreguem la sessió actual a nivell de memoria)
                     Collection allTaskLog = getTaskLogEntityDao().findAllHavingTasqueByServer(host);
-                    HashMap<Long, String[]> estatAllTasks = new HashMap<Long, String[]>();
+                    HashMap<Long, String[][]> estatAllTasks = new HashMap<Long, String[][]>();
 
                     for (Iterator tit = allTaskLog.iterator(); tit.hasNext(); ) {
                         TaskLogEntity tl = (TaskLogEntity) tit.next();
-                        String[] estatsTL = estatAllTasks.get(tl.getTask().getId());
-                        if (estatsTL == null) {
-                            estatsTL = new String[nomAgentsActius.size()];
-                        }
                         Integer estatAgentTascaActual = agentsPos.get(tl.getSystem().getName());
                         if (estatAgentTascaActual != null) {
-                            estatsTL[estatAgentTascaActual] = "S".equals(tl.getCompleted()) ? SeyconTask.Estat.DONE : "N".equals(tl.getCompleted()) ? SeyconTask.Estat.ERROR : SeyconTask.Estat.PENDING;
-                            estatAllTasks.put(tl.getTask().getId(), estatsTL);
+	                        String[][] s = estatAllTasks.get(tl.getTask().getId());
+	                        String[]  estatsTL;
+	                        String[]  messages;
+	                        String[]  exceptions;
+	                        if (s == null) {
+	                            estatsTL = new String[nomAgentsActius.size()];
+	                            messages = new String[nomAgentsActius.size()];
+	                            exceptions = new String[nomAgentsActius.size()];
+	                            estatAllTasks.put(tl.getTask().getId(), new String[][] { estatsTL, messages, exceptions});
+	                        } else {
+	                        	estatsTL = s[0];
+	                        	messages = s[1];
+	                        	exceptions = s[2];
+	                        }
+                        	if ("N".equals(tl.getCompleted())) {
+                        		messages[estatAgentTascaActual] = tl.getMessage();
+                        		exceptions[estatAgentTascaActual] = tl.getStackTrace();
+                        	}
+                            estatsTL[estatAgentTascaActual] = "S".equals(tl.getCompleted()) ? 
+                            		SeyconTask.Estat.DONE : 
+                            		"N".equals(tl.getCompleted()) ? SeyconTask.Estat.ERROR : 
+                            			SeyconTask.Estat.PENDING;
                         }
                     }
 
@@ -265,19 +312,26 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
                     for (Iterator it = tasques.iterator(); it.hasNext(); ) {
                         TaskEntity t = (TaskEntity) it.next();
-                        String[] estats = estatAllTasks.get(t.getId());
-                        if (estats == null) estats = new String[nomAgentsActius.size()];
+                        String[][] s = estatAllTasks.get(t.getId());
+                        String[] estats;
+						if (s == null) 
+							estats = new String[nomAgentsActius.size()];
+                        else 
+                        	estats = s[0];
                         if (t.getSystemName() == null) {
                             for (int i = 0; i < estats.length; i++) if (estats[i] == null) estats[i] = SeyconTask.Estat.PENDING;
                         } else {
                             int estatAgentTascaActual = agentsPos.get(t.getSystemName());
                             for (int i = 0; i < estats.length; i++) {
                                 if (estats[i] == null) {
-                                    if (i != estatAgentTascaActual) estats[i] = SeyconTask.Estat.DONE; else estats[i] = SeyconTask.Estat.PENDING;
+                                    if (i != estatAgentTascaActual) estats[i] = SeyconTask.Estat.DONE; 
+                                    else estats[i] = SeyconTask.Estat.PENDING;
                                 }
                             }
                         }
                         SeyconTask st = new SeyconTask(t.getId(), tascaToString(t), estats);
+                        st.setMessage(s != null && s.length > 1 ? s[1]: null);
+                        st.setException(s != null && s.length > 2 ? s[2]: null);
                         tasquesPendents.add(st);
                     }
 
@@ -300,9 +354,8 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
      *      java.lang.String)
      */
     protected java.util.Collection<SyncAgentTaskLog> handleGetAgentTasks(java.lang.String url, java.lang.String agentCodi) throws java.lang.Exception {
-        URLManager m = new URLManager(url);
         // Ens quedem només amb el host
-        String host = m.getServerURL().getHost();
+        String host = new URL(url).getHost();
 
         // hem d'agafar TOTES les tasques del servidor
 
@@ -338,33 +391,41 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             for (Iterator it = tasques.iterator(); it.hasNext(); ) {
                 TaskEntity t = (TaskEntity) it.next();
                 TaskLogEntity tl = allTaskLogs.get(t.getId());
+                SyncAgentTaskLog satl;
                 if (tl != null && "S".equals(tl.getCompleted())) continue;
-                if (tl == null) {
-                    tasquesAgent.add(new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, "PENDING", "", null, null, null, null, null, null, t.getPriority(), null));
-                } else {
-                    Calendar dataDarreraExecucio = null;
-                    if (tl.getLastExecution() != null) {
-                        dataDarreraExecucio = Calendar.getInstance();
-                        dataDarreraExecucio.setTimeInMillis(tl.getLastExecution());
-                    }
-                    Calendar dataProximaExecucio = null;
-                    if (tl.getNextExecution() != null) {
-                        dataProximaExecucio = Calendar.getInstance();
-                        dataProximaExecucio.setTimeInMillis(tl.getNextExecution());
-                    }
-                    Calendar dataCreacio = null;
-                    if (tl.getCreationDate() != null) {
-                        dataCreacio = Calendar.getInstance();
-                        dataCreacio.setTime(tl.getCreationDate());
-                    }
-                    tasquesAgent.add(new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, tl.getCompleted(), tl.getMessage(), dataCreacio, tl.getLastExecution(), dataDarreraExecucio, tl.getNextExecution(), dataProximaExecucio, tl.getExecutionsNumber(), t.getPriority(), tl.getStackTrace()));
-                }
+                satl = generateSeyconAgentTaskLog(agentCodi, t, tl);
+                tasquesAgent.add(satl);
             }
 
         }// fi_tasques-not-null
 
         return tasquesAgent;
     }
+
+	public SyncAgentTaskLog generateSeyconAgentTaskLog(java.lang.String agentCodi, TaskEntity t, TaskLogEntity tl) {
+		SyncAgentTaskLog satl;
+		if (tl == null) {
+		    satl = new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, "PENDING", "", null, null, null, null, null, null, t.getPriority(), null);
+		} else {
+		    Calendar dataDarreraExecucio = null;
+		    if (tl.getLastExecution() != null) {
+		        dataDarreraExecucio = Calendar.getInstance();
+		        dataDarreraExecucio.setTimeInMillis(tl.getLastExecution());
+		    }
+		    Calendar dataProximaExecucio = null;
+		    if (tl.getNextExecution() != null) {
+		        dataProximaExecucio = Calendar.getInstance();
+		        dataProximaExecucio.setTimeInMillis(tl.getNextExecution());
+		    }
+		    Calendar dataCreacio = null;
+		    if (tl.getCreationDate() != null) {
+		        dataCreacio = Calendar.getInstance();
+		        dataCreacio.setTime(tl.getCreationDate());
+		    }
+		    satl = new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, tl.getCompleted(), tl.getMessage(), dataCreacio, tl.getLastExecution(), dataDarreraExecucio, tl.getNextExecution(), dataProximaExecucio, tl.getExecutionsNumber(), t.getPriority(), tl.getStackTrace());
+		}
+		return satl;
+	}
 
     protected InputStream handleGetSeyconServerLog(String urlServer) throws Exception {
         // Aquí asumim que la configuració ja està feta (!!)
@@ -429,59 +490,9 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     	return port == null ? "760": port;
     }
 
-    private String tascaToString(TaskEntity tasca) {
-        String result = tasca.getTransaction();
-        String transactionCode = tasca.getTransaction();
-
-        if (transactionCode.equals(TaskHandler.UPDATE_USER) || transactionCode.equals(TaskHandler.UPDATE_USER_PASSWORD)
-                || transactionCode.equals(TaskHandler.PROPAGATE_PASSWORD)
-                || transactionCode.equals(TaskHandler.UPDATE_PROPAGATED_PASSWORD)
-                || transactionCode.equals(TaskHandler.UPDATE_ACCOUNT) 
-                || transactionCode.equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD) 
-                || transactionCode.equals(TaskHandler.VALIDATE_PASSWORD)
-                || transactionCode.equals(TaskHandler.UPDATE_USER_ALIAS)
-                || transactionCode.equals(TaskHandler.EXPIRE_USER_PASSWORD)
-                || transactionCode.equals(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD) 
-                || transactionCode.equals(TaskHandler.RECONCILE_USER))
-            result = result + " " + tasca.getUser(); //$NON-NLS-1$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_ACCOUNT) ||
-        	transactionCode.equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD)) //$NON-NLS-1$
-            result = result + "@" + tasca.getSystemName(); //$NON-NLS-1$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_HOST)) //$NON-NLS-1$
-            result = result + " " + tasca.getHost(); //$NON-NLS-1$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_GROUP)) //$NON-NLS-1$
-            result = result + " " + tasca.getGroup(); //$NON-NLS-1$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_ROLE)  
-        		|| transactionCode.equals(TaskHandler.RECONCILE_ROLE)) //$NON-NLS-1$
-            result = result + " " + tasca.getRole() + tasca.getDb(); //$NON-NLS-1$
-
-        if (transactionCode.equals(TaskHandler.CREATE_FOLDER)) //$NON-NLS-1$
-            result = result + " " + tasca.getFolder(); //$NON-NLS-1$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_OBJECT )
-        				|| transactionCode.equals(TaskHandler.DELETE_OBJECT)) //$NON-NLS-1$
-            result = result + " " + tasca.getEntity()+"#"+tasca.getPrimaryKeyValue(); //$NON-NLS-1$ //$NON-NLS-2$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_LIST_ALIAS)) //$NON-NLS-1$
-            result = result + " " + tasca.getAlias() + "@" + tasca.getMailDomain(); //$NON-NLS-1$ //$NON-NLS-2$
-
-        if (transactionCode.equals(TaskHandler.UPDATE_OBJECT)) //$NON-NLS-1$
-            result = result + " " + tasca.getCustomObjectType() + " " + tasca.getCustomObjectName(); //$NON-NLS-1$ //$NON-NLS-2$
-
-        return result;
-
-    }
 
     private SyncServerInfo generaTascaPendentBuidaTotOK() {
-        // url, descripcio, versio, estat, numAgents,
-        // numTasquesPendents, sso, jetty, ssoDaemon, taskGenerator,
-        // caducitatRootCertificate,
-        // caducitatMainCertificate, dataActualServer, databaseConnections
-        return new SyncServerInfo("Tasques sense planificar", "", "", "OK", "Cap Tasca pendent de Planificar", "0", "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR"); //$NON-NLS-1$
+        return null;
     }
 
     protected Collection<SyncServerInfo> handleGetPendingTasksInfo() throws Exception {
@@ -523,7 +534,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
                         // ssoDaemon, taskGenerator, caducitatRootCertificate,
                         // caducitatMainCertificate, dataActualServer,
                         // databaseConnections
-                        serversInfo.add(new SyncServerInfo(Messages.getString("SeyconServerServiceImpl.NoTasksPlan"), "", "", colorTasquesPendents, descripcioEstat, "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//                        serversInfo.add(new SyncServerInfo(Messages.getString("SeyconServerServiceImpl.NoTasksPlan"), "", "", colorTasquesPendents, descripcioEstat, "" + numTasquesPendents, "ERROR", "ERROR", "ERROR", null, null, null, null, "ERROR")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
                     } else {
                         serversInfo.add(generaTascaPendentBuidaTotOK());
@@ -624,9 +635,23 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         URLManager m = new URLManager(url);
         RemoteServiceLocator rsl = createRemoteServiceLocator(url);
 
-        SyncStatusService status = rsl.getSyncStatusService();
+        try {
+        	SyncStatusService status = rsl.getSyncStatusService();
+        	return status.getSyncServerInfo(Security.getCurrentTenantName());
+        } catch (Exception e) {
+            SyncServerInfo si = new SyncServerInfo();
+            si.setConnectedAgents(0);
+            si.setNumberOfAgents( getDispatcherService().findDispatchersByFilter(null, null, null, null, null, Boolean.TRUE).size() );
+            si.setStatus("ERROR");
+            si.setUrl(url);
+			si.setNumberOfPendingTasks(0);
+			for (Long data: getTaskEntityDao().findDataPendingTasks(m.getServerURL().getHost())) {
+				if (data != null)
+					si.setNumberOfPendingTasks(data.longValue());
+            }
+            return si;
+        }
 
-        return status.getSyncServerInfo(Security.getCurrentTenantName());
 	}
 
 	@Override
@@ -659,6 +684,10 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		}
 		
 		return l2;
+	}
+
+	private String tascaToString(TaskEntity e) {
+		return e.toString();
 	}
 
 	@Override
@@ -712,6 +741,171 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             }
         }
 		return null;
+	}
+
+	@Override
+	protected Collection<Server> handleGetSyncServers() throws Exception {
+        LinkedList<Server> list = new LinkedList<Server>();
+
+    	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
+    	for (TenantServerEntity s: tenant.getServers())
+    	{
+    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER) {
+    			
+    			Server server = getServerEntityDao().toServer(s.getTenantServer());
+    			server.setPk(null);
+    			server.setPublicKey(null);
+    			server.setUseMasterDatabase(false);
+    			server.setAuth(null);
+				list.add( server);
+    		}
+    	}
+    	return list;
+	}
+
+	@Override
+	protected Collection<AgentStatusInfo> handleGetServerAgentStatus() throws Exception {
+		List<AgentStatusInfo> m = new LinkedList<>();
+
+		Collection<Object[]> tasks = getTaskEntityDao().countTasksBySystem();
+		Collection<Object[]> tl = getTaskLogEntityDao().countTasksBySystem();
+		Long total = getTaskEntityDao().countTasks();
+		for (SystemEntity agent: getSystemEntityDao().findActives()) {
+			AgentStatusInfo s = new AgentStatusInfo();
+			s.setAgentName(agent.getName());
+			s.setClassName(agent.getClassName());
+			s.setUrl(agent.getUrl());
+			s.setPendingTasks(0);
+			for (Object[] tll: tasks) {
+				if ( tll[0] == null || tll[0].toString().trim().isEmpty() ||
+						tll[0].equals(agent.getName())) {
+					s.setPendingTasks( s.getPendingTasks() + ((Long) tll[1]).intValue());
+				}
+			}
+			for (Object[] tll: tl) {
+				if ( agent.getName().equals(tll[0])) {
+					s.setPendingTasks(s.getPendingTasks() - ((Long) tll[1]).intValue());
+				}
+			}
+			m.add(s);
+		}
+		Collections.sort(m, new Comparator<AgentStatusInfo>() {
+			@Override
+			public int compare(AgentStatusInfo o1, AgentStatusInfo o2) {
+				return o1.getAgentName().compareTo(o2.getAgentName());
+			}
+		});
+		return m;
+	}
+
+	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmm");
+	@Override
+	protected Map<String,Vector<Object[]>> handleGetPendingTasksStats() throws Exception {
+		Calendar now = Calendar.getInstance();
+		now.set(Calendar.SECOND, 0);
+		now.set(Calendar.MILLISECOND, 0);
+		
+		Map<String, Vector<Object[]>> map = new HashMap<>();
+		Calendar then = Calendar.getInstance();
+		then.setTime(now.getTime());
+		then.add(Calendar.MINUTE, -29);
+
+		List<TaskEntity> unscheduled = getTaskEntityDao().findUnscheduled();
+		Vector<Object[]> data = null;
+		Map<String, Integer> lastPosition = new HashMap<>();
+		// Create data for unscheduled based on current task queue
+		data = createSerie ("Unscheduled", then, map);
+		for (int p = 0; p < 30; p++) {
+			Date d2 = (Date) data.get(p)[0];
+			long l = 0;
+			for (TaskEntity task: unscheduled) {
+				if (task.getDate().before(d2))
+					l ++;
+			}
+			data.get(p)[1] = new Long(l);
+		}
+		// Load data from stats
+		for ( StatsEntity stat: getStatsEntityDao().findByName("pending-tasks", 
+				simpleDateFormat.format(then.getTime()),
+				simpleDateFormat.format(now.getTime()))) {
+			int lastposition = 0;
+			Date d = simpleDateFormat.parse(stat.getDate());
+			int position = (int) ( ( d.getTime() - then.getTimeInMillis() ) / 60000L);
+			if ( ! map.containsKey(stat.getSerie() )) {
+				data = createSerie(stat.getSerie(), then, map);
+			} else {
+				Integer p = lastPosition.get(stat.getSerie());
+				lastposition = p == null ? -1: p.intValue();
+				data = map.get(stat.getSerie());
+			}
+			lastPosition.put(stat.getSerie(), position);
+
+			if (position >= 0 && position < 30) {
+				data.get(position)[1] = stat.getValue();
+				if (stat.getSerie().equals("Unscheduled")) {
+					if (lastposition == -1) 
+						for (int i = 0; i < position; i++)
+							data.get(i)[1] = stat.getValue();
+					else
+						for (int i = lastposition + 1; i < position; i++)
+							data.get(i)[1] = data.get(lastposition)[1];
+				} else {
+					for ( int i = position; i < 30; i++)
+						data.get(i)[1] = stat.getValue();
+				}
+			}
+		}
+		return map;
+	}
+
+	public Vector<Object[]> createSerie(String serie, Calendar start, Map<String, Vector<Object[]>> map) {
+		Vector<Object[]> data;
+		data = new Vector<Object[]>();
+		
+		Calendar c = Calendar.getInstance();
+		c.setTime(start.getTime());;
+		for ( int i = 0; i < 30; i++) {
+			Object[] o = new Object[2];
+			o[0] = c.getTime();
+			o[1] = new Long(0);
+			c.add(Calendar.MINUTE, +1);
+			data.add(o);
+		}
+		map.put(serie, data);
+		return data;
+	}
+
+	@Override
+	protected void handleUpdatePendingTasks() throws Exception {
+		String d = simpleDateFormat.format(new Date());
+		Long c = getTaskEntityDao().countUnscheduledTasks();
+		StatsEntity stats = getStatsEntityDao().newStatsEntity();
+		stats.setDate(d);
+		stats.setName("pending-tasks");
+		stats.setSerie("Unscheduled");
+		stats.setValue(c);
+		getStatsEntityDao().create(stats);
+		for ( Server server: handleGetSyncServers()) {
+			c = getTaskEntityDao().countTasksByServer(server.getName());
+			stats = getStatsEntityDao().newStatsEntity();
+			stats.setDate(d);
+			stats.setName("pending-tasks");
+			stats.setSerie(server.getUrl());
+			stats.setValue(c);
+			getStatsEntityDao().create(stats);			
+		}
+	}
+
+	@Override
+	protected SyncAgentTaskLog handleGetAgentTasks(String url, String agentName, Long taskId) throws Exception {
+		TaskEntity te = getTaskEntityDao().load(taskId);
+		if (te == null)
+			return null;
+		for (TaskLogEntity tl: te.getTaskLogs()) {
+			if (tl.getSystem().getName().equals(agentName)) 
+				return generateSeyconAgentTaskLog(agentName, te, tl);
+		}
+		return generateSeyconAgentTaskLog(agentName, te, null);		
 	}
 
 }

@@ -3,6 +3,7 @@ package com.soffid.iam.web.component;
 import java.io.IOException;
 import java.util.List;
 
+import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
@@ -32,7 +33,7 @@ public class NavigationBar extends Div implements AfterCompose {
 		List<MenuOption> options;
 		try {
 			options = new MenuParser().parse(menu);
-			if (fillMenu ( options, path))
+			if (fillMenu ( options, path, false ) || fillMenu(options, path, true))
 			{
 				String name = Labels.getLabel("menu.title");				
 				insertBefore(new Label(" > "), getFirstChild());
@@ -43,20 +44,32 @@ public class NavigationBar extends Div implements AfterCompose {
 				label.setSclass("link");
 				insertBefore(label, getFirstChild());
 			}
-		} catch (IOException e) {
+			else 
+			{
+				String name = Labels.getLabel("menu.title");				
+				Label label = new Label(name);
+				label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
+				label.setAttribute("target", "");
+				label.setSclass("link");
+				insertBefore(label, getFirstChild());				
+			}
+		} catch (IOException | InstantiationException | IllegalAccessException | ClassNotFoundException | JSONException e) {
 			throw new UiException(e);
 		}
 	}
 
 	
-	private boolean fillMenu(List<MenuOption> options, String path) {
+	private boolean fillMenu(List<MenuOption> options, String path, boolean dynamic) {
 		if (options == null || path == null)
 			return false;
 		for ( MenuOption option: options)
 		{
-			if (sameUrl(path, option.getUrl()) || fillMenu(option.getOptions(), path)) 
+			if ( dynamic && option.getOptions() == null && option.getHandler() != null) {
+				option.setOptions( option.getHandler().getOptions());
+			}
+			if (sameUrl(path, option.getUrl()) || fillMenu(option.getOptions(), path, dynamic)) 
 			{
-				String name = Labels.getLabel(option.getLabel());
+				String name =  option.getLiteral() != null ? option.getLiteral() : Labels.getLabel(option.getLabel());
 				Label label = new Label(name);
 				
 				if ( option.getOptions() == null || option.getOptions().isEmpty())

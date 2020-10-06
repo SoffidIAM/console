@@ -31,9 +31,9 @@ import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SecurityFunctionMapper;
+import com.soffid.iam.web.zk.ConfigureUserSettings;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.web.ConfiguraSEU;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datamodel.xml.FunctionMapperChain;
 
@@ -78,12 +78,13 @@ public class WorkflowInterceptor implements Filter {
 		if (!configured) {
 			if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)
 			{
-				Labels.register(new es.caib.bpm.ui.V2LabelLocator());
-				Labels.register(new es.caib.bpm.ui.BPMLabelLocator());
+				Labels.register(new com.soffid.iam.web.zk.V2LabelLocator());
+				Labels.register(new com.soffid.iam.web.zk.BPMLabelLocator());
 			}
-			Interpreters.add(
-					"java", "es.caib.seycon.ng.web.component.BSHInterpreter"); //$NON-NLS-1$ //$NON-NLS-2$
+//			Interpreters.add(
+//					"java", "es.caib.seycon.ng.web.component.BSHInterpreter"); //$NON-NLS-1$ //$NON-NLS-2$
 			FunctionMapperChain.addFunctionMapper(new SecurityFunctionMapper());
+			Interpreters.add("java", "bsh-is-disabled");
 			configured = true;
 		}
 		if (request instanceof HttpServletRequest) 
@@ -113,8 +114,8 @@ public class WorkflowInterceptor implements Filter {
 				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
 						.getAttribute(SOFFID_NESTED_PRINCIPAL);
 				
-				if (sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA) == null)
-					ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
+				if (sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA) == null)
+					ConfigureUserSettings.configuraUsuariSEU((HttpServletRequest) request);
 
 				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
 				if (forcedLocale != null)
@@ -124,7 +125,7 @@ public class WorkflowInterceptor implements Filter {
 					org.zkoss.util.Locales.setThreadLocal(locale);
 					MessageFactory.setThreadLocale(locale);
 				} else {
-					String lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);			
+					String lang = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA);			
 					if (lang != null)
 					{
 						Locale locale = new Locale (lang);
@@ -132,11 +133,11 @@ public class WorkflowInterceptor implements Filter {
 						MessageFactory.setThreadLocale(locale);
 					}
 				}
-				String timezone = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_TIMEZONE);
+				String timezone = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEZONE);
 				if (timezone != null)
 					TimeZones.setThreadLocal(TimeZone.getTimeZone(timezone));
-				String dateFormat = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_DATEFORMAT);
-				String timeFormat = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_TIMEFORMAT);
+				String dateFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_DATEFORMAT);
+				String timeFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEFORMAT);
 				if (dateFormat != null) {
 					DateFormats.setThreadLocal(new String[] {
 							dateFormat,

@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
-<div use="com.soffid.iam.web.user.UserAccountsHandler" id="handler">
+<div use="com.soffid.iam.web.user.UserSharedAccountsHandler" id="handler">
 	<div class="navigation-bar dummy">
-		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+		<label bind="${arg.listbox}:/@userName"></label> - <label bind="${arg.listbox}:/@fullName"/>
 	</div>
 
 	<datatable dataPath="${arg.listbox}:/sharedAccount" 
-		id="tree"
-		use="com.soffid.iam.web.user.UserColumnsTree" 
-		onSetPassword="ref:handler.openPasswordWindow"
+		id="listbox"
 		onSelect="ref:handler.openAccount"
-		openLevels="2"
 		enablefilter="true">
 		<attribute name="columns"><![CDATA[
-		- name: ${c:l('accounts.dispatcher')}
+		- name: ${c:l('com.soffid.iam.api.Account.system')}
 		  value: system
 		- name: ${c:l('usuaris.zul.Account')}
-		  value: name
+		  template: #{loginName == null? name: loginName}
+		- name: ${c:l('com.soffid.iam.api.Account.description')}
+		  value: description
 		- name: ${c:l('usuaris.zul.DataUpdate')}
 		  width: 150px
 		  value: lastUpdated_datetime

@@ -110,7 +110,7 @@ public class Dispatcher {
 	public boolean fullReconciliation;
 
 	@Description("Forrward changes to each agent after load")
-	@Attribute(defaultValue="true")
+	@Attribute(defaultValue="false")
 	public boolean generateTasksOnLoad;
 
 	@Nullable

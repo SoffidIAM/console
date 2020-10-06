@@ -26,7 +26,7 @@ public class Frame extends es.caib.zkib.zkiblaf.Frame implements AfterCompose {
 		List<MenuOption> menu;
 		try {
 			menu = mp.getMenus("console.yaml");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new UiException(e);
 		}
 		MenuOption option = mp.findMenuOption(menu, getPage());

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.application.RuleHandler" id="frame">
+	<script src='~./js/codemirror/java-classes.js'/>
+	<datamodel id="model" rootNode="root" src="rulesDescriptor.xml"/>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('mail:admin')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('rule:admin')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<datatable id="listbox" autocommit="true" dataPath="/model:/rule"
+			    maxheight="70vh"
+				sortColumn="0" onSelect="ref:frame.showDetails">
+				<attribute name="columns">
+					<![CDATA[
+- name: ${c:l('rules.name')}
+  value: name
+- name: ${c:l('rules.description')}
+  value: description
+					]]>
+				</attribute>
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div id="dades">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+					<pager datatable="listbox"/>
+					
+					<menu2>
+						<menu2item if="${soffid:isUserInRole('mail:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					</menu2>
+					
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				</div>
+				<form2 id="form" onChangeXPath="ref:frame.onChangeForm"
+					dataPath="/listbox:/." width="100%">
+					<div sclass="section">
+						<label sclass="separator" value="${c:l('rules.rule') }"/>
+						<customfield3 bind="name" dataType="STRING" maxlength="150" required="true" label="${c:l('rules.name') }"/>
+						<customfield3 bind="description" dataType="STRING" maxlength="150" required="false" label="${c:l('rules.description') }"/>
+						<codemirror value="" id="ru_script" linenumbers="true" visible="true" 
+							readonly="${! soffid:isUserInRole('rule:admin') }"
+						    bind="@bshExpression"
+							height="20em"
+							language="java"
+							width="100%">
+						</codemirror>
+						<html><![CDATA[
+							<div>${c:l('rules.availableVariables') }</div>
+							<div style="display: table; margin-left: 36px">
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">serviceLocator</span>
+									<span style="display:table-cell;">${c:l('rules.var1')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">user:</span>
+									<span style="display:table-cell;">${c:l('rules.var2')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">attributes:</span>
+									<span style="display:table-cell;">${c:l('rules.var3')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">groupsList:</span>
+									<span style="display:table-cell;">${c:l('rules.var4')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">groups:</span>
+									<span style="display:table-cell;">${c:l('rules.var5')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">return value</span>
+									<span style="display:table-cell;">${c:l('rules.var7')}</span>
+								</div>
+							</div>
+							<div style="margin-left: 36px">
+								<a href="http://www.soffid.org/doc/console/latest/uml/" target="_blank">Service model</a>
+							</div>
+						
+							<div style="margin-left: 36px">
+								<a href="http://www.soffid.org/doc/console/latest/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</a>
+							</div>	
+						]]></html>
+						
+					</div>
+					<div sclass="section">
+						<label sclass="separator" value="${c:l('rules.roles') }"/>
+						<datatable dataPath="/ruleAssignedRole" use="com.soffid.iam.web.application.RuleAssignedRoleDataTable">
+						<attribute name="columns">
+						- name: ${c:l('rules.role')}
+						  value: name
+						- name: ${c:l('rules.system')}
+						  value: system
+						- name: ${c:l('rules.description')}
+						  value: description
+						- name: ${c:l('rules.roleContext')}
+						  value: domain
+						</attribute>
+						</datatable>
+						<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >
+							<div class="addButton" onClick="ref:frame.addNewRole">+</div>
+						</div>
+						<customfield3 dataType="STRING" bind="bshRoles" multiline="true" maxlength="10000" label="${c:l('rules.rolesExpression') }" selectIcon="/img/pencil.svg" />
+						<html><![CDATA[
+							<div>${c:l('rules.availableVariables') }</div>
+							<div style="display: table; margin-left: 36px">
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">serviceLocator</span>
+									<span style="display:table-cell;">${c:l('rules.var1')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">user:</span>
+									<span style="display:table-cell;">${c:l('rules.var2')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">attributes:</span>
+									<span style="display:table-cell;">${c:l('rules.var3')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">groupsList:</span>
+									<span style="display:table-cell;">${c:l('rules.var4')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">groups:</span>
+									<span style="display:table-cell;">${c:l('rules.var5')}</span>
+								</div>
+								<div style="dislay: table-row;">
+									<span style="display:table-cell; width:10em;">return value</span>
+									<span style="display:table-cell;">${c:l('rules.var6')}</span>
+								</div>
+							</div>
+						]]></html>
+					</div>
+					<div style="width: 100%">
+						<button label="${c:l('rules.preview')}" onClick="ref:frame.previewRules">
+						</button>
+						<button label="${c:l('rules.apply')}" onClick="ref:frame.applyRule">
+						</button>
+						<div style="float: right">
+							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+							</databutton>
+							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+						</div>
+					</div>
+				</form2>
+			</div>
+		</div>
+	</div>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-window"
+		position="top, center" sizable="true"
+		title="${c:l('user-roles.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("user-roles.selectRole")}
+	- ${c:l("user-roles.selectDomain")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div id="step1">
+
+				<customfield3 dataType="ROLE" id="role"
+					label="${c:l('user-roles.selectRole') }"
+					required="true" >
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.undoAdd" />
+					<button image="/img/next-r.svg" label="${c:l('user-roles.selectDomain')}" onClick="ref:frame.selectDomain"/>
+				</div>
+						
+			</div>
+			<div >
+
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="domainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:frame.back" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:frame.applyAdd"/>
+				</div>
+						
+			</div>
+		</wizard>
+	</window>
+	
+	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="true"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}" onClick="ref:frame.closePreview">
+			</button>
+			<button label="${c:l('rules.apply')}" onClick="ref:frame.applyRule">
+			</button>
+		</div>
+		
+	</window>
+	
+	
+</frame>

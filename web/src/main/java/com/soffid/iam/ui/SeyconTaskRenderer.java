@@ -48,17 +48,17 @@ public class SeyconTaskRenderer implements ListitemRenderer {
 
 	protected void doRender(final Listitem item, Object data) throws Exception {
 		final SeyconTask t = (SeyconTask) data;
-		Listcell lc = new Listcell(t.getDescripcioTasca());
+		Listcell lc = new Listcell(t.getTaskName());
 		lc.setParent(item);
 		ImageClic icCancel = new ImageClic("/img/stop.png");
 		icCancel.setTitle("Cancel task");
 		icCancel.setParent(lc);
 		icCancel.setStyle("width: 16px; float:right");
-		icCancel.setVariable("Title", t.getDescripcioTasca(), true);
+		icCancel.setVariable("Title", t.getTaskName(), true);
 		icCancel.setVariable("id", t.getId(), true);
 		icCancel.addEventListener("onClick", new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {
-				Missatgebox.confirmaOK_CANCEL(String.format("Do you really want to cancel task %s?", t.getDescripcioTasca()),
+				Missatgebox.confirmaOK_CANCEL(String.format("Do you really want to cancel task %s?", t.getTaskName()),
 						"Cancel task",
 						new EventListener() {
 							

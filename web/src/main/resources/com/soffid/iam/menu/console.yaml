@@ -1,8 +1,17 @@
 - name: inbox.lblFiltroTareas1
   img: /img/menu/tasks.svg
-  url: /resource/business/tasks.zul
+  url: /wf/inbox.zul
+- name: seu.startWorkflow
+  img: /img/menu/start-wf.svg
+  handler: com.soffid.iam.web.inbox.NewProcessMenuHandler
+- name: sup.lblBusquedaCasos
+  img: /img/menu/process.svg
+  url: /wf/search.zul
+- name: seu.myAccounts
+  img: /img/menu/accounts.svg
+  url: /self/account.zul
 - name: soffid.admin
-  img: /img/menu/matrix.svg
+  img: /img/menu/laboratory.svg
   options:
       - name: seu.resources
         img: /img/menu/resources.svg
@@ -23,6 +32,10 @@
           url: /resource/network/network.zul
           permissions: ["seu:networks:show"]
           img: /img/menu/networks.svg
+        - name: seu.roles
+          url: /resource/application/roles.zul
+          img: /img/menu/roles.svg
+          permissions: ["seu:rules:show"]
         - name: seu.maquines
           url: /resource/host/host.zul
           permissions: ["seu:hosts:show"]
@@ -48,9 +61,13 @@
           img: /img/menu/mail-domain.svg
           permissions: ["seu:dominiscorreu:show"]
         - name: seu.llistescorreu
-          url: /resource/maillist/mail-lists.zul
+          url: /resource/maillist/mail-list.zul
           img: /img/menu/mail-lists.svg
           permissions: ["seu:dominiscorreu:show"]
+        - name: seu.rules
+          url: /resource/application/role-rules.zul
+          img: /img/menu/role-rules.svg
+          permissions: ["seu:rules:show"]
       - name: seu.configuration
         img_old: /img/menu/system-settings.png
         img: /img/menu/toolbox.svg
@@ -145,6 +162,19 @@
         img: /img/menu/monitor.svg
         options:
         - name: seu.seyconserver
-          url: /seyconserver.zul
+          url: /monitor/syncserver.zul
           permissions: ["seu:monitor:show"]
-          img: /img/menu/monitor-sync.svg
+          img: /img/menu/syncserver-monitor.svg
+        - name: seu.auditoria
+          url: /monitor/audit.zul
+          permissions: ["seu:auditoria:show"]
+          img: /img/menu/audit.svg
+        - name: seu.registresaccess
+          url: /monitor/access.zul
+          permissions: ["seu:registreAcces:show"]
+          img: /img/menu/access-record.svg
+        - name: seu.sessions
+          url: /monitor/session.zul
+          permissions: ["seu:session:show"]
+          img: /img/menu/session.svg
+          

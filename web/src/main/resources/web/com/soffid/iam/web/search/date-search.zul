@@ -5,11 +5,11 @@
        		<rows>
        			<row style="margin-top: 10px; border: 0px solid">
        				<label value="${c:l('attributeQuery.Since')}:"/>
-					<datebox id='db1' format="${c:l('accounts.dateFormat') }" width="10em" height="18px" />
+					<databox type="DATE" id='db1' format="${c:l('accounts.dateFormat') }" />
        			</row>
        			<row style="margin-top: 10px; border: 0px solid">
        				<label value="${c:l('attributeQuery.Until')}:"/>
-					<datebox id='db2' format="${c:l('accounts.dateFormat') }" width="10em" height="18px" />
+					<databox type="DATE" id='db2' format="${c:l('accounts.dateFormat') }" />
        			</row>
        		</rows>
        	</grid>

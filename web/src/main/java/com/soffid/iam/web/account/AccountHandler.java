@@ -159,10 +159,15 @@ public class AccountHandler extends FrameHandler {
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 		String user = req.getParameter("name");
 		String system = req.getParameter("system");
+		String id = req.getParameter("id");
 		if (user != null && system != null) {
 			sb.setBasicMode();
 			sb.addAttribute("name").setSearchFilter(user);
 			sb.addAttribute("system").setSearchFilter(system);
+			sb.search();
+		} else if (id != null) {
+			sb.setBasicMode();
+			sb.addAttribute("id").setSearchFilter(id);
 			sb.search();
 		} else {
 			HashSet<String> s = new HashSet<String>();

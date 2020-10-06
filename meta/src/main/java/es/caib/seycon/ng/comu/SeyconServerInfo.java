@@ -26,11 +26,14 @@ public class SeyconServerInfo {
 
 	@Nullable
 	@Attribute(translated = "numberOfAgents" )
-	public java.lang.String numAgents;
+	public Integer numAgents;
+
+	@Nullable
+	public Integer connectedAgents ;
 
 	@Nullable
 	@Attribute(translated = "numberOfPendingTasks" )
-	public java.lang.String numTasquesPendents;
+	public long numTasquesPendents;
 
 	@Nullable
 	public java.lang.String sso;

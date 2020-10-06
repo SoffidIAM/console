@@ -776,6 +776,9 @@ public class DeployerBean implements DeployerService {
 		if (ongoing)
 			return;
 
+		if (System.getProperty("dbStatus") == null) // Not configured yet
+			return;
+		
 		waitForDatabase ();
 		
 		ongoing = true;

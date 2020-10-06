@@ -1229,6 +1229,13 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:roles:show</codi>
+		<descripcio>Access to roles page</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>seu:auditoria:show</codi>
 		<descripcio>Access to audit page</descripcio>
 		<ambit>Soffid</ambit>
@@ -1286,6 +1293,12 @@
 	<autoritzacio>
 		<codi>seu:registreAcces:show</codi>
 		<descripcio>Access to access logs page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:session:show</codi>
+		<descripcio>Access to running sessions page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 

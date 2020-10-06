@@ -1,5 +1,7 @@
 package com.soffid.iam.web.component.inputField;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -56,8 +58,11 @@ public class AccountDataHandler extends InputFieldDataHandler<Account> {
 		
 	}
 	@Override
-	public void followLink(String value) {
-		// TODO Auto-generated method stub
+	public String followLink(String name) throws UnsupportedEncodingException {
+		int i = name.lastIndexOf('@');
+		String accountName = i < 0 ? name: name.substring(0,  i);
+		String systemName = i < 0 ? "soffid": name.substring(i+1);
+		return "/soffid/resource/account/account.zul?name="+URLEncoder.encode(accountName,"UTF-8")+"&system="+URLEncoder.encode(systemName, "UTF-8"); 
 	}
 
 	@Override

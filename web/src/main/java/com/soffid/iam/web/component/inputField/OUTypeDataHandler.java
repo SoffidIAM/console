@@ -1,5 +1,7 @@
 package com.soffid.iam.web.component.inputField;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -55,9 +57,10 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 	}
 
 	@Override
-	public void followLink(String value) {
-		// TODO Auto-generated method stub
+	public String followLink(String value) throws UnsupportedEncodingException {
+		return "/soffid/config/group-types.zul?name="+URLEncoder.encode(value,"UTF-8"); 
 	}
+
 
 	@Override
 	public String[] toNameDescription(OUType o) {

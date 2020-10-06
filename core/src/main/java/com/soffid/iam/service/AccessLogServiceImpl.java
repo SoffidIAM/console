@@ -16,18 +16,27 @@ package com.soffid.iam.service;
 import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AccessLog;
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccessLogEntity;
+import com.soffid.iam.model.AccessLogEntityDao;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.HostEntityDao;
+import com.soffid.iam.model.NetworkEntity;
+import com.soffid.iam.model.NetworkEntityDao;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.ServiceEntityDao;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -37,6 +46,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -428,6 +438,49 @@ public class AccessLogServiceImpl extends
         getAccessLogEntityDao().create(entity);
         return getAccessLogEntityDao().toAccessLog(entity);
     }
+
+	@Override
+	protected AsyncList<AccessLog> handleFindAccessLogByJsonQueryAsync(String jsonQuery) throws Exception {
+		final AsyncList<AccessLog> result = new AsyncList<AccessLog>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindAccessLogByTextAndJsonQuery(jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected List<AccessLog> handleFindAccessLogByJsonQuery(String jsonQuery, Integer start, Integer pageSize)
+			throws Exception {
+		final LinkedList<AccessLog> result = new LinkedList<AccessLog>();
+		doFindAccessLogByTextAndJsonQuery(jsonQuery, start, pageSize, result);
+		return result;
+	}
 	
+	private void doFindAccessLogByTextAndJsonQuery(String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<AccessLog> result) throws TokenMgrError, Exception {
+		final AccessLogEntityDao dao = getAccessLogEntityDao();
+		ScimHelper h = new ScimHelper(AccessLog.class);
+		h.setPrimaryAttributes(new String[] { "hostName", "userName"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("user.tenant.id");
+
+		h.setGenerator((entity) -> {
+			AccessLogEntity ne = (AccessLogEntity) entity;
+			return dao.toAccessLog((AccessLogEntity) entity);
+		}); 
+		h.search(null, jsonQuery, (Collection) result); 
+	}
 
 }

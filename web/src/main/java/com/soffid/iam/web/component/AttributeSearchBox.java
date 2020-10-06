@@ -19,7 +19,6 @@ import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Radio;
@@ -31,6 +30,7 @@ import org.zkoss.zul.impl.XulElement;
 import com.soffid.iam.web.SearchAttributeDefinition;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.zkib.component.Databox;
 import es.caib.zkib.events.SerializableEventListener;
 
 public class AttributeSearchBox extends XulElement {
@@ -66,6 +66,30 @@ public class AttributeSearchBox extends XulElement {
 		} else {
 			queryExpression = attributeDef.getName()+" eq \""+escape(search)+"\"";
 			humanExpression = Labels.getLabel("attributeQuery.Equals")+": \""+search +"\"";
+			textValue = search;
+			textOperation = 0;
+		}
+		invalidate();
+	}
+	
+	public void setSearchFilter(String operator, String search)
+	{
+		if (search == null || search.isEmpty()) {
+			queryExpression = "";
+			humanExpression = Labels.getLabel("attributeQuery.all");
+			textValue = "";
+			textOperation = 0;
+		} else {
+			queryExpression = attributeDef.getName()+" "+operator+" \""+escape(search)+"\"";
+			humanExpression = 
+				operator.equals("eq") ? Labels.getLabel("attributeQuery.Equals") :
+				operator.equals("sw") ? Labels.getLabel("attributeQuery.StartsWith") :
+				operator.equals("ew") ? Labels.getLabel("attributeQuery.EndsWith") :
+				operator.equals("co") ? Labels.getLabel("attributeQuery.Contains") :
+				operator.equals("gt") ? Labels.getLabel("attributeQuery.GreaterThan") :
+				operator.equals("lt") ? Labels.getLabel("attributeQuery.LessThan") :
+				operator;
+			humanExpression = humanExpression + ": \""+search +"\"";
 			textValue = search;
 			textOperation = 0;
 		}
@@ -439,10 +463,10 @@ public class AttributeSearchBox extends XulElement {
 	}
 
 	private void doDateSearch(Window w, Div bg) {
-		Datebox db1 = (Datebox)w.getFellow("db1");
-		since = db1.getValue();
-		Datebox db2 = (Datebox)w.getFellow("db2");
-		until = db2.getValue();
+		Databox db1 = (Databox)w.getFellow("db1");
+		since = (Date) db1.getValue();
+		Databox db2 = (Databox)w.getFellow("db2");
+		until = (Date) db2.getValue();
 		setDateSearchInterval(since, until);
 		w.detach();
 		bg.detach();
@@ -493,8 +517,8 @@ public class AttributeSearchBox extends XulElement {
 	private void createDateSearch(final Window w, final Div bg) {
 		Executions.createComponents("~./com/soffid/iam/web/search/date-search.zul",
 				w, new HashMap<String, String>());
-		((Datebox)w.getFellow("db1")).setValue( since );
-		((Datebox)w.getFellow("db2")).setValue( until );
+		((Databox)w.getFellow("db1")).setValue( since );
+		((Databox)w.getFellow("db2")).setValue( until );
 		
 		for (String id: DATE_DATEBOXES)
 		{

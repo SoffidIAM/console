@@ -73,6 +73,10 @@ div.clean-tabs {
 	width: 100%;
 	overflow-x: auto;
 }
+
+.clean-tab.redtab a {
+	color: red;
+}
 .clean-tab, .clean-tab a, .clean-tabsel, .clean-tabsel a {
 	font-weight:bold;
 	text-decoration: none;

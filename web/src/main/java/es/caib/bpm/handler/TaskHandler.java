@@ -1,8 +1,9 @@
 package es.caib.bpm.handler;
 
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.BPMApplication;
-import es.caib.bpm.vo.TaskInstance;
+import com.soffid.iam.web.bpm.BPMApplication;
+
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
+import com.soffid.iam.bpm.api.TaskInstance;
 import es.caib.zkib.datamodel.DataContext;
 import es.caib.zkib.datamodel.xml.handler.PersistenceHandler;
 

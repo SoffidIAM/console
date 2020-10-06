@@ -20,4 +20,6 @@ public class Rule {
 
 	public java.lang.String bshExpression;
 
+	@Nullable
+	public java.lang.String bshRoles;
 }

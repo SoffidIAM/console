@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">		
+		<finder name="mailList" type="mailList">  <!-- mail:query, user:create, user:update -->
+			<ejb-finder jndi="java:/module/MailListsService-v2"
+				method="findMailListByTextAndFilterAsync" if="${query != null || textQuery !=null}">
+				<parameter value="${textQuery}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.MailList">
+			</new-instance-bean>
+		</finder>
+	</datanode>	
+	
+	<datanode name="mailList">
+		<ejb-handler jndi="java:/module/MailListsService-v2">
+			<insert-method method="create" returnBean="true"> <!-- mail:create -->
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">  <!-- mail:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">  <!-- mail:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+</zkib-model>

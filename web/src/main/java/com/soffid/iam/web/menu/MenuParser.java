@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -30,7 +31,7 @@ import es.caib.zkib.zkiblaf.Application;
 public class MenuParser {
 	static Map<String,List<MenuOption>> maps = new HashMap<String,List<MenuOption>>();
 	
-	public List<MenuOption> getMenus(String cfg) throws IOException {
+	public List<MenuOption> getMenus(String cfg) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 		List<MenuOption> options = maps.get(cfg);
 		if (options == null)
 		{
@@ -70,7 +71,7 @@ public class MenuParser {
 		}
 	}
 
-	public List<MenuOption> parse(String cfg) throws IOException {
+	public List<MenuOption> parse(String cfg) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 		List<MenuOption> options = new LinkedList<MenuOption>();
 		Enumeration<URL> r = MenuParser.class.getClassLoader().getResources("com/soffid/iam/menu/"+cfg);
 		while (r.hasMoreElements())
@@ -89,7 +90,7 @@ public class MenuParser {
 		return options;
 	}
 
-	private void parseMenus(List<MenuOption> options, JSONArray array) throws IOException {
+	private void parseMenus(List<MenuOption> options, JSONArray array) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 		for ( int i = 0; i < array.length(); i++)
 		{
 			JSONObject obj = array.getJSONObject(i);
@@ -158,6 +159,9 @@ public class MenuParser {
 				if (o.options == null)
 					o.options = new LinkedList<MenuOption>();
 				parseMenus(o.options, options2);
+			}
+			if (obj.has("handler")) {
+				o.handler =  (DynamicMenuHandler) Class.forName(obj.getString("handler")).newInstance();
 			}
 		}
 	}

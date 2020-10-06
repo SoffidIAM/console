@@ -2,18 +2,15 @@ package com.soffid.iam.bpm.service.scim;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.soffid.iam.api.AsyncList;
-import com.soffid.iam.api.Network;
-import com.soffid.iam.model.Parameter;
-import com.soffid.iam.model.QueryBuilder;
+import com.soffid.iam.api.DataType;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.service.AdditionalDataService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
@@ -33,6 +30,7 @@ public class ScimHelper {
 	String tenantFilter;
 	private Class objectClass;
 	private ValueObjectGenerator generator;
+	AdditionalDataService svc = com.soffid.iam.ServiceLocator.instance().getAdditionalDataService();
 	
 	public ScimHelper (Class objectClass) {
 		this.objectClass = objectClass;
@@ -109,7 +107,7 @@ public class ScimHelper {
 		}
 	}
 
-	String generateQuickSearchQuery (String text) {
+	String generateQuickSearchQuery (String text) throws InternalErrorException {
 		if (text == null )
 			return  "";
 		String[] split = text.trim().split(" +");
@@ -122,11 +120,21 @@ public class ScimHelper {
 				sb.append(" and ");
 			sb.append("(");
 			boolean first = true;
-			for (String primaryAttribute: primaryAttributes)
-			{
-				if (first) first = false;
-				else sb.append(" or ");
-				sb.append(primaryAttribute + " co \""+t+"\"");
+			Collection<DataType> list = svc.findDataTypesByObjectTypeAndName2(objectClass.getName(), null);
+			for (DataType dt: list) {
+				if (Boolean.TRUE.equals( dt.getSearchCriteria())) {
+					if (first) first = false;
+					else sb.append(" or ");
+					sb.append(dt.getName() + " co \""+t+"\"");
+				}
+			}
+			if (first) {
+				for (String primaryAttribute: primaryAttributes)
+				{
+					if (first) first = false;
+					else sb.append(" or ");
+					sb.append(primaryAttribute + " co \""+t+"\"");
+				}
 			}
 			sb.append(")");
 		}

@@ -44,7 +44,7 @@ public class TaskInstance {
 	@Nullable
 	protected String swimlane = null;
 	@Nullable
-	protected Set pooledActors = null;
+	protected Set<String> pooledActors = null;
 	@Nullable
 	protected Map variables = null;
 	@Nullable

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?page id="syncserver"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.audit.AccessLogHandler" id="frame">
+
+	<datamodel id="model" rootNode="root" src="accessDescriptor.xml"/>
+	
+	<div sclass="single-face-card" id="card">
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<menu2>
+				<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+				<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+			</menu2>
+		</div>
+
+		<searchbox auto="true" id="searchBox"
+			jsonObject="com.soffid.iam.api.AccessLog" 
+			defaultAttributes="startDate, endDate, userName, serverName"
+			dataPath="/model:/accessLog" variableName="query"></searchbox>
+
+		<datatable id="listbox" autocommit="true" 
+			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+			preference="audit"
+			dataPath="/model:/accessLog" maxheight="70vh" 
+			enablefilter="true" >
+		<attribute name="allColumns">
+<![CDATA[
+- name: ${c:l('registreAcces.zul.Tipus')}
+  value: accessType
+  default: true
+- name: ${c:l('registreAcces.zul.Protocol')}
+  value: accessProtocol
+  default: true
+- name: ${c:l('registreAcces.zul.Datainici')}
+  value: startDate_datetime
+  default: true
+- name: ${c:l('registreAcces.zul.Datafi')}
+  value: endDate_datetime
+  default: true
+- name: ${c:l('registreAcces.zul.Sessia')}
+  value: sessionId
+  default: true
+- name: ${c:l('registreAcces.zul.Servidor-2')}
+  value: serverName
+  default: true
+- name: ${c:l('registreAcces.zul.Client-2')}
+  value: clientName
+  default: true
+- name: ${c:l('registreAcces.zul.Usuari-2')}
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(user)}" target="_blank" class="shylink">#{user }</a>
+  default: true
+- name: ${c:l('registreAcces.zul.Agent')}
+  value: codeAge
+- name: ${c:l('registreAcces.zul.Informacia')}
+  value: information
+  default: true
+		]]>
+		</attribute>
+		</datatable>
+	</div>
+
+</frame>

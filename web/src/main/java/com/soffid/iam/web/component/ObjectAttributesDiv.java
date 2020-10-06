@@ -47,6 +47,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	String ownerContext;
 	String objectType;
 	String system; 
+	boolean hidebuiltin;
 	private static final long serialVersionUID = 1L;
 	List<InputField3> fields = new LinkedList<>();
 	
@@ -164,48 +165,51 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 				List<InputField3> inputFields = new LinkedList<InputField3>();
 				for (DataType att: dataTypes)
 				{
-					InputField3 inputField = new InputField3();
-					WebDataType webDataType = new WebDataType( att );
-					inputField.setDataType( webDataType );
-					if ( att.getBuiltin() != null && att.getBuiltin().booleanValue())
-						inputField.setBind(att.getName());
-					else
-						inputField.setBind("/attributes[@name='"+att.getName()+"']");
-					inputField.setReadonly(readonly);
-					inputField.setOwnerObject(ownerObject);
-					if ( att.getType() == TypeEnumeration.SEPARATOR) {
-						if (section != null && emptySection)
-							section.setVisible(false);
-						section = new Div();
-						section.setSclass("section");
-						appendChild(section);
-						emptySection = true;
-					}
-					if (section == null)
-						appendChild(inputField);
-					else
-						section.appendChild(inputField);
-					inputField.afterCompose();
-					try {
-						inputField.createField();
-						inputFields.add(inputField);
-					} catch (Exception e) {
-						throw new UiException(e);
-					};
-					inputField.addEventListener("onChange", new EventListener() {
-						public void onEvent(Event event) throws Exception {
-							adjustVisibility();
-							
+					if (Boolean.FALSE.equals(att.getBuiltin()) || ! hidebuiltin) {
+						InputField3 inputField = new InputField3();
+						WebDataType webDataType = new WebDataType( att );
+						inputField.setDataType( webDataType );
+						if ( att.getBuiltin() != null && att.getBuiltin().booleanValue())
+							inputField.setBind(att.getName());
+						else
+							inputField.setBind("/attributes[@name='"+att.getName()+"']");
+						inputField.setReadonly(readonly);
+						inputField.setOwnerObject(ownerObject);
+						if ( att.getType() == TypeEnumeration.SEPARATOR) {
+							if (section != null && emptySection)
+								section.setVisible(false);
+							section = new Div();
+							section.setSclass("section");
+							appendChild(section);
+							emptySection = true;
 						}
-					});
-					boolean visible = inputField.attributeVisible();
-					inputField.setVisible(visible);
-					if ( att.getType() == TypeEnumeration.SEPARATOR) {
-						if (!visible) section.setVisible(false);
-					} else {
-						if (visible) emptySection = false;
+						if (section == null)
+							appendChild(inputField);
+						else
+							section.appendChild(inputField);
+						inputField.afterCompose();
+						try {
+							inputField.createField();
+							inputFields.add(inputField);
+						} catch (Exception e) {
+							throw new UiException(e);
+						};
+						inputField.addEventListener("onChange", new EventListener() {
+							public void onEvent(Event event) throws Exception {
+								adjustVisibility();
+								
+							}
+						});
+						boolean visible = inputField.attributeVisible();
+						inputField.setVisible(visible);
+						if ( att.getType() == TypeEnumeration.SEPARATOR) {
+							if (!visible) section.setVisible(false);
+						} else {
+							if (visible) emptySection = false;
+						}
+						fields.add(inputField);
+						
 					}
-					fields.add(inputField);
 				}
 				for ( InputField3 input: inputFields)
 					input.runOnLoadTrigger();
@@ -342,5 +346,15 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 			if (dt.getName().equals(name))
 				return dt;
 		return null;
+	}
+
+	
+	public boolean isHidebuiltin() {
+		return hidebuiltin;
+	}
+
+	
+	public void setHidebuiltin(boolean hidebuiltin) {
+		this.hidebuiltin = hidebuiltin;
 	}
 }

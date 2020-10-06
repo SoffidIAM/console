@@ -2,15 +2,15 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page id="index" title="Soffid Identity and Access Manager" ?>
 <?meta http-equiv="X-UA-Compatible" content="IE=Edge" ?>
+<?link rel="icon" href="/anonymous/user-orig.svg" sizes="any" type="image/svg+xml"?>
 
-<div 
-    xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+<div xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
 	id="main" width="100%" 
 	use="com.soffid.iam.web.main.MainPage"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: hidden">
-	<application id="app" allowOpenMultipleTabs="true" autoReload="false" favorits="//favorits/favorits"
+	<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits"
 	    template="main/application.zul" 
 		initialPage="${initialPage}"
 		style="overflow: visible; margin-top: 40px;" embed="true" 

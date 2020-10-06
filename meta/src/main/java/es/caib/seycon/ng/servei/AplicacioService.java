@@ -564,6 +564,14 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRoleAccountByAccountNoRule(
+			long accountId)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation()
 	public es.caib.seycon.ng.comu.RolAccount findRoleAccountById(
 			long id) {
@@ -623,6 +631,15 @@ public abstract class AplicacioService {
 			roles.user_query.class }, translated = "findUserRolesByUserName")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findRolsUsuarisByCodiUsuari(
+			java.lang.String codiUsuari)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.application_query.class,
+			roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findUserRolesByUserNameNoRules(
 			java.lang.String codiUsuari)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;

@@ -6,6 +6,8 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.util.Collection;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
@@ -22,6 +24,7 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AccountPasswordEntity;
@@ -352,6 +355,20 @@ public abstract class UsuariService {
 	public java.lang.String[] getTasques(java.lang.String codiUsuari)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
+	}
+
+	@Description("Retrieves current synchronization tasks for user")
+	@Operation ( grantees={roles.user_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Collection<SeyconAgentTaskLog> getActiveTasks(String userName) {
+		return null;
+	}
+
+	@Description("Identifies if there is any pending change. 0 means no change pending, 1 task is on hald, 2 means synchronization in progress, 3 means error")
+	@Operation ( grantees={roles.user_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public int isUpdatePendingExtended(String userName) {
+		return 0;
 	}
 
 	@Operation(grantees = { roles.user_create.class }, translated = "getFollowingName")

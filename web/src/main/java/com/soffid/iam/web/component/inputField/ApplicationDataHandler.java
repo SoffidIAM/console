@@ -1,6 +1,8 @@
 package com.soffid.iam.web.component.inputField;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -56,8 +58,8 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 	}
 
 	@Override
-	public void followLink(String value) {
-		Executions.getCurrent().sendRedirect("/resource/application/application.zul?name="+value, "_blank");
+	public String followLink(String value) throws UnsupportedEncodingException {
+		return "/soffid/resource/application/application.zul?name="+URLEncoder.encode(value,"UTF-8"); 
 	}
 
 	@Override

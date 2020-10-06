@@ -22,6 +22,7 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.DominiCorreu;
+import es.caib.seycon.ng.comu.LlistaCorreu;
 import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.RolEntity;
@@ -412,6 +413,26 @@ public abstract class LlistesDeCorreuService {
 	@Operation(grantees = { roles.mail_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public AsyncList<DominiCorreu> findMailDomainsByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String query)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<LlistaCorreu> findMailListByTextAndFilter(
+			@Nullable String text, 
+			@Nullable String query, 
+			@Nullable Integer first,
+			@Nullable Integer max)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.mail_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<LlistaCorreu> findMailListByTextAndFilterAsync(
 			@Nullable String text,
 			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {

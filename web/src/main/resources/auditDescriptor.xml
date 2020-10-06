@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="audit" type="audit">
+			<ejb-finder jndi="java:/module/AuditService-v2"
+				method="findAuditByJsonQueryAsync" if = "${query != null &amp;&amp; synchro == null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/AuditService-v2"
+				method="findAuditByJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean className="es.caib.seycon.ng.comu.Auditoria">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="audit" transient="true">
+	</datanode>
+	
+</zkib-model>

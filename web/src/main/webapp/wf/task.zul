@@ -3,77 +3,87 @@
 <?component name="processInfo" macroURI="task/processInfo.zul" inline="true"?>
 <?component name="attachments" macroURI="task/attachments.zul" inline="true"?>
 <?component name="comments" macroURI="task/comments.zul" inline="true"?>
-<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-
-	<frame id="ui" use="es.caib.bpm.ui.task.TaskUI" width="100%" onIdentity="ui.onIdentity(event.data)">
-		<style>
-			.redtab a {color:red}
-			.redtab.tabsel a {color: #9EC73C};
-		</style>
+<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	id="frame" use="com.soffid.iam.web.bpm.TaskUI" width="100%">
 	
-		<datamodel class="es.caib.bpm.datamodel.BPMDataNode" id="BPMdata"/>
-		<grid width="100%">
-			<rows>
-				<row>
-					<label sclass="label" value="${c:l('process.lblProceso')}"/>
-					<label id="txtIdProceso"/>
-					<label id="txtProceso"/>
-				</row>
-				<row>
-					<label sclass="label" value="${c:l('process.lblTarea')}"/>
-					<label id="txtIdTarea"/>
-					<label id="txtTarea"/>
-				</row>
-			</rows>
-		</grid>
-		<tabbox id="tabTarea" onSelect="ui.cambiarPestana(self.getSelectedPanel())" width="100%">
-			<tabs>
-				<tab label="${c:l('inbox.lblTarea')}"/>
-				<tab label="${c:l('inbox.lblMapaProceso')}"/>
-				<tab id="tabAnexos" label="${c:l('inbox.lblAnexos')}"/>
-				<tab style="text-weight: bold" label="${c:l('task.comentari')}"/>
-			</tabs>
-			<tabpanels>
-				<tabpanel id="tarea" style="overflow:auto;min-height:30em;">
-					<form dataPath="BPMdata:/taskInstance[1]/variables" width="100%">
-						<vbox id="datosElementoWorkflow" width="100%">
-					
-						</vbox>
-			
-						<hbox id="newCommentBox" width="100%" widths="20%,80%">
-							<label value="${c:l('task.addcomentari')}"/>
-							<textbox id="newComment" multiline="true" width="100%" rows="3"/>
-						</hbox>
-					</form>
-				</tabpanel>
-				<tabpanel style="overflow:auto;min-height:30em;">
-					<processInfo/>
-				</tabpanel>
-				<tabpanel style="overflow:auto;min-height:30em;">
-					<attachments/>
-				</tabpanel>
-				<tabpanel style="overflow:auto;min-height:30em;">
-					<comments/>
-				</tabpanel>
-			</tabpanels>
-		</tabbox>
-	    <hbox width="100%">
-			<hbox style="float:left;">
-				<button id="btnDelegar" label="${c:l('task.btnDelegar')}" onClick="ui.delegarTarea()"/>
-				<button id="btnSalvar" label="${c:l('task.btnSalvar')}" onClick="ui.salvarTarea()"/>
-				<button id="btnCerrar" label="${c:l('task.btnCerrar')}" onClick="ui.cerrarTarea()"/>
-			</hbox>
+	<datamodel class="com.soffid.iam.web.bpm.BPMDataNode" id="model"/>
 
-			<hbox style="float:right;">
-				<button id="btnTomar" label="${c:l('task.btnTomar')}" onClick="ui.tomarTarea()"/>
-				<hbox id="botonera"/>
-			</hbox>
-		</hbox>
-		<include src="usuarisllista.zul" />
-		<include src="grupsllista.zul" />
-		<include src="aplicacionsllista.zul" />
-		<include src="customObjectsllista.zul" />
-		<include src="rolsllista.zul" />
-		<include src="finestres/identity.zul" />
-	</frame>
-</zk>
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<label value=" &gt; " if="${arg.embed != 'true' }"/>
+		<label id="navigatorLabel" if="${arg.embed != 'true' }"/>
+		<pager datatable="/listbox" if="${arg.embed == 'true' }"/>								
+		<menu2>
+			<menu2item id="btnDelegar" label="${c:l('task.btnDelegar')}" onClick="ref:frame.delegarTarea()"/>
+		</menu2>
+	</div>
+
+	<grid width="100%">
+		<rows>
+			<row>
+				<label sclass="label" value="${c:l('process.lblProceso')}"/>
+				<label id="txtIdProceso"/>
+				<label id="txtProceso"/>
+			</row>
+			<row>
+				<label sclass="label" value="${c:l('process.lblTarea')}"/>
+				<label id="txtIdTarea"/>
+				<label id="txtTarea"/>
+			</row>
+		</rows>
+	</grid>
+	<tabbox id="tabTarea" onSelect="ref:frame.cambiarPestana" style="width: 100%; height: 70vh">
+		<tabs>
+			<tab label="${c:l('inbox.lblTarea')}"/>
+			<tab label="${c:l('inbox.lblMapaProceso')}"/>
+			<tab id="tabAnexos" label="${c:l('inbox.lblAnexos')}"/>
+			<tab label="${c:l('task.comentari')}"/>
+		</tabs>
+		<tabpanels>
+			<tabpanel id="tarea" style="overflow:auto; min-height:20em;">
+				<form2 dataPath="model:/taskInstance[1]/variables" style="width:100%; height: calc( 100vh - 340px )">
+					<div id="datosElementoWorkflow" style="width: 90vw; width: calc( 100vw - 80px ); overflow-x: auto">
+				
+					</div>
+					<databox id="newCommentBox" width="100%" label="${c:l('task.addcomentari')}" type="STRING" multiline="true" selectIcon=""/>
+				</form2>
+			</tabpanel>
+			<tabpanel style="overflow:auto;min-height:30em;">
+				<processInfo/>
+			</tabpanel>
+			<tabpanel style="overflow:auto;min-height:30em;">
+				<attachments/>
+			</tabpanel>
+			<tabpanel style="overflow:auto;min-height:30em;">
+				<comments/>
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
+    <div style="width: 100%; text-align: right">
+		<button id="btnCerrarr" image="/img/save-r.svg" label="${c:l('task.btnCerrar')}" onClick="ref:frame.salvarTarea()"
+			style="float:left"/>
+		<button id="btnTomar" label="${c:l('task.btnTomar')}" onClick="ref:frame.tomarTarea()"/>
+		<div id="botonera"/>
+	</div>
+	
+	<window 
+	    closable="false"
+		id="delegate-window"
+		position="top, center" sizable="true"
+		title="${c:l('seleccionUsuario.btnDelegar')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDelegate()">
+
+		<customfield3 label="${c:l('com.soffid.iam.api.User.userName') }"
+				dataType="USER"
+				id="user"
+				required="true"></customfield3>
+
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
+				onClick="ref:frame.closeDelegate">
+			</button>
+			<button image="/img/save-r.svg" label="${c:l('seleccionUsuario.btnDelegar')}" onClick="ref:frame.delegate"/>
+		</div>
+	</window>
+	
+	
+</frame>

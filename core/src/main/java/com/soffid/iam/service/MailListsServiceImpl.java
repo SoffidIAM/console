@@ -30,6 +30,7 @@ import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailDomainEntityDao;
 import com.soffid.iam.model.EmailListContainerEntity;
 import com.soffid.iam.model.EmailListEntity;
+import com.soffid.iam.model.EmailListEntityDao;
 import com.soffid.iam.model.ExternEmailEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -158,15 +159,125 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		getEmailListEntityDao().create(llistaCorreuEntity);
 		llistaCorreu.setId(llistaCorreuEntity.getId());
+		updateUsers(llistaCorreuEntity, llistaCorreu.getUsersList());
+		updateGroups(llistaCorreuEntity, llistaCorreu.getGroupMembers());
+		updateRoles(llistaCorreuEntity, llistaCorreu.getRoleMembers());
+		updateLists(llistaCorreuEntity, llistaCorreu.getLists());
+		updateExternal(llistaCorreuEntity, llistaCorreu.getExternalList());
 		updateMailListAttributes(llistaCorreu, llistaCorreuEntity);
 		return getEmailListEntityDao().toMailList(llistaCorreuEntity);
 	}
+
+	private void updateUsers(EmailListEntity llistaCorreuEntity, List<String> usersList) throws InternalErrorException {
+		LinkedList<String> l = new LinkedList<String>(fixNull(usersList));
+		for (UserEmailEntity m: llistaCorreuEntity.getUserMailLists()) {
+			if (l.contains(m.getUser().getUserName())) 
+				l.remove(m.getUser().getUserName());
+			else
+				getUserEmailEntityDao().remove(m);
+		}
+		
+		for (String ll: l) {
+			UserEmailEntity m = getUserEmailEntityDao().newUserEmailEntity();
+			m.setUser(getUserEntityDao().findByUserName(ll));
+			if (m.getUser() == null) throw new InternalErrorException("Unknown user "+ll);
+			m.setMailList(llistaCorreuEntity);
+			m.setStart(new Date());
+			m.setDisabled(false);
+			getUserEmailEntityDao().create(m);
+		}
+	}
+
+	private void updateGroups(EmailListEntity llistaCorreuEntity, List<String> groupsList) throws InternalErrorException {
+		LinkedList<String> l = new LinkedList<String>(fixNull(groupsList));
+		for (MailListGroupMemberEntity m: llistaCorreuEntity.getGroups()) {
+			if (l.contains(m.getGroup().getName())) 
+				l.remove(m.getGroup().getName());
+			else
+				getMailListGroupMemberEntityDao().remove(m);
+		}
+		
+		for (String ll: l) {
+			MailListGroupMemberEntity m = getMailListGroupMemberEntityDao().newMailListGroupMemberEntity();
+			m.setGroup(getGroupEntityDao().findByName(ll));
+			if (m.getGroup() == null) throw new InternalErrorException("Unknown group "+ll);
+			m.setMailList(llistaCorreuEntity);
+			getMailListGroupMemberEntityDao().create(m);
+		}
+	}
+
+	private void updateRoles(EmailListEntity llistaCorreuEntity, List<String> rolesList) throws InternalErrorException {
+		LinkedList<String> l = new LinkedList<String>(fixNull(rolesList));
+		for (MailListRoleMemberEntity m: llistaCorreuEntity.getRoles()) {
+			String shortName = m.getRole().getName()+"@"+m.getRole().getSystem().getName();
+			if (l.contains(shortName)) 
+				l.remove(shortName);
+			else
+				getMailListRoleMemberEntityDao().remove(m);
+		}
+		
+		for (String ll: l) {
+			MailListRoleMemberEntity m = getMailListRoleMemberEntityDao().newMailListRoleMemberEntity();
+			m.setRole(getRoleEntityDao().findByShortName(ll));
+			if (m.getRole() == null) throw new InternalErrorException("Unknown role "+ll);
+			m.setMailList(llistaCorreuEntity);
+			getMailListRoleMemberEntityDao().create(m);
+		}
+	}
+
+	private void updateLists(EmailListEntity llistaCorreuEntity, List<String> listList) throws InternalErrorException {
+		LinkedList<String> l = new LinkedList<String>(fixNull(listList));
+		for (EmailListContainerEntity m: llistaCorreuEntity.getMailListContent()) {
+			String shortName = m.getContains().getName()+"@"+m.getContains().getDomain().getName();
+			if (l.contains(shortName)) 
+				l.remove(shortName);
+			else
+				getEmailListContainerEntityDao().remove(m);
+		}
+		
+		for (String ll: l) {
+			EmailListContainerEntity m = getEmailListContainerEntityDao().newEmailListContainerEntity();
+			String split[] = ll.split("@");
+			if (split.length != 2) throw new InternalErrorException ("Any mail list must have one and only one @ character");
+			m.setContains(getEmailListEntityDao().findByNameAndDomain(split[0], split[1]));
+			if (m.getContains() == null) throw new InternalErrorException("Unknown mail list "+ll);
+			m.setPertains(llistaCorreuEntity);
+			getEmailListContainerEntityDao().create(m);
+		}
+	}
+
+	private Collection<? extends String> fixNull(List<String> list) {
+		return list == null ? new LinkedList<>(): list;
+	}
+
+	private void updateExternal(EmailListEntity llistaCorreuEntity, List<String> externalList) throws InternalErrorException {
+		LinkedList<String> l = new LinkedList<String>(fixNull(externalList));
+		for (ExternEmailEntity m: llistaCorreuEntity.getExternals()) {
+			String shortName = m.getAddress();
+			if (l.contains(shortName)) 
+				l.remove(shortName);
+			else
+				getExternEmailEntityDao().remove(m);
+		}
+		
+		for (String ll: l) {
+			ExternEmailEntity m = getExternEmailEntityDao().newExternEmailEntity();
+			m.setAddress(ll);
+			m.setMailList(llistaCorreuEntity);
+			getExternEmailEntityDao().create(m);
+		}
+	}
+
 
 	protected void handleDelete(MailList llistaCorreu) throws Exception {
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		if(!llistaCorreuEntity.getExternals().isEmpty() || !llistaCorreuEntity.getUserMailLists().isEmpty() || !llistaCorreuEntity.getMailListContent().isEmpty())
 			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.IntegrityException"), llistaCorreu.getName()));
 //		getMailListAttributeEntityDao().remove(llistaCorreuEntity.getAttributes());
+		getUserEmailEntityDao().remove(llistaCorreuEntity.getUserMailLists());
+		getMailListGroupMemberEntityDao().remove(llistaCorreuEntity.getGroups());
+		getMailListRoleMemberEntityDao().remove(llistaCorreuEntity.getRoles());
+		getExternEmailEntityDao().remove(llistaCorreuEntity.getExternals());
 		getEmailListEntityDao().remove(llistaCorreuEntity);
 	}
 
@@ -189,6 +300,11 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 			getEmailListEntityDao().update(llistaCorreuEntity);
 		else
 			getEmailListEntityDao().create(llistaCorreuEntity);
+		updateUsers(llistaCorreuEntity, llistaCorreu.getUsersList());
+		updateGroups(llistaCorreuEntity, llistaCorreu.getGroupMembers());
+		updateRoles(llistaCorreuEntity, llistaCorreu.getRoleMembers());
+		updateLists(llistaCorreuEntity, llistaCorreu.getLists());
+		updateExternal(llistaCorreuEntity, llistaCorreu.getExternalList());
 		updateMailListAttributes(llistaCorreu, llistaCorreuEntity);
 		return getEmailListEntityDao().toMailList(llistaCorreuEntity);
 	}
@@ -904,4 +1020,46 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		h.search(text, jsonQuery, (Collection) result); 
 	}
 	
+	protected List<MailList> handleFindMailListByTextAndFilter(String text, String query, Integer first,
+			Integer pageSize) throws Exception {
+		final LinkedList<MailList> result = new LinkedList<MailList>();
+		doFindMailListByTextAndJsonQuery(text, query, first, pageSize, result);
+		return result;
+	}
+	
+	private void doFindMailListByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			Collection<MailList> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+		final EmailListEntityDao dao = getEmailListEntityDao();
+		ScimHelper h = new ScimHelper(MailList.class);
+		h.setPrimaryAttributes(new String[] { "name", "domain", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toMailList((EmailListEntity) entity);
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+	}
+	
+	@Override
+	protected AsyncList<MailList> handleFindMailListByTextAndFilterAsync(String text, String query) throws Exception {
+		final AsyncList<MailList> result = new AsyncList<MailList>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindMailListByTextAndJsonQuery(text, query, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+
 }

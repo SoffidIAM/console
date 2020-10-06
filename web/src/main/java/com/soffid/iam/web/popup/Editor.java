@@ -40,8 +40,8 @@ public class Editor extends Window implements AfterCompose {
 			editorWindow.textbox = textbox;
 			editorWindow.vars = vars;
 			editorWindow.editor.setGlobalVars(vars);
-			editorWindow.editor.setValue( textbox.getText() );
 			editorWindow.doHighlighted();
+			editorWindow.editor.setValue( textbox.getText() );
 			editorWindow.editor.focus();
 		}
 	}

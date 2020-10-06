@@ -3,6 +3,8 @@
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <div use="com.soffid.iam.web.user.UserRolesHandler" id="handler"
 	listboxPath="${arg.listbox }">
+	<style>
+	</style>
 	<div class="navigation-bar dummy">
 		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
 		<menu2>
@@ -14,52 +16,52 @@
 	</div>
 	
 	<datatable id="listbox" autocommit="true" 
-		use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+		use="com.soffid.iam.web.user.RoleAccountDatatable"
 		preference="com.soffid.iam.web.user.RoleAccount-cols"
 		dataPath="${arg.listbox }:/role" maxheight="70vh" sortColumn="0"
 		onSelect="ref:handler.showDetails" enablefilter="true">
 		<attribute name="allColumns"><![CDATA[
-		- name: ${c:l('com.soffid.iam.api.RoleAccount.risk')}
-		  width: 30px
-		  template: <img src="/img/risk-#{sodRisk}.png" style='#{sodRisk? "": "display:none" }'>
-		  value: sodRisk
-		- name: ${c:l('usuaris.zul.RoleCategory')}
-		  width: 150px
-		  value: roleCategory
-		- name: ${c:l('usuaris.zul.Rol')}
-		  value: roleName
-		  default: true
-		- name: ${c:l('aplica_rolinfo.zul.Descripcia')}
-		  value: roleDescription
-		- name: ${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}
-		  value: domainValue/value
-		  default: false
-		- name: ${c:l('aplicacions.zul.DomainDescription')}
-		  value: domainValue/description
-		  default: false
-		- name: ${c:l('usuaris.zul.Bbdd')}
-		  width: 150px
-		  default: true
-		  value: system
-		- name: ${c:l('usuaris.zul.Account')}
-		  width: 150px
-		  value: accountName
-		  default: true
-		- name: ${c:l('usuaris.zul.Aplicacia')}
-		  width: 150px
-		  value: informationSystemName
-		  default: true
-		- name: ${c:l('usuaris.zul.startDate')}
-		  width: 150px
-		  value: startDate_date
-		  default: true
-		- name: ${c:l('usuaris.zul.endDate')}
-		  width: 150px
-		  value: endDate_date
-		  default: true
-		- name: ${c:l('usuaris.zul.holderGroup')}
-		  width: 150px
-		  value: holderGroup
+- name: ${c:l('com.soffid.iam.api.RoleAccount.risk')}
+  width: 30px
+  template: <img src="/img/risk-#{sodRisk}.png" style='#{sodRisk? "": "display:none" }'>
+  value: sodRisk
+- name: ${c:l('usuaris.zul.RoleCategory')}
+  width: 150px
+  value: roleCategory
+- name: ${c:l('usuaris.zul.Rol')}
+  value: roleName
+  default: true
+- name: ${c:l('aplica_rolinfo.zul.Descripcia')}
+  value: roleDescription
+- name: ${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}
+  value: domainValue/value
+  default: false
+- name: ${c:l('aplicacions.zul.DomainDescription')}
+  value: domainValue/description
+  default: false
+- name: ${c:l('usuaris.zul.Bbdd')}
+  width: 150px
+  default: true
+  value: system
+- name: ${c:l('usuaris.zul.Account')}
+  width: 150px
+  value: accountName
+  default: true
+- name: ${c:l('usuaris.zul.Aplicacia')}
+  width: 150px
+  value: informationSystemName
+  default: true
+- name: ${c:l('usuaris.zul.startDate')}
+  width: 150px
+  value: startDate_date
+  default: true
+- name: ${c:l('usuaris.zul.endDate')}
+  width: 150px
+  value: endDate_date
+  default: true
+- name: ${c:l('usuaris.zul.holderGroup')}
+  width: 150px
+  value: holderGroup
 		]]>
 		</attribute>
 	</datatable>
@@ -75,8 +77,13 @@
 		title="${c:l('user-roles.header')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
 
-		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<div sclass="navigation-bar dummy">
+			<label bind="${arg.listbox }:/userName"></label>
+			-
+			<label bind="${arg.listbox }:/fullName"></label>
+			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
+					id="trash"
 					 if="${soffid:isUserInRole('user:group:delete')}" 
 					label="${c:l('plugins.zul.Delete') }" 
 					onClick="ref:handler.delete"/>
@@ -102,6 +109,8 @@
 				bind="endDate" dataType="DATE" readonly="true"/>
 			<customfield3 label="${c:l('usuaris.zul.holderGroup') }" id="holderGroup"
 				bind="holderGroup" dataType="STRING" readonly="true"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.rule') }"
+				bind="ruleDescription" dataType="STRING" readonly="true"/>
 		</form>
 		<div style="text-align: right; width: 100%">
 			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 

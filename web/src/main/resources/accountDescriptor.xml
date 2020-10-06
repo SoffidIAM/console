@@ -21,7 +21,7 @@
 	<datanode name="account"> 
 		<finder name="role" type="role" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
-				method="findRoleAccountByAccount">
+				method="findRoleAccountByAccountNoRule">
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 

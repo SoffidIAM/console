@@ -1,22 +1,19 @@
 package com.soffid.iam.web.component;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
-import org.zkoss.zk.ui.metainfo.EventHandler;
-import org.zkoss.zk.ui.metainfo.ZScript;
-import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Tabpanel;
@@ -24,18 +21,21 @@ import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
-import com.soffid.iam.web.users.additionalData.AttributesDiv;
+import com.soffid.iam.web.popup.SelectColumnsHandler;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.expr.AndExpression;
+import com.soffid.scimquery.expr.ComparisonExpression;
+import com.soffid.scimquery.expr.NotExpression;
+import com.soffid.scimquery.expr.OrExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
-import es.caib.zkib.component.Databox;
-import es.caib.zkib.component.Form;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
-import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -54,14 +54,15 @@ public class FrameHandler extends Frame {
 	public void afterCompose() {
 		if (!Executions.getCurrent().isExplorer())
 		{
+			String ctx = getDesktop().getExecution().getContextPath();
 			response("setUrl", 
 					new AuScript(this, 
 							String.format("try {"
 									+ "window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");"
 									+ "} catch (e) {console.log(e);}",
-									getPage().getRequestPath(), 
+									ctx + getPage().getRequestPath(), 
 									getPage().getTitle(), 
-									getPage().getRequestPath())));
+									ctx + getPage().getRequestPath())));
 			
 		}
 		MenuParser menuParser = new MenuParser();
@@ -75,14 +76,14 @@ public class FrameHandler extends Frame {
 			} else {
 				setTitle ("");
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 		}
 
 		Application.registerPage(this);
 		super.afterCompose();
 		
 		SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
-		if (sb != null)
+		if (sb != null) {
 			sb.addEventListener("onSingleRecord", event -> {
 				Component lb = getListbox();
 				if (lb instanceof DataTable) {
@@ -92,8 +93,52 @@ public class FrameHandler extends Frame {
 					}
 				}
 			});
+			
+			javax.servlet.http.HttpServletRequest req = (javax.servlet.http.HttpServletRequest) org.zkoss.zk.ui.Executions.getCurrent().getNativeRequest();
+			String filter = req.getParameter("filter");
+			if (filter != null) {
+				applyFilter(sb, filter);
+			}
+		}
 	}
 
+	public void applyFilter(SearchBox sb, String filter) {
+		try {
+			AbstractExpression e = ExpressionParser.parse(filter);
+			sb.setBasicMode();
+			applyFilter (sb, e);
+			sb.search();
+		} catch (Exception e) {
+			sb.setAdvancedMode();
+			sb.setAdvancedSearchFilter(filter);
+			sb.search();
+		}
+	}
+
+
+	private void applyFilter(SearchBox sb, AbstractExpression e) throws Exception {
+		if ( e instanceof AndExpression) {
+			for ( AbstractExpression se: ((AndExpression) e).getMembers()) {
+				applyFilter (sb, se);
+			}
+		}
+		if (e instanceof OrExpression) {
+			List<AbstractExpression> members = ((OrExpression) e).getMembers();
+			if (members.size() == 1)
+				applyFilter(sb, members.get(0));
+			else
+				throw new Exception("Or is not supported");
+		}
+		if (e instanceof NotExpression)
+			throw new Exception("Not is not supported");
+		if (e instanceof ComparisonExpression) {
+			ComparisonExpression ce = (ComparisonExpression) e;
+			AttributeSearchBox att = sb.addAttribute(ce.getAttribute());
+			if (att.getQueryExpression() == null)
+				throw new Exception("Attribute "+ce.getAttribute()+" is defined twice");
+			att.setSearchFilter(ce.getOperator(), ce.getValue().toString());
+		}
+	}
 
 	@Override
 	public void setPage(Page p) {
@@ -128,16 +173,24 @@ public class FrameHandler extends Frame {
 	}
 
 	public void hideDetails() throws CommitException {
-		getModel().commit();
+		if (getModel() != null)
+			getModel().commit();
 		
 		if (isSingleFaceCard()) return;
 
 		getCard().setSclass ( "card" );
-		Component lb = getListbox();
-		if (lb instanceof DataTable)
-			((DataTable) lb).setSelectedIndex(-1);
-		if (lb instanceof DataTree2)
-			((DataTree2) lb).setSelectedIndex(new int[0]);
+		try {
+			Component lb = getListbox();
+			if (lb != null) {
+				if (lb instanceof DataTable)
+					((DataTable) lb).setSelectedIndex(-1);
+				if (lb instanceof DataTree2)
+					((DataTree2) lb).setSelectedIndex(new int[0]);
+				
+			}
+		} catch (ComponentNotFoundException e) {
+			
+		}
 	}
 	
 	protected Component getListbox() {
@@ -264,7 +317,7 @@ public class FrameHandler extends Frame {
 	}
 
 	
-	public void closeFrame() throws IOException {
+	public void closeFrame() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 		Page p = getPage();
 		String path = p.getRequestPath();
 		
@@ -312,5 +365,9 @@ public class FrameHandler extends Frame {
 			((DataTable) lb).download();
 		if (lb instanceof DataTree2)
 			((DataTree2) lb).download();
+	}
+
+	public void changeColumns(Event event) throws IOException {
+		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
 	}
 }

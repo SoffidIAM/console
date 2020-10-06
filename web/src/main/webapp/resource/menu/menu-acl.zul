@@ -21,7 +21,7 @@
 		- name: ${c:l('aplicacionsIntranet.zul.Nivell')}
 		  template: #{authorizationLevelDescription=='admin'? '${c:l('aplicacionsIntranet.zul.Administrador')}': '${c:l('aplicacionsIntranet.zul.Autoritzat')}'}
 		- name: ${c:l('aplicacionsIntranet.zul.Propietari')}
-		  template: <img src="/img/#{authorizationEntityType}-green.svg" style='width:1em; margin-right: 1em; vertical-align: text-bottom'/>#{authorizedEntityCode}
+		  template: <img src="${execution.contextPath }/img/#{authorizationEntityType}-green.svg" style='width:1em; margin-right: 1em; vertical-align: text-bottom'/>#{authorizedEntityCode}
 		- name: ${c:l('com.soffid.iam.api.Account.description')}
 		  value: authorizedEntityDescription
 		]]>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?page id="syncserver"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.syncserver.SyncserverHandler" id="frame">
+	
+	<style >
+		iframe { 
+			border:none;
+			width: 200px;
+			height: 200px;
+			vertical-align: top;
+		}
+	</style>
+	
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			</div>
+			<div id="servers"/>
+			<div style="width: 100%">
+				<label value="${c:l('seyconserver.zul.Tasques')}" sclass="separator"/>
+			</div>
+	         <iframe src="/graph/graph.html?data=tasks" style="width: 400px; height: 400px"> </iframe>
+	         <iframe src="/graph/graph.html?data=syncserver_queue" style="width: 400px; height: 400px"> </iframe>
+			<div sclass="options options-small" style="display: inline-block; text-align: left">
+				<div sclass="menuoption" onClick="ref:frame.viewUnscheduledTasks">
+					<image src="/img/grid.svg"/>
+					<label sclass='menuoption-title' value="${c:l('seyconserver.zul.Unscheduled')}" />
+				</div> 
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<label value="&gt;" style="margin-left: 10px; margin-right: 10px"/>
+				<label id="form-label" />
+				<databutton image="/img/refresh.svg" label="${c:l('seyconserver.Refresca') }"
+					 onClick="ref:frame.refreshTasks" 
+					 onlyIcon="true" id="refreshButton" 
+					 style="float:right"/>
+			</div>
+			
+			<form2>
+				<div id="tab_info">
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.Versia')}" id="ss_versio"/>
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.SSO')}"  id="ss_sso"/>
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.Jetty')}" id="ss_jetty"/>
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.SSODaemon')}" id="ss_ssodaemon"/>
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.TaskGenerator')}" id="ss_taskgenerator"/>
+					<customfield3 readonly="true" dataType="date_time" label="${c:l('seyconserver.zul.Caducitatcertificatr')}" id="ss_cad_root"/>
+					<customfield3 readonly="true" dataType="date_time" label="${c:l('seyconserver.zul.Caducitatcertificatm')}" id="ss_cad_main"/>
+					<customfield3 readonly="true" dataType="date_time" label="${c:l('seyconserver.zul.Datadelservidor')}" id="ss_data_server"/>
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.Connexionsdebbdd')}" id="ss_database_connections"/>
+				</div>
+				
+<!-- ============================ Performance graph ======================== -->				
+
+				<div id="tab_stats" style="width:100%; height: 70vh">
+					<iframe style="width:100%; height: 100%" id="statsGraph" />
+				</div>
+				
+<!-- ============================ Tasks grid ======================== -->				
+
+				<div id="tab_tasks" style="width:100%; height: 70vh">
+					<datatable id="tasks_table" onCancelTask="ref:frame.cancelGridTask"  onTaskDetails="ref:frame.getTaskDetails"
+						maxheight="65vh">
+						<attribute name="columns" filter="true" sort="true"><![CDATA[
+- name: ${c:l('seyconserver.zul.Tasca') }
+  value: task
+]]>
+						</attribute>
+					</datatable>
+				</div>
+				
+<!-- ============================ Agents ======================== -->				
+				<div id="tab_agents" style="width:100%; height: 70vh">
+					<datatable id="agents_table" onSelect="ref:frame.openAgentTasks" 
+						maxheight="65vh">
+					<attribute name="columns" filter="true" sort="true"><![CDATA[
+- name: ${c:l('seyconserver.zul.Agent') }
+  value: agentName
+- name: ${c:l('seyconserver.zul.Tasques')}
+  value: pendingTasks
+- name: ${c:l('seyconserver.zul.Estat')}
+  value: status
+- name: ${c:l('agents.zul.Url-2') }Agents
+  value: url
+]]></attribute></datatable>
+				</div>
+
+<!-- ============================ Not scheduled tasks ======================== -->				
+
+				<div id="tab_unscheduledtasks" style="width:100%; height: 70vh">
+					<datatable id="unscheduledtasks_table" multiselect="true" 
+						maxheight="65vh">
+						<attribute name="columns" filter="true" sort="true"><![CDATA[
+- name: ${c:l('seyconserver.zul.Tasca') }
+  value: task
+- name: ${c:l('seyconserver.zul.Estat')}
+  value: status
+]]>
+						</attribute>
+					</datatable>
+					<button label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove.svg" onClick="ref:frame.cancelUnscheduledTask"/>
+					<button label="${c:l('seyconserver.zul.Release') }" image="/img/play.svg" onClick="ref:frame.releaseTask"/>
+				</div>
+				
+
+			</form2>
+		</div>
+	</div>
+
+	<window closable="false" width="80%" id="logWindow"
+		position="center,top"
+		title=""
+		visible="false">
+		<textbox id="tb" width="100%" height="350px" multiline="true" style="font-family: monospace; resize: vertical"/>
+		<button label="${c:l('error.zul.Tancar') }" onClick="ref:frame.closeLogWindow"/>
+	</window>
+
+	<window closable="false" width="80%" id="agentWindow"
+		position="center,top"
+		title=""
+		visible="false">
+		<databox label="${c:l('agents.zul.Codi') }" type="STRING" readonly="true" id="name"/>
+		<databox label="${c:l('agents.zul.Url-2') }" type="STRING" readonly="true" id="url"/>
+		<databox label="${c:l('seyconserver.zul.Versia') }" type="STRING" readonly="true" id="version"/>
+		<databox label="${c:l('aplica_rolinfo.Error2') }" type="STRING" readonly="true" multiline="true" id="stackTrace"/>
+		<datatable id="table" style="width: 100%; min-width: 400px;" maxheight="50vh" onSelect="ref:frame.getAgentTaskDetails">
+		<attribute name="columns"><![CDATA[
+- name: ${c:l('seyconserver.zul.Tasca')}
+  value: task
+- name: ${c:l('seyconserver.zul.Priority')}
+  value: priority
+- name: ${c:l('seyconserver.zul.Executions')}
+  value: executions
+- name: ${c:l('seyconserver.zul.Executiontime')}
+  value: executiontime_datetime
+- name: ${c:l('seyconserver.zul.Message')}
+  value: message
+- name: ${c:l('seyconserver.zul.Scheduled')}
+  value: scheduled_datetime
+		]]></attribute>
+		</datatable>
+		<div style="height: 24px">
+			<button label="${c:l('seyconserver.Log') }" onClick="ref:frame.downloadLog" image="/img/download.svg" id="log_button"/>
+			<button label="${c:l('seyconserver.zul.Reinicia') }" onClick="ref:frame.restartAgent" image="/img/restart.svg" id="restart_button"/>
+			<button label="${c:l('error.zul.Tancar') }" onClick="ref:frame.closeAgentWindow" style="float: right" image="/img/undo.svg"/>
+		</div>
+	</window>
+
+	<window closable="false" width="80%" id="taskWindow"
+		position="center,top"
+		title=""
+		visible="false">
+		<databox label="${c:l('seyconserver.zul.Tasca') }" type="STRING" readonly="true" id="task"/>
+		<databox label="${c:l('seyconserver.zul.Priority') }" type="STRING" readonly="true" id="priority"/>
+		<databox label="${c:l('seyconserver.zul.Executions') }" type="STRING" readonly="true" id="executions"/>
+		<databox label="${c:l('seyconserver.zul.Message') }" type="STRING" readonly="true" id="message"/>
+		<databox label="${c:l('seyconserver.zul.Executiontime') }" type="DATE" readonly="true" id="lastExecution"/>
+		<databox label="${c:l('seyconserver.zul.Scheduled') }" type="DATE" readonly="true" id="nextExecution"/>
+
+		<textbox id="tb" width="100%" height="350px" multiline="true" style="font-family: monospace; resize: vertical"/>
+
+		<div style="height: 24px">
+			<button label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove.svg" onClick="ref:frame.cancelTask"/>
+			<button label="${c:l('seyconserver.reschedule') }" image="/img/play.svg" onClick="ref:frame.reescheduleTask"/>
+			<button label="${c:l('error.zul.Tancar') }" image="/img/undo.svg" onClick="ref:frame.closeTaskWindow" style="float:right"/>
+		</div>
+	</window>
+
+	<iframe height="0" id="logwindow" visible="false" width="0"/>
+
+</frame>

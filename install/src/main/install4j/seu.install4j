@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="5.1.7" transformSequenceNumber="4">
   <directoryPresets config="../../../target/lib/sso-plugin.jar" />
-  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="6521-4210-9097-2612" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.7" javaMaxVersion="1.9" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
+  <application name="SOFFID Identity Manager Console" distributionSourceDir="" applicationId="6521-4210-9097-2612" mediaDir="../../../target" mediaFilePattern="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:sys.version}" compression="6" lzmaCompression="false" pack200Compression="false" excludeSignedFromPacking="true" commonExternalFiles="false" createMd5Sums="true" shrinkRuntime="true" shortName="SoffidIAM" publisher="Soffid IAM S.L." publisherWeb="http://www.soffid.com" version="${compiler:seu.version}" allPathsRelative="true" backupOnSave="false" autoSave="true" convertDotsToUnderscores="true" macSignature="????" installerName="" javaMinVersion="1.8" javaMaxVersion="1.11" allowBetaVM="false" jdkMode="runtimeJre" jdkName="">
     <languages skipLanguageSelection="false" languageSelectionInPrincipalLanguage="false">
       <principalLanguage id="en" customLocalizationFile="" />
       <additionalLanguages />
@@ -33,8 +33,8 @@
       <dirEntry mountPoint="1071" file="../../../target/lib" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" entryMode="direct" subDirectory="lib" excludeSuffixes="*.jar,*.ear" dirMode="755" overrideDirMode="false">
         <exclude />
       </dirEntry>
-      <fileEntry mountPoint="1070" file="../../../target/lib/iam-ear.ear" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1537" file="../../../target/lib/sso-plugin.jar" overwriteMode="1" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="true" overrideUninstallMode="false" />
+      <fileEntry mountPoint="1070" file="../../../target/lib/iam-ear.ear" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1072" file="../../../target/lib/iam-tomee.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1072" file="../../../target/lib/mariadb-java-client.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />
       <fileEntry mountPoint="1072" file="../../../target/lib/ojdbc7.jar" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="false" overrideOverwriteMode="false" overrideUninstallMode="false" />

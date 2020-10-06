@@ -105,7 +105,20 @@ public class YamlParser {
 		{
 			return new JSONObject(line);
 		}
-		return line;
+		try {
+			return Long.decode(line);
+		} catch ( NumberFormatException e) {
+			try {
+				return Double.valueOf(line);
+			} catch ( NumberFormatException e2) {
+				if ("true".equals(line))
+					return true;
+				else if ("false".equals(line))
+					return false;
+				else
+					return line;
+			}
+		}
 	}
 
 	private JSONObject readObject( String prefix) throws IOException {

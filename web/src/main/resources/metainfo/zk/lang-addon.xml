@@ -4,7 +4,7 @@
 	<addon-name>common-web</addon-name>
 	<depends>ZKIB-LAF</depends>
 	 <version>
-	  	<version-class>es.caib.bpm.ui.Version</version-class>
+	  	<version-class>com.soffid.iam.web.zk.Version</version-class>
 	  	<version-uid>1.0</version-uid>
 	  </version>
 
@@ -17,19 +17,7 @@
 	<component>
 		<extends>window</extends>
 		<component-name>task</component-name>
-		<component-class>es.caib.bpm.toolkit.WorkflowWindow</component-class>
-	</component>
-
-	<component>
-		<extends>treecell</extends>
-		<component-name>apptreecell</component-name>
-		<component-class>es.caib.bpm.ui.tree.ApplicationTreecell</component-class>
-	</component>
-
-	<component>
-		<extends>treeitem</extends>
-		<component-name>menutreeitem</component-name>
-		<component-class>es.caib.bpm.ui.tree.MenuTreeitem</component-class>
+		<component-class>com.soffid.iam.web.bpm.WorkflowWindow</component-class>
 	</component>
 
 	<component>

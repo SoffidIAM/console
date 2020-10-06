@@ -21,11 +21,11 @@
 		Programming reference links:
 	</div>
 	<div style="margin-left: 36px">
-		<h:a href="http://www.soffid.org/doc/console/2.5.0/uml/" target="_blank">Service model</h:a>
+		<h:a href="http://www.soffid.org/doc/console/latest/uml/" target="_blank">Service model</h:a>
 	</div>
 
 	<div style="margin-left: 36px">
-		<h:a href="http://www.soffid.org/doc/console/2.5.0/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</h:a>
+		<h:a href="http://www.soffid.org/doc/console/latest/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</h:a>
 	</div>	
 
 	<separator spacing="5px"/>

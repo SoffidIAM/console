@@ -50,6 +50,8 @@ public class ConnectionFactory {
         File file = SeyconKeyStore.getKeyStoreFile();
         KeyStore ks = SeyconKeyStore.loadKeyStore(file);
 
+        if (ks.getCertificate("secretsKey") != null)
+        	ks.deleteEntry("secretsKey");
         SSLContext ctx;
         ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 

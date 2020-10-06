@@ -110,28 +110,24 @@ public class EmailListEntityDaoImpl extends
 		}
 	}
 
-	private String findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(
+	private List<String> findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(
 			String nomLlistaCorreu, String codiDomini) {
-		String llistat = ""; //$NON-NLS-1$
+		List<String> llistat = new LinkedList<>(); //$NON-NLS-1$
 		EmailListEntity llistaCorreuEntity = this.findByNameAndDomain(nomLlistaCorreu, codiDomini);
 		Collection correusExterns = llistaCorreuEntity.getExternals();
 		if (correusExterns != null) {
 			Iterator iterator = correusExterns.iterator();
 			while (iterator.hasNext()) {
 				ExternEmailEntity correuExtern = (ExternEmailEntity) iterator.next();
-				llistat += correuExtern.getAddress() + ", "; //$NON-NLS-1$
+				llistat.add(correuExtern.getAddress()); //$NON-NLS-1$
 			}
 		}
-		if (llistat == "") { //$NON-NLS-1$
-			return llistat;
-		} else {
-			return llistat.substring(0, llistat.length() - 2);
-		}
+		return llistat;
 	}
 
-	private String findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(
+	private List<String> findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(
 			String nomLlistaCorreu, String codiDomini) {
-		String llistat = ""; //$NON-NLS-1$
+		List<String> llistat = new LinkedList<>(); //$NON-NLS-1$
 		Collection llistesCorreuEntities = getEmailListContainerEntityDao().findByContained(nomLlistaCorreu, codiDomini);
 		if (llistesCorreuEntities != null) {
 			Iterator iterator = llistesCorreuEntities.iterator();
@@ -139,33 +135,10 @@ public class EmailListEntityDaoImpl extends
 				EmailListContainerEntity relacioLlistaCorreuEntity = (EmailListContainerEntity) iterator.next();
 				EmailListEntity llistaCorreuEntityPertany = relacioLlistaCorreuEntity.getPertains();
 				String codiDominiCurrent = llistaCorreuEntityPertany.getDomain() == null ? null : llistaCorreuEntityPertany.getDomain().getName();
-				llistat += llistaCorreuEntityPertany.getName() + "@" + codiDominiCurrent + ", "; //$NON-NLS-1$
+				llistat.add(llistaCorreuEntityPertany.getName() + "@" + codiDominiCurrent ); //$NON-NLS-1$
 			}
 		}
-		if (llistat == "") { //$NON-NLS-1$
-			return llistat;
-		} else {
-			return llistat.substring(0, llistat.length() - 2);
-		}
-	}
-
-	private String findLlistaCompactaUsuarisByNomLlistaCorreuAndCodiDomini(
-			String nomLlistaCorreu, String codiDomini) {
-		String llistat = ""; //$NON-NLS-1$
-		EmailListEntity llistaCorreuEntity = this.findByNameAndDomain(nomLlistaCorreu, codiDomini);
-		Collection llistaCorreuUsuaris = llistaCorreuEntity.getUserMailLists();
-		if (llistaCorreuUsuaris != null) {
-			Iterator iterator = llistaCorreuUsuaris.iterator();
-			while (iterator.hasNext()) {
-				UserEmailEntity llistaCorreuUsuari = (UserEmailEntity) iterator.next();
-				llistat += llistaCorreuUsuari.getUser().getUserName() + ", "; //$NON-NLS-1$
-			}
-		}
-		if (llistat == "") { //$NON-NLS-1$
-			return llistat;
-		} else {
-			return llistat.substring(0, llistat.length() - 2);
-		}
+		return llistat;
 	}
 
 	public void toMailList(com.soffid.iam.model.EmailListEntity sourceEntity, com.soffid.iam.api.MailList targetVO) {
@@ -292,20 +265,11 @@ public class EmailListEntityDaoImpl extends
 		targetVO.setUsersList(flatten(users));
 	}
 
-	private String flatten(Collection<String> users) {
+	private List<String> flatten(Collection<String> users) {
 		if (users == null || users.isEmpty())
-			return "";
+			return new LinkedList<String>();
 		else
-		{
-			StringBuffer sb = new StringBuffer();
-			for (String s: users)
-			{
-				if (sb.length() > 0)
-					sb.append (", ");
-				sb.append (s);
-			}
-			return sb.toString();
-		}
+			return new LinkedList<String>(users);
 	}
 
 	/**

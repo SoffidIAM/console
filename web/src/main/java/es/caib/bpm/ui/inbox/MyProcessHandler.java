@@ -14,12 +14,16 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 
+import com.soffid.iam.web.bpm.BPMApplication;
+import com.soffid.iam.web.bpm.ListitemCreator;
+
 import es.caib.bpm.exception.BPMException;
-import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.BPMApplication;
+import com.soffid.iam.bpm.service.ejb.BpmEngine;
+
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
 
@@ -89,7 +93,7 @@ public class MyProcessHandler extends com.soffid.iam.web.component.Frame {
 					item = new Listitem();
 					item.appendChild( new Listcell( Long.toString(proc.getId()) ));
 					item.appendChild( new Listcell( proc.getDescription() ));
-					item.appendChild( new Listcell( decorator.formatConHora.format(proc.getStart()) ));
+					item.appendChild( new Listcell( DateFormats.getDateTimeFormat().format(proc.getStart()) ));
 					item.appendChild( new Listcell( proc.getCurrentTask() ));
 					item.setValue(proc);
 					listbox.appendChild(item);

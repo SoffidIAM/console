@@ -22,6 +22,7 @@ import com.soffid.iam.api.Tenant;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.bpm.attachment.ReaderInputStream;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.popup.FileUpload2;
 
@@ -99,7 +100,7 @@ public class TenantHandler extends FrameHandler {
 		else if (media.inMemory())
 			in = new java.io.ByteArrayInputStream(media.getStringData().getBytes());
 		else
-			in = new es.caib.bpm.attachment.ReaderInputStream(media.getReaderData());
+			in = new ReaderInputStream(media.getReaderData());
 
 		com.soffid.iam.api.Tenant t = com.soffid.iam.EJBLocator.getTenantService().importTenant(in);
 

@@ -10,7 +10,7 @@
 						ui.cargarProcesosHabilitados();
 				</attribute>
 			</checkbox>
-			<toolbarbutton image="/img/upload.png" label="${c:l('deploy.btnDeploy')}">
+			<toolbarbutton image="/img/upload.svg" label="${c:l('deploy.btnDeploy')}">
 			 	<attribute name="onClick">
 			 		ui.upload();
 			 		if(todos.checked)

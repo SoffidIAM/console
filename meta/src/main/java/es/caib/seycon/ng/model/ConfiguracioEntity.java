@@ -20,7 +20,7 @@ public abstract class ConfiguracioEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="CON_CODI", length=50, translated="name")
+	@Column (name="CON_CODI", length=100, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="CON_VALOR", length=500, translated="value")

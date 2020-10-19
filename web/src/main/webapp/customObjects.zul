@@ -177,6 +177,6 @@
 	<include src="impressoresllista.zul"/>
 	<include src="finestres/tipusUnitatsOrganitzativesllista.zul"/>
 	<include src="usuarisllista.zul"/>
-	
-	
+	<include src="finestres/editorHTML.zul"/>
+
 </frame>

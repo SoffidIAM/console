@@ -136,10 +136,11 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 			else
 				try {
 					return DATE_FORMAT2.parse(getValue());
-				} catch (ParseException e) {
+				} catch (Exception e) {
 					try {
 						return DATE_FORMAT.parse(getValue());
-					} catch (ParseException e2) {
+					} catch (Exception e2) {
+						org.apache.commons.logging.LogFactory.getLog(getClass()).info("Error parsing date "+getValue()+" for attribute value "+getId());
 						return null;
 					}
 				}

@@ -2242,7 +2242,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected Collection<Account> handleFindAccountByJsonQuery(String query) throws InternalErrorException, Exception {
 		AsyncList<Account> result = new AsyncList<Account>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findByJsonQuery(result, query, null);
+		findByJsonQuery(result, query, new CriteriaSearchConfiguration());
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();

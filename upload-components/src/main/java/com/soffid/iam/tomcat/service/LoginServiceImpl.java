@@ -158,7 +158,7 @@ public class LoginServiceImpl implements LoginService {
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
 						roles.add("PASSWORD:EXPIRED");
-						holderGroup = getHolderGroups(acc, holder, "PASSWORD:EXPRIED");
+						holderGroup = getHolderGroups(acc, holder, "PASSWORD:EXPIRED");
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
 								userName, fullName, holderGroup,
 								roles,

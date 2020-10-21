@@ -12,8 +12,8 @@ RUN locale-gen
 
 RUN echo "Adding soffid console ${pom.version} "
 ADD target/Soffid-iamconsole.tar.gz /opt/soffid/
-COPY src/main/docker/start.sh /opt/soffid/iam-console-2/start.sh
-COPY src/main/docker/server.xml /opt/soffid/iam-console-2/conf/server.xml
+COPY src/main/docker/start.sh /opt/soffid/iam-console-3/start.sh
+COPY src/main/docker/server.xml /opt/soffid/iam-console-3/conf/server.xml
 
 EXPOSE 8080
 
@@ -21,7 +21,7 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-VOLUME  /opt/soffid/iam-console-2/logs
-VOLUME  /opt/soffid/iam-console-2/docs
-VOLUME  /opt/soffid/iam-console-2/conf
-ENTRYPOINT /opt/soffid/iam-console-2/start.sh
+VOLUME  /opt/soffid/iam-console-3/logs
+VOLUME  /opt/soffid/iam-console-3/docs
+VOLUME  /opt/soffid/iam-console-3/conf
+ENTRYPOINT /opt/soffid/iam-console-3/start.sh

@@ -26,7 +26,8 @@
 			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 			preference="audit"
 			dataPath="/model:/accessLog" maxheight="70vh" 
-			enablefilter="true" >
+			enablefilter="true"
+			onSelect="ref:frame.openSession" >
 		<attribute name="allColumns">
 <![CDATA[
 - name: ${c:l('registreAcces.zul.Tipus')}
@@ -55,6 +56,8 @@
   default: true
 - name: ${c:l('registreAcces.zul.Agent')}
   value: codeAge
+- name: ${c:l('registreAcces.zul.jumpServerGroup')}
+  value: jumpServerGroup
 - name: ${c:l('registreAcces.zul.Informacia')}
   value: information
   default: true

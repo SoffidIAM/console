@@ -74,7 +74,7 @@ public class SyncServerGraph extends HttpServlet {
 				+ "    - rgb(199, 255, 199)\n"
 				+ "    - rgb(255, 25, 18)\n"
 				+ "  labels:\n"
-				+ "  - Connected agents\n"
+				+ "  - Connected\n"
 				+ "  - Disconnected\n";  
 		try {
 			for (Server server: syncServerService.getSyncServers()) {

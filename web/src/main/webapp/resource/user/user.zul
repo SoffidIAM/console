@@ -7,6 +7,8 @@
 <?component name="user_groups" macro-uri="user-groups.zul"?>
 <?component name="user_roles" macro-uri="user-roles.zul"?>
 <?component name="user_effective_roles" macro-uri="user-effective-roles.zul"?>
+<?component name="user_process" macro-uri="user-process.zul"?>
+<?component name="user_session" macro-uri="user-session.zul"?>
 
 <?page id="user"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
@@ -57,6 +59,8 @@
 					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
 					<tab label="${c:l('usuaris.zul.RolsHeretats')}" id="tabeffectiveroles" />
 					<tab label="${c:l('usuaris.zul.SharedAccounts')}" id="tabsharedaccount"/>
+					<tab label="${c:l('usuaris.zul.Sessions')}" id="tabsession"/>
+					<tab label="${c:l('usuaris.zul.Processosdusuari')}" id="tabprocess"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
@@ -97,6 +101,12 @@
 					<tabpanel id="sharedaccount" fulfill="tabsharedaccount.onSelect" >
 						<user_shared_accounts listbox="//user/listbox" id="user_shared_accounts"/>
 					</tabpanel>
+					<tabpanel fulfill="tabsession.onSelect" >
+						<user_session listbox="//user/listbox" id="user_session"/>
+					</tabpanel>
+					<tabpanel fulfill="tabprocess.onSelect" >
+						<user_process listbox="//user/listbox" id="user_process"/>
+					</tabpanel>
 				</tabpanels>
 			</tabbox>
 		</div>
@@ -110,6 +120,7 @@
   value: agentCode
 - name: ${c:l('seyconserver.zul.Estat')}
   value: complete
+  className: statusColumn
 - name: ${c:l('seyconserver.zul.Priority')}
   value: priority
 - name: ${c:l('seyconserver.zul.Executions')}
@@ -122,7 +133,7 @@
   value: nextExecutionDate_datetime
 		]]></attribute></datatable>
 		<div style="margin-left:auto; margin-right:auto">
-			<button label="${c:l('canviPassword.zul.Accepta')}" onClick="ref:frame.closeTaskWindow"/>
+			<button image="/img/ok-r.svg" label="${c:l('canviPassword.zul.Accepta')}" onClick="ref:frame.closeTaskWindow"/>
 		</div>
 	</window>
 

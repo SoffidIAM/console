@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="300"
-   height="200"
-   viewBox="0 0 79.374998 52.916668"
+   width="284.09229"
+   height="157.29039"
+   viewBox="0 0 75.166082 41.616417"
    version="1.1"
    id="svg8"
    sodipodi:docname="start-wf.svg"
@@ -44,9 +44,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.5600002"
-     inkscape:cx="117.69597"
-     inkscape:cy="119.9653"
+     inkscape:zoom="1.2800001"
+     inkscape:cx="-24.476273"
+     inkscape:cy="102.94613"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -61,19 +61,23 @@
      inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:snap-global="false"
-     inkscape:pagecheckerboard="true">
+     inkscape:pagecheckerboard="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
     <sodipodi:guide
-       position="54.983722,-23.667805"
+       position="54.264286,-28.170794"
        orientation="0,1"
        id="guide1196"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="25.72469,22.764891"
+       position="25.005254,18.261903"
        orientation="0,1"
        id="guide1219"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="40.523696,39.573638"
+       position="39.80426,35.07065"
        orientation="1,0"
        id="guide1221"
        inkscape:locked="false" />
@@ -94,13 +98,19 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-244.08332)">
+     transform="translate(-0.71943616,-250.88058)">
     <path
-       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#22b9d8;stroke-width:2.5999999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 26.348505,252.38735 43.851421,-0.20672 c 2.267258,-0.0107 4.062337,1.82548 4.092565,4.09256 l 0.292326,21.92445 c 0.03023,2.26708 -0.948305,3.79884 -3.215587,3.80025 l -28.392346,0.0177 c -1.133638,7.1e-4 -9.181523,9.18154 -9.181523,9.18154 l -2.567879,-8.47748 -3.317406,0.004 c -3.046669,0.004 -5.328269,-2.28285 -5.361809,-4.02695 l -0.438489,-22.80145 c -0.04359,-2.26687 1.971471,-3.49722 4.238727,-3.5079 z"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.5999999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 62.045354,252.16359 8.172328,-0.15505 c 2.266874,-0.043 4.062336,1.82548 4.092565,4.09256 l 0.292325,21.92445 c 0.03023,2.26708 -0.948304,3.79884 -3.215588,3.80025 l -28.392345,0.0177 c -1.133638,7.9e-4 -9.181523,9.18154 -9.181523,9.18154 l -2.567879,-8.47748 -3.317407,0.004 c -3.046668,0.004 -5.328269,-2.28284 -5.361809,-4.02694 l -0.438489,-22.80145 c -0.04359,-2.26687 1.971471,-3.49722 4.238727,-3.5079 v 4e-5 l 31.020761,-0.10337"
+       id="rect1752-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="csssssccsssscc" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:0.6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 62.027598,252.33564 8.172328,-0.15505 c 2.266875,-0.043 4.062337,1.82548 4.092565,4.09256 l 0.292326,21.92445 c 0.03023,2.26708 -0.948305,3.79884 -3.215587,3.80025 l -20.60405,-0.0945 m -4.134114,0 -3.654182,0.1122 c -1.133104,0.0348 -9.181523,9.18154 -9.181523,9.18154 l -2.567879,-8.47748 -3.317406,0.004 c -3.046669,0.004 -5.328269,-2.28285 -5.361809,-4.02695 l -0.438489,-22.80145 c -0.04359,-2.26687 1.971471,-3.49722 4.238727,-3.5079 v 4e-5 l 31.020761,-0.10336"
        id="rect1752"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ssssssccssss" />
+       sodipodi:nodetypes="cssssccsccsssscc" />
     <g
        aria-label="?"
        transform="matrix(1.0270243,0,0,0.97368677,38.11024,-25.314226)"

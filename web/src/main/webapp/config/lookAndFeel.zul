@@ -40,12 +40,12 @@
 	<div>
 		<div width="400px" style="display: inline-block">
 			<label value="Toolbar:" style="display: inline-block; width: 100px"></label>
-			<textbox value="${color2 }" id="color2tb" action="onInput:onChangeTBColor('color2Selector',this.value)" onChange=""/> 
+			<textbox value="${color2 }" id="color2tb" action="onInput:onChangeTBColor('color2Selector',this.value)"/> 
 			<h:input type='color' id="color2Selector" value="${color2 }" onChange="onChangeColor('${color2tb.uuid }', this.value)"></h:input >
 		</div>
 		<div width="400px" style="display: inline-block">
 			<label value="Toolbar background:" style="display: inline-block; width: 100px"></label>
-			<textbox value="${color2text }" id="color2Texttb" action="onInput:onChangeTBColor('color2TextSelector',this.value)"  onChange=""/> 
+			<textbox value="${color2text }" id="color2Texttb" action="onInput:onChangeTBColor('color2TextSelector',this.value)" /> 
 			<h:input type='color' id="color2TextSelector" value="${color2text }" onChange="onChangeColor('${color2Texttb.uuid }', this.value)"></h:input >
 		</div>
 	</div>

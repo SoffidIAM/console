@@ -46,7 +46,7 @@ public class HostHandler extends FrameHandler {
 	}
 		
 
-	public void onChangeForm(Event ev) {
+	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
 		Long level = null;
 		Long id = null;

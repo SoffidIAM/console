@@ -23,9 +23,15 @@ public class RefInterpreter extends GenericInterpreter implements
 
 	@Override
 	protected void exec(String script) {
+		if (script == null || script.trim().isEmpty())
+			return;
+		if (script.startsWith("import java.util.*;"))
+			return; // Ignore bsh expression
 		String[] s = script.split("\\.");
-		if ( s.length != 2 )
+		if ( s.length != 2 ) {
+			log.warn("Error evaluating expression for component " + getVariable("self") );
 			throw new UiException("Wrong reference script "+script);
+		}
 		Method m;
 		try {
 			Event event = (Event) getFromNamespace("event");

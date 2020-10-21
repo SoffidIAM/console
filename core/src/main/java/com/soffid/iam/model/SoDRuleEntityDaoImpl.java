@@ -18,14 +18,14 @@ public class SoDRuleEntityDaoImpl extends com.soffid.iam.model.SoDRuleEntityDaoB
 	@Override
     public void toSoDRule(com.soffid.iam.model.SoDRuleEntity source, SoDRule target) {
 		super.toSoDRule(source, target);
-		target.setApplicationId(source.getApplication().getId());
+		target.setApplication(source.getApplication().getName());
 
 	}
 
 	@Override
     public void soDRuleToEntity(SoDRule source, com.soffid.iam.model.SoDRuleEntity target, boolean copyIfNull) {
 		super.soDRuleToEntity(source, target, copyIfNull);
-		target.setApplication(getInformationSystemEntityDao().load(source.getApplicationId()));
+		target.setApplication(getInformationSystemEntityDao().findByCode(source.getApplication()));
 	}
 	
 	

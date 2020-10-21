@@ -412,6 +412,11 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.List<Job> getAllJobs()
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void resumeJob(
 		es.caib.bpm.vo.Job jobvo)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {

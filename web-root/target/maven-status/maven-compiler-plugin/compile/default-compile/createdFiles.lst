@@ -1,4 +1,9 @@
+com/soffid/iam/init/ejb/ApplicationBean.class
+com/soffid/iam/init/rest/ConfigureResponse.class
 com/soffid/iam/init/web/LogoutServlet.class
 com/soffid/iam/init/web/Messages.class
+com/soffid/iam/init/rest/ConfigureRest.class
 com/soffid/iam/init/web/LoginFilter.class
+com/soffid/iam/init/web/NotFoundServlet.class
+com/soffid/iam/init/rest/ConfigureRequest.class
 com/soffid/iam/init/Configuration.class

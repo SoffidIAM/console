@@ -79,6 +79,17 @@ public abstract class RegistreAccesEntity {
 	@Column(name="RAC_TEN_ID")
 	TenantEntity tenant;
 	
+	@Nullable
+	@Description("Jump server group used in PAM sessions")
+	@Column(name = "RAC_JUSEGR", length=128)
+	String jumpServerGroup;
+	
+	@Nullable
+	@Description("Account name used in PAM sessions")
+	@Column(name = "RAC_ACCNAM", length=128)
+	String accountName;
+	
+
 	@Operation(translated = "findAccessLogByCriteria")
 	@DaoFinder("select registreAcces\n"
 			+ "from com.soffid.iam.model.AccessLogEntity registreAcces\n"

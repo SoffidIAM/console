@@ -5,7 +5,7 @@
 <?component name="comments" macroURI="task/comments.zul" inline="true"?>
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	id="frame" use="com.soffid.iam.web.bpm.TaskUI" width="100%">
-	
+
 	<datamodel class="com.soffid.iam.web.bpm.BPMDataNode" id="model"/>
 
 	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">

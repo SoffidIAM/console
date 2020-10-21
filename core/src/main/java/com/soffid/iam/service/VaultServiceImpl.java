@@ -1099,7 +1099,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected VaultElement handleCreate(VaultElement folder) throws Exception {
 		if ("account".equals(folder.getType())) {
-			folder.setAccount( getAccountService().createAccount(folder.getAccount()) );
+			folder.setAccount( getAccountService().createAccount2(folder.getAccount()) );
 			folder.setId(folder.getAccount().getId());
 			folder.setParentId(folder.getAccount().getVaultFolderId());
 		}
@@ -1114,7 +1114,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected VaultElement handleUpdate(VaultElement folder) throws Exception {
 		if ("account".equals(folder.getType())) {
-			folder.setAccount( getAccountService().updateAccount(folder.getAccount()) );
+			folder.setAccount( getAccountService().updateAccount2(folder.getAccount()) );
 			folder.setParentId(folder.getAccount().getVaultFolderId());
 		}
 		if ("folder".equals(folder.getType())) {

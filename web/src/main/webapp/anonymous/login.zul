@@ -24,8 +24,8 @@
 		}
 		div.login {
 			font-size: 12pt;
-			background-color: black;
-			opacity: 0.8;
+			background-color: #202020;
+			opacity: 1;
 			color: white;
 			margin-top: 100px;
 			padding: 30px;
@@ -35,7 +35,7 @@
 			font-weight: bold;
 		}		
 		div.loginbox {
-			width: 100%;
+			width: 100%; 
 		}
 		input, input[type="submit"] {
 			margin-top: 12px;
@@ -48,7 +48,7 @@
 	</style>
 	<html id="htmlData" use="com.soffid.iam.web.main.LoginPage"><![CDATA[
 		<div class="login">
-        		<p><img src="/soffid/anonymous/logo.png" alt="Soffid logo" /> </p> 
+        		<p><img src="/soffid/anonymous/logo - iam.svg" alt="Soffid logo" /> </p> 
 			<div class="loginbox" id="loginbox"> 
 				<p>${c:l('configure.header')}</p>
 				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8">
@@ -61,7 +61,7 @@
 				<p>
 					<input placeholder="${c:l('login.lblPassword')}" name="j_password" id="j_password" type="password" autocomplete="off" value="${password }"/>
 				</p>
-				<p style="color:red;">${error}</p>
+				<p style="color:white; font-weight: bold; margin-top: 5px">${error}</p>
 				<p>
 				<input name="formUCboton" type="submit" value="${c:l('configure.Login')}">
 				</p>

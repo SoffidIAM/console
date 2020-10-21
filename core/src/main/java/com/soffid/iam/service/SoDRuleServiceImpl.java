@@ -11,24 +11,39 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.Application;
+import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SoDRoleEntity;
 import com.soffid.iam.model.SoDRuleEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
 
 import es.caib.seycon.ng.comu.SoDRisk;
 import com.soffid.iam.api.SoDRole;
 import com.soffid.iam.api.SoDRule;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
 
 /**
  * @author bubu
@@ -337,6 +352,68 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
         	getSoDRuleEntityDao().update(sodRule);
         	getSoDRoleEntityDao().remove(sodRole);
         }
+	}
+
+	@Override
+	protected List<SoDRule> handleFindSodRuleByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
+		AsyncList<SoDRule> result = new AsyncList<SoDRule>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findSoDRuleByJsonQuery(result, query, first, pageSize);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
+	@Override
+	protected AsyncList<SoDRule> handleFindSodRuleByJsonQueryAsync(final String query) throws Exception {
+		final AsyncList<SoDRule> result = new AsyncList<SoDRule>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findSoDRuleByJsonQuery(result, query, null, null);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+
+	protected void findSoDRuleByJsonQuery ( AsyncList<SoDRule> result, String query, Integer first, Integer pageSize) 
+			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
+	{
+
+		// Prepare query HQL
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(SoDRule.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.application.tenant.id = :tenantId";
+		else
+			qs = "(" + qs + ") and o.application.tenant.id = :tenantId";
+		hql.setWhereString(new StringBuffer(qs));
+
+		// Include HQL parameters
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size() + 1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFirstResult(first);
+		cfg.setMaximumResultSize(pageSize);
+		// Execute HQL and generate result
+		for (SoDRuleEntity ruleEntity : getSoDRuleEntityDao().query(hql.toString(), paramArray, cfg )) {
+			if (result.isCancelled())
+				return;
+			SoDRule rule = getSoDRuleEntityDao().toSoDRule(ruleEntity);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(rule)) {
+					result.add(rule);
+			}
+		}
 	}
 
 }

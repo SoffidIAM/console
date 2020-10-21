@@ -46,8 +46,8 @@ import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
-@Stateless(name = "LoginService")
-@Local({ LoginService.class })
+//@Stateless(name = "com.soffid.iam.tomcat.LoginService")
+//@Local({ com.soffid.iam.tomcat.LoginService.class })
 public class LoginServiceImpl implements LoginService {
 	Log log = LogFactory.getLog(getClass());
 

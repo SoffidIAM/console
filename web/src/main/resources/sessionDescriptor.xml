@@ -4,7 +4,7 @@
 	<datanode name="root">
 		<finder name="session" type="session">
 			<ejb-finder jndi="java:/module/SessionService-v2"
-				method="getActiveSessions" >
+				method="findActiveSessions" > 
 			</ejb-finder>
 		</finder>
 	</datanode>

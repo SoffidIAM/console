@@ -327,4 +327,18 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
             return null;
     }
 
+	@Override
+	protected Collection<Session> handleFindActiveSessions() throws Exception {
+        SessionEntityDao dao = getSessionEntityDao();
+        LinkedList<Session> sessions = new LinkedList<Session>();
+        for (Iterator<SessionEntity> it = dao.loadAll().iterator(); it.hasNext(); ) {
+            SessionEntity sessioEntity = it.next();
+            Session s = dao.toSession(sessioEntity);
+            s.setKey(null);
+            s.setTemporaryKey(null);
+            sessions.add(s);
+        }
+        return sessions;
+	}
+
 }

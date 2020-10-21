@@ -6,6 +6,7 @@ import com.soffid.mda.annotation.Enumeration;
 public class TypeEnumeration {
 
 	public String stringType = "S";
+	public String numberType = "9";
 	public String passwordType = "Z";
 	public String binaryType = "B";
 	public String booleanType = "O";

@@ -10,46 +10,25 @@
 	 id="topframe" width="100%" use="com.soffid.iam.web.vault.QueryPamSessionFrame" >
 	<label use="com.soffid.iam.web.vault.QueryPamSessionData" id="data"/>
 	
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+	</div>
+
 	<style>
 		div.grid td {vertical-align: top;}
 		div.grid td.gc div { min-height: 24px};
 	</style>
 
-	<grid id="grid" fixedLayout="true" style="width: 500px; margin-top: 80px; margin-left: auto; margin-right: auto">
-		<columns>
-			<column width="150px"/>
-			<column width="350px"/>
-		</columns>
-		<rows>
-			<row>
-				<label value="${c:l('pamSession.jumpServerGroup') } :"/>
-				<label value="${pamSession.jumpServerGroup }"/>
-			</row>
-			<row>
-				<label value="${c:l('pamSession.sessionId') } :"/>
-				<label value="${pamSession.path}"/>
-			</row>
-			<row>
-				<label value="${c:l('pamSession.userName') } :"/>
-				<label value="${pamSession.user } ${user.fullName }"/>
-			</row>
-			<row>
-				<label value="${c:l('pamSession.start') } :"/>
-				<datebox value="${pamSession.serverStart }" format="${c:l('selfService.Format') }" disabled="true" buttonVisible="false"/>
-			</row>
-			<row>
-				<label value="${c:l('pamSession.end') } :"/>
-				<datebox value="${pamSession.serverEnd }" format="${c:l('selfService.Format') }" disabled="true" buttonVisible="false"/>
-			</row>
-			<row>
-				<label value="${c:l('pamSession.serviceUrl') } :"/>
-				<label value="${pamSession.serverUrl}"/>
-			</row>
-			<row>
-				<label value="${c:l('pamSession.accountName') } :"/>
-				<label value="${pamSession.accountName}"/>
-			</row>
-		</rows>
-	</grid>
+	<div>
+		<databox type="STRING" readonly="true" value="${pamSession.jumpServerGroup }" label="${c:l('pamSession.jumpServerGroup') } :" />
+		<databox type="STRING" readonly="true" value="${pamSession.path}" label="${c:l('pamSession.sessionId') } :" />
+		<customfield3 dataType="USER" readonly="true" value="${pamSession.user }" label="${c:l('pamSession.userName') }" />
+		<customfield3 dataType="DATE_TIME" readonly="true" value="${pamSession.serverStart }" label="${c:l('pamSession.start') }" />
+		<customfield3 dataType="DATE_TIME" readonly="true" value="${pamSession.serverEnd }" label="${c:l('pamSession.end') }" />
+		<databox type="STRING" readonly="true" value="${pamSession.serverUrl}" label="${c:l('pamSession.serviceUrl') } :" />
+		<databox type="STRING" readonly="true" value="${pamSession.accountName}" label="${c:l('pamSession.accountName') } :" />
+		<div sclass="section" id="videos">
+			<customfield3 label="${c:l('pamSession.recordings') }" dataType="SEPARATOR"/>
+		</div>
+	</div>
 
 </frame>

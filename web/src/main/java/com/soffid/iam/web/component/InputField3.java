@@ -1,6 +1,8 @@
 package com.soffid.iam.web.component;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -17,6 +19,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xml.HTMLs;
 import org.zkoss.xml.XMLs;
@@ -24,6 +27,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
 
@@ -33,6 +37,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.OsType;
+import com.soffid.iam.api.Password;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
@@ -53,6 +58,7 @@ import com.soffid.iam.web.component.inputField.OUTypeDataHandler;
 import com.soffid.iam.web.component.inputField.RoleDataHandler;
 import com.soffid.iam.web.component.inputField.UserDataHandler;
 import com.soffid.iam.web.popup.Editor;
+import com.soffid.iam.web.popup.FileUpload2;
 import com.soffid.iam.web.users.additionalData.AttributesDiv;
 import com.soffid.iam.web.users.additionalData.SearchFilter;
 
@@ -64,6 +70,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.web.Messages;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.DateFormats;
@@ -165,7 +172,7 @@ public class InputField3 extends Databox
 		
 		
 		if (getEventHandler("onChange") == null)
-			addEventHandler("onChange", new EventHandler(ZScript.parseContent(""), null));
+			addEventHandler("onChange", new EventHandler(ZScript.parseContent("ref:"), null));
 		disableRecursive = true;
 		
 		try
@@ -292,6 +299,7 @@ public class InputField3 extends Databox
 						Security.nestedLogoff();
 					}
 				}
+				setSelectIcon2(getSelectIcon().substring(0, getSelectIcon().length()-4)+"-white.svg");
 			}
 			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE)
 				setVisible(false);
@@ -324,6 +332,9 @@ public class InputField3 extends Databox
 			else if (dataType.getType() == TypeEnumeration.PHOTO_TYPE)
 			{
 				setType(Databox.Type.IMAGE);
+				setIcon("/img/upload.svg");
+				setSelectIcon("/img/upload.svg");
+				setSelectIcon2("/img/upload-white.svg");
 			}
 			else if (dataType.getType() == TypeEnumeration.SEPARATOR)
 			{
@@ -332,6 +343,10 @@ public class InputField3 extends Databox
 			} else if (dataType.getValues() != null && !dataType.getValues().isEmpty()) {
 				setType(Databox.Type.LIST);
 				setValues(dataType.getValues());
+			}
+			else if (dataType.getType() == TypeEnumeration.NUMBER_TYPE)
+			{
+				setType(Databox.Type.NUMBER);
 			} else {
 				setType(Databox.Type.STRING);
 				configureEnumeration();
@@ -858,6 +873,33 @@ public class InputField3 extends Databox
 				throw new UiException(e);
 			}
 		}
+		else if (dataType.getType() == TypeEnumeration.PHOTO_TYPE) {
+			FileUpload2.get((event) -> {
+	        	Media dataSubida = ((UploadEvent)event).getMedia();
+	        	if (dataSubida == null) return; //Per si l'usuari pitja en Cancelar
+	        	if (!dataSubida.isBinary()) {
+	        		throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
+	        	}
+	        	byte data[];
+	        	if (dataSubida.inMemory()) {
+	        		data = dataSubida.getByteData();
+	        	} else {
+	        		ByteArrayOutputStream os = new ByteArrayOutputStream();
+	        		InputStream is = dataSubida.getStreamData();
+	        		byte b[] = new byte[2048];
+	        		int read = is.read(b);
+	        		while (read > 0) {
+	        			os.write(b, 0, read);
+	        			read = is.read(b);
+	        		}
+	        		is.close();
+	        		os.close();
+	        		data = os.toByteArray();
+	        	}
+	        	binder.setValue(data);
+	        	invalidate();
+			});
+		}
 		else if (isMultiline()) {
 			Editor.edit(this, "{}");
 		}
@@ -888,6 +930,8 @@ public class InputField3 extends Databox
 			} catch (Exception e) {
 				throw new UiException(e);
 			}
+		} else if ( dataType != null && dataType.getType() == TypeEnumeration.PASSWORD_TYPE){
+			value = new Password((String)value);
 		} else {
 			value = super.parseUiValue(value);
 		}

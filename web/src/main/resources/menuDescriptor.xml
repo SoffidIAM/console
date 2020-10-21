@@ -45,7 +45,7 @@
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.AccessTreeAuthorization" />
 		</finder>
-		<finder name="execution" type="execution">  <!-- intranetMenus:query -->
+		<finder name="execution" type="execution" executeOnNewObjects="true">  <!-- intranetMenus:query -->
 			<custom-finder className="com.soffid.iam.web.menu.ExecutionFinder" />
 		</finder>
 

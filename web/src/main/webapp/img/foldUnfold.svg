@@ -1,6 +1,26 @@
-<?xml version="1.0" encoding='utf-8'?>
-<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
-<svg class="tree-collapse open" width="16" height="16" version="1.1"><g id="layer1" transform="translate(0,-281)">
-    <path style="opacity:1;fill:currentColor;fill-opacity:1;fill-rule:nonzero;stroke:currentColor;stroke-width:0.39421901;stroke-miterlimit:4;stroke-dasharray:none" id="path815" d="m 0.61876638,291.44886 a 7.7849007,7.7845583 0 0 1 4.96050982,-9.80929 7.7849007,7.7845583 0 0 1 9.8249028,4.93016 7.7849007,7.7845583 0 0 1 -4.900205,9.83956 7.7849007,7.7845583 0 0 1 -9.85498012,-4.86977 L 8.01896,289.03198 Z">
-    </path><path style="fill:none;stroke:#ffffff;stroke-width:1.41703427;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 6.3314345,293.6398 11.302735,288.98191 6.3314345,284.2312" id="path817"></path>
-</g></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#17B5C8;}
+	.st1{fill:#11828F;}
+	.st2{fill:none;}
+	.st3{fill:#A6D100;}
+	.st4{fill:#89AB00;}
+	.st5{fill:#5F7993;}
+	.st6{fill:#405162;}
+	.st7{fill:#FFFFFF;}
+	.st8{fill:#3A5368;}
+</style>
+<g>
+	<g>
+		<path class="st1" d="M16,0c-0.5,0-1,0-1.5,0.1C22.6,0.8,29,7.7,29,16s-6.4,15.2-14.5,15.9c0.5,0,1,0.1,1.5,0.1c8.8,0,16-7.2,16-16
+			S24.8,0,16,0z"/>
+		<path class="st0" d="M14.5,0.1C6.4,0.8,0,7.7,0,16s6.4,15.2,14.5,15.9C22.6,31.2,29,24.3,29,16S22.6,0.8,14.5,0.1z"/>
+	</g>
+	<path class="st7" d="M13.7,23.1c-0.4,0-0.7-0.1-1-0.4c-0.3-0.3-0.4-0.6-0.4-1s0.1-0.7,0.4-1l4.8-4.8l-3.4-3.4l-1.4-1.4
+		c-0.5-0.5-0.5-1.4,0-1.9c0.3-0.3,0.6-0.4,1-0.4s0.7,0.1,1,0.4l5.7,5.7c0.3,0.3,0.4,0.6,0.4,1c0,0.4-0.1,0.7-0.4,1l-1.2,1.2
+		l-3.1,3.1l-1.4,1.4C14.4,22.9,14.1,23.1,13.7,23.1z"/>
+</g>
+</svg>

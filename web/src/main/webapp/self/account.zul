@@ -12,6 +12,13 @@
 		
 	<datamodel id="model" rootNode="root" src="myAccountsDescriptor.xml"/>
 
+	<style>
+	div.datatable table tr td.small {
+		width: 300px;
+		text-align: center;
+	}
+	</style>
+	
 	<script>
 	function doCopy (uuid) {
 		document.getElementById(uuid).style.display="inline"; 
@@ -44,14 +51,16 @@
 			<attribute name="columns"><![CDATA[
 - name: ${c:l('accounts.dispatcher')}
   value: system
-- name: ${c:l('accounts.dispatcher')} 
+- name: ${c:l('accounts.dispatcherDescription')} 
   value: systemDescription
 - name: ${c:l('accounts.name')}
   value: loginName
-- name: ${c:l('selfService.QueryPasswords')}
-  template: <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)"><img src="${execution.contextPath }/img/password-r.svg"/>${c:l('self_account.setPassword')}</button>
-- name: ${c:l('selfService.ChangePassword')}
-  template: <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)"><img src="${execution.contextPath }/img/search2-r.svg"/>${c:l('self_account.queryPassword')}</button>
+- name: ${c:l('seyconserver.zul.Actions') }
+  filter: false
+  sort: false
+  className: small
+  template: >-
+  	<button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)"><img src="${execution.contextPath }/img/password-r.svg"/>${c:l('self_account.setPassword')}</button> <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)"><img src="${execution.contextPath }/img/search2-r.svg"/>${c:l('self_account.queryPassword')}</button>
 			]]></attribute>
 			</datatable>
 		</div>

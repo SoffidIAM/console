@@ -124,7 +124,8 @@ public class ProcessUI extends FrameHandler {
 		}
 	}
 
-	public void onCreate ()  throws Exception  {
+	@Override
+	public void afterCompose ()   {
         // Establecemos los datos de proceso
         proceso = (Label) getFellow("txtProceso"); //$NON-NLS-1$
         idproceso = (Label) getFellow("txtIdProceso"); //$NON-NLS-1$
@@ -147,8 +148,8 @@ public class ProcessUI extends FrameHandler {
         btnUpgrade = (Button) getFellow("btnUpgrade"); //$NON-NLS-1$
 
         if (processId != 0) {
-			ProcessInstance pi = EJBLocator.getBpmEngine().getProcess(processId);
 			try {
+				ProcessInstance pi = EJBLocator.getBpmEngine().getProcess(processId);
 				openProcessInstance(pi, true);
 			} catch (Exception e)
 			{

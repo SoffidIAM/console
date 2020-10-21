@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="job" type="job" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/BpmEngine-v2"
+				method="getAllJobs"> 
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="job" transient='true'>
+	</datanode>
+</zkib-model>

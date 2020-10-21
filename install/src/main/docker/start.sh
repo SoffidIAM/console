@@ -86,20 +86,19 @@ function configure {
 			echo "Cannot guess database driver for url $DB_URL"
 			exit 1
 		fi
+		echo "dbDriverClass=$DB_DRIVER"
 		echo "dbDriverUrl=$DB_URL"
-	) > /opt/soffid/iam-console-2/conf/system.properties		
+		echo "dbStatus=1"
+	) > /opt/soffid/iam-console-3/conf/system.properties		
 
-	cp /opt/soffid/iam-console-2/conf/tomee.xml  /opt/soffid/iam-console-2/conf/tomee.xml.bak
-	sed -e 's/jdbcDriver.*/jdbcDriver = '"$DB_DRIVER"'/g'  </opt/soffid/iam-console-2/conf/tomee.xml.bak >/opt/soffid/iam-console-2/conf/tomee.xml
-
-	touch /opt/soffid/iam-console-2/conf/configured 
+	touch /opt/soffid/iam-console-3/conf/configured 
 	
 	true
 }
 
 
 
-if [[ ! -f /opt/soffid/iam-console-2/conf/configured ]]
+if [[ ! -f /opt/soffid/iam-console-3/conf/configured ]]
 then
    configure || exit 1
 fi
@@ -112,7 +111,7 @@ else
 fi
 export INSTALL4J_ADD_VM_PARAMS
 
-for trustedcert in /opt/soffid/iam-console-2/trustedcerts/*
+for trustedcert in /opt/soffid/iam-console-3/trustedcerts/*
 do   
    if [[ -r "$trustedcert" ]]
    then
@@ -129,4 +128,4 @@ else
     echo "Starting Soffid IAM Console"
 fi
 
-exec /opt/soffid/iam-console-2/bin/run 
+exec /opt/soffid/iam-console-3/bin/run 

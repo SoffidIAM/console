@@ -1,0 +1,240 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="../css/setup.css">
+	</head>
+	<body onload="load()">
+	    <script type="text/javascript">
+function onChangeType() {
+  var type = document.getElementById("driver").value;
+  var d = document.getElementById("url");
+  if (type == "mariadb") 
+    d.value = "jdbc:mariadb://<host>/<database>";
+  if (type == "mysql") 
+    d.value = "jdbc:mysql://<host>/<database>";
+  if (type == "postgresql") 
+    d.value = "jdbc:postgresql://<host>/<database>";
+  if (type == "sqlserver") 
+    d.value = "jdbc:sqlserver://<server>\<instance>;databaseName=<database>";
+  if (type == "oracle") 
+    d.value = "jdbc:oracle:thin:@<server>:<port>:<sid>";
+}
+
+
+var messages = [ 
+	"Starting up console", 
+	"Still working. Please, be patient"];
+var messageNumber = 0;
+var done = false;
+
+function doMessage() {
+	msg = document.getElementById("message");
+	if (done) {
+		msg.innerTexte = "Done";		
+	} else {
+		msg.innerText = messages[messageNumber++];
+		if (messageNumber >= messages.length) messageNumber = 0;
+	}
+}
+
+
+function waitForStartup() {
+	fetch ('/soffid', {
+		method: 'GET'
+		})
+    .finally(e => {
+    	document.location = "/soffid";
+    	done = true;
+    	doMessage();
+    });		  
+}
+
+function progress() {
+	var w = document.getElementById("wait");
+	w.style.display="block";
+	doMessage();
+	setInterval (doMessage, 10000);
+	setTimeout(waitForStartup, 10000);
+}
+
+function configure() {
+	var w = document.getElementById("wait");
+	w.style.display="block";
+	var data = {
+		hostname: document.getElementById('hostname').value,
+		username: document.getElementById('username').value,
+		password: document.getElementById('password').value,
+		driver: document.getElementById('driver').value,
+		url: document.getElementById('url').value,
+		adminName: document.getElementById('adminname').value,
+		firstName: document.getElementById('firstname').value,
+		lastName: document.getElementById('lastname').value,
+		adminPassword: document.getElementById('adminpassword1').value
+	};
+	fetch ('/rest/configure', {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(data)
+			})
+	    .then(response => response.json())
+	    .then(data => {
+	    	w.style.display="none";
+		    console.log(data); 
+		    if (! data.success)
+		    	alert(data.message);
+		    else {
+		    	if (data.createUser)
+		    	{
+		    		document.getElementById("step1").style.display="none";
+		    		document.getElementById("step2").style.display="block";
+		    	}
+		    	else
+		    	{
+		    		startup();	
+		    	}
+		    }
+		})
+	    .catch(e => {
+	    	w.style.display="none";
+	    	console.log(e);
+	    	alert("Error connecting to the server");
+	    });		  
+}
+
+function configure2() {
+	var admin = document.getElementById('adminname').value;
+	if (admin == null || admin.length < 2) {
+		alert("Please, enter an administator name");
+		return;
+	}
+	var p1 = document.getElementById('adminpassword1').value;
+	var p2 = document.getElementById('adminpassword2').value;
+	if (p1 == null || p1.length < 6) {
+		alert("Please, enter an administator password longer than 6 characters");
+		return;
+	}
+	if (p2 != p1) {
+		alert("Please, enter the same administrator password twice. Current password do not match");
+		return;
+	}
+	startup();
+}
+
+function startup() {
+	var w = document.getElementById("wait");
+	w.style.display="block";
+	var data = {
+		adminName: document.getElementById('adminname').value,
+		firstName: document.getElementById('firstname').value,
+		lastName: document.getElementById('lastname').value,
+		adminPassword: document.getElementById('adminpassword1').value
+	};
+	fetch ('/rest/configure2', {
+			method: 'POST',
+			headers: {'Content-Type':'application/json'},
+			body: JSON.stringify(data)
+			})
+	    .then(response => response.json())
+	    .then(data => {
+	    	w.style.display="none";
+		    console.log(data); 
+		    if (! data.success)
+		    	alert(data.message);
+		    else {
+		    	progress();
+		    }
+		})
+	    .catch(e => {
+	    	w.style.display="none";
+	    	console.log(e);
+	    	alert("Error connecting to the server");
+	    });		  
+}
+
+function load() {
+	var host = document.location.hostname;
+	document.getElementById('hostname').value = host;
+}
+	    </script>
+		<div style="text-align: center">
+			<img src="../logo.svg" width="100px" />
+			<p style="font-size: 18pt">Setup wizard</p>
+		</div>
+		<div style="width: 600px; margin-left: auto; margin-right: auto" id="step1">
+			<div class="subtitle">
+			    Web server
+			</div>
+			<div class="row">
+				<span>Host name</span>
+				<input type="text" id="hostname">
+			</div>
+			<div class="subtitle">
+				Database
+			</div>
+			<div class="row">
+				<span>User name</span>
+				<input type="text" id="username">
+			</div>
+			<div class="row">
+				<span>Password</span>
+				<input type="password" id="password">
+			</div>
+			<div class="row">
+				<span>Driver</span>
+				<select id="driver" onInput="onChangeType()">
+					<option value="">- Select one -</option>
+					<option value="mariadb">MariaDB</option>
+					<option value="mysql">MySQL</option>
+					<option value="postgresql">PostgreSQL</option>
+					<option value="sqlserver">MS SQL Server</option>
+					<option value="oracle">Oracle</option>
+				</select>
+			</div>
+			<div class="row">
+				<span>URL</span>
+				<input id="url">
+			</div>
+			<div  style="text-align:center; margin-top: 20px">
+				<button onclick="configure()">Connect</button>
+			</div>
+		</div>
+		<div style="width: 600px; margin-left: auto; margin-right: auto; display: none" id="step2">
+			<div class="subtitle">
+			    Administrator user to create
+			</div>
+			<div class="row">
+				<span>Login name</span>
+				<input type="text" id="adminname" value="admin">
+			</div>
+			<div class="row">
+				<span>First name</span>
+				<input type="text" id="firstname" value="Soffid">
+			</div>
+			<div class="row">
+				<span>Last name</span>
+				<input type="text" id="lastname" value="Administrator">
+			</div>
+			<div class="row">
+				<span>Password</span>
+				<input type="password" id="adminpassword1">
+			</div>
+			<div class="row">
+				<span>Repeat password</span>
+				<input type="password" id="adminpassword2">
+			</div>
+			<div  style="text-align:center; margin-top: 20px">
+				<button onclick="configure2()">Startup</button>
+			</div>
+		</div>
+		<div id="wait" style="display:none"">
+			<div style="height: 100%; left: 0; top: 0; position: fixed; width: 100%; background: transparent; z-index: 1">
+				<div  style="margin-left: auto; margin-right: auto; width: 250px; height: 90px; background-color:white; margin-top: 45%; border-radius: 16px; border: solid 1px #808080; text-align: center">
+					<img src="../img/wait.gif"/>
+					<div  style="width: 100%; text-align: center" id="message">
+					</div>
+				</div>
+			</div>
+			<div style="height: 100%;  background-color: rgb(128, 128, 128); opacity: 0.5; left: 0; top: 0; position: absolute; width: 100%;" >
+			</div> 
+		</div>
+	</body>
+</html>

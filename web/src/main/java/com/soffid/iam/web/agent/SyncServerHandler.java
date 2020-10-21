@@ -87,7 +87,7 @@ public class SyncServerHandler extends FrameHandler {
 	}
 
 	@Override
-	public void onChangeForm(Event evt)
+	public void onChangeForm(Event evt) throws Exception
 	{
 		super.onChangeForm(evt);
 	}

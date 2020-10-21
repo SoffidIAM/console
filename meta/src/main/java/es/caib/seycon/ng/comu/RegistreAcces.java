@@ -64,4 +64,9 @@ public class RegistreAcces {
 	@Attribute(translated = "userFullName" )
 	public java.lang.String nomCompletUsuari;
 
+	@Description("Jump server for PAM Sessions")
+	@Nullable String jumpServerGroup;
+	
+	@Description("Account name for PAM Sessions")
+	@Nullable String accountName;
 }

@@ -99,18 +99,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<artifactId>jboss-jmx</artifactId>
-			<groupId>jboss</groupId>
-			<version>3.2.8-5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<artifactId>jboss-system</artifactId>
-			<groupId>jboss</groupId>
-			<version>3.2.8-5</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>iam-core</artifactId>
 			<version>${project.version}</version>
@@ -130,24 +118,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomee</groupId>
-			<artifactId>openejb-jee</artifactId>
-			<version>7.0.3</version>
+			<artifactId>javaee-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomee</groupId>
 			<artifactId>tomee-catalina</artifactId>
-			<version>7.0.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.openejb</groupId>
+			<groupId>org.apache.tomee</groupId>
 			<artifactId>openejb-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.openejb</groupId>
-			<artifactId>javaee-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

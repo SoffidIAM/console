@@ -1847,7 +1847,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	protected Network handleFindNetworkByIpAddress(String ipAdress) throws Exception {
         InetAddress addr = InetAddress.getByName(ipAdress);
         NetworkEntity x = guessNetwork(addr.getAddress());
-    	return getNetworkEntityDao().toNetwork(x);
+        if (x == null)
+        	return null;
+        else
+        	return getNetworkEntityDao().toNetwork(x);
 	}
 
 	@Override

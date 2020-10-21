@@ -39,22 +39,31 @@ public class MenuParser {
 			maps.put(cfg, options);
 		}
 		
-		applyPermissions(options);
+		options = applyPermissions(options);
 		return options;
 	}
 
-	private void applyPermissions(List<MenuOption> options) {
+	private List<MenuOption> applyPermissions(List<MenuOption> options) {
+		List<MenuOption> r = new LinkedList<>();
 		for (Iterator<MenuOption> iterator = options.iterator();
 				iterator.hasNext();) {
-			MenuOption option = iterator.next();
-			if (option.getOptions() != null && ! option.getOptions().isEmpty()) {
-				applyPermissions(option.getOptions());
+			MenuOption src = iterator.next();
+			MenuOption option = (MenuOption) src.clone();
+			List<MenuOption> children = option.getOptions();
+//			if (option.getHandler() != null) {
+//				children = option.getHandler().getOptions(option);
+//			}
+			if (children != null ) {
+				option.setOptions( applyPermissions(children) );
 				if (option.getOptions().isEmpty())
 				{
-					iterator.remove();
 					continue;
 				}
-			} 
+				if (option.getOptions().size() == 1)
+					option = option.getOptions().get(0);
+			}  else {
+				option.setOptions(null);
+			}
 			if (option.getPermissions() != null && option.getPermissions().length > 0)
 			{
 				boolean found = false;
@@ -66,9 +75,11 @@ public class MenuParser {
 					}
 				}
 				if (!found)
-					iterator.remove();
+					continue;
 			}
+			r.add(option);
 		}
+		return r;
 	}
 
 	public List<MenuOption> parse(String cfg) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
@@ -141,6 +152,8 @@ public class MenuParser {
 					// Page not found
 				}
 			}
+			if (obj.has("small"))
+				o.setSmall(obj.getBoolean("small"));
 			if ( obj.has("img")) 
 				o.setImg( obj.getString("img"));
 			if (obj.has("permissions"))

@@ -131,12 +131,6 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>jboss</groupId>
-        <artifactId>jboss-j2ee</artifactId>
-        <version>3.2.8-5</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate</artifactId>
         <version>3.2.7.ga</version>
@@ -384,30 +378,30 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.tomee</groupId>
+			<artifactId>tomee-catalina</artifactId>
+			<version>8.0.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomee</groupId>
+			<artifactId>openejb-core</artifactId>
+			<version>8.0.4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomee</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>8.0-4</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
-			<version>8.5.11</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.openejb</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>6.0-6</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.openejb</groupId>
-			<artifactId>openejb-core</artifactId>
-			<version>4.7.4</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.openejb</groupId>
-			<artifactId>tomee-catalina</artifactId>
-			<version>1.7.4</version>
+			<version>9.0.37</version>
 			<scope>provided</scope>
 		</dependency>
 

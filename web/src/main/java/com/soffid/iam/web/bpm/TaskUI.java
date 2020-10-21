@@ -72,7 +72,6 @@ import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.bpm.attachment.TaskAttachmentManager;
-import com.soffid.iam.web.bpm.task.Messages;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.Menu2item;

@@ -14,4 +14,6 @@ public class TipusSessio {
 
 	public java.lang.String ESSO="E";
 
+	public java.lang.String PAM="P";
+
 }

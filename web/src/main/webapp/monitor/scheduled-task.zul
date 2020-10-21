@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
+	id="frame" title="${c:l('main.lblAdminJobs')}"
+	use="com.soffid.iam.web.task.ScheduledTaskHandler" 
+	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+	<datamodel id="model" rootNode="root" src="scheduledTaskDescriptor.xml"/>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/refresh.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('schedule:show')}" onClick="ref:frame.refresh"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+				dataPath="/model:/task"
+				preference="task"
+				maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="true">
+				<attribute name="allColumns"><![CDATA[
+- name: ${c:l('jobadmin.enable')}
+  template: #{enabled ? '${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}' : '${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}' }
+  value: enabled
+  default: true
+- name: ${c:l('jobadmin.task')}
+  value: name
+  default: true
+- name: ${c:l('jobadmin.month')}
+  value: monthsPattern
+  default: true
+- name: ${c:l('jobadmin.day')}
+  value: dayPattern
+  default: true
+- name: ${c:l('jobadmin.hour')}
+  value: hourPattern
+  default: true
+- name: ${c:l('jobadmin.minute')}
+  value: minutePattern
+  default: true
+- name: ${c:l('jobadmin.dayOfWeek')}
+  value: dayOfWeekPattern
+  default: true
+- name: ${c:l('jobadmin.server') }
+  value: serverName
+  default: true
+- name: ${c:l('llistaRegistreAccesUsuari.zul.Datainici') }
+  value: lastExecution
+  template: #{lastExecution_datetime}
+- name: ${c:l('llistaRegistreAccesUsuari.zul.Datafi') }
+  value: lastEnd
+  template: #{lastEnd_datetime}
+- name: ${c:l('jobadmin.status') }
+  template: <img class="small-icon" src="${execution.contextPath }/img/#{!lastExecution? 'pixel.png': active?'sync.svg': error? 'warning.svg': 'ok.svg'}">
+  value: error
+  default: true
+  className: selector
+]]></attribute>
+			</datatable>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+			</div>
+			<form2 dataPath="/listbox:/" width="100%" onChangeXPath="ref:frame.onChangeForm" id="form">
+				<customfield3 label="${c:l('jobadmin.enable')}" readonly="${! soffid:isUserInRole('schedule:admin') }" bind="enabled" dataType="BOOLEAN" maxlength="12"/>
+				<customfield3 label="${c:l('jobadmin.task')}" readonly="true" bind="@name" dataType="STRING"/>
+				<customfield3 label="${c:l('jobadmin.month')}" bind="monthsPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+				<customfield3 label="${c:l('jobadmin.day')}" bind="dayPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+				<customfield3 label="${c:l('jobadmin.hour')}" bind="hoursPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+				<customfield3 label="${c:l('jobadmin.minute')}" bind="minutesPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+				<customfield3 label="${c:l('jobadmin.dayOfWeek')}" bind="dayOfWeekPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+				<customfield3 label="${c:l('jobadmin.server')}" bind="serverName" dataType="STRING" maxlength="20"  disabled="${! soffid:isUserInRole('schedule:admin') }" uiHandler="com.soffid.iam.web.task.ServerSelector" required="true"/>
+				<div sclass="section" id="logSection">
+					<customfield3 label="${c:l('scheduledTask.lastExecution') }" dataType="SEPARATOR"/>
+					<customfield3 label="${c:l('llistaRegistreAccesUsuari.zul.Datainici')}" bind="lastExecution" dataType="DATE_TIME" readonly="true"/>
+					<customfield3 label="${c:l('llistaRegistreAccesUsuari.zul.Datafi')}" bind="lastEnd" dataType="DATE_TIME" readonly="true"/>
+					<databox label="${c:l('scheduledTask.executionLog')}:" id="log" type="STRING" multiline="true" readonly="true" disabled="true"
+						onOpen="ref:frame.downloadLog"
+						sclass="databox fixedtext"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo"/>
+					<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+				</div>
+			</form2>
+		</div>
+	</div>
+	
+</frame>

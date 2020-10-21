@@ -84,6 +84,10 @@ public abstract class SessioEntity {
 	@Nullable
 	public String authenticationMethod;
 
+	@Column (name="SES_MONURL", length=150)
+	@Nullable
+	public String monitorUrl;
+
 	@Operation(translated="findSessionByUserName")
 	@DaoFinder("select session\n"
 			+ "from com.soffid.iam.model.SessionEntity session "

@@ -1236,15 +1236,19 @@ public class ApplicationBootServiceImpl extends
 			grupSvc.create(grup);
 		}
 
-		User usu = usuariSvc.findUserByUserName("admin"); //$NON-NLS-1$
+		String user = System.getProperty("soffid.startup.userName");
+		if (user == null) user = "admin";
+		User usu = usuariSvc.findUserByUserName(user); //$NON-NLS-1$
 		if (usu == null) {
 			usu = new User();
-			usu.setUserName("admin"); //$NON-NLS-1$
+			usu.setUserName(user); //$NON-NLS-1$
 			usu.setPrimaryGroup("admingroup"); //$NON-NLS-1$
 			usu.setComments("Autocreated"); //$NON-NLS-1$
 			usu.setMultiSession(new Boolean(true));
-			usu.setFirstName("Soffid"); //$NON-NLS-1$
-			usu.setLastName("Administrator"); //$NON-NLS-1$
+			String firstName = System.getProperty("soffid.startup.firstName");
+			usu.setFirstName( firstName == null ? "Soffid": firstName); //$NON-NLS-1$
+			String lastName = System.getProperty("soffid.startup.lastName");
+			usu.setLastName(lastName == null ? "Administrator": lastName); //$NON-NLS-1$
 			usu.setHomeServer("null"); //$NON-NLS-1$
 			usu.setProfileServer("null"); //$NON-NLS-1$
 			usu.setMailServer("null"); //$NON-NLS-1$
@@ -1252,8 +1256,12 @@ public class ApplicationBootServiceImpl extends
 			usu.setActive(new Boolean(true));
 			usu = usuariSvc.create(usu);
 
-			passSvc.storePassword(usu.getUserName(), dc.getCode(),
-					"changeit", false); //$NON-NLS-1$
+			if (System.getProperty("soffid.startup.password") == null)
+				passSvc.storePassword(usu.getUserName(), dc.getCode(),
+					"changeit", true); //$NON-NLS-1$
+			else
+				passSvc.storePassword(usu.getUserName(), dc.getCode(),
+						System.getProperty("soffid.startup.password"), false); //$NON-NLS-1$
 		}
 
 		UserAccount account = null;

@@ -229,7 +229,7 @@ public class FrameHandler extends Frame {
 				});
 	}
 
-	public void onChangeForm(Event ev) {
+	public void onChangeForm(Event ev) throws Exception {
 	}
 	
 	public void apply(Event ev) throws CommitException {

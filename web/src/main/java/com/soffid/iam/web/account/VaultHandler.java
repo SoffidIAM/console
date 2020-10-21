@@ -27,6 +27,7 @@ import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
+import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
@@ -73,11 +74,11 @@ public class VaultHandler extends FrameHandler {
 	}
 		
 
-	public void onChangeForm(Event ev) {
+	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
 		DataTree2 lb = (DataTree2) getListbox();
 		if ( lb.getSelectedItemXPath() != null ) {
-			VaultElement instance = (VaultElement) ((DataNode)XPathUtils.getValue(lb, "/.")).getInstance();
+			VaultElement instance = (VaultElement) ((DataNode)XPathUtils.eval(lb, "/.")).getInstance();
 			getFellow("accountProperties").setVisible("account".equals(instance.getType()));
 			getFellow("folderProperties").setVisible("folder".equals(instance.getType()));
 			if ("folder".equals(instance.getType())) {
@@ -97,6 +98,8 @@ public class VaultHandler extends FrameHandler {
 	}
 
 	public void updateAccountIcons() {
+		Long id = (Long) XPathUtils.eval(getForm(), "id");
+		((Tabbox)getFellow("accountTabbox")).setSelectedIndex(id == null ? 1 : 0);
 		String url = (String) XPathUtils.getValue(getForm(), "loginUrl");
 		AccountAccessLevelEnum accessLevel = (AccountAccessLevelEnum) XPathUtils.getValue(getForm(), "accessLevel"); 
 		AccountType type = (AccountType) XPathUtils.getValue(getForm(), "type");

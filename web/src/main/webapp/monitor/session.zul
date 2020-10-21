@@ -8,6 +8,7 @@
 	use="com.soffid.iam.web.audit.SessionHandler" id="frame">
 
 	<datamodel id="model" rootNode="root" src="sessionDescriptor.xml"/>
+	<timer onTimer="ref:frame.refresh" running="true" delay="5000" repeats="true" />
 	
 	<div sclass="single-face-card" id="card">
 		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
@@ -28,15 +29,26 @@
   value: userName
   template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(userName)}" target="_blank" class="shylink">#{userName }</a>
   default: true
--name: ${c:l('usuaris.zul.Maquinaservidora')}
--name: ${c:l('usuaris.zul.Maquinaservidora')}
-			width="*" />
-		<column label="${c:l('usuaris.zul.Maquinaclient')}"
-			width="*" />
-		<column label="${c:l('usuaris.zul.Port')}" width="120px"/>
-		<column label="${c:l('usuaris.zul.DataInici')}"
-			width="140px" />
-		<column label="${c:l('usuaris.zul.VNC')}" width="60px" />
+- name: ${c:l('usuaris.zul.Maquinaservidora')}
+  value: serverHostName
+  default: true
+- name: ${c:l('usuaris.zul.Maquinaclient')}
+  value: clientHostName
+  default: true
+- name: ${c:l('usuaris.zul.Port')}
+  value: port
+- name: ${c:l('usuaris.zul.DataInici')}
+  value: stardDate
+  template: #{startDate_datetime}
+  default: true
+- name: ${c:l('registreAcces.zul.Tipus') }
+  value: type
+  template: #{type.value == 'P' ? 'PAM': type.value == 'W' ? 'WebSSO': 'ESSO' }
+  default: true
+- name: ${c:l('pamSession.serviceUrl') }
+  value: sessionUrl
+- name: ${c:l('pamSession.accountName') }
+  value: accountName
 		]]>
 		</attribute>
 		</datatable>

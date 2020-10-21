@@ -2,13 +2,20 @@ package com.soffid.iam.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.tomcat.util.codec.binary.Base64;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -32,14 +39,22 @@ import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
+import com.soffid.iam.api.Session;
+import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
+import com.soffid.iam.model.ServiceEntity;
+import com.soffid.iam.model.SessionEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.ssl.AlwaysTrustConnectionFactory;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class PamSessionServiceImpl extends PamSessionServiceBase {
@@ -141,7 +156,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl());
 	}
 
-	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl) throws InternalErrorException, MalformedURLException, JSONException
+	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl) throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException
 	{
 		Password password = getAccountService().queryAccountPasswordBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
 		if (password == null)
@@ -202,8 +217,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		NewPamSession nps = new NewPamSession();
 		nps.setJumpServerGroup(jumpServerGroup.getName());
 		nps.setSessionId(sessionKey);
-		nps.setUrl(new URL (url.getProtocol() + "://" + url.getHost() + (url.getPort() == -1 ? "" : ":" + url.getPort())
-				+ "/launch/start?sessionId=" + URLEncoder.encode(sessionKey)));
+		String jumpServerUrlBase = url.getProtocol() + "://" + url.getHost() + (url.getPort() == -1 ? "" : ":" + url.getPort());
+		nps.setUrl(new URL (jumpServerUrlBase + "/launch/start?sessionId=" + URLEncoder.encode(sessionKey, "UTF-8")));
 		
 		Audit audit = new Audit();
 		audit.setAuthor(Security.getCurrentAccount());
@@ -218,8 +233,51 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		AuditEntity auditEntity = getAuditEntityDao().auditToEntity(audit);
 		getAuditEntityDao().create(auditEntity);
 
+		if (Security.getCurrentUser() != null) {
+			AccessLogEntity log = getAccessLogEntityDao().newAccessLogEntity();
+			log.setAccessType("L");
+			log.setAccountName(entity.getLoginName() == null ? entity.getName():  entity.getLoginName());
+			for (HostEntity host: getHostEntityDao().findByIP(Security.getClientIp())) {
+				log.setServer(host);
+				log.setHostName(host.getName());
+			};
+			log.setHostAddress(Security.getClientIp());
+			log.setJumpServerGroup(jumpServerGroup.getName());
+			log.setProtocol(findPamProtocol());
+			log.setInformation(targetUrl);
+			log.setStartDate(new Date());
+			log.setSystem(account.getSystem());
+			log.setUser( getUserEntityDao().findByUserName(Security.getCurrentUser()) );
+			log.setSessionId((String) map.get("sessionId"));
+			getAccessLogEntityDao().create(log);
+			
+			SessionEntity session = getSessionEntityDao().newSessionEntity();
+			session.setAuthenticationMethod("P");
+			session.setHost(log.getServer());
+			session.setHostName(log.getHostName());
+			session.setHostAddress(log.getHostAddress());
+			session.setKeepAliveDate(new Date());
+			session.setKey(sessionKey);
+			session.setLoginLogInfo(log);
+			session.setStartDate(new Date());
+			session.setType(TipusSessio.PAM);
+			session.setUser(log.getUser());
+			session.setWebHandler(base+"/store/session/check-alive");
+			session.setMonitorUrl(jumpServerUrlBase  + "/launch/connect?sessionId=" + URLEncoder.encode(sessionKey,"UTF-8"));
+			getSessionEntityDao().create(session);
+		}
 		return nps;
-		
+	}
+
+	private ServiceEntity findPamProtocol() {
+		ServiceEntity e = getServiceEntityDao().findByName("PAM");
+		if (e == null) {
+			e = getServiceEntityDao().newServiceEntity();
+			e.setDescription("Soffid PAM Service");
+			e.setName("PAM");
+			getServiceEntityDao().create(e);
+		}
+		return e;
 	}
 
 	public String selectJumpServer(JumpServerGroupEntity jumpServerGroup)
@@ -346,8 +404,23 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throw new InternalErrorException("Error connecting to " + base + ": " + "HTTP/"
 					+ response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
 
-		PamSession r = response.readEntity(PamSession.class);
-		
+		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmssZ");
+		String s = response.readEntity(String.class);
+		JSONObject o = new JSONObject(s);
+		PamSession r = new PamSession();
+		r.setAccountName(o.optString("accountName"));
+		r.setChapters(new LinkedList<>());
+		JSONArray ch = o.optJSONArray("chapters");
+		for (int i = 0; i < ch.length(); i++)
+			r.getChapters().add(ch.getLong(i));
+		r.setId(o.optString("id"));
+		r.setPath(o.optString("path"));
+		if (o.has("serverEnd"))
+			r.setServerEnd(df.parse(o.optString("serverEnd")));
+		if (o.has("serverStart"))
+			r.setServerStart(df.parse(o.optString("serverStart")));
+		r.setServerUrl(o.optString("serverUrl"));
+		r.setUser(o.optString("user"));
 		r.setJumpServerGroup(serverGroup);
 
 		return r;
@@ -366,7 +439,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		conn.setDoOutput(false);
 		String auth = serverGroup.getStoreUserName()+":"+
 				Password.decode(serverGroup.getPassword()).getPassword();
-		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBase64String(auth.getBytes("UTF-8")));
+		conn.addRequestProperty("Authorization", "Basic "+Base64.getEncoder().encodeToString(auth.getBytes("UTF-8")));
 		
 		conn.connect();
 		
@@ -397,7 +470,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		conn.setDoOutput(false);
 		String auth = serverGroup.getStoreUserName()+":"+
 				Password.decode(serverGroup.getPassword()).getPassword();
-		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBase64String(auth.getBytes("UTF-8")));
+		conn.addRequestProperty("Authorization", "Basic "+Base64.getEncoder().encodeToString(auth.getBytes("UTF-8")));
 		
 		conn.connect();
 		
@@ -427,7 +500,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		conn.setDoOutput(false);
 		String auth = serverGroup.getStoreUserName()+":"+
 				Password.decode(serverGroup.getPassword()).getPassword();
-		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBase64String(auth.getBytes("UTF-8")));
+		conn.addRequestProperty("Authorization", "Basic "+Base64.getEncoder().encodeToString(auth.getBytes("UTF-8")));
 		
 		conn.connect();
 		
@@ -506,4 +579,42 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		}
 	}
 
+	@Override
+	protected boolean handleCheckJumpServerSession(Session sessio) throws Exception {
+    	URL url = new URL (sessio.getUrl()+"?sessionId="+ URLEncoder.encode(sessio.getKey(), "UTF-8"));
+
+    	JumpServerGroupEntity selected = null;
+    	for ( JumpServerGroupEntity js: getJumpServerGroupEntityDao().loadAll()) {
+    		URL url2 = new URL(js.getStoreUrl());
+    		if (url2.getHost().equals(url.getHost()) &&
+    				url2.getPort() == url.getPort()) {
+    			selected = js;
+    			break;
+    		}
+    	}
+    	
+    	if (selected == null)
+    		return false;
+    	
+		Response response;
+		try {
+			response = 
+					WebClient
+					.create(url.toString(), selected.getStoreUserName(), 
+							Password.decode(selected.getPassword()).getPassword(), null)
+					.accept(MediaType.APPLICATION_JSON)
+					.get();
+					
+		} catch (Exception e) {
+			throw new InternalErrorException ("Error connecting to "+selected.getStoreUrl()+": "+e.getMessage() );
+		}
+		
+		if (response.getStatus() == HttpServletResponse.SC_NOT_FOUND)
+			return false;
+		else if (response.getStatus() == HttpServletResponse.SC_OK)
+			return true;
+		else
+			throw new InternalErrorException("Error connecting to " + selected.getStoreUrl() + ": " + "HTTP/"
+					+ response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
+	}
 }

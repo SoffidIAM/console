@@ -34,22 +34,22 @@ public class SvgFilter extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		boolean original = false;
-		String originalGreen = "#9ec73c";
-		String originalBlue = "#637792";
-		String originalSky = "#22B9D8";
 		String green = ConfigurationCache.getProperty("soffid.ui.color1");
-		if (green == null) green = originalGreen;
+		if (green == null) green = StandardColors.originalGreen;
 		
 		String blue = ConfigurationCache.getProperty("soffid.ui.color2");
-		if (blue == null) blue = originalBlue;
+		if (blue == null) blue = StandardColors.originalBlue;
 
 		
 		String sky = ConfigurationCache.getProperty("soffid.ui.color3");
-		if (sky == null) sky = originalSky;
+		if (sky == null) sky = StandardColors.originalSky;
 
+		String originalWhite = "#ffffff";
+		String white = "#ffffff";
 		String uri = req.getServletPath();
 //		uri = req.getPathInfo();
 		
+		String originalBlue = StandardColors.originalBlue;
 		if (uri.endsWith("-orig.svg")) {
 			original = true;
 			uri = uri.substring(0, uri.length()-9)+".svg";
@@ -58,11 +58,20 @@ public class SvgFilter extends HttpServlet {
 			originalBlue = "#ffffff";
 			blue = sky;
 			sky = ConfigurationCache.getProperty("soffid.ui.text3");
-			if (sky == null) sky = "#ffffff";
+			if (sky == null) sky = StandardColors.originalSky;
 		}
 		else if (uri.endsWith("-black.svg")) {
 			uri = uri.substring(0, uri.length()-10)+".svg";
-			sky = "#101001";
+			sky = "#101010";
+			blue = "#101010";
+			green = "#101010";
+		}
+		else if (uri.endsWith("-white.svg")) {
+			white = sky ;
+			uri = uri.substring(0, uri.length()-10)+".svg";
+			sky = "#ffffff";
+			blue = "#ffffff";
+			green = "#ffffff";
 		}
 		else if (uri.endsWith("-green.svg")) {
 			uri = uri.substring(0, uri.length()-10)+".svg";
@@ -74,12 +83,14 @@ public class SvgFilter extends HttpServlet {
 			resp.sendError(HttpServletResponse.SC_NOT_FOUND);
 		} else {
 			if ( ! original ) {
-				Color originalGreenRgb = toColor ( originalGreen);
+				Color originalGreenRgb = toColor ( StandardColors.originalGreen);
 				Color originalBlueRgb = toColor ( originalBlue);
-				Color originalSkyRgb = toColor ( originalSky);
+				Color originalSkyRgb = toColor ( StandardColors.originalSky);
 				Color newGreenRgb = toColor ( green);
 				Color newBlueRgb = toColor ( blue);
 				Color newSkyRgb = toColor ( sky);
+				Color black = toColor ( "#000000" );
+				Color newBlack = toColor ( "#606060" );
 				
 				HSLColor originalGreenHsl = new HSLColor(originalGreenRgb);
 				HSLColor originalBlueHsl = new HSLColor(originalBlueRgb);
@@ -88,6 +99,8 @@ public class SvgFilter extends HttpServlet {
 				HSLColor newBlueHsl = new HSLColor(newBlueRgb);
 				HSLColor newSkyHsl = new HSLColor(newSkyRgb);
 				
+				HSLColor blackHsl = new HSLColor(black);
+				HSLColor newBlackHsl = new HSLColor(newBlack);
 				
 				for (int pos = t.indexOf("#"); pos >= 0; pos = t.indexOf("#", pos+1))
 				{
@@ -104,6 +117,8 @@ public class SvgFilter extends HttpServlet {
 								replaceColor (t, pos, originalBlueHsl, newBlueHsl, hslColor);
 							else if ( sameColor (originalSkyHsl, hslColor ))
 								replaceColor (t, pos, originalSkyHsl, newSkyHsl, hslColor);
+							else if ( color.equals(originalWhite.substring(1)))
+								t.replace(pos, pos+7, white);
 						}
 					}
 				}
@@ -123,9 +138,15 @@ public class SvgFilter extends HttpServlet {
 	private void replaceColor(StringBuffer t, int pos, HSLColor original, HSLColor newColor, HSLColor current) {
 		HSLColor c;
 		try {
-			float luminance = newColor.getLuminance() / original.getLuminance() * current.getLuminance();
-			c = new HSLColor( newColor.getHue(), newColor.getSaturation(),
-					luminance > 100.0f ? 100.0f: luminance);
+			if (original.getLuminance() == current.getLuminance()) 
+				c = newColor;
+			else if (original.getLuminance() == 0.0)
+				return; // Do not divide by 0
+			else {
+				float luminance = newColor.getLuminance() / original.getLuminance() * current.getLuminance();
+				c = new HSLColor( newColor.getHue(), newColor.getSaturation(),
+						luminance > 100.0f ? 100.0f: luminance);
+			}
 			
 		} catch (IllegalArgumentException e) {
 			c = newColor;

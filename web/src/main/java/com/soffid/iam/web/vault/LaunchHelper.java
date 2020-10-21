@@ -147,7 +147,7 @@ public class LaunchHelper {
 			openWssoEntryPoint(item, exec, accounts);
 		}
 		else
-			Clients.evalJavaScript("window.open('/execucions?id="+item.getId()+"', '_blank');");
+			Clients.evalJavaScript("window.open('"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"', '_blank');");
 
 	}
 	

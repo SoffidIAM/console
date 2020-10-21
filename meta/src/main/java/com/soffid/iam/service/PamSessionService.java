@@ -16,14 +16,23 @@ import com.soffid.mda.annotation.Role;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.Sessio;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AuditoriaEntity;
+import es.caib.seycon.ng.model.MaquinaEntity;
+import es.caib.seycon.ng.model.RegistreAccesEntity;
+import es.caib.seycon.ng.model.ServeiEntity;
+import es.caib.seycon.ng.model.SessioEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.servei.AccountService;
 import roles.Tothom;
 
 @Service
 @Depends({JumpServerGroupEntity.class, JumpServerEntity.class, AccountEntity.class, AccountService.class,
-	AuditoriaEntity.class})
+	AuditoriaEntity.class,
+	ServeiEntity.class,
+	RegistreAccesEntity.class, SessioEntity.class, UsuariEntity.class,
+	MaquinaEntity.class})
 public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	List<JumpServerGroup> findJumpServerGroups() {return null;}
@@ -45,6 +54,9 @@ public class PamSessionService {
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor) {return null;}
 
+	@Description("Checks a server session is up")
+	boolean checkJumpServerSession (Sessio sessio) {return false;}
+	
 	@Operation(grantees = {pamSession_query.class})
 	@Description("Retrieves a pam session descriptor")
 	PamSession findSession (String serverGroup, String sessionId) {return null;}

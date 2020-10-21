@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg7384"
+   width="16"
+   height="16"
+   version="1.1"
+   sodipodi:docname="network.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <defs
+     id="defs2197" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     id="namedview2195"
+     showgrid="false"
+     inkscape:pagecheckerboard="true"
+     inkscape:zoom="41.7193"
+     inkscape:cx="1.803827"
+     inkscape:cy="10.396972"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7384" />
+  <metadata
+     id="metadata90">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Gnome Symbolic Icon Theme</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <title
+     id="title9167">Gnome Symbolic Icon Theme</title>
+  <g
+     id="layer10-6"
+     transform="matrix(0.8960452,0,0,0.8960452,-53.379096,-507.67401)"
+     style="fill:#22b9d8">
+    <path
+       style="color:#bebebe;fill:#ffffff;stroke-width:1.24469912"
+       d="m 65.546028,567.6668 h 6.192234 v 6.25492 h -6.192234 z"
+       id="rect9200-7"
+       inkscape:connector-curvature="0" />
+    <path
+       style="color:#bebebe;fill:#22b9d8"
+       d="m 61,578 h 5 v 4.9375 h -5 z"
+       id="rect8421-2"
+       inkscape:connector-curvature="0" />
+    <path
+       style="color:#bebebe;fill:#ffffff;stroke-width:1.36317778"
+       d="m 70.466563,577.54682 6.428007,0.0401 0.01337,6.32099 -6.481508,0.0535 z"
+       id="rect8425-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="path8427-1"
+       d="m 62.354239,575.90795 0.07147,2.77458 2.588903,-0.0757 0.07605,-1.57854 7.259914,-0.0226 -0.03173,1.90374 2.548383,-0.0936 0.005,-4.23353 -12.504401,-0.0757 z"
+       style="color:#000000;text-indent:0;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;white-space:normal;isolation:auto;mix-blend-mode:normal;solid-color:#000000;fill:#ffffff;color-rendering:auto;image-rendering:auto;shape-rendering:auto"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccccccc" />
+    <path
+       id="path9198-2"
+       d="m 67.293078,572 v 3.5 h 2.770387 V 572 Z"
+       style="color:#000000;text-indent:0;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;white-space:normal;isolation:auto;mix-blend-mode:normal;solid-color:#000000;fill:#ffffff;stroke-width:1.66444767;color-rendering:auto;image-rendering:auto;shape-rendering:auto"
+       inkscape:connector-curvature="0" />
+    <path
+       style="color:#bebebe;fill:#ffffff;stroke-width:1.36317778"
+       d="m 60.405204,577.45607 6.615261,-0.0401 0,6.57513 -6.628636,-0.0134 z"
+       id="rect8425-9-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+  <g
+     id="layer10"
+     transform="matrix(0.8960452,0,0,0.8960452,-53.235028,-507.4113)"
+     style="fill:#17b5c8">
+    <rect
+       id="rect8421"
+       x="61"
+       y="578"
+       width="5"
+       height="4.9375"
+       ry="0"
+       style="color:#bebebe;fill:#17b5c8" />
+    <rect
+       id="rect8425"
+       x="71"
+       y="578"
+       width="5"
+       height="5"
+       ry="0"
+       style="color:#bebebe;fill:#17b5c8" />
+    <path
+       id="path8427"
+       d="m 63.031,575 v 3.5312 h 1 V 576 h 8.9688 v 2.5312 h 1 V 575 h -10.969 z"
+       style="color:#000000;text-indent:0;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;white-space:normal;isolation:auto;mix-blend-mode:normal;solid-color:#000000;fill:#17b5c8;color-rendering:auto;image-rendering:auto;shape-rendering:auto"
+       inkscape:connector-curvature="0" />
+    <path
+       id="path9198"
+       d="m 68,572 v 3.5 h 1 V 572 Z"
+       style="color:#000000;text-indent:0;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;white-space:normal;isolation:auto;mix-blend-mode:normal;solid-color:#000000;fill:#17b5c8;color-rendering:auto;image-rendering:auto;shape-rendering:auto"
+       inkscape:connector-curvature="0" />
+    <rect
+       id="rect9200"
+       x="66"
+       y="568"
+       width="5"
+       height="5"
+       ry="0"
+       style="color:#bebebe;fill:#17b5c8" />
+  </g>
+</svg>

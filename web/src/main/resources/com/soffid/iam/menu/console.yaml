@@ -1,6 +1,9 @@
 - name: inbox.lblFiltroTareas1
   img: /img/menu/tasks.svg
   url: /wf/inbox.zul
+- name: selfService.Applications
+  img: /img/menu/app-launcher.svg
+  handler: com.soffid.iam.web.launcher.LauncherMenuHandler
 - name: seu.startWorkflow
   img: /img/menu/start-wf.svg
   handler: com.soffid.iam.web.inbox.NewProcessMenuHandler
@@ -15,6 +18,7 @@
   options:
       - name: seu.resources
         img: /img/menu/resources.svg
+        small: true
         options:
         - name: seu.usuaris
           url: /resource/user/user.zul
@@ -68,6 +72,10 @@
           url: /resource/application/role-rules.zul
           img: /img/menu/role-rules.svg
           permissions: ["seu:rules:show"]
+        - name: seu.sod
+          url: /resource/application/sod.zul
+          img: /img/menu/sod.svg
+          permissions: ["seu:sod:show"]
       - name: seu.configuration
         img_old: /img/menu/system-settings.png
         img: /img/menu/toolbox.svg
@@ -165,6 +173,14 @@
           url: /monitor/syncserver.zul
           permissions: ["seu:monitor:show"]
           img: /img/menu/syncserver-monitor.svg
+        - name: seu.scheduledTasks
+          url: /monitor/scheduled-task.zul
+          permissions: ["seu:scheduled-task:show"]
+          img: /img/menu/scheduled-task.svg
+        - name: seu.scheduledJobs
+          url: /monitor/scheduled-job.zul
+          permissions: ["seu:scheduled-job:show"]
+          img: /img/menu/scheduled-job.svg
         - name: seu.auditoria
           url: /monitor/audit.zul
           permissions: ["seu:auditoria:show"]
@@ -177,4 +193,9 @@
           url: /monitor/session.zul
           permissions: ["seu:session:show"]
           img: /img/menu/session.svg
+        - name: seu.pam_dashboard
+          url: /monitor/pam_dashboard.zul
+          permissions: ["seu:pamDashboard"]
+          img: /img/menu/pam-monitor.svg
+        
           

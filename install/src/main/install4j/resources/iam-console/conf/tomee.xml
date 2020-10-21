@@ -19,26 +19,23 @@
 		definition =
 		ignoreDefaultValues = false
 		initialSize = 0
-		jdbcDriver = com.mariadb.jdbc.Driver
-		jdbcUrl = ${dbDriverUrl}
 		jtaManaged = true
 		maxActive = 50
 		maxIdle = 20
 		maxOpenPreparedStatements = 0
-		maxWaitTime = -1 millisecond
+		maxWaitTime = 30 seconds
 		minEvictableIdleTime = 30 minutes
 		minIdle = 0
 		numTestsPerEvictionRun = 3
-		password = ${dbPassword}
-		passwordCipher = ${dbPasswordCipher}
 		poolPreparedStatements = false
 		serviceId =
 		testOnBorrow = true
 		testOnReturn = false
 		testWhileIdle = false
 		timeBetweenEvictionRuns = -1 millisecond
-		userName = ${dbUser}
-		validationQuery = ${dbValidationQuery}
+		validationQuery = select 1
+		jdbcDriver = com.soffid.iam.db.SoffidBrokerDriver
+    jdbcUrl = jdbc:soffid:db
 	</Resource>
 	<Container id="myStatelessContainer" type="STATELESS">
 		accessTimeout = 30 seconds

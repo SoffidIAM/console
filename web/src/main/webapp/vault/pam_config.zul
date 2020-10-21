@@ -5,7 +5,7 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('pam_config.title')}"
 	 id="frame" width="100%" use="com.soffid.iam.web.pam.ServerHandler" >
-	<datamodel id="model" rootNode="root" src="descriptorVault.xml" />
+	<datamodel id="model" rootNode="root" src="pamDescriptor.xml" />
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar"
@@ -45,51 +45,27 @@
 
 				<menu2>
 					<menu2item if="${canUpdateServers}"
-						image="~./img/trash.svg" label="${c:l('plugins.zul.Delete') }"
+						image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }"
 						onClick="ref:frame.delete" />
 				</menu2>
 
-				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" 
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" 
 					onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 
 			<form2 id="form" dataPath="listbox:/."
 				onChangeXPath="ref:frame.onChangeForm" width="100%"  >
 
-				<grid sclass="noBorderGrid" fixedLayout="true" width="100%">
-					<rows>
-						<row>
-							${c:l('jumpserver.groupName')}:
-							<textbox width="100%" onChange="" bind="name" constraint="no empty" maxlength="50"  disabled="${! canUpdateJumpServer }" />
-						</row>
-						<row>
-							${c:l('jumpserver.description')}:
-							<textbox width="100%" onChange="" bind="description" constraint="no empty" maxlength="150"  disabled="${! canUpdateJumpServer }" />
-						</row>
-						<row>
-							<label value="${c:l('jumpserver.userName') } :"/>
-							<textbox onChange="" width="100%" bind="storeUserName" disabled="${! canUpdateJumpServer }" />
-						</row>
-						<row>
-							<label value="${c:l('jumpserver.password') } :"/>
-							<input_password width="100%" width_custom="100%" bind="password" 
-								lectura="${! canUpdateJumpServer }"/>
-						</row>
-						<row>
-							<label value="${c:l('jumpserver.url') } :"/>
-							<textbox width="100%" bind="storeUrl" onChange=""  disabled="${! canUpdateJumpServer }"/>
-						</row>
-						<row>
-							${c:l('jumpserver.jumpServers')} :
-							<inputfield bind="jumpServers" dataType="string" noLabel="true" width="100%" sclass="std" multiValue="true">
-							</inputfield>
-						</row>
-					</rows>
-				</grid>
+				<customfield3 label="${c:l('jumpserver.groupName')}" bind="name" required="true" maxlength="50"  dataType="STRING" disabled="${! canUpdateJumpServer }" />
+				<customfield3 label="${c:l('jumpserver.description')}" bind="description" required="true" dataType="STRING" maxlength="150"  disabled="${! canUpdateJumpServer }" />
+				<customfield3 label="${c:l('jumpserver.userName')}" bind="storeUserName" required="true" dataType="STRING" maxlength="150"  disabled="${! canUpdateJumpServer }" />
+				<customfield3 label="${c:l('jumpserver.password')}" bind="password" required="true" dataType="PASSWORD" maxlength="150"  disabled="${! canUpdateJumpServer }" />
+				<customfield3 label="${c:l('jumpserver.url')}" bind="storeUrl" required="true" dataType="STRING" maxlength="150"  disabled="${! canUpdateJumpServer }" />
+				<customfield3 label="${c:l('jumpserver.jumpServers')}" bind="jumpServers" required="true" dataType="STRING" multiValue="true" maxlength="150"  disabled="${! canUpdateJumpServer }" />
 				<div style="text-align: right; width: 100%">
-					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					<databutton image="/img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 					</databutton>
-					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 				</div>
 			</form2>
 		</div>

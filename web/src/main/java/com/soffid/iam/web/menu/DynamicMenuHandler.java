@@ -5,6 +5,6 @@ import java.util.List;
 import org.json.JSONArray;
 
 public interface DynamicMenuHandler {
-	List<MenuOption> getOptions();
-	String getTip();
+	List<MenuOption> getOptions(MenuOption option);
+	String getTip(MenuOption option);
 }

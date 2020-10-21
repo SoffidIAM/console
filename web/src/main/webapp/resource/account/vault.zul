@@ -79,7 +79,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatree2="listbox"/>
 								
-				<imageclic src="/img/wait.gif" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
+				<imageclic src="/img/sync.svg" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
 
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				<menu2>
@@ -90,10 +90,10 @@
 			<div id="dades">
 				<form2 id="form" onChangeXPath="ref:frame.onChangeForm" dataPath="/listbox:/" width="100%">
 					<form2 id="accountProperties" dataPath="/account" width="100%">
-						<tabbox>
+						<tabbox id="accountTabbox">
 							<tabs>
-								<tab label="${c:l('vault.actions')}" />
-								<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
+								<tab label="${c:l('vault.actions')}" id="accountActions"/>
+								<tab label="${c:l('usuaris.zul.Informaciabasica')}" id="accountBasics"/>
 							</tabs>
 							<tabpanels>
 								<tabpanel>

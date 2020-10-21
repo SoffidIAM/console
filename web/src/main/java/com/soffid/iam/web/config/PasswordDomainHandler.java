@@ -77,7 +77,7 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 	}
 		
 
-	public void onChangeForm(Event event) {
+	public void onChangeForm(Event event) throws Exception {
 		super.onChangeForm(event);
 		DataNode dn;
 		try {

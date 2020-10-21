@@ -21,10 +21,10 @@
 		<attribute name="finders"><![CDATA[
         - path: /effectiveRole
           icon: >-
-            #{accountName != null ? "/img/account-green.svg": 
-              groupName != null ? "/img/group-green.svg": 
-              ruleName != null ? "/img/rule-green.svg":
-              "/img/role-green.svg"}
+            #{accountName != null ? "/img/account.svg": 
+              groupName != null ? "/img/group.svg": 
+              ruleName != null ? "/img/rulesvg":
+              "/img/role.svg"}
           template: >-
              #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}
              #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}
@@ -39,10 +39,10 @@
                 #{roleName != null ? roleDescription: ""}
         - path: /nested
           icon: >-
-            #{accountName != null ? "/img/account-green.png": 
-            groupName != null ? "/img/group-green.svg": 
-            ruleName != null ? "/img/rule-green.svg":
-            "/img/role-green.svg"}
+            #{accountName != null ? "/img/account.png": 
+            groupName != null ? "/img/group.svg": 
+            ruleName != null ? "/img/rule.svg":
+            "/img/role.svg"}
           template: >-
              #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}
              #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}

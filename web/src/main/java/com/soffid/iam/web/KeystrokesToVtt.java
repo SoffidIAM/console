@@ -3,14 +3,13 @@ package com.soffid.iam.web;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
-
-import com.lowagie.text.pdf.ByteBuffer;
 
 
 public class KeystrokesToVtt extends OutputStream {
 	private OutputStream out;
-	ByteBuffer buffer = new ByteBuffer();
+	ByteBuffer buffer = ByteBuffer.allocate(99999);
 	private long start;
 	final static int MIN_GAP = 3;
 	final static int MAX_GAP = 6;
@@ -29,7 +28,7 @@ public class KeystrokesToVtt extends OutputStream {
 		if (b == '\n')
 			flush();
 		else
-			buffer.append((byte)b);
+			buffer.put((byte)b);
 	}
 
 	@Override
@@ -41,7 +40,7 @@ public class KeystrokesToVtt extends OutputStream {
 
 	@Override
 	public void flush() throws IOException {
-		String s = new String (buffer.toByteArray(), "UTF-8");
+		String s = new String (buffer.array(), 0, buffer.position(), "UTF-8");
 		int i = s.indexOf(' ');
 		if ( i > 0)
 		{
@@ -68,7 +67,7 @@ public class KeystrokesToVtt extends OutputStream {
 				sbNext.append(keys);					
 			}
 		}
-		buffer.setSize(0);
+		buffer.clear();
 	}
 
 	private void flushBuffer(long gap) throws UnsupportedEncodingException, IOException {

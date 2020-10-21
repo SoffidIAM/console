@@ -2920,6 +2920,44 @@ public class BpmEngineImpl extends BpmEngineBase {
 	}
 
 	@Override
+	protected List handleGetAllJobs() throws Exception {
+		JbpmContext jbpmContext = null;
+
+		try {
+			jbpmContext = getContext();
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(jbpmContext);
+
+			Query q = jbpmContext.getSession().createQuery(
+					"select job\n" + 
+					"      from org.jbpm.job.Job as job\n" + 
+					"      order by job.dueDate asc"); //$NON-NLS-1$
+			List l = q.list();
+
+			Vector v = new Vector();
+			for (Iterator it = l.iterator(); it.hasNext();) {
+				org.jbpm.job.Job j = (org.jbpm.job.Job) it.next();
+				org.jbpm.graph.exe.ProcessInstance pi = j.getProcessInstance();
+				if (business.isUserAuthorized(SUPERVISOR_ROLE, getUserGroups(),
+						pi))
+				{
+					TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
+					if (tm == null && Security.getCurrentTenantName().equals(Security.getMasterTenantName()) ||
+							tm != null && tm.getTenantId() != null && Security.getCurrentTenantId() == tm.getTenantId().longValue())
+						v.add(VOFactory.newJob(j));
+				}
+			}
+
+			return v;
+
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+	}
+
+	@Override
 	protected void handleResumeJob(Job jobvo) throws Exception {
 		enableJob(jobvo, true);
 	}

@@ -401,6 +401,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (app.getAttributes() == null)
 			app.setAttributes(new HashMap<String, Object>());
 		
+		if ("com.soffid.iam.sync.sso.agent.SSOAgent".equals(entity.getSystem().getClassName())) {
+			app.getAttributes().put("SSO:Server", app.getServerName());
+			app.getAttributes().put("SSO:URL", app.getLoginUrl());
+			app.getAttributes().put("type", app.getServerType());
+		}
+		
 		LinkedList<AccountAttributeEntity> entities = new LinkedList<AccountAttributeEntity> (entity.getAttributes());
 		HashSet<String> keys = new HashSet<String>();
 		for (String key: app.getAttributes().keySet() )

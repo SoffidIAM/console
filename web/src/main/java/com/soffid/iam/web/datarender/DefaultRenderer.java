@@ -6,6 +6,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.json.JSONObject;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 
 import com.soffid.iam.api.DataType;
@@ -28,6 +29,11 @@ public class DefaultRenderer extends DataTypeRenderer {
 			o.put("template", "${"+prefix+dt.getName()+"_date}");
 		if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE)
 			o.put("template", "${"+prefix+dt.getName()+"_datetime}");
+		if (dt.getType() == TypeEnumeration.BOOLEAN_TYPE) {
+			o.put("template", "${"+prefix+dt.getName()+ "? '" +
+					Labels.getLabel("mesg:org.zkoss.zul.mesg.MZul:YES")+ "' : '"+
+					Labels.getLabel("mesg:org.zkoss.zul.mesg.MZul:NO")+ "' }");
+		}
 		return o;
 	}
 

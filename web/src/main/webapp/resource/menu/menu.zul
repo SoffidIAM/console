@@ -83,6 +83,7 @@
 								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.menuType') }" bind="menuType" dataType="STRING" id="menuType" listOfValues="L: List, I: Icons, T: Tree"/>
 								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.publicAccess') }" bind="publicAccess" dataType="BOOLEAN"/>
 								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.visible') }" bind="visible" dataType="BOOLEAN"/>
+								<customfield3 label="${c:l('com.soffid.iam.api.AccessTree.icon') }" bind="icon1Image" dataType="PHOTO"/>
 								<div style="text-align: right; width: 100%">
 									<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 									</databutton>

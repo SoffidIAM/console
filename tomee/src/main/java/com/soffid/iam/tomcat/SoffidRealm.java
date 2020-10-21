@@ -48,11 +48,6 @@ public class SoffidRealm extends RealmBase {
 	}
 
 	@Override
-	protected String getName() {
-		return ("Soffid Realm");
-	}
-
-	@Override
 	protected String getPassword(String user) {
 		return null;
 	}

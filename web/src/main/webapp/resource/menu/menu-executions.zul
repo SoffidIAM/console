@@ -12,7 +12,8 @@
 			<label bind='label' sclass="separator"/>
 			<customfield3 dataType="BOOLEAN" label="${c:l('com.soffid.iam.api.User.active') }" bind="enabled" 
 				onChange="ref:handler.enable"/>
-			<customfield3 dataType="STRING" label="${c:l('aplicacionsIntranet.zul.Tipus')}"  uiHandler="com.soffid.iam.web.menu.MimeTypeHandler"
+			<customfield3 dataType="STRING" label="${c:l('aplicacionsIntranet.zul.Tipus')}"  
+				uiHandler="com.soffid.iam.web.menu.MimeTypeHandler"
 				required="true" bind="exec/executionTypeCode"/>
 			<customfield3 dataType="STRING" label="${c:l('aplicacionsIntranet.zul.Contingut')}" multiline="true"
 				required="true" bind="exec/content"

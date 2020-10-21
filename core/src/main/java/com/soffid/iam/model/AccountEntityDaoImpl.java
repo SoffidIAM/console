@@ -270,7 +270,16 @@ public class AccountEntityDaoImpl extends
 			
 			if (target.getLoginName() == null || target.getLoginName().trim().isEmpty())
 				target.setLoginName(target.getName());
-				
+
+			if ("com.soffid.iam.sync.sso.agent.SSOAgent".equals(source.getSystem().getClassName())) {
+				if (target.getServerType() == null) 
+					target.setServerType( (String) target.getAttributes().get("type") );
+				if (target.getServerName() == null) 
+					target.setServerName( (String) target.getAttributes().get("SSO:Server") );
+				if (target.getLoginUrl() == null) 
+					target.setLoginUrl( (String) target.getAttributes().get("SSO:URL") );
+			}
+
 			storeCacheEntry(source, target);
 	
 			if (source.getType() == AccountType.PRIVILEGED) 

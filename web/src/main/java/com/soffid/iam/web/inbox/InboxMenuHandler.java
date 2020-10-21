@@ -20,12 +20,12 @@ public class InboxMenuHandler implements DynamicMenuHandler {
 	Log log = LogFactory.getLog(getClass());
 	
 	@Override
-	public List<MenuOption> getOptions() {
+	public List<MenuOption> getOptions(MenuOption option) {
 		return null;
 	}
 
 	@Override
-	public String getTip() {
+	public String getTip(MenuOption option) {
 		int c;
 		try {
 			c = EJBLocator.getBpmEngine().findMyTasks().size();

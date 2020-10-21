@@ -47,7 +47,7 @@ public class MenuSsoHandler extends Div implements AfterCompose {
 	
 	public void validaXML() {
 		DataTree2 listbox = (DataTree2) org.zkoss.zk.ui.Path.getComponent(getSpaceOwner(), listboxPath);
-		DataNode dn = (DataNode) XPathUtils.getValue( listbox , "/.");
+		DataNode dn = (DataNode) XPathUtils.eval( listbox , "/.");
 		AccessTree data = (AccessTree) dn.getInstance();
 		try {		
 			String errorVal = EJBLocator.getEntryPointService().validateXMLApplicationAccess(data);

@@ -28,7 +28,6 @@ public class AuthenticationServiceFactory implements ServiceFactory {
 	 */
 	public Service openService() {
 		try{
-			
 	        ConfigParameterVO param = null;
 	        String authenticationServiceClassName="es.caib.bpm.security.SeyconAuthenticationService"; //$NON-NLS-1$
 	        try {

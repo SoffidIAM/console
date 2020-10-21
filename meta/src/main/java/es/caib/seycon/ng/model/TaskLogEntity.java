@@ -108,12 +108,12 @@ public abstract class TaskLogEntity {
 
 	@DaoFinder("select system.name, count(*) from \n"
 			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
-			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server \n"
+			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server and \n"
+			+ "(task.systemName is null or task.systemName = system.name) "
 			+ "group by system.name \n"
 			+ "order by system.name")
 	public Collection<Object[]> countTasksByServerAndSystem(String server) {
 		return null;
 	}
-
 
 }

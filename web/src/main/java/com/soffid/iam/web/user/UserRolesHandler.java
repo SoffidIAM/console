@@ -2,6 +2,7 @@ package com.soffid.iam.web.user;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.UserService;
@@ -40,6 +42,7 @@ import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
 
+import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DateFormats;
@@ -79,6 +82,21 @@ public class UserRolesHandler extends Div implements AfterCompose {
 		Component trash = w.getFellow("trash");
 		Object ruleId = getListbox().getJXPathContext().getValue("ruleId");
 		trash.setVisible(ruleId == null);
+
+		SoDRisk risk = (SoDRisk) getListbox().getJXPathContext().getValue("sodRisk");
+		CustomField3 sodRisk = (CustomField3) w.getFellow("sodRisk");
+		sodRisk.setVisible(risk != null);
+		CustomField3 sodRules = (CustomField3) w.getFellow("sodRules");
+		sodRules.setVisible(risk != null);
+		StringBuffer sb = new StringBuffer();
+		List<SoDRule> rules = (List<SoDRule>) getListbox().getJXPathContext().getValue("sodRules");
+		for (SoDRule rule: rules) {
+			if (rule.getRisk() != null)
+				sb.append("<img class='small-icon' src='"+getDesktop().getExecution().getContextPath()+"/img/risk."+rule.getRisk().getValue()+".svg'> </img>");
+			sb.append(rule.getName());
+			sb.append("<BR>");
+		}
+		sodRules.setValue(sb.toString());
 	}
 	
 	public void closeDetails(Event event) {
@@ -133,6 +151,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 			String fullName = (String) XPathUtils.getValue((DataSource) usersListbox, "@fullName");
 
 			if (currentRole != null) {
+				List<RoleAccount> ra = new LinkedList<RoleAccount>(EJBLocator.getApplicationService().findUserRolesByUserNameNoSoD(userName));
 				currentRoleAccount = new RoleAccount();
 				currentRoleAccount.setUserCode(userName);
 				currentRoleAccount.setUserFullName(fullName);
@@ -143,7 +162,13 @@ public class UserRolesHandler extends Div implements AfterCompose {
 				currentRoleAccount.setRoleDescription(currentRole.getDescription());
 				currentRoleAccount.setRoleName(currentRole.getName());
 				currentRoleAccount.setSystem(currentRole.getSystem());
+				ra.add(currentRoleAccount);
+				EJBLocator.getSoDRuleService().qualifyRolAccountList(ra);
 				
+				if (alreadyGrantedByRule(currentRoleAccount)) {
+					input.setWarning(null, "This role is already granted");
+					return;
+				}
 				DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue((DataSource)usersListbox, "/role");
 				coll.add(currentRoleAccount);
 				coll.setActiveNode(coll.getDataModel(coll.getSize()-1));
@@ -162,6 +187,16 @@ public class UserRolesHandler extends Div implements AfterCompose {
 		}
 	}
 
+	private boolean alreadyGrantedByRule(RoleAccount currentRoleAccount2) throws InternalErrorException, NamingException, CreateException {
+		String userName = (String) XPathUtils.getValue((DataSource) getUsersListbox(), "@userName");
+		for (RoleAccount ra: EJBLocator.getApplicationService().findUserRolesByUserNameNoSoD(userName)) {
+			if (ra.getRoleName().equals(currentRoleAccount2.getRoleName()) &&
+					ra.getSystem().equals(currentRoleAccount2.getSystem()) )
+				return true;
+		}
+		return false;
+	}
+
 	public void setProperties(Event ev) throws InternalErrorException, NamingException, CreateException {
 		Window w = getWindowAdd();
 		DomainValueField input = (DomainValueField) w.getFellow("domainValues");
@@ -170,6 +205,20 @@ public class UserRolesHandler extends Div implements AfterCompose {
 		input2.setValue(domains);
 		guessAccountName();
 		guessHolderGroups();
+
+		CustomField3 sodRisk = (CustomField3) w.getFellow("sodRisk");
+		sodRisk.setVisible(currentRoleAccount.getSodRisk() != null);
+		CustomField3 sodRules = (CustomField3) w.getFellow("sodRules");
+		sodRules.setVisible(currentRoleAccount.getSodRisk() != null);
+		StringBuffer sb = new StringBuffer();
+		for (SoDRule rule: currentRoleAccount.getSodRules()) {
+			if (rule.getRisk() != null)
+				sb.append("<img class='small-icon' src='"+getDesktop().getExecution().getContextPath()+"/img/risk."+rule.getRisk().getValue()+".svg'> </img>");
+			sb.append(rule.getName());
+			sb.append("<BR>");
+		}
+		sodRules.setValue(sb.toString());
+
 	}
 
 

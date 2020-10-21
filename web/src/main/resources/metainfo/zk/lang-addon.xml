@@ -3,10 +3,11 @@
 <language-addon>
 	<addon-name>common-web</addon-name>
 	<depends>ZKIB-LAF</depends>
-	 <version>
+	<depends>ZKDB</depends>
+	<version>
 	  	<version-class>com.soffid.iam.web.zk.Version</version-class>
 	  	<version-uid>1.0</version-uid>
-	  </version>
+	</version>
 
 	<language-name>xul/html</language-name>
 	
@@ -194,5 +195,18 @@
 			<mold-uri>~./zul/html/window-2.dsp</mold-uri>
 		</mold>
 	</component>
+		
+	<component>
+		<component-name>databutton</component-name>
+		<component-class>com.soffid.iam.web.component.DatasourceButton3</component-class>
+	</component>
+
+	<component>
+		<component-name>button</component-name>
+		<extends>button</extends>
+		<component-class>com.soffid.iam.web.component.DatasourceButton3</component-class>
+	</component>
+
+	
 </language-addon>
 

@@ -26,6 +26,7 @@ import com.soffid.iam.api.Configuration;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.laf.StandardColors;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -50,14 +51,14 @@ public class ColorHandler extends FrameHandler {
 	public void setColors () throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		String green = ConfigurationCache.getProperty("soffid.ui.color1");
-		if (green == null) green = "#9ec73c";
+		if (green == null) green = StandardColors.originalGreen;
 
 		String blue = ConfigurationCache.getProperty("soffid.ui.color2");
-		if (blue == null) blue = "#637792";
+		if (blue == null) blue = StandardColors.originalBlue;
 
 		
 		String sky = ConfigurationCache.getProperty("soffid.ui.color3");
-		if (sky == null) sky = "#22B9D8";
+		if (sky == null) sky = StandardColors.originalSky;
 
 
 		String greenText = ConfigurationCache.getProperty("soffid.ui.text1");
@@ -142,11 +143,11 @@ public class ColorHandler extends FrameHandler {
 
 	public void reset (Event event) throws IOException
 	{
-		reset (event.getTarget(), "color1tb", "color1Selector", "#9ec73c");
+		reset (event.getTarget(), "color1tb", "color1Selector",  StandardColors.originalGreen);
 		reset (event.getTarget(), "color1Texttb", "color1TextSelector", "#000000");
-		reset (event.getTarget(), "color2tb", "color2Selector", "#637792");
+		reset (event.getTarget(), "color2tb", "color2Selector", StandardColors.originalBlue);
 		reset (event.getTarget(), "color2Texttb", "color2TextSelector", "#ffffff");
-		reset (event.getTarget(), "color3tb", "color3Selector", "#22B9D8");
+		reset (event.getTarget(), "color3tb", "color3Selector", StandardColors.originalSky);
 		reset (event.getTarget(), "color3Texttb", "color3TextSelector", "#ffffff");
 		image = null;
 		Image img = (Image) event.getTarget().getFellow("logoImage");

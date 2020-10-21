@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.user.UserSessionHandler" id="handler">
+	<div class="navigation-bar dummy">
+		<label bind="${arg.listbox}:/@userName"></label> - <label bind="${arg.listbox}:/@fullName"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+	<timer onTimer="ref:handler.refresh" running="true" delay="5000" repeats="true" />
+	<datatable id="listbox" autocommit="true" 
+			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+			preference="session"
+			dataPath="${arg.listbox}:/session" 
+			maxheight="70vh" 
+			enablefilter="true" >
+		<attribute name="allColumns">
+<![CDATA[
+- name: ${c:l('registreAcces.zul.Usuari-2')}
+  value: userName
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(userName)}" target="_blank" class="shylink">#{userName }</a>
+- name: ${c:l('usuaris.zul.Maquinaservidora')}
+  value: serverHostName
+  default: true
+- name: ${c:l('usuaris.zul.Maquinaclient')}
+  value: clientHostName
+  default: true
+- name: ${c:l('usuaris.zul.Port')}
+  value: port
+- name: ${c:l('usuaris.zul.DataInici')}
+  value: stardDate
+  template: #{startDate_datetime}
+  default: true
+- name: ${c:l('registreAcces.zul.Tipus') }
+  value: type
+  template: #{type.value == 'P' ? 'PAM': type.value == 'W' ? 'WebSSO': 'ESSO' }
+  default: true
+- name: ${c:l('pamSession.serviceUrl') }
+  value: sessionUrl
+- name: ${c:l('pamSession.accountName') }
+  value: accountName
+		]]>
+		</attribute>
+	</datatable>
+</div>

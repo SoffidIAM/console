@@ -31,6 +31,7 @@ import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SecurityFunctionMapper;
+import com.soffid.iam.web.interp.RefInterpreter;
 import com.soffid.iam.web.zk.ConfigureUserSettings;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -84,7 +85,7 @@ public class WorkflowInterceptor implements Filter {
 //			Interpreters.add(
 //					"java", "es.caib.seycon.ng.web.component.BSHInterpreter"); //$NON-NLS-1$ //$NON-NLS-2$
 			FunctionMapperChain.addFunctionMapper(new SecurityFunctionMapper());
-			Interpreters.add("java", "bsh-is-disabled");
+//			Interpreters.add("java", RefInterpreter.class.getCanonicalName());
 			configured = true;
 		}
 		if (request instanceof HttpServletRequest) 

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zul.Html;
 
@@ -17,6 +18,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 
 
 public class LoginPage extends Html {
+	private String error;
+
 	public LoginPage() throws IOException, InternalErrorException {
 		Execution execution = Executions.getCurrent();
 		javax.servlet.http.HttpServletRequest req = (HttpServletRequest) execution.getNativeRequest();
@@ -52,7 +55,7 @@ public class LoginPage extends Html {
 		}
 		
 		String failed = req.getParameter("failed");
-		String error = "";
+		error = "";
 	    if (failed != null && ! failed.isEmpty())
 	    {
 	      error = "Login failed";
@@ -68,4 +71,11 @@ public class LoginPage extends Html {
 		}		    
 
 	}
+
+	@Override
+	public void onPageAttached(Page newpage, Page oldpage) {
+		super.onPageAttached(newpage, oldpage);
+		setVariable("error", error, false);
+	}
+	
 }

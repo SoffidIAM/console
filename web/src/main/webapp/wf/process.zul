@@ -40,7 +40,7 @@
 					<attribute name="finders">
 					<![CDATA[
 - path: process
-  icon: /img/engine-green.svg
+  icon: /img/agent-green.svg
   value: id
   leaf: false
   columns:

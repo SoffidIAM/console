@@ -1,70 +1,26 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="0 0 32 32"
-   version="1.1"
-   id="svg5"
-   sodipodi:docname="export.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
-  <metadata
-     id="metadata9">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1920"
-     inkscape:window-height="1043"
-     id="namedview7"
-     showgrid="false"
-     inkscape:zoom="14.75"
-     inkscape:cx="2.0338983"
-     inkscape:cy="16"
-     inkscape:window-x="0"
-     inkscape:window-y="1080"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg5"
-     inkscape:pagecheckerboard="true" />
-  <defs
-     id="defs3051">
-    <style
-       type="text/css"
-       id="current-color-scheme">
-      .ColorScheme-Text {
-        color:#4d4d4d;
-      }
-      </style>
-  </defs>
-  <path
-     style="fill:none;stroke:#ffffff;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 17.555406,28.067797 8.512384,-0.0678 V 4 H 6.0677895 l -0.0717,19.025424 10.0717005,-0.02542 -5,-5 5,5 -5,5"
-     id="path1438-6"
-     inkscape:connector-curvature="0"
-     sodipodi:nodetypes="ccccccccc" />
-  <path
-     style="fill:none;stroke:#22b9d8;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 17.555406,28.067797 26.06779,28 V 4 H 6.0677895 L 5.9960895,23.025424 16.06779,23 l -5,-5 5,5 -5,5"
-     id="path1438"
-     inkscape:connector-curvature="0"
-     sodipodi:nodetypes="ccccccccc" />
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#17B5C8;}
+	.st1{fill:#11828F;}
+	.st2{fill:none;}
+	.st3{fill:#A6D100;}
+	.st4{fill:#89AB00;}
+	.st5{fill:#5F7993;}
+	.st6{fill:#405162;}
+	.st7{fill:#FFFFFF;}
+	.st8{fill:#3A5368;}
+</style>
+<path class="st0" d="M17.5,10.9V16c0,0.8-0.7,1.5-1.5,1.5c-0.8,0-1.5-0.7-1.5-1.5v-5.1L0,16.2l16,7.6l16-7.6L17.5,10.9z"/>
+<polygon class="st3" points="32,16.2 32,22.1 16,29.8 16,23.8 "/>
+<g>
+	<path class="st5" d="M15.1,7.1h1.8V16c0,0.5-0.4,0.9-0.9,0.9h0c-0.5,0-0.9-0.4-0.9-0.9V7.1z"/>
+	<path class="st5" d="M15.8,2.4l-2.5,4.3c-0.1,0.2,0,0.4,0.2,0.4h5c0.2,0,0.4-0.2,0.2-0.4l-2.5-4.3C16.1,2.2,15.9,2.2,15.8,2.4z"/>
+	<path class="st6" d="M16.9,7.5V7.1h-1.8v0.4v2.3C15.1,9.8,15.5,7.5,16.9,7.5z"/>
+</g>
+<polygon class="st5" points="0,16.2 0,22.1 16,29.8 16,23.8 "/>
+<path class="st6" d="M2.6,17.4c0,0-2.6,2.2,0,5.9L0,22.1v-5.9L2.6,17.4z"/>
+<path class="st4" d="M29.4,17.4c0,0,2.6,2.2,0,5.9l2.6-1.2v-5.9L29.4,17.4z"/>
 </svg>

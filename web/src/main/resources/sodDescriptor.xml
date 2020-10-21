@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="rule" type="rule">
+			<ejb-finder jndi="java:/module/SoDRuleService-v2"
+				method="findSodRuleByJsonQueryAsync"
+				if = "${query != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.SoDRule">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="rule">
+		<ejb-handler jndi="java:/module/SoDRuleService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="remove">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<finder name="role" type="role">
+			<ejb-finder jndi="java:/module/SoDRuleService-v2"
+				method="findRolesByRule"> <!--agent:query, application:update-->
+				<parameter value="${instance.id}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.SoDRole">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	
+	<datanode name="role">
+		<ejb-handler jndi="java:/module/SoDRuleService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="remove">
+				<parameter value="${instance}"/>
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

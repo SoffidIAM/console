@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zhtml.Img;
 import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -42,12 +44,14 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 	private List<MenuOption> currentOptions;
 	private Div navigator;
 	private Div optionsDiv;
+	boolean small;
 	
 	@Override
 	public void afterCompose() {
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 		String option = (String) req.getParameter("option");
 		Application.setTitle(Labels.getLabel("menu.title"));
+		small = false;
 		try {
 			options = new MenuParser().getMenus(menu);
 			currentOptions = options;
@@ -56,6 +60,24 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		while (currentOptions == null && ! stack.isEmpty()) {
+			MenuOption prev = stack.removeLast();
+			if ( ! stack.isEmpty())
+				currentOptions = stack.getLast().getOptions();
+			if (prev.getExecHandler() != null) {
+				try {
+					prev.getExecHandler().launch(prev);
+				} catch (Exception e) {
+					throw new UiException(e);
+				}
+			}
+			else if (prev.getUrl() != null) {
+				Application.setPage(prev.getUrl());
+				return;
+			}
+		}
+		if (currentOptions == null)
+			currentOptions = options;
 		navigator = (Div) getFirstChild();
 		optionsDiv = (Div) getLastChild();
 		loadMenus();
@@ -80,21 +102,19 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 	private boolean searchOption(List<MenuOption> options, String optionName) {
 		for (MenuOption option: options)
 		{
-			if (option.getOptions() != null && ! option.getOptions().isEmpty())
+			if (option.getLabel() != null && option.getLabel().equals(optionName))
 			{
-				if (option.getLabel().equals(optionName))
-				{
-					stack.add(option);
-					currentOptions = option.getOptions();
+				stack.add(option);
+				currentOptions = option.getOptions();
+				small = option.isSmall();
+				return true;
+			}
+			else if (option.getOptions() != null && ! option.getOptions().isEmpty())
+			{
+				stack.add(option);
+				if ( searchOption(option.getOptions(), optionName))
 					return true;
-				}
-				else
-				{
-					stack.add(option);
-					if ( searchOption(option.getOptions(), optionName))
-						return true;
-					stack.removeLast();
-				}
+				stack.removeLast();
 			}
 		}
 		return false;
@@ -111,83 +131,58 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			addNavigatorItem (menuOption, optionName, it.hasNext());
 			if ( ! it.hasNext() ) break;
 			menuOption = it.next();
-			optionName = Labels.getLabel( menuOption.getLabel() );
+			optionName = menuOption.getLiteral() != null ? menuOption.getLiteral(): Labels.getLabel( menuOption.getLabel() );
 		} while (true);
+		
+		if (small) optionsDiv.setSclass("options options-small");
+		else optionsDiv.setSclass("options");
 		
 		optionsDiv.getChildren().clear();
 		for ( MenuOption option: currentOptions) {
-			if (isAllowed (option))
+			String tip = null;
+			
+			Div d = new Div();
+			d.setSclass("menuoption");
+			d.addEventHandler("onClick", new EventHandler(ZScript.parseContent("ref:"+getId()+".openMenu"), null));
+			d.setAttribute("menuOption", option);
+			optionsDiv.appendChild(d);
+			if (option.getImg() != null)
 			{
-				String tip = null;
-				
-				Div d = new Div();
-				d.setSclass("menuoption");
-				d.addEventHandler("onClick", new EventHandler(ZScript.parseContent("ref:"+getId()+".openMenu"), null));
-				d.setAttribute("menuOption", option);
-				optionsDiv.appendChild(d);
-				if (option.getImg() != null)
+				Img img = new Img();
+				if (option.getImg().startsWith("data:"))
+					img.setDynamicProperty("src", option.getImg());
+				else
+					img.setDynamicProperty("src", getDesktop().getExecution().getContextPath() + option.getImg());
+				d.appendChild(img);
+			}
+			if (option.getLiteral() != null) {
+				Label l = new Label( option.getLiteral());
+				l.setSclass("menuoption-title");
+				d.appendChild(l);
+			} else if (option.getLabel() != null) {
+				Label l = new Label( Labels.getLabel(option.getLabel()));
+				l.setSclass("menuoption-title");
+				d.appendChild(l);
+			}
+			if (option.getHandler() != null) {
+				tip = option.getHandler().getTip(option);
+			}
+			if (option.getOptions() != null && !option.getOptions().isEmpty()) {
+				Div d2 = new Div ();
+				d2.setSclass("menuoption-suboptions");
+				d.appendChild(d2);
+				boolean first = true;
+				for (MenuOption suboption: option.getOptions())
 				{
-					Image img = new Image(option.getImg());
-					d.appendChild(img);
-				}
-				if (option.getLabel() != null) {
-					Label l = new Label( Labels.getLabel(option.getLabel()));
-					l.setSclass("menuoption-title");
-					d.appendChild(l);
-				}
-				if (option.getLiteral() != null) {
-					Label l = new Label( option.getLiteral());
-					l.setSclass("menuoption-title");
-					d.appendChild(l);
-				}
-				if (option.getHandler() != null) {
-					List<MenuOption> options2 = option.getHandler().getOptions();
-					if (options2 != null && options2.isEmpty()) {
-						continue; // Skip empty menu
-					} else {
-						option.setOptions(options2);
-					}
-					tip = option.getHandler().getTip();
-				}
-				if (!option.getOptions().isEmpty()) {
-					Div d2 = new Div ();
-					d2.setSclass("menuoption-suboptions");
-					d.appendChild(d2);
-					boolean first = true;
-					for (MenuOption suboption: option.getOptions())
-					{
-						if ( isAllowed(suboption))
-						{
-							if (!first)
-								d2.appendChild(new Label(", "));
-							first = false;
-							Label l = new Label( suboption.getLiteral() != null ? suboption.getLiteral(): Labels.getLabel( suboption.getLabel()));
-							l.setSclass("menusuboption-title");
-							d2.appendChild(l);
-						}
-					}
+					if (!first)
+						d2.appendChild(new Label(", "));
+					first = false;
+					Label l = new Label( suboption.getLiteral() != null ? suboption.getLiteral(): Labels.getLabel( suboption.getLabel()));
+					l.setSclass("menusuboption-title");
+					d2.appendChild(l);
 				}
 			}
 		}
-	}
-
-
-	private boolean isAllowed(MenuOption option) {
-		if (option.getPermissions() == null)
-			option.setPermissions( new String[0] );
-		if (option.getOptions() == null)
-			option.setOptions(new LinkedList<MenuOption>());
-		if ( option.getOptions().isEmpty() && option.getPermissions().length == 0)
-		{
-			return true;
-		}
-		for (String p: option.getPermissions())
-			if (Security.isUserInRole(p))
-				return true;
-		for (MenuOption child: option.getOptions())
-			if (isAllowed(child))
-				return true;
-		return false;
 	}
 
 
@@ -203,13 +198,19 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			stack.removeLast();
 			while ( ! stack.isEmpty()) {
 				MenuOption o = stack.getLast();
-				if ( s != null &&   s.getLabel().equals(o.getLabel()) ) break;
+				if ( s != null &&  
+						(s.getLiteral() == null || s.getLiteral().equals(o.getLiteral())) &&
+						(s.getLabel() == null || s.getLabel().equals(o.getLabel())) ) break;
 				stack.removeLast();
 			} 
-			if (stack.isEmpty())
+			if (stack.isEmpty()) {
 				currentOptions = options;
-			else 
+				small = false;
+			}
+			else  {
+				small = stack.getLast().isSmall();
 				currentOptions = stack.getLast().getOptions();
+			}
 			
 			loadMenus();
 			focusSearchbox();
@@ -239,13 +240,18 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 	}
 
 	
-	public void openMenu(Event event) {
+	public void openMenu(Event event) throws Exception {
 		MenuOption option = (MenuOption) event.getTarget().getAttribute("menuOption");
-		if (option.getOptions() == null || option.getOptions().isEmpty())
+		if ( option.getHandler() != null)
+			option.setOptions(option.getHandler().getOptions(option));
+		if ((option.getOptions() == null || option.getOptions().isEmpty()) && option.getUrl() != null )
 		{
 			Application.setPage(option.getUrl());
+		} else if ((option.getOptions() == null || option.getOptions().isEmpty()) && option.getExecHandler() != null) {
+			option.getExecHandler().launch(option);
 		} else {
 			stack.add(option);
+			small = option.isSmall();
 			currentOptions = option.getOptions();
 			loadMenus();
 			focusSearchbox();

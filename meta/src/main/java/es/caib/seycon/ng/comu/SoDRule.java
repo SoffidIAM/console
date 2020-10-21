@@ -7,7 +7,10 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.SoDRuleEntity;
+
 @ValueObject (translatedName="SoDRule", translatedPackage="com.soffid.iam.api")
+@JsonObject(hibernateClass = SoDRuleEntity.class)
 public class SoDRule {
 
 	@Nullable
@@ -20,6 +23,7 @@ public class SoDRule {
 
 	public es.caib.seycon.ng.comu.SoDRisk risk;
 
-	public java.lang.Long applicationId;
+	@JsonAttribute(hibernateAttribute = "application.name")
+	public java.lang.String application;
 
 }

@@ -29,7 +29,7 @@
 					<parameter value="${parent.parent.instance.userName}"/>
 					<parameter value="${parent.instance.name}"/>
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.UserAccount">
+			<new-instance-bean className="com.soffid.iam.api.UserAccount">
 			</new-instance-bean>
 		</finder>
 	</datanode>
@@ -50,7 +50,7 @@
 				method="findAllPasswordDomain">
 			</ejb-finder>
 		</finder>
-		<finder name="sessio" type="sessio"> <!-- user:session:query -->
+		<finder name="session" type="sessio"> <!-- user:session:query -->
 			<ejb-finder jndi="java:/module/UserService-v2"
 				method="findSessionByUserName" if="${canQueryUserSession}">
 				<parameter value="${instance.userName}" />
@@ -92,8 +92,6 @@
 				method="findBpmUserProcessInstanceByUserName">
 				<parameter value="${instance.userName}"/>
 			</ejb-finder>
-			<new-instance-bean className="com.soffid.iam.bpm.api.ProcessInstance">
-			</new-instance-bean>
 		</finder>
 		<finder name="sharedAccount" type ="account" refreshAfterCommit="true">
 			<ejb-finder jndi="java:/module/AccountService-v2"
@@ -173,8 +171,9 @@
 
 	<datanode name="sessio" />
 	
-	<datanode name="processosUsuari">
-		<finder name="processDefinition" type="processDefinition">
+	<datanode name="processosUsuari" transient="true">
+<!-- 
+ 		<finder name="processDefinition" type="processDefinition">
 			<ejb-finder jndi="java:/module/BPMEngine-v2"
 				method="getProcessDefinition">
 				<parameter value="${instance}"/>
@@ -182,6 +181,7 @@
 			<new-instance-bean className="es.caib.bpm.vo.ProcessDefinition">
 			</new-instance-bean>
 		</finder>
+ -->
 	</datanode>
 	
 	<datanode name="processDefinition"/>

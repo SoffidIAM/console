@@ -748,9 +748,10 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         LinkedList<Server> list = new LinkedList<Server>();
 
     	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
+    	HashSet<String> names = new HashSet<>();
     	for (TenantServerEntity s: tenant.getServers())
     	{
-    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER) {
+    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER && !names.contains(s.getTenantServer().getUrl())) {
     			
     			Server server = getServerEntityDao().toServer(s.getTenantServer());
     			server.setPk(null);
@@ -758,6 +759,8 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     			server.setUseMasterDatabase(false);
     			server.setAuth(null);
 				list.add( server);
+				
+				names.add(s.getTenantServer().getUrl());
     		}
     	}
     	return list;

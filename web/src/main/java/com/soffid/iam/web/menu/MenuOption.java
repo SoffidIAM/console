@@ -2,14 +2,28 @@ package com.soffid.iam.web.menu;
 
 import java.util.List;
 
-public class MenuOption {
+import org.zkoss.image.Image;
+
+import com.soffid.iam.api.AccessTree;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.web.launcher.LauncherMenuHandler;
+
+public class MenuOption implements Cloneable {
 	String literal;
 	String label;
 	String url;
 	String img;
 	String[] permissions;
+	String menuType;
+	String menuId;
+	AccessTree accessTree;
+	Image image;
+	boolean small = false;
+	
 	List<MenuOption> options;
 	DynamicMenuHandler handler;
+	private DynamicLauncher execHandler;
+	private Account account;
 	
 	public String getLabel() {
 		return label;
@@ -56,5 +70,81 @@ public class MenuOption {
 	
 	public void setLiteral(String literal) {
 		this.literal = literal;
+	}
+	
+	public String getMenuType() {
+		return menuType;
+	}
+	
+	public void setMenuType(String menuType) {
+		this.menuType = menuType;
+	}
+	
+	public String getMenuId() {
+		return menuId;
+	}
+	
+	public void setMenuId(String menuId) {
+		this.menuId = menuId;
+	}
+	public void setExecHandler(DynamicLauncher launcherMenuHandler) {
+		this.execHandler = launcherMenuHandler;
+		
+	}
+	
+	public DynamicLauncher getExecHandler() {
+		return execHandler;
+	}
+	
+	public AccessTree getAccessTree() {
+		return accessTree;
+	}
+	
+	public void setAccessTree(AccessTree accessTree) {
+		this.accessTree = accessTree;
+	}
+	
+	public boolean isSmall() {
+		return small;
+	}
+	
+	public void setSmall(boolean small) {
+		this.small = small;
+	}
+	public void setAccount(Account account) {
+		this.account = account;
+		
+	}
+	
+	public Account getAccount() {
+		return account;
+	}
+	@Override
+	public Object clone()  {
+		MenuOption mo;
+		mo = new MenuOption();
+		mo.accessTree = accessTree;
+		mo.account = account;
+		mo.execHandler = execHandler;
+		mo.handler = handler;
+		mo.img = img;
+		mo.image = image;
+		mo.label = label;
+		mo.literal = literal;
+		mo.menuId = menuId;
+		mo.menuType = menuType;
+		mo.options = options;
+		mo.permissions = permissions;
+		mo.small = small;
+		mo.url = url;
+		return mo;
+	}
+	
+	public Image getImage() {
+		return image;
+	}
+	
+	public void setImage(Image image) {
+		this.image = image;
 	}
 }

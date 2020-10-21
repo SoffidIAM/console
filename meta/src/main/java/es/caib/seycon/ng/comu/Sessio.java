@@ -56,5 +56,18 @@ public class Sessio {
 	@Nullable
 	public String authenticationMethod;
 	
+	@Nullable
+	public TipusSessio type;
 
+	@Description("Monitoring URL")
+	@Nullable
+	public String monitorUrl;
+
+	@Nullable
+	@Description("Session URL for PAM sessions")
+	public String sessionUrl;
+
+	@Nullable
+	@Description("Account name for PAM sessions")
+	public String accountName;
 }

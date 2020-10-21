@@ -1,4 +1,9 @@
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/rest/ConfigureRequest.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/rest/ConfigureRest.java
 /home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/Configuration.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/rest/ConfigureResponse.java
 /home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/LogoutServlet.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/ejb/ApplicationBean.java
 /home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/LoginFilter.java
+/home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/NotFoundServlet.java
 /home/gbuades/soffid/console/web-root/src/main/java/com/soffid/iam/init/web/Messages.java

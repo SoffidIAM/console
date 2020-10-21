@@ -14,7 +14,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		<div sclass="col_der help"  onClick="ref:appWindow.help">
 			<image src="/img/question-black.svg"/>
 		</div>
-		
+		 
 		<image src="anonymous/small-logo.png" sclass="logo col_der"/>
 		
 		<div sclass="col_izq">

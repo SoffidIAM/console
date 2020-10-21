@@ -24,7 +24,7 @@ public class LoginFilter implements Filter {
 		
 		if ( ! req.getRequestURI().startsWith("/logout") && 
 				! req.getRequestURI().startsWith("/soffid")) {
-			Configuration cfg = new Configuration();
+			Configuration cfg = Configuration.getConfiguration();
 			if (cfg.isConfigured())
 				resp.sendRedirect("/soffid");
 			else

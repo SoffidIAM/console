@@ -84,7 +84,7 @@ public class DeployerBean implements DeployerService {
 	boolean failSafe;
 	private File selfServiceWarFile;
 
-	@Resource(name="soffidDataSource")
+	@Resource(name="jdbc/soffid")
 	DataSource ds ;
 	
 	Deployer deployer = new DeployerEjb();
@@ -246,11 +246,6 @@ public class DeployerBean implements DeployerService {
 						if (type.equals("W")) //$NON-NLS-1$
 						{
 							extractWarAddon(removeFileExtension(mainWarFile), name,
-									rset.getBinaryStream(5));
-						}
-						if (type.equals("E")) //$NON-NLS-1$
-						{
-							extractWarAddon(removeFileExtension (selfServiceWarFile), name,
 									rset.getBinaryStream(5));
 						}
 						if (type.equals("C") || type.equals("V")) //$NON-NLS-1$ //$NON-NLS-2$
@@ -817,8 +812,7 @@ public class DeployerBean implements DeployerService {
 					if (result == null)
 					{
 						// First time
-						System.setProperty("soffid.fail-safe", "true");
-						log.info("Deploying on fail-safe mode");
+						log.info("First time deploy");
 						recursivelyDelete(tmpDir());
 						getTimestampFile().delete();
 						uncompressEar();
@@ -836,6 +830,9 @@ public class DeployerBean implements DeployerService {
 						}
 					} else
 						generateEar(qh);
+				} catch (SQLException e) { // Tables do not exist yet
+					log.info("Deploying simple "+deployDir().getPath());
+					failSafeDeploy();
 				} finally {
 					conn.close();
 				}
@@ -852,24 +849,7 @@ public class DeployerBean implements DeployerService {
 						e);
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
-				recursivelyDelete(tmpDir());
-				getTimestampFile().delete();
-				uncompressEar();
-				updateApplicationXml();
-				log.info("Deploying "+deployDir().getPath());
-				exceptionToThrow = null;
-				java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
-					public Object run() {
-						try {
-							appInfo = deployer.deploy(deployDir().getPath());
-						} catch (Throwable th) {
-							exceptionToThrow = th;
-						}
-						return null;
-					}
-				});
-				if (exceptionToThrow != null)
-					throw exceptionToThrow;
+				failSafeDeploy();
 			} finally {
 				Thread.sleep(1000);
 			}
@@ -884,6 +864,28 @@ public class DeployerBean implements DeployerService {
 		} finally {
 			ongoing = false;
 		}
+	}
+
+	public void failSafeDeploy() throws Exception, SAXException, IOException, ParserConfigurationException,
+			XPathExpressionException, TransformerException, Throwable {
+		recursivelyDelete(tmpDir());
+		getTimestampFile().delete();
+		uncompressEar();
+		updateApplicationXml();
+		log.info("Deploying "+deployDir().getPath());
+		exceptionToThrow = null;
+		java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					appInfo = deployer.deploy(deployDir().getPath());
+				} catch (Throwable th) {
+					exceptionToThrow = th;
+				}
+				return null;
+			}
+		});
+		if (exceptionToThrow != null)
+			throw exceptionToThrow;
 	}
 
 

@@ -65,7 +65,7 @@ public class NavigationBar extends Div implements AfterCompose {
 		for ( MenuOption option: options)
 		{
 			if ( dynamic && option.getOptions() == null && option.getHandler() != null) {
-				option.setOptions( option.getHandler().getOptions());
+				option.setOptions( option.getHandler().getOptions(option));
 			}
 			if (sameUrl(path, option.getUrl()) || fillMenu(option.getOptions(), path, dynamic)) 
 			{

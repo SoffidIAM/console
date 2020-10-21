@@ -44,7 +44,7 @@ public class WorkflowImage extends HttpServlet {
 						resp.setContentType("image/png");
 					else 
 						resp.setContentType("image/gif");
-					resp.setIntHeader("Content-Lenght", img.length);
+					resp.setIntHeader("Content-Length", img.length);
 					ServletOutputStream out = resp.getOutputStream();
 					out.write(img);
 					out.close();

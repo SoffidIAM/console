@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
+	id="frame" title="${c:l('main.lblAdminJobs')}" use="com.soffid.iam.web.bpm.ActiveJobHandler" 
+	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	
+	<datamodel id="model" rootNode="root" src="jobDescriptor.xml"/>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/refresh.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('schedule:show')}" onClick="ref:frame.refresh"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.bpm.JobDatatable"
+				dataPath="/model:/job"
+				preference="job"
+				maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="true">
+				<attribute name="allColumns"><![CDATA[
+- name: ${c:l('job.lblId')}
+  value: id
+  default: true
+- name: ${c:l('job.lbldefinicionTarea')}
+  value: name
+  default: true
+- name: ${c:l('inbox.lblFecha')}
+  value: ip
+  template: #{dueDate_datetime}
+  default: true
+- name: ${c:l('process.lblEstado')}
+  template: #{paused ? "${c:l('job.status.pause') }" : error ? "${c:l('job.status.error') }" : failures > 0 && errorMessage != null ? "${c:l('job.status.warning') }": "${c:l('job.status.pending') }" }
+  default: true
+- name: ${c:l('process.lblErrorMessage') }
+  value: errorMessage
+]]></attribute>
+			</datatable>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+			</div>
+			<form2 dataPath="/listbox:/" width="100%" onChangeXPath="ref:frame.onChangeForm" id="form">
+				<customfield3 label="${c:l('process.lblIdentificador')}" readonly="true" bind="@id" dataType="STRING" maxlength="12"/>
+				<customfield3 label="${c:l('job.name')}" readonly="true" bind="@name" dataType="STRING"/>
+				<customfield3 label="${c:l('process.lblProceso')}" readonly="true" dataType="HTML" id="procLabel"/>
+				<customfield3 label="${c:l('job.dueDate')}" readonly="true" bind="@dueDate" dataType="DATE_TIME"/>
+				<customfield3 label="${c:l('job.failures')}" readonly="true" bind="failures" dataType="NUMBER"/>
+				<customfield3 label="${c:l('job.status')}" readonly="true" dataType="STRING" id="status"/>
+				<customfield3 label="${c:l('job.error')}" readonly="true" dataType="STRING" id="errorLog" multiline="true"/>
+				<div style="text-align: right; width: 100%">
+				    <button id="closebutton" label="${c:l('job.button.close')}" onClick="ref:frame.hideDetails"/>
+				    <button id="pausebutton" label="${c:l('job.button.pause')}" onClick="ref:frame.pause"/>
+				    <button id="resumebutton" label="${c:l('job.button.resume')}" onClick="ref:frame.resume"/>
+				    <button id="retrybutton" label="${c:l('job.button.retry')}" onClick="ref:frame.retry"/>
+				</div>
+			</form2>
+		</div>
+	</div>
+	
+</frame>

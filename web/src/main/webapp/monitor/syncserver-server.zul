@@ -2,7 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 
-<div style="width: 100%">
+<window style="width: 100%">
 	<custom-attributes serverId="${arg.id }" serverUrl="${arg.url }"/>
 	<div style="width: 100%">
 		<label value="${arg.url }" sclass="separator"/>
@@ -10,7 +10,7 @@
 	<div style="width:100%">
          <iframe src="/graph/graph.html?data=syncserver_status/${arg.id }"> </iframe>
 		
-		<div sclass="options options-small" style="display: inline-block; width: calc(100% - 210px); text-align: left">
+		<div sclass="options options-tiny" style="display: inline-block; width: calc(100% - 210px); text-align: left">
 			<div sclass="menuoption" onClick="ref:frame.viewAgents">
 				<image src="/img/engine.svg"/>
 				<label sclass='menuoption-title' value="${c:l('seyconserver.zul.VeureAgents')}" />
@@ -37,4 +37,4 @@
 			</div> 
 		</div>
 	</div>
-</div>
+</window>

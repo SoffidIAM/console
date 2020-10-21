@@ -987,12 +987,11 @@ tr.seld td.UNKNOWN {
 
 /* FI TASQUES PENDENTS SEYCON */
 
-
 /* Element per a mostrar informació heading */ 
 .titolpagina {
 	padding: 1px 0 5px 0;
 }
-
+ 
 .titolpagina span {
 	font-size: 14pt;
 	font-weight: bold;
@@ -1005,6 +1004,12 @@ tr.seld td.UNKNOWN {
 	width:340px;
 }
 
+.loginbox2 {
+	padding: 20px 0 0 0;
+	font-weight: bold;
+	width:540px;
+}
+
 .inputlogin{
 	padding: 0 0 0 10px;
 	text-align: {TEXT_ALIGN_RIGHT};
@@ -1013,7 +1018,7 @@ tr.seld td.UNKNOWN {
 	margin-bottom: 10px;
 }
 
-.login{
+.login {
 	padding: 100px 0 0 10px;
 	width:340px;
 	text-align: center;
@@ -1021,10 +1026,20 @@ tr.seld td.UNKNOWN {
 	margin: 0 auto;
 	font-weight:bold; 
 }
+ 
+.login2 {
+	padding: 100px 0 0 10px;
+	width:540px;
+	text-align: center;
+	vertical-align: middle;
+	margin: 0 auto;
+	font-weight:bold; 
+}
+
 
 .atencio { 
 	color: #a6ff00;
-	width:340px;
+	width: 100%;
 	font-weight:bold; 
 	text-align:center;
 	margin-top: 10px; 
@@ -1363,10 +1378,17 @@ div.databox img.remove-icon:hover {
 
 div.databox div.datahtml {
 	background: transparent;
-	width: 100%
+	width: 100%;
+	margin-top: 6px;
 } 
 div.databox div.container, div.databox div.container span {
-	white-space: pre;
+	white-space: pre; 
+}
+
+div.databox div.container img.dataimage {
+	max-width: 96px;
+	max-hight: 96px;
+	object-fit: contain;
 }
 
 div.databox div.container input.name {
@@ -1374,6 +1396,9 @@ div.databox div.container input.name {
 	min-width: 250px;
 }
 
+div.databox.fixedtext div.container div.text {
+	font-family: monospace;
+}
 .button-container {
 	margin-top: 7px;
 }
@@ -2073,6 +2098,11 @@ div.datatable table.tbody tr td.selector {
 	text-align: center;
 }
 
+div.datatable table.tbody tr td.statusColumn {
+	width: 100px;
+	text-align: center;
+}
+
 div.datatable table.tbody tr.dashed td,
 div.databox.dashed select {
 	text-decoration: line-through;
@@ -2080,6 +2110,10 @@ div.databox.dashed select {
 div.datatable table.tbody tr.bold td,
 div.databox.bold select {
 	font-weight: bold;
+}
+div.datatable table.tbody tr.red td,
+div.databox.red select {
+	color: {SKY};
 }
 div.datatable table.tbody tr.approval-pending td {
 	color: #808080;
@@ -2453,6 +2487,7 @@ div.menu2 {
 	 text-align: center;
 }
 
+
 div.menu2modal {
 	display:none;
 }
@@ -2506,6 +2541,18 @@ div.menu2modal.open div.menu2dropdown tr td img{
 div.menu2modal.open div.menu2dropdown tr:hover {
 	color: {BLUETEXT};
 	background-color: {BLUE};
+}
+
+div.menu2modal.open div.menu2dropdown tr img.menu2rev {
+	 display: none;
+}
+
+div.menu2modal.open div.menu2dropdown tr:hover img.menu2rev {
+	 display: inline-block;
+}
+
+div.menu2modal.open div.menu2dropdown tr:hover img.menu2std {
+	 display: none;
 }
 
 div.menu2 div.menu2starter, button.icon-button, span.zbtnbk {
@@ -2568,6 +2615,9 @@ div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-but
 	background-size: cover;
 }
 
+button img.menu2rev { display: none}
+button:hover img.menu2rev { display: inline-block}
+button:hover img.menu2std { display: none}
 
 div.navigation-bar span.pager span {
 	color: {GREEN};
@@ -2575,7 +2625,7 @@ div.navigation-bar span.pager span {
 }
 
 div.navigation-bar span.pager span:first-child,
-div.navigation-bar span.pager span:last-child {
+div.navigation-bar span.pager span:last-child { 
 	color: {SKY};
 	margin-left: 8px;
 	margin-right: 8px;
@@ -2595,50 +2645,79 @@ div.options {
 }
 
 .options.options-small .menuoption {
-	width: 90px;
+	width: 225px;
+	padding: 20px;
+	text-align: center;
+}
+
+.options.options-tiny .menuoption {
+	width: 100px;
 	padding: 10px;
+	text-align: center;
 }
 
 .options .menuoption img {
-	padding-left: 9px;
-	padding-right: 9px;
-	padding-top: 6px;
-	padding-bottom: 6px;
-	width: 100%;
+	object-fit: contain;
+	padding-left: 47px;
+	padding-right: 47px;
+	padding-top: 22px;
+	padding-bottom: 22px;
+	width: 300px;
+	height: 200px;
 	opacity: 1;
-	border: solid 1px #c0c0c0;
+	border: solid 1px #e0e0e0;
 	border-radius: 20px;
 	margin-bottom: 18px;
     transition: padding 0.2s ease-in-out;
 }
 
 .options.options-small .menuoption img {
-	padding-left: 6px;
-	padding-right: 6px;
-	padding-top: 6px;
-	padding-bottom: 6px;
-	border-radius: 8px;
+	object-fit: contain;
+	padding-left: 39px;
+	padding-right: 39px;
+	padding-top: 27px;
+	padding-bottom: 27px;
+	border-radius: 10px; 
+	width: 200px;
+	height: 140px; 
+}
+
+.options.options-tiny .menuoption img {
+	object-fit: contain;
+	padding: 14px;
+	width: 80px;
+	height: 80px; 
+}
+
+.options.options-small .menuoption .menuoption-suboptions, 
+.options.options-tiny .menuoption .menuoption-suboptions{
+	display: none;
 }
 
 .options .menuoption:hover img {
-	width: 100%;
 	box-shadow: 12px 12px 8px {GREEN};
-	padding: 0px;
+	padding-left: 9px;
+	padding-right: 9px;
+	padding-top: 6px;
+	padding-bottom: 6px;
 	background-color: #e8e8e8;
 }
 
 .options.options-small .menuoption:hover img {
 	box-shadow: 6px 6px 4px {GREEN};
 }
-
-.options .menuoption .menuoption-title {
-	font-family: inherit;
-	font-size: 15pt;
-	font-weight: lighter;
-	word-break: break-word;
+.options.options-tiny .menuoption:hover img {
+	box-shadow: 6px 6px 4px {GREEN};
+	padding: 4px;
 }
 
-.options.options-small .menuoption .menuoption-title {
+.options .menuoption .menuoption-title {
+	word-break: break-word;
+	font-size: 15pt;
+}
+
+.options.options-small .menuoption .menuoption-title,
+.options.options-tiny .menuoption .menuoption-title {
 	font-size: 10pt;
 }
 
@@ -2923,12 +3002,12 @@ div.menu3 {
 	position: absolute;
 	z-index:10;
 	display: block;
-	border: solid 3px {BLUE};	
+	border: solid 2px {BLUE};	
 	border-radius: 3px;
 	z-index: +1;
 	background: white;
 	text-align: left;
-	box-shadow: 4px 4px #a0a0a0;
+	box-shadow: 4px 4px rgb(190, 190, 190, 0.5);
 }
 
 div.menu3 div.menu3menu {
@@ -2944,8 +3023,8 @@ div.menu3 table {
 div.menu3 tr td {
 	padding-left: 6px;
 	padding-right: 6px;
-	padding-top: 4px;
-	padding-bottom: 4px;
+	padding-top: 8px;
+	padding-bottom: 8px;
 	cursor: pointer;
 }
 
@@ -2956,8 +3035,10 @@ div.menu3 table tr td a:visited {
 }
 
 div.menu3 table tr td img{
+	object-fit: contain;
 	margin-right: 8px;
 	height: 20px;
+	width: 40px;
 	vertical-align: middle;
 }
 

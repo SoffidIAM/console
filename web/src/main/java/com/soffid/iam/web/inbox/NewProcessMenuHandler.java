@@ -24,7 +24,7 @@ public class NewProcessMenuHandler implements DynamicMenuHandler {
 	Log log = LogFactory.getLog(getClass());
 	
 	@Override
-	public List<MenuOption> getOptions() {
+	public List<MenuOption> getOptions(MenuOption option) {
 		List<MenuOption> list = new LinkedList<MenuOption>();
 		try {
 			MenuOption o = new MenuOption();
@@ -47,7 +47,7 @@ public class NewProcessMenuHandler implements DynamicMenuHandler {
 	}
 
 	@Override
-	public String getTip() {
+	public String getTip(MenuOption option) {
 		return null;
 	}
 

@@ -80,12 +80,21 @@ public abstract class SessioService {
 		java.lang.String key)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	@Operation(grantees = { roles.user_session_query.class })
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.Sessio> findActiveSessions()
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
 	@Operation(translated="getActiveSessions")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Sessio> getActiveSessions()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation(translated="getActiveSessions")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Sessio> getActiveSessions(

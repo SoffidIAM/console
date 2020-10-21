@@ -1380,7 +1380,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		String id3 = id + "c"; //$NON-NLS-1$
 
 		String removeAction = dataType.isMultiValued() && !readonly? 
-				"<imageclic src='~./img/remove.png' sclass='removeValueIcon' " //$NON-NLS-1$
+				"<imageclic src='/img/remove.svg' sclass='removeValueIcon' " //$NON-NLS-1$
 				+ "onClick='event.getTarget().getFellow(\""+getId()+"\").onRemoveValue(event)' " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "id='"+id+"_removeIcon' title='"+ //$NON-NLS-1$ //$NON-NLS-2$
 				Labels.getLabel("contenidoTarea.btnEliminar")+"' " //$NON-NLS-1$ //$NON-NLS-2$
@@ -1406,7 +1406,7 @@ public class InputField2 extends Div implements XPathSubscriber
 								+ "onOK='self.parent.parent.onChildChange2(event)' " //$NON-NLS-1$
 								+ "sclass='widetextbox textbox' " //$NON-NLS-1$
 								+ "/>" //$NON-NLS-1$
-							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "<imageclic src='/img/user.svg' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ "onClick='self.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 							+ required+removeAction+"</div>"; //$NON-NLS-1$
@@ -1419,7 +1419,7 @@ public class InputField2 extends Div implements XPathSubscriber
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
 									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
-							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"<imageclic src='/img/user.svg' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 									+ "</listcell><listcell>" //$NON-NLS-1$
@@ -1439,7 +1439,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
 							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
 							+ "readonly=\"" +readonlyExpr+ "\"/>"  //$NON-NLS-1$ //$NON-NLS-2$
-							+ "<imageclic src='/img/user.png' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "<imageclic src='/img/user.svg' visible=\""+(!readonly && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									+ "onClick='self.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
 									+ "onActualitza='self.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 							+ "<label style='text-decoration: underline; cursor:pointer' onClick='self.parent.parent.openUser(event)' id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
@@ -1453,7 +1453,7 @@ public class InputField2 extends Div implements XPathSubscriber
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
 									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
-							"<imageclic src='/img/user.png' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"<imageclic src='/img/user.svg' visible=\""+(!readonly  && Security.isUserInRole("user:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									+ "onClick='self.parent.parent.parent.parent.onSelectUser(event)' " //$NON-NLS-1$
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaUser(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 									+ "</listcell><listcell>" //$NON-NLS-1$
@@ -1479,7 +1479,7 @@ public class InputField2 extends Div implements XPathSubscriber
 								+ "onOK='self.parent.parent.onChildChange2(event)' " //$NON-NLS-1$
 								+ "sclass='textbox widetextbox' "    //$NON-NLS-1$
 								+ "/>" //$NON-NLS-1$
-							+ "<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ "<imageclic src='/img/role.svg' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ "onClick='self.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 							+ required+removeAction+"</div>"; //$NON-NLS-1$
@@ -1492,7 +1492,7 @@ public class InputField2 extends Div implements XPathSubscriber
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
 									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
-							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"<imageclic src='/img/role.svg' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 									+ "</listcell><listcell>" //$NON-NLS-1$
@@ -1512,7 +1512,7 @@ public class InputField2 extends Div implements XPathSubscriber
 									+ "onBlur='self.parent.parent.onBlur(event)' " //$NON-NLS-1$
 									+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
 									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
-							"<imageclic src='/img/key.png' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"<imageclic src='/img/role.svg' visible=\""+(!readonly && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									+ "onClick='self.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
 									+ "onActualitza='self.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 							+ "<label id=\""+id2+"\" />" //$NON-NLS-1$ //$NON-NLS-2$
@@ -1526,7 +1526,7 @@ public class InputField2 extends Div implements XPathSubscriber
 									+ "onBlur='self.parent.parent.parent.parent.onBlur(event)' " //$NON-NLS-1$
 									+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
 									+ "readonly=\"" +readonlyExpr+ "\"/>" + //$NON-NLS-1$ //$NON-NLS-2$
-							"<imageclic src='/img/key.png' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							"<imageclic src='/img/role.svg' visible=\""+(!readonly  && Security.isUserInRole("role:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 									+ "onClick='self.parent.parent.parent.parent.onSelectRole(event)' " //$NON-NLS-1$
 									+ "onActualitza='self.parent.parent.parent.parent.onActualitzaRole(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px' />" //$NON-NLS-1$
 									+ "</listcell><listcell>" //$NON-NLS-1$
@@ -1547,7 +1547,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/group.svg' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly  && Security.isUserInRole("group:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1561,7 +1561,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/grup.gif' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/group.svg' onClick='self.parent.parent.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly && Security.isUserInRole("group:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1582,7 +1582,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onOK='' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/host.svg' " //$NON-NLS-1$
 							+ "onClick='self.parent.parent.onSelectApplication(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaApplication(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
@@ -1595,7 +1595,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/host.svg' " //$NON-NLS-1$
 							+ "onClick='self.parent.parent.parent.parent.onSelectApplication(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaApplication(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
@@ -1618,7 +1618,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/host.png' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/host.svg' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly  && Security.isUserInRole("host:all:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1629,7 +1629,7 @@ public class InputField2 extends Div implements XPathSubscriber
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/host.png' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/host.svg' " //$NON-NLS-1$
 							+ "onClick='self.parent.parent.onSelectHost(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaHost(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
@@ -1687,7 +1687,7 @@ public class InputField2 extends Div implements XPathSubscriber
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='~./img/servidorCorreu.gif' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/maildomain.svg' " //$NON-NLS-1$
 							+ "onClick='self.parent.parent.onSelectMailDomain(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaMailDomain(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
@@ -1699,7 +1699,7 @@ public class InputField2 extends Div implements XPathSubscriber
 					sb.append("<textbox sclass='textbox' maxlength='"+size+"' onChange='self.parent.parent.parent.parent.onChildChange(event)' onOK='' " //$NON-NLS-1$ //$NON-NLS-2$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='~./img/servidorCorreu.gif' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/maildomain.svg' " //$NON-NLS-1$
 							+ "onClick='self.parent.parent.parent.parent.onSelectMailDomain(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaMailDomain(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
@@ -1838,7 +1838,7 @@ public class InputField2 extends Div implements XPathSubscriber
 				if (!readonly)
 				{
 						result = result + 
-							"<imageclic style='valign:top' src=\"/img/pencil.png\" width=\"1em\" >\n" +  //$NON-NLS-1$
+							"<imageclic style='valign:top' src=\"/img/pencil.svg\" width=\"1em\" >\n" +  //$NON-NLS-1$
 								"<attribute name=\"onClick\"><![CDATA[\n" +  //$NON-NLS-1$
 									"Events.sendEvent(new Event (\"onEdit\", \n" +  //$NON-NLS-1$
 										"desktop.getPage(\"htmlEditor\").getFellow(\"top\"),\n" +  //$NON-NLS-1$
@@ -1964,7 +1964,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		{
 			if (twoPhaseEdit && ! readonly)
 				result= "<div><label id='"+id3+"'/>" //$NON-NLS-1$ //$NON-NLS-2$
-						+ "<imageclic src='/img/pencil.png' " //$NON-NLS-1$
+						+ "/img/pencil.svgeclic src='/img/pencil.svg' " //$NON-NLS-1$
 							+ "onClick='self.visible = self.previousSibling.visible = false; " //$NON-NLS-1$
 								+ "self.nextSibling.visible = self.nextSibling.nextSibling.visible=true'/> " //$NON-NLS-1$
 						+ "<textbox sclass=\"textbox\" width='90%' " //$NON-NLS-1$
@@ -2293,7 +2293,9 @@ public class InputField2 extends Div implements XPathSubscriber
 			}
 		}
 
-		Component input = getFellow(getIdForPosition(position));
+		Component input = getFellowIfAny(getIdForPosition(position));
+		if (input == null)
+			return true;
 		if (input instanceof InputElement)
 		{
 			InputElement inputElement = (InputElement) input;

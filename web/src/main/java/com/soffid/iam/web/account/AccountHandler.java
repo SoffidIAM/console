@@ -65,7 +65,7 @@ public class AccountHandler extends FrameHandler {
 	}
 		
 
-	public void onChangeForm(Event ev) {
+	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
 		updateStatus();
 	}

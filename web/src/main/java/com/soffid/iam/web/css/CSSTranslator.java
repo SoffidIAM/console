@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.web.laf.StandardColors;
 
 public abstract class CSSTranslator extends HttpServlet {
 	String getText () throws IOException {
@@ -33,18 +34,18 @@ public abstract class CSSTranslator extends HttpServlet {
 		boolean rtl = "ar".equals(currentLocale) ;
 		
 		String green = ConfigurationCache.getProperty("soffid.ui.color1");
-		if (green == null) green = "#9ec73c";
+		if (green == null) green = StandardColors.originalGreen;
 		String greenLight = generateString( Color.decode(green).brighter() );
 		String greenDark = generateString( Color.decode(green).darker() );
 
 		String blue = ConfigurationCache.getProperty("soffid.ui.color2");
-		if (blue == null) blue = "#637792";
+		if (blue == null) blue = StandardColors.originalBlue;
 		String blueLight = generateString( Color.decode(blue).brighter() );
 		String blueDark = generateString( Color.decode(blue).darker() );
 
 		
 		String sky = ConfigurationCache.getProperty("soffid.ui.color3");
-		if (sky == null) sky = "#22B9D8";
+		if (sky == null) sky = StandardColors.originalSky;
 		String skyLight = generateString( Color.decode(sky).brighter() );
 		String skyDark = generateString( Color.decode(sky).darker() );
 

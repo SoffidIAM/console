@@ -14,8 +14,13 @@
 package com.soffid.iam.service;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -31,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
 import javax.ejb.RemoveException;
@@ -285,24 +292,28 @@ public class EntryPointServiceImpl extends
 		// ACTUALITZACIONS
 		// UPDATE: Ja té icona, i s'ha posta una nova
 		if (entity.getIcon1() != null && puntEntrada.getIcon1Image() != null
-				&& puntEntrada.getIcon1Image().length != 0
-				&& puntEntrada.getIcon1Id() == null) {
-			// Esborrem l'icona anterior
-			getEntryPointIconEntityDao().remove(entity.getIcon1()); // Per id
-			// S'ha actualitzat l'icona: creem una nova
-			EntryPointIconEntity icona1 = createIcona(puntEntrada
-					.getIcon1Image());
-			entity.setIcon1(icona1.getId());
+				&& puntEntrada.getIcon1Image().length != 0 ) {
+			EntryPointIconEntity i = getEntryPointIconEntityDao().load(entity.getIcon1());
+			if (i != null) {
+				i.setIcon(puntEntrada.getIcon1Image());
+				getEntryPointIconEntityDao().update(i);
+			} else {
+				EntryPointIconEntity icona1 = createIcona(puntEntrada
+						.getIcon1Image());
+				entity.setIcon1(icona1.getId());
+			}
 		}
 		if (entity.getIcon2() != null && puntEntrada.getIcon2Image() != null
-				&& puntEntrada.getIcon2Image().length != 0
-				&& puntEntrada.getIcon2Id() == null) {
-			// Esborrem l'icona anterior
-			getEntryPointIconEntityDao().remove(entity.getIcon2()); // Per id
-			// S'ha actualitzat l'icona: creem una nova
-			EntryPointIconEntity icona2 = createIcona(puntEntrada
-					.getIcon2Image());
-			entity.setIcon2(icona2.getId());
+				&& puntEntrada.getIcon2Image().length != 0) {
+			EntryPointIconEntity i = getEntryPointIconEntityDao().load(entity.getIcon2());
+			if (i != null) {
+				i.setIcon(puntEntrada.getIcon2Image());
+				getEntryPointIconEntityDao().update(i);
+			} else {
+				EntryPointIconEntity icona2 = createIcona(puntEntrada
+						.getIcon2Image());
+				entity.setIcon2(icona2.getId());
+			}
 		}
 		// ADD: NOVES ICONES (no existien abans)
 		if (entity.getIcon1() == null && puntEntrada.getIcon1Image() != null
@@ -489,7 +500,7 @@ public class EntryPointServiceImpl extends
 					.findByCode("SOFFID"); //$NON-NLS-1$
 			root.setInformationSystem(app);
 			root.setMenu("S"); //$NON-NLS-1$
-			root.setName("Acme Company"); //$NON-NLS-1$
+			root.setName("Corporate applications"); //$NON-NLS-1$
 			root.setMenuType("L"); //$NON-NLS-1$
 			root.setVisible("S"); //$NON-NLS-1$
 			getEntryPointEntityDao().create(root);
@@ -1783,6 +1794,8 @@ public class EntryPointServiceImpl extends
 				.accessTreeExecutionToEntity(execucio);
 		getEntryPointExecutableEntityDao().create(entity);
 
+		updateImage(puntEntrada, entity);
+		
 		auditarExecucioPuntEntrada(
 				"C",
 				puntEntrada.getName() + " tipus "
@@ -1790,6 +1803,117 @@ public class EntryPointServiceImpl extends
 						+ execucio.getScope());
 
 		return getEntryPointExecutableEntityDao().toAccessTreeExecution(entity);
+	}
+
+	private void updateImage(AccessTree entryPoint, EntryPointExecutableEntity entity) {
+		if (entity.getExecutionCode().equals("URL") &&
+				entity.getEntryPoint().getIcon1() == null) {
+			try {
+				String icon = guessIconName(entity);
+				if (icon != null) {
+					byte[] data = downloadIcon(icon);
+					if (data == null)
+						data = downloadDefaultIcon(entity);
+					if (data != null) {
+						EntryPointIconEntity ico = getEntryPointIconEntityDao().newEntryPointIconEntity();
+						ico.setIcon(data);
+						getEntryPointIconEntityDao().create(ico);
+						entity.getEntryPoint().setIcon1(ico.getId());
+						getEntryPointEntityDao().update(entity.getEntryPoint());
+						entryPoint.setIcon1Id(ico.getId());
+						entryPoint.setIcon1Image(data);
+					}
+				}
+			} catch (Exception e) {
+				
+			}
+		}
+	}
+
+	public String guessIconName(EntryPointExecutableEntity entity)
+			throws IOException, MalformedURLException, UnsupportedEncodingException {
+		String icon = null;
+		try {
+			URL url = new URL(entity.getContent().trim());
+			icon = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/favicon.ico").toString();
+
+			HttpURLConnection.setFollowRedirects(true);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.connect();
+			InputStream in = conn.getInputStream();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			for (int i = in.read(); i >= 0; i = in.read())
+				out.write(i);
+			in.close();
+			out.close();
+			conn.disconnect();
+			String ct = conn.getContentType();
+			if (!ct.startsWith("text/html")) return icon;
+			
+			String enc = "UTF-8";
+			if (ct.contains("charset=")) {
+				enc = ct.substring(ct.indexOf("charset=") + 8);
+				enc = enc.replaceAll("\"", "");
+			}
+			String s = new String( out.toByteArray(), enc);
+			Pattern p = Pattern.compile("<link([^>]*)>");
+			Pattern prel = Pattern.compile("rel=(\"([^\"]*)\"|'([^']*)')");
+			Pattern phref = Pattern.compile("href=(\"([^\"]*)\"|'([^']*)')");
+			Matcher m = p.matcher(s);
+			while (m.find()) {
+				String link = m.group(1);
+				Matcher m2 = prel.matcher(link);
+				if (m2.find()) {
+					String tag = m2.group(2) == null ? m2.group(3): m2.group(2);
+					if (tag.contains("icon")) {
+						Matcher m3 = phref.matcher(link);
+						if (m3.find()) {
+							if (m3.group(2) != null) icon = m3.group(2);
+							if (m3.group(3) != null) icon = m3.group(3);
+							break;
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			
+		}
+		return icon;
+	}
+
+
+	public byte[] downloadDefaultIcon (EntryPointExecutableEntity entity)
+			throws IOException, MalformedURLException, UnsupportedEncodingException {
+		String icon = null;
+		try {
+			URL url = new URL(entity.getContent().trim());
+			icon = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/favicon.ico").toString();
+			return downloadIcon(icon);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public byte[] downloadIcon(String icon)
+			throws IOException, MalformedURLException, UnsupportedEncodingException {
+		try {
+			URL url = new URL(icon);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setFollowRedirects(true);
+			conn.connect();
+			InputStream in = conn.getInputStream();
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			for (int i = in.read(); i >= 0; i = in.read())
+				out.write(i);
+			in.close();
+			out.close();
+			conn.disconnect();
+			String ct = conn.getContentType();
+			if (ct.startsWith("image")) return out.toByteArray();
+		} catch (Exception e) {
+			
+		}
+		return null;
 	}
 
 	protected void handleDeleteExecution(AccessTree puntEntrada,
@@ -1848,6 +1972,8 @@ public class EntryPointServiceImpl extends
 		EntryPointExecutableEntity entity = getEntryPointExecutableEntityDao()
 				.accessTreeExecutionToEntity(execucio);
 		getEntryPointExecutableEntityDao().update(entity);
+
+		updateImage(puntEntrada, entity);
 
 		auditarExecucioPuntEntrada(
 				"U",

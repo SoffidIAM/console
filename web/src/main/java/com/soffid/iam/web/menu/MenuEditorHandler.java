@@ -24,7 +24,7 @@ public class MenuEditorHandler extends FrameHandler {
 	}
 		
 
-	public void onChangeForm(Event ev) {
+	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
 		try {
 			Long id = (Long) XPathUtils.getValue(getForm(), "id");

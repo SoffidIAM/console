@@ -28,20 +28,40 @@ zkMenu3.openRef=function(ed) {
 	zkMenu3.open(ed, ed, options, true);
 }
 
+zkMenu3.populate=function(ed, pos, data) {
+	var v = pos.split(" ");
+	var option = ed.options [v[0]];
+	for (var i = 1; i < v.length; i++) {
+		option = option.options[v[i]];
+	}
+	option.dynamic = false;
+	option.options = JSON.parse(data);
+	if (ed.currentPosition == pos) {
+		console.log("Opening "+ed.currentPosition);
+		var menu = ed.currentTR.parentElement/*table*/.parentElement;
+		menu.openOption = zkMenu3.open(ed, ed.currentTR, option.options, false);
+	}
+}
+
 zkMenu3.open=function(ed, parent, options, first) {
 	var w = document.createElement("div");
 	w.master = ed;
+	var position;
 	if ( first )
 	{
 		var pos = parent.previousElementSibling.getClientRects()[0];
 		w.style.left = ""+(pos.x) + "px";
 		w.style.top = ""+(pos.y + pos.height) + "px";
+		position = "";
 	} else {
 		var pos = parent.getClientRects()[0];
 		w.style.left = ""+(pos.x + pos.width) + "px";
 		w.style.top = ""+(pos.y + pos.height - 24) + "px";
+		position = parent.position + " ";
 	}
+	console.log("Creating position "+position);
 	ed.modal.appendChild(w);
+	w.position = position;
 	w.setAttribute("class", "menu3");
 	w.style.position="fixed";
 	var t = document.createElement("table");
@@ -50,6 +70,7 @@ zkMenu3.open=function(ed, parent, options, first) {
 		var option = options[i];
 		var tr = document.createElement("tr");
 		tr.option = option;
+		tr.position = position + i;
 		t.appendChild(tr);
 		var od = document.createElement("td");
 		var img = document.createElement("img");
@@ -58,7 +79,7 @@ zkMenu3.open=function(ed, parent, options, first) {
 		tr.appendChild(od);
 		var td = document.createElement("td");
 		tr.appendChild(td);
-		if (option.options) {
+		if (option.options || option.dynamic) {
 			od.setAttribute("class", "menu3menu");
 			od.appendChild(document.createTextNode(option.label));
 			zk.listen(tr, "mouseover", zkMenu3.onMouseOver);
@@ -78,8 +99,10 @@ zkMenu3.open=function(ed, parent, options, first) {
 
 zkMenu3.closeMenu=function(menu) {
 	if (menu.openOption) {
+		console.log("closing "+menu.openOption.position);
 		zkMenu3.closeMenu(menu.openOption);
 		menu.openOption.remove();
+		menu.openOption = null;
 	}
 }
 
@@ -93,7 +116,17 @@ zkMenu3.onMouseOver=function(ev) {
 	var option = ev.currentTarget;
 	var menu = option.parentElement/*table*/.parentElement;
 	zkMenu3.closeMenu(menu);
-	menu.openOption = zkMenu3.open(menu.master, option, option.option.options, false);
+	menu.master.currentTR = option;
+	menu.master.currentPosition = option.position;
+	console.log("Over "+option.position);
+	if (option.option.dynamic) {
+		if (!option.option.inProgress) {
+			option.option.inProgress = true; // Prevent new refresh
+			zkau.send ({uuid: menu.master.id, cmd: "onPopulate", data : [option.position]}, 5);		
+		}
+	} else {		
+		menu.openOption = zkMenu3.open(menu.master, option, option.option.options, false);
+	}
 } 
 
 zkMenu3.onCloseMenu=function(ev) {

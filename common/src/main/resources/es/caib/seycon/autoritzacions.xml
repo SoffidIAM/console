@@ -687,6 +687,49 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>sod:create</codi>
+		<descripcio>Create SoD rules</descripcio>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query,
+			role:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>sod:update</codi>
+		<descripcio>Update the SoD rules</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query,
+			role:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>sod:delete</codi>
+		<descripcio>Delete applications</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query,
+			role:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>sod:query</codi>
+		<descripcio>Query Segregation of duties rules</descripcio>
+		<tipusDomini>APLICACIONS</tipusDomini>
+		<ambit>Applications</ambit>
+		<hereta>
+			application:query,
+			role:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>accessRegister:query</codi>
 		<descripcio>Query all access logs</descripcio>
 		<ambit>Access logs</ambit>
@@ -1413,6 +1456,24 @@
 	<autoritzacio>
 		<codi>seu:rules:show</codi>
 		<descripcio>Access to role assignment rules screen</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:sod:show</codi>
+		<descripcio>Access to SoD rules screen</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:scheduled-task:show</codi>
+		<descripcio>Access to scheduled tasks screen</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:scheduled-job:show</codi>
+		<descripcio>Access to scheduled jobs screen</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="pamServerGroup" type="pamServerGroup">
+			<ejb-finder jndi="java:/module/PamSessionService-v2"
+				method="findJumpServerGroups" >
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.JumpServerGroup"/> 
+		</finder>
+		
+	</datanode>
+ 
+
+	<datanode name="pamServerGroup" >
+		<ejb-handler jndi="java:/module/PamSessionService-v2">
+			<insert-method method="create" returnBean="true" >  <!-- user:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="remove">    
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update"> <!-- user:update -->
+				<parameter value="${instance}" />
+			</update-method>
+		
+		</ejb-handler>
+
+	</datanode>
+
+
+</zkib-model>

@@ -21,10 +21,15 @@
             <transaction-type>Bean</transaction-type>
 		</session>
 
-		<!-- Message Driven Beans -->
-		<!-- To add message driven beans that you have deployment descriptor info 
-			for, add a file to your XDoclet merge directory called message-driven-beans.xml 
-			that contains the <message-driven></message-driven> markup for those beans. -->
+		<!-- Entity Beans -->
+		<session>
+			<description><![CDATA[Login service]]></description>
+			<display-name>LoginService</display-name>
+			<ejb-name>LoginService</ejb-name>
+			<business-local>com.soffid.iam.tomcat.LoginService</business-local>
+			<ejb-class>com.soffid.iam.tomcat.service.LoginServiceImpl</ejb-class>
+			<session-type>Stateless</session-type>
+		</session>
 
 	</enterprise-beans>
 
@@ -44,6 +49,11 @@
 			<method>
 				<description><![CDATA[Default create method]]></description>
 				<ejb-name>UploadServiceBean</ejb-name>
+				<method-name>*</method-name>
+			</method>
+			<method>
+				<description><![CDATA[Default create method]]></description>
+				<ejb-name>LoginService</ejb-name>
 				<method-name>*</method-name>
 			</method>
 		</method-permission>

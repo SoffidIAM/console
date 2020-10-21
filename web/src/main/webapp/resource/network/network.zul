@@ -58,7 +58,8 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatable="listbox"/>
 								
-				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"
+					use="com.soffid.iam.web.component.DatasourceButton3"/>
 			</div>
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 				<tabs>
@@ -123,7 +124,7 @@
 									readonly="true"
 									id="busy"
 									maxlength="50"/>
-						</form>
+							</form>
 						</div>
 						<div style="text-align: right; width: 100%">
 							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">

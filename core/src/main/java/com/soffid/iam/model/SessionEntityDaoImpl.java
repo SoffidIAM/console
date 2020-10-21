@@ -18,6 +18,7 @@ import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.utils.ExceptionTranslator;
 
+import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
 
@@ -48,7 +49,9 @@ public class SessionEntityDaoImpl extends
 		HostEntity maquinaClientEntity = sourceEntity.getClientHost();
 		if (maquinaClientEntity == null)
 		{
-			targetVO.setClientHostName(sourceEntity.getClientHostName());
+			targetVO.setClientHostName(sourceEntity.getClientHostName() == null ? 
+				sourceEntity.getClientAddress(): 
+				sourceEntity.getClientHostName());
 		}
 		else
 		{
@@ -56,7 +59,9 @@ public class SessionEntityDaoImpl extends
 		}
 		if (sourceEntity.getHost() == null)
 		{
-			targetVO.setServerHostName(sourceEntity.getHostName());
+			targetVO.setServerHostName(sourceEntity.getHostName() == null?
+					sourceEntity.getHostAddress() : 
+					sourceEntity.getHostName());
 		} else {
 			targetVO.setServerHostName(sourceEntity.getHost().getName());
 		}
@@ -64,6 +69,12 @@ public class SessionEntityDaoImpl extends
 		targetVO.setUserFullName(sourceEntity.getUser().getFullName());
 		if (sourceEntity.getLoginLogInfo() != null)
 			targetVO.setAccessLogId(sourceEntity.getLoginLogInfo().getId());
+		targetVO.setType(sourceEntity.getType());
+		
+		if (sourceEntity.getLoginLogInfo() != null && sourceEntity.getType() == TipusSessio.PAM) {
+			targetVO.setAccountName(sourceEntity.getLoginLogInfo().getAccountName());
+			targetVO.setSessionUrl(sourceEntity.getLoginLogInfo().getInformation());
+		}
 	}
 
 	/**

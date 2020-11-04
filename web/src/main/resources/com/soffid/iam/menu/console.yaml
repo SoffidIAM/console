@@ -1,18 +1,23 @@
 - name: inbox.lblFiltroTareas1
   img: /img/menu/tasks.svg
   url: /wf/inbox.zul
+  permissions: ["selfservice:tasks"]
 - name: selfService.Applications
   img: /img/menu/app-launcher.svg
   handler: com.soffid.iam.web.launcher.LauncherMenuHandler
+  permissions: ["selfservice:applications"]
 - name: seu.startWorkflow
   img: /img/menu/start-wf.svg
   handler: com.soffid.iam.web.inbox.NewProcessMenuHandler
+  permissions: ["selfservice:new-process"]
 - name: sup.lblBusquedaCasos
   img: /img/menu/process.svg
   url: /wf/search.zul
+  permissions: ["selfservice:search-process"]
 - name: seu.myAccounts
   img: /img/menu/accounts.svg
   url: /self/account.zul
+  permissions: ["selfservice:accounts"]
 - name: soffid.admin
   img: /img/menu/laboratory.svg
   options:
@@ -166,7 +171,6 @@
             img: /img/menu/password-policy.svg
             permissions: ["seu:userTypes:show"]
       - name: seu.monitoritzacio
-        permissions: ["seu:tenant:show"]
         img: /img/menu/monitor.svg
         options:
         - name: seu.seyconserver

@@ -58,7 +58,7 @@ public class LoginPage extends Html {
 		error = "";
 	    if (failed != null && ! failed.isEmpty())
 	    {
-	      error = "Login failed";
+	      error = "\u26a0 Login failed";
 	    }
 	    if (req.getRequestURL().toString().endsWith("/zkau")) {
             ((HttpServletResponse) execution.getNativeResponse()).sendError(401, "Unauthenticatd ajax request");

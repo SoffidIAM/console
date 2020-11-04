@@ -523,10 +523,12 @@
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 						</div>
 						<div style="margin-bottom: 32px">
+							<label value="${c:l('agents.zul.fullReconcile')} :" sclass="label"/>
 							<switch bind="@fullReconciliation" disabled="${!canModifyAgent}" label="${c:l('agents.zul.fullReconcile') }" onCheck=""/>
 							<label value="${c:l('agents.zul.fullReconcile2')}" style="margin-left:16px; display:inline-block;"/>
 						</div>
 						<div style="margin-bottom: 32px">
+							<label value="${c:l('agents.zul.generateTasksOnLoad')}: "  sclass="label"/>
 							<switch bind="@generateTasksOnLoad" disabled="${!canModifyAgent}" label="${c:l('agents.zul.generateTasksOnLoad') }" onCheck=""/>
 							<label value="${c:l('agents.zul.generateTasksOnLoad2')}" style="margin-left:16px; display:inline-block;"/>
 						</div>
@@ -578,15 +580,15 @@
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 						</div>
 						<vbox>
-							<button image="/img/propagausu.gif" label="${c:l('agents.PropagaUsuaris')}"
+							<button image="/img/user-r.svg" label="${c:l('agents.PropagaUsuaris')}"
 									id="imgPropaga" if="${canPropagateAgentUsers}" onClick='ref:frame.propagaCanvisAgent_Usuaris'> 
 							</button>
 							<space width="4px"/>
-							<button id="imgPropagaRols" if="${canPropagateAgentRoles}" image="/img/propagarols.gif" label="${c:l('agents.PropagaRols')}"
+							<button id="imgPropagaRols" if="${canPropagateAgentRoles}" image="/img/role-r.svg" label="${c:l('agents.PropagaRols')}"
 								onClick="ref:frame.propagaCanvisAgent_Rols"> 
 							</button>
 							<space width="4px"/>
-							<button id="imgPropagaGroups" if="${canPropagateAgentGroups}" image="/img/propagagroup.png" label="${c:l('agents.PropagaGroups')}"
+							<button id="imgPropagaGroups" if="${canPropagateAgentGroups}" image="/img/group-r.svg" label="${c:l('agents.PropagaGroups')}"
 								onClick="ref:frame.propagaCanvisAgent_Groups()"> 
 							</button>
 							<space width="4px"/>

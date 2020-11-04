@@ -18,12 +18,18 @@ import com.soffid.iam.web.component.inputField.VaultFolderDataHandler;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.zkib.component.Databox.Type;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.jxpath.JXPathNotFoundException;
 
 public class VaultFieldHandler extends InputFieldUIHandler {
 	@Override
 	public boolean isVisible(InputField3 field) throws Exception {
-		AccountType type = (AccountType) XPathUtils.getValue(field, "type");
-		return type != AccountType.USER;
+		try 
+		{
+			AccountType type = (AccountType) XPathUtils.getValue(field, "type");
+			return type != AccountType.USER;
+		} catch (JXPathNotFoundException e) {
+			return false;
+		}
 	}
 
 	@Override

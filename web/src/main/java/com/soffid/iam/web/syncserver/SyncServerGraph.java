@@ -86,7 +86,12 @@ public class SyncServerGraph extends HttpServlet {
 					data.put (status.getNumberOfAgents() -
 							status.getConnectedAgents());
 					((JSONObject) base.query("/data/datasets/0")).put("data",  data);
-					if (! status.getConnectedAgents().equals(status.getNumberOfAgents())) {
+					if ("OFFLINE".equals(status.getStatus())) {
+						JSONObject center = base.getJSONObject("options").getJSONObject("elements").getJSONObject("center");
+						center.put("text", "Off");
+						center.put("color", "rgb(0,0,0)");
+					} 
+					else if (! status.getConnectedAgents().equals(status.getNumberOfAgents())) {
 						JSONObject center = base.getJSONObject("options").getJSONObject("elements").getJSONObject("center");
 						center.put("text", status.getNumberOfAgents().intValue() - status.getConnectedAgents().intValue());
 						center.put("color", "rgb(255, 25, 18)");

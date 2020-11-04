@@ -134,6 +134,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		JumpServerGroupEntity jumpServerGroup = entity.getJumpServerGroup();
 		if (jumpServerGroup == null)
 			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
+		getPamSecurityHandlerService().checkPermission(entity, "launch");
 		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl());
 	}
 	
@@ -141,6 +142,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 	protected NewPamSession handleCreateJumpServerSession(Account account, String entryPointDescriptor)
 			throws Exception {
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
+
+		getPamSecurityHandlerService().checkPermission(entity, "launch");
 		
 		Properties p = new Properties();
 		p.load(new StringReader(entryPointDescriptor));

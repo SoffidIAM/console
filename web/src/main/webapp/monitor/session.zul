@@ -19,8 +19,9 @@
 		</div>
 
 		<datatable id="listbox" autocommit="true" 
-			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+			use="com.soffid.iam.web.audit.SessionDatatable"
 			preference="session"
+			onSelect="ref:frame.open"
 			dataPath="/model:/session" maxheight="70vh" 
 			enablefilter="true" >
 		<attribute name="allColumns">

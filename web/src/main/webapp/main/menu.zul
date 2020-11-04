@@ -4,6 +4,7 @@
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
  width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
  use="com.soffid.iam.web.component.MainMenu"
+ nomenu="true"
  menu="console.yaml">
 	<div sclass="navigation-bar">
 	</div>

@@ -2,26 +2,22 @@
 <div style="margin: 10px">
 	<div>
 		<radiogroup id="rg">
-			<grid style="border: 0px solid">
-	       		<rows>
-	       			<row style="margin-top: 10px; border: 0px solid">
-	       				<radio label="${c:l('attributeQuery.Contains')}:" value="co"/>
-	       				<textbox id='tb1'/>
-	       			</row>
-	       			<row style="margin-top: 10px; border: 0px solid">
-	       				<radio label="${c:l('attributeQuery.StartsWith')}:" value="sw"/>
-	       				<textbox id='tb2'/>
-	       			</row>
-	       			<row style="margin-top: 10px; border: 0px solid">
-	       				<radio label="${c:l('attributeQuery.EndsWith')}:" value="ew"/>
-	       				<textbox id='tb3'/>
-	       			</row>
-	       			<row style="margin-top: 10px; border: 0px solid">
-	       				<radio label="${c:l('attributeQuery.Equals')}:" value="eq"/>
-	       				<textbox id='tb4'/>
-	       			</row>
-	       		</rows>
-	       	</grid>
+			<div>
+	      		<radio label="${c:l('attributeQuery.Contains')}:" value="co"/>
+	      		<textbox id='tb1'/>
+			</div>
+			<div style="margin-top: 10px; border: 0px solid">
+	      		<radio label="${c:l('attributeQuery.StartsWith')}:" value="sw"/>
+	      		<textbox id='tb2'/>
+			</div>
+			<div style="margin-top: 10px; border: 0px solid">
+	      		<radio label="${c:l('attributeQuery.EndsWith')}:" value="ew"/>
+	      		<textbox id='tb3'/>
+			</div>
+			<div style="margin-top: 10px; border: 0px solid">
+	       		<radio label="${c:l('attributeQuery.Equals')}:" value="eq"/>
+	       		<textbox id='tb4'/>
+	       	</div>
 		</radiogroup>
 	</div>
 	<div class='button-container'>

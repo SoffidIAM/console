@@ -31,7 +31,7 @@ public class ZulFns {
 	public static final String getStatusIcon(Account account) {
 		try {
 			int i = EJBLocator.getAccountService().isUpdatePendingExtended(account);
-			return i == 1 ? "/img/held.svg" :
+			return i == 1 ? "/img/held-green.svg" :
 				i == 2 ? "/img/sync.svg":
 				i == 3 ? "/img/warning.svg":
 					"/img/account-green.svg";

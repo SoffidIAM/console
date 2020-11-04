@@ -51,7 +51,7 @@
 						required="true"
 						dataType="string"
 						bind="name"
-						maxlength="10"/>
+						maxlength="20"/>
 								
 					<customfield3 label="${c:l('com.soffid.iam.api.OUType.description')}" 
 						readonly="${! soffid:isUserInRole('organizationalUnit:update') }"

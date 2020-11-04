@@ -8,6 +8,7 @@
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	id="frame" title="${c:l('selfService.MyProcess')}"
 	mold="div"
+	nomenu="true"
 	use="com.soffid.iam.web.bpm.process.MyRequestsHandler">
 		
 

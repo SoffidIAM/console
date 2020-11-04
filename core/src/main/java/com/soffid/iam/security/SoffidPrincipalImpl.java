@@ -1,8 +1,11 @@
 package com.soffid.iam.security;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.catalina.realm.GenericPrincipal;
 
@@ -17,6 +20,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private String[] soffidRoles;
 	private String[] groupsAndRoles;
 	private String userName;
+	List<Obligation> obligations = new LinkedList<>();
 	
 	public SoffidPrincipalImpl(String name,
 			String userName,
@@ -114,5 +118,48 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	@Override
 	public String getUserName() {
 		return userName;
+	}
+
+	@Override
+	public Map<String, Map<String, String>> getObligations() {
+		Map<String, Map<String, String>> o = new HashMap<String, Map<String,String>>();
+		synchronized (obligations) {
+			for (Iterator<Obligation> it = obligations.iterator(); it.hasNext();) {
+				Obligation obligation = it.next();
+				if (obligation.timeout < System.currentTimeMillis())
+					it.remove();
+				else {
+					o.put(obligation.obligation, obligation.attributes);
+				}
+			}
+		}
+		return o ;
+	}
+
+	@Override
+	public void setObligation(String obligation, Map<String, String> properties, long timeout) {
+		Obligation o = new Obligation();
+		o.obligation = obligation;
+		o.attributes = properties == null ? new HashMap<>(): properties;
+		o.timeout = timeout;
+		
+		obligations.add(o);
+	}
+
+	@Override
+	public Map<String, String> getObligation(String obligationName) {
+		Obligation o = null;
+		synchronized (obligations) {
+			for (Iterator<Obligation> it = obligations.iterator(); it.hasNext();) {
+				Obligation obligation = it.next();
+				if (obligation.timeout < System.currentTimeMillis())
+					it.remove();
+				else {
+					if (obligationName.equals(obligation.obligation))
+						o = obligation;
+				}
+			}
+		}
+		return o == null ? null : new HashMap<>(o.attributes);
 	}
 }

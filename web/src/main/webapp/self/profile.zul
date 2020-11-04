@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="elmeuperfil" title="El meu perfil"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="/comu/input_criteri.zul"?>
+<?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
+
+<frame id="frame" title="${c:l('perfil.Titol')}" use="com.soffid.iam.web.profile.ProfileHandler">
+	<style>
+		span.u {text-decoration: underline;}
+	</style>
+	<script type="text/javascript">
+	function generateValues(userRoleValueDomain) {
+		var s = ""; 
+		for (var i = 0; i &lt; userRoleValueDomain.length; i++) { 
+			if (s.length &gt; 0) s += ", "; 
+			s += userRoleValueDomain[i].value;
+		}
+		return s;
+	} 
+	</script>
+	<datamodel id="model" rootNode="root" src="authDescriptor.xml"/>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<tabbox id="panels" width="${amplaria2}">
+				<tabs>
+					<tab label="${c:l('perfil.zul.Informaciabasica')}"/>
+					<tab label="${c:l('perfil.zul.Autoritzacions')}"/>
+				</tabs>
+		
+				<tabpanels>
+					<tabpanel height="410px" id="basica">
+						<form2 id="form">
+							<label sclass="separator_label">
+								${c:l('perfil.zul.Informaciadelusuari')}
+							</label>
+							<databox label="${c:l('perfil.zul.DarrerloginalSEU')}" value="${lastLogin }" readonly="true"/>
+							<databox label="${c:l('perfil.zul.DarreraIPdeconexiaal')}" value="${lastIp }" readonly="true"/>
+	
+							<div id="changePassword">
+								${c:l('perfil.CanviarPWD')} 
+								<button label="${c:l('perfil.zul.Canvidecontrasenya')}" onClick="ref:frame.setPassword" width="200px"/>
+							</div>
+			
+							<label sclass="separator_label">${c:l('perfil.zul.Preferancies')}</label>
+	
+							<databox label="${c:l('perfil.zul.IdiomadelSEU')}"  required="true"
+								id="idioma" type="LIST" />
+	
+							<databox label="${c:l('perfil.zul.TimeZone')}" required="true"
+								id="timezone" type="LIST" />
+	
+							<databox label="${c:l('perfil.zul.DateFormat')}" required="true"
+								id="dateformat" type="STRING" maxlength="20"  onChange="ref:frame.updateSample" onOK="ref:frame.updateSample"/>
+	
+							<databox label="${c:l('perfil.zul.sample')}" readonly="true"
+								id="sampledateformat" type="STRING"  />
+	
+							<databox label="${c:l('perfil.zul.TimeFormat')}" required="true"
+								id="timeformat" type="STRING" maxlength="20" onChange="ref:frame.updateSample" onOK="ref:frame.updateSample"/>
+	
+							<databox label="${c:l('perfil.zul.sample')}" readonly="true"
+								id="sampletimeformat" type="STRING"  />
+	
+							<div style="width: 100%; text-align: right">
+								<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" onClick="ref:frame.apply"/>
+							</div>
+	
+						</form2>
+					</tabpanel>
+					<tabpanel height="410px" id="autoritzacions">
+						<label sclass="separator_label">${c:l('perfil.zul.Autoritzacions-2')}</label>
+						<separator/>
+						${c:l('perfil.Descripcio1')}
+						<label sclass="u">${c:l('perfil.zul.autoritzacions')}</label> ${c:l('perfil.Descripcio2')}
+						<separator/>
+						${c:l('perfil.Descripcio3')} 
+						<separator height="1px"/>
+						${c:l('perfil.Descripcio4')}
+						<separator height="10px"/>
+						<input_etiqueta value="${c:l('perfil.zul.Acontinuaciapotveure')}"/>
+						<separator/>
+						<datatable dataPath="/model:/auth" >
+						<attribute name="columns"><![CDATA[
+		- name: ${c:l('perfil.zul.Rol')}
+		  value: role.name
+		- name: ${c:l('perfil.zul.Autoritzacia[valordo')}
+		  value: description
+		- name: ${c:l('perfil.zul.AmbitSEU')}
+		  value: scope
+		- name: ${c:l('aplicacions.zul.ValordeDomini')}
+		  value: valors
+		  template: #{generateValues(userRoleValueDomain)}
+						]]></attribute>
+						</datatable>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</div>
+	</div>
+	
+	<window id="newPassword" closable="false" 
+		position="center, top" sizable="true"
+		title="${c:l('selfService.NewPassword')}" visible="false" width="50em">
+		<databox type="PASSWORD" label="${c:l('changepass.zul.Contrasenyaactual')}" id="p0" onOK="ref:frame.nextPassword();"/>
+		<databox type="PASSWORD" label="${c:l('canviPassword.Titol')}" id="p1" onOK="ref:frame.nextPassword2();"/>
+		<databox type="PASSWORD" label="${c:l('canviPassword.Titol')}" id="p2" 
+				onOK="ref:frame.onSetPassword();" />
+		<databox type="STRING" label="${c:l('accounts.policy') }" sclass="databox policy"
+			multiline="true" id="policy" readonly="true" disabled="true"/>
+		<div align="center">
+			<button label="${c:l('accounts.setPassword.OK')}"
+				onClick="ref:frame.onSetPassword()" />
+			<space width="1em" />
+			<button label="${c:l('accounts.setPassword.Cancel')}"
+				onClick="ref:frame.onCancelPassword()" />
+		</div>
+	</window>
+
+	
+</frame>

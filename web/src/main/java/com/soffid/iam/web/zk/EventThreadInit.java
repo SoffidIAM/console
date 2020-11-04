@@ -1,10 +1,13 @@
 package com.soffid.iam.web.zk;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.util.Locales;
+import org.zkoss.util.TimeZones;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 
@@ -14,6 +17,7 @@ import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
 import com.soffid.iam.utils.Security;
 
+import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.zkiblaf.tomee.TomeeThreadInit;
 
 public class EventThreadInit extends TomeeThreadInit {
@@ -21,6 +25,8 @@ public class EventThreadInit extends TomeeThreadInit {
 	private static SessionCacheService ejb = null;
 	private SoffidPrincipal currentIdentity;
 	Locale locale;
+	TimeZone timeZone;
+	String[] dateFormat;
 	private String clientIp;
 	
 	public EventThreadInit() throws NamingException, CreateException {
@@ -42,6 +48,9 @@ public class EventThreadInit extends TomeeThreadInit {
 			Security.setClientIp(clientIp);
 			Security.nestedLogin(currentIdentity);
 		}
+		Locales.setThreadLocal(locale);
+		TimeZones.setThreadLocal(timeZone);
+		DateFormats.setThreadLocal(dateFormat);
 		MessageFactory.setThreadLocale(locale);
 		return true;
 	}
@@ -51,7 +60,9 @@ public class EventThreadInit extends TomeeThreadInit {
 		super.prepare(comp, event);
 		cacheSession = ejb.getCurrentSessionId();
 		currentIdentity = Security.getSoffidPrincipal();
-		locale = MessageFactory.getLocale();
+		locale = Locales.getCurrent();
+		timeZone = TimeZones.getCurrent();
+		dateFormat = DateFormats.getThreadLocal();
 		clientIp = Security.getClientIp();
 	}
 

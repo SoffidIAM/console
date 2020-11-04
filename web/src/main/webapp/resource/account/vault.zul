@@ -53,7 +53,9 @@
 				<![CDATA[
 				- path: /vault
 				  icon: #{type=='account'? "/img/account-green.svg": "/img/container-green.svg"}
-				  template: #{type=='account'? (account.loginName == null ? account.name: account.loginName) : folder.name}
+				  template: >-
+				    #{type=='account'? (account.loginName == null ? account.name: account.loginName) : folder.name}
+				    #{type=='account' && account.lockedBy != null? c:cat3("<span class='lock'>Locked by ",account.lockedBy,'</span>'): ""}
 				  tail: >-
 				    #{type == 'account' ? '': '
 				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, &quot;onAddFolder&quot;)">${c:l('vault.createFolder')}</button>

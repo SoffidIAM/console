@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding='utf-8'?>
 <div style="margin: 10px">
 	<div>
-		<grid style="border: 0px solid">
-       		<rows>
-       			<row style="margin-top: 10px; border: 0px solid">
-       				<label value="${c:l('attributeQuery.Since')}:"/>
-					<databox type="DATE" id='db1' format="${c:l('accounts.dateFormat') }" />
-       			</row>
-       			<row style="margin-top: 10px; border: 0px solid">
-       				<label value="${c:l('attributeQuery.Until')}:"/>
-					<databox type="DATE" id='db2' format="${c:l('accounts.dateFormat') }" />
-       			</row>
-       		</rows>
-       	</grid>
+		<customfield3 
+			label="${c:l('attributeQuery.Since')}"
+			dataType="DATE_TIME" id='db1' />
+		<customfield3 
+			label="${c:l('attributeQuery.Until')}"
+			dataType="DATE_TIME" id='db2' />
 	</div>
 	<div class='button-container'>
 		<div class='buttons'>

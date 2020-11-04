@@ -21,40 +21,45 @@
 			</div>
 	
 			<div id="query-box">
-				<databox label="${c:l('observacion.lblTextToSearch')}" id="txt" onOK="ref:frame.buscar"
+				<databox label="${c:l('observacion.lblTextToSearch')} :" id="txt" onOK="ref:frame.buscar"
 					type="STRING" selectIcon="/img/help.gif" onOpen="ref:frame.onOpenHelp"/>
 					
-				<databox label="${c:l('observacion.lblIdProceso')}" onOK="ref:frame.buscar"
+				<databox label="${c:l('observacion.lblIdProceso')} :" onOK="ref:frame.buscar"
 					type="STRING" maxlength="15" selectIcon=""
 					id="txtProcessID"/>
 				
-				<databox label="${c:l('observacion.lblFechaInicio')}"  onOK="ref:frame.buscar"
+				<databox label="${c:l('observacion.lblFechaInicio')} :"  onOK="ref:frame.buscar"
 					type="DATE" maxlength="15" selectIcon=""
 					style="display: inline-block; width: 50%; min-width: 400px"
+					calendarIcon="/img/calendar.svg"
 					format="${soffid:dateformat() }"
 					id="startDate"/>
 	
-				<databox label="${c:l('attributeQuery.Until')}"  onOK="ref:frame.buscar"
+				<databox sclass="right-label databox" label="${c:l('attributeQuery.Until')} :"  onOK="ref:frame.buscar"
 					type="DATE" maxlength="15" selectIcon=""
 					style="display: inline-block; width: 50%; min-width: 400px"
+					calendarIcon="/img/calendar.svg"
 					format="${soffid:dateformat() }"
 					id="startDate2"/>
 
-				<databox label="${c:l('observacion.lblFinalizada')}" onOK="ref:frame.buscar"
+				<databox label="${c:l('observacion.lblFinalizada')} :" onOK="ref:frame.buscar"
 					type="BOOLEAN" selectIcon=""
 					id="txtFinalizada" onChange="ref:frame.activaFi"/>
 	
 				<div style="width:100%" id="enddateblock" visible="false">
-					<databox label="${c:l('observacion.lblFechaFinalizacion')}"  onOK="ref:frame.buscar"
+					<databox label="${c:l('observacion.lblFechaFinalizacion')} :"  onOK="ref:frame.buscar"
 						type="DATE" maxlength="15" selectIcon=""
 						style="display: inline-block; width: 50%; min-width: 400px"
 						format="${soffid:dateformat() }"
+						calendarIcon="/img/calendar.svg"
 						id="endDate" />
 		
-					<databox label="${c:l('attributeQuery.Until')}"  onOK="ref:frame.buscar"
+					<databox label="${c:l('attributeQuery.Until')} :"  onOK="ref:frame.buscar"
+						sclass="right-label databox"
 						type="DATE" maxlength="15" selectIcon=""
 						style="display: inline-block; width: 50%; min-width: 400px"
 						format="${soffid:dateformat() }"
+						calendarIcon="/img/calendar.svg"
 						id="endDate2" />
 				</div>
 				<div style="width: 100%; text-align: right; margin-bottom: 16px">

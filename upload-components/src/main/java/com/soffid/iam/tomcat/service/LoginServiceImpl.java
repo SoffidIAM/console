@@ -38,6 +38,7 @@ import com.soffid.iam.service.PasswordService;
 import com.soffid.iam.service.SamlService;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.service.PreferencesService;
 import com.soffid.iam.tomcat.LoginService;
 import com.soffid.iam.tomcat.SoffidRealm;
 import com.soffid.iam.utils.Security;
@@ -112,7 +113,8 @@ public class LoginServiceImpl implements LoginService {
 					UserService us = ServiceLocator.instance().getUserService();
 					AccountService as = ServiceLocator.instance().getAccountService();
 					PasswordService ps = ServiceLocator.instance().getPasswordService();
-	
+					PreferencesService prefsSvc = ServiceLocator.instance().getPreferencesService();
+					
 					String dispatcher = ps.getDefaultDispatcher();
 					Account acc = null;
 					try {
@@ -153,6 +155,9 @@ public class LoginServiceImpl implements LoginService {
 					
 					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next() : null;
 					String fullName = acc.getDescription();
+					if (userName != null) {
+						fullName = us.findUserByUserName(userName).getFullName();
+					}
 					
 					if (samlAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
@@ -161,6 +166,9 @@ public class LoginServiceImpl implements LoginService {
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account,
 								userName, fullName, holderGroup,
 								roles, groups, soffidRoles);
+						if (userName != null) {
+							prefsSvc.setUserPreference(userName,"last_login", "" + System.currentTimeMillis());
+						}
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
 						roles.add("PASSWORD:EXPIRED");

@@ -31,7 +31,7 @@ public class PreferencesService {
 	public Map<String,String> setUserPreferences(String user, @Nullable Map<String,String> preferences) { return null; }
 
 	@Operation(grantees = { user_update.class })
-	public void setUserPreference(String user, String preference, String value) {  }
+	public void setUserPreference(String user, String preference, @Nullable String value) {  }
 
 	@Operation(grantees = {Tothom.class})
 	@Description("Retrieves current user preference")

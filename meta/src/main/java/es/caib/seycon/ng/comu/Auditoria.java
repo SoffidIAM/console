@@ -56,6 +56,7 @@ public class Auditoria {
 
 	@Nullable
 	@Attribute(translated = "group" )
+	@JsonAttribute(hibernateAttribute = "group.name")
 	public java.lang.String grup;
 
 	@Nullable

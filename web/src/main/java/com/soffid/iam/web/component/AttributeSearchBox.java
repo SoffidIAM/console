@@ -31,6 +31,7 @@ import com.soffid.iam.web.SearchAttributeDefinition;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.zkib.component.Databox;
+import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.events.SerializableEventListener;
 
 public class AttributeSearchBox extends XulElement {
@@ -476,7 +477,7 @@ public class AttributeSearchBox extends XulElement {
 	public void setDateSearchInterval(Date since, Date until) {
 		this.since = since;
 		this.until = until;
-		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT); 
+		DateFormat df = DateFormats.getDateTimeFormat(); 
 		
 		if (since == null && until == null)
 		{

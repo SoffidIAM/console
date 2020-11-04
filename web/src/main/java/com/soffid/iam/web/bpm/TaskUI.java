@@ -968,5 +968,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 	public void setParentFrame(InboxHandler inboxHandler) {
 		this.inboxHandler = inboxHandler;
 	}
+	
+	public void closeProcessViewer (Event event) {
+		event.getTarget().getFellow("visorProcesoWnd").setVisible(false);
+	}
 }
 

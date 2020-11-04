@@ -16,15 +16,12 @@
 			<div use="com.soffid.iam.web.component.NavigationBar"
 				frame="ui"> index
 			</div>
-			<toolbar>
-				<checkbox id="todos" label="${c:l('deploy.btnReloadTodos')}"
-					visible="true" class="toolbar-checkbox" checked="false" style="float: right">
-					<attribute name="onCheck" >ref:ui.onCheck</attribute>
-				</checkbox>
-				<toolbarbutton image="/img/upload.svg" label="${c:l('deploy.btnDeploy')}"
-					onClick="ref:ui.upload">
-				</toolbarbutton>
-			</toolbar>
+			<div style="margin-bottom: 16px">
+				<label sclass="label" value="${c:l('deploy.btnReloadTodos')}:"/>
+				<switch id="todos"
+						visible="true" checked="false" 
+						onCheck="ref:ui.onCheck"/>
+			</div>
 			<listbox id="listbox" fixedLayout="true" mold="paging"
 				pageSize="15" width="100%">
 				<listhead>
@@ -35,8 +32,10 @@
 					<listheader label="${c:l('deploy.CanviarEstat')}" sort="auto" width="150px"/>
 				</listhead>
 			</listbox>
-			<separator height="8px" />
-			<label sclass="label" style="padding-left:15px"
+			<div width="100%" style="text-align: right">
+				<div class="addButton" onClick="ref:ui.upload" title="${c:l('deploy.btnDeploy')}">+</div>
+			</div>
+			<label sclass="label" style="width: 100%"
 				value="${c:l('deploy.lblResultadoDespliegue')}" />
 			<textbox id="txtResultadoDespliegue" readonly="true" rows="5" width="100%" />
 		</div>

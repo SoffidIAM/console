@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?page id="login" title="SOFFID IAM error page" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
-<div xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" use="com.soffid.iam.web.error.ErroHandler">
+<div xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" use="com.soffid.iam.web.error.ErrorHandler">
 	<html><![CDATA[
   		<p style="height:100px; "/>
 	<div style="margin-left:auto; margin-right: auto; width:40em; text-align:center; margin-top:auto; margin-bottom:auto; min-height:10em; vertical-align:middle;">

@@ -3,13 +3,19 @@ package com.soffid.iam.web.interp;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.enterprise.event.ObserverException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.scripting.HierachicalAware;
 import org.zkoss.zk.scripting.util.GenericInterpreter;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+
+import com.soffid.iam.security.ObserveObligationException;
+import com.soffid.iam.web.obligation.ObligationManager;
 
 public class RefInterpreter extends GenericInterpreter implements
 		HierachicalAware {
@@ -33,10 +39,19 @@ public class RefInterpreter extends GenericInterpreter implements
 			throw new UiException("Wrong reference script "+script);
 		}
 		Method m;
+		Event event = (Event) getFromNamespace("event");
 		try {
-			Event event = (Event) getFromNamespace("event");
 			Object o = getFromNamespace(s[0]) ;
-			if ( o == null)
+			if ( o == null || o == UNDEFINED) {
+				o = null;
+				Component c = event.getTarget();
+				do {
+					c = c.getNamespace().getOwner().getParent();
+					if (c == null) break;
+					o = c.getFellowIfAny(s[0]);
+				} while (o == null);
+			}
+			if (o == null)
 				throw new UiException("Cannot find component "+s[0]);
 			String method = s[1];
 			if (method.contains("("))
@@ -62,7 +77,15 @@ public class RefInterpreter extends GenericInterpreter implements
 		} catch (IllegalArgumentException e) {
 			throw new UiException(e);
 		} catch (InvocationTargetException e) {
-			throw new UiException(e.getTargetException());
+			Throwable te = e.getTargetException();
+			if (te instanceof ObserveObligationException) {
+				ObserveObligationException oe = (ObserveObligationException) te;
+				ObligationManager om = new ObligationManager();
+				om.setCurrentObligations(event, oe.getObligations());
+				throw new UiException(oe);
+			} else {
+				throw new UiException(e.getTargetException());
+			}
 		}
 	}
 

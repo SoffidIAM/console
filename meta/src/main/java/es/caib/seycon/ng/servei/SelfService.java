@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.service.EntitlementDelegationService;
+import com.soffid.iam.service.PamSecurityHandlerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.DadaUsuari;
+import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.model.DadaUsuariEntity;
@@ -43,7 +45,8 @@ import es.caib.seycon.ng.model.UsuariEntity;
 	DadesAddicionalsService.class,
 	AutoritzacioService.class,
 	AuditoriaService.class,
-	EntitlementDelegationService.class})
+	EntitlementDelegationService.class,
+	PamSecurityHandlerService.class})
 public abstract class SelfService {
 
 	@Operation(translated="getUserAccounts")
@@ -52,6 +55,21 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void checkCanSetAccountPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Description("Generates a temporary password for the account")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Password generateAccountTemporaryPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
 	@Operation(translated="setAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void setAccountPassword(
@@ -69,6 +87,14 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 		return false;
 	}
+	@Description ("Unlocks a high privileged account")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void checkinHPAccount(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Operation (translated="getCurrentUser")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Usuari getCurrentUsuari()

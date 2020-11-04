@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="otp" title="SOFFID IAM OTP" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
+		<window closable="true" id="w" position="center, center"
+			handler="${arg.handler}"
+			sizable="true" title="Enter your OTP value"
+			mode="highlighted" width="34em"
+			use="com.soffid.iam.web.popup.OtpWindow"
+			onClose="ref:w.close">
+			<div style="height: 1em">
+				<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
+			</div>
+			<div align="center" height="4em" >
+				<label sclass="label" 
+						value="${arg.handler.challenge.cardNumber}">
+				</label>
+				<textbox type="password" width="18em" id="password"
+						onOK="ref:w.onSetPassword();">
+				</textbox>
+			</div>
+			<div width="100%" style="text-align: right" >
+				<button label="${c:l('accounts.setPassword.OK')}"
+					onClick="ref:w.onSetPassword()" />
+				<button
+					label="${c:l('accounts.setPassword.Cancel')}"
+					onClick="ref:w.onCancelPassword()" />
+			</div>
+		</window>
+</zk>

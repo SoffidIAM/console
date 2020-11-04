@@ -14,13 +14,12 @@
 	font-weight: lighter;
 }
 
-
 div.highlighted {
 	margin: 0;
 	padding: 0;
 	box-shadow: 0px 0px 20px 3px #2b2b2b;
 }
-
+ 
 p, div, span, label, a, input, textarea,
 button, input.button, input.file {
 	font-family: inherit;
@@ -146,8 +145,14 @@ div.z-loading-indicator {box-sizing: content-box;}
 
 .col_der, .col_izq {
 	height: 100%;
-	cursor: pointer;
 }
+
+div.col_izq img.menu3starter,
+div.col_der div.menu2starter, 
+div.col_der.help {
+	cursor:pointer;
+}
+
 
 .col_der {
 	float: {TEXT_ALIGN_RIGHT}; 
@@ -337,7 +342,7 @@ textarea {
 	resize: vertical;
 }
 
-span.label, sapn label {
+span.label, span label {
 	font-family: inherit;
 	font-size: inherit;
 	font-weight: normal; margin-left:3px; 
@@ -413,12 +418,15 @@ button, input[type="button"], input[type="submit"] {
 }	
 
 /* Buttons */
-button.small-button:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover,
-button.small-button:focus, button:focus, input[type="button"]:focus, input[type="submit"]:focus {
+button.small-button:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 	background-image: none;
 	background-color: {SKY};
 	color: {SKYTEXT};
 	box-shadow: none;
+}
+
+button.small-button:focus, button:focus, input[type="button"]:focus, input[type="submit"]:focus {
+	text-decoration: underline;
 }
 
 /* Barra de botons */
@@ -1371,6 +1379,11 @@ div.CodeMirror-linenumber {font-size: 12pt}
 }
 
 
+div.databox.inline {
+	display: inline-block;
+	vertical-align: top;
+}
+
 .attribute-search-box-remove:hover, 
 div.databox img.remove-icon:hover {
 	opacity: 1;
@@ -1757,7 +1770,7 @@ tr.grid td.gc {
 input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text {
     box-sizing: border-box;
     padding: 2px;
-    border: 4px solid #f0f0f0;
+    border: 4px solid #e0e0e0;
     background: #f8f8f8;
     border-radius: 4px;
 }
@@ -1904,7 +1917,7 @@ span.rbtnbk {
 }
 
 select {
-    border: 4px solid #f0f0f0;
+    border: 4px solid #e0e0e0;
     padding: 2px;
     color: black;
     margin-top: 2px;
@@ -2101,6 +2114,11 @@ div.datatable table.tbody tr td.selector {
 div.datatable table.tbody tr td.statusColumn {
 	width: 100px;
 	text-align: center;
+}
+
+div.datatable table.tbody tr td.datetimeColumn {
+	width: 150px;
+	text-align: right;
 }
 
 div.datatable table.tbody tr.dashed td,
@@ -2645,7 +2663,7 @@ div.options {
 }
 
 .options.options-small .menuoption {
-	width: 225px;
+	width: 250px;
 	padding: 20px;
 	text-align: center;
 }
@@ -2924,7 +2942,6 @@ div.datatree. div.tfoot {
 }
 
 div.datatree div.thead div.column ,
-div.datatree div.thead div.filter-cell ,
 div.datatree div.tbody div.tree-label div.tree-cell {
 	box-sizing: border-box;
 	display: inline-block;
@@ -2934,6 +2951,18 @@ div.datatree div.tbody div.tree-label div.tree-cell {
 	white-space: nowrap;
 	text-overflow: clip;
 	border-right: 1px solid #c0c0c0;
+}
+div.datatree div.thead div.filter-cell {
+	box-sizing: border-box;
+	display: inline-block;
+	padding-right: 4px;
+	overflow: hidden;
+	height: 30px;
+	white-space: nowrap;
+	text-overflow: clip;
+	border-right: 1px solid #c0c0c0;
+	padding-top: 3px;
+	padding-bottom: 3px;
 }
 div.datatree div.tbody div.tree-label div.tree-cell,
 div.datatree div.tbody div.tree-label.no-columns {
@@ -2955,6 +2984,12 @@ div.datatree div.tbody div.tree-label {
 	overflow: hidden;
 }
 
+span.lock {
+	color: {GREENTEXT};
+	background-color: {GREEN};
+	border: solid 3px {GREEN};
+	border-radius: 6px;
+}
 /******* END DATATREE **********/
 tr.noBorderGrid td {
 	vertical-align: top;
@@ -3057,7 +3092,7 @@ img.menu3starter:hover {
 	background-color: {BLUELIGHT};
 }
 
-div.form {
+div.card div.form {
 	height: calc( 100vh - 140px);
 	overflow-y: auto;
 	overflow-x: hidden; 
@@ -3151,8 +3186,32 @@ div.databox div.label, span.label {
 	width: 192px;
 	color: 	{BLUE};
     vertical-align: top;
+    text-align: left;
     margin-top: 6px;
 	margin-left: 8px;
+}
+span.label.longlabel {
+	width: 350px;
+}
+
+div.databox div.label, span.label {
+	display: inline-block;
+	width: 192px;
+	color: 	{BLUE};
+    vertical-align: top;
+    text-align: left;
+    margin-top: 6px;
+	margin-left: 8px;
+}
+
+div.databox.databox_switch div.label {
+	width: auto;
+	min-width: 192px ; 
+}
+
+div.databox.right-label div.label {
+	text-align: right;
+	padding-right: 10px;
 }
 
 div.databox.separator div.label, span.separator,
@@ -3361,3 +3420,10 @@ div.wizard-bar div.separator-d {
 		 display:none;
 	}
 }
+
+input[type='radio'] + label {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+

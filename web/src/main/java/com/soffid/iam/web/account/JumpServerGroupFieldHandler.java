@@ -18,12 +18,17 @@ import com.soffid.iam.web.component.ObjectAttributesDiv;
 
 import es.caib.zkib.component.Databox.Type;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.jxpath.JXPathException;
 
 public class JumpServerGroupFieldHandler extends InputFieldUIHandler {
 	@Override
 	public boolean isVisible(InputField3 field) throws Exception {
-		LaunchType type = (LaunchType) XPathUtils.getValue(field, "launchType");
-		return type == LaunchType.LAUNCH_TYPE_PAM;
+		try {
+			LaunchType type = (LaunchType) XPathUtils.getValue(field, "launchType");
+			return type == LaunchType.LAUNCH_TYPE_PAM;
+		} catch (JXPathException e) {
+			return false;
+		}
 	}
 
 	@Override

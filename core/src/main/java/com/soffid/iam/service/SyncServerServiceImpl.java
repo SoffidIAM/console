@@ -637,12 +637,14 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
         try {
         	SyncStatusService status = rsl.getSyncStatusService();
-        	return status.getSyncServerInfo(Security.getCurrentTenantName());
+        	SyncServerInfo si = status.getSyncServerInfo(Security.getCurrentTenantName());
+        	si.setStatus("OK");
+        	return si;
         } catch (Exception e) {
             SyncServerInfo si = new SyncServerInfo();
             si.setConnectedAgents(0);
             si.setNumberOfAgents( getDispatcherService().findDispatchersByFilter(null, null, null, null, null, Boolean.TRUE).size() );
-            si.setStatus("ERROR");
+            si.setStatus("OFFLINE");
             si.setUrl(url);
 			si.setNumberOfPendingTasks(0);
 			for (Long data: getTaskEntityDao().findDataPendingTasks(m.getServerURL().getHost())) {

@@ -36,6 +36,7 @@ import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.Switch;
 import es.caib.zkib.events.SerializableEventListener;
 
 public class DespliegueUI extends FrameHandler 
@@ -362,7 +363,7 @@ public class DespliegueUI extends FrameHandler
 	}
 	
 	public void onCheck(Event ev) throws LoginException, RemoteException, CreateException, NamingException, InternalErrorException {
-		Checkbox todos = (Checkbox) getFellow("todos");
+		Switch todos = (Switch) getFellow("todos");
 		if (todos.isChecked())
 			cargarListadoProcesos();
 		else

@@ -35,10 +35,10 @@ public class AccountTypeHandler extends InputFieldUIHandler {
 	public void enableDescription(InputField3 field) {
 		ObjectAttributesDiv d = field.getObjectContainer();
 		if (d != null) {
-			AccountType type = (AccountType) field.getValue();
+			Object type = field.getValue();
 			ObjectAttributesDiv oad = (ObjectAttributesDiv) d;
 			InputField3 desc = oad.getInputFieldsMap().get("description");
-			desc.setReadonly(type == AccountType.USER);
+			desc.setReadonly(type.toString().equals( AccountType.USER.toString()));
 			desc.invalidate();
 		}
 	}

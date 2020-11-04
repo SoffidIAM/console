@@ -1,12 +1,3 @@
-/**
- * 
- */
-/**
- * 
- */
-/**
- * 
- */
 package com.soffid.iam.service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -119,7 +110,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	protected void handleSetAccountPassword (Account account, Password password)
 					throws Exception
 	{
-		getAccountService().setAccountPassword(account, password);
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
+			getAccountService().setAccountPassword(account, password);
 	}
 
 	/* (non-Javadoc)
@@ -129,6 +122,8 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	protected boolean handleSetHPAccountPassword (Account account, Password password,
 					Date untilDate, boolean force) throws Exception
 	{
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
 		return getAccountService().setHPAccountPassword(account, password, untilDate, force);
 	}
 
@@ -253,8 +248,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	 */
 	public Password handleQueryAccountPassword (Account account) throws InternalErrorException
 	{
-		Password p = getAccountService().queryAccountPassword(account);
-		return p;
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "queryPassword");
+		return getAccountService().queryAccountPassword(account);
 	}
 	
 	/* (non-Javadoc)
@@ -262,8 +258,9 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	 */
 	public Password handleQueryAccountPasswordBypassPolicy (Account account) throws InternalErrorException
 	{
-		Password p = getAccountService().queryAccountPasswordBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_USER);
-		return p;
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "queryPasswordBypassPolicy");
+		return getAccountService().queryAccountPasswordBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_USER);
 	}
 	
 	/* (non-Javadoc)
@@ -497,6 +494,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		if (acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_MANAGER) ||
 				acc.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_OWNER))
 		{
+			
 			Security.nestedLogin(Security.getCurrentUser(), 
 					new String [] { Security.AUTO_ACCOUNT_QUERY,
 						Security.AUTO_ACCOUNT_UPDATE});
@@ -548,4 +546,22 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 			throw new SecurityException (String.format("Not authorized to update account %s on %s",acc.getName(), acc.getSystem()));
 		}
 	}
+	@Override
+	protected void handleCheckCanSetAccountPassword(Account account) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
+	}
+	@Override
+	protected Password handleGenerateAccountTemporaryPassword(Account account) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
+		return getAccountService().generateAccountTemporaryPassword(account);
+	}
+	@Override
+	protected void handleCheckinHPAccount(Account account) throws Exception {
+//		AccountEntity entity = getAccountEntityDao().load(account.getId());
+//		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
+		getAccountService().checkinHPAccount(account);
+	}
+	
 }

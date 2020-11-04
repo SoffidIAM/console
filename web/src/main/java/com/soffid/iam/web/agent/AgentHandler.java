@@ -19,7 +19,8 @@ import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.jfree.util.Log;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -91,7 +92,8 @@ import es.caib.zkib.jxpath.JXPathContext;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class AgentHandler extends FrameHandler {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	private boolean canCreateAccessControlAgent;
 	private boolean canQueryAccessControlAgent;
 	private Tab accessControlTab;
@@ -457,7 +459,7 @@ public class AgentHandler extends FrameHandler {
 			else if ( error != null && error.booleanValue())
 			{
 				statusComponent.setVisible(true);
-				statusComponent.setSrc ("/img/semafor-vermell.png");
+				statusComponent.setSrc ("/img/warning.svg");
 				lastComponent.setVisible(true);
 				lastComponent.setValue(last1.getTime());
 				labelComponent.setVisible(true);
@@ -467,7 +469,7 @@ public class AgentHandler extends FrameHandler {
 			}
 			else if ( error != null && last2 != null)
 			{
-				statusComponent.setSrc ("/img/semafor-verd.png");
+				statusComponent.setSrc ("/img/ok.svg");
 				statusComponent.setVisible(true);
 				lastComponent.setVisible(true);
 				lastComponent.setValue(last1.getTime());
@@ -568,7 +570,7 @@ public class AgentHandler extends FrameHandler {
 				}
 			}
 			catch (Exception e) {
-				Log.warn("Error generating custom properties page", e);
+				log.warn("Error generating custom properties page", e);
 				customAgentProperties.setVisible(true);
 				setVisibleAttributeMapping (false);
 				setVisibleWorkflows(false);

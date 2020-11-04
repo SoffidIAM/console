@@ -38,7 +38,7 @@
 					var input = document.createElement("input");
 					td.appendChild(input);
 					input.value = value[col.value];
-					input.setAttribute("style", "width: 100%");
+					input.setAttribute("style", "width: 100%; border: none");
 					zk.listen(input, 'change',
 							() => {zkDatatable.sendClientAction(input,"onEditValue", [col.value, input.value])});
 					td.appendChild(input);
@@ -74,7 +74,7 @@
   value: column5
   render: renderColumn
 - name: "" 
-  template: <img src="/img/remove.svg" class="imageclic" title="${c:l('agents.DeleteAgent') }" onClick='zkDatatable.sendClientAction(this,"onRemove")'>
+  template: <img src="${execution.contextPath }/img/remove.svg" class="imageclic" title="${c:l('agents.DeleteAgent') }" onClick='zkDatatable.sendClientAction(this,"onRemove")'>
   sort: false
   ]]>
 				</attribute>

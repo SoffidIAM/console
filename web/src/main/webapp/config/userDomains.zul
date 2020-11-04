@@ -79,8 +79,8 @@
 						</row>
 						<row>
 							<div>
-								<imageclic src="/img/question.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
 								<label value="${c:l('dominiUsuaris.zul.scriptCreate')} :"/>
+								<imageclic src="/img/info.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="vertical-align: middle; margin-right: 8px"/>
 							</div>
 							<codemirror bind="@bshExprCreate" id="du_script1" 
 								readonly="${!canModifyUserDomain}"
@@ -92,8 +92,8 @@
 
 						<row>
 							<div>
-								<imageclic src="/img/question.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="margin-right: 8px"/>
 								<label value="${c:l('dominiUsuaris.zul.script')} :"/>
+								<imageclic src="/img/info.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="vertical-align: middle; margin-right: 8px"/>
 							</div>
 							<codemirror bind="@bshExpr" id="du_script2"
 								linenumbers="true" 

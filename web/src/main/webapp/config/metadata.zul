@@ -236,7 +236,7 @@
 					<row id="visibility4">
 						<div>
 							${c:l('dadesAddicionals.zul.VisibilityExpr')} :
-							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
+							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
 						</div>
 						<hbox width="100%"  widths="*, 24px">
 							<textbox width="100%" visible="true" style="resize: vertical"  bind="@visibilityExpression" rows="1" multiline="true"  onChange=""/>
@@ -246,7 +246,7 @@
 					<row id="visibility5">
 						<div>
 							${c:l('dadesAddicionals.zul.ValidExpr')} :
-							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;value: ${c:l('dadesAddicionals.zul.var4')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
+							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;value: ${c:l('dadesAddicionals.zul.var4')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
 						</div>
 						<hbox width="100%"  widths="*, 24px">
 							<textbox width="100%" visible="true" style="resize: vertical" bind="@validationExpression" rows="1" multiline="true"  onChange=""/>
@@ -256,7 +256,7 @@
 					<row id="visibility6">
 						<div>
 							${c:l('dadesAddicionals.zul.FilterExpr')} :
-							<imageclic src="/img/info.png" title="${c:l('dadesAddicionals.zul.var6') }" />
+							<imageclic src="/img/info.svg" title="${c:l('dadesAddicionals.zul.var6') }" />
 						</div>
 						<hbox width="100%"  widths="*, 24px">
 							<textbox width="100%" visible="true" style="resize: vertical"  bind="@filterExpression" multiline="true" onChange=""/>
@@ -266,7 +266,7 @@
 					<row >
 						<div>
 							${c:l('dadesAddicionals.zul.onLoadTrigger')} :
-							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
+							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
 						</div>
 						<hbox width="100%"  widths="*, 24px">
 							<textbox width="100%" visible="true" style="resize: vertical"  bind="@onLoadTrigger" multiline="true" onChange=""/>
@@ -276,7 +276,7 @@
 					<row >
 						<div>
 							${c:l('dadesAddicionals.zul.onChangeTrigger')} :
-							<imageclic src="/img/info.png" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
+							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
 						</div>
 						<hbox width="100%" widths="*, 24px">
 							<textbox width="100%" visible="true" style="resize: vertical"  bind="@onChangeTrigger" multiline="true" onChange=""/>

@@ -41,6 +41,7 @@ public class CustomField3 extends InputField3 {
 	String enumeration = null;
 	String metadata = null;
 	String uiHandler = null;
+	String label = null;
 	
 	private List<TipusDada> dataTypes;
 
@@ -85,9 +86,10 @@ public class CustomField3 extends InputField3 {
 			dataTypeObj.setRequired(required);
 			dataTypeObj.setFilterExpression(filterExpression);
 			dataTypeObj.setBuiltinHandler(uiHandler);
+			dataTypeObj.setLabel(label);
 			if (listOfValues != null)
 				dataTypeObj.setValues(Arrays.asList(listOfValues));
-			
+
 			List names = TypeEnumeration.names();
 			for ( int i = 0; i < names.size(); i++)
 			{
@@ -308,7 +310,8 @@ public class CustomField3 extends InputField3 {
 	}
 	
 	public void setLabel(String label) {
-		super.setLabel(label+" :");
+		this.label = label;
+		super.setLabel(label);
 		super.setPlaceholder(label);
 	}
 	
@@ -336,5 +339,5 @@ public class CustomField3 extends InputField3 {
 	public void setUiHandler(String uiHandler) {
 		this.uiHandler = uiHandler;
 	}
-	
+
 }

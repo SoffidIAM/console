@@ -32,6 +32,8 @@ public class MainWindow extends Window {
 		SoffidPrincipal p = Security.getSoffidPrincipal();
 		String usuari = p.getName();
 		String nom = p.getFullName();
+		if (usuari.startsWith("master\\"))
+			usuari = usuari.substring(7);
 		getPage().getNamespace().setVariable("usuari", usuari, true);
 		getPage().getNamespace().setVariable("nom", nom, true);
 	}

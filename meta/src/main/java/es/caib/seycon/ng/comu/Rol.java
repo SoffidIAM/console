@@ -33,7 +33,7 @@ public class Rol {
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute="system.name")
-	@Attribute(translated = "system" )
+	@Attribute(translated = "system", customUiHandler = "com.soffid.iam.web.account.SystemFieldHandler" )
 	public java.lang.String baseDeDades;
 
 	@Nullable
@@ -49,7 +49,8 @@ public class Rol {
 	public java.lang.Long id;
 
 	@Nullable
-	@Attribute(translated = "domain" )
+	@Attribute(translated = "domain",
+		customUiHandler = "com.soffid.iam.web.application.RoleDomainFieldHandler")
 	public String domini;
 
 	@Nullable

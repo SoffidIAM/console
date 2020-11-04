@@ -1,4 +1,4 @@
-package com.soffid.iam.web.interp;
+package es.caib.seycon.ng.web.component;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Page;

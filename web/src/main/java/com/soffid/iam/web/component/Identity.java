@@ -191,13 +191,14 @@ public class Identity implements Comparable<Identity>{
 		d.setSclass("identity-selector");
 		d.setAttribute("identity", this);
 		Image img = new Image (type == Type.USER ? "/img/user.png" :
-			type == Type.GROUP ? "/img/group.png" :
-			type == Type.ROLE ? "/img/key.png":
-			type == Type.GRANT ? "/img/key.png":
-			type == Type.APPLICATION ? "/img/key.png":
+			type == Type.GROUP ? "/img/group.svg" :
+			type == Type.ROLE ? "/img/role.svg":
+			type == Type.GRANT ? "/img/role.svg":
+			type == Type.APPLICATION ? "/img/application.svg":
 			type == Type.NETWORK ? "/img/network.svg":
-			type == Type.HOST ? "/img/host.png":
-				"/img/account.png");
+			type == Type.HOST ? "/img/host.svg":
+				"/img/account.svg");
+		img.setSclass("small-icon");
 		d.appendChild(img);
 		String l = selectorLabel == null ? label: selectorLabel;
 		
@@ -248,11 +249,14 @@ public class Identity implements Comparable<Identity>{
 			type == Type.GRANT ? "identity-tag-role":
 				"identity-tag-account");
 		d.setAttribute("identity", this);
-		Image img = new Image (type == Type.USER ? "/img/user.png" :
-			type == Type.GROUP ? "/img/group.png" :
-			type == Type.GRANT ? "/img/key.png":
-			type == Type.ROLE ? "/img/key.png":
-				"/img/account.png");
+		Image img = new Image (type == Type.USER ? "/img/user.svg" :
+			type == Type.GROUP ? "/img/group.svg" :
+			type == Type.GRANT ? "/img/key.svg":
+			type == Type.ROLE ? "/img/role.svg":
+			type == Type.HOST ? "/img/host.svg":
+			type == Type.NETWORK ? "/img/network.svg":
+				"/img/account.svg");
+		img.setSclass("small-icon");
 		d.appendChild(img);
 		Label l = new Label(label);
 		d.appendChild(l);

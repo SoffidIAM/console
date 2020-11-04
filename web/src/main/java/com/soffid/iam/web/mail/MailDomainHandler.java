@@ -27,7 +27,9 @@ import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datasource.CommitException;
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class MailDomainHandler extends FrameHandler {
@@ -105,13 +107,20 @@ public class MailDomainHandler extends FrameHandler {
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
-		SearchBox sb = (SearchBox) getFellow("searchBox");
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 		String name = req.getParameter("name");
 		if (name != null) {
-			sb.setBasicMode();
-			sb.addAttribute("name").setSearchFilter(name);
-			sb.search();
+			DataTable dt = (DataTable) getListbox();
+			for (int i = 0; i < dt.getModel().getSize(); i++)
+			{
+				dt.setSelectedIndex(i);
+				String thisName = (String) dt.getJXPathContext().getValue("name");
+				if (name.equals(thisName)) {
+					showDetails();
+					return;
+				}
+			}
+			dt.setSelectedIndex(-1);
 		}
 	}
 

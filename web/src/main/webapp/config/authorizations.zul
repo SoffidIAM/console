@@ -47,7 +47,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<pager datatable="listbox"/>
 				
-				<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				
 			</div>
 			<form2 id="form" onChangeXPath="ref:frame.onChangeForm()"
@@ -68,7 +68,7 @@
 						- name: ${c:l('autoritzacions.zul.Domini')}
 						  value: role.domain.name
 						- name: ""
-						  template: <img src='/img/remove.svg' class='imageclic' onClick='zkDatatable.sendClientAction(this,"onRemove")' />
+						  template: <img src='${execution.contextPath}/img/remove.svg' class='imageclic' onClick='zkDatatable.sendClientAction(this,"onRemove")' />
 						  sort: false
 						  filter: false
 						]]>
@@ -78,9 +78,9 @@
 					<div class="addButton" onClick="ref:frame.addNew">+</div>
 				</div>
 				<div style="text-align: right; width: 100%">
-					<databutton image="~./img/undo.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+					<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 					</databutton>
-					<databutton image="~./img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+					<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 				</div>
 			</form2>
 		</div>

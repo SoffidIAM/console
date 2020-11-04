@@ -31,14 +31,14 @@
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
    inkscape:window-width="1920"
-   inkscape:window-height="1043"
+   inkscape:window-height="1016"
    id="namedview13"
    showgrid="false"
-   inkscape:zoom="7.375"
+   inkscape:zoom="20.85965"
    inkscape:cx="16"
    inkscape:cy="16"
    inkscape:window-x="0"
-   inkscape:window-y="1080"
+   inkscape:window-y="27"
    inkscape:window-maximized="1"
    inkscape:current-layer="g8" />
 <style
@@ -59,7 +59,13 @@
 	<g
    id="g8"
    style="fill:#17b5c8">
-		<path
+		<ellipse
+   style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+   id="path981"
+   cx="16.011774"
+   cy="16.012196"
+   rx="15.963835"
+   ry="15.987804" /><path
    class="st4"
    d="M16,0c-0.5,0-1,0-1.5,0.1C22.6,0.8,29,7.7,29,16s-6.4,15.2-14.5,15.9c0.5,0,1,0.1,1.5,0.1c8.8,0,16-7.2,16-16    S24.8,0,16,0z"
    id="path4"

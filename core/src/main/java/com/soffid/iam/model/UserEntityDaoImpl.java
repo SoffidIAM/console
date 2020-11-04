@@ -502,7 +502,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
         HostEntity maquina = null;
         String nomServidor = sourceVO.getMailServer();
-        if (nomServidor != null) {
+        if (nomServidor != null && ! nomServidor.trim().isEmpty()) {
             maquina = getHostEntityDao().findByName(sourceVO.getMailServer());
             if (maquina == null) {
                 throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.mailServerNotFound"), sourceVO.getMailServer()));
@@ -513,7 +513,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         }
 
         nomServidor = sourceVO.getProfileServer();
-        if (nomServidor != null) {
+        if (nomServidor != null && ! nomServidor.trim().isEmpty()) {
             maquina = getHostEntityDao().findByName(sourceVO.getProfileServer());
             if (maquina == null) {
                 throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.profileServerNotFound"), sourceVO.getProfileServer()));
@@ -524,7 +524,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         }
 
         nomServidor = sourceVO.getHomeServer();
-        if (nomServidor != null) {
+        if (nomServidor != null && ! nomServidor.trim().isEmpty()) {
             maquina = getHostEntityDao().findByName(nomServidor);
             if (maquina == null) {
                 throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.homeServerNotFound"), sourceVO.getHomeServer()));

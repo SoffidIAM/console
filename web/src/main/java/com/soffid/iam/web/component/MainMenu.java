@@ -246,7 +246,11 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			option.setOptions(option.getHandler().getOptions(option));
 		if ((option.getOptions() == null || option.getOptions().isEmpty()) && option.getUrl() != null )
 		{
-			Application.setPage(option.getUrl());
+			if (event instanceof MouseEvent &&
+					(((MouseEvent) event).getKeys() & MouseEvent.CTRL_KEY) != 0)
+				getDesktop().getExecution().sendRedirect(option.getUrl(), "_blank");
+			else
+				Application.call(option.getUrl());
 		} else if ((option.getOptions() == null || option.getOptions().isEmpty()) && option.getExecHandler() != null) {
 			option.getExecHandler().launch(option);
 		} else {

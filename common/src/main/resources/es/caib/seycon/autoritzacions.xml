@@ -1695,5 +1695,34 @@
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
+	<autoritzacio>
+		<codi>selfservice:applications</codi>
+		<descripcio>View my applications</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>selfservice:tasks</codi>
+		<descripcio>View my tasks</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>selfservice:new-process</codi>
+		<descripcio>Start new requests</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>selfservice:search-process</codi>
+		<descripcio>Search current processes</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>selfservice:accounts</codi>
+		<descripcio>View my accounts</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
 
 </autoritzacions>

@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.sys.ExecutionCtrl;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.Challenge;
@@ -81,9 +82,6 @@ public class OtpPageHandler {
 	
 	public boolean requestOtp () throws InternalErrorException, NamingException, CreateException, SecurityException
 	{
-		if (hasPreviousOtp())
-			return false;
-		
 		challenge = new com.soffid.iam.api.Challenge();
 		com.soffid.iam.api.User u = com.soffid.iam.EJBLocator.getUserService().getCurrentUser();
 		if (u == null)
@@ -112,17 +110,22 @@ public class OtpPageHandler {
 	
 	public void showOtpDialog () throws InternalErrorException, NamingException, CreateException, SecurityException
 	{
-		component.setVisible(false);
+		if (component != null)
+			component.setVisible(false);
 		HashMap<String, Object> map = new HashMap<String, Object>();
 			
 		map.put("handler", this);
 
 		otpWindow = new Window();
-		if (component.getParent() == null)
+		if (component == null) {
+			Page p = Executions.getCurrent().getDesktop().getPage(page);
+			otpWindow.setPage(p);
+		} 
+		else if (component.getParent() == null)
 			otpWindow.setPageBefore(component.getPage(), component);
 		else
 			component.getParent().insertBefore(otpWindow, component);
-		Executions.getCurrent().createComponents("/otp/otp.zul", otpWindow, map);
+		Executions.getCurrent().createComponents("/popup/otp.zul", otpWindow, map);
 	}
 	
 	public boolean needsOtp (Component comp) 

@@ -29,7 +29,7 @@ public class Menu3 extends Div implements AfterCompose {
 	Vector<MenuOption> optionsArray = new Vector<MenuOption>();
 	List<MenuOption> options;
 	public Menu3() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
-		options = new MenuParser().parse("console.yaml");
+		options = new MenuParser().getMenus("console.yaml");
 	}
 
 	public void open() {
@@ -55,6 +55,9 @@ public class Menu3 extends Div implements AfterCompose {
 			o.put("url", option.getUrl());
 			if (option.getUrl() != null)
 				o.put("full_url", getDesktop().getExecution().getContextPath()+option.getUrl());
+			else if (option.getOptions() != null &&
+					! option.getOptions().isEmpty() && option.getLabel() != null) 
+				o.put("full_url", getDesktop().getExecution().getContextPath()+"/main/menu.zul?option="+option.getLabel());
 			int size = optionsArray.size();
 			o.put("url", size);
 			optionsArray.add(option);
@@ -110,6 +113,8 @@ public class Menu3 extends Div implements AfterCompose {
 					o.getExecHandler().launch(o);
 				else if ("true".equals(data[1]))
 					Executions.getCurrent().sendRedirect(o.getUrl(), "_blank");
+				else if (o.getUrl() == null)
+					Application.setPage("/main/menu.zul?option="+o.getLabel());					
 				else
 					Application.setPage(o.getUrl());
 			}

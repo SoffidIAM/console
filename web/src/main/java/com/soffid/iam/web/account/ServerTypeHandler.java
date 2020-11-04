@@ -6,14 +6,19 @@ import com.soffid.iam.web.component.ObjectAttributesDiv;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.jxpath.JXPathException;
 
 public class ServerTypeHandler extends InputFieldUIHandler {
 	@Override
 	public boolean isVisible (InputField3 field) throws Exception {
-		String system = (String) XPathUtils.getValue(field, "system");			
-		String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
-		AccountType type = (AccountType) XPathUtils.getValue(field, "type");
-		return (ssoSystem == null || ssoSystem.equals(system) && type != AccountType.IGNORED);
+		try {
+			String system = (String) XPathUtils.getValue(field, "system");			
+			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+			AccountType type = (AccountType) XPathUtils.getValue(field, "type");
+			return (ssoSystem == null || ssoSystem.equals(system) && type != AccountType.IGNORED);
+		} catch (JXPathException e) {
+			return false;
+		}
 	}
 
 

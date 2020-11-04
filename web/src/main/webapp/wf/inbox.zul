@@ -20,18 +20,21 @@
 			<datatable enablefilter="true" id="listbox" 
 				onSelect="ref:frame.openTask">
 			<attribute name="columns"><![CDATA[
+- name: ${c:l('inbox.lblIdentificador')}
+  value: id
+  className: datetimeColumn
 - name: ${c:l('inbox.lbldefinicionTarea')}
   value: task
 - name: ${c:l('inbox.lblFecha')}
   value: date
+  className: datetimeColumn
   template: #{date_datetime }
 - name: ${c:l('inbox.lblFechaPrevistaFin')}
   value: duedate
   template: #{duedate_datetime }
+  className: datetimeColumn
 - name: ${c:l('inbox.lblActoresAsignados')}
   value: actor
-- name: ${c:l('inbox.lblIdentificador')}
-  value: id
 			]]></attribute>
 			</datatable>
 		</div>

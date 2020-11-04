@@ -134,11 +134,12 @@ public class WorkflowInterceptor implements Filter {
 						MessageFactory.setThreadLocale(locale);
 					}
 				}
-				String timezone = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEZONE);
+				TimeZone timezone = (TimeZone) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEZONE);
 				if (timezone != null)
-					TimeZones.setThreadLocal(TimeZone.getTimeZone(timezone));
+					TimeZones.setThreadLocal(timezone);
 				String dateFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_DATEFORMAT);
 				String timeFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEFORMAT);
+				String sourceIP = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IP);
 				if (dateFormat != null) {
 					DateFormats.setThreadLocal(new String[] {
 							dateFormat,

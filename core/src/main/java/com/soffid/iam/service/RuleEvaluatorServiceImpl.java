@@ -128,7 +128,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                     assignRole(rule, roles, user, rar.getRole(), stringValue, method);
                 }
 				
-				if ( rule.getBshExpression() != null)
+				if ( rule.getBshRoles() != null)
 				{
 					Object o = evaluate(rule.getBshRoles(), env);
 					if (o != null) {

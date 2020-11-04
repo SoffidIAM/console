@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.UiException;
 import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.common.ChangePass;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -117,7 +118,7 @@ public class PasswordChangeHandler extends FrameHandler {
 			return;
 		}
 		
-		es.caib.loginModule.ChangePass thechange = new es.caib.loginModule.ChangePass();
+		ChangePass thechange = new ChangePass();
 		try
 		{
 			String usuari = com.soffid.iam.utils.Security.getCurrentAccount();

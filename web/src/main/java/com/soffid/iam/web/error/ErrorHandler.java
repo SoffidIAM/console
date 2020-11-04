@@ -15,6 +15,9 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.security.ObserveObligationException;
+import com.soffid.iam.web.obligation.ObligationManager;
+
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class ErrorHandler extends Window implements AfterCompose {
@@ -48,23 +51,25 @@ public class ErrorHandler extends Window implements AfterCompose {
 		Textbox exceptionLabel = (Textbox)getFellow("exception");
 		if (e instanceof Throwable)
 		{
-			boolean noTeAutoritzacions = false;
 		    Throwable original = (Throwable) e;
-		    Throwable cause = null;
-		    do {
-		       if ( e instanceof javax.ejb.EJBException ) 
-		          cause = ((EJBException)e).getCausedByException ();
-		       else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
-		       	  cause = e.getCause ();
-		       	  noTeAutoritzacions = true;
-		       }
-		       else
-		          cause = e.getCause ();
-		       if (cause == null || cause == e)
-		          break;
-		       e = cause;
-		    } while (true);
+		    e = getRootException(e);
 
+		    
+		    if (e instanceof ObserveObligationException) {
+		    	ObligationManager om = new ObligationManager();
+		    	if (om.getNextObligation() != null)
+		    	{
+		    		try {
+		    			om.handleNextObligation();
+		    			detach();
+		    			return;
+		    		} catch (Exception e2) {
+		    			original = e = e2;
+		    		    e = getRootException(e);
+		    		}
+		    	}
+		    }
+		    
 		    if (e instanceof javax.security.auth.login.LoginException )
 			{
 				messageLabel.setValue ( Labels.getLabel("error.SessionExpired") );
@@ -87,7 +92,7 @@ public class ErrorHandler extends Window implements AfterCompose {
 			} 
 			c = es.caib.seycon.ng.exception.SoffidStackTrace.getStackTrace(original);
 			log.warn (Labels.getLabel("error.NoPrevist")+ " " 
-					+execution.getDesktop().getRequestPath()+" ["+execution.getUserPrincipal()+"] "+
+					+execution.getDesktop().getRequestPath()+" ["+execution.getUserPrincipal().getName()+"] "+
 				"[Remote="+execution.getRemoteAddr()+"]",
 				original);
 		}
@@ -99,6 +104,25 @@ public class ErrorHandler extends Window implements AfterCompose {
 					 req.getAttribute("javax.servlet.error.exception");				
 		}
 		exceptionLabel.setValue(c);
+	}
+
+	public Throwable getRootException(Throwable e) {
+		boolean noTeAutoritzacions;
+		Throwable cause = null;
+		do {
+			if ( e instanceof javax.ejb.EJBException ) 
+				cause = ((EJBException)e).getCausedByException ();
+			else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
+				cause = e.getCause ();
+				noTeAutoritzacions = true;
+			}
+			else
+				cause = e.getCause ();
+			if (cause == null || cause == e)
+				break;
+			e = cause;
+		} while (true);
+		return e;
 	}
 
 	void resetSession() {

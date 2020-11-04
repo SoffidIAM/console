@@ -273,9 +273,9 @@ public class AccountWindow extends Window implements AfterCompose {
 		Component form = getFellow("form");
 		AccountType accountType = (AccountType) XPathUtils.getValue(form, "/type");
 		LaunchType type = (LaunchType) XPathUtils.getValue(form, "/launchType");
-		String serverName = (String) XPathUtils.getValue(form, "/attributes[@name='SSO:Server']");
-		String serverType = (String) XPathUtils.getValue(form, "/attributes[@name='type']");
-		String url = (String) XPathUtils.getValue(form, "/attributes[@name='SSO:URL']");
+		String serverName = (String) XPathUtils.getValue(form, "serverName");
+		String serverType = (String) XPathUtils.getValue(form, "serverType");
+		String url = (String) XPathUtils.getValue(form, "/loginUrl");
 		if ( (url == null || url.isEmpty()) &&
 				accountType != AccountType.IGNORED )
 		{
@@ -293,7 +293,7 @@ public class AccountWindow extends Window implements AfterCompose {
 				url = "jdbc:<dbtype>://"+serverName+"/databaseName";
 			}
 			XPathUtils.setValue(form, "loginUrl", url);
-			XPathUtils.setValue(form, "/attributes[@name='SSO:URL']", url);
+//			XPathUtils.setValue(form, "/attributes[@name='SSO:URL']", url);
 		}
 	}
 	

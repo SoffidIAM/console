@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="auth" type="auth">   <!-- tothom -->
+			<ejb-finder jndi="java:/module/AuthorizationService-v2"
+				method="getDescriptionUserAuthorizations">
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="auth" transient="true">
+	</datanode>
+
+</zkib-model>

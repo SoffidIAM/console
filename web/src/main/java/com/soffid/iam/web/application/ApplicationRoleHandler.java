@@ -75,9 +75,11 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		DataSource rootDs = (DataSource) Path.getComponent(getSpaceOwner(), "/model");
 		String name = (String) XPathUtils.getValue (dataSource, "/name");
 		
+		getListbox().addNew();
 		
+		XPathUtils.setValue(getListbox(), "informationSystemName", name);
 		
-		Window w = (Window) getFellow("add_domain_window");
+		Window w = (Window) getFellow("modify-window");
 		w.doHighlighted();
 	}
 	

@@ -39,6 +39,7 @@ import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.AccountService;
+import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
@@ -247,14 +248,14 @@ public class VaultHandler extends FrameHandler {
 		if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
-			EJBLocator.getAccountService().setAccountPassword(element.getAccount(), new Password( password.getValue()) );
+			EJBLocator.getSelfService().setAccountPassword(element.getAccount(), new Password( password.getValue()) );
 			es.caib.zkib.zkiblaf.Missatgebox
 					.confirmaOK(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
 		}
 		else
 		{
-			Password nouPassword =  EJBLocator.getAccountService().generateAccountTemporaryPassword(element.getAccount());
+			Password nouPassword =  EJBLocator.getSelfService().generateAccountTemporaryPassword(element.getAccount());
 			showPasswordAssist(nouPassword.getPassword());
 		}
 
@@ -424,7 +425,7 @@ public class VaultHandler extends FrameHandler {
 		CustomField3 x = (CustomField3) w.getFellow("checkpwd");
 
 		boolean done = service.setHPAccountPassword(account,
-				new Password((String) p.getValue()), (Date) d.getValue(),
+				(Password) p.getValue(), (Date) d.getValue(),
 					Boolean.TRUE.equals( x.getValue()) );
 		if (done)
 		{
@@ -454,7 +455,7 @@ public class VaultHandler extends FrameHandler {
 		Missatgebox.confirmaOK_CANCEL("Please, confirm you want to return this account",
 				(Event evt) ->  {
 						if ("onOK".equals(evt.getName())) {
-							AccountService ejb = EJBLocator.getAccountService();
+							SelfService ejb = EJBLocator.getSelfService();
 							ejb.checkinHPAccount(account);
 							XPathUtils.setValue(getForm(), "lockedBy", null);
 							updateAccountIcons();
@@ -476,7 +477,7 @@ public class VaultHandler extends FrameHandler {
 		}
 		else
 		{
-			com.soffid.iam.api.Password pawd = service.queryAccountPassword(account);
+			com.soffid.iam.api.Password pawd = EJBLocator.getSelfService().queryAccountPassword(account);
 			if(pawd!=null){
 					String cadena = pawd.getPassword();
 					String cadenaResultant = "";

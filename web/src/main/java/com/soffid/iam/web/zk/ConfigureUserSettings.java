@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -34,6 +35,7 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.api.User;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.Languages;
 
 import es.caib.seycon.ng.EJBLocator;
@@ -57,11 +59,13 @@ public class ConfigureUserSettings {
 	
 	// Nom de les variables de sessio
 	public static final String SESSIO_IDIOMA = "es.caib.seycon.ng.web.idioma"; //$NON-NLS-1$
-	public static final String SESSIO_TIMEZONE = "es.caib.seycon.ng.web.timezone"; //$NON-NLS-1$
+	public static final String SESSIO_TIMEZONE = Attributes.PREFERRED_TIME_ZONE; //$NON-NLS-1$
 
 	public static final String SESSIO_DATEFORMAT = "es.caib.seycon.ng.web.dateformat";
 
 	public static final String SESSIO_TIMEFORMAT = "es.caib.seycon.ng.web.timeformat";
+
+	public static final String SESSIO_IP = "es.caib.seycon.ng.web.ip";
 	
 	static Log log = LogFactory.getLog(ConfigureUserSettings.class);
 	
@@ -168,7 +172,7 @@ public class ConfigureUserSettings {
 		if (timezone == null)
 			timezone = ConfigurationCache.getProperty("soffid.timezone");
 		if (timezone != null)
-			sessio.setAttribute(SESSIO_TIMEZONE, timezone);
+			sessio.setAttribute(SESSIO_TIMEZONE, TimeZone.getTimeZone(timezone));
 		String dateformat = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("dateformat");
 		if (dateformat == null)
 			dateformat = ConfigurationCache.getProperty("soffid.dateformat");
@@ -179,6 +183,9 @@ public class ConfigureUserSettings {
 			timeformat = ConfigurationCache.getProperty("soffid.timeformat");
 		if (timeformat != null)
 			sessio.setAttribute(SESSIO_TIMEFORMAT, timeformat);
+		String sourceIP = Security.getClientIp();
+		sessio.setAttribute(SESSIO_IP, sourceIP);
+		com.soffid.iam.EJBLocator.getPreferencesService().updateMyPreference("last_ip", sourceIP);
 	}
 
 }

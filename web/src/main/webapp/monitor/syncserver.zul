@@ -137,14 +137,18 @@
   value: task
 - name: ${c:l('seyconserver.zul.Priority')}
   value: priority
+  className: statusColumn
 - name: ${c:l('seyconserver.zul.Executions')}
   value: executions
+  className: statusColumn
 - name: ${c:l('seyconserver.zul.Executiontime')}
   value: executiontime_datetime
+  className: datetimeColumn
 - name: ${c:l('seyconserver.zul.Message')}
   value: message
 - name: ${c:l('seyconserver.zul.Scheduled')}
   value: scheduled_datetime
+  className: datetimeColumn
 		]]></attribute>
 		</datatable>
 		<div style="height: 24px">

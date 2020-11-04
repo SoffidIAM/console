@@ -5,10 +5,6 @@ import java.io.UnsupportedEncodingException;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
-import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.AccessTree;
-import com.soffid.iam.api.AccessTreeExecution;
-import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.menu.DynamicLauncher;
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.vault.LaunchHelper;

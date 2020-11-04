@@ -29,6 +29,15 @@ public abstract class UserAccountEntity {
 	@Nullable
 	public java.util.Date untilDate;
 
+	@Column(name = "UAC_BPM")
+	@Nullable
+	Long workflowId;
+	
+	@Description("Approved flag for BPM")
+	@Column(name = "UAC_APPROV")
+	@Nullable
+	Boolean approved;
+	
 	@Operation(translated = "findByAccountSystemAndName")
 	@DaoFinder("select uae\n"
 			+ "from  com.soffid.iam.model.UserAccountEntity as uae\n"

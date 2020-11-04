@@ -19,7 +19,7 @@ public class UserAccountsTree extends DataTree2 {
 	
 	protected String getRowClass(TreeModelProxyNode node) {
 		DataNode dataNode = (DataNode) node.getValue();
-		if (dataNode.getInstance() instanceof Account) {
+		if (dataNode != null && dataNode.getInstance() instanceof Account) {
 			Account acc = (Account) dataNode.getInstance();
 			if (acc.isDisabled())
 				return "dashed";

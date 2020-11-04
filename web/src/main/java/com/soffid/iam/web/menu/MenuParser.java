@@ -84,19 +84,26 @@ public class MenuParser {
 
 	public List<MenuOption> parse(String cfg) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
 		List<MenuOption> options = new LinkedList<MenuOption>();
-		Enumeration<URL> r = MenuParser.class.getClassLoader().getResources("com/soffid/iam/menu/"+cfg);
-		while (r.hasMoreElements())
-		{
-			URL next = r.nextElement();
-			InputStream in = next.openStream();
-			StringBuffer sb = new StringBuffer();
-			InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-			int read;
-			while ( (read=reader.read()) >= 0)
-				sb.append((char) read);
-			in.close();
-			JSONArray array = (JSONArray) new YamlParser().parse(sb.toString());
-			parseMenus (options, array );
+		String rsrcName = "com/soffid/iam/menu/"+cfg;
+		List<String> names = new LinkedList<>();
+		names.add(rsrcName);
+		if (rsrcName.endsWith(".yaml"))
+			names.add(rsrcName.substring(0, rsrcName.length()-5)+"-addon.yaml");
+		for (String name: names) {
+			Enumeration<URL> r = MenuParser.class.getClassLoader().getResources(name);
+			while (r.hasMoreElements())
+			{
+				URL next = r.nextElement();
+				InputStream in = next.openStream();
+				StringBuffer sb = new StringBuffer();
+				InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+				int read;
+				while ( (read=reader.read()) >= 0)
+					sb.append((char) read);
+				in.close();
+				JSONArray array = (JSONArray) new YamlParser().parse(sb.toString());
+				parseMenus (options, array );
+			}
 		}
 		return options;
 	}
@@ -181,6 +188,8 @@ public class MenuParser {
 	
 	
 	public MenuOption findMenuOption (List<MenuOption> option, Page page) {
+		if (page == null)
+			return null;
 		String path = page.getRequestPath();
 		return findMenu (option, path);
 	}

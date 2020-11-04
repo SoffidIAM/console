@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.xml.HTMLs;
 import org.zkoss.xml.XMLs;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -75,6 +77,7 @@ import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datasource.CommitException;
+import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.JXPathException;
 
@@ -93,6 +96,9 @@ public class InputField3 extends Databox
 	InputFieldUIHandler uiHandler = null;
 	InputFieldDataHandler<?> dataHandler = null;
 	boolean readonly = false;
+	boolean visible = true;
+	String keysPath = null;
+	String valuesPath = null;
 	
 	private SearchFilter filter;
 
@@ -270,7 +276,7 @@ public class InputField3 extends Databox
 							}
 						});
 						for (UserType ut: allUserType ) {
-							values.add(ut.getCode()+":"+ut.getDescription());
+							values.add( URLEncoder.encode( ut.getCode(), "UTF-8" )+":"+ut.getDescription());
 						}
 						setType(Databox.Type.LIST);
 						setValues(values);
@@ -291,7 +297,7 @@ public class InputField3 extends Databox
 							}
 						});
 						for (OsType ut: allOperatingSystems ) {
-							values.add(ut.getName()+":"+ut.getDescription());
+							values.add(URLEncoder.encode( ut.getName(), "UTF-8" )+":"+ut.getDescription());
 						}
 						setType(Databox.Type.LIST);
 						setValues(values);
@@ -303,8 +309,10 @@ public class InputField3 extends Databox
 			}
 			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE)
 				setVisible(false);
-			else if (dataType.getType() == TypeEnumeration.BOOLEAN_TYPE)
+			else if (dataType.getType() == TypeEnumeration.BOOLEAN_TYPE) {
 				setType(Databox.Type.BOOLEAN);
+				setSclass("databox databox_switch");
+			}
 			else if (dataType.getType() == TypeEnumeration.DATE_TIME_TYPE)
 			{
 				setType(Databox.Type.DATE);
@@ -386,20 +394,20 @@ public class InputField3 extends Databox
 
 	private void calculateVisibility() throws Exception {
 		if (uiHandler != null && !uiHandler.isVisible(this)) {
-			setVisible(false);
+			super.setVisible(false);
 		} 
 		else if (dataType.getVisibilityExpression() != null &&
 				!dataType.getVisibilityExpression().trim().isEmpty())
 		{
 			SecureInterpreter interp = createInterpreter();
 			if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
-				this.setVisible(false);
+				super.setVisible(false);
 			else
-				this.setVisible(true);
+				super.setVisible(visible);
 		}
 		else
 		{
-			this.setVisible(true);
+			super.setVisible(visible);
 		}
 	}
 
@@ -924,11 +932,15 @@ public class InputField3 extends Databox
 	protected Object parseUiValue(Object value) {
 		if (dataType != null && dataType.getEnumeration() != null && ! dataType.getEnumeration().trim().isEmpty()) {
 			List<String> r = new LinkedList<String>();
-			try {
-				Class<?> cl = Class.forName(dataType.getEnumeration());
-				value = cl.getMethod("fromString", String.class).invoke(null, (String)value);
-			} catch (Exception e) {
-				throw new UiException(e);
+			if (value == null || value.toString().isEmpty())
+				value = null;
+			else {
+				try {
+					Class<?> cl = Class.forName(dataType.getEnumeration());
+					value = cl.getMethod("fromString", String.class).invoke(null, (String)value);
+				} catch (Exception e) {
+					throw new UiException(e);
+				}
 			}
 		} else if ( dataType != null && dataType.getType() == TypeEnumeration.PASSWORD_TYPE){
 			value = new Password((String)value);
@@ -952,16 +964,63 @@ public class InputField3 extends Databox
 							String label = Labels.getLabel(cl.getName()+"."+name);
 							if (label == null || label.trim().isEmpty())
 								label = name;
-							r.add(v+":"+ label);
+							r.add(URLEncoder.encode( v, "UTF-8" )+":"+ label);
 						}
 					}
 				}
 				setValues(r);
 				setType(Type.LIST);
-			} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+			} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException | UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
+		} else if (keysPath != null) {
+			List<String> keys = calcListValues(keysPath);
+			List<String> labels = calcListValues(valuesPath);
+			List<String> values = new LinkedList<>();
+			for (int i = 0; i < keys.size(); i++) {
+				String key;
+				try {
+					key = keys.get(i);
+					if (labels.size() > i)
+						key = URLEncoder.encode( key, "UTF-8") + ":"+labels.get(i);
+					else
+						key = URLEncoder.encode( key, "UTF-8") + ":"+key;
+				} catch (UnsupportedEncodingException e) {
+					throw new RuntimeException(e);
+				}
+				values.add(key);
+			}
+			setValues(values);
+			setType(Type.LIST);
 		}
+	}
+
+	public List<String> calcListValues(String path) {
+		List<String> v = new LinkedList<>();
+		if (path == null) return v;
+		Component c = this;
+		if (path.contains(":")) {
+			c = Path.getComponent(getSpaceOwner(), keysPath.substring(0,path.indexOf(":")));
+			path = path.substring(path.indexOf(":")+1);
+		}
+		if (c instanceof DataSource) {
+			DataSource ds = (DataSource) c;
+			for (Iterator it = ds.getJXPathContext().iterate( path );
+					it.hasNext();)
+			{
+				Object o = it.next();
+				v.add(o == null ? null: o.toString());
+			}
+		} else {
+			BindContext b = XPathUtils.getComponentContext(c);
+			for (Iterator it = b.getDataSource().getJXPathContext().iterate( XPathUtils.concat(b.getXPath(), path));
+					it.hasNext();)
+			{
+				Object o = it.next();
+				v.add(o == null ? null: o.toString());
+			}
+		}
+		return v;
 	}
 	
 	public Object getValueObject() throws Exception {
@@ -1014,4 +1073,42 @@ public class InputField3 extends Databox
 		this.dataHandler = dataHandler;
 	}
 
+	
+	public String getKeysPath() {
+		return keysPath;
+	}
+
+	
+	public void setKeysPath(String keysPath) {
+		this.keysPath = keysPath;
+	}
+
+	
+	public String getValuesPath() {
+		return valuesPath;
+	}
+
+	
+	public void setValuesPath(String valuesPath) {
+		this.valuesPath = valuesPath;
+	}
+
+	
+	public boolean isVisible() {
+		return super.isVisible();
+	}
+
+	
+	public boolean setVisible(boolean visible) {
+		this.visible = visible;
+		if (visible) {
+			try {
+				calculateVisibility();
+			} catch (Exception e) {
+			}
+			return super.isVisible();
+		}
+		else
+			return super.setVisible(visible);
+	}
 }

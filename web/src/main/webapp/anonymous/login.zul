@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
-<?link rel="icon" href="/anonymous/ff-orig.svg" sizes="any" type="image/svg+xml"?>
+<?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
 		<script>
 		updateUsername = function  ()
@@ -17,9 +17,11 @@
 		</script>
 	<style>
 		body {
-			background-image: url(${execution.contextPath}/anonymous/background.svg);
+			background-color: #5ec0a5;
+			background-image: url(${execution.contextPath}/anonymous/bg-orig.svg);
 			background-repeat: no-repeat;
 			background-size: cover;
+			background-position: center;
 			overflow: hidden;
 		}
 		div.login {
@@ -27,7 +29,11 @@
 			background-color: #202020;
 			opacity: 1;
 			color: white;
-			margin-top: 100px;
+			top: 50%;
+		    transform: translateY(-50%)translateX(-50%);
+		    position: absolute;
+		    left: 50%;
+			margin-top: -125px;
 			padding: 30px;
 			border-radius: 12px;
 		}
@@ -48,7 +54,8 @@
 	</style>
 	<html id="htmlData" use="com.soffid.iam.web.main.LoginPage"><![CDATA[
 		<div class="login">
-        		<p><img src="/soffid/anonymous/logo - iam.svg" alt="Soffid logo" /> </p> 
+		<p><img src="/soffid/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  alt="" /> </p> 
+        		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 
 			<div class="loginbox" id="loginbox"> 
 				<p>${c:l('configure.header')}</p>
 				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8">

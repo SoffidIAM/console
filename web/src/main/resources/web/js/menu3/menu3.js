@@ -81,9 +81,19 @@ zkMenu3.open=function(ed, parent, options, first) {
 		tr.appendChild(td);
 		if (option.options || option.dynamic) {
 			od.setAttribute("class", "menu3menu");
-			od.appendChild(document.createTextNode(option.label));
 			zk.listen(tr, "mouseover", zkMenu3.onMouseOver);
 			td.innerHTML = ("&#x279c;");
+			if (option.full_url) {
+				od.setAttribute("class", "menu3item");
+				var a = document.createElement("a");
+				a.href = option.full_url;
+				a.appendChild(document.createTextNode(option.label));				
+				zk.listen(a, "click", zkMenu3.prevent);
+				od.appendChild(a);
+				zk.listen(tr, "click", zkMenu3.onClick);
+			} else {
+				od.appendChild(document.createTextNode(option.label));				
+			}
 		} else {
 			od.setAttribute("class", "menu3item");
 			var a = document.createElement("a");

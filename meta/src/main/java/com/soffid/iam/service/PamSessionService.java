@@ -32,7 +32,8 @@ import roles.Tothom;
 	AuditoriaEntity.class,
 	ServeiEntity.class,
 	RegistreAccesEntity.class, SessioEntity.class, UsuariEntity.class,
-	MaquinaEntity.class})
+	MaquinaEntity.class,
+	PamSecurityHandlerService.class})
 public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	List<JumpServerGroup> findJumpServerGroups() {return null;}

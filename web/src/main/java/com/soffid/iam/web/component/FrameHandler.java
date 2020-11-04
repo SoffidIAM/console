@@ -42,7 +42,8 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class FrameHandler extends Frame {
 	String menu = "console.yaml";
-
+	boolean nomenu = false;
+	
 	public FrameHandler() throws InternalErrorException {
 		setMold("div");
 		setStyle("position:relative");
@@ -65,18 +66,24 @@ public class FrameHandler extends Frame {
 									ctx + getPage().getRequestPath())));
 			
 		}
+		
 		MenuParser menuParser = new MenuParser();
 		List<MenuOption> options;
+		MenuOption option = null;
 		try {
 			options = menuParser.getMenus(menu);
-			MenuOption option = menuParser.findMenuOption(options, getPage());
-			if (option != null)
-			{
-				setTitle(Labels.getLabel(option.getLabel()));
-			} else {
-				setTitle ("");
-			}
+			option = menuParser.findMenuOption(options, getPage());
 		} catch (Exception e) {
+		}
+		if (option != null)
+		{
+			setTitle(Labels.getLabel(option.getLabel()));
+		} else {
+			setTitle ("");
+			if (! nomenu) {
+				setVisible(false);
+				throw new SecurityException("This URL is forbidden");
+			}
 		}
 
 		Application.registerPage(this);
@@ -369,5 +376,15 @@ public class FrameHandler extends Frame {
 
 	public void changeColumns(Event event) throws IOException {
 		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
+	}
+
+	
+	public boolean isNomenu() {
+		return nomenu;
+	}
+
+	
+	public void setNomenu(boolean nomenu) {
+		this.nomenu = nomenu;
 	}
 }

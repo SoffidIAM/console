@@ -32,6 +32,7 @@
 - name: ${c:l('auditoria.zul.Data/Hora')}
   default: true
   value: calendar_datetime
+  className: datetimeColumn
 - name: ${c:l('auditoria.zul.Autor-2')}
   default: true
   value: author

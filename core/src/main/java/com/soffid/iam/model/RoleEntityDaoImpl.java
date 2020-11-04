@@ -650,7 +650,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				TipusDomini.MEMBERSHIPS.equals(tipusDomini) ||
 				TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
 			targetVO.setDomain(TipusDomini.GROUPS);
-		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0) {
+		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0 ||
+				tipusDomini.equals(TipusDomini.APPLICATIONS)) {
 			targetVO.setDomain(TipusDomini.APPLICATIONS);
 		} else if (sourceEntity.getApplicationDomain() == null) {
 			targetVO.setDomain(null);

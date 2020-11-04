@@ -106,6 +106,13 @@ public abstract class ServerService {
 	 return null;
 	}
 	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"UnknownUserException"})
+	public java.util.Collection<es.caib.seycon.ng.comu.UsuariGrup> getUserMemberships(
+		java.lang.String accountName, 
+		@Nullable java.lang.String dispatcherId)
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
+	 return null;
+	}
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"UnknownUserException"})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> getUserGroupsHierarchy(
 		java.lang.String accountName, 
 		@Nullable java.lang.String dispatcherId)

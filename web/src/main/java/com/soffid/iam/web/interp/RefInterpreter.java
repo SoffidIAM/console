@@ -46,7 +46,9 @@ public class RefInterpreter extends GenericInterpreter implements
 				o = null;
 				Component c = event.getTarget();
 				do {
-					c = c.getNamespace().getOwner().getParent();
+					c = c.getNamespace().getOwner();
+					if (c == null) break;
+					c = c.getParent();
 					if (c == null) break;
 					o = c.getFellowIfAny(s[0]);
 				} while (o == null);

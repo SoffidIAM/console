@@ -540,8 +540,7 @@ public class RoleAccountEntityDaoImpl
 			primerCognom = primerCognom != null ? primerCognom : ""; //$NON-NLS-1$
 			String segonCognom = usuariEntity.getMiddleName();
 			segonCognom = segonCognom != null ? segonCognom : ""; //$NON-NLS-1$
-			targetVO.setUserFullName(nom
-					+ " " + primerCognom + " " + segonCognom); //$NON-NLS-1$ //$NON-NLS-2$
+			targetVO.setUserFullName(usuariEntity.getFullName()); //$NON-NLS-1$ //$NON-NLS-2$
 			targetVO.setUserCode(usuariEntity == null ? null : usuariEntity
 					.getUserName());
 		} else {

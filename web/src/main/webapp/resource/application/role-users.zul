@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.application.RoleUsersHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	
+	<div class="navigation-bar dummy">
+		<label bind="${arg.listbox }:/@name"></label> - <label bind="${arg.listbox }:/@description"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }"  if="${soffid:isUserInRole('user:role:create')}"  onClick="ref:handler.addNew"/>
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+
+	<datatable id="listbox" autocommit="false" 
+		use="com.soffid.iam.web.user.RoleAccountDatatable"
+		preference="com.soffid.iam.web.user.RoleAccount-role-cols"
+		dataPath="${arg.listbox }:/grant" maxheight="60vh" sortColumn="0"
+		onSelect="ref:handler.showDetails" enablefilter="true">
+		<attribute name="allColumns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.RoleAccount.risk')}
+  width: 30px
+  template: <img class="small-icon" src="${execution.contextPath}/img/risk.#{sodRisk.value}.svg" style='#{sodRisk != null && sodRisk.value != ""? "": "display:none" }'>
+  className: selector
+  sort: false
+  filter: false
+  value: sodRisk
+- name: ${c:l('usuaris.zul.RoleCategory')}
+  width: 150px
+  value: roleCategory
+- name: ${c:l('usuaris.zul.Account')}
+  width: 150px
+  value: accountName
+  default: true
+- name: ${c:l('com.soffid.iam.api.Account.description')}
+  value: userFullName
+  default: true
+- name: ${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}
+  value: domainValue/value
+  default: false
+- name: ${c:l('aplicacions.zul.DomainDescription')}
+  value: domainValue/description
+  default: false
+- name: ${c:l('usuaris.zul.startDate')}
+  className: datetimeColumn
+  value: startDate_date
+  default: true
+- name: ${c:l('usuaris.zul.endDate')}
+  className: datetimeColumn
+  value: endDate_date
+  default: true
+- name: ${c:l('usuaris.zul.recertification')}
+  className: statusColumn
+  value: certificationDate_date
+  default: true
+- name: ${c:l('usuaris.zul.holderGroup')}
+  width: 150px
+  value: holderGroup
+		]]>
+		</attribute>
+	</datatable>
+
+	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:role:create')}" >
+		<div class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+		position="center, center" sizable="true"
+		title="${c:l('user-roles.header')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
+
+		<div sclass="navigation-bar dummy">
+			<label bind="../${arg.listbox }:/name"></label>
+			-
+			<label bind="../${arg.listbox }:/description"></label>
+			<pager datatable="../listbox"/>
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					id="trash"
+					 if="${soffid:isUserInRole('user:group:delete')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:handler.delete"/>
+		</div>
+
+		<form id="form" width="100%" dataPath="../listbox:/">
+			<customfield3 label="${c:l('com.soffid.iam.api.Role.informationSystemName') }" dataType="STRING" readonly="true"
+				bind="informationSystemName"/>
+			<customfield3 label="${c:l('aplicacions.zul.NomRol-2') }" dataType="STRING" readonly="true"
+				bind="roleName"/>
+			<customfield3 label="${c:l('accounts.dispatcher') }" dataType="STRING" readonly="true"
+				bind="system"/>
+			<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+				label="${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini') }:" readonly="true" 
+				multiValue="false"
+				bind="domainValue/value"
+				id="domainValues2"/>
+			<customfield3 label="${c:l('pamSession.accountName') }" dataType="STRING"
+				bind="accountName" id="account" readonly="true"/>
+			<customfield3 label="${c:l('usuaris.zul.startDate') }"
+				bind="startDate" dataType="DATE" readonly="true"/>
+			<customfield3 label="${c:l('usuaris.zul.endDate') }"
+				bind="endDate" dataType="DATE" readonly="true"/>
+			<customfield3 label="${c:l('usuaris.zul.recertification') }"
+				bind="certification" dataType="DATE" readonly="true"/>
+			<customfield3 label="${c:l('usuaris.zul.holderGroup') }" id="holderGroup"
+				bind="holderGroup" dataType="STRING" readonly="true"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.rule') }"
+				bind="ruleDescription" dataType="STRING" readonly="true"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.risk') }"
+				bind="sodRisk" dataType="STRING" enumeration="es.caib.seycon.ng.comu.SoDRisk" readonly="true" id="sodRisk"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.sodRules') }"
+				dataType="HTML" readonly="true" id="sodRules"/>
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
+				onClick="ref:handler.closeDetails">
+			</button>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add-window"
+		position="top, center" sizable="true"
+		title="${c:l('user-roles.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("user-roles.selectAccount")}
+	- ${c:l("user-roles.selectDomain")}
+	- ${c:l("user-groups.setProperties")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div id="step1">
+
+				<customfield3 dataType="USER" id="user"
+					label="${c:l('user-roles.selectUser') }"
+					multiValue="true"
+					filterExpression='active eq "true"'
+					required="false" >
+				</customfield3>		
+
+				<customfield3 dataType="ACCOUNT" id="account"
+					label="${c:l('user-roles.selectAccount') }"
+					multiValue="true"
+					required="false" >
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.undoAdd" />
+					<button image="/img/next-r.svg" label="${c:l('user-roles.selectDomain')}" onClick="ref:handler.selectDomain"/>
+				</div>
+						
+			</div>
+			<div >
+
+				<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+					label="${c:l('user-roles.selectDomainValue') }"
+					multiValue="true"
+					required="true" 
+					id="domainValues">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.back" />
+					<button image="/img/next-r.svg" label="${c:l('user-groups.setProperties')}" onClick="ref:handler.setProperties"/>
+				</div>
+						
+			</div>
+			<div>
+				<form width="100%" dataPath="../listbox:/">
+					<customfield3 label="${c:l('com.soffid.iam.api.Role.informationSystemName') }" dataType="STRING" readonly="true"
+						bind="../${arg.listbox }:/informationSystemName"/>
+					<customfield3 label="${c:l('aplicacions.zul.NomRol-2') }" dataType="STRING" readonly="true"
+						bind="../${arg.listbox }:/name"/>
+					<customfield3 label="${c:l('accounts.dispatcher') }" dataType="STRING" readonly="true"
+						bind="../${arg.listbox }:/system"/>
+					<customfield3 use="com.soffid.iam.web.component.DomainValueField" 
+						label="${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini') }:" readonly="true" 
+						multiValue="true"
+						id="domainValues2"/>
+					<customfield3 label="${c:l('pamSession.accountName') }" dataType="STRING"
+						noadd="true" noremove="true"
+						id="account2" multiValue="true"/>
+					<customfield3 label="${c:l('usuaris.zul.startDate') }"
+						id="startDate" dataType="DATE"/>
+					<customfield3 label="${c:l('usuaris.zul.endDate') }"
+						id="endDate" dataType="DATE"/>
+				</form>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:handler.backAndRollback" />
+					<button image="/img/ok-r.svg" label="${c:l('user-account-new.Finish') }"
+						onClick="ref:handler.applyAdd"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+</div>

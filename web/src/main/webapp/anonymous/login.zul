@@ -3,7 +3,7 @@
 <?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
 		<script>
-		updateUsername = function  ()
+		function updateUsername ()
 		{
 			var tenant = document.getElementById("j_tenant").value;
 			var account = document.getElementById("j_account").value;
@@ -13,6 +13,19 @@
 			} else {
 				document.getElementById("j_username").value = tenant + "\\" + account;
 			}
+		}
+		
+		function preparesubmit(event) {
+			if (document.getElementById("login").classList.contains("progress"))
+				return true;
+			else {
+				document.getElementById("login").classList.add("progress");
+				setTimeout(() => {
+					document.getElementById("loginForm").submit();
+				}, 50);
+				event.preventDefault();
+	  			return false;
+	  		}
 		}
 		</script>
 	<style>
@@ -24,19 +37,26 @@
 			background-position: center;
 			overflow: hidden;
 		}
+
 		div.login {
 			font-size: 12pt;
 			background-color: #202020;
 			opacity: 1;
 			color: white;
 			top: 50%;
-		    transform: translateY(-50%)translateX(-50%);
 		    position: absolute;
 		    left: 50%;
 			margin-top: -125px;
 			padding: 30px;
 			border-radius: 12px;
+			transition: transform 0.5s;
+			transform-style: preserve-3d ;
+		    transform: translateY(-50%)translateX(-50%);
 		}
+		div.login.progress {
+		    transform: translateY(-50%)translateX(-50%)rotateX( 90deg );
+		}
+		
 		div.login div.loginbox div.inputlogin {
 			font-weight: bold;
 		}		
@@ -53,12 +73,12 @@
 		}
 	</style>
 	<html id="htmlData" use="com.soffid.iam.web.main.LoginPage"><![CDATA[
-		<div class="login">
+		<div class="login" id='login'>
 		<p><img src="/soffid/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  alt="" /> </p> 
         		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 
 			<div class="loginbox" id="loginbox"> 
 				<p>${c:l('configure.header')}</p>
-				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8">
+				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8" onsubmit="preparesubmit(event)">
 				<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 				<input name="j_username" id="j_username" type="hidden" value="${user }">
 				<input name="j_tenant" id="j_tenant" type="hidden" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>

@@ -7,8 +7,8 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 	<div sclass="topline">		
 		<menu2 image="/img/gear.svg" sclass="col_der">
 			<label value="${nom } - ${usuari } " sclass="welcome"/>
-			<menu2item image="/img/profile.svg" onClick='es.caib.zkib.zkiblaf.Application.call("self/profile.zul")'   label="${c:l('perfil.Titol') }" />
-			<menu2item image="/img/power.svg" label="${c:l('zkiblaf.tancarSessio')}" id="logoutButton"/>
+			<menu2item image="/img/profile.svg" onClick='ref:appWindew.profile'   label="${c:l('perfil.Titol') }" />
+			<menu2item image="/img/power.svg" label="${c:l('zkiblaf.tancarSessio')}" onClick="ref:appWindow.logout"/>
 		</menu2>
 
 		<div sclass="col_der help"  onClick="ref:appWindow.help">

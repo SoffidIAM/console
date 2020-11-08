@@ -20,6 +20,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.web.component.CustomField3;
@@ -38,6 +39,7 @@ import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.Wizard;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -393,34 +395,32 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		case WIZARD_GROUP:
 			switch (wizard.getSelected()) {
 			case 0:
-				CustomField3 group = (CustomField3) wizardWindow.getFellow("group");
-				if (group.validate()) {
-					wizardGroup = (Group) group.getValueObject();
-					wizard.next();
-					String currentDomain = (String) getListbox().getJXPathContext().getValue("/@domain");
-					DomainValueField dvf = (DomainValueField) wizardWindow.getFellow("sourceDomainValues");
-					if (currentDomain != null)
+				{
+					CustomField3 group = (CustomField3) wizardWindow.getFellow("group");
+					if (group.validate()) {
+						wizardGroup = (Group) group.getValueObject();
+						wizard.next();
+						String currentDomain = (String) getListbox().getJXPathContext().getValue("/@domain");
+						if (currentDomain != null)
+							break;
+					} else {
 						break;
-				} else {
-					break;
+					}
 				}
 			case 1:
 				{
 					wizard.next();
+					CustomField3 group = (CustomField3) wizardWindow.getFellow("group");
 					String currentRole = (String) getListbox().getJXPathContext().getValue("/@name");
 					String currentSystem = (String) getListbox().getJXPathContext().getValue("/@system");
 					String currentDomain = (String) getListbox().getJXPathContext().getValue("/@domain");
 					((Databox)wizardWindow.getFellow("grantedRole")).setValue(currentRole+"@"+currentSystem); 
 					
-					List<String> sourceValues = (List<String>) ((Databox)wizardWindow.getFellow("sourceDomainValues")).getValue(); 
+					List<String> sourceValues = (List<String>) ((Databox)wizardWindow.getFellow("domainValues")).getValue(); 
 					((Databox)wizardWindow.getFellow("grantedScope")).setValue(sourceValues);
 					((Databox)wizardWindow.getFellow("grantedScope")).setVisible(currentDomain != null);
 								
-					((Databox)wizardWindow.getFellow("granteeRole")).setValue(wizardRole.getName()+"@"+wizardRole.getSystem());
-	
-					List<String> values = (List<String>) ((Databox)wizardWindow.getFellow("domainValues")).getValue(); 
-					((Databox)wizardWindow.getFellow("granteeScope")).setValue(values);
-					((Databox)wizardWindow.getFellow("granteeScope")).setVisible(wizardRole.getDomain() != null);
+					((Databox)wizardWindow.getFellow("granteeRole")).setValue(group.getValue());
 	
 					break;
 				}
@@ -532,7 +532,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 				ownerRoles.add(rg);
 			}
 
-			getListbox().getJXPathContext().setValue("/granteGroups", ownerRoles);
+			getListbox().getJXPathContext().setValue("/granteeGroups", ownerRoles);
 			getListbox().sendEvent(new XPathRerunEvent(getListbox(), "/granteeGroups"));
 //			getListbox().commit();
 			wizardWindow.setVisible(false);
@@ -583,7 +583,17 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 
 	public void preview(Event event) throws InternalErrorException, NamingException, CreateException {
 		Role r = (Role) ((DataNode) getListbox().getJXPathContext().getValue("/")).getInstance();
-		String file = EJBLocator.getApplicationService().generateChangesReport(r);
+		List<RoleAccount> ra = new LinkedList<>();
+		List<RoleAccount> rr = new LinkedList<>();
+		DataNodeCollection dnc = (DataNodeCollection) getListbox().getJXPathContext().getValue("/grant");
+		for (int i = 0; i < dnc.size(); i++) {
+			DataNode dn = (DataNode) dnc.getDataModel(i);
+			if (dn.isDeleted())
+				rr.add((RoleAccount) dn.getInstance());
+			else if (dn.isNew())
+				ra.add((RoleAccount) dn.getInstance());
+		}
+		String file = EJBLocator.getApplicationService().generateChangesReport(r, ra, rr);
 		Window previewWindow = (Window) getFellow("previewWindow");
 		((FileDump)previewWindow.getFellow("previewDiv")).setSrc(file);
 		previewWindow.doHighlighted();

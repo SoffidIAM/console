@@ -3024,6 +3024,11 @@ public class ApplicationServiceImpl extends
 	
 	@Override
 	protected String handleGenerateChangesReport(Role rol) throws Exception {			
+		return handleGenerateChangesReport(rol, new LinkedList<>(), new LinkedList<>());
+	}
+	
+	@Override
+	protected String handleGenerateChangesReport(Role rol, List<RoleAccount> grantsToAdd, List<RoleAccount> grantsToRemove) throws Exception {			
 		// Get current grantees
 		HashSet<RolAccountDetail> set1 = new HashSet<RolAccountDetail>();
 		if (rol.getId() != null)
@@ -3047,12 +3052,37 @@ public class ApplicationServiceImpl extends
 		
 		LinkedList<RoleGrant> list1 = new LinkedList<RoleGrant>();
 		toRoleGrantList(set1, list1);
-		
 		// Get new grantees
 		HashSet<RolAccountDetail> set2 = new HashSet<RolAccountDetail>();
 		computeNewGrantees(rol, set2 );
 		LinkedList<RoleGrant> list2 = new LinkedList<RoleGrant>();
 		toRoleGrantList(set2, list2);
+		if (grantsToAdd != null) {
+			for (RoleAccount ra: grantsToAdd) {
+				boolean found = false;
+				RoleGrant rgadd = roleAccountToRoleGrant(ra);
+				for (RoleGrant rg: list2) {
+					if (sameGrant(rg, rgadd)) {
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					list2.add(rgadd);
+			}
+		}
+		if (grantsToRemove != null) {
+			for (RoleAccount ra: grantsToRemove) {
+				RoleGrant rgremove = roleAccountToRoleGrant(ra);
+				for (Iterator<RoleGrant> it = list2.iterator(); it.hasNext();) {
+					RoleGrant rg = it.next();
+					if (sameGrant(rg, rgremove)) {
+						it.remove();
+						break;
+					}
+				}
+			}
+		}
 		
 		RolGrantDiffReport report = new RolGrantDiffReport ();
 		report.setAccountEntityDao(getAccountEntityDao());
@@ -3060,6 +3090,30 @@ public class ApplicationServiceImpl extends
 		File f = report.generateReport (list1, list2);
 		
 		return f.getAbsolutePath();
+	}
+	
+	private boolean sameGrant(RoleGrant rg, RoleGrant rgadd) {
+		if (rg.getOwnerAccountName().equals(rgadd.getOwnerAccountName()) &&
+				rg.getRoleName().equals(rgadd.getRoleName()) &&
+				rg.getSystem().equals(rgadd.getSystem())) {
+			if (rg.getDomainValue() == null && rgadd.getDomainValue() == null)
+				return true;
+			if (rg.getDomainValue() == null || rgadd.getDomainValue() == null)
+				return false;
+			return rg.getDomainValue().equals(rgadd.getDomainValue());
+		}
+		else
+			return false;
+	}
+	
+	public RoleGrant roleAccountToRoleGrant(RoleAccount ra) {
+		RoleGrant rg = new RoleGrant();
+		rg.setRoleName(ra.getRoleName());
+		rg.setRoleDescription(ra.getRoleDescription());
+		rg.setSystem(ra.getSystem());
+		rg.setOwnerAccountName(ra.getAccountName());
+		rg.setOwnerSystem(ra.getSystem());
+		return rg;
 	}
 
 	private void computeNewGrantees(Role rol, HashSet<RolAccountDetail> radSet) throws Exception {

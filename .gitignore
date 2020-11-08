@@ -190,3 +190,4 @@
 /web/src/main/webapp/codetest/
 
 pom.xml~
+/web-root/target

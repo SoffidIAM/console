@@ -63,7 +63,6 @@ public class DynamicColumnsDatatable extends DataTable {
 			Set<String> cols = new java.util.HashSet<String>();
 			JSONArray a = new JSONArray();
 			
-			
 			String customColumns = getCustomColumns();
 			if (customColumns != null && !customColumns.trim().isEmpty())
 				a = (JSONArray) new YamlParser().parse(customColumns);

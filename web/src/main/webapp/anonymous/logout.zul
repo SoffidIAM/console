@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
+	<style>
+		body {
+			background-color: #5ec0a5;
+			background-image: url(${execution.contextPath}/anonymous/bg-orig.svg);
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-position: center;
+			overflow: hidden;
+		}
+
+		div.login {
+			font-size: 12pt;
+			background-color: #202020;
+			opacity: 1;
+			color: white;
+			top: 50%;
+		    position: absolute;
+		    left: 50%;
+			margin-top: -125px;
+			padding: 30px;
+			border-radius: 12px;
+			transition: transform 0.5s;
+			transform-style: preserve-3d ;
+		    transform: translateY(-50%)translateX(-50%);
+		}
+	</style>
+	<script>
+		function reload() {
+			document.location.href="..";
+		}
+	</script>
+	<html id="htmlData"><![CDATA[
+		<div class="login" id='login'>
+			<p><img src="/soffid/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  alt="" /> </p> 
+       		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 
+			<p style='margin-top: 24px; margin-bottom: 24px'>${c:l('LogoutServlet.3')}</p>
+			<p>
+				<input name="formUCboton" type="button" value="${c:l('LogoutServlet.4')}" onClick="reload()">
+			</p>
+		</div>
+]]></html>
+</zk>

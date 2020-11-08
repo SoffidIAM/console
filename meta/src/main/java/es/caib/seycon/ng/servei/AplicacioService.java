@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.servei;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Aplicacio;
 import es.caib.seycon.ng.comu.Domini;
 import es.caib.seycon.ng.comu.Rol;
+import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.model.RolsGrupEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
@@ -836,6 +838,14 @@ public abstract class AplicacioService {
 	@Description("Generates a report to view the changes that a role change will generat")
 	@Transactional(readOnly=true, noRollbackFor={java.lang.Exception.class})
 	public String generateChangesReport(Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Operation (grantees={roles.application_update.class})
+	@Description("Generates a report to view the changes that a role change will generat")
+	@Transactional(readOnly=true, noRollbackFor={java.lang.Exception.class})
+	public String generateChangesReport(Rol rol, @Nullable List<RolAccount> grantsToAdd, @Nullable List<RolAccount> grantsToRemove)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

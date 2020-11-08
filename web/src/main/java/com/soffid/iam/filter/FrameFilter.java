@@ -39,7 +39,8 @@ public class FrameFilter implements Filter {
 		} catch (Exception e) {}
 		if (app == null && target != null && 
 				!target.isEmpty() &&
-				!target.equals("/index.zul"))
+				!target.equals("/index.zul") &&
+				!target.equals("/anonymous/logout.zul"))
 		{
 			HttpServletRequestWrapper req2 = new IndexRequestWrapper(req, "/index.zul", target);
 			req.setAttribute("$soffid$target", target);

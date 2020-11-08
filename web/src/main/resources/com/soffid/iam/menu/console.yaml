@@ -42,7 +42,7 @@
           permissions: ["seu:networks:show"]
           img: /img/menu/networks.svg
         - name: seu.roles
-          url: /resource/application/roles.zul
+          url: /resource/application/role.zul
           img: /img/menu/roles.svg
           permissions: ["seu:rules:show"]
         - name: seu.maquines

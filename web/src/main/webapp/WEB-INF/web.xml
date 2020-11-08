@@ -80,17 +80,8 @@
 	</servlet>
 
 
-	<!--  Logout srevlet -->
-	<servlet>
-		<description>
-			<![CDATA[Logout servlet]]>
-		</description>
-		<servlet-name>logoutServlet</servlet-name>
-		<servlet-class>com.soffid.iam.web.LogoutServlet</servlet-class>
-	</servlet>
 	<!-- servlet per obtindre logs del seycon-server -->
 	<servlet>
-		<description>servlet para propiedades de firma del applet de firma</description>
 		<servlet-name>ServerLogServlet</servlet-name>
 		<servlet-class>
 			es.caib.seycon.ng.web.servlet.ServerLogServlet
@@ -123,10 +114,6 @@
 	<servlet-mapping>
 		<servlet-name>ServerLogServlet</servlet-name>
 		<url-pattern>/SEU/serverlog</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>logoutServlet</servlet-name>
-		<url-pattern>/prelogout</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

@@ -6,8 +6,10 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.json.JSONObject;
+import org.zkoss.mesg.Messages;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.mesg.MZul;
 
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.web.WebDataType;
@@ -30,9 +32,10 @@ public class DefaultRenderer extends DataTypeRenderer {
 		if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE)
 			o.put("template", "${"+prefix+dt.getName()+"_datetime}");
 		if (dt.getType() == TypeEnumeration.BOOLEAN_TYPE) {
-			o.put("template", "${"+prefix+dt.getName()+ "? '" +
-					Labels.getLabel("mesg:org.zkoss.zul.mesg.MZul:YES")+ "' : '"+
-					Labels.getLabel("mesg:org.zkoss.zul.mesg.MZul:NO")+ "' }");
+			String yes = Messages.get(MZul.YES);
+			String no = Messages.get(MZul.NO);
+			o.put("template", "${"+prefix+dt.getName()+ "? '" +yes+ "' : '"+no+ "' }");
+			o.put("className", "statusColumn");
 		}
 		return o;
 	}

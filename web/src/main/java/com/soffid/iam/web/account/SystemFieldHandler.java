@@ -32,26 +32,20 @@ public class SystemFieldHandler extends InputFieldUIHandler {
 	@Override
 	public void afterCreate(InputField3 field) throws Exception {
 		field.setType(Type.LIST);
-		LinkedList<System> active = new LinkedList<>( EJBLocator.getDispatcherService().findAllActiveDispatchers() );
-		Collections.sort(active, new Comparator<System>() {
-			@Override
-			public int compare(System o1, System o2) {
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
-		});
-		LinkedList<System> all = new LinkedList<>( EJBLocator.getDispatcherService().findDispatchersByFilter(null, null, null, null, null, false) );
+		LinkedList<System> all = new LinkedList<>( EJBLocator.getDispatcherService().findSystemByTextAndFilter("", "", null, null) );
 		Collections.sort(all, new Comparator<System>() {
 			@Override
 			public int compare(System o1, System o2) {
+				if (o1.getUrl() == null && o2.getUrl() != null)
+					return -1;
+				if (o1.getUrl() != null && o2.getUrl() == null)
+					return +1;
 				return o1.getName().compareToIgnoreCase(o2.getName());
 			}
 		});
 		List<String> values = new LinkedList<>();
-		for (System s: active)
-			values.add(s.getName()+":"+s.getName()+" - "+s.getDescription());
 		for (System s: all)
-			if (s.getUrl() == null)
-				values.add(s.getName()+":"+s.getName()+" - "+s.getDescription());
+			values.add(s.getName()+":"+s.getName()+" - "+s.getDescription());
 		field.setValues(values);
 	}
 

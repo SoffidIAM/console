@@ -3,7 +3,6 @@
 <zkib-model>
 
 	<datanode name="applications">
-
 		<finder name="application" type="application" >
 			<ejb-finder jndi="java:/module/ApplicationService-v2" 
 				method="findApplicationByJsonQueryAsync"
@@ -31,6 +30,16 @@
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Application"></new-instance-bean>
 		</finder>
+		
+		<finder name="role" type="role" >
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findRoleByTextAndFilterAsync" 
+				if = "${queryText != null  || query != null}">
+				<parameter value="${queryText}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Role"></new-instance-bean>
+		</finder>
+		
 	</datanode>
 
 	<datanode name="application"
@@ -129,6 +138,15 @@
 	</datanode>
 
 	<datanode name="role">
+		<finder name="grant" type="grant">
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName">
+				<parameter value="${instance.name}" />
+				<parameter value="${instance.informationSystemName}" />
+				<parameter value="${instance.system}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount">
+			</new-instance-bean>
+		</finder>
 		<ejb-handler jndi="java:/module/ApplicationService-v2">
 			<insert-method method="create2" returnBean="true">
 				<parameter value="${instance}" />
@@ -137,6 +155,20 @@
 				<parameter value="${instance}" />
 			</delete-method>
 			<update-method method="update2">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
+	<datanode name="grant">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>

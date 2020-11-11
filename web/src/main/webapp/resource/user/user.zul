@@ -49,7 +49,7 @@
 								
 				<databutton image="/img/sync.svg" onClick="ref:frame.viewTasks" onlyIcon="true" id="pendingTasksButton"/>
 				
-				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 			</div>
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 				<tabs>

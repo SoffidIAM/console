@@ -21,8 +21,11 @@
 			else {
 				document.getElementById("login").classList.add("progress");
 				setTimeout(() => {
-					document.getElementById("loginForm").submit();
+ 					document.getElementById("loginForm").submit();
 				}, 50);
+				setTimeout(() => {
+					document.getElementById("wait").classList.add("progress");
+				}, 500);
 				event.preventDefault();
 	  			return false;
 	  		}
@@ -31,7 +34,7 @@
 	<style>
 		body {
 			background-color: #5ec0a5;
-			background-image: url(${execution.contextPath}/anonymous/bg-orig.svg);
+			background-image: url(${execution.contextPath}/anonymous/bg.png);
 			background-repeat: no-repeat;
 			background-size: cover;
 			background-position: center;
@@ -63,6 +66,7 @@
 		div.loginbox {
 			width: 100%; 
 		}
+		
 		input, input[type="submit"] {
 			margin-top: 12px;
 			margin-bottom: 6px;
@@ -71,8 +75,34 @@
 			font-size: 11pt;
 			padding: 6px;
 		}
+		
+		div.wait {
+			position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    margin-top: -48px;
+		    margin-left: -48px;
+		    background-color: white;
+		    border-radius: 48px;
+		    width: 96px;
+		    height: 96px;
+		    display: none;
+		}
+		
+		div.wait.progress {
+			display: block;
+		}
+		div.wait img {
+			margin-left: 16px;
+			margin-top: 16px;
+			width: 64px;
+			height: 64px;
+		}
 	</style>
 	<html id="htmlData" use="com.soffid.iam.web.main.LoginPage"><![CDATA[
+		<div class="wait" id="wait">
+			<img src="${execution.contextPath }/anonymous/wait.gif" />
+		</div>
 		<div class="login" id='login'>
 		<p><img src="/soffid/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  alt="" /> </p> 
         		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 

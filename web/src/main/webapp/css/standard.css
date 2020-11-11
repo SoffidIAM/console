@@ -2121,6 +2121,11 @@ div.datatable table.tbody tr td.datetimeColumn {
 	text-align: right;
 }
 
+div.datatable table.tbody tr td.dateColumn {
+	width: 110px;
+	text-align: right;
+}
+
 div.datatable table.tbody tr.dashed td,
 div.databox.dashed select {
 	text-decoration: line-through;
@@ -2489,6 +2494,7 @@ div.addButton span {
 	display: inline-block;
 	color: white;
 	font-size: 35px;
+	padding-top: 3px;
 }
 
 span.link {

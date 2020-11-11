@@ -8,4 +8,5 @@ public class RequestedObligationEnum {
 	public String MESSAGE = "urn:soffid:obligation:message";
 	public String WORKFLOW = "urn:soffid:obligation:bpm";
 	public String SESSION_RECORDING = "urn:soffid:obligation:session-recording";
+	public String NOTIFY_OWNER = "urn:soffid:obligation:notify-owner";
 }

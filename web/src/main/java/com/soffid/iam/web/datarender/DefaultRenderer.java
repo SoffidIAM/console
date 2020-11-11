@@ -27,10 +27,14 @@ public class DefaultRenderer extends DataTypeRenderer {
 		String prefix = Boolean.TRUE.equals(d.getBuiltin()) ?  "": "attributes.";
 		o.put("value", prefix+dt.getName());
 		o.put("name", dt.getLabel());
-		if (dt.getType() == TypeEnumeration.DATE_TYPE)
+		if (dt.getType() == TypeEnumeration.DATE_TYPE) {
 			o.put("template", "${"+prefix+dt.getName()+"_date}");
-		if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE)
+			o.put("className", "dateColumn");
+		}
+		if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE) {
 			o.put("template", "${"+prefix+dt.getName()+"_datetime}");
+			o.put("className", "datetimeColumn");
+		}
 		if (dt.getType() == TypeEnumeration.BOOLEAN_TYPE) {
 			String yes = Messages.get(MZul.YES);
 			String no = Messages.get(MZul.NO);

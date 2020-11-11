@@ -3,25 +3,18 @@ package es.caib.bpm.toolkit;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ejb.CreateException;
-import javax.naming.NamingException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.web.bpm.WorkflowWindowInterface;
 import com.soffid.iam.web.users.additionalData.CustomField;
 
 import es.caib.bpm.servei.ejb.BpmEngine;
-import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.bpm.toolkit.exception.WorkflowException;
 import es.caib.bpm.vo.ProcessInstance;
 import es.caib.bpm.vo.TaskInstance;
@@ -68,7 +61,7 @@ public class WorkflowWindow extends Window implements WorkflowWindowInterface {
         this.canDeleteAttachments = canDeleteAttachments;
     }
 
-    public WorkflowWindow() throws NamingException, CreateException
+    public WorkflowWindow() 
     {
     	Execution exe = Executions.getCurrent();
     	if (exe == null)
@@ -87,7 +80,11 @@ public class WorkflowWindow extends Window implements WorkflowWindowInterface {
 			taskInstance.setVariables(processInstance.getVariables());
 		}
 
-        engine = EJBLocator.getBpmEngine();
+		try {
+			engine = EJBLocator.getBpmEngine();
+		} catch (Exception e) {
+			throw new UiException(e);
+		}
         this.addEventListener(PREPARE_TRANSITION_EVENT, new SerializableEventListener() {
             public void onEvent(org.zkoss.zk.ui.event.Event event)
                     throws Exception {

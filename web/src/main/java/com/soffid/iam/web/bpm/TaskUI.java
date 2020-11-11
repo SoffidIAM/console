@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -124,7 +125,7 @@ public class TaskUI extends FrameHandler implements EventListener {
     Button btnTomar = null;
     Button btnDelegar = null;
 	private Long definitionId;
-
+	private Map<String,String[]> newTaskParameters = null;
     
 	public boolean canClose() {
         boolean result;
@@ -155,6 +156,7 @@ public class TaskUI extends FrameHandler implements EventListener {
 					definitionId = d.getId();
 				}
 			}
+			newTaskParameters = req.getParameterMap();
 		}
 		
 	}
@@ -215,6 +217,12 @@ public class TaskUI extends FrameHandler implements EventListener {
 				throw new InternalErrorException("Cannot crate task for process " +definitionId);
 			if (ti.getStart() == null) {
 				ti = EJBLocator.getBpmEngine().startTask(ti);
+			}
+			Map vars = ti.getVariables();
+			for ( Map.Entry<String,String[]> param: newTaskParameters.entrySet()) {
+				if (param.getKey().startsWith("_")) {
+					vars.put(param.getKey().substring(1), ((String[])param.getValue())[0]);
+				}
 			}
 			openTaskInstance(ti);
 		}

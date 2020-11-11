@@ -43,6 +43,7 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 public class FrameHandler extends Frame {
 	String menu = "console.yaml";
 	boolean nomenu = false;
+	boolean registerUrl = true;
 	
 	public FrameHandler() throws InternalErrorException {
 		setMold("div");
@@ -53,7 +54,7 @@ public class FrameHandler extends Frame {
 
 	@Override
 	public void afterCompose() {
-		if (!Executions.getCurrent().isExplorer())
+		if (!Executions.getCurrent().isExplorer() && registerUrl)
 		{
 			String ctx = getDesktop().getExecution().getContextPath();
 			response("setUrl", 
@@ -64,7 +65,6 @@ public class FrameHandler extends Frame {
 									ctx + getPage().getRequestPath(), 
 									getPage().getTitle(), 
 									ctx + getPage().getRequestPath())));
-			
 		}
 		
 		MenuParser menuParser = new MenuParser();
@@ -386,5 +386,15 @@ public class FrameHandler extends Frame {
 	
 	public void setNomenu(boolean nomenu) {
 		this.nomenu = nomenu;
+	}
+
+	
+	public boolean isRegisterUrl() {
+		return registerUrl;
+	}
+
+	
+	public void setRegisterUrl(boolean registerUrl) {
+		this.registerUrl = registerUrl;
 	}
 }

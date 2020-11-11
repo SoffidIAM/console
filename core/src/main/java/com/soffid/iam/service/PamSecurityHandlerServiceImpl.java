@@ -43,10 +43,10 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 		if ( ! psc.isAllowed())
 			throw new SecurityException("Action not authorized");
 		else
-			checkObligations(account, psc.getObligations());
+			checkObligations(account, action, psc.getObligations());
 	}
 
-	private void checkObligations(AccountEntity account, List<RequestedObligation> obligations) throws ObserveObligationException {
+	private void checkObligations(AccountEntity account, String action, List<RequestedObligation> obligations) throws ObserveObligationException {
 		List<Obligation> unmeetObligations = new LinkedList<>();
 		for (RequestedObligation req: obligations) {
 			if (req.getObligation().equals(RequestedObligationEnum.WORKFLOW.getValue())) {
@@ -68,8 +68,10 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 							ProcessInstance process;
 							try {
 								process = getBpmEngine().getProcess(wfId);
-								if (process.getEnd() != null ) {
-									req.getAttributes().put("currentProcessId", wfId.toString());
+								if (process.getEnd() == null ) {
+									req.getAttributes().put("in-progress-process", wfId.toString());
+								} else {
+									getUserAccountEntityDao().remove(userAccount);
 								}
 							} catch (InternalErrorException | BPMException e) {
 							}
@@ -77,11 +79,11 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 					}
 				}
 				if (!found) {
-					addObligation(req, unmeetObligations);
+					addObligation(req, unmeetObligations, account, action);
 				}
 			} else {
 				if ( !checkObligation(req)) {
-					addObligation(req, unmeetObligations);
+					addObligation(req, unmeetObligations, account, action);
 				}
 			}
 		}
@@ -90,7 +92,7 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 	}
 
 
-	public void addObligation(RequestedObligation req, List<Obligation> unmeetObligations) {
+	public void addObligation(RequestedObligation req, List<Obligation> unmeetObligations, AccountEntity account, String action) {
 		Obligation o = new Obligation();
 		o.setObligation(req.getObligation());
 		o.setAttributes(req.getAttributes());
@@ -100,6 +102,13 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 		} catch (Exception e) {
 			o.setTimeout(System.currentTimeMillis() + 60000);
 		}
+
+		o.getAttributes().put("account", account.getName());
+		o.getAttributes().put("systemName", account.getSystem().getName());
+		o.getAttributes().put("loginName", account.getLoginName());
+		o.getAttributes().put("server", account.getServerName());
+		o.getAttributes().put("action",  action);
+		
 		unmeetObligations.add(o);
 	}
 

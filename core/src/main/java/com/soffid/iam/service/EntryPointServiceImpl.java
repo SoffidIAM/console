@@ -105,8 +105,6 @@ public class EntryPointServiceImpl extends
 	public EntryPointServiceImpl() {
 	}
 
-	private static final Long ROOT_ID = new Long(0);
-
 	// Informació de l'usuari actual (per comprovar les autoritzacions)
 
 	/**
@@ -483,17 +481,14 @@ public class EntryPointServiceImpl extends
 	protected com.soffid.iam.api.AccessTree handleFindRoot()
 			throws java.lang.Exception {
 
-		EntryPointEntity entity = getEntryPointEntityDao().load(ROOT_ID);
-		if (entity == null) {
-			List<EntryPointEntity> entities = getEntryPointEntityDao()
-					.findByCriteria("%", ROOT_TAG); //$NON-NLS-1$
-			if (entities.size() > 0)
-				entity = entities.get(0);
-		}
+		EntryPointEntity entity = null;
+		List<EntryPointEntity> entities = getEntryPointEntityDao()
+				.findByCriteria("%", ROOT_TAG); //$NON-NLS-1$
+		if (entities.size() > 0)
+			entity = entities.get(0);
 		if (entity == null) {
 			EntryPointEntity root = getEntryPointEntityDao()
 					.newEntryPointEntity();
-			root.setId(ROOT_ID);
 			root.setCode(ROOT_TAG);
 			root.setPublicAccess("S"); //$NON-NLS-1$
 			InformationSystemEntity app = getInformationSystemEntityDao()

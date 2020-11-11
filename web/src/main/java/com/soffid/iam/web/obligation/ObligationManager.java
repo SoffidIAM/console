@@ -1,5 +1,7 @@
 package com.soffid.iam.web.obligation;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.sys.ExecutionCtrl;
 
+import com.soffid.iam.api.RequestedObligationEnum;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.security.Obligation;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -36,6 +39,18 @@ public class ObligationManager {
 
 	public void setCurrentObligations(Event event, List<Obligation> obligations) {
 		desktop.setAttribute("obligation_event", event);
+		Collections.sort(obligations, new Comparator<Obligation>() {
+			@Override
+			public int compare(Obligation o1, Obligation o2) {
+				int order1 = RequestedObligationEnum.MESSAGE.getValue().equals(o1.getObligation()) ? 3:
+					RequestedObligationEnum.OTP.getValue().equals(o1.getObligation()) ? 2:
+					RequestedObligationEnum.WORKFLOW.getValue().equals(o1.getObligation()) ? 1: 0;
+				int order2 = RequestedObligationEnum.MESSAGE.getValue().equals(o2.getObligation()) ? 3:
+					RequestedObligationEnum.OTP.getValue().equals(o2.getObligation()) ? 2:
+					RequestedObligationEnum.WORKFLOW.getValue().equals(o2.getObligation()) ? 1: 0;
+				return order1 - order2;
+			}
+		});
 		desktop.setAttribute("obligations", obligations);
 	}
 
@@ -81,7 +96,7 @@ public class ObligationManager {
 
 	public void handleObligation(final Obligation obligation) {
 		try {
-			if (obligation.getObligation().endsWith("urn:soffid:obligation:message")) {
+			if (obligation.getObligation().endsWith(RequestedObligationEnum.MESSAGE.getValue())) {
 				
 				Missatgebox.avis(obligation.getAttributes().get("text"),
 						obligation.getAttributes().get("title"),
@@ -90,7 +105,7 @@ public class ObligationManager {
 							handleNextObligation();
 						});
 			} 
-			else if (obligation.getObligation().endsWith("urn:soffid:obligation:otp")) {
+			else if (obligation.getObligation().endsWith(RequestedObligationEnum.OTP.getValue())) {
 				OtpObligationHandler h = new OtpObligationHandler();
 				
 				ExecutionCtrl execution = (ExecutionCtrl) Executions.getCurrent();
@@ -99,6 +114,20 @@ public class ObligationManager {
 				h.setPage(page.getId());
 				h.setOptional(false);
 				h.requestOtp();
+				
+			}
+			else if (obligation.getObligation().endsWith(RequestedObligationEnum.WORKFLOW.getValue())) {
+				WorkflowObligationHandler h = new WorkflowObligationHandler();
+				
+				h.startWorkflow(obligation.getAttributes());
+			}
+			else if (obligation.getObligation().endsWith(RequestedObligationEnum.NOTIFY_OWNER.getValue())) {
+				MailObligationHandler h = new MailObligationHandler();
+				
+				h.sendMail(obligation.getAttributes());
+				
+				meetObligation(obligation);
+				handleNextObligation();
 				
 			} else {
 				throw new UiException("Unhandled unknown obligation "+obligation.getObligation());

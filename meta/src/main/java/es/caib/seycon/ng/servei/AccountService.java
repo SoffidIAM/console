@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.servei;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -483,7 +484,11 @@ public abstract class AccountService {
 		return false;
 	}
 
+
+	void registerAccountReservationProcess (Account account, String user, Long processId) {}
 	
+	void grantAcccountToUser(Account account, String user, Long processId, Date until) {}
+
 	//
 	@Description ("Unlocks a high privileged account")
 	@Operation ( grantees={roles.Tothom.class})

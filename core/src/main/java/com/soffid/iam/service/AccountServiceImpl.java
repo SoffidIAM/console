@@ -2769,4 +2769,38 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         }
         return r;
 	}
+
+	@Override
+	protected void handleGrantAcccountToUser(Account account, String user, Long processId, Date until)
+			throws Exception {
+		AccountEntity accountEntity = getAccountEntityDao().load(account.getId());
+		if (accountEntity == null)
+			return;
+		for (UserAccountEntity uac: accountEntity.getUsers()) {
+			if (uac.getWorkflowId().equals(processId) &&
+					uac.getUser().getUserName().equals(user) &&
+					uac.getApproved() == null) {
+				uac.setApproved(true);
+				uac.setUntilDate(until);
+				getUserAccountEntityDao().update(uac);
+			}
+		}
+	}
+
+	@Override
+	protected void handleRegisterAccountReservationProcess(Account account, String user, Long processId)
+			throws Exception {
+		AccountEntity accountEntity = getAccountEntityDao().load(account.getId());
+		if (accountEntity == null)
+			return;
+		UserEntity userEntity = getUserEntityDao().findByUserName(user);
+		if (userEntity == null)
+			return;
+		UserAccountEntity uac = getUserAccountEntityDao().newUserAccountEntity();
+		uac.setUser(userEntity);
+		uac.setApproved(null);
+		uac.setAccount(accountEntity);
+		uac.setWorkflowId(processId);
+		getUserAccountEntityDao().create(uac);
+	}
 }

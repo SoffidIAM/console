@@ -4,6 +4,7 @@ import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
@@ -34,18 +35,18 @@ import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
 public class AuthoritativeChangeService {
 	@Operation
 	@Description ("Performs authoritative change")
-	public void finishAuthoritativeChange (AuthoritativeChange change) {
+	public void finishAuthoritativeChange (@Nullable AuthoritativeChange change) {
 		
 	}
 	
 	@Operation
 	@Description ("Cancels an authoritative change")
-	public void cancelAuthoritativeChange (AuthoritativeChange change) {
+	public void cancelAuthoritativeChange (@Nullable AuthoritativeChange change) {
 		
 	}
 	@Operation
 	@Description ("Notifies a new authoritative change has just arrived.\nResturns true if the authoritative change has been performed")
-	public boolean startAuthoritativeChange (AuthoritativeChange change)
+	public boolean startAuthoritativeChange (@Nullable AuthoritativeChange change)
 	{
 		return true;
 	}

@@ -436,7 +436,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @param change
 	 * @throws InternalErrorException 
 	 */
-	private void applyGroupChange(User user, ProcessTracker tracker) throws InternalErrorException {
+	private void applyGroup2Change(User user, ProcessTracker tracker) throws InternalErrorException {
 		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(user.getUserName());
 		
 		AuthoritativeChange change = tracker.change;
@@ -471,7 +471,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
         }
 	}
 
-	private void applyGroup2Change(User user, ProcessTracker tracker) throws InternalErrorException {
+	private void applyGroupChange(User user, ProcessTracker tracker) throws InternalErrorException {
 		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(user.getUserName());
 		
 		AuthoritativeChange change = tracker.change;

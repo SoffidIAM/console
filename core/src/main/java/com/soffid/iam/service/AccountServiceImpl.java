@@ -2555,7 +2555,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected void handleSynchronizeAccount(String accountName, String system) throws Exception {
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
 		if (acc != null)
-			createAccountTask(acc);
+		{
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
+			tasque.setUser(accountName);
+			tasque.setSystemName(system);
+			tasque.setDb(system);
+			getTaskEntityDao().createForce(tasque);
+		}
 	}
 
 	@Override

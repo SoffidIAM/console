@@ -2554,13 +2554,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	@Override
 	protected void handleSynchronizeAccount(String accountName, String system) throws Exception {
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
-		if (acc != null)
+		if (acc != null && ! acc.getType().equals(AccountType.IGNORED))
 		{
 			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
 			tasque.setTransaction(TaskHandler.UPDATE_ACCOUNT);
-			tasque.setUser(accountName);
-			tasque.setSystemName(system);
-			tasque.setDb(system);
+			tasque.setUser(acc.getName());
+			tasque.setSystemName(acc.getSystem().getName());
+			tasque.setDb(acc.getSystem().getName());
 			getTaskEntityDao().createForce(tasque);
 		}
 	}

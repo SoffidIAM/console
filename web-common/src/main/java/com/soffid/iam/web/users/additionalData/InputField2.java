@@ -2488,3 +2488,4 @@ public class InputField2 extends Div implements XPathSubscriber
 		}
 	}
 }
+

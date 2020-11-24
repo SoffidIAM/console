@@ -551,6 +551,7 @@ public class SelfServiceHandler extends com.soffid.iam.web.component.Frame
 		return null;
 	}
 
+
 	private void openPamEntryPoint(PuntEntrada instance, ExecucioPuntEntrada exe, List<com.soffid.iam.api.Account> accounts) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
 		Long name = instance.getId();
 		// Get passwords

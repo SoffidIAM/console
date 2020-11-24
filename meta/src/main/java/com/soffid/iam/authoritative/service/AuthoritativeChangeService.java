@@ -35,18 +35,18 @@ import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
 public class AuthoritativeChangeService {
 	@Operation
 	@Description ("Performs authoritative change")
-	public void finishAuthoritativeChange (@Nullable AuthoritativeChange change) {
+	public void finishAuthoritativeChange (AuthoritativeChange change) {
 		
 	}
 	
 	@Operation
 	@Description ("Cancels an authoritative change")
-	public void cancelAuthoritativeChange (@Nullable AuthoritativeChange change) {
+	public void cancelAuthoritativeChange (AuthoritativeChange change) {
 		
 	}
 	@Operation
 	@Description ("Notifies a new authoritative change has just arrived.\nResturns true if the authoritative change has been performed")
-	public boolean startAuthoritativeChange (@Nullable AuthoritativeChange change)
+	public boolean startAuthoritativeChange (AuthoritativeChange change)
 	{
 		return true;
 	}

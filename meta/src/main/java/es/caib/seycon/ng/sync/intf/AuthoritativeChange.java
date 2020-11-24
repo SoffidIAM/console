@@ -33,6 +33,7 @@ public class AuthoritativeChange {
 	@Nullable
 	Set<String> groups;
 
+	@Nullable
 	Collection<UsuariGrup> groups2;
 	
 	@Nullable

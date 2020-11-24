@@ -189,7 +189,7 @@ public class Config {
         } else {
             dir = new File("/var/log/soffid"); //$NON-NLS-1$
         }
-	dir.mkdirs();
+        dir.mkdirs();
         return dir;
     }
 

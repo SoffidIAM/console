@@ -1806,9 +1806,9 @@ String nomRolsBorrar = "";
 										for (Iterator itcell = cells.iterator(); itcell
 												.hasNext();) {
 											Listcell cell = (Listcell) itcell.next();
-											if (pos==2) {nomRol = cell.getChildren().get(0).getValue(); celdaBorrar = cell;} 
+											if (pos==2) {nomRol = cell.getChildren().get(0).getChildren().get(0).getValue(); celdaBorrar = cell;} 
 											else
-												if (pos==10) {
+												if (pos==11) {
 													Iterator itcb = cell.getChildren().iterator();
 													if (itcb.hasNext()) cbox = (DataCheckbox) itcb.next();
 												}

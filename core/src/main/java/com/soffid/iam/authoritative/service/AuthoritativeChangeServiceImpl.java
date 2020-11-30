@@ -437,34 +437,34 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @throws InternalErrorException 
 	 */
 	private void applyGroup2Change(User user, ProcessTracker tracker) throws InternalErrorException {
-		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(user.getUserName());
+		Collection<GroupUser> currentGroups = getGroupService().findUsersGroupByUserName(user.getUserName());
 		
 		AuthoritativeChange change = tracker.change;
-		LinkedList<GroupUser> actualGroups = new LinkedList<GroupUser>(change.getGroups2());
+		LinkedList<GroupUser> newGroups = new LinkedList<GroupUser>(change.getGroups2());
 		
 		// First remove
-		for (Iterator<GroupUser> it = grups.iterator(); it.hasNext(); ) {
-            GroupUser ug = it.next();
-            GroupUser ug2 = findMembership (ug.getGroup(), change.getGroups2());
-            if (ug2 == null) {
+		for (Iterator<GroupUser> it = currentGroups.iterator(); it.hasNext(); ) {
+            GroupUser currentGroup = it.next();
+            GroupUser newGroup = findMembership (currentGroup.getGroup(), newGroups);
+            if (newGroup == null) {
                 auditAuthoritativeChange(tracker);
-                getGroupService().removeGroupFormUser(user.getUserName(), ug.getGroup());
+                getGroupService().delete(currentGroup);
             } 
             else 
             {
-            	if (ug2.getAttributes() != null && ! ug2.getAttributes().equals(ug.getAttributes()))
+            	if (newGroup.getAttributes() != null && ! newGroup.getAttributes().equals(currentGroup.getAttributes()))
 	            {
 	                auditAuthoritativeChange(tracker);
-	                ug2.setId(ug.getId());
-	                ug2.setUser(ug.getGroup());
-	                getGroupService().update(ug2);
+	                newGroup.setId(currentGroup.getId());
+	                newGroup.setUser(currentGroup.getGroup());
+	                getGroupService().update(newGroup);
 	            }
-	            actualGroups.remove(ug2);
+	            newGroups.remove(newGroup);
             }
         }
 
 		// Now add
-		for (GroupUser groupUser : actualGroups) {
+		for (GroupUser groupUser : newGroups) {
             auditAuthoritativeChange(tracker);
             groupUser.setUser(user.getUserName());
             getGroupService().create(groupUser);

@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.Tenant;
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.CrudRegistryService;
 import com.soffid.mda.annotation.Depends;
@@ -36,6 +37,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	ServerPluginService.class,
 	TenantService.class,
 	TipusDadaEntity.class,
+	CustomObjectTypeEntity.class,
 	com.soffid.iam.service.ScheduledTaskService.class,
 	CrudRegistryService.class})
 public abstract class ApplicationBootService {

@@ -21,7 +21,9 @@ import org.zkoss.zul.Div;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.WebDataType;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
@@ -162,6 +164,11 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 			ownerObject = binder.getValue();
 			if (ownerObject != null)
 			{
+				String userName = null;
+				try {
+					userName = (String) PropertyUtils.getProperty(ownerObject, "userName");
+				} catch (Exception e) {}
+				String currentUser = Security.getCurrentUser();
 				List<InputField3> inputFields = new LinkedList<InputField3>();
 				for (DataType att: dataTypes)
 				{
@@ -201,6 +208,16 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 							}
 						});
 						boolean visible = inputField.attributeVisible();
+						if (att.getCustomObjectType().equals("com.soffid.iam.api.User")) {
+							AttributeVisibilityEnum vis = 
+								currentUser != null && currentUser.equals(userName) ? att.getUserVisibility() : 
+								Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL) ? att.getAdminVisibility() :
+								att.getOperatorVisibility();
+							if (vis == AttributeVisibilityEnum.HIDDEN)
+								visible = false;
+							else if (vis == AttributeVisibilityEnum.READONLY)
+								inputField.setReadonly(true);
+						}
 						inputField.setVisible(visible);
 						if ( att.getType() == TypeEnumeration.SEPARATOR) {
 							if (!visible) section.setVisible(false);

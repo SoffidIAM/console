@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObjectType;
@@ -111,6 +112,23 @@ public class AdditionalDataServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.DadesAddicionalsService#create(es.caib.seycon.ng.comu.TipusDada)
 	 */
 	protected com.soffid.iam.api.DataType handleCreate(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
+		// Compatibility with v2
+		if (tipusDada.getObjectType() == null) {
+			if (tipusDada.getScope() == MetadataScope.ACCOUNT)
+				tipusDada.setObjectType(Account.class.getName());
+			if (tipusDada.getScope() == MetadataScope.APPLICATION)
+				tipusDada.setObjectType(Application.class.getName());
+			if (tipusDada.getScope() == MetadataScope.GROUP)
+				tipusDada.setObjectType(Group.class.getName());
+			if (tipusDada.getScope() == MetadataScope.GROUP_MEMBERSHIP)
+				tipusDada.setObjectType(GroupUser.class.getName());
+			if (tipusDada.getScope() == MetadataScope.MAIL_LIST)
+				tipusDada.setObjectType(MailList.class.getName());
+			if (tipusDada.getScope() == MetadataScope.ROLE)
+				tipusDada.setObjectType(Role.class.getName());
+			if (tipusDada.getScope() == MetadataScope.USER || tipusDada.getScope() == null)
+				tipusDada.setObjectType(User.class.getName());
+		}
 		if (tipusDada.getAdminVisibility() == null)
 			tipusDada.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
 		if (tipusDada.getAdminVisibility() == null)
@@ -443,6 +461,29 @@ public class AdditionalDataServiceImpl extends
 		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().newCustomObjectTypeEntity();
 		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
 		getCustomObjectTypeEntityDao().create(entity);
+		
+		MetaDataEntity name = getMetaDataEntityDao().newMetaDataEntity();
+		name.setBuiltin(true);
+		name.setObjectType(entity);
+		name.setName("name");
+		name.setNlsLabel("com.soffid.iam.api.CustomObject.name");
+		name.setOrder(1L);
+		name.setRequired(true);
+		name.setSize(100);
+		name.setType(TypeEnumeration.STRING_TYPE);
+		getMetaDataEntityDao().create(name);
+		
+		MetaDataEntity description = getMetaDataEntityDao().newMetaDataEntity();
+		description.setBuiltin(true);
+		description.setObjectType(entity);
+		description.setName("description");
+		description.setNlsLabel("com.soffid.iam.api.CustomObject.description");
+		description.setOrder(2L);
+		description.setRequired(true);
+		description.setSize(100);
+		description.setType(TypeEnumeration.STRING_TYPE);
+		getMetaDataEntityDao().create(description);
+		
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}
 

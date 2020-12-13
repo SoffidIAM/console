@@ -16,7 +16,7 @@
 
 			<ejb-name>UploadServiceBean</ejb-name>
 
-			<ejb-class>es.caib.seycon.ng.upload.UploadService</ejb-class>
+			<ejb-class>com.soffid.iam.upload.UploadService</ejb-class>
 			<session-type>Stateless</session-type>
             <transaction-type>Bean</transaction-type>
 		</session>

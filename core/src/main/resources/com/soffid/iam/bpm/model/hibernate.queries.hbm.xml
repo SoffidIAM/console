@@ -48,6 +48,16 @@
     ]]>
   </query>
   
+  <query name="GraphSession.findLatestProcessDefinitionQuery2">
+    <![CDATA[
+     select pd.name, max(pd.version)
+     from com.soffid.iam.bpm.model.TenantModuleDefinition td
+     join td.processDefinition as pd 
+     where td.tenantId = :tenant
+     group by pd.name    
+    ]]>
+  </query>
+  
   <query name="GraphSession.findProcessDefinitionByNameAndVersion">
     <![CDATA[
       select pd

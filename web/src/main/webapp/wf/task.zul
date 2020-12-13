@@ -43,7 +43,7 @@
 		<tabpanels>
 			<tabpanel id="tarea" style="overflow:auto; min-height:20em;">
 				<form2 dataPath="model:/taskInstance[1]/variables" style="width:100%; height: calc( 100vh - 340px )">
-					<div id="datosElementoWorkflow" style="width: 90vw; width: calc( 100vw - 80px ); overflow-x: auto">
+					<div id="datosElementoWorkflow" style="width: 90vw; width: calc( 100vw - 80px ); overflow-x: auto; padding-right: 24px">
 				
 					</div>
 					<databox id="newCommentBox" width="100%" label="${c:l('task.addcomentari')}" type="STRING" multiline="true" selectIcon=""/>

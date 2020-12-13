@@ -1,12 +1,98 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
 <?page id="changepass" title="${c:l('changepass.Titol')}" ?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml"
 	forced="true"
-	id="frame" saveContent="false" title="${c:l('changepassPerfil.Titol')}" use="com.soffid.iam.web.profile.PasswordChangeHandler">
-	<div class="login2">
-		<image src="/anonymous/logo.svg" />
-		<div class="loginbox2">
+	id="frame" saveContent="false" title="${c:l('changepassPerfil.Titol')}" use="com.soffid.iam.web.profile.PasswordChangeHandler"
+	style="">
+	<style>
+		body {
+			background-color: #5ec0a5;
+			background-image: url(${execution.contextPath}/anonymous/bg.jpeg);
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-position: center;
+			overflow: hidden;
+		}
+
+		div.login {
+			width: 550px;
+			font-size: 12pt;
+			background-color: #202020;
+			opacity: 1;
+			color: white;
+			top: 50%;
+		    position: absolute;
+		    left: 50%;
+			margin-top: -75px;
+			padding: 30px;
+			border-radius: 12px;
+			transition: transform 0.5s;
+			transform-style: preserve-3d ;
+		    transform: translateY(-50%)translateX(-50%);
+		}
+		div.login.progress {
+		    transform: translateY(-50%)translateX(-50%)rotateX( 90deg );
+		}
+		
+		div.login div.loginbox div.inputlogin {
+			font-weight: bold;
+		}		
+		div.loginbox {
+			width: 100%; 
+		}
+		
+		input, input[type="submit"] {
+			margin-top: 12px;
+			margin-bottom: 6px;
+			width: 100%;
+			margin-left: 0px;
+			font-size: 11pt;
+			padding: 6px;
+		}
+		
+		div.wait {
+			position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    margin-top: -96px;
+		    margin-left: -96px;
+		    background: #202020;
+		    border-radius: 12px;
+		    width: 250px;
+		    height: 192px;
+/*		    display: none; */
+		    color: white;
+		    font-weight: bold;
+			text-align: center;
+			padding-top: 30px;
+			transition: transform 0.5s;
+			transform-style: preserve-3d ;
+		    transform: rotateX( 90deg );
+		}
+		
+		div.wait p {
+			font-weight: bold;
+		}
+		div.wait.progress {
+			display: block;
+		    transform: rotateX( 0deg );
+		}
+		div.wait img {
+			margin-top: 30px;
+			width: 48px;
+			height: 48px;
+		}
+		div.login span {
+			color: white;
+			word-break: break-word;
+		}
+	</style>
+	<div class="login">
+		<h:p><image src="/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  /> </h:p> 
+        <h:p><image src="/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" /> </h:p> 
+		<div class="loginbox">
 
 			<div class="atencio" if="${!canviVoluntari}">
 				${c:l('changepass.zul.Lasevacontrasenyahac')}
@@ -14,25 +100,9 @@
 			
 			<div class="formCanviContrasenya">
 				<form id="canviPassw" width="100%">
-					<vbox width="100%">
-						<vbox width="100%">
-							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%"> 
-								<label sclass="etiqueta" value="${c:l('login.lblUser')}"/>
-								<label style="text-weigth:bold;" value="${usuari}"/>
-							</hbox>
-							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%"> 
-								<label sclass="etiqueta" value="${c:l('changepass.zul.Contrasenyaactual')}"/>
-								<textbox id="passactual" type="password"/>
-							</hbox>
-							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%">
-								<label sclass="etiqueta" value="${c:l('changepass.zul.Novacontrasenya')}"/>
-								<textbox id="passnueva1" type="password"/>
-							</hbox>
-							<hbox style="padding-bottom:5px;" width="100%" widths="50%,50%">
-								<label sclass="etiqueta" value="${c:l('changepass.zul.Repeticianovacontras')}"/>
-								<textbox id="passnueva2" onOK="ref:frame.canviaPass" type="password"/>
-							</hbox>
-						</vbox>
+					<textbox id="passactual" type="password" placeholder="${c:l('changepass.zul.Contrasenyaactual')}"/>
+					<textbox id="passnueva1" type="password" placeholder="${c:l('changepass.zul.Novacontrasenya')}"/>
+					<textbox id="passnueva2" type="password" placeholder="${c:l('changepass.zul.Repeticianovacontras')}"/>
 						
 						<div align="center" class="botonera">
 							<hbox align="center" style="margin: 0 auto;">
@@ -46,12 +116,11 @@
 								</button>
 							</hbox>
 						</div>
-					</vbox>
 				</form>
 			</div>
 			<div id="info" style="text-align:left;">
 				<h:p>${c:l('changepass.Instruccio1')} <h:em>${c:l('changepass.zul.Acceptar')}</h:em>.</h:p>
-				<h:pre>${policyDescription}</h:pre>
+				<h:pre style="white-space: pre-line">${policyDescription}</h:pre>
 			</div>
 		</div>
 	</div>

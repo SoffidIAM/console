@@ -79,6 +79,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     			tasqueEntity.setPriority(1L);
     		}
         }
+        tasqueEntity.setServer(c.server);
         super.create(tasqueEntity);
     }
 
@@ -274,6 +275,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     	if (c.readonly)
     		return;
 		
+        tasque.setServer(c.server);
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
     	if (checkDuplicate(tasque))
     		return;
@@ -292,6 +294,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 		TransactionStatus c = currentTransactionStatus();
     	if (c.readonly)
     		return;
+        tasque.setServer(c.server);
     	
 		tooMuchTasks(tasque);
 		tasque.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
@@ -353,6 +356,25 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 	}
 
 	@Override
+	protected String handleStartVirtualSourceTransaction(boolean readonly, String server) throws Exception {
+		TransactionStatus current = currentTransactionStatus();
+		TransactionStatus c = new TransactionStatus();
+		c.previous = current;
+		synchronized (transactionSeed)
+		{
+			c.virtualId = transactionSeed + "#" + virtualCounter;
+			virtualCounter ++;
+		}
+		c.transactionHash = null;
+		c.count = 0;
+		if (readonly )
+			c.readonly = true;
+		c.server = server;
+		transactionStatus.set(c);
+		return c.virtualId;
+	}
+
+	@Override
 	protected void handleCancelUnscheduledCopies(TaskEntity entity) throws Exception {
 		if (entity.getTransaction().equals("UpdateUser") && entity.getSystemName() == null)
 		{
@@ -391,6 +413,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 
 class TransactionStatus {
 	String virtualId;
+	String server;
 	String transactionHash;
 	int count;
 	boolean exceeded;

@@ -38,7 +38,10 @@ public class AccountTypeHandler extends InputFieldUIHandler {
 			Object type = field.getValue();
 			ObjectAttributesDiv oad = (ObjectAttributesDiv) d;
 			InputField3 desc = oad.getInputFieldsMap().get("description");
-			desc.setReadonly(type.toString().equals( AccountType.USER.toString()));
+			if (type == null)
+				desc.setReadonly(false);
+			else
+				desc.setReadonly(type.toString().equals( AccountType.USER.toString()));
 			desc.invalidate();
 		}
 	}

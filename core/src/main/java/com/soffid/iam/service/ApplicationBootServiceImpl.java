@@ -55,6 +55,7 @@ import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.impl.DatabaseParser;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -1374,7 +1375,37 @@ public class ApplicationBootServiceImpl extends
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, false);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/MailList.ui.json", MetadataScope.MAIL_LIST, false);
-	}
+
+		for (CustomObjectTypeEntity entity: getCustomObjectTypeEntityDao().loadAll()) {
+			if (! entity.isBuiltin()) {
+				if ( getMetaDataEntityDao().findByObjectTypeAndName(entity.getName(), "name") == null) {
+					MetaDataEntity name = getMetaDataEntityDao().newMetaDataEntity();
+					name.setBuiltin(true);
+					name.setObjectType(entity);
+					name.setName("name");
+					name.setNlsLabel("com.soffid.iam.api.CustomObject.name");
+					name.setOrder(-2L);
+					name.setRequired(true);
+					name.setSize(100);
+					name.setType(TypeEnumeration.STRING_TYPE);
+					getMetaDataEntityDao().create(name);
+				}
+				
+				if ( getMetaDataEntityDao().findByObjectTypeAndName(entity.getName(), "description") == null) {
+					MetaDataEntity description = getMetaDataEntityDao().newMetaDataEntity();
+					description.setBuiltin(true);
+					description.setObjectType(entity);
+					description.setName("description");
+					description.setNlsLabel("com.soffid.iam.api.CustomObject.description");
+					description.setOrder(-1L);
+					description.setRequired(true);
+					description.setSize(100);
+					description.setType(TypeEnumeration.STRING_TYPE);
+					getMetaDataEntityDao().create(description);
+				}
+			}
+		}
+}
 
 	static Database database = null;
 	

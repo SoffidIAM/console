@@ -168,6 +168,11 @@ public class ServerPluginParser {
 				objectTriggers = "false";//Posem N si és nul //$NON-NLS-1$
 			ad.setEnableObjectTriggers("true".equals(objectTriggers)); //$NON-NLS-1$
 
+			String service = xpath.evaluate("service", n); //$NON-NLS-1$
+			if (service == null || "".equals(service)) //$NON-NLS-1$
+				service = "false";//Posem N si és nul //$NON-NLS-1$
+			ad.setService("true".equals(service)); //$NON-NLS-1$
+
 			loadDefaultAttributeMappings (ad, n);
 			
 

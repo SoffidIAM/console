@@ -21,7 +21,8 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" >
 				<menu2>
-					<menu2item image="~./img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateRolAutoritzacion}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateRolAutoritzacion}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 				
 			</div>

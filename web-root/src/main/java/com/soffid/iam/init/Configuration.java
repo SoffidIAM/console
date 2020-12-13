@@ -119,6 +119,8 @@ public class Configuration {
 		String srcName = tomcat_home+"/conf/tomee.xml.template";
 		String targetName = tomcat_home+"/webapps/context.xml";
 		
+		if (! new File(srcName).canRead())
+			srcName = tomcat_home+"/conf/tomee.xml";
 		InputStream in = new FileInputStream(srcName);
 		
 		BufferedReader reader = new BufferedReader( new InputStreamReader(in) );

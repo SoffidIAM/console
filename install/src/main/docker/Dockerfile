@@ -15,6 +15,7 @@ ADD target/Soffid-iamconsole.tar.gz /opt/soffid/
 COPY src/main/docker/start.sh /opt/soffid/iam-console-3/start.sh
 COPY src/main/docker/server.xml /opt/soffid/iam-console-3/conf/server.xml
 
+RUN chmod a+rx /opt/soffid/iam-console-3/bin/*.sh
 EXPOSE 8080
 
 ENV LANG en_US.UTF-8

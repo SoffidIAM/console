@@ -116,7 +116,7 @@ public abstract class AccountMetadataEntity {
 	String onFocusTrigger;
 	
 
-	/********************** DAOS ************************/
+	// ********************** DAOS ************************
 	@DaoFinder("from com.soffid.iam.model.AccountMetadataEntity where system.name = :system and name = :name\n"
 			+ "and system.tenant.id=:tenantId")
 	public AccountMetadataEntity findByName(String system,

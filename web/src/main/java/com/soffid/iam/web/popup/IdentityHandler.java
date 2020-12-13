@@ -75,10 +75,10 @@ public class IdentityHandler extends Window implements AfterCompose {
 			page.setVariable("wildcardDomain", args.get("wildcardDomain") );
 			page.setVariable("types", args.get("types"));
 			page.setVariable("singleIdentity", args.get("singleIdentity") );
-			page.setVariable("title", args.get("title"));
 			page.setVariable("invoker", args.get("invoker"));
 			page.setVariable("backMessage", args.get("backMessage"));
 			page.setVariable("visible", args.get("visible"));
+			setTitle((String) args.get("title"));
 		}
 	}
 	

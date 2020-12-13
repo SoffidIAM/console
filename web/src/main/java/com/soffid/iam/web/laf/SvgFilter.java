@@ -125,6 +125,10 @@ public class SvgFilter extends HttpServlet {
 				
 			}
 			byte[] b = t.toString().getBytes("UTF-8");
+			
+			resp.setHeader("Cache-Control", "public, max-age=120");
+			resp.setDateHeader("Expires", System.currentTimeMillis()+120000);
+			resp.setDateHeader("Last-Modified", System.currentTimeMillis()-1200000);
 			resp.setStatus(200);
 			resp.setContentLength(b.length);
 			resp.setCharacterEncoding("UTF-8");

@@ -48,6 +48,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 	
 	@Override
 	public void afterCompose() {
+		super.afterCompose();
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 		String option = (String) req.getParameter("option");
 		Application.setTitle(Labels.getLabel("menu.title"));
@@ -55,7 +56,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		try {
 			options = new MenuParser().getMenus(menu);
 			currentOptions = options;
-			if (option != null)
+			if (option != null) 
 				searchOption(options, option);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -82,7 +83,6 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		optionsDiv = (Div) getLastChild();
 		loadMenus();
 		focusSearchbox();
-		super.afterCompose();
 	}
 
 
@@ -106,7 +106,10 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			{
 				stack.add(option);
 				currentOptions = option.getOptions();
+				if ( option.getHandler() != null)
+					currentOptions = option.getHandler().getOptions(option);
 				small = option.isSmall();
+				setUrl("/main/menu.zul?option="+optionName);
 				return true;
 			}
 			else if (option.getOptions() != null && ! option.getOptions().isEmpty())
@@ -214,6 +217,8 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			
 			loadMenus();
 			focusSearchbox();
+			if (s != null)
+				setUrl("/main/menu.zul?option="+s.getLabel());
 		}
 	}
 	
@@ -258,6 +263,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			small = option.isSmall();
 			currentOptions = option.getOptions();
 			loadMenus();
+			setUrl("/main/menu.zul?option="+option.getLabel());
 			focusSearchbox();
 		}
 	}

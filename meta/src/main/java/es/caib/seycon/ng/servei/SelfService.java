@@ -108,7 +108,7 @@ public abstract class SelfService {
 	 return null;
 	}
 
-	/** Application entry point methods **/
+	//// ** Application entry point methods **
 	
 	@Operation(translated="findRoot")
 	@Transactional(rollbackFor={java.lang.Exception.class})

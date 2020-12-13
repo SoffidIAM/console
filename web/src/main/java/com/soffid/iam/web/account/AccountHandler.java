@@ -331,6 +331,10 @@ public class AccountHandler extends FrameHandler {
 		Image i = (Image) getFellow("pendingChanges");
 		Component lb = getListbox();
 		if ( lb instanceof DataTable && ((DataTable) lb).getSelectedIndex() >= 0) {
+			Long id = (Long) XPathUtils.eval(getForm(), "id");
+			getFellow("tabroles").setVisible(id != null);
+			getFellow("tabeffectiveroles").setVisible(id != null);
+
 			Object instance = ((DataNode)XPathUtils.getValue(getForm(), "/")).getInstance();
 			Account account = (Account) instance;
 			try {
@@ -339,6 +343,9 @@ public class AccountHandler extends FrameHandler {
 				i.setVisible(false);
 			}
 		} else if ( lb instanceof DataTree2 && ((DataTree2) lb).getSelectedItemXPath() != null ) {
+			Long id = (Long) XPathUtils.eval(getForm(), "id");
+			getFellow("tabroles").setVisible(id != null);
+			getFellow("tabeffectiveroles").setVisible(id != null);
 			Object instance = ((DataNode)XPathUtils.getValue(lb, "/.")).getInstance();
 			if (instance instanceof VaultElement &&
 					"account".equals(((VaultElement) instance).getType())) {

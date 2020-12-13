@@ -317,7 +317,7 @@ public abstract class DispatcherService {
 		return null;
 	}
 
-	/** Trigger methods **/
+	// ** Trigger methods **
 	@Operation(grantees = { roles.agent_update.class })
 	public ObjectMappingTrigger create(ObjectMappingTrigger trigger)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -509,4 +509,11 @@ public abstract class DispatcherService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+
+	@Operation(grantees = {agent_query.class})
+	protected String startVirtualSourceTransaction(boolean readonly, @Nullable String server) { return null; }
+
+	@Operation(grantees = {agent_query.class})
+	protected void finishVirtualSourceTransaction(String transactionId) { }
 }

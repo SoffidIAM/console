@@ -15,7 +15,7 @@ import es.caib.seycon.ng.model.UsuariEntity;
 @ValueObject ( translatedName="User",
 	 cache=300,
 	 translatedPackage="com.soffid.iam.api")
-public class Usuari {
+public abstract class Usuari {
 	@Nullable
 	@Attribute(hidden=true)
 	public java.lang.Long id;
@@ -62,8 +62,8 @@ public class Usuari {
 	public java.lang.String servidorPerfil;
 	
 	@Nullable
-	@Attribute(type="EMAIL", separator="_emails")
-	public String email;
+	@Attribute(type="EMAIL", separator="_emails", customUiHandler = "com.soffid.iam.web.user.EmailHandler")
+	public String emailAddress;
 	
 	@Nullable
 	@Attribute(translated = "mailAlias" )

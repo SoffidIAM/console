@@ -24,18 +24,17 @@ public class Rol {
 	@Attribute(translated = "description", searchCriteria = true )
 	public java.lang.String descripcio;
 
+	@JsonAttribute(hibernateAttribute="system.name")
+	@Attribute(translated = "system", customUiHandler = "com.soffid.iam.web.application.SystemFieldHandler" )
+	public java.lang.String baseDeDades;
+
 	@Nullable
 	public String category;
 	
 	@Nullable
 	@Attribute(translated = "enableByDefault", hidden=true )
 	public java.lang.Boolean defecte;
-
-	@Nullable
-	@JsonAttribute(hibernateAttribute="system.name")
-	@Attribute(translated = "system", customUiHandler = "com.soffid.iam.web.account.SystemFieldHandler" )
-	public java.lang.String baseDeDades;
-
+	
 	@Nullable
 	@Attribute(translated = "password", hidden=true )
 	public java.lang.Boolean contrasenya;
@@ -77,13 +76,13 @@ public class Rol {
 	public java.lang.Boolean gestionableWF;
 
 	@Description("Last modification date")
-	@Attribute(readonly = true)
+	@Attribute(readonly = true, customUiHandler = "com.soffid.iam.web.application.ApprovalFieldHandler" )
 	@Nullable
 	public Date approvalStart;
 
 	@Description("Approval date")
 	@Nullable
-	@Attribute(readonly = true)
+	@Attribute(readonly = true, customUiHandler = "com.soffid.iam.web.application.ApprovalFieldHandler" )
 	public Date approvalEnd;
 
 	@Description ("Role custom attributes")

@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -135,10 +136,16 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
 					if (task.getStart() != null) {
 						o.put("date_datetime", DateFormats.getDateTimeFormat().format(task.getStart()));
 						o.put("date", task.getStart().getTime());
+					} else {
+						o.put("date_datetime", DateFormats.getDateTimeFormat().format(task.getCreate()));
+						o.put("date", task.getCreate().getTime());
+						o.put("$class", "bold");
 					}
 					if (task.getDueDate() != null) {
 						o.put("duedate_datetime", DateFormats.getDateTimeFormat().format(task.getDueDate()));
 						o.put("duedate", task.getDueDate().getTime());
+						if (task.getDueDate().before(new Date()))
+							o.put("$class", "red");
 					}
 					if (task.getActorId() != null)
 						o.put("actor", task.getActorId());
@@ -150,6 +157,7 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
 						}
 						o.put("actor", actors.toString());
 					}
+					o.put("processName", task.getProcessName());
 					o.put("id", task.getId());
 					sb.append(o.toString());
 				}

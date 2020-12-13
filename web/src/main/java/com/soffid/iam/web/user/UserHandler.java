@@ -72,19 +72,8 @@ public class UserHandler extends FrameHandler {
 		updateStatus();
 	}
 	
-	public void importCsv () throws IOException, CommitException {
-		getModel().commit();
-		
-		String[][] data = { 
-				{"name", Labels.getLabel("parametres.zul.Parametre-2")},
-				{"networkName", Labels.getLabel("parametres.zul.Xarxa-2")},
-				{"value", Labels.getLabel("parametres.zul.Valor-2")},
-				{"description", Labels.getLabel("parametres.zul.Descripcia-2")}
-		};
-		
-		String title = Labels.getLabel("tenant.zul.import");
-		ImportCsvHandler.startWizard(title, data, this, 
-				parser -> importCsv(parser));
+	public void importCsv () throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		new UserImporter().importCsv(this);
 	}
 
 	private void importCsv(CsvParser parser) {
@@ -167,14 +156,19 @@ public class UserHandler extends FrameHandler {
 	public void updateStatus() {
 		Button b = (Button) getFellow("pendingTasksButton");
 		try {
-			String userName = (String) XPathUtils.getValue(getForm(), "userName");
-			int i = EJBLocator.getUserService().isUpdatePendingExtended(userName);
-			if ( i == 0 ) b.setVisible( false );
+			Long id = (Long) XPathUtils.eval(getForm(), "id");
+			if (id == null)
+				b.setVisible(false);
 			else {
-				b.setVisible(true);
-				b.setImage(i == 1 ? "/img/held.svg" :
-					i == 2 ? "/img/sync.svg" :
-						"/img/warning.svg");
+				String userName = (String) XPathUtils.getValue(getForm(), "userName");
+				int i = EJBLocator.getUserService().isUpdatePendingExtended(userName);
+				if ( i == 0 ) b.setVisible( false );
+				else {
+					b.setVisible(true);
+					b.setImage(i == 1 ? "/img/held.svg" :
+						i == 2 ? "/img/sync.svg" :
+							"/img/warning.svg");
+				}
 			}
 		} catch (Exception e) {
 			b.setVisible(false);

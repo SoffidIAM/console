@@ -106,7 +106,7 @@ public abstract class GrupEntity {
 	@ForeignKey (foreignColumn="RLU_GROUP")
 	public java.util.Collection<es.caib.seycon.ng.model.RolAccountEntity> holdedRoleAssignments;
 
-	/*********************************************************** METHODS **************************************/
+	/// *********************************************************** METHODS **************************************
 	
 	
 	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.parent.name = :parent "

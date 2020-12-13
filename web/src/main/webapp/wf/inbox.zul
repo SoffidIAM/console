@@ -23,6 +23,8 @@
 - name: ${c:l('inbox.lblIdentificador')}
   value: id
   className: datetimeColumn
+- name: ${c:l('deploy.lblProceso')}
+  value: processName
 - name: ${c:l('inbox.lbldefinicionTarea')}
   value: task
 - name: ${c:l('inbox.lblFecha')}

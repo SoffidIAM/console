@@ -4,7 +4,7 @@
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 
-<frame id="frame" title="${c:l('perfil.Titol')}" use="com.soffid.iam.web.profile.ProfileHandler">
+<frame id="frame" title="${c:l('perfil.Titol')}" use="com.soffid.iam.web.profile.ProfileHandler" >
 	<style>
 		span.u {text-decoration: underline;}
 	</style>
@@ -25,7 +25,7 @@
 			<tabbox id="panels" width="${amplaria2}">
 				<tabs>
 					<tab label="${c:l('perfil.zul.Informaciabasica')}"/>
-					<tab label="${c:l('perfil.zul.Autoritzacions')}"/>
+					<tab label="${c:l('perfil.zul.Autoritzacions')}" id="tabauths"/>
 				</tabs>
 		
 				<tabpanels>
@@ -68,7 +68,7 @@
 	
 						</form2>
 					</tabpanel>
-					<tabpanel height="410px" id="autoritzacions">
+					<tabpanel height="410px" id="autoritzacions" fulfill="tabauths.onSelect">
 						<label sclass="separator_label">${c:l('perfil.zul.Autoritzacions-2')}</label>
 						<separator/>
 						${c:l('perfil.Descripcio1')}

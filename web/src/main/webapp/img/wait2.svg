@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.1"
+   viewBox="0 0 100 100"
+   >
+  <circle id="c1" r="1" cx="50" cy="50" fill="#a6d100"/>
+  <animate 
+    href="#c1"
+    attributeName="cy"
+    from="50"
+    to="250" 
+    dur="3s"
+    begin="click"
+    values="50; 250; 120;250; 170; 250; 210; 250"
+    keyTimes="0; 0.15; 0.3; 0.45; 0.6; 0.75; 0.9; 1"
+    keySplines=".42 0 1 1;
+                0 0 .59 1;
+                .42 0 1 1;
+                0 0 .59 1;
+                .42 0 1 1;
+                0 0 .59 1;
+                .42 0 1 1;
+                0 0 .59 1;"
+    fill="freeze" 
+    id="circ-anim"/>
+</svg>

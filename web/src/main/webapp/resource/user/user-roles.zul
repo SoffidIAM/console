@@ -187,8 +187,6 @@
 						bind="startDate" dataType="DATE"/>
 					<customfield3 label="${c:l('usuaris.zul.endDate') }"
 						bind="endDate" dataType="DATE"/>
-					<customfield3 label="${c:l('usuaris.zul.endDate') }"
-						bind="endDate" dataType="DATE"/>
 					<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.risk') }" id="sodRisk"
 						bind="sodRisk" dataType="STRING" enumeration="es.caib.seycon.ng.comu.SoDRisk" readonly="true"/>
 					<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.sodRules') }"

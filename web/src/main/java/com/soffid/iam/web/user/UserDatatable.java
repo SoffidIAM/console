@@ -4,22 +4,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.ejb.CreateException;
-import javax.naming.NamingException;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.DataType;
-import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.User;
 import com.soffid.iam.web.component.DatatypeColumnsDatatable;
-import com.soffid.iam.web.component.DynamicColumnsDatatable;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
-import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.datamodel.DataNode;
 
 

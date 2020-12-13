@@ -659,7 +659,6 @@ public class TaskUI extends FrameHandler implements EventListener {
 
     public void ejecutarTarea(final String transicion) throws InterruptedException,
             IOException, CreateException, NamingException {
-        final TaskInstance task = currentTask;
         final BpmEngine engine = getEngine();
 
         try {
@@ -700,6 +699,7 @@ public class TaskUI extends FrameHandler implements EventListener {
                 }
                 try {
 
+                    final TaskInstance task = new TaskInstance( currentTask );
                     EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
 						@Override
 						public Object run() throws Exception

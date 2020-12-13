@@ -31,7 +31,7 @@
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.account.AccountDatatable"
 				preference="account"
-				dataPath="/model:/account" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/account" maxheight="70vh"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('account:create')}" >

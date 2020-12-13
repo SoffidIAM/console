@@ -81,12 +81,6 @@
 			<new-instance-bean className="com.soffid.iam.api.GroupUser"> 
 			</new-instance-bean>
 		</finder>
-		<finder name="attributes" type="attributes" executeOnNewObjects="true" refreshAfterCommit="true" >  <!-- user:query -->
-			<ejb-finder jndi="java:/module/UserService-v2"
-				method="findUserAttributes" if="${canQueryUser}">
-				<parameter value="${instance.userName}"/>
-			</ejb-finder>
-		</finder>
 		<finder name="processosUsuari" type="processosUsuari">
 			<ejb-finder jndi="java:/module/UserService-v2"
 				method="findBpmUserProcessInstanceByUserName">
@@ -132,19 +126,6 @@
 	<datanode name="effectiveRole" transient="true"/>
 	<datanode name="tipusDada" transient="true" />
 		
-	<datanode name="attributes">
-		<ejb-handler jndi="java:/module/UserService-v2">
-			<insert-method method="updateUserAttributes"  > <!-- user:metadata:update -->
-				<parameter value="${parent.userName}" />
-				<parameter value="${instance}" />
-			</insert-method>
-			<update-method method="updateUserAttributes"> <!-- user:metadata:update -->
-				<parameter value="${parent.userName}" />
-				<parameter value="${instance}" />
-			</update-method>
-		</ejb-handler>
-	</datanode>
-	
 	<datanode name="account">
 		<script-handler>
 			<update-script>

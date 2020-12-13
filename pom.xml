@@ -31,7 +31,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>add-sources</id>
@@ -458,6 +458,7 @@
    			<module>common</module>
    			<module>core</module>
    			<module>tomee</module>
+   			<module>juli</module>
    			<module>web-root</module>
    			<module>web</module>
    			<module>webservice</module>

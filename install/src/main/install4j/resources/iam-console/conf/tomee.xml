@@ -35,7 +35,7 @@
 		timeBetweenEvictionRuns = -1 millisecond
 		validationQuery = select 1
 		jdbcDriver = com.soffid.iam.db.SoffidBrokerDriver
-    jdbcUrl = jdbc:soffid:db
+	    jdbcUrl = jdbc:soffid:db
 	</Resource>
 	<Container id="myStatelessContainer" type="STATELESS">
 		accessTimeout = 30 seconds

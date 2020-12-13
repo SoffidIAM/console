@@ -34,7 +34,7 @@
 	<style>
 		body {
 			background-color: #5ec0a5;
-			background-image: url(${execution.contextPath}/anonymous/bg.png);
+			background-image: url(${execution.contextPath}/anonymous/bg.jpeg);
 			background-repeat: no-repeat;
 			background-size: cover;
 			background-position: center;
@@ -80,27 +80,38 @@
 			position: absolute;
 		    top: 50%;
 		    left: 50%;
-		    margin-top: -48px;
-		    margin-left: -48px;
-		    background-color: white;
-		    border-radius: 48px;
-		    width: 96px;
-		    height: 96px;
-		    display: none;
+		    margin-top: -96px;
+		    margin-left: -96px;
+		    background: #202020;
+		    border-radius: 12px;
+		    width: 250px;
+		    height: 192px;
+/*		    display: none; */
+		    color: white;
+		    font-weight: bold;
+			text-align: center;
+			padding-top: 30px;
+			transition: transform 0.5s;
+			transform-style: preserve-3d ;
+		    transform: rotateX( 90deg );
 		}
 		
+		div.wait p {
+			font-weight: bold;
+		}
 		div.wait.progress {
 			display: block;
+		    transform: rotateX( 0deg );
 		}
 		div.wait img {
-			margin-left: 16px;
-			margin-top: 16px;
-			width: 64px;
-			height: 64px;
+			margin-top: 30px;
+			width: 48px;
+			height: 48px;
 		}
 	</style>
 	<html id="htmlData" use="com.soffid.iam.web.main.LoginPage"><![CDATA[
 		<div class="wait" id="wait">
+			<p>${c:l('login.connecting') }</p>
 			<img src="${execution.contextPath }/anonymous/wait.gif" />
 		</div>
 		<div class="login" id='login'>

@@ -197,7 +197,7 @@ public abstract class DispatcherEntity {
 	@Nullable
 	Long longTimeout;	
 	
-	/************************ DAOS *******************************/
+	// ************************ DAOS ******************************
 	@DaoFinder("from com.soffid.iam.model.SystemEntity se "
 			+ "where (:name is null or se.name like :name) and "
 			+ "(:className is null or se.className like :className) and "
@@ -248,6 +248,15 @@ public abstract class DispatcherEntity {
 				+ "join tenant.servers as server "
 				+ "where server.tenantServer.name = :server)")
 	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findServerTenants(String server) {
+		return null;
+	}
+	
+	@DaoFinder("select dis "
+				+ "from com.soffid.iam.model.SystemEntityImpl as dis, com.soffid.iam.model.AgentDescriptorEntity d "
+				+ "where (dis.url = :url or dis.url2 = :url) and "
+				+ "dis.className = d.className and "
+				+ "d.service = :t")
+	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findServices(String url, boolean t) {
 		return null;
 	}
 }

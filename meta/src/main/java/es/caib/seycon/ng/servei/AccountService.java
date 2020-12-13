@@ -133,11 +133,6 @@ public abstract class AccountService {
 	 return null;
 	}
 	
-	/**
-	 * 
-	 * @param account
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 */
 	@Operation ( grantees={roles.user_create.class,roles.user_update.class},
 			translated="removeAccount")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -146,13 +141,6 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
-	/**
-	 * 
-	 * @param dispatcher
-	 * @param nom
-	 * @return
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 */
 	@Description("Search shareds account on a system")
 	@Operation ( grantees={roles.agent_query.class,roles.agent_update.class},
 			translated="listNonUserAccounts")
@@ -164,13 +152,6 @@ public abstract class AccountService {
 	 return null;
 	}
 	
-	/**
-	 * 
-	 * @param account
-	 * @return
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
-	 */
 	@Description ("Creates a shared account")
 	@Operation ( grantees={roles.agent_update.class,roles.account_create.class},
 			translated="createAccount")
@@ -181,13 +162,6 @@ public abstract class AccountService {
 	 return null;
 	}
 	
-	/**
-	 * 
-	 * @param account
-	 * @return
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
-	 */
 	@Description ("Creates a shared account, including its attributes")
 	@Operation ( grantees={roles.agent_update.class,roles.account_create.class},
 			translated="createAccount2")
@@ -198,12 +172,6 @@ public abstract class AccountService {
 	 return null;
 	}
 	
-	/**
-	 * 
-	 * @param account
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
-	 */
 	@Description("Updates a shared account")
 	@Operation ( grantees={roles.agent_update.class,roles.account_update.class},
 			translated="updateAccount")
@@ -214,12 +182,6 @@ public abstract class AccountService {
 		return null;
 	}
 	
-	/**
-	 * 
-	 * @param account
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 * @throws es.caib.seycon.ng.exception.AccountAlreadyExistsException
-	 */
 	@Description("Updates a shared account, including its attributes")
 	@Operation ( grantees={roles.agent_update.class,roles.account_update.class},
 			translated="updateAccount2")
@@ -230,13 +192,6 @@ public abstract class AccountService {
 		return null;
 	}
 	
-	/**
-	 * 
-	 * @param accountName
-	 * @param dispatcherName
-	 * @return
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 */
 	@Description ("Finds an account by name and system")
 	@Operation ( grantees={roles.user_create.class,roles.user_query.class,
 			roles.user_update.class,roles.agent_query.class,
@@ -250,13 +205,6 @@ public abstract class AccountService {
 	 return null;
 	}
 	
-	/**
-	 * 
-	 * @param accountName
-	 * @param dispatcherName
-	 * @return
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 */
 	@Description ("Finds an account by id")
 	@Operation ( grantees={roles.user_create.class,roles.user_query.class,
 			roles.user_update.class,roles.agent_query.class,
@@ -268,11 +216,6 @@ public abstract class AccountService {
 	}
 	
 
-	/**
-	 * 
-	 * @param account
-	 * @throws es.caib.seycon.ng.exception.InternalErrorException
-	 */
 	@Description("Removes a shared account")
 	@Operation ( grantees={roles.agent_update.class,roles.account_delete.class},
 			translated="removeAccount")

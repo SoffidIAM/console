@@ -1,0 +1,8 @@
+Section: admin
+Priority: optional
+Maintainer: Soffid <contact@soffid.com>
+Package: soffid-iamconsole
+Version: ${project.version}
+Architecture: all
+Description: Soffid IAM Console
+Depends: java-runtime

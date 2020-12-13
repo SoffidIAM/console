@@ -16,6 +16,8 @@ import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.AgentDescriptor;
+import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.ServerEntity;
@@ -190,9 +192,12 @@ public abstract class ServerService {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void clientAgentStarted(
-		java.lang.String AgentName)
+		java.lang.String serverName)
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	public Collection<Dispatcher> getServices() { return null; }
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Maquina> getHostsFromNetwork(
 		long networkId)
@@ -450,7 +455,7 @@ public abstract class ServerService {
 	}
 	public CustomObject getCustomObject(String type, String name) { return null;}
 	
-	/** Attribute translation services **/
+	////// ** Attribute translation services **
 	public String translate (String domain, String column1) { return null ; }
 	public String reverseTranslate (String domain, String column2) { return null; }
 	public Collection<AttributeTranslation> translate2 (String domain, String column1) { return null ; }

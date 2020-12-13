@@ -5,7 +5,11 @@
 
 package com.soffid.iam.model;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.api.ScheduledTaskLog;
 
 /**
  * DAO ScheduledTaskEntity implementation
@@ -39,6 +43,13 @@ public class ScheduledTaskEntityDaoImpl extends ScheduledTaskEntityDaoBase
 			target.setServerName(source.getServer().getName());
 		target.setHandlerName(source.getHandler().getName());
 		target.setTenant(source.getTenant().getName());
+		target.setLogs( getScheduledTaskLogEntityDao().toScheduledTaskLogList( source.getLogs() ) );
+		Collections.sort(target.getLogs(), new Comparator<ScheduledTaskLog>() {
+			@Override
+			public int compare(ScheduledTaskLog o1, ScheduledTaskLog o2) {
+				return -o1.getTime().compareTo(o2.getTime());
+			}
+		});
 	}
 
 	@Override

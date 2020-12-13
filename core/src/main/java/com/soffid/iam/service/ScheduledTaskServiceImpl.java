@@ -9,6 +9,7 @@
  */
 package com.soffid.iam.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Calendar;
@@ -16,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +28,7 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
+import com.soffid.iam.api.ScheduledTaskLog;
 import com.soffid.iam.doc.api.DocumentInputStream;
 import com.soffid.iam.doc.api.DocumentReference;
 import com.soffid.iam.doc.exception.DocumentBeanException;
@@ -33,10 +36,13 @@ import com.soffid.iam.doc.service.DocumentService;
 import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
+import com.soffid.iam.model.ScheduledTaskLogEntity;
 import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.remote.URLManager;
 import com.soffid.iam.sync.service.SyncStatusService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.ServerType;
@@ -189,6 +195,32 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	public void handleRegisterStartTask (ScheduledTask task) throws InternalErrorException
 	{
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(task.getId());
+		if (entity.getLastExecution() != null) {
+			int max = 10;
+			try {
+				max = Integer.parseInt( ConfigurationCache.getProperty("soffid.scheduledTask.maxLog") );
+			} catch (NumberFormatException e) {}
+			LinkedList<ScheduledTaskLogEntity> l = new LinkedList<ScheduledTaskLogEntity> ( entity.getLogs());
+			Collections.sort(l, new Comparator<ScheduledTaskLogEntity>() {
+				@Override
+				public int compare(ScheduledTaskLogEntity o1, ScheduledTaskLogEntity o2) {
+					return o1.getTime().compareTo(o2.getTime());
+				}
+			});
+			while ( l.size() >= max) {
+				ScheduledTaskLogEntity last = l.pollLast();
+				getScheduledTaskLogEntityDao().remove(last);
+				entity.getLogs().remove(last);
+			}
+			ScheduledTaskLogEntity taskLog = getScheduledTaskLogEntityDao().newScheduledTaskLogEntity();
+			taskLog.setError(entity.isError());
+			taskLog.setLogReferenceID(entity.getLogReferenceID());
+			taskLog.setTask(entity);
+			taskLog.setTime(entity.getLastExecution());
+			getScheduledTaskLogEntityDao().create(taskLog);
+			entity.getLogs().add(taskLog);
+			entity.setLogReferenceID(null);
+		}
 		entity.setActive(true);
 		entity.setLastExecution(new Date());
 		if (entity.getLogReferenceID() != null)
@@ -198,6 +230,12 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 				ds.deleteDocument(new DocumentReference( entity.getLogReferenceID()) );
 			} catch (Exception e) {
 				
+			}
+		}
+		if (entity.getServer() == null) {
+			try {
+				entity.setServer( getServerEntityDao().findByName( Config.getConfig().getHostName() ) );
+			} catch (IOException e) {
 			}
 		}
 		entity.setLogReferenceID(null);
@@ -357,4 +395,11 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
         }
         return null;
     }
+
+	@Override
+	protected ScheduledTask handleLoad(Long taskId) throws Exception {
+		ScheduledTaskEntity entity = getScheduledTaskEntityDao().load(taskId);
+		if (entity == null) return null;
+		else return getScheduledTaskEntityDao().toScheduledTask(entity);
+	}
 }

@@ -5,6 +5,8 @@
 //
 
 package com.soffid.iam.api;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 @ValueObject 
@@ -59,4 +61,7 @@ public class ScheduledTask {
 	@Nullable
 	public java.lang.String serverName;
 
+	@Nullable
+	@Attribute(defaultValue = "new java.util.LinkedList<>()")
+	public List<ScheduledTaskLog> logs;
 }

@@ -55,6 +55,7 @@
 						<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateMetadata &amp;&amp; canUpdateMetadata &amp;&amp; canDeleteMetadata}" onClick="ref:frame.importAttributeCsv"/>
 						<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadAttributeCsv"/>
 						<menu2item if="${canDeleteMetadata}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+						<menu2item image="/img/refresh.svg" label="${c:l('dadesAddicionals.zul.reset') }" onClick="ref:frame.setToDefault"/>
 					</menu2>
 					
 					<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
@@ -97,6 +98,9 @@
 				- name: ${c:l('dadesAddicionals.zul.Type')}
 				  value: typeDescription
 				  sort: false
+				- name: ${c:l('com.soffid.iam.api.CustomObjectType.builtin')}
+				  template: ${'$'}{builtin? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+				  sort: false
 				  				]]></attribute>
 					</datatable>
 					<div width="100%" style="text-align: right"
@@ -119,7 +123,7 @@
 		id="objectAttributeWindow"
 		closable="false">
 		
-		<form dataPath="../metadataGrid:/">
+		<form dataPath="../metadataGrid:/" id="form">
 			<div sclass='navigation-bar'>
 				${c:l('dadesAddicionals.zul.attribute') } <pager datatable="../metadataGrid" />
 				<menu2>
@@ -194,7 +198,7 @@
 							</datarow>
 						</grid>
 					</row>
-					<row visible="false">
+					<row visible="false" id="admvisrow">
 						<label value="${c:l('dadesAddicionals.zul.AdminVisibility')}" />
 						<div width="100%">
 							<listbox width="90%" visible="true" bind="@adminVisibility"
@@ -207,7 +211,7 @@
 							<label value="*" />
 						</div>
 					</row>
-					<row visible="false">
+					<row visible="false"  id="opevisrow">
 						<label value="${c:l('dadesAddicionals.zul.OperatorVisibility')}" />
 						<div width="100%">
 							<listbox width="90%" visible="true" bind="@operatorVisibility"
@@ -220,7 +224,7 @@
 							<label value="*" />
 						</div>
 					</row>
-					<row visible="false">
+					<row visible="false"  id="usevisrow">
 						<label value="${c:l('dadesAddicionals.zul.UserVisibility')}" />
 						<div width="100%">
 							<listbox width="90%" visible="true" bind="@userVisibility"

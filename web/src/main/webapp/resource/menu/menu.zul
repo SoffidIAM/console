@@ -2,7 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 
-<?page id="menu"?>
+<?page id="menueditor"?>
 <?component name="menu_acl" macro-uri="menu-acl.zul"?>
 <?component name="menu_executions" macro-uri="menu-executions.zul"?>
 <?component name="menu_sso" macro-uri="menu-sso.zul"?>
@@ -11,6 +11,7 @@
 	use="com.soffid.iam.web.menu.MenuEditorHandler" id="frame">
 	
 	<datamodel id="model" rootNode="root" src="menuDescriptor.xml"/>
+	
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 	
@@ -91,13 +92,13 @@
 								</div>					
 							</tabpanel>
 							<tabpanel fulfill="p_autoritzacions.onSelect" id="tp_autoritzacions">
-								<menu_acl listbox="//menu/listbox"/>
+								<menu_acl listbox="//menueditor/listbox"/>
 							</tabpanel>
 							<tabpanel fulfill="p_execucions.onSelect" id="tp_executions">
-								<menu_executions listbox="//menu/listbox"/>
+								<menu_executions listbox="//menueditor/listbox"/>
 							</tabpanel>
 							<tabpanel fulfill="p_xml.onSelect" id="tp_xml">
-								<menu_sso listbox="//menu/listbox"/>
+								<menu_sso listbox="//menueditor/listbox"/>
 							</tabpanel>
 						</tabpanels>
 					</tabbox>

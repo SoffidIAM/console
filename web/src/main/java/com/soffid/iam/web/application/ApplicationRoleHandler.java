@@ -559,7 +559,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	}
 	
 	public void removeGroup(Event event) {
-		DataTable ownerGroup = (DataTable) getWindowModify().getFellow("granteeGroups");
+		DataTable ownerGroup = (DataTable) getWindowModify().getFellow("ownerGroups");
 		ownerGroup.delete();
 	}
 	
@@ -577,26 +577,29 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	
 	public void setMandatoryGroup(Event event) {
 		String [] data = (String[]) event.getData();
-		DataTable dt = (DataTable) getWindowModify().getFellow("granteeGroups");
+		DataTable dt = (DataTable) getWindowModify().getFellow("ownerGroups");
 		dt.getJXPathContext().setValue("@mandatory", data.length > 0 && "true".equals(data[0]));
 	}
 
 	public void preview(Event event) throws InternalErrorException, NamingException, CreateException {
 		Role r = (Role) ((DataNode) getListbox().getJXPathContext().getValue("/")).getInstance();
-		List<RoleAccount> ra = new LinkedList<>();
-		List<RoleAccount> rr = new LinkedList<>();
-		DataNodeCollection dnc = (DataNodeCollection) getListbox().getJXPathContext().getValue("/grant");
-		for (int i = 0; i < dnc.size(); i++) {
-			DataNode dn = (DataNode) dnc.getDataModel(i);
-			if (dn.isDeleted())
-				rr.add((RoleAccount) dn.getInstance());
-			else if (dn.isNew())
-				ra.add((RoleAccount) dn.getInstance());
+		ObjectAttributesDiv d = (ObjectAttributesDiv) getWindowModify().getFellow("attributes");
+		if (d.validate() && r.getId() != null) {
+			List<RoleAccount> ra = new LinkedList<>();
+			List<RoleAccount> rr = new LinkedList<>();
+			DataNodeCollection dnc = (DataNodeCollection) getListbox().getJXPathContext().getValue("/grant");
+			for (int i = 0; i < dnc.size(); i++) {
+				DataNode dn = (DataNode) dnc.getDataModel(i);
+				if (dn.isDeleted())
+					rr.add((RoleAccount) dn.getInstance());
+				else if (dn.isNew())
+					ra.add((RoleAccount) dn.getInstance());
+			}
+			String file = EJBLocator.getApplicationService().generateChangesReport(r, ra, rr);
+			Window previewWindow = (Window) getFellow("previewWindow");
+			((FileDump)previewWindow.getFellow("previewDiv")).setSrc(file);
+			previewWindow.doHighlighted();
 		}
-		String file = EJBLocator.getApplicationService().generateChangesReport(r, ra, rr);
-		Window previewWindow = (Window) getFellow("previewWindow");
-		((FileDump)previewWindow.getFellow("previewDiv")).setSrc(file);
-		previewWindow.doHighlighted();
 	}
 	
 	public void closePreview(Event event) {

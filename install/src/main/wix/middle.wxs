@@ -1,0 +1,40 @@
+         </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="Soffid IAM Console">
+	         <Component Id="ApplicationShortcut" Guid="*">
+	                <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Run" 
+	                	Name="SoffidConsole" 
+	                	Type="string" 
+	                	Value='"[ProgramFiles64Folder]\Soffid\IAM-Console\bin\Tomee.exe" //MS//Soffid-iamconsole' 
+	                	KeyPath="yes"/>
+				    <File Name='Soffid IAM Console.url' 
+				    	DiskId='1' Id='startup.url' 
+				    	Source='src/main/wix/Soffid IAM Console.url'/>
+			        <Shortcut Id="ApplicationStartMenuShortcut" 
+			                  Name="Soffid IAM Console systray monitor"
+			                  Description="Open Soffid IAM Console systray monitor"
+			                  Target="[#ROOT.bin.TomEE.exe]"
+			                  Arguments='//MS//Soffid-iamconsole'/>
+		    </Component>
+		 </Directory>
+      </Directory>
+    </Directory>
+
+    <CustomAction Id="SoffidService2"          
+		  Execute="deferred" 
+		  FileKey="ROOT.bin.service.remove.as.admin.bat"
+		  Impersonate="no"
+		  ExeCommand=""
+          Return="ignore" />
+
+    <CustomAction Id="ZRegisterSoffidService"          
+		  Execute="deferred" 
+		  FileKey="ROOT.bin.service.install.as.admin.bat"
+		  Impersonate="no"
+		  ExeCommand=""
+          Return="ignore" />
+
+    <Feature Id='Complete' Level='1'>
+    

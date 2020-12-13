@@ -607,7 +607,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 							Password.decode(selected.getPassword()).getPassword(), null)
 					.accept(MediaType.APPLICATION_JSON)
 					.get();
-					
+			String s = response.readEntity(String.class);
 		} catch (Exception e) {
 			throw new InternalErrorException ("Error connecting to "+selected.getStoreUrl()+": "+e.getMessage() );
 		}

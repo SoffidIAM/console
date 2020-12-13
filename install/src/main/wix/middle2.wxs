@@ -1,0 +1,22 @@
+         </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <CustomAction Id="RunMainApp"          
+          ExeCommand=''
+		  FileKey='ROOT.opt.soffid.iam-console-3.bin.service.install.as.admin.bat'
+		  Execute="deferred" 
+		  Impersonate="no"
+		  HideTarget='no'
+          Return="check"/>
+
+    <CustomAction Id="Uninstall"
+		  FileKey='ROOT.opt.soffid.iam-console-3.bin.service.remove.as.admin.bat'
+          ExeCommand='UNINSTALL'
+		  Execute="deferred" 
+		  Impersonate="no"
+		  HideTarget='no'
+          Return="ignore"/>
+	
+    <Feature Id='Complete' Level='1'>

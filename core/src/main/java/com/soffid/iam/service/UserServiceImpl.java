@@ -3218,7 +3218,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				}
 			}
 
-			fetchUserAttributes(attributes, entities, false);
+			fetchUserAttributes(attributes, entity.getUserData(), false);
 			
 			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.USER);
 			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )

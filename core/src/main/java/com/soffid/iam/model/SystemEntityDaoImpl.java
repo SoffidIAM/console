@@ -133,9 +133,9 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
         super.toSystem(sourceEntity, targetVO);
 
         // Fem les transformacions necessàries
-        targetVO.setTrusted(new Boolean(sourceEntity.getTrusted().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setRolebased(new Boolean(sourceEntity.getRoleBased().compareTo("S") == 0)); //$NON-NLS-1$
-        targetVO.setAccessControl(new Boolean(sourceEntity.getEnableAccessControl().compareTo("S") == 0)); //$NON-NLS-1$
+        targetVO.setTrusted("S".equals(sourceEntity.getTrusted())); //$NON-NLS-1$
+        targetVO.setRolebased("S".equals(sourceEntity.getRoleBased())); //$NON-NLS-1$
+        targetVO.setAccessControl("S".equals(sourceEntity.getEnableAccessControl())); //$NON-NLS-1$
 
         // Tipus d'usuari
         if (sourceEntity.getUserType() != null) {

@@ -26,6 +26,7 @@ import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.juli.AsyncFileHandler;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.TenantService;
@@ -439,7 +440,6 @@ public class Security {
     		{
 		        p = new SoffidPrincipalImpl(tenant+"\\"+user, null, null, null, Arrays.asList(roles), null, null);
     		} else {
-    			
     			SoffidPrincipal currentPrincipal = Security.getSoffidPrincipal();
     			
 				Long tenantId = getTenantId(tenant);
@@ -519,6 +519,7 @@ public class Security {
         if ( i >= 0)
         	assertCanSetTenant(principal.getName().substring(0, i));
     	assertCanSetIdentity();
+    	
     	getIdentities().push((SoffidPrincipal) principal);
     }
 

@@ -30,8 +30,37 @@
 				<filtering>true</filtering>
 				<targetPath>../docker</targetPath>
 			</resource>
+			<resource>
+				<directory>src/main/deb</directory>
+				<filtering>true</filtering>
+				<targetPath>../deb</targetPath>
+			</resource>
+			<resource>
+				<directory>src/main/wix</directory>
+				<filtering>true</filtering>
+				<targetPath>../wix</targetPath>
+			</resource>
+			<resource>
+				<directory>src/main/rpm</directory>
+				<filtering>true</filtering>
+				<targetPath>../rpm</targetPath>
+			</resource>
 		</resources>
 		<plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -68,6 +97,8 @@
 								</copy>
 								<copy tofile="${basedir}/target/dist/opt/soffid/iam-console-3/webapps/ROOT.war" 
 									  file="${basedir}/target/lib/iam-webroot.war" />
+								<copy tofile="${basedir}/target/dist/opt/soffid/iam-console-3/bin/tomcat-juli.jar" 
+									  file="${basedir}/target/lib/iam-juli.jar" />
 								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid/bpm" >
 									<fileset dir="${basedir}/target/lib" includes="*.par" />
 								</copy>
@@ -109,6 +140,64 @@
 						</goals>
 					</execution>
 					<execution>
+						<id>build-deb</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${basedir}/target/deb" >
+									<fileset dir="${basedir}/target/dist" includes="**/*"/>
+								</copy>
+								<chmod dir="${basedir}/target/deb/DEBIAN" perm="755" includes="p*"/>
+								<chmod dir="${basedir}/target/deb/opt/soffid/iam-console-3/bin" perm="750" includes="**"/>
+								<exec executable="fakeroot" failonerror="true">
+									<arg value="dpkg-deb" />
+									<arg value="-b" />
+									<arg value="${basedir}/target/deb" />
+									<arg value="target/soffid-iamconsole-${project.version}.deb" />
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>build-rpm</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<copy todir="${basedir}/target/rpm/dist" >
+									<fileset dir="${basedir}/target/dist" includes="**/*"/>
+								</copy>
+								<chmod dir="${basedir}/target/rpm/dist/opt/soffid/iam-console-3/bin" perm="750" includes="**"/>
+								<exec executable="fakeroot" failonerror="true">
+									<arg value="rpmbuild" />
+									<arg value="--target=noarch" />
+									<arg value="--buildroot" />
+									<arg value="${basedir}/target/rpm/dist" />
+									<arg value="-bb" />
+									<arg value="${basedir}/target/rpm/soffid-iamconsole.spec" />
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>build-msi</id>
+						<phase>package</phase>
+						<configuration>
+							<tasks>
+								<exec executable="${basedir}/src/main/wix/generateWix.sh" failonerror="true">
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
 						<id>docker</id>
 						<phase>package</phase>
 						<configuration>
@@ -134,7 +223,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.1</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-artifacts</id>
@@ -146,27 +235,27 @@
 							<artifacts>
 								<artifact>
 									<file>
-										target/SOFFID_console_installer.sh
-									</file>
-									<type>sh</type>
-								</artifact>
-								<artifact>
-									<file>
-										target/SEU_installer.exe
-									</file>
-									<type>exe</type>
-								</artifact>
-								<artifact>
-									<file>
-										target/SEU_installer_64.exe
-									</file>
-									<type>64bits.exe</type>
-								</artifact>
-								<artifact>
-									<file>
 										target/Soffid-iamconsole.tar.gz
 									</file>
-									<type>tar.gz</type>
+									<type>tgz</type>
+								</artifact>
+								<artifact>
+									<file>
+										target/soffid-iamconsole-${project.version}.deb
+									</file>
+									<type>deb</type>
+								</artifact>
+								<artifact>
+									<file>
+										target/soffid-iamconsole-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-1.noarch.rpm
+									</file>
+									<type>rpm</type>
+								</artifact>
+								<artifact>
+									<file>
+										target/wix/console.msi
+									</file>
+									<type>msi</type>
 								</artifact>
 							</artifacts>
 						</configuration>
@@ -266,6 +355,12 @@
            	<artifactId>iam-webroot</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
+		</dependency>
+	    <dependency>
+           	<groupId>${project.groupId}</groupId>
+           	<artifactId>iam-juli</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

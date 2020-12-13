@@ -1,6 +1,10 @@
 package com.soffid.iam.web.datarender;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URLEncoder;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -17,6 +21,7 @@ import com.soffid.iam.web.users.additionalData.InputField2;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.Databox.Type;
 
 public class DefaultRenderer extends DataTypeRenderer {
 
@@ -31,17 +36,60 @@ public class DefaultRenderer extends DataTypeRenderer {
 			o.put("template", "${"+prefix+dt.getName()+"_date}");
 			o.put("className", "dateColumn");
 		}
-		if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE) {
+		else if (dt.getType() == TypeEnumeration.DATE_TIME_TYPE) {
 			o.put("template", "${"+prefix+dt.getName()+"_datetime}");
 			o.put("className", "datetimeColumn");
 		}
-		if (dt.getType() == TypeEnumeration.BOOLEAN_TYPE) {
+		else if (dt.getType() == TypeEnumeration.BOOLEAN_TYPE) {
 			String yes = Messages.get(MZul.YES);
 			String no = Messages.get(MZul.NO);
 			o.put("template", "${"+prefix+dt.getName()+ "? '" +yes+ "' : '"+no+ "' }");
 			o.put("className", "statusColumn");
 		}
+		else if (dt.getType() == TypeEnumeration.PHOTO_TYPE) {
+			o.put("template", "<img class='small-picture' style='display:${"+prefix+dt.getName()+"?'inline-block':'none'}' "
+					+ "src='data:${"+prefix+dt.getName()+"_contentType};base64,${"+
+					prefix+dt.getName()+ "}'/>");
+			o.put("className", "statusColumn");
+		}
+		else if (dt.getEnumeration() != null && ! dt.getEnumeration().trim().isEmpty()) {
+			try {
+				String s = "${";
+				Class<?> cl = Class.forName(dt.getEnumeration());
+				for (Field field: cl.getFields()) {
+					if ( (field.getModifiers() & Modifier.STATIC) != 0) {
+						if (field.getType() == cl) {
+							String name = field.getName();
+							Object value = field.get(null);
+							String v = value.toString();
+							String label = Labels.getLabel(cl.getName()+"."+name);
+							if (label == null || label.trim().isEmpty())
+								label = name;
+							s += prefix+dt.getName()+".value=='"+jsEncode(v)+"'? '"+jsEncode(label)+"':";
+						}
+					}
+				}
+				s += "''}";
+				o.put("template", s);
+			} catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		else if (dt.getValues() != null && !dt.getValues().isEmpty()) {
+			String s = "${";
+			for (String value: dt.getValues()) {
+				int i = value.indexOf(':');
+				if (i > 0) 
+					s += prefix+dt.getName()+"=='"+jsEncode( value.substring(0, i).trim())+"'? '"+jsEncode(value.substring(i+1).trim())+"':";
+			}
+			s += prefix+dt.getName()+"}";
+			o.put("template", s);
+		}
 		return o;
+	}
+
+	private String jsEncode(String v) {
+		return v;
 	}
 
 	@Override

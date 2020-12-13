@@ -82,11 +82,11 @@ public abstract class TasqueEntity {
 	@Nullable
 	public java.lang.String role;
 
-	@Column(name = "TAS_BD", length = 50, translated = "db")
+	@Column(name = "TAS_BD", length = 150, translated = "db")
 	@Nullable
 	public java.lang.String bd;
 
-	@Column(name = "TAS_CODDIS", length = 50, translated = "systemName")
+	@Column(name = "TAS_CODDIS", length = 150, translated = "systemName")
 	@Nullable
 	public java.lang.String coddis;
 
@@ -275,6 +275,12 @@ public abstract class TasqueEntity {
 
 	@DaoOperation
 	public String startVirtualSourceTransaction(boolean readonly)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@DaoOperation
+	public String startVirtualSourceTransaction(boolean readonly, String server)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

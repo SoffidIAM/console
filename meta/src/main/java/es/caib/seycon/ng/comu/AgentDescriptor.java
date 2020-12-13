@@ -26,4 +26,6 @@ public class AgentDescriptor {
 	public boolean enableAttributeMapping;
 
 	public boolean enableObjectTriggers;
+	
+	public boolean service;
 }

@@ -65,7 +65,7 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 		listboxPath = (String) Executions.getCurrent().getArg().get("listbox");
 	}
 	
-	public void addNew (Event event) {
+	public void addNew (Event event) throws CommitException {
 		Window w = (Window) getFellow("add-window");
 		getWizard().setSelected(0);
 		w.doHighlighted();

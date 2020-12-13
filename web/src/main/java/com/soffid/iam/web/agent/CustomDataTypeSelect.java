@@ -120,15 +120,17 @@ public class CustomDataTypeSelect extends Select implements XPathSubscriber {
 			}
 			for (com.soffid.iam.api.CustomObjectType cot : com.soffid.iam.EJBLocator.getAdditionalDataService()
 					.findCustomObjectTypeByJsonQuery(null)) {
-				o = new JSONObject();
-				o.put("label", cot.getName());
-				String value = TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue()+":"+cot.getName();
-				o.put("value", value);
-				array.put(o);
-				if (currentType != null &&
-						currentType.getValue().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue())
-						&& cot.getName().equals(currentCustomType))
-					selected = value;
+				if ( !cot.isBuiltin()) {
+					o = new JSONObject();
+					o.put("label", cot.getName());
+					String value = TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue()+":"+cot.getName();
+					o.put("value", value);
+					array.put(o);
+					if (currentType != null &&
+							currentType.getValue().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE.getValue())
+							&& cot.getName().equals(currentCustomType))
+						selected = value;
+				}
 			}
 			setOptions(array.toString());
 			setSelectedValue(selected);

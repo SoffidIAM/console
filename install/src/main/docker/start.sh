@@ -105,11 +105,11 @@ fi
 
 if [[ "$JAVA_OPT" == "" ]]
 then
-    INSTALL4J_ADD_VM_PARAMS="-Xmx2048m -Xms256m"
+    CATALINA_OPTIONS="-Xmx2048m -Xms256m"
 else
-    INSTALL4J_ADD_VM_PARAMS="$JAVA_OPT"
+    CATALINA_OPTIONS="$JAVA_OPT"
 fi
-export INSTALL4J_ADD_VM_PARAMS
+export CATALINA_OPTIONS
 
 for trustedcert in /opt/soffid/iam-console-3/trustedcerts/*
 do   
@@ -124,8 +124,9 @@ done
 if [[ "$SECURE" == "true" ]]
 then
     echo "Starting SECURE Soffid IAM Console"
+	exec /opt/soffid/iam-console-3/bin/catalina.sh run 
 else
     echo "Starting Soffid IAM Console"
+	exec /opt/soffid/iam-console-3/bin/catalina.sh run -security
 fi
 
-exec /opt/soffid/iam-console-3/bin/run 

@@ -5,8 +5,10 @@ import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.CreateException;
+import javax.enterprise.concurrent.LastExecution;
 import javax.naming.NamingException;
 
 import org.zkoss.util.resource.Labels;
@@ -19,6 +21,8 @@ import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.api.ScheduledTaskLog;
 import com.soffid.iam.bpm.api.Job;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.doc.exception.DocumentBeanException;
@@ -33,6 +37,7 @@ import es.caib.zkib.component.Databox;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.events.XPathRerunEvent;
 
 public class ScheduledTaskHandler extends FrameHandler {
 
@@ -58,8 +63,18 @@ public class ScheduledTaskHandler extends FrameHandler {
 		if (dt.getSelectedIndex() >= 0) {
 			Calendar last = (Calendar) XPathUtils.eval(getForm(), "lastEnd");
 			Boolean active = (Boolean) XPathUtils.eval(getForm(), "active");
+			Boolean error = (Boolean) XPathUtils.eval(getForm(), "error");
 			String ref = (String) XPathUtils.eval(getForm(), "logReferenceID");
-			if (last == null)
+			List<ScheduledTaskLog> logs = (List<ScheduledTaskLog>) XPathUtils.eval(getForm(), "logs");
+			
+			getFellow("status-running").setVisible(Boolean.TRUE.equals(active));
+			getFellow("status-stopped").setVisible(!Boolean.TRUE.equals(active));
+			getFellow("warning").setVisible(Boolean.TRUE.equals(error));
+
+			getFellow("logsSection").setVisible(logs != null && !logs.isEmpty());
+			dt.sendEvent(new XPathRerunEvent(dt, "/logs"));
+			
+			if (last == null || Boolean.TRUE.equals(active))
 				getFellow("logSection").setVisible(false);
 			else {
 				getFellow("logSection").setVisible(true);
@@ -96,6 +111,7 @@ public class ScheduledTaskHandler extends FrameHandler {
 					logField.invalidate();
 				}
 			}
+			updateStatus(event);
 		}
 	}
 	
@@ -109,6 +125,57 @@ public class ScheduledTaskHandler extends FrameHandler {
 				"text/plain; charset=utf-8",
 				name+".txt");
 	}
+
+	public void updateStatus(Event event) {
+		DataTable dt = (DataTable) getListbox();
+		if (dt.getSelectedIndex() >= 0) {
+			Long taskId = (Long) dt.getJXPathContext().getValue("@id");
+			if (taskId != null) {
+				ScheduledTask task;
+				try {
+					task = EJBLocator.getScheduledTaskService().load(taskId);
+					Object lastExecution = dt.getJXPathContext().getValue("lastExecution");
+					Object lastEnd = dt.getJXPathContext().getValue("lastEnd");
+					if ((lastExecution == null ? 
+							task.getLastExecution() != null :
+							!lastExecution.equals(task.getLastExecution())) ||
+						(lastEnd == null ?
+							task.getLastEnd() != null:
+							!lastEnd.equals(task.getLastEnd())))
+					{
+						XPathUtils.setValue(dt, "lastEnd", task.getLastEnd());
+						XPathUtils.setValue(dt, "error", task.isError());
+						XPathUtils.setValue(dt, "active", task.isActive());
+						XPathUtils.setValue(dt, "lastExecution", task.getLastExecution());
+						XPathUtils.setValue(dt, "logReferenceID", task.getLogReferenceID());
+						XPathUtils.setValue(dt, "logs", task.getLogs());
+						onChangeForm(event);
+					}
+				} catch (Exception e) {
+				}
+			}
+		}
+	}
 	
+	public void start(Event event) throws InternalErrorException, NamingException, CreateException, InterruptedException {
+		ScheduledTask task = (ScheduledTask) XPathUtils.eval(getForm(), "instance");
+		EJBLocator.getScheduledTaskService().startNow(task );
+		Thread.sleep(2000);
+		updateStatus(event);
+	}
+	
+	public void downloadOtherLog() throws IllegalArgumentException, InternalErrorException, NamingException, CreateException, DocumentBeanException {
+		DataTable dt = (DataTable) getFellow("logs");
+		String reference = (String) dt.getJXPathContext().getValue("logReferenceID");
+		if (reference != null) {
+			String name = (String) XPathUtils.eval(getForm(), "name");
+			DocumentService doc = EJBLocator.getDocumentService();
+			doc.openDocument(new com.soffid.iam.doc.api.DocumentReference(reference));
+
+			Filedownload.save(new com.soffid.iam.doc.api.DocumentInputStream(doc),
+					"text/plain; charset=utf-8",
+					name+".txt");			
+		}
+	}
 }
 

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.CrudHandler;
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
@@ -20,6 +21,7 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.crud.CrudAccountHandler;
 import com.soffid.iam.service.crud.CrudApplicationHandler;
+import com.soffid.iam.service.crud.CrudCustomObjectHandler;
 import com.soffid.iam.service.crud.CrudDomainValueHandler;
 import com.soffid.iam.service.crud.CrudGroupHandler;
 import com.soffid.iam.service.crud.CrudHostHandler;
@@ -57,6 +59,7 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(VaultFolder.class.getName(), new CrudVaultFolderHandler());
 		registry.put(Account.class.getName(), new CrudAccountHandler());
 		registry.put(MailList.class.getName(), new CrudMailListHandler());
+		registry.put(CustomObject.class.getName(), new CrudCustomObjectHandler());
 	}
 
 	@Override

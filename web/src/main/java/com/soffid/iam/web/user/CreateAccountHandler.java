@@ -153,7 +153,7 @@ public class CreateAccountHandler extends Window implements AfterCompose {
 				account.setName(accountName);
 				account.setSystem(systemName);
 				account.setPasswordPolicy((String) usersDataSource.getJXPathContext().getValue("userType"));
-				account.setStatus(AccountStatus.FORCED_ACTIVE);
+				account.setStatus(AccountStatus.ACTIVE);
 				newUserPath = XPathUtils.createPath(usersDataSource, path, account);
 				
 				accountsTree.setSelectedIndexByXPath(newUserPath);

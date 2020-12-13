@@ -15,8 +15,12 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.popup.Editor;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
@@ -25,10 +29,15 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.ReorderEvent;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class MetadataHandler extends Div implements AfterCompose{
+public class MetadataHandler extends FrameHandler implements AfterCompose{
+	public MetadataHandler() throws InternalErrorException {
+		super();
+	}
+
 	private DataTable metadataGrid;
 	private Window metadataWindow;
 	private boolean canModifyMetadata;
@@ -77,7 +86,7 @@ public class MetadataHandler extends Div implements AfterCompose{
 	}
 
 
-	public void apply () {
+	public void apply (Event event) {
 		metadataGrid.commit();
 		metadataGrid.setSelectedIndex(-1);
 		metadataWindow.setVisible(false);
@@ -158,6 +167,7 @@ public class MetadataHandler extends Div implements AfterCompose{
 		collection.sort(new OrderComparator());
 		
 	}
+	
 }
 
 class OrderComparator implements Comparator<DataType>

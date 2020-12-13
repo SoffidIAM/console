@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="host"?>
+
+<?component name="host_sessions" macro-uri="host-sessions.zul"?>
+<?component name="host_acl" macro-uri="host-acl.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.custom.CustomObjectHandler" id="frame"
+	type="${execution.nativeRequest.parameterMap['type'][0] }">
+	<datamodel id="model" rootNode="objects" src="customObjectDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" pageArgs="type=${execution.nativeRequest.parameterMap['type'][0] }">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('host:all:create') &amp;&amp; soffid:isUserInRole('network:all:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.CustomObject#${execution.nativeRequest.parameterMap['type'][0] }" 
+				defaultAttributes="name, description"
+				preference="custom-${execution.nativeRequest.parameterMap['type'][0] }"
+				dataPath="/model:/object" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.custom.CustomObjectDatatable"
+				preference="custom-${execution.nativeRequest.parameterMap['type'][0] }"
+				type="${execution.nativeRequest.parameterMap['type'][0] }"
+				dataPath="/model:/object" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+			</datatable>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('network:all:create')}" >
+				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails"
+				pageArgs="type=${execution.nativeRequest.parameterMap['type'][0] }">
+				<pager datatable="listbox"/>
+								
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+				<menu2>
+					<menu2item id="deleteHost" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+			</div>
+			<form id="form" onChangeXPath="ref:frame.onChangeForm"
+				dataPath="/listbox:/." width="100%">
+				<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+					objectType="${execution.nativeRequest.parameterMap['type'][0] }"
+					dataPath="/." id="attributes"/>
+			</form>
+			<div style="text-align: right; width: 100%">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+			</div>
+		</div>
+	</div>
+</frame>

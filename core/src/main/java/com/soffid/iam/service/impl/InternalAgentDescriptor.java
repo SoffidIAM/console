@@ -42,23 +42,6 @@ public class InternalAgentDescriptor extends AgentDescriptor
 	}
 
 	/**
-	 * @param id
-	 * @param description
-	 * @param className
-	 * @param userInterface
-	 * @param enableAccessControl
-	 * @param authoritativeSource
-	 * @param enableAttributeMapping
-	 */
-	public InternalAgentDescriptor (Long id, String description, String className,
-					byte[] userInterface, boolean enableAccessControl,
-					boolean authoritativeSource, boolean enableAttributeMapping, boolean enableObjectTriggers)
-	{
-		super(id, description, className, userInterface, enableAccessControl,
-						authoritativeSource, enableAttributeMapping, enableObjectTriggers);
-	}
-
-	/**
 	 * @param otherBean
 	 */
 	public InternalAgentDescriptor (AgentDescriptor otherBean)

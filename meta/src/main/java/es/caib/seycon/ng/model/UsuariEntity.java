@@ -136,11 +136,6 @@ public abstract class UsuariEntity {
 	@Column (name="USU_TEN_ID")
 	TenantEntity tenant;
 	
-	/**
-	 * @Column (name="USU_ALCOAN", length=240)
-	 * @Nullable Not used public java.lang.String aliesCorreu;
-	 */
-
 	@ForeignKey(foreignColumn = "APL_IDCONTACT", translated = "ApplicationResponsible")
 	public java.util.Collection<es.caib.seycon.ng.model.AplicacioEntity> aplicacioSocPersonaResponsable;
 
@@ -165,7 +160,7 @@ public abstract class UsuariEntity {
 	@ForeignKey(foreignColumn = "PAU_USU_ID")
 	public java.util.Collection<com.soffid.iam.authoritative.model.AuthoritativeChangeEntity> pendingAuthoritativeChanges;
 
-	/************************ DAOs **********************************/
+	// ************************ DAOs **********************************
 	@Operation(translated = "findByUserName")
 	@DaoFinder("from com.soffid.iam.model.UserEntity  where userName = :userName and tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UsuariEntity findByCodi(

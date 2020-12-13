@@ -728,6 +728,12 @@
 		    <version>1.1.1</version>
 		    <scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>iam-juli</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>
 

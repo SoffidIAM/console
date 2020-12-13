@@ -45,7 +45,7 @@ public abstract class TipusUnitatOrganitzativaEntity {
 	@ForeignKey(foreignColumn = "GRU_TIPUS", translated = "groupEntities")
 	public java.util.Collection<es.caib.seycon.ng.model.GrupEntity> grupEntities;
 
-	/************************* DAOS ***********************************/
+	/// ************************* DAOS ***********************************
 	@Operation(translated = "findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.TipusUnitatOrganitzativaEntity findByCodi(

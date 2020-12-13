@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -9,6 +10,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.json.JSONException;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
@@ -26,12 +29,17 @@ import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
+import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.ParseException;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -332,4 +340,92 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			q = filter;
 		return handleFindCustomObjectByJsonQuery(objectType, q);
 	}
+
+	@Override
+	protected AsyncList<CustomObject> handleFindCustomObjectByTextAndJsonQueryAsync(String text, String filter)
+			throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+
+		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
+		
+		final String query = q;
+		getAsyncRunnerService().run(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					internalSearchCustomObjectsByJson(query, result, null, null);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+			
+		}, result);
+
+		return result;
+	}
+
+	@Override
+	protected List<CustomObject> handleFindCustomObjectByTextAndJsonQuery(String text, String filter,
+			Integer start, Integer end) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		LinkedList<CustomObject> result = new LinkedList<CustomObject>();
+
+		internalSearchCustomObjectsByJson(q, result, start, end);
+		
+		return result;
+	}
+
+	private void internalSearchCustomObjectsByJson(String query, Collection<CustomObject> result,
+			Integer start, Integer end)
+			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
+			EvalException, InternalErrorException {
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+
+		AbstractExpression expr = ExpressionParser.parse(query);
+		HQLQuery hql = expr.generateHSQLString(CustomObject.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.tenant.id = :tenantId";
+		else
+			qs = "("+qs+") and o.tenant.id = :tenantId";
+		
+		qs = qs + " order by o.name";
+
+		hql.setWhereString(new StringBuffer(qs));
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size()+1];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		TimeOutUtils tou = new TimeOutUtils();
+		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
+		cfg.setFirstResult(start);
+		cfg.setMaximumResultSize(end);
+		for (CustomObjectEntity ue : getCustomObjectEntityDao().query(hql.toString(),
+				paramArray, cfg)) {
+			if (result instanceof AsyncList)
+			{
+				if (((AsyncList) result).isCancelled())
+					return;
+			}
+			else
+			{
+				tou.checkTimeOut();
+			}
+			CustomObject c = getCustomObjectEntityDao().toCustomObject(ue);
+			result.add(c);
+		}
+	}
+
 }

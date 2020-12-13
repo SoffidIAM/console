@@ -54,7 +54,7 @@
 		sizable="true" title="${c:l('accounts.setPassword.title')}"
 		visible="false" width="34em"
 		onClose="ref:handler.onCancelPassword">
-		<vbox width="30em" heights="2em, 2em" style="margin: 4em">
+		<div style="margin: 1em">
 			<radiogroup id="generationType" width="24em" orient="vertical"
 				onCheck="ref:handler.onChangeSelectedGeneration">
 				<radio label="${c:l('usuaris.zul.radomPassword')}" 
@@ -76,15 +76,15 @@
 					onOK="ref:handler.onSetPassword">
 				</textbox>
 			</div>
-			<hbox align="center" pack="end" width="26em" style="margin-top: 2em">
+			<div align="right" style="width: 100%; margin-top: 1em">
 				<button
 					label="${c:l('accounts.setPassword.Cancel')}"
 					onClick="ref:handler.onCancelPassword" />
 				<button id = "setButton"
 				    label="${c:l('accounts.setPassword.OK')}"
 					onClick="ref:handler.onSetPassword" />
-			</hbox>
-		</vbox>
+			</div>
+		</div>
 	</window>
 	
 	<!-- Window to show the random password -->

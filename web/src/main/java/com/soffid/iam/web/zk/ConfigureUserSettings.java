@@ -177,12 +177,12 @@ public class ConfigureUserSettings {
 		if (dateformat == null)
 			dateformat = ConfigurationCache.getProperty("soffid.dateformat");
 		if (dateformat != null)
-			sessio.setAttribute(SESSIO_DATEFORMAT, dateformat);
+			sessio.setAttribute(SESSIO_DATEFORMAT, dateformat.trim());
 		String timeformat = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("timeformat");
 		if (timeformat == null)
 			timeformat = ConfigurationCache.getProperty("soffid.timeformat");
 		if (timeformat != null)
-			sessio.setAttribute(SESSIO_TIMEFORMAT, timeformat);
+			sessio.setAttribute(SESSIO_TIMEFORMAT, timeformat.trim());
 		String sourceIP = Security.getClientIp();
 		sessio.setAttribute(SESSIO_IP, sourceIP);
 		com.soffid.iam.EJBLocator.getPreferencesService().updateMyPreference("last_ip", sourceIP);

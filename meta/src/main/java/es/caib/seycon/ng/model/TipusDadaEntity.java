@@ -185,7 +185,7 @@ public abstract class TipusDadaEntity {
 	@Column(name="TDA_LETCAS", defaultValue="com.soffid.iam.api.LetterCaseEnum.MIXEDCASE")
 	LetterCaseEnum letterCase;
 
-	/********************** DAOS ************************/
+	// ********************** DAOS ************************
 	@Operation(translated="findDataTypeByName")
 	@DaoFinder("from com.soffid.iam.model.MetaDataEntity where name = :name and tenant.id = :tenantId and scope='user'")
 	public es.caib.seycon.ng.model.TipusDadaEntity findTipusDadaByCodi(

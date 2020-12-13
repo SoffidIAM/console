@@ -5,7 +5,7 @@
 	<style>
 		body {
 			background-color: #5ec0a5;
-			background-image: url(${execution.contextPath}/anonymous/bg-orig.svg);
+			background-image: url(${execution.contextPath}/anonymous/bg.jpeg);
 			background-repeat: no-repeat;
 			background-size: cover;
 			background-position: center;

@@ -132,7 +132,7 @@ public abstract class RolAccountEntity {
 	@Nullable
 	public Date delegateUntil;
 
-	/**************************** DAOs ******************************/
+	/// **************************** DAOs ******************************
 	@DaoFinder("select ra" 
 			+ " from com.soffid.iam.model.RoleAccountEntity ra\n"
 			+ "inner join    ra.account as account\n"

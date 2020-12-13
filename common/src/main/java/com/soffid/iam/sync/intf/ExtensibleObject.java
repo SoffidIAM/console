@@ -136,6 +136,14 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 		}
 		return o2;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("Extensible object [type = "+objectType+"]");
+		for (String key: attributes.keySet()) 
+			sb.append("\n  ").append(key).append(": ").append(attributes.get(key));
+		return sb.toString();
+	}
 }
 
 

@@ -30,12 +30,14 @@ public class ZulFns {
 
 	public static final String getStatusIcon(Account account) {
 		try {
+			if (account.getId() == null)
+				return "/img/sync.svg";
 			int i = EJBLocator.getAccountService().isUpdatePendingExtended(account);
 			return i == 1 ? "/img/held-green.svg" :
 				i == 2 ? "/img/sync.svg":
 				i == 3 ? "/img/warning.svg":
 					"/img/account-green.svg";
-		} catch (InternalErrorException | NamingException | CreateException e) {
+		} catch (Exception e) {
 			return "/img/account-green.svg";
 		}
 	}

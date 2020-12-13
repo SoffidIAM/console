@@ -28,7 +28,11 @@ public class AccessLogHandler extends FrameHandler {
 		if (filter == null) {
 			SearchBox searchBox = (SearchBox) getFellow("searchBox");
 			java.util.Calendar c = java.util.Calendar.getInstance();
-			c.add(java.util.Calendar.DAY_OF_MONTH, -7);
+			c.add(java.util.Calendar.DAY_OF_MONTH, -6);
+			c.set(java.util.Calendar.HOUR, 0);
+			c.set(java.util.Calendar.MINUTE, 0);
+			c.set(java.util.Calendar.SECOND, 0);
+			c.set(java.util.Calendar.MILLISECOND, 0);
 			searchBox.addAttribute("startDate").setDateSearchInterval(c.getTime(), null);
 		}
 	}

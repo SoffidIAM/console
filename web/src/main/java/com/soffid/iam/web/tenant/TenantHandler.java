@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.media.Media;
 import org.zkoss.zhtml.Filedownload;
 import org.zkoss.zk.ui.Component;
@@ -21,6 +24,7 @@ import org.zkoss.zul.Textbox;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.security.SoffidPrincipalImpl;
+import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.bpm.attachment.ReaderInputStream;
 import com.soffid.iam.web.component.FrameHandler;
@@ -38,6 +42,7 @@ public class TenantHandler extends FrameHandler {
 	private boolean canUpdateTenant;
 	private boolean canDeleteTenant;
 	private boolean canQueryTenant;
+	Log log = LogFactory.getLog(getClass());
 
 	public TenantHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
@@ -145,7 +150,7 @@ public class TenantHandler extends FrameHandler {
 		}
 	}
 	
-	public void nestedLogin() throws InterruptedException {
+	public void nestedLogin() throws InterruptedException, InternalErrorException {
 		if (getModel().isCommitPending()) {
 			Messagebox.show(org.zkoss.util.resource.Labels.getLabel("dbpropertyadmin.CanvisPendents"),
 					org.zkoss.util.resource.Labels.getLabel("dbpropertyadmin.Alerta"), Messagebox.OK,
@@ -170,7 +175,22 @@ public class TenantHandler extends FrameHandler {
 
 			SoffidPrincipal p = new SoffidPrincipalImpl(
 					name + "\\" + Security.getCurrentAccount(), effectiveRoles, Security.getSoffidPrincipal());
-			
+
+			Security.nestedLogin(name, "admin", Security.ALL_PERMISSIONS);
+			try {
+				Tenant tenant = (Tenant) XPathUtils.getValue((Component) getForm(), "instance");
+	            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
+	            		getBeansOfType(ApplicationBootService.class);
+	
+	            for ( Object service: beans.keySet())
+	            {
+	            	log.info ("Executing startup bean: " + service);
+	            	
+	            	((ApplicationBootService) beans.get(service)).tenantBoot(tenant);
+	            }
+			} finally {
+            	Security.nestedLogoff();
+            }
 			Executions
 				.getCurrent()
 				.getDesktop()

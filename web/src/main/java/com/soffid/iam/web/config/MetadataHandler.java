@@ -55,6 +55,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.ReorderEvent;
+import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
@@ -214,7 +215,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 
 	public void displayRestrictions ()
     {
-    	com.soffid.iam.api.MetadataScope scope = (MetadataScope) XPathUtils.getValue(
+    	com.soffid.iam.api.MetadataScope scope = (MetadataScope) XPathUtils.eval(
     			objectAttributeWindow.getFellow("form"), 
     			"scope");
     	if (scope == null)
@@ -223,9 +224,9 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
     	}
     			
     	boolean display = scope == com.soffid.iam.api.MetadataScope.USER;
-    	objectAttributeWindow.getFellow ("visibility1").setVisible(display);
-    	objectAttributeWindow.getFellow ("visibility2").setVisible(display);
-    	objectAttributeWindow.getFellow ("visibility3").setVisible(display);
+    	objectAttributeWindow.getFellow ("usevisrow").setVisible(display);
+    	objectAttributeWindow.getFellow ("opevisrow").setVisible(display);
+    	objectAttributeWindow.getFellow ("admvisrow").setVisible(display);
     	objectAttributeWindow.getFellow ("visibility4").setVisible(true);
     	objectAttributeWindow.getFellow ("visibility5").setVisible(true);
     	es.caib.seycon.ng.comu.TypeEnumeration type = (TypeEnumeration) XPathUtils.getValue(
@@ -368,6 +369,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 
 	public void showAttributeDetails() {
 		objectAttributeWindow.doHighlighted();
+		displayRestrictions();
 	}
 	
 	public void onChangeAttributeForm(Event event) {
@@ -495,7 +497,18 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 				new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
 	}
 	
-
+	public void setToDefault(Event event) throws Exception {
+		getModel().commit();
+		String name = (String) XPathUtils.eval(getListbox(), "@name");
+		MetadataScope scope = (MetadataScope) XPathUtils.eval(getListbox(), "@scope");
+		if (scope != null) {
+			EJBLocator.getAdditionalDataService().registerStandardObject(
+					name.replace('.', '/')+".ui.json", 
+					scope, true);
+			DataModelCollection dmc = (DataModelCollection) XPathUtils.eval(getListbox(), "/metadata");
+			dmc.refresh();
+		}
+	}
 }
 
 class OrderComparator implements Comparator<DataType>

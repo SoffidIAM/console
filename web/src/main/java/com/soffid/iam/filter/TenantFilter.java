@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.juli.AsyncFileHandler;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -71,7 +72,7 @@ public class TenantFilter implements Filter {
 				}
 				else
 				{
-					chain.doFilter(request, response);
+	    			chain.doFilter(request, response);
 				}
 			}
 		} finally {

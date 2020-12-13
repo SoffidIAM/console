@@ -30,7 +30,6 @@ package es.caib.seycon.ng.sync.intf;
 
 import java.rmi.RemoteException;
 
-import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -42,59 +41,20 @@ import es.caib.seycon.ng.exception.InternalErrorException;
  * @version $Revision: 1.1.2.2 $
  */
  
+@Deprecated
 public interface UserMgr extends java.rmi.Remote {
-  /**Update user data.
-   * 
-   * @param user código de usuario
-   * @throws java.rmi.RemoteException error de comunicaciones
-   * @throws InternalErrorException cualquier otra causa
-   */
   public void updateUser (String userName, Usuari userData) 
     throws java.rmi.RemoteException, 
             InternalErrorException;
-  /** 
-   * Update shared account data
-   * 
-   * @param user código de usuario
-   * @throws java.rmi.RemoteException error de comunicaciones
-   * @throws InternalErrorException cualquier otra causa
-   */
   public void updateUser (String accountName, String description) 
     throws java.rmi.RemoteException, 
             InternalErrorException;
-  /**
-   * Delete a user or account
-   * 
-   * @param userName
-   * @throws RemoteException
-   * @throws InternalErrorException
-   */
   public void removeUser (String userName) throws RemoteException, InternalErrorException;
-  /** 
-   * Updates account password.
-   * 
-   * @param user account name
-   * @param userData option user info (non shared accounts)
-   * @param password password to set
-   * @param mustchange true if user must change password at next login
-   * @throws java.rmi.RemoteException error de comunicaciones
-   * @throws InternalErrorException cualquier otra causa
-   */
+
   public void updateUserPassword (String userName, Usuari userData, Password password, boolean mustchange)
     throws java.rmi.RemoteException, 
             InternalErrorException;
 
-  /** 
-   * 
-   * Verifyfies the user password
-   * 
-   * @param user account name
-   * @param password password to test
-   * 
-   * @return true si la contraseña es válida
-   * @throws java.rmi.RemoteException error de comunicaciones
-   * @throws InternalErrorException cualquier otra causa
-   */
   public boolean validateUserPassword (String userName, Password password)
     throws java.rmi.RemoteException,
             InternalErrorException;

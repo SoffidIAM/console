@@ -27,42 +27,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @version $Revision: 1.1.2.1 $
  */
 
-// $Log: Password.java,v $
-// Revision 1.1.2.1  2012-09-18 06:11:59  u07286
-// Moure class Password
-//
-// Revision 1.1.2.1  2012-05-16 10:33:38  u07286
-// Reestructuració de paquets seycon antics
-//
-// Revision 1.6  2011-04-05 12:02:32  u07286
-// Generador automàtico de hash
-//
-// Revision 1.5 2010-03-15 10:23:31 u07286
-// Movido a tag HEAD
-//
-// Revision 1.2.2.2 2009-06-16 11:23:01 u07286
-// Merge a seycon-3.0.15
-//
-// Revision 1.2.2.1 2009-03-23 07:52:00 u89559
-// *** empty log message ***
-//
-// Revision 1.3 2009-02-16 08:08:25 u89559
-// *** empty log message ***
-//
-// Revision 1.2 2008-03-13 08:38:34 u07286
-// Creado tipo de agente "local"
-// Creado agente JBPM
-// Creado entorno de test
-//
-// Revision 1.1 2007-09-06 12:51:10 u89559
-// [T252]
-//
-// Revision 1.3 2004-03-15 12:08:04 u07286
-// Conversion UTF-8
-//
-// Revision 1.2 2004/03/15 11:57:48 u07286
-// Agregada documentacion JavaDoc
-//
 @JsonDeserialize(using=PasswordDeserializer.class)
 @JsonSerialize(using=PasswordSerializer.class)
 public class Password extends Object implements Serializable {
@@ -105,9 +69,8 @@ public class Password extends Object implements Serializable {
     /**
      * Des-serializar
      * 
-     * @param contraseña
-     *            cifrada
-     * @return objeto con contraseña cifrada en su interior
+     * @param s  encrypted password
+     * @return Password object holding the encrypted password
      */
     static public Password decode(String s) {
         Password p = new Password(null);
@@ -119,7 +82,12 @@ public class Password extends Object implements Serializable {
     static private String base64Array = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" //$NON-NLS-1$
             + "abcdefghijklmnopqrstuvwxyz" + "0123456789+/"; //$NON-NLS-1$ //$NON-NLS-2$
 
-    /** Convierte un array de caracteres a base 64 */
+    /**
+     * Transforms to base 64
+     *  
+     * @param source data to transform
+     * @return bas64 string
+     */
     public static String toBase64(byte source[]) {
         int i;
         int j = 0;

@@ -114,13 +114,17 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 		{
 			JSONObject colDef = this.cols.getJSONObject( positions[i] );
 			allCols.put(colDef);
-			if (Arrays.binarySearch(selected, positions[i]) >= 0) {
+			if (selected.length == 0) {
+				colDef.put("enabled", colDef.optBoolean("default"));
+				cols.put(colDef);
+			} else if (Arrays.binarySearch(selected, positions[i]) >= 0) {
 				colDef.put("enabled", true);
 				cols.put(colDef);
 			} else {
 				colDef.put("enabled", false);
 			}
 		}
+		
 		src.setColumns(cols.toString());
 		src.storePreferredColumns(allCols);
 		setVisible(false);

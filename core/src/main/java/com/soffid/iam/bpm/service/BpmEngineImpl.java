@@ -2082,10 +2082,16 @@ public class BpmEngineImpl extends BpmEngineBase {
 			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
 			business.setContext(context);
 			Vector<ProcessDefinition> resultadoFinal = new Vector();
-			for (Iterator it = context.getGraphSession()
-					.findLatestProcessDefinitions().iterator(); it.hasNext();) {
-				org.jbpm.graph.def.ProcessDefinition definition = (org.jbpm.graph.def.ProcessDefinition) it
-						.next();
+			for (Iterator it = context.getSession()
+					.getNamedQuery("GraphSession.findLatestProcessDefinitionQuery2")
+					.setLong("tenant", Security.getCurrentTenantId())
+					.iterate();
+					it.hasNext();) {
+				Object[] row = (Object[]) it.next();
+				String nam = (String) row[0];
+				Integer version = (Integer) row[1];
+				org.jbpm.graph.def.ProcessDefinition definition = 
+						context.getGraphSession().findProcessDefinition(nam, version.intValue());
 
 				TenantModuleDefinition tm = (TenantModuleDefinition) definition.getDefinition(TenantModuleDefinition.class);
 				

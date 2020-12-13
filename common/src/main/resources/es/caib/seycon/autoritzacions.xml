@@ -1382,6 +1382,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:console-log:show</codi>
+		<descripcio>View Soffid console log</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>seu:usersDomain:show</codi>
 		<descripcio>Access to user domains management page</descripcio>
 		<ambit>Soffid</ambit>
@@ -1581,7 +1587,7 @@
 	</autoritzacio>
 
 	<autoritzacio>
-		<codi>seu:custemObject:show</codi>
+		<codi>seu:customObject:show</codi>
 		<descripcio>Open custom objects page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>

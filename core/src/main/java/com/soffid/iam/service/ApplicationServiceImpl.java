@@ -46,6 +46,7 @@ import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.ApplicationAdministration;
+import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
@@ -178,13 +179,36 @@ public class ApplicationServiceImpl extends
             getInformationSystemEntityDao().create(apl);
             aplicacio.setId(apl.getId());
             updateApplicationAttributes(aplicacio, apl);
+            if (aplicacio.getType() == ApplicationType.BUSINESS) {
+            	createBusinessSystem();
+            }
             return (getInformationSystemEntityDao().toApplication(apl));
         }
 		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoUserPermission"), //$NON-NLS-1$
 				Security.getCurrentAccount())); //$NON-NLS-1$
     }
 
-    /**
+    private SystemEntity createBusinessSystem() {
+    	SystemEntity b = getSystemEntityDao().findByName("business");
+    	if (b == null)
+    	{
+    		SystemEntity soffid = getSystemEntityDao().findSoffidSystem();
+    		b = getSystemEntityDao().newSystemEntity();
+    		b.setName("business");
+    		b.setDescription("Business roles");
+    		b.setClassName("-");
+    		b.setManualAccountCreation(true);
+    		b.setPasswordDomain(soffid.getPasswordDomain());
+    		b.setReadOnly(true);
+    		b.setRoleBased("N");
+    		b.setEnableAccessControl("N");
+    		b.setTrusted("N");
+    		b.setUserDomain(soffid.getUserDomain());
+    		getSystemEntityDao().create(b);
+    	}
+    	return b;
+	}
+	/**
      * @see es.caib.seycon.ng.servei.AplicacioService#delete(es.caib.seycon.ng.comu.Aplicacio)
      */
     protected void handleDelete(com.soffid.iam.api.Application aplicacio) throws java.lang.Exception {
@@ -235,7 +259,10 @@ public class ApplicationServiceImpl extends
     	
     	getInformationSystemEntityDao().applicationToEntity(aplicacio, aplEntity, true);
         if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_UPDATE, aplEntity)) {
-            getInformationSystemEntityDao().update(aplEntity);
+        	getInformationSystemEntityDao().update(aplEntity);
+            if (aplicacio.getType() == ApplicationType.BUSINESS) {
+            	createBusinessSystem();
+            }
             updateApplicationAttributes(aplicacio, aplEntity);
             if ( ! old.equals(aplEntity.getName())) {
             	recursiveRenameChildren ( aplEntity.getChildren(), aplEntity.getName());            	
@@ -716,6 +743,9 @@ public class ApplicationServiceImpl extends
 				throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.ExistentRole"), rol.getName(), rol.getSystem(), aplicacio));
         }
 
+        if (rol.getSystem().equals("business"))
+        	createBusinessSystem();
+
         // Obtenemos la entidad asociada al VO
         RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
         
@@ -728,6 +758,10 @@ public class ApplicationServiceImpl extends
 
         updateRoleAttributes(rol, rolEntity);
 
+        if (rolEntity.getInformationSystem().getType() == ApplicationType.BUSINESS) {
+        	rolEntity.setSystem(createBusinessSystem());
+        	getRoleEntityDao().update(rolEntity);
+        }
         return getRoleEntityDao().toRole(rolEntity);
     }
 
@@ -750,6 +784,8 @@ public class ApplicationServiceImpl extends
         }
 
         // Obtenemos la entidad asociada al VO
+        if (rol.getSystem().equals("business"))
+        	createBusinessSystem();
         RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
         
         if  (! getAuthorizationService().hasPermission(Security.AUTO_ROLE_CREATE, rolEntity))
@@ -758,6 +794,10 @@ public class ApplicationServiceImpl extends
                     Messages.getString("AplicacioServiceImpl.NotAuthorizedToManageRol")); //$NON-NLS-1$
         // Creamos la entidad asociada al VO Rol
         rolEntity = getRoleEntityDao().create(rol, true);
+        if (rolEntity.getInformationSystem().getType() == ApplicationType.BUSINESS) {
+        	rolEntity.setSystem(createBusinessSystem());
+        	getRoleEntityDao().update(rolEntity);
+        }
 
         updateRoleAttributes(rol, rolEntity);
         
@@ -799,8 +839,14 @@ public class ApplicationServiceImpl extends
         String oldName = rolEntity.getName();
         if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
 
+            if (rol.getSystem().equals("business"))
+            	createBusinessSystem();
             rolEntity = getRoleEntityDao().update(rol, false); // actualizamos cambios del rol
 
+            if (rolEntity.getInformationSystem().getType() == ApplicationType.BUSINESS) {
+            	rolEntity.setSystem(createBusinessSystem());
+            	getRoleEntityDao().update(rolEntity);
+            }
             updateRoleAttributes(rol, rolEntity);
             
             if (!oldName.equals(rol.getName()))
@@ -2494,9 +2540,16 @@ public class ApplicationServiceImpl extends
         RoleEntity rolEntity = getRoleEntityDao().roleToEntity(rol);
         if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_UPDATE, rolEntity)) {
 
+            if (rol.getSystem().equals("business"))
+            	createBusinessSystem();
         	
             rolEntity = getRoleEntityDao().update(rol, true); // actualizamos cambios del rol
             
+            if (rolEntity.getInformationSystem().getType() == ApplicationType.BUSINESS) {
+            	rolEntity.setSystem(createBusinessSystem());
+            	getRoleEntityDao().update(rolEntity);
+            }
+
             updateRoleAttributes(rol, rolEntity);
             
             return getRoleEntityDao().toRole(rolEntity);

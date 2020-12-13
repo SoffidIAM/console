@@ -1,0 +1,13 @@
+    </Feature>
+
+	<InstallExecuteSequence> 
+
+     <Custom Action="RunMainApp" Before="InstallFinalize" >
+	     (NOT UPGRADINGPRODUCTCODE) AND (REMOVE&lt;&gt;"ALL")
+	 </Custom>
+	 <Custom Action="Uninstall" Before="InstallFinalize" >
+		(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")
+	   </Custom>
+    </InstallExecuteSequence>
+  </Product>
+</Wix>

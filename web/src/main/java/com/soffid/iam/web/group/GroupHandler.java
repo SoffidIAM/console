@@ -2,6 +2,8 @@ package com.soffid.iam.web.group;
 
 import java.io.IOException;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.zkoss.zk.ui.Executions;
@@ -14,11 +16,13 @@ import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
+import com.soffid.iam.web.user.UserImporter;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNodeCollection;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.Variables;
@@ -82,4 +86,7 @@ public class GroupHandler extends FrameHandler {
 		super.setPage(p);
 	}
 	
+	public void importCsv () throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		new GroupImporter().importCsv(this);
+	}
 }

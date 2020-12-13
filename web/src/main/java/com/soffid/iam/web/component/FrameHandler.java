@@ -52,8 +52,7 @@ public class FrameHandler extends Frame {
 		setId("frame");
 	}
 
-	@Override
-	public void afterCompose() {
+	public void setUrl(String url) {
 		if (!Executions.getCurrent().isExplorer() && registerUrl)
 		{
 			String ctx = getDesktop().getExecution().getContextPath();
@@ -62,10 +61,14 @@ public class FrameHandler extends Frame {
 							String.format("try {"
 									+ "window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");"
 									+ "} catch (e) {console.log(e);}",
-									ctx + getPage().getRequestPath(), 
+									ctx + url, 
 									getPage().getTitle(), 
-									ctx + getPage().getRequestPath())));
+									ctx + url)));
 		}
+	}
+	@Override
+	public void afterCompose() {
+		setUrl(getPage().getRequestPath());
 		
 		MenuParser menuParser = new MenuParser();
 		List<MenuOption> options;
@@ -338,7 +341,12 @@ public class FrameHandler extends Frame {
 	}
 	
 	public boolean applyNoClose(Event event) throws CommitException {
-		if (validateAttributes ((Component) getForm())) {
+		Component form = null;
+		try {
+			form = (Component) getForm();
+		} catch (ComponentNotFoundException e) {
+		}
+		if (validateAttributes (form)) {
 			getModel().commit();
 			return true;
 		} else {
@@ -397,4 +405,5 @@ public class FrameHandler extends Frame {
 	public void setRegisterUrl(boolean registerUrl) {
 		this.registerUrl = registerUrl;
 	}
+	
 }

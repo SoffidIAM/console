@@ -1,8 +1,0 @@
-# Set memory constraints for console's JVM
--Xmx2048m
--Xms256m
-#-XX:PermSize=64m
-#-XX:MaxPermSize=500m
-# Uncomment to enable security manager
-# -Djava.security.manager 
-# -Djava.security.policy=${installer:sys.installationDir}/conf/catalina.policy

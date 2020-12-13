@@ -15,6 +15,7 @@ import javax.naming.NamingException;
 
 import org.zkoss.util.Locales;
 import org.zkoss.util.TimeZones;
+import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.UiException;
@@ -27,6 +28,7 @@ import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.PreferencesService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.common.ChangePass;
@@ -178,7 +180,9 @@ public class ProfileHandler extends FrameHandler {
 			Locales.setThreadLocal(new Locale(lang));
 			svc.updateMyPreference("lang", lang);
 			session.setAttribute(ConfigureUserSettings.SESSIO_IDIOMA, lang);
+			session.setAttribute(Attributes.PREFERRED_LOCALE, new Locale(lang));
 
+			
 			lb = (Databox) getFellow("timezone");
 			String tz = (String) lb.getValue();
 			TimeZones.setThreadLocal(TimeZone.getTimeZone(tz));
@@ -187,10 +191,10 @@ public class ProfileHandler extends FrameHandler {
 
 			
 			lb = (Databox) getFellow("dateformat");
-			String h = (String) lb.getValue();
+			String h = (String) lb.getValue().toString().trim();
 
 			lb = (Databox) getFellow("timeformat");
-			String m = (String) lb.getValue();
+			String m = (String) lb.getValue().toString().trim();
 
 			DateFormats.setThreadLocal(new String[] {h, m});
 			svc.updateMyPreference("dateformat", h);

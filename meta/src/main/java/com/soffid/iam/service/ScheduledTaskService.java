@@ -7,6 +7,7 @@
 package com.soffid.iam.service;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.doc.service.DocumentService;
+import com.soffid.iam.model.ScheduledTaskLogEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.ConfiguracioEntity;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service ( translatedName="ScheduledTaskService",
 	 translatedPackage="com.soffid.iam.service")
-@Depends ({com.soffid.iam.model.ScheduledTaskHandlerEntity.class,
+@Depends ({com.soffid.iam.model.ScheduledTaskHandlerEntity.class, ScheduledTaskLogEntity.class,
 	com.soffid.iam.model.ScheduledTaskEntity.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
@@ -83,6 +84,12 @@ public abstract class ScheduledTaskService {
 	 return null;
 	}
 	
+	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public com.soffid.iam.api.ScheduledTask load(Long taskId) {
+		return null;
+	}
+
 	@Operation ( grantees={com.soffid.iam.roles.schedule_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<com.soffid.iam.api.ScheduledTask> listServerTasks(String server)

@@ -23,7 +23,7 @@
   value: mask
 - name: ${c:l('xarxes.zul.Identitat')}
   value: identity.identityCode
-- name: ${c:l('xarxes.zul.Identitat')}
+- name: ${c:l('identitatsllista.zul.Descripcia')}
   value: identity.description
 			]]></attribute>
 		

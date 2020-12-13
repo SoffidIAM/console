@@ -2,6 +2,7 @@ package com.soffid.iam.service;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,4 +66,13 @@ public class CustomObjectService {
 	@Transactional(readOnly=true)
 	public java.util.Collection<String> findCustomObjectNames(String objectType) { return null; }
 
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Operation(grantees={customObject_query.class})
+	public List<CustomObject> findCustomObjectByTextAndJsonQuery(@Nullable String text, @Nullable String filter, @Nullable Integer start, @Nullable Integer end) { return null; }
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	@Operation(grantees={customObject_query.class})
+	public AsyncList<CustomObject> findCustomObjectByTextAndJsonQueryAsync(@Nullable String text, @Nullable String filter) { return null; }
+
+	
 }

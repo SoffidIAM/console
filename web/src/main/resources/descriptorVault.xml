@@ -3,7 +3,7 @@
 <zkib-model>
 	<datanode name="root">
 		<finder name="vault" type="vault">
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+			<ejb-finder jndi="java:/module/VaultService-v2"
 				method="findVaultElementByText" >
 				<parameter value="${textQuery}" />
 			</ejb-finder>
@@ -33,7 +33,7 @@
 		</ejb-handler>
 
 		<finder name="vault" type="vault">  <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+			<ejb-finder jndi="java:/module/VaultService-v2"
 				method="getChildren">
 				<parameter value="${instance}" />
 			</ejb-finder>
@@ -61,7 +61,7 @@
 
 	<datanode name="folder2">
 		<finder name="folder2" type="folder2">  <!-- intranetMenus:query -->
-			<ejb-finder jndi="java:comp/env/ejb/VaultServiceEJB"
+			<ejb-finder jndi="java:/module/VaultService-v2"
 				method="getChildren">
 				<parameter value="${instance}" />
 			</ejb-finder>

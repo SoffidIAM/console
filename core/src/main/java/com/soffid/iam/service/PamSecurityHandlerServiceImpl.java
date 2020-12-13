@@ -57,7 +57,7 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 						getUserAccountEntityDao().remove(userAccount);
 						account.getUsers().remove(userAccount);
 					}
-					if (userAccount.getUser().getUserName().equals(Security.getSoffidPrincipal().getUserName()))
+					else if (userAccount.getUser().getUserName().equals(Security.getSoffidPrincipal().getUserName()))
 					{
 						if (userAccount.getWorkflowId() == null ||
 							Boolean.TRUE.equals(userAccount.getApproved()))

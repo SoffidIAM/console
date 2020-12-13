@@ -20,6 +20,7 @@ public class NavigationBar extends Div implements AfterCompose {
 	String frame = "frame";
 	String menu = "console.yaml";
 	String lastAction = null;
+	String pageArgs = null;
 
 	public NavigationBar () {
 		setSclass("navigation-bar");
@@ -29,6 +30,8 @@ public class NavigationBar extends Div implements AfterCompose {
 	public void afterCompose() {
 		Page p = getPage();
 		String path = p.getRequestPath();
+		if (pageArgs != null)
+			path = path + "?" + pageArgs;
 		
 		List<MenuOption> options;
 		try {
@@ -138,6 +141,16 @@ public class NavigationBar extends Div implements AfterCompose {
 	
 	public void setLastAction(String lastAction) {
 		this.lastAction = lastAction;
+	}
+
+	
+	public String getPageArgs() {
+		return pageArgs;
+	}
+
+	
+	public void setPageArgs(String pageArgs) {
+		this.pageArgs = pageArgs;
 	}
 
 }

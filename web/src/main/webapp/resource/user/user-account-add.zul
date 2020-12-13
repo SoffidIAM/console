@@ -58,7 +58,7 @@
 	
 			<div style="text-align: right; width: 100%">
 				<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" onClick="ref:window.back" />
-				<button image="/img/next-r.svg" label="${c:l('user-account-new.selectName')}" onClick="ref:window.setAccountProperties"/>
+				<button image="/img/next-r.svg" label="${c:l('user-account-new.setProperties')}" onClick="ref:window.setAccountProperties"/>
 			</div>
 					
 		</div>
@@ -73,6 +73,7 @@
 					enumeration = "com.soffid.iam.api.AccountStatus"
 					label="${c:l('accounts.status')}"/>
 				<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+					hidebuiltin="true"
 					objectType="com.soffid.iam.api.Account" dataPath="/."
 					id="accountAttributes" />
 			</form>

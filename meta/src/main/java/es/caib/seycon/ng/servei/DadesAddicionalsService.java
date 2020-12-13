@@ -199,5 +199,6 @@ public abstract class DadesAddicionalsService {
 	@Operation(grantees={customObjectType_delete.class})
 	public void deleteCustomObjectType (CustomObjectType obj) { }
 	
+	@Operation(grantees = { roles.metadata_update.class })
 	public void registerStandardObject ( String resourceName, @Nullable MetadataScope scope, boolean reset) { }
 }

@@ -4,7 +4,7 @@
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
 <zk>
-	<datamodel id="model" rootNode="grups" src="descriptorGrup.xml" />
+	<datamodel id="model" rootNode="grups" src="descriptorGroup.xml" />
 
 	<zscript src="comu/checkTruncatedResults.zul" />
 

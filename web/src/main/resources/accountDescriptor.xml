@@ -43,11 +43,8 @@
 				as.removeAccount(instance);
 			</delete-script>
 			<insert-script>
-				usuari = parent.parent.parent.instance;
-				ds = com.soffid.iam.EJBLocator.getDispatcherService();
-				dispatcher = ds.findDispatcherByName(instance.system);
 				as = com.soffid.iam.EJBLocator.getAccountService();
-				account = as.createAccount(usuari, dispatcher, instance.name);
+				account = as.createAccount2(instance);
 				instance.id = account.id;
 				instance.type = account.type;
 				instance.name = account.name;

@@ -327,7 +327,7 @@ public class Base64
      * Example: <code>encodeObject( myObj, Base64.GZIP | Base64.DONT_BREAK_LINES )</code>
      *
      * @param serializableObject The object to encode
-     * @options Specified options
+     * @param options Specified options
      * @return The Base64-encoded object
      * @see Base64#GZIP
      * @see Base64#DONT_BREAK_LINES
@@ -417,6 +417,7 @@ public class Base64
      * Does not GZip-compress data.
      *
      * @param source The data to convert
+     * @return The encoded data
      * @since 1.4
      */
   public static String encodeBytes(byte[] source)
@@ -441,6 +442,7 @@ public class Base64
      *
      * @param source The data to convert
      * @param options Specified options
+     * @return The encoded data
      * @see Base64#GZIP
      * @see Base64#DONT_BREAK_LINES
      * @since 2.0
@@ -458,6 +460,7 @@ public class Base64
      * @param source The data to convert
      * @param off Offset in array where conversion should begin
      * @param len Length of data to convert
+     * @return The encoded data
      * @since 1.4
      */
   public static String encodeBytes(byte[] source, int off, int len)
@@ -483,8 +486,8 @@ public class Base64
      * @param source The data to convert
      * @param off Offset in array where conversion should begin
      * @param len Length of data to convert
-     * @param breakLines Break lines at 80 characters or less.
      * @param options Specified options
+     * @return The encoded data
      * @see Base64#GZIP
      * @see Base64#DONT_BREAK_LINES
      * @since 2.0
@@ -922,15 +925,6 @@ public class Base64
   /* ********  I N N E R   C L A S S   I N P U T S T R E A M  ******** */
 
 
-  /**
-     * A {@link Base64#InputStream} will read data from another
-     * {@link java.io.InputStream}, given in the constructor,
-     * and encode/decode to/from Base64 notation on the fly.
-     *
-     * @see Base64
-     * @see java.io.FilterInputStream
-     * @since 1.3
-     */
   public static class InputStream extends java.io.FilterInputStream
   {
     private int options; // Options specified
@@ -944,7 +938,7 @@ public class Base64
 
 
     /**
-         * Constructs a {@link Base64#InputStream} in DECODE mode.
+         * Constructs a Base64 InputStream in DECODE mode.
          *
          * @param in the {@link java.io.InputStream} from which to read data.
          * @since 1.3
@@ -956,7 +950,7 @@ public class Base64
 
 
     /**
-         * Constructs a {@link Base64#InputStream} in
+         * Constructs a base64 inputstream in
          * either ENCODE or DECODE mode.
          * <p>
          * Valid options:<pre>
@@ -1155,15 +1149,6 @@ public class Base64
   /* ********  I N N E R   C L A S S   O U T P U T S T R E A M  ******** */
 
 
-  /**
-     * A {@link Base64#OutputStream} will write data to another
-     * {@link java.io.OutputStream}, given in the constructor,
-     * and encode/decode to/from Base64 notation on the fly.
-     *
-     * @see Base64
-     * @see java.io.FilterOutputStream
-     * @since 1.3
-     */
   public static class OutputStream extends java.io.FilterOutputStream
   {
     private int options;

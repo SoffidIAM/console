@@ -8,7 +8,7 @@
 <?component name="accountMetadata" macro-uri="/config/agent/account_metadata.zul"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
-<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div"
+<frame xmlns:h="http://www.w3.org/1999/xhtml"
 	style="position: relative" use="com.soffid.iam.web.agent.AgentHandler"
 	id="frame">
 
@@ -764,5 +764,4 @@
 		<html id="content" sclass="svg-container"/>
 	</window>
 
-	<include src="controlAcces.zul"/>
 </frame>

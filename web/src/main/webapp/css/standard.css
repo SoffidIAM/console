@@ -15,12 +15,12 @@
 }
 
 div.highlighted {
-	margin: 0;
+	margin: 0; 
 	padding: 0;
 	box-shadow: 0px 0px 20px 3px #2b2b2b;
 }
  
-p, div, span, label, a, input, textarea,
+p, div, span, label, a, input, textarea, 
 button, input.button, input.file {
 	font-family: inherit;
 	font-size: inherit;
@@ -340,13 +340,6 @@ textarea {
 	font-family: inherit;
 	font-size: inherit; 
 	resize: vertical;
-}
-
-span.label, span label {
-	font-family: inherit;
-	font-size: inherit;
-	font-weight: normal; margin-left:3px; 
-	color: {BLUE};
 }
 
 span {
@@ -700,6 +693,11 @@ img.imageclic .centre{
 	margin: 0 auto;
 }
 
+div.datatable div.tbodydiv table.tbody tr td img.imageclic {
+    width: 24px;
+    height: 24px;
+    vertical-align: baseline;
+}
 /* arreglem problema que surt a IE7 que mostra un scrolling vertical en els grids */
 .grid .sensescroll div  {
 	overflow:none !important;border: 1px solid transparent;
@@ -791,15 +789,15 @@ div.menupopup a  {
 }
 
 
-.outer-frame {padding: 16px 16px 0px 16px;}
+.outer-frame {padding: 16px 16px 0px 16px; width: 100%}
 .tabpanel-real {padding: 0px;}
 div.frame-none {width: 100%; padding: 0px; border: none}
 div.frame-vertical-none {width: 100%; padding: 0px; border:none}
 
 div.frame-none div.record-list { width: 100%}
-div.frame-none div.record-list-shrinked { width: 45%; vertical-align: top; display: inline-block;}
+div.frame-none div.record-list-shrinked { width: 30%; vertical-align: top; display: inline-block;}
 
-div.frame-none div.record-form { width: 50%; vertical-align: top; display: inline-block; margin-left: 5%}
+div.frame-none div.record-form { width: 65%; vertical-align: top; display: inline-block; margin-left: 5%}
 div.frame-none div.record-form-shrinked { display: none;}
 
 div.frame-vertical-none div.record-list { width: 100% }
@@ -924,7 +922,7 @@ td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 .z-loading-indicator {
     border-color: #0e5462 !important;
     padding: 20px 25px 10px 25px !important;
-	background-image:url('../img/wait.gif') !important; 
+	background-image:url('../anonymous/wait.gif') !important; 
 	background-size: 26px; 
 	background-repeat: no-repeat;
 	background-position: 15px 15px;
@@ -1301,6 +1299,8 @@ button.small-button {
 	height: 2em;
  	border-radius: 8px;
  	font-size: 10pt;
+ 	margin-top: 0px;
+ 	margin-bottom: 0px;
 }	
 
 button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
@@ -1409,8 +1409,11 @@ div.databox div.container input.name {
 	min-width: 250px;
 }
 
+span.fixedtext,
+textarea.fixedtext,
 div.databox.fixedtext div.container div.text {
 	font-family: monospace;
+	white-space: pre-line;
 }
 .button-container {
 	margin-top: 7px;
@@ -1767,7 +1770,7 @@ tr.grid td.gc {
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text {
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text, div.text {
     box-sizing: border-box;
     padding: 2px;
     border: 4px solid #e0e0e0;
@@ -2117,7 +2120,7 @@ div.datatable table.tbody tr td.statusColumn {
 }
 
 div.datatable table.tbody tr td.datetimeColumn {
-	width: 150px;
+	width: 160px;
 	text-align: right;
 }
 
@@ -2463,7 +2466,7 @@ div.datatable div.sort-indicator-disabled {
 .card.is-flipped {
   transform: rotateY(180deg);
 }
-		
+
 div.addButton {
 	display: inline-block;
 	margin: 5px;
@@ -2974,7 +2977,8 @@ div.datatree div.tbody div.tree-label div.tree-cell,
 div.datatree div.tbody div.tree-label.no-columns {
 	padding-left: 4px;
 	padding-right: 4px;
-	padding-top: 4px;
+	padding-top: 2px;
+	padding-bottom: 2px;
 	height: 32px;
 }
 
@@ -3130,10 +3134,6 @@ tr.compactGrid > td.gc, tr.compactGrid > td.gc > div.gc {
 	vertical-align: middle;
 }
 
-span.label {
-	color: {BLUE};
-}
-
 div.tree-body td, div.listbox-body td, 
 div.tree-foot td, div.listbox-foot td, 
 tr.item, tr.item a, tr.item a:visited {
@@ -3187,27 +3187,26 @@ form.upload-form input[type="submit"] {display:none;}
 form.upload-form input[type="button"] {float: right;}
 	
 	/************* databox *****************/
-div.databox div.label, span.label {
+div.databox {
+/*	display: flex; */
+}
+div.databox div.label, span.label, span label {
 	display: inline-block;
-	width: 192px;
+	min-width: 192px;
 	color: 	{BLUE};
     vertical-align: top;
     text-align: left;
     margin-top: 6px;
 	margin-left: 8px;
-}
-span.label.longlabel {
-	width: 350px;
 }
 
-div.databox div.label, span.label {
-	display: inline-block;
-	width: 192px;
-	color: 	{BLUE};
-    vertical-align: top;
-    text-align: left;
-    margin-top: 6px;
-	margin-left: 8px;
+span.label.black {
+	width: auto;
+	color: 	black;
+}
+
+span.label.longlabel {
+	width: 350px;
 }
 
 div.databox.databox_switch div.label {
@@ -3234,10 +3233,14 @@ span.separator_label {
 
 div.databox div.container {
 	display: inline-block;
-	width: calc( 100% - 200px );
     margin-bottom: 4px;
     vertical-align: top;
     position: relative;
+    width: calc(100% - 200px);
+}
+
+div.databox div.container.wrapped {
+	margin-left: 200px;
 }
 
 div.databox div.container.datebox {
@@ -3246,7 +3249,9 @@ div.databox div.container.datebox {
 
 div.databox div.container.switch {
 	width: 80px;
+	flex-grow: 0;
 }
+
 
 div.databox div.container input.text ,
 div.databox div.container textarea.text {
@@ -3433,3 +3438,7 @@ input[type='radio'] + label {
 }
 
 
+img.small-picture {
+	max-width: 48px;
+	max-height: 48px;	
+}

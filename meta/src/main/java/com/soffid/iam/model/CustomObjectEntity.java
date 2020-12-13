@@ -38,12 +38,12 @@ public class CustomObjectEntity {
 	@DaoFinder("select o "
 			+ "from com.soffid.iam.model.CustomObjectEntity as o "
 			+ "where o.type.name = :objectType and "
-			+ "o.name = :name")
+			+ "o.name = :name and o.type.tenant.id=:tenantId")
 	public CustomObjectEntity findByTypeAndName(String objectType, String name) {return null;}
 
 	@DaoFinder("select o.name "
 			+ "from com.soffid.iam.model.CustomObjectEntity as o "
-			+ "where o.type.name=:type")
+			+ "where o.type.name=:type and o.type.tenant.id=:tenantId")
 	public java.util.List<String> findCustomObjectNames(String type) {
 		return null;
 	}

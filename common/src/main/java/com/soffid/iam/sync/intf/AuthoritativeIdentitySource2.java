@@ -15,6 +15,8 @@ public interface AuthoritativeIdentitySource2
 	/**
 	 * Gets the pending changes
 	 * 
+	 * @param lastChange the last succesful change loaded
+	 * 
 	 * @return a list of changes to apply
 	 * 
 	 * @throws InternalErrorException
@@ -22,19 +24,17 @@ public interface AuthoritativeIdentitySource2
 	public Collection<AuthoritativeChange> getChanges(String lastChange) throws InternalErrorException;
 	
 	/**
-	 * Commits a change. It shouldn't be returned on getChanges from now on.
+	 * Check if there is more data to load
 	 * 
-	 * @param id change identifier
-	 * 
+	 * @return true if there is more data to load
 	 * @throws InternalErrorException
 	 */
 	public boolean hasMoreData () throws InternalErrorException;
 
 	/**
-	 * Commits a change. It shouldn't be returned on getChanges from now on.
+	 * Gets the next bunch of changes
 	 * 
-	 * @param id change identifier
-	 * 
+	 * @return a list of changes
 	 * @throws InternalErrorException
 	 */
 	public String getNextChange () throws InternalErrorException;

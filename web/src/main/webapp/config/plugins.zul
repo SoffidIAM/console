@@ -54,6 +54,7 @@
   value: author
 - name: ${c:l('deploy.Date')}
   value: deployed_datetime
+  className: datetimeColumn
 					]]>
 				</attribute>
 			</datatable>
@@ -133,10 +134,10 @@
 			padding:20px 40px; display:inline-block; padding: 5px 5px 20px 5px;">
 			<label id="popupRefresh" style="font-family: Arial; font-size: 13px;"
 				value="${c:l('plugins.zul.RestartServerMsg')}"/>
-			<image src="/img/waitpacman.gif"/>
+			<image src="/img/tetris.gif" style="width: 105px; height: 210px;"/>
 			
-		<h:input type="button" value="${c:l('plugins.zul.Reload')}"
-			onClick="location.reload()" />
+			<h:input type="button" value="${c:l('plugins.zul.Reload')}"
+				onClick="location.reload()" />
 		</vbox>
 	</window>
 </frame>

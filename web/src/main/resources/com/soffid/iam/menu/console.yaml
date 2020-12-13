@@ -33,46 +33,18 @@
           url: /resource/group/group.zul
           permissions: ["seu:grups:show"]
           img: /img/menu/groups.svg
-        - name: seu.aplciacions
-          url: /resource/application/application.zul
-          permissions: ["seu:aplicacions:show"]
-          img: /img/menu/applications.svg
-        - name: seu.xarxes
-          url: /resource/network/network.zul
-          permissions: ["seu:networks:show"]
-          img: /img/menu/networks.svg
-        - name: seu.roles
-          url: /resource/application/role.zul
-          img: /img/menu/roles.svg
-          permissions: ["seu:rules:show"]
-        - name: seu.maquines
-          url: /resource/host/host.zul
-          permissions: ["seu:hosts:show"]
-          img: /img/menu/hosts.svg
-        - name: seu.impressores
-          url: /resource/printer/printer.zul
-          permissions: ["seu:impressores:show"]
-          img: /img/menu/printers.svg
         - name: seu.accounts
           url: /resource/account/account.zul
           permissions: ["seu:accounts:show"]
           img: /img/menu/accounts.svg
-        - name: seu.vault
-          url: /resource/account/vault.zul
-          permissions: ["sso:manageAccounts"]
-          img: /img/menu/vault.svg
-        - name: seu.adminintranet
-          url: /resource/menu/menu.zul
-          img: /img/menu/launcher-editor.svg
-          permissions: ["seu:menusIntranet:show"]
-        - name: seu.dominiscorreu
-          url: /resource/maildomain/mail-domain.zul
-          img: /img/menu/mail-domain.svg
-          permissions: ["seu:dominiscorreu:show"]
-        - name: seu.llistescorreu
-          url: /resource/maillist/mail-list.zul
-          img: /img/menu/mail-lists.svg
-          permissions: ["seu:dominiscorreu:show"]
+        - name: seu.aplciacions
+          url: /resource/application/application.zul
+          permissions: ["seu:aplicacions:show"]
+          img: /img/menu/applications.svg
+        - name: seu.roles
+          url: /resource/application/role.zul
+          img: /img/menu/roles.svg
+          permissions: ["seu:rules:show"]
         - name: seu.rules
           url: /resource/application/role-rules.zul
           img: /img/menu/role-rules.svg
@@ -81,6 +53,38 @@
           url: /resource/application/sod.zul
           img: /img/menu/sod.svg
           permissions: ["seu:sod:show"]
+        - name: seu.xarxes
+          url: /resource/network/network.zul
+          permissions: ["seu:networks:show"]
+          img: /img/menu/networks.svg
+        - name: seu.maquines
+          url: /resource/host/host.zul
+          permissions: ["seu:hosts:show"]
+          img: /img/menu/hosts.svg
+        - name: seu.impressores
+          url: /resource/printer/printer.zul
+          permissions: ["seu:impressores:show"]
+          img: /img/menu/printers.svg
+        - name: seu.dominiscorreu
+          url: /resource/maildomain/mail-domain.zul
+          img: /img/menu/mail-domain.svg
+          permissions: ["seu:dominiscorreu:show"]
+        - name: seu.llistescorreu
+          url: /resource/maillist/mail-list.zul
+          img: /img/menu/mail-lists.svg
+          permissions: ["seu:dominiscorreu:show"]
+        - name: seu.adminintranet
+          url: /resource/menu/menu.zul
+          img: /img/menu/launcher-editor.svg
+          permissions: ["seu:menusIntranet:show"]
+        - name: seu.vault
+          url: /resource/account/vault.zul
+          permissions: ["sso:manageAccounts"]
+          img: /img/menu/vault.svg
+        - name: seu.customObjects
+          handler: com.soffid.iam.web.custom.CustomObjectMenuHandler
+          permissions: ["seu:customObject:show"]
+          img: /img/menu/custom-object.svg
       - name: seu.configuration
         img_old: /img/menu/system-settings.png
         img: /img/menu/toolbox.svg
@@ -201,5 +205,9 @@
           url: /monitor/pam_dashboard.zul
           permissions: ["seu:pamDashboard"]
           img: /img/menu/pam-monitor.svg
+        - name: seu.console_log
+          url: /monitor/console_log.zul
+          permissions: ["seu:console-log:show"]
+          img: /img/menu/console-log.svg
         
           

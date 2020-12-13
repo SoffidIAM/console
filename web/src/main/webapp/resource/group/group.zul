@@ -13,8 +13,8 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
-					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
-					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUser &amp;&amp; canUpdateUser &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('group:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('group:create') &amp;&amp; soffid:isUserInRole('group:update') &amp;&amp; soffid:isUserInRole('group:delete')}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>

@@ -6,7 +6,6 @@
 	use="com.soffid.iam.web.popup.IdentityHandler"
 	sizable="false" 
 	style="min-width: 60em; width:60%"
-	title="${c:l('identity.title')}" 
 	visible="false"
 	onDisplay="ref:identityWindow.start"
 	onClose="ref:identityWindow.onClose">

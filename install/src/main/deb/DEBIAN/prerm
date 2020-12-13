@@ -1,0 +1,5 @@
+#!/bin/bash
+
+systemctl stop 'soffid-iamconsole.service' || true
+
+systemctl disable 'soffid-iamconsole.service' || true

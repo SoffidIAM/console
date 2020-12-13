@@ -123,6 +123,16 @@ public class DynamicColumnsDatatable extends DataTable {
 				a.put(o);
 			}
 		}
+
+		if (a.isEmpty()) {
+			for (int i = 0; i < allColumns.length(); i++) {
+				JSONObject o = allColumns.getJSONObject(i);
+				if ( Arrays.binarySearch(mandatory, o.optString("value")) >= 0 || o.optBoolean("default")) {
+					o.put("enabled", true);
+					a.put(o);
+				}
+			}
+		}
 		setColumns(a.toString());
 	}
 	

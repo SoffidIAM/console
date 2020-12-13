@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<?page id="syncserver"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.log.LogHandler" id="frame">
+
+	<div sclass="single-face-card" id="card">
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<menu2>
+				<menu2item image="/img/download.svg" label="${c:l('contenidoTarea.btnDescargar') }" onClick="ref:frame.download"/>
+			</menu2>
+		</div>
+		
+		<textbox readonly="true" multiline="true" sclass="fixedtext" id="txt" style="width: 100%; height: 70vh"/>
+		
+	</div>
+
+</frame>

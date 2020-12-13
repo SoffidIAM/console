@@ -5,14 +5,6 @@ import java.rmi.Remote;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public interface KerberosAgent extends Remote {
-    /**
-     * Creates a kerberos principal
-     * 
-     * @param name Principal name
-     * @param password Principal password
-     * @return keytab
-     * @throws InternalErrorException 
-     */
     public KerberosPrincipalInfo createServerPrincipal (String server) throws InternalErrorException;
 
     public String getRealmName () throws InternalErrorException;

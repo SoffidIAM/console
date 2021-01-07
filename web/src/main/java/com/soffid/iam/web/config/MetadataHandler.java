@@ -40,10 +40,12 @@ import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.Editor;
@@ -59,6 +61,7 @@ import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
+import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.JXPathContext;
 import es.caib.zkib.jxpath.JXPathException;
@@ -105,8 +108,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		try {
 			builtin = (Boolean) XPathUtils.getValue(getForm(), "@builtin" );
 		} catch (Exception e) {}
-		((Textbox)getFellow("objectTypeName")).setReadonly(builtin);
-		((Textbox)getFellow("objectTypeDescription")).setReadonly(builtin);
+		((CustomField3)getFellow("objectTypeName")).setReadonly(builtin);
+		((CustomField3)getFellow("objectTypeDescription")).setReadonly(builtin);
 	}
 	
 	public void importAttributeCsv () throws IOException, CommitException {
@@ -155,7 +158,12 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 				String name = m.get("name");
 				if (name != null && ! name.trim().isEmpty())
 				{
+					
 					DataType dt = findDataType (coll, name);
+					if ( dt.getName() == null)
+						inserts++;
+					else
+						updates++;
 					for (String s: m.keySet())
 					{
 						String value = m.get(s);
@@ -182,8 +190,10 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 	    	for (DataNode dataNode: (Collection<DataNode>)coll) {
 	    		if ( !dataNode.isDeleted()) {
 	    			DataType dt = (DataType) dataNode.getInstance();
-	    			if (! names.contains(dt.getName()))
+	    			if (! names.contains(dt.getName())) {
+	    				removed ++;
 	    				dataNode.delete();
+	    			}
 	    		}
 	    	}
 	    	getModel().commit();
@@ -315,9 +325,9 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		);
 	}
 
-	public void addNewAttribute(Event event) {
+	public void addNewAttribute(Event event) throws CommitException {
 		Component lb = getFellow("metadataGrid");
-		if (lb instanceof DataTable)
+		if (lb instanceof DataTable && applyNoClose(event))
 		{
 			DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(getForm(), "/metadata");
 			long next = 1;
@@ -508,6 +518,33 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 			DataModelCollection dmc = (DataModelCollection) XPathUtils.eval(getListbox(), "/metadata");
 			dmc.refresh();
 		}
+	}
+
+	@Override
+	public void addNew() throws Exception {
+		super.addNew();
+		
+		DataType name = new DataType();
+		name.setBuiltin(true);
+		name.setName("name");
+		name.setNlsLabel("com.soffid.iam.api.CustomObject.name");
+		name.setLabel(Labels.getLabel(name.getNlsLabel()));
+		name.setOrder(1L);
+		name.setRequired(true);
+		name.setSize(100);
+		name.setType(TypeEnumeration.STRING_TYPE);
+		XPathUtils.createPath((DataSource) getListbox(), "/metadata", name);
+		
+		DataType description = new DataType();
+		description.setBuiltin(true);
+		description.setName("description");
+		description.setNlsLabel("com.soffid.iam.api.CustomObject.description");
+		description.setLabel(Labels.getLabel(description.getNlsLabel()));
+		description.setOrder(2L);
+		description.setRequired(true);
+		description.setSize(100);
+		description.setType(TypeEnumeration.STRING_TYPE);
+		XPathUtils.createPath((DataSource) getListbox(), "/metadata", description);
 	}
 }
 

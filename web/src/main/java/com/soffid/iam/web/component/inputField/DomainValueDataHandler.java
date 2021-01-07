@@ -36,7 +36,7 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 
 	@Override
 	public String getDescription(String name, String filter) throws Exception {
-		String q = "name eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+app+"\"";
+		String q = "value eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+quote(app)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
 		List<DomainValue> r = handler.read(null, q, null, null);
@@ -48,12 +48,15 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 
 	@Override
 	public AsyncList<DomainValue> search(String text, String filter) throws Exception {
-		return handler.readAsync(text, filter);
+		String q = "domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+quote(app)+"\"";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		return handler.readAsync(text, q);
 	}
 
 	@Override
 	public void openFinder(String filter, boolean multiple, Databox databox, EventListener listener) throws Exception {
-		String q = "domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+app+"\"";
+		String q = "domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+quote(app)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
 		FinderHandler.startWizard("Select Domain value", DomainValue.class.getName(),
@@ -75,7 +78,7 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 
 	@Override
 	public DomainValue getObject(String name, String filter) throws Exception {
-		String q = "name eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+app+"\"";
+		String q = "value eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+quote(app)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
 		List<DomainValue> r = handler.read(null, q, null, null);
@@ -84,6 +87,5 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 		else
 			return null;
 	}
-
 
 }

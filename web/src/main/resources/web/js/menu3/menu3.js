@@ -37,7 +37,6 @@ zkMenu3.populate=function(ed, pos, data) {
 	option.dynamic = false;
 	option.options = JSON.parse(data);
 	if (ed.currentPosition == pos) {
-		console.log("Opening "+ed.currentPosition);
 		var menu = ed.currentTR.parentElement/*table*/.parentElement;
 		menu.openOption = zkMenu3.open(ed, ed.currentTR, option.options, false);
 	}
@@ -59,7 +58,6 @@ zkMenu3.open=function(ed, parent, options, first) {
 		w.style.top = ""+(pos.y + pos.height - 24) + "px";
 		position = parent.position + " ";
 	}
-	console.log("Creating position "+position);
 	ed.modal.appendChild(w);
 	w.position = position;
 	w.setAttribute("class", "menu3");
@@ -109,7 +107,6 @@ zkMenu3.open=function(ed, parent, options, first) {
 
 zkMenu3.closeMenu=function(menu) {
 	if (menu.openOption) {
-		console.log("closing "+menu.openOption.position);
 		zkMenu3.closeMenu(menu.openOption);
 		menu.openOption.remove();
 		menu.openOption = null;
@@ -128,7 +125,6 @@ zkMenu3.onMouseOver=function(ev) {
 	zkMenu3.closeMenu(menu);
 	menu.master.currentTR = option;
 	menu.master.currentPosition = option.position;
-	console.log("Over "+option.position);
 	if (option.option.dynamic) {
 		if (!option.option.inProgress) {
 			option.option.inProgress = true; // Prevent new refresh

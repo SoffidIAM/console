@@ -40,7 +40,7 @@ public class ConfigEntityDaoImpl extends
 		com.soffid.iam.model.ConfigEntityDaoBase {
 	
 	private void auditarConfiguracio(String accio, String parametre) {
-		if ( parametre != null && !parametre.contains("addon.report"))
+		if ( parametre != null && !parametre.contains("addon.report") && ! parametre.contains("soffid.syncserver.main"))
 		{
 			String codiUsuari = Security.getCurrentAccount();
 			Audit auditoria = new Audit();

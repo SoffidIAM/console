@@ -366,7 +366,7 @@ public class DomainServiceImpl extends
 			Collection<DomainValue> result) throws ClassNotFoundException, InternalErrorException, UnsupportedEncodingException, JSONException, EvalException, ParseException, TokenMgrError {
 		final DomainValueEntityDao dao = getDomainValueEntityDao();
 		ScimHelper h = new ScimHelper(DomainValue.class);
-		h.setPrimaryAttributes(new String[] { "name", "description"});
+		h.setPrimaryAttributes(new String[] { "value", "description"});
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);

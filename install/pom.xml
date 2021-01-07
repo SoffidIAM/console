@@ -190,6 +190,7 @@
 						<configuration>
 							<tasks>
 								<exec executable="${basedir}/src/main/wix/generateWix.sh" failonerror="true">
+									<arg value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}" />
 								</exec>
 							</tasks>
 						</configuration>

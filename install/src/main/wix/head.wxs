@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-  <Product Name='Soffid IAM Console v3' 
+  <Product Name='Soffid 3 Console' 
 	Id='*' 
 	UpgradeCode='a65dda87-f32a-45a7-a064-d67e586d8689'
     Language='1033' Codepage='1252' Version='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}' Manufacturer='Soffid IAM SL'>
 
     <MajorUpgrade DowngradeErrorMessage="A newer version of Soffid IAM Console is already installed." />
 
-    <Package Id='*' Keywords='Installer' Description="Soffid IAM Console"
+    <Package Id='*' Keywords='Installer' Description="Soffid 3 Console"
       Comments='Soffid IAM Console' Manufacturer='Soffid IAM SL'
       InstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
 

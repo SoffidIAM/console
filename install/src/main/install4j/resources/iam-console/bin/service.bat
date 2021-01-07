@@ -117,7 +117,7 @@ set "EXECUTABLE=%proc%"
 
 rem Set default Service name (If you change this then rename also TomEE.exe to the same name)
 set SERVICE_NAME=Soffid-iamconsole
-set PR_DISPLAYNAME=Soffid IAM Console
+set PR_DISPLAYNAME=Soffid 3 IAM Console
 set OLD_SERVICEUSER=%PR_SERVICEUSER%
 set OLD_SERVICEPASSWORD=%PR_SERVICEPASSWORD%
 
@@ -137,7 +137,7 @@ if "x%1x" == "x--service-passwordx" goto servicePassword
 if "x%1x" == "xx" goto checkServiceCmd
 
 set SERVICE_NAME=%1
-set PR_DISPLAYNAME=Soffid IAM Console (%1)
+set PR_DISPLAYNAME=Soffid 3 IAM Console (%1)
 shift
 goto checkUser
 :runAsUser
@@ -193,7 +193,7 @@ echo Using JRE_HOME:         "%JRE_HOME%"
 rem Use the environment variables as an example
 rem Each command line option is prefixed with PR_
 
-set "PR_DESCRIPTION=Soffid IAM Console (https://www.soffid.com)"
+set "PR_DESCRIPTION=Soffid 3 IAM Console (https://www.soffid.com)"
 set "PR_INSTALL=%EXECUTABLE%"
 set "PR_LOGPATH=%CATALINA_BASE%\logs"
 set "PR_CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_BASE%\bin\tomcat-juli.jar;%CATALINA_HOME%\bin\tomcat-juli.jar"
@@ -216,12 +216,12 @@ echo Using Service User:     "%PR_SERVICEUSER%"
     --StopParams stop ^
     --Startup auto ^
     --JvmMs=512 ^
-    --JvmMx=1024 ^
+    --JvmMx=2048m ^
     --JvmSs=2048 ^
     --StartMode jvm ^
     --StopMode jvm ^
     --LogLevel Info ^
-    --LogPrefix TomEE
+    --LogPrefix boot
 
 echo Installed, will now configure TomEE
 

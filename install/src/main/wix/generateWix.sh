@@ -10,7 +10,7 @@ function dump {
      elif [ -d "$f" ]
      then
          echo "$2<Directory Id='$3.$f' Name='$f'>"
-         dumpFiles "$f" "  $2" "$3.$f" "$4/$f"
+         dumpFiles "$f" "  $2" "$3.$f" "$4/$f" "$5"
          dump "$f" "  $2" "$3.$f" "$4/$f"
          echo "$2</Directory>"
      fi
@@ -32,7 +32,7 @@ function dumpFiles {
 		   echo "   <ComponentRef Id='$3_cmp'/>" >>$base/target/wix/feature.wxs
 		   echo "$2<Component Id='$3_cmp' Guid='*'>"
          fi
-         echo "$2  <File Name='$f' DiskId='1' Id='$3.$f' Source='$4/$f'/>"
+         echo "$2  <File Name='$f' DiskId='1' Id='$3.$f' DefaultVersion='$5' Source='$4/$f'/>"
      fi
    done
    if [ "$found" = 1 ]
@@ -55,10 +55,10 @@ fi
 cd $base/target/dist/opt/soffid/iam-console-3
 cat $base/target/wix/head.wxs  >$base/target/wix/console.wxs
 echo >$base/target/wix/feature.wxs
-dump . "" ROOT $base/target/dist/opt/soffid/iam-console-3 >>$base/target/wix/console.wxs
+dump . "" ROOT $base/target/dist/opt/soffid/iam-console-3 "$1">>$base/target/wix/console.wxs
 cat $base/target/wix/middle.wxs  >>$base/target/wix/console.wxs
 cat $base/target/wix/feature.wxs  >>$base/target/wix/console.wxs
 cat $base/target/wix/tail.wxs >>$base/target/wix/console.wxs
 
 cd $base
-wixl $base/target/wix/console.wxs
+wixl -a x64 $base/target/wix/console.wxs

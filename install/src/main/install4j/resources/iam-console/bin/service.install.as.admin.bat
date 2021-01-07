@@ -33,7 +33,7 @@ if "%OS%" == "Windows_NT" (
 
 pushd %DIRNAME%
 
-CACLS "%DIRNAME%\.."s /T /E /G SERVICE:F 
+CACLS "%DIRNAME%\.." /T /E /G "NT Authority\Local Service:F" 
 
 :checkUser
 if "x%1x" == "x/service-userx" goto serviceUser

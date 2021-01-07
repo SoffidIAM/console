@@ -31,14 +31,14 @@
    inkscape:pageopacity="0"
    inkscape:pageshadow="2"
    inkscape:window-width="1920"
-   inkscape:window-height="1043"
+   inkscape:window-height="1027"
    id="namedview21"
    showgrid="false"
    inkscape:zoom="20.85965"
    inkscape:cx="16"
-   inkscape:cy="16"
+   inkscape:cy="14.27418"
    inkscape:window-x="0"
-   inkscape:window-y="1080"
+   inkscape:window-y="27"
    inkscape:window-maximized="1"
    inkscape:current-layer="g18" />
 <style
@@ -78,18 +78,21 @@
 	</g>
 	<path
    class="st5"
-   d="M16.9,22.1h-1.8v-8.8c0-0.5,0.4-0.9,0.9-0.9h0c0.5,0,0.9,0.4,0.9,0.9V22.1z"
+   d="m 19.872245,21.524732 h -7.74449 v -8.8 c 0,-0.5 1.720998,-0.9 3.872245,-0.9 v 0 c 2.151247,0 3.872245,0.4 3.872245,0.9 z"
    id="path12"
-   style="fill:#a6d100" />
+   style="fill:#a6d100;stroke-width:2.07424569"
+   inkscape:connector-curvature="0" />
 	<path
    class="st5"
-   d="M16.2,26.9l2.5-4.3c0.1-0.2,0-0.4-0.2-0.4h-5c-0.2,0-0.4,0.2-0.2,0.4l2.5,4.3C15.9,27.1,16.1,27.1,16.2,26.9z"
+   d="m 16.454321,31.700255 5.366482,-9.23035 c 0.21466,-0.429319 0,-0.858636 -0.429318,-0.858636 H 10.658521 c -0.429319,0 -0.8586379,0.429317 -0.429319,0.858636 l 5.366482,9.23035 c 0.21466,0.429318 0.643977,0.429318 0.858637,0 z"
    id="path14"
-   style="fill:#89ab00" />
+   style="fill:#89ab00;stroke-width:2.14659286"
+   inkscape:connector-curvature="0" />
 	<path
    class="st6"
-   d="M15.1,21.7v0.4h1.8v-0.4v-2.3C16.9,19.4,16.5,21.7,15.1,21.7z"
+   d="m 12.127755,21.268549 v 0.4 h 7.74449 v -0.4 -2.3 c 0,0 -1.720998,2.3 -7.74449,2.3 z"
    id="path16"
-   style="fill:#89ab00" />
+   style="fill:#89ab00;stroke-width:2.07424545"
+   inkscape:connector-curvature="0" />
 </g>
 </svg>

@@ -20,21 +20,25 @@
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('account:create')}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('account:create') &amp;&amp; soffid:isUserInRole('account:update') &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:frame.bulkAction" />
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Account" 
 				defaultAttributes="name, description, system, type"
-				preference="users"
+				preference="account"
 				dataPath="/model:/account" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.account.AccountDatatable"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				preference="account"
 				dataPath="/model:/account" maxheight="70vh"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('account:create')}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>

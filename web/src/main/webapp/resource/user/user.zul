@@ -24,6 +24,7 @@
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUser &amp;&amp; canUpdateUser &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:frame.bulkAction" />
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"
@@ -34,11 +35,14 @@
 
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.user.UserDatatable"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				preference="user"
 				dataPath="/model:/user" maxheight="70vh" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${canCreateUser}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -67,8 +71,12 @@
 						<div class="navigation-bar">
 							<menu2>
 								<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+								<menu2item image="/img/menu/audit.svg" label="${c:l('seu.auditoria') }" onClick="ref:frame.audit" if="${soffid:isUserInRole('seu:auditoria:show') }"/>
+								<menu2item image="/img/menu/access-record.svg" label="${c:l('seu.registresaccess') }" onClick="ref:frame.accessLog" if="${soffid:isUserInRole('seu:registreAcces:show') }"/>
+								<menu2item image="/img/refresh.svg" label="${c:l('usuaris.PropagarCanvi') }" onClick="ref:frame.refresh" />
 							</menu2>
 						</div>
+						
 						<div id="dades"> 
 							<form id="form" onChangeXPath="ref:frame.onChangeDades"
 								dataPath="/listbox:/." width="100%">
@@ -84,9 +92,6 @@
 						</div>
 					</tabpanel>
 					<tabpanel if="${soffid:isUserInRole('user:group:delete') }" fulfill="tabgroup.onSelect" >
-						<div class="navigation-bar dummy">
-							<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
-						</div>
 						<user_groups listbox="//user/listbox"/>
 					</tabpanel>
 					<tabpanel id="account" fulfill="tabaccount.onSelect" >

@@ -92,7 +92,7 @@ public class ErrorHandler extends Window implements AfterCompose {
 			} 
 			c = es.caib.seycon.ng.exception.SoffidStackTrace.getStackTrace(original);
 			log.warn (Labels.getLabel("error.NoPrevist")+ " " 
-					+execution.getDesktop().getRequestPath()+" ["+execution.getUserPrincipal().getName()+"] "+
+					+execution.getDesktop().getRequestPath()+" ["+(execution.getUserPrincipal() == null? "nobody": execution.getUserPrincipal().getName())+"] "+
 				"[Remote="+execution.getRemoteAddr()+"]",
 				original);
 		}

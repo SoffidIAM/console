@@ -208,7 +208,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 							}
 						});
 						boolean visible = inputField.attributeVisible();
-						if (att.getCustomObjectType().equals("com.soffid.iam.api.User")) {
+						if ("com.soffid.iam.api.User".equals(att.getCustomObjectType())) {
 							AttributeVisibilityEnum vis = 
 								currentUser != null && currentUser.equals(userName) ? att.getUserVisibility() : 
 								Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL) ? att.getAdminVisibility() :

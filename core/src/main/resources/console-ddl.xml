@@ -1115,11 +1115,5 @@
 		<foreignColumn name='DOC_ID'/>
 	</foreignKey>
 
-	<foreignKey name='SC_USUPRO_FK_PROC' table='SC_USUPRO' foreignTable='JBPM_PROCESSINSTANCE'>
-		<column name='UPR_IDPROC'/>
-		<foreignColumn name='ID_'/>
-	</foreignKey>
-
-
 </database>
 

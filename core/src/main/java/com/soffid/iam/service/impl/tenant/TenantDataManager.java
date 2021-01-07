@@ -129,7 +129,10 @@ public class TenantDataManager {
 				"SCV_RECIS",
 					" WHERE RIS_TEN_ID=${tenantId}",
 				"SCV_RECGRO",
-					" WHERE RGR_TEN_ID=${tenantId}"
+					" WHERE RGR_TEN_ID=${tenantId}",
+				"SC_USUPRO",
+					" WHERE UPR_IDPROC IN (SELECT JBPM_MODULEINSTANCE.PROCESSINSTANCE_ FROM  JBPM_MODULEINSTANCE "
+							+ "WHERE JBPM_MODULEINSTANCE.TENANT_=${tenantId})",
 					
 		};
 

@@ -94,7 +94,7 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 			Textbox password = (Textbox) w.getFellow("password");
 			userService.changePassword(user, domain, new Password(password.getValue()));
 			es.caib.zkib.zkiblaf.Missatgebox
-					.confirmaOK(org.zkoss.util.resource.Labels
+					.avis(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
 		}
 		else

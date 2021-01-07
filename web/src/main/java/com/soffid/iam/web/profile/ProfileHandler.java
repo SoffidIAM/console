@@ -53,7 +53,7 @@ public class ProfileHandler extends FrameHandler {
 	}
 
 	public void afterCompose() {
-
+		Application.registerPage(this);
 		// Locale
 		Locale locale = Locales.getCurrent();		
 		Databox lb = (Databox) getFellow("idioma");
@@ -277,8 +277,7 @@ public class ProfileHandler extends FrameHandler {
 			p2.setWarning(null,  "");
 			
 			new ChangePass().changePassword(Security.getCurrentUser(), pp0, pp1);
-			es.caib.zkib.zkiblaf.Missatgebox
-			.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
+			es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
 			onCancelPassword();
 		}
 	}

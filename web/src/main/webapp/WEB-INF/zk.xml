@@ -1,4 +1,4 @@
-	<zk>
+<zk>
 	<listener>
 		<description>ZK thread start event</description>
 		<listener-class>com.soffid.iam.web.zk.EventThreadInit</listener-class>
@@ -12,8 +12,8 @@
 		<location>/error.zul</location>
 	</error-page>
 	<session-config>
-  		<session-timeout>0</session-timeout>
-  		<timer-keep-alive>false</timer-keep-alive> 
+  		<session-timeout>1200</session-timeout>
+  		<timer-keep-alive>true</timer-keep-alive> 
 	</session-config>
 	<device-config>
 		<device-type>ajax</device-type>
@@ -99,7 +99,8 @@ zk.error = function (msg) {
      ]]></embed>
 	</device-config>
 	<system-config>
-		<max-upload-size>40480</max-upload-size>
+		<max-upload-size>400480</max-upload-size>
+		<disable-event-thread>true</disable-event-thread>
 	</system-config>
 	<zscript-config>
 		<language-name>ref</language-name>

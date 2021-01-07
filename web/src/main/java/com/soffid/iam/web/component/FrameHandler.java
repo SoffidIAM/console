@@ -1,6 +1,7 @@
 package com.soffid.iam.web.component;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -13,7 +14,9 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.MouseEvent;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Tabpanel;
@@ -59,8 +62,10 @@ public class FrameHandler extends Frame {
 			response("setUrl", 
 					new AuScript(this, 
 							String.format("try {"
-									+ "window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");"
+									+ "if (! window.location.pathname.startsWith(\"%s\")) "
+									+ "    window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");"
 									+ "} catch (e) {console.log(e);}",
+									ctx + url, 
 									ctx + url, 
 									getPage().getTitle(), 
 									ctx + url)));
@@ -159,6 +164,7 @@ public class FrameHandler extends Frame {
 		if (isSingleFaceCard()) return;
 		getCard().setSclass ( "card is-flipped" );
 		focusElement (getCard().getLastChild());
+		displayRemoveButton(getListbox(), false);
 	}
 
 	private boolean focusElement(Component c) {
@@ -201,6 +207,9 @@ public class FrameHandler extends Frame {
 		} catch (ComponentNotFoundException e) {
 			
 		}
+		try {
+			displayRemoveButton(getListbox(), false);
+		} catch (ComponentNotFoundException e) {} // Ignore
 	}
 	
 	protected Component getListbox() {
@@ -293,27 +302,30 @@ public class FrameHandler extends Frame {
 			Application.setPage("/main/menu.zul?option="+option);
 	}
 	
-	public boolean canClose ()
+	public boolean canClose (EventListener action)
 	{
-		boolean result = false;
 		if (getModel() != null && getModel().isCommitPending())
 		{
 			try
 			{
-				result = Missatgebox.confirmaYES_NO(Labels.getLabel("task.msgDeseaSalir"), //$NON-NLS-1$
+				Missatgebox.confirmaYES_NO(Labels.getLabel("task.msgDeseaSalir"), //$NON-NLS-1$
 						Labels.getLabel("task.titleDeseaSalir"), //$NON-NLS-1$
+						(event2) -> {
+							if (event2.equals("onYes"))
+							{
+								Component c = getModel();
+								if (c != null && c instanceof DataModel)
+								{
+									DataModel dm  =(DataModel) c;
+									dm.refresh();
+								}
+								if (action != null)	
+									action.onEvent(new Event("onClose", this));
+							}
+							
+						},
 						Messagebox.QUESTION);
-
-				if (result)
-				{
-					Component c = getModel();
-					if (c != null && c instanceof DataModel)
-					{
-						DataModel dm  =(DataModel) c;
-						dm.refresh();
-					}
-				}
-				return result;
+				return false;
 			}
 			catch (Exception ex)
 			{
@@ -406,4 +418,38 @@ public class FrameHandler extends Frame {
 		this.registerUrl = registerUrl;
 	}
 	
+	public void displayRemoveButton(Component lb, boolean display) {
+		HtmlBasedComponent d = (HtmlBasedComponent) lb.getNextSibling();
+		if (d != null && d instanceof Div) {
+			d =  (HtmlBasedComponent) d.getFirstChild();
+			if (d != null && "deleteButton".equals(d.getSclass())) {
+				d.setVisible(display);
+			}
+		}
+	}
+	
+	public void multiSelect(Event event) {
+		DataTable lb = (DataTable) event.getTarget();
+		displayRemoveButton( lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+	}
+
+	public void deleteSelected(Event event0) {
+		Component b = event0.getTarget();
+		final Component lb = b.getParent().getPreviousSibling();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							displayRemoveButton(lb, false);
+						}
+					});
+		}
+	}
 }

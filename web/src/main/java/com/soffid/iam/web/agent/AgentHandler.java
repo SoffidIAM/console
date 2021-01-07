@@ -34,6 +34,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Filedownload;
@@ -70,6 +71,7 @@ import com.soffid.iam.web.component.AttributeSearchBox;
 import com.soffid.iam.web.component.FileDump;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.SearchBox;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -1029,10 +1031,12 @@ public class AgentHandler extends FrameHandler {
 	}
 	
 	public void importMapping() throws Exception {
-		org.zkoss.util.media.Media m = Fileupload.get();
-		es.caib.zkib.datasource.DataSource listbox = (DataSource) getListbox();
-		new com.soffid.iam.web.agent.Importer().doImport(m, listbox);
-		listbox.sendEvent( new es.caib.zkib.events.XPathRerunEvent( listbox, "/" ) );
+        FileUpload2.get((event) -> {
+        	org.zkoss.util.media.Media m = ((UploadEvent)event).getMedia();
+			es.caib.zkib.datasource.DataSource listbox = (DataSource) getListbox();
+			new com.soffid.iam.web.agent.Importer().doImport(m, listbox);
+			listbox.sendEvent( new es.caib.zkib.events.XPathRerunEvent( listbox, "/" ) );
+        });
 	}
 	
 	public void test() throws Exception {

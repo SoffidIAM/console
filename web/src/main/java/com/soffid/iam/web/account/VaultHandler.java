@@ -250,7 +250,7 @@ public class VaultHandler extends FrameHandler {
 			Textbox password = (Textbox) w.getFellow("password");
 			EJBLocator.getSelfService().setAccountPassword(element.getAccount(), new Password( password.getValue()) );
 			es.caib.zkib.zkiblaf.Missatgebox
-					.confirmaOK(org.zkoss.util.resource.Labels
+					.avis(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
 		}
 		else
@@ -430,7 +430,7 @@ public class VaultHandler extends FrameHandler {
 		if (done)
 		{
 			es.caib.zkib.zkiblaf.Missatgebox
-				.confirmaOK(org.zkoss.util.resource.Labels
+				.avis(org.zkoss.util.resource.Labels
 				.getLabel("accounts.setPassword.msg"));
 			try {
 				XPathUtils.setValue(getForm(), "lockedBy", Security.getCurrentUser());
@@ -442,7 +442,7 @@ public class VaultHandler extends FrameHandler {
 		else
 		{
 			es.caib.zkib.zkiblaf.Missatgebox
-			.confirmaOK(org.zkoss.util.resource.Labels
+			.avis(org.zkoss.util.resource.Labels
 			.getLabel("accounts.setPassword.delayed.msg"));
 		}
 		w.setVisible(false);

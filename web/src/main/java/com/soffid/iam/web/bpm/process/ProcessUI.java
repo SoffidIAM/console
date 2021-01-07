@@ -836,14 +836,15 @@ public class ProcessUI extends FrameHandler {
     }
     
     public void cancel( ) throws IOException, DocumentException, ClassNotFoundException, SQLException, NamingException, CreateException, BPMException, InternalErrorException {
-			boolean result = Missatgebox.confirmaYES_NO(Labels.getLabel("process.confirmCancel"), //$NON-NLS-1$
-					Labels.getLabel("process.warning") //$NON-NLS-1$
-					,Messagebox.EXCLAMATION);
-			if (result)
-			{
-				setCurrentProcess(getEngine().cancel(getCurrentProcess()));
-				refresh();
-			}
+			Missatgebox.confirmaYES_NO(Labels.getLabel("process.confirmCancel"), //$NON-NLS-1$
+					Labels.getLabel("process.warning"), //$NON-NLS-1$
+					(event) -> {
+						if (event.getName().equals("onYes")) {
+							setCurrentProcess(getEngine().cancel(getCurrentProcess()));
+							refresh();
+						}
+					},
+					Messagebox.EXCLAMATION);
 
     }
 

@@ -40,6 +40,7 @@ import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.metainfo.PageDefinition;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
@@ -77,6 +78,7 @@ import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.Menu2item;
 import com.soffid.iam.web.inbox.InboxHandler;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.exception.BPMException;
@@ -127,19 +129,6 @@ public class TaskUI extends FrameHandler implements EventListener {
 	private Long definitionId;
 	private Map<String,String[]> newTaskParameters = null;
     
-	public boolean canClose() {
-        boolean result;
-
-		if (! getDataModel().isCommitPending())
-			return true;
-		
-		result=Missatgebox.confirmaYES_NO(Labels.getLabel("task.msgDeseaSalir"), //$NON-NLS-1$
-				Labels.getLabel("task.titleDeseaSalir") //$NON-NLS-1$
-				,Messagebox.QUESTION);
-
-        return result;
-	}
-
 	public TaskUI() throws InternalErrorException, NamingException, CreateException {
 		super();
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
@@ -894,25 +883,26 @@ public class TaskUI extends FrameHandler implements EventListener {
     public void subirArchivo() throws InterruptedException, IOException, NamingException, CreateException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException
     {
 
-            Media dataSubida= null;
             TaskAttachmentManager business= new TaskAttachmentManager(getCurrentTask());
             Session sesion= this.getDesktop().getSession();
             
-            dataSubida = Fileupload.get(true);
+            FileUpload2.get((event) -> {
+            	org.zkoss.util.media.Media dataSubida = ((UploadEvent)event).getMedia();
             
-            if(dataSubida!= null)
-            {
-                    String tag = ((HttpSession)sesion.getNativeSession()).getId();
-                    List tags = business.getTags();
-                    int counter = 0;
-                    while ( tags.contains(tag) )
-                    {
-                    	counter++;
-                    	tag = ((HttpSession)sesion.getNativeSession()).getId()+"_"+counter;
-                    }
-                    business.uploadFile(dataSubida, tag);
-                    refreshListadoArchivos();
-            }
+            	if(dataSubida!= null)
+	            {
+	                    String tag = ((HttpSession)sesion.getNativeSession()).getId();
+	                    List tags = business.getTags();
+	                    int counter = 0;
+	                    while ( tags.contains(tag) )
+	                    {
+	                    	counter++;
+	                    	tag = ((HttpSession)sesion.getNativeSession()).getId()+"_"+counter;
+	                    }
+	                    business.uploadFile(dataSubida, tag);
+	                    refreshListadoArchivos();
+	            }
+            });
     }
 
     public void eliminarArchivo() throws Exception

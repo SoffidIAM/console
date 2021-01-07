@@ -3,6 +3,8 @@ package com.soffid.iam.web.dsp;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.xel.fn.CommonFns;
+
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.utils.Security;
@@ -49,4 +51,5 @@ public class ZulFns {
 	public static final String getDateTimeFormat() {
 		return DateFormats.getDateTimeFormatString();
 	}
+
 }

@@ -103,7 +103,7 @@ public class MyAccountsHandler extends FrameHandler {
 			EJBLocator.getSelfService().setAccountPassword(account, new Password(pp1));
 			getModel().refresh();
 			es.caib.zkib.zkiblaf.Missatgebox
-			.confirmaOK(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
+			.avis(org.zkoss.util.resource.Labels.getLabel("accounts.setPassword.msg"));
 			onCancelPassword();
 		}
 	}

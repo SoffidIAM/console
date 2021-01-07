@@ -8,6 +8,8 @@ import javax.naming.NamingException;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.Session;
+import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zul.Textbox;
 
@@ -124,16 +126,20 @@ public class PasswordChangeHandler extends FrameHandler {
 			String usuari = com.soffid.iam.utils.Security.getCurrentAccount();
 			thechange.changePassword(usuari,contraAnt,contraNova1);
 		
-			if (Missatgebox.confirmaOK(org.zkoss.util.resource
+			Missatgebox.confirmaOK(org.zkoss.util.resource
 							.Labels.getLabel("changepassPerfil.CanviOK"),
 						org.zkoss.util.resource
-							.Labels.getLabel("changepassPerfil.CanviPWD")))
-			{
-				if (forced)
-					logout();
-				else
-					es.caib.zkib.zkiblaf.Application.setPage("/perfil//perfil.zul");
-			}
+							.Labels.getLabel("changepassPerfil.CanviPWD"),
+						(event) -> {
+							if (forced) {
+								Session session  = Sessions.getCurrent();
+								session.setAttribute("$$SoffidPasswordChanged$$", true);
+								String returnUrl = (String) session.getAttribute("$$SoffidPassswordBack$$");
+								getDesktop().getExecution().sendRedirect( returnUrl == null ? "/": returnUrl);
+							}
+							else
+								es.caib.zkib.zkiblaf.Application.setPage("/perfil//perfil.zul");
+						});
 		}
 		
 		catch (es.caib.seycon.ng.exception.BadPasswordException e)

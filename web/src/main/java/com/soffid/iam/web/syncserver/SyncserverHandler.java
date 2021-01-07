@@ -1,5 +1,6 @@
 package com.soffid.iam.web.syncserver;
 
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
@@ -147,19 +148,20 @@ public class SyncserverHandler extends FrameHandler {
 		{
 			try
 			{
-				if (es.caib.zkib.zkiblaf.Missatgebox.
-						confirmaOK_CANCEL(String.format(org.zkoss.util.resource
-								.Labels.getLabel("seyconServer.DesitjaReiniciar"),
-						new Object [] {url})))
-				{
-					com.soffid.iam.EJBLocator.getSyncServerService().resetSyncServer(
-								url, null);
-					
-					Missatgebox.confirmaOK (
-							String.format(org.zkoss.util.resource
-									.Labels.getLabel("seyconServer.Restarting"), 
-							new Object [] {url}));
-				}
+				es.caib.zkib.zkiblaf.Missatgebox.confirmaOK_CANCEL(
+						String.format(org.zkoss.util.resource.Labels.getLabel("seyconServer.DesitjaReiniciar"),
+									new Object [] {url}) ,
+						(event2) -> {
+							if (event2.getName().equalsIgnoreCase("onOK") ) {
+								com.soffid.iam.EJBLocator.getSyncServerService().resetSyncServer(
+										url, null);
+								
+								Missatgebox.avis(
+										String.format(org.zkoss.util.resource
+												.Labels.getLabel("seyconServer.Restarting"), 
+												new Object [] {url}));
+							}
+						});
 			}
 			catch (Throwable th)
 			{
@@ -541,19 +543,27 @@ public class SyncserverHandler extends FrameHandler {
 		{
 			try
 			{
-				if (es.caib.zkib.zkiblaf.Missatgebox.
+				es.caib.zkib.zkiblaf.Missatgebox.
 						confirmaOK_CANCEL(String.format(org.zkoss.util.resource
 								.Labels.getLabel("seyconServer.DesitjaReiniciar"),
-						new Object [] {currentAgent.getUrl()})))
-				{
-					com.soffid.iam.EJBLocator.getSyncServerService().resetSyncServer(
-								currentAgent.getUrl(), null);
-					
-					Missatgebox.confirmaOK (
-							String.format(org.zkoss.util.resource
-									.Labels.getLabel("seyconServer.Restarting"), 
-							new Object [] {currentAgent.getUrl()}));
-				}
+						new Object [] {currentAgent.getUrl()}),
+								(event2) -> {
+									if (event2.getName().equalsIgnoreCase("onOK")) {
+										String agentUrl = currentAgent.getUrl();
+										if (currentAgent.getUrl() == null ||
+												"local".equals(currentAgent.getUrl())) {
+											agentUrl = serverUrl;
+										}
+										com.soffid.iam.EJBLocator.getSyncServerService().resetSyncServer(
+												serverUrl, agentUrl);
+										
+										Missatgebox.avis (
+												String.format(org.zkoss.util.resource
+														.Labels.getLabel("seyconServer.Restarting"), 
+														new Object [] {currentAgent.getUrl()}));
+										
+									}
+								});
 			}
 			catch (Throwable th)
 			{

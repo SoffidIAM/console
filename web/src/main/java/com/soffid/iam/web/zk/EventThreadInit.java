@@ -42,11 +42,13 @@ public class EventThreadInit extends TomeeThreadInit {
 			ejb.clearSession();
 		else
 			ejb.setSession(cacheSession);
-		Security.clearNestedLogins();
+//		Security.clearNestedLogins();
 		if (currentIdentity != null)
 		{
 			Security.setClientIp(clientIp);
 			Security.nestedLogin(currentIdentity);
+		} else {
+			Security.nestedLogin("anonymous", new String[0]);
 		}
 		Locales.setThreadLocal(locale);
 		TimeZones.setThreadLocal(timeZone);

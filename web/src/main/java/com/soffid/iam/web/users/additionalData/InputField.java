@@ -26,6 +26,7 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Image;
@@ -35,6 +36,7 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Aplicacio;
@@ -655,43 +657,45 @@ public class InputField extends Div implements XPathSubscriber
 	}
 	
 	public void upload(Component span) throws Exception {
-        Media uploadData = Fileupload.get();
-        if (uploadData == null) return; //Per si l'usuari pitja en Cancelar
-        if (!uploadData.isBinary()) {
-            throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
-        }
-        byte data[];
-        if (uploadData.inMemory()) {
-            data = uploadData.getByteData();
-        } else {
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            InputStream is = uploadData.getStreamData();
-            byte b[] = new byte[2024];
-            int read = is.read(b);
-            while (read > 0) {
-                os.write(b, 0, read);
-                read = is.read(b);
-            }
-            is.close();
-            os.close();
-            data = os.toByteArray();
-        }
-        setBlobDataValue(data);
-        for (Iterator<?> it = span.getChildren().iterator(); it.hasNext();)
-        {
-        	Component c = (Component) it.next();
-        	if (c instanceof Image)
-        		it.remove();
-        }
-        org.zkoss.zul.Image img = new org.zkoss.zul.Image();
-        img.setContent(byteArrayToImage(data));
-        img.setParent(span);       
-        img.setStyle("max-width: 100px; max-height: 100px; ");
-        if (twoPhaseEdit)
-        {
-        	binder.getDataSource().commit();
-        }
-    }
+        FileUpload2.get((event) -> {
+        	org.zkoss.util.media.Media uploadData = ((UploadEvent)event).getMedia();
+	        if (uploadData == null) return; //Per si l'usuari pitja en Cancelar
+	        if (!uploadData.isBinary()) {
+	            throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
+	        }
+	        byte data[];
+	        if (uploadData.inMemory()) {
+	            data = uploadData.getByteData();
+	        } else {
+	            ByteArrayOutputStream os = new ByteArrayOutputStream();
+	            InputStream is = uploadData.getStreamData();
+	            byte b[] = new byte[2024];
+	            int read = is.read(b);
+	            while (read > 0) {
+	                os.write(b, 0, read);
+	                read = is.read(b);
+	            }
+	            is.close();
+	            os.close();
+	            data = os.toByteArray();
+	        }
+	        setBlobDataValue(data);
+	        for (Iterator<?> it = span.getChildren().iterator(); it.hasNext();)
+	        {
+	        	Component c = (Component) it.next();
+	        	if (c instanceof Image)
+	        		it.remove();
+	        }
+	        org.zkoss.zul.Image img = new org.zkoss.zul.Image();
+	        img.setContent(byteArrayToImage(data));
+	        img.setParent(span);       
+	        img.setStyle("max-width: 100px; max-height: 100px; ");
+	        if (twoPhaseEdit)
+	        {
+	        	binder.getDataSource().commit();
+	        }
+	    });
+	}
 	
 	
 	public void changeHtml(String text) throws Exception {
@@ -711,45 +715,47 @@ public class InputField extends Div implements XPathSubscriber
 	
 	
 	public void uploadBinary() throws Exception {
-        Media uploadData = Fileupload.get();
-        if (uploadData == null) return; //Per si l'usuari pitja en Cancelar
-        byte data[];
-        if (!uploadData.isBinary()) {
-	        if (uploadData.inMemory()) {
-	            data = uploadData.getStringData().getBytes("UTF-8");
+        FileUpload2.get((event) -> {
+        	org.zkoss.util.media.Media uploadData = ((UploadEvent)event).getMedia();
+	        if (uploadData == null) return; //Per si l'usuari pitja en Cancelar
+	        byte data[];
+	        if (!uploadData.isBinary()) {
+		        if (uploadData.inMemory()) {
+		            data = uploadData.getStringData().getBytes("UTF-8");
+		        } else {
+		            ByteArrayOutputStream os = new ByteArrayOutputStream();
+		            Reader is = uploadData.getReaderData();
+		            char b[] = new char[2048];
+		            int read = is.read(b);
+		            while (read > 0) {
+		                os.write(new String (b,  0, read).getBytes("UTF-8"));
+		                read = is.read(b);
+		            }
+		            is.close();
+		            os.close();
+		            data = os.toByteArray();
+		        }
 	        } else {
-	            ByteArrayOutputStream os = new ByteArrayOutputStream();
-	            Reader is = uploadData.getReaderData();
-	            char b[] = new char[2048];
-	            int read = is.read(b);
-	            while (read > 0) {
-	                os.write(new String (b,  0, read).getBytes("UTF-8"));
-	                read = is.read(b);
-	            }
-	            is.close();
-	            os.close();
-	            data = os.toByteArray();
+		        if (uploadData.inMemory()) {
+		            data = uploadData.getByteData();
+		        } else {
+		            ByteArrayOutputStream os = new ByteArrayOutputStream();
+		            InputStream is = uploadData.getStreamData();
+		            byte b[] = new byte[2048];
+		            int read = is.read(b);
+		            while (read > 0) {
+		                os.write(b, 0, read);
+		                read = is.read(b);
+		            }
+		            is.close();
+		            os.close();
+		            data = os.toByteArray();
+		        }
 	        }
-        } else {
-	        if (uploadData.inMemory()) {
-	            data = uploadData.getByteData();
-	        } else {
-	            ByteArrayOutputStream os = new ByteArrayOutputStream();
-	            InputStream is = uploadData.getStreamData();
-	            byte b[] = new byte[2048];
-	            int read = is.read(b);
-	            while (read > 0) {
-	                os.write(b, 0, read);
-	                read = is.read(b);
-	            }
-	            is.close();
-	            os.close();
-	            data = os.toByteArray();
-	        }
-        }
-        setBlobDataValue(data);
-        if (twoPhaseEdit)
-        	binder.getDataSource().commit();
+	        setBlobDataValue(data);
+	        if (twoPhaseEdit)
+	        	binder.getDataSource().commit();
+        });
     }
 	
 	public void downloadBinary(Component span) throws Exception {

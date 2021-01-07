@@ -167,14 +167,20 @@ public class WorkflowInterceptor implements Filter {
 				}
 				else
 				{
-					Security.clearNestedLogins();
-					filter.doFilter(request, response);
+					String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
+					Security.nestedLogin( (SoffidPrincipal) ((HttpServletRequest) request).getUserPrincipal());
+					try {
+						filter.doFilter(request, response);
+					} finally {
+						Security.nestedLogoff();
+					}
 				}
 
 			} catch (Exception e) {
 				throw new ServletException(
 						Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
 			} finally {
+				Security.clearNestedLogins();
 				try {
 					MessageFactory.setThreadLocale(null);
 					org.zkoss.util.Locales.setThreadLocal(null);

@@ -40,7 +40,6 @@ public class UserTypeHandler extends FrameHandler {
 		canUpdateuserType = Security.isUserInRole("userType:update");
 		canDeleteuserType = Security.isUserInRole("userType:delete");
 		canQueryUserType = Security.isUserInRole("userType:query");;
-		
 	}
 
 	@Override

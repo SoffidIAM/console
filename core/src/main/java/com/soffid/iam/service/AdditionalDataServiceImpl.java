@@ -140,8 +140,9 @@ public class AdditionalDataServiceImpl extends
 		{
 			validateUniqueOrderForAccountMetadata(tipusDada);
 			AccountMetadataEntity tipusDadaMateixCodi = getAccountMetadataEntityDao().findByName(tipusDada.getSystemName(), tipusDada.getCode());
-			if(tipusDadaMateixCodi != null)
+			if(tipusDadaMateixCodi != null) {
 				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
+			}
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().dataTypeToEntity(tipusDada);
 			if (tipusDadaEntity != null) {
 				getAccountMetadataEntityDao().create(tipusDadaEntity);
@@ -155,8 +156,16 @@ public class AdditionalDataServiceImpl extends
 				tipusDada.setObjectType(typeForScope.get(tipusDada.getScope()));
 			validateUniqueOrderForMetaData(tipusDada);
 			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findByObjectTypeAndName(tipusDada.getCustomObjectType(), tipusDada.getCode());
-			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty())
-				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
+			if(tipusDadaMateixCodi != null && !tipusDadaMateixCodi.isEmpty()) {
+				MetaDataEntity d = tipusDadaMateixCodi.get(0);
+				if (Boolean.TRUE.equals(d.getBuiltin())) {
+					tipusDada.setBuiltin(d.getBuiltin());
+					tipusDada.setId(d.getId());
+					return handleUpdate(tipusDada);
+				}
+				else
+					throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
+			}
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
 			if (tipusDadaEntity != null) {
 				getMetaDataEntityDao().create(tipusDadaEntity);
@@ -432,7 +441,7 @@ public class AdditionalDataServiceImpl extends
 		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().findByName(name);
 		if (entity == null)
 			return new LinkedList<>();
-		Collection<MetaDataEntity> entities = entity.getAttributes();
+		Collection<MetaDataEntity> entities = new LinkedList<MetaDataEntity>( entity.getAttributes() );
 		for ( Iterator<MetaDataEntity> iterator = entities.iterator(); iterator.hasNext(); )
 		{
 			MetaDataEntity md = iterator.next();
@@ -526,7 +535,7 @@ public class AdditionalDataServiceImpl extends
 	@Override
 	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName(String objectType, String code)
 			throws Exception {
-		List<MetaDataEntity> col = getMetaDataEntityDao().findByObjectTypeAndName(objectType, code);
+		List<MetaDataEntity> col = new LinkedList<MetaDataEntity> (getMetaDataEntityDao().findByObjectTypeAndName(objectType, code));
 		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
 		{
 			MetaDataEntity td = it.next();

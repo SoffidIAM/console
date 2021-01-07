@@ -39,12 +39,6 @@
   value: url ]]>
 				</attribute>
 			</datatable>
-			<div width="100%" style="text-align: right"
-				if="${canManageServers}">
-				<div class="addButton" onClick="ref:frame.addNew">
-					+
-				</div>
-			</div>
 		</div>
 
 		<div sclass="card__face card__face--back">

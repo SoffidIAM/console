@@ -34,6 +34,7 @@ public class ConfigureRest {
 			r.createUser = ! cfg.isUserAlreadyExist();
 			return Response.ok(r).build();
 		} catch (Exception e) {
+			log.warn("Error configuring sytem", e);
 			r.success = false;
 			r.message = e.getMessage();
 			return Response.ok(r).build();
@@ -53,6 +54,7 @@ public class ConfigureRest {
 			r.success = true;
 			return Response.ok(r).build();
 		} catch (Exception e) {
+			log.warn("Error configuring sytem", e);
 			r.success = false;
 			r.message = e.getMessage();
 			return Response.ok(r).build();

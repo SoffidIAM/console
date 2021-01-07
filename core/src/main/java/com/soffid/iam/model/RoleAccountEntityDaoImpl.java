@@ -757,18 +757,24 @@ public class RoleAccountEntityDaoImpl
 			 */
 			nomDomini = rol.getApplicationDomain().getName();
 			String codiAplicacio = rol.getInformationSystem().getName();
-			String valor = valorDomini.getValue();
-			DomainValueEntity valorDominiAplicacioEntity = findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(
-					nomDomini, codiAplicacio, valor);
-			if (valorDominiAplicacioEntity != null) {
-				targetEntity.setDomainValue(valorDominiAplicacioEntity);
-				targetEntity.setDomainType(TipusDomini.CUSTOM);
-				targetEntity.setGroup(null);
-				targetEntity.setInformationSystem(null);
+			if (valorDomini != null) {
+				String valor = valorDomini.getValue();
+				DomainValueEntity valorDominiAplicacioEntity = findValorDominiByNomDominiAndCodiAplicacioDominiAndValor(
+						nomDomini, codiAplicacio, valor);
+				if (valorDominiAplicacioEntity != null) {
+					targetEntity.setDomainValue(valorDominiAplicacioEntity);
+					targetEntity.setDomainType(TipusDomini.CUSTOM);
+					targetEntity.setGroup(null);
+					targetEntity.setInformationSystem(null);
+				} else {
+					throw new SeyconException(
+							String.format(
+									Messages.getString("RolsUsuarisEntityDaoImpl.14"), nomDomini, codiAplicacio, valor)); //$NON-NLS-1$
+				}
 			} else {
 				throw new SeyconException(
 						String.format(
-								Messages.getString("RolsUsuarisEntityDaoImpl.14"), nomDomini, codiAplicacio, valor)); //$NON-NLS-1$
+								Messages.getString("RolsUsuarisEntityDaoImpl.14"), nomDomini, codiAplicacio, valorDomini)); //$NON-NLS-1$
 			}
 		}
 

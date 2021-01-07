@@ -5,27 +5,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.util.media.Media;
-import org.zkoss.zhtml.Filedownload;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
-import org.zkoss.zul.Fileupload;
-import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
 
-import com.soffid.iam.api.Tenant;
 import com.soffid.iam.exception.DuplicatedClassException;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
@@ -34,11 +24,6 @@ import com.soffid.iam.web.popup.FileUpload2;
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.web.Messages;
-import es.caib.zkib.component.DataTable;
-import es.caib.zkib.component.DataTree2;
-import es.caib.zkib.datamodel.DataNode;
-import es.caib.zkib.datasource.XPathUtils;
-import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class PluginHandler extends FrameHandler {
@@ -60,7 +45,6 @@ public class PluginHandler extends FrameHandler {
 				.Labels.getLabel("seu.plugins"));
 		}
 		catch (Exception ex){}
-
 	}
 
 	@Override
@@ -166,6 +150,6 @@ public class PluginHandler extends FrameHandler {
 	{
 		org.zkoss.zul.Window p = (org.zkoss.zul.Window) getFellow("popupRefreshPage"); //$NON-NLS-1$
 		p.doHighlighted();
-
+		response("reload", new org.zkoss.zk.au.out.AuScript(this,  "play(); setTimeout(()=>{document.location.reload()}, 10000);"));
 	}
 }

@@ -442,6 +442,11 @@ public class ServerPluginParser {
 				attributeMapping = "false";//Posem N si és nul //$NON-NLS-1$
 			ad.setEnableAttributeMapping("true".equals(attributeMapping)); //$NON-NLS-1$
 
+			String service = xpath.evaluate("service", n); //$NON-NLS-1$
+			if (attributeMapping == null || "".equals(attributeMapping)) //$NON-NLS-1$
+				attributeMapping = "false";//Posem N si és nul //$NON-NLS-1$
+			ad.setService("true".equals(service)); //$NON-NLS-1$
+
 			loadDefaultAttributeMappings (ad, n);
 
 			agents.add(ad);

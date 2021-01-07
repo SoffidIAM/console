@@ -180,6 +180,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
 	    			agentEntity.setAuthoritativeSource(agent.isAuthoritativeSource());
 	    			agentEntity.setEnableObjectTriggers(agent.isEnableObjectTriggers());
 	    			agentEntity.setPlugin(plugin);
+	    			agentEntity.setService(agent.isService());
 	    			getAgentDescriptorEntityDao().create(agentEntity);
 	    			if (agent instanceof InternalAgentDescriptor && ((InternalAgentDescriptor) agent).getObjects() != null)
 	    			{

@@ -226,8 +226,8 @@ div.main-search.ctxpopup {
 	width: 330px;
 	border: solid 2px #2b2b2b;
 	box-shadow: 0px 0px 7px #2b2b2b;	
+	position: fixed !important;
 }
-
 div.main-search.ctxpopup span.search-header {
 	color: {BLUE};
 	display: block;
@@ -693,11 +693,6 @@ img.imageclic .centre{
 	margin: 0 auto;
 }
 
-div.datatable div.tbodydiv table.tbody tr td img.imageclic {
-    width: 24px;
-    height: 24px;
-    vertical-align: baseline;
-}
 /* arreglem problema que surt a IE7 que mostra un scrolling vertical en els grids */
 .grid .sensescroll div  {
 	overflow:none !important;border: 1px solid transparent;
@@ -2105,12 +2100,19 @@ div.datatable table tr td.selector {
 	width: 50px;
 	min-width: 50px;
 }
+
+div.datatable div.tbodydiv table.tbody tr td img.imageclic {
+    width: 24px;
+    height: 24px;
+    vertical-align: baseline;
+}
+
 div.datatable.fixedlayout table {
 	table-layout: fixed;
 }
 
 div.datatable table.tbody tr td.selector {
-	width: 38px;
+	width: 50px;
 	text-align: center;
 }
 
@@ -2125,7 +2127,7 @@ div.datatable table.tbody tr td.datetimeColumn {
 }
 
 div.datatable table.tbody tr td.dateColumn {
-	width: 110px;
+	width: 120px;
 	text-align: right;
 }
 
@@ -2467,7 +2469,7 @@ div.datatable div.sort-indicator-disabled {
   transform: rotateY(180deg);
 }
 
-div.addButton {
+div.addButton, div.deleteButton {
 	display: inline-block;
 	margin: 5px;
 	height: 40px;
@@ -2481,7 +2483,12 @@ div.addButton {
 	cursor: pointer;
 }
 
-div.addButton:hover {
+div.deleteButton {
+	float: left;
+	background-color: {SKYDARK};
+}
+
+div.addButton:hover, div.deleteButton:hover {
 	margin: 0px;
 	height: 50px;
 	width: 50px;
@@ -2492,12 +2499,20 @@ div.addButton:hover {
 	line-height: 50px;
 }
 
-div.addButton span {
+div.deleteButton:hover {
+	background-color: {SKY};
+}
+
+div.addButton span, div.deleteButton span {
 	vertical-align: middle;
 	display: inline-block;
 	color: white;
 	font-size: 35px;
-	padding-top: 3px;
+	padding-top: 2px;
+}
+
+div.deleteButton span {
+	padding-top: 0px;
 }
 
 span.link {
@@ -2563,6 +2578,8 @@ div.menu2modal.open div.menu2dropdown tr td {
 div.menu2modal.open div.menu2dropdown tr td img{
 	margin-right: 8px;
 	height: 18px;
+	width: 18px;
+	object-fit: cover;
 }
 
 div.menu2modal.open div.menu2dropdown tr:hover {
@@ -3247,14 +3264,16 @@ div.databox div.container.datebox {
 	width: fit-content;
 }
 
-div.databox div.container.switch {
+div.databox div.container.switch, div.databox div.container.switch.wrapped {
 	width: 80px;
 	flex-grow: 0;
+	margin-left: 0;
 }
 
 
 div.databox div.container input.text ,
-div.databox div.container textarea.text {
+div.databox div.container textarea.text,
+div.databox textarea.text {
 	width: 100%;
 	resize: vertical;
 }
@@ -3439,6 +3458,6 @@ input[type='radio'] + label {
 
 
 img.small-picture {
-	max-width: 48px;
-	max-height: 48px;	
+	max-width: 32px;
+	max-height: 32px;	
 }

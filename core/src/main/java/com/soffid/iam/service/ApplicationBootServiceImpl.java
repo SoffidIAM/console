@@ -1405,7 +1405,7 @@ public class ApplicationBootServiceImpl extends
 				}
 			}
 		}
-}
+	}
 
 	static Database database = null;
 	

@@ -948,7 +948,7 @@ public class ApplicationServiceImpl extends
            			if (dispatcher == null)
            				throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UnknownSystem"), 
            						inital.getSystem()));
-           			account = getAccountService().createAccount(usu, getSystemEntityDao().toSystem(dispatcher), null);
+           			account = getAccountService().createAccount(usu, getSystemEntityDao().toSystem(dispatcher), ra.getAccountName());
            		}
            		else
            		{

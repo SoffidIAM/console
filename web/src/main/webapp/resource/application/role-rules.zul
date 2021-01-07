@@ -18,6 +18,8 @@
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/rule"
 			    maxheight="70vh"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
 					<![CDATA[
@@ -29,6 +31,7 @@
 				</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -97,7 +100,10 @@
 					</div>
 					<div sclass="section">
 						<label sclass="separator" value="${c:l('rules.roles') }"/>
-						<datatable dataPath="/ruleAssignedRole" use="com.soffid.iam.web.application.RuleAssignedRoleDataTable">
+						<datatable dataPath="/ruleAssignedRole" use="com.soffid.iam.web.application.RuleAssignedRoleDataTable"
+							multiselect="true"
+							onMultiSelect="ref:frame.multiSelect"
+						>
 						<attribute name="columns">
 						- name: ${c:l('rules.role')}
 						  value: name
@@ -110,6 +116,7 @@
 						</attribute>
 						</datatable>
 						<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >
+							<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 							<div class="addButton" onClick="ref:frame.addNewRole">+</div>
 						</div>
 						<customfield3 dataType="STRING" bind="bshRoles" multiline="true" maxlength="10000" label="${c:l('rules.rolesExpression') }" selectIcon="/img/pencil.svg" />

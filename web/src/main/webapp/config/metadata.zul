@@ -29,6 +29,8 @@
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/customObject"
 			    maxheight="70vh"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
 					<![CDATA[
@@ -42,6 +44,7 @@
 				</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${canCreateMetadata}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -64,14 +67,8 @@
 					onChangeXPath="ref:frame.onChangeForm()"
 					dataPath="/listbox:/." width="100%">
 					<div>
-						<div>
-							<label style="width:150px; display:inline-block" value="${c:l('com.soffid.iam.api.CustomObjectType.name')} :"></label>
-							<textbox bind="@name" width="15em" id="objectTypeName"/>
-						</div>
-						<div>
-							<label style="width:150px; display:inline-block"  value="${c:l('com.soffid.iam.api.CustomObjectType.description')} :"></label>
-							<textbox bind="@description" width="30em" id="objectTypeDescription"/>
-						</div>
+						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.name')}" required="true" dataType="STRING" maxlength="50" bind="@name" id="objectTypeName"/>
+						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.description')} :" required="true" dataType="STRING" maxlength="150" bind="@description" id="objectTypeDescription"/>
 					</div>
 					<style>
 						div.datatable.hideFirstCol div.tbodydiv table.tbody tr td:first-child,
@@ -81,9 +78,11 @@
 						}
 					</style>
 					<datatable id="metadataGrid" autocommit="true" use="com.soffid.iam.web.agent.MetadataTable"
-								dataPath="/metadata" maxheight="70vh" sortColumn="0"
+								dataPath="/metadata" maxheight="50vh" sortColumn="0"
 								sclass="datatable hideFirstCol"
 								reorder="true"
+								multiselect="true"
+								onMultiSelect="ref:frame.multiSelect"
 								onReorder="ref:frame.reorder"
 								onSelect="ref:frame.showAttributeDetails" enablefilter="true">
 								<attribute name="columns"><![CDATA[
@@ -105,6 +104,7 @@
 					</datatable>
 					<div width="100%" style="text-align: right"
 						if="${canModifyMetadata}">
+					<div class="deleteButton" onClick="ref:frame.deleteSelectedAttribute" visible="false">-</div>
 						<div class="addButton" onClick="ref:frame.addNewAttribute">
 							+
 						</div>

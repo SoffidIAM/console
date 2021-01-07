@@ -16,6 +16,8 @@
 
 	<datatable id="listbox" autocommit="true" 
 		dataPath="${arg.listbox }:/auth" maxheight="70vh" sortColumn="0"
+		multiselect="true"
+		onMultiSelect="ref:handler.multiSelect"
 		onSelect="ref:handler.showDetails" enablefilter="true">
 		<attribute name="columns"><![CDATA[
 		- name: ${c:l('aplicacionsIntranet.zul.Nivell')}
@@ -29,6 +31,7 @@
 	</datatable>
 
 	<div width="100%" style="text-align: right" >
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false">-</div>
 		<div class="addButton" onClick="ref:handler.addNew">+</div>
 	</div>
 

@@ -19,6 +19,8 @@
 			<datatable id="listbox" autocommit="true" dataPath="/model:/mailDomain"
 			    maxheight="70vh"
 				sortColumn="0" onSelect="ref:frame.showDetails"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				use='com.soffid.iam.web.mail.MailDomainDatatable'>
 				<attribute name="columns">
 					<![CDATA[
@@ -32,6 +34,7 @@
 				</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('mail:create')}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>

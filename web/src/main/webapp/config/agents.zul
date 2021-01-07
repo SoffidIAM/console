@@ -68,6 +68,8 @@
 
 			<datatable id="listbox" autocommit="true" use="com.soffid.iam.web.agent.AgentsTable"
 				dataPath="/model:/agent" maxheight="70vh" sortColumn="0"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 				<attribute name="columns"><![CDATA[
 - name: ${c:l('agents.zul.Codi')} 
@@ -82,6 +84,7 @@
 			</datatable>
 			<div width="100%" style="text-align: right"
 				if="${canCreateAgent}">
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">
 					+
 				</div>
@@ -255,6 +258,7 @@
 										<datatable multiselect="true" dataPath="/model:/tipusUsuari" id="lbTipusUsuari"
 											footer="false"
 											onSelect="ref:frame.onSelectUserType"
+											onMultiSelect="ref:frame.onSelectUserType"
 											sortColumn="0" enablefilter="false">
 				<attribute name="columns"><![CDATA[
 	- name: ${c:l('agents.zul.Tipusdusuari')}
@@ -638,6 +642,8 @@
 							onEdit="ref:tabControlAcces.editRule"
 							onRemove="ref:tabControlAcces.onRemove"
 							onClone="ref:tabControlAcces.onClone"
+							multiselect="true"
+							onMultiSelect="ref:frame.multiSelect"
 							maxheight="300px" id="gridControlAccess" width="100%">
 							<attribute name="columns"><![CDATA[
 - name: ${c:l('agents.zul.Usuari')}
@@ -657,6 +663,7 @@
 					<div align="right"><listexportbutton acces="${canQueryAgent}" listbox="gridControlAccess"/></div>
 					<div width="100%" style="text-align: right"
 						if="${canCreateAgent}">
+						<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 						<div class="addButton" onClick="ref:tabControlAcces.addNew">
 							+
 						</div>

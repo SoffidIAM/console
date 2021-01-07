@@ -7,30 +7,6 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.application.RoleHandler" id="frame">
-	<style>
-		div.datatable.roleGrant table tr td:nth-child(4),
-		div.datatable.roleGrant table tr td:nth-child(9)
-		 {
-			width: 24px;
-			min-width: 24px;
-			padding: 0px;
-			text-align: center
-		}
-		div.datatable.roleGrant table tr td:nth-child(8) {
-			text-align: center;
-		}
-		div.datatable.groupGrant table tr td:nth-child(2),
-		div.datatable.groupGrant table tr td:nth-child(7)
-		 {
-			width: 24px;
-			min-width: 24px;
-			padding: 0px;
-			text-align: center
-		}
-		div.datatable.groupGrant table tr td:nth-child(6) {
-			text-align: center;
-		}
-	</style>
 	<datamodel id="model" rootNode="applications" src="descriptorApplication.xml"/>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
@@ -53,12 +29,15 @@
 
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.application.RoleDatatable"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				preference="user"
 				dataPath="/model:/role" maxheight="70vh" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('application:create')}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -97,37 +76,45 @@
 						<datatable id="ownedRoles" autocommit="false" 
 						    sclass="datatable roleGrant"
 						    onSetMandatory="ref:handler.setMandatoryGranted"
+							multiselect="true"
+							onMultiSelect="ref:handler.multiSelect2"
 						    onRemove="ref:handler.removeGranted"
 							dataPath="listbox:/ownedRoles" maxheight="60vh" sortColumn="0"
 							enablefilter="true">
 						<attribute name="columns"><![CDATA[
-	- name: ${c:l('aplica_rolinfo.zul.Rol')}
-	  value: ownerRoleName
-	- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
-	  value: ownerSystem
-	- name: ${c:l('aplica_rolinfo.zul.Domini')}
-	  value: ownerRolDomainValue
-	- name: ""
-	  width: 24px
-	  sort: false
-	  filter: false
-	  template: <img src="${execution.contextPath }/img/next.svg">
-	- name: ${c:l('aplica_rolinfo.zul.Rol')}
-	  value: roleName
-	- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
-	  value: system
-	- name: ${c:l('aplica_rolinfo.zul.Domini')}
-	  value: domainValue
-	- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
-	  value: mandatory
-	  filter: false
-	  template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-	- name: ""
-	  filter: false
-	  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: ownerRoleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: ownerSystem
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: ownerRolDomainValue
+- name: ""
+  width: 24px
+  sort: false
+  filter: false
+  className: selector
+  template: <img class="small-icon" src="${execution.contextPath }/img/next.svg">
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  value: mandatory
+  filter: false
+  sort: false
+  className: selector
+  template: <input type="checkbox" title="${c:l('aplica_rolsllista.zul.Mandatory') }" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
+- name: ""
+  filter: false
+  className: selector
+  sort: false
+  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 						]]></attribute>
 						</datatable>
 						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+							<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 							<div style="float: right"  class="addButton" onClick="ref:handler.addNewGranted">+</div>
 						</div>
 					</tabpanel>
@@ -136,36 +123,45 @@
 						    sclass="datatable roleGrant"
 						    onSetMandatory="ref:handler.setMandatoryGrantee"
 						    onRemove="ref:handler.removeGrantee"
+							multiselect="true"
+							onSelect="ref:handler.multiSelect2"
+							onMultiSelect="ref:handler.multiSelect2"
 							dataPath="listbox:/ownerRoles" maxheight="60vh" sortColumn="0"
 							enablefilter="true">
 						<attribute name="columns"><![CDATA[
-	- name: ${c:l('aplica_rolinfo.zul.Rol')}
-	  value: ownerRoleName
-	- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
-	  value: ownerSystem
-	- name: ${c:l('aplica_rolinfo.zul.Domini')}
-	  value: ownerRolDomainValue
-	- name: ""
-	  width: 24px
-	  sort: false
-	  filter: false
-	  template: <img src="${execution.contextPath }/img/next.svg">
-	- name: ${c:l('aplica_rolinfo.zul.Rol')}
-	  value: roleName
-	- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
-	  value: system
-	- name: ${c:l('aplica_rolinfo.zul.Domini')}
-	  value: domainValue
-	- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
-	  value: mandatory
-	  filter: false
-	  template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-	- name: ""
-	  filter: false
-	  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: ownerRoleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: ownerSystem
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: ownerRolDomainValue
+- name: ""
+  width: 24px
+  sort: false
+  filter: false
+  className: selector
+  template: <img class="small-icon" src="${execution.contextPath }/img/next.svg">
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  value: mandatory
+  className: selector
+  filter: false
+  sort: false
+  template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
+- name: ""
+  filter: false
+  sort: false 
+  className: selector
+  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 						]]></attribute>
 						</datatable>
 						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+							<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 							<div style="float: right"  class="addButton" onClick="ref:handler.addNewGrantee">+</div>
 						</div>
 					</tabpanel>
@@ -174,32 +170,41 @@
 						    sclass="datatable groupGrant"
 						    onSetMandatory="ref:handler.setMandatoryGroup"
 						    onRemove="ref:handler.removeGroup"
+							multiselect="true"
+							onSelect="ref:handler.multiSelect2"
+							onMultiSelect="ref:handler.multiSelect2"
 							dataPath="listbox:/granteeGroups" maxheight="60vh" sortColumn="0"
 							enablefilter="true">
-						<attribute name="columns"><![CDATA[
-	- name: ${c:l('aplica_rolinfo.zul.Rol')}
-	  value: ownerGroup
-	- name: ""
-	  width: 24px
-	  sort: false
-	  filter: false
-	  template: <img src="${execution.contextPath }/img/next.svg">
-	- name: ${c:l('aplica_rolinfo.zul.Rol')}
-	  value: roleName
-	- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
-	  value: system
-	- name: ${c:l('aplica_rolinfo.zul.Domini')}
-	  value: domainValue
-	- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
-	  value: mandatory
-	  filter: false
-	  template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-	- name: ""
-	  filter: false
-	  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
-						]]></attribute>
+					<attribute name="columns"><![CDATA[
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: ownerGroup
+- name: ""
+  width: 24px
+  sort: false
+  filter: false
+  className: selector
+  template: <img class="small-icon" src="${execution.contextPath }/img/next.svg">
+- name: ${c:l('aplica_rolinfo.zul.Rol')}
+  value: roleName
+- name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
+  value: system
+- name: ${c:l('aplica_rolinfo.zul.Domini')}
+  value: domainValue
+- name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  className: selector
+  value: mandatory
+  sort: false
+  filter: false
+  template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
+- name: ""
+  filter: false
+  sort: false
+  className: selector
+  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
+					]]></attribute>
 						</datatable>
 						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+							<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 							<div style="float: right"  class="addButton" onClick="ref:handler.addNewGroup">+</div>
 						</div>
 					</tabpanel>
@@ -262,6 +267,9 @@
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGranted"
 					    onRemove="ref:handler.removeGranted"
+						multiselect="true"
+						onSelect="ref:handler.multiSelect2"
+						onMultiSelect="ref:handler.multiSelect2"
 						dataPath="../listbox:/ownedRoles" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
 					<attribute name="columns"><![CDATA[
@@ -292,6 +300,7 @@
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 						<div style="float: right"  class="addButton" onClick="ref:handler.addNewGranted">+</div>
 					</div>
 				</tabpanel>
@@ -300,6 +309,9 @@
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGrantee"
 					    onRemove="ref:handler.removeGrantee"
+						multiselect="true"
+						onSelect="ref:handler.multiSelect2"
+						onMultiSelect="ref:handler.multiSelect2"
 						dataPath="../listbox:/ownerRoles" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
 					<attribute name="columns"><![CDATA[
@@ -330,6 +342,7 @@
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 						<div style="float: right"  class="addButton" onClick="ref:handler.addNewGrantee">+</div>
 					</div>
 				</tabpanel>
@@ -337,6 +350,9 @@
 					<datatable id="ownerGroups" autocommit="false" 
 					    sclass="datatable groupGrant"
 					    onSetMandatory="ref:handler.setMandatoryGroup"
+						multiselect="true"
+						onSelect="ref:handler.multiSelect2"
+						onMultiSelect="ref:handler.multiSelect2"
 					    onRemove="ref:handler.removeGroup"
 						dataPath="../listbox:/granteeGroups" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
@@ -364,6 +380,7 @@
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 						<div style="float: right"  class="addButton" onClick="ref:handler.addNewGroup">+</div>
 					</div>
 				</tabpanel>

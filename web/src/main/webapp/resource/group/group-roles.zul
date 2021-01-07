@@ -17,6 +17,8 @@
 	<datatable id="listbox" autocommit="true" 
 		preference="group-roles"
 		dataPath="${arg.listbox }:/grantedRoles" maxheight="70vh" sortColumn="0"
+		multiselect="true"
+		onMultiSelect="ref:frame.multiSelect"
 		use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 		onSelect="ref:handler.showDetails" enablefilter="true">
 		<attribute name="allColumns"><![CDATA[
@@ -41,6 +43,7 @@
 	</datatable>
 
 	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:group:create')}" >
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false">-</div>
 		<div class="addButton" onClick="ref:handler.addNew">+</div>
 	</div>
 

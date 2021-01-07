@@ -19,6 +19,8 @@
 
 			<datatable id="listbox" autocommit="true"
 				use="com.soffid.iam.web.pam.JumpserverTable"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				dataPath="/model:/pamServerGroup" maxheight="70vh" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
 				<attribute name="columns"><![CDATA[
@@ -32,6 +34,7 @@
 			</datatable>
 			<div width="100%" style="text-align: right"
 				if="${canCreateJumpServer}">
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">
 					+
 				</div>

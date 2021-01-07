@@ -57,6 +57,8 @@
 				<label bind="/@name"/> : <label bind="@description"/>
 				<datatable id="rolesTable" autocommit="false" dataPath="/autoritzacioRol"
 					onRemove="ref:frame.rolesTableAction"
+					multiselect="true"
+					onMultiSelect="ref:frame.multiSelect"
 					sortColumn="0" onSelect="ref:frame.showDetails" sclass="datatable roles">
 					<attribute name="columns">
 						<![CDATA[
@@ -76,6 +78,7 @@
 					</attribute>
 				</datatable>
 				<div width="100%" style="text-align: right"  if="${canCreateRolAutoritzacion}" >
+					<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 					<div class="addButton" onClick="ref:frame.addNew">+</div>
 				</div>
 				<div style="text-align: right; width: 100%">

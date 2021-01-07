@@ -16,6 +16,8 @@
 	<datatable id="listbox" autocommit="false" 
 		use="com.soffid.iam.web.user.RoleAccountDatatable"
 		preference="com.soffid.iam.web.user.RoleAccount-role-cols"
+		multiselect="true"
+		onMultiSelect="ref:handler.multiSelect"
 		dataPath="${arg.listbox }:/grant" maxheight="60vh" sortColumn="0"
 		onSelect="ref:handler.showDetails" enablefilter="true">
 		<attribute name="allColumns"><![CDATA[
@@ -43,15 +45,15 @@
   value: domainValue/description
   default: false
 - name: ${c:l('usuaris.zul.startDate')}
-  className: datetimeColumn
+  className: dateColumn
   value: startDate_date
   default: true
 - name: ${c:l('usuaris.zul.endDate')}
-  className: datetimeColumn
+  className: dateColumn
   value: endDate_date
   default: true
 - name: ${c:l('usuaris.zul.recertification')}
-  className: statusColumn
+  className: dateColumn
   value: certificationDate_date
   default: true
 - name: ${c:l('usuaris.zul.holderGroup')}
@@ -62,6 +64,7 @@
 	</datatable>
 
 	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:role:create')}" >
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false">-</div>
 		<div class="addButton" onClick="ref:handler.addNew">+</div>
 	</div>
 

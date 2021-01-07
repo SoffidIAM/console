@@ -17,6 +17,8 @@
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/userDomain"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
 					<![CDATA[
@@ -28,6 +30,7 @@
 				</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${canCreateUserDomain}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>

@@ -32,10 +32,13 @@
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.mail.MailListDatatable"
 				preference="mailList"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				dataPath="/model:/mailList" maxheight="70vh" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('mail:create')}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>

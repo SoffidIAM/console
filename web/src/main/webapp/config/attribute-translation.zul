@@ -49,6 +49,8 @@
 			<datatable id="listbox" 
 				sclass="datatable atttranslation"
 				autocommit="false"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				updateRowEvent = "false"
 				dataPath="/model:/translation" maxheight="70vh" sortColumn="0"
 				onRemove="ref:frame.delete"
@@ -81,6 +83,7 @@
 			</datatable>
 			<div width="100%" style="text-align: right"
 				if="${canCreateAttributeTranslation}">
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">
 					+
 				</div>

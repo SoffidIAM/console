@@ -3,14 +3,25 @@
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <div use="com.soffid.iam.web.user.UserGroupsHandler" id="handler"
 	listboxPath="${arg.listbox }">
+	<div class="navigation-bar dummy">
+		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
+		</menu2>
+	</div>
+	
 	<datatable id="listbox" autocommit="true" 
 		use="com.soffid.iam.web.user.UserGroupDatatable"
 		preference="user-group"
+		multiselect="true"
+		onMultiSelect="ref:handler.multiSelect"
 		dataPath="${arg.listbox }:/group" maxheight="70vh" sortColumn="0"
 		onSelect="ref:handler.showDetails" enablefilter="true">
 	</datatable>
 
 	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:group:create')}" >
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false" if="${soffid:isUserInRole('user:group:delete')}">-</div>
 		<div class="addButton" onClick="ref:handler.addNew">+</div>
 	</div>
 

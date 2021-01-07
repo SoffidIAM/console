@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -88,6 +89,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	public void showDetails(Event event) {
 		DataNode dn = (DataNode) getListbox().getJXPathContext().getValue("/");
 		getWindowModify().doHighlighted();
+		displayRemoveButton(false);
 	}
 	
 	public void closeDetails(Event event) throws Exception {
@@ -517,7 +519,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 			
 			List<String> values = (List<String>) ((Databox)wizardWindow.getFellow("domainValues")).getValue(); 
 			
-			List<RoleGrant> ownerRoles = new LinkedList<> ((List<RoleGrant>) getListbox().getJXPathContext().getValue("@ownerRoles"));
+			List<RoleGrant> ownerRoles = new LinkedList<> ((List<RoleGrant>) getListbox().getJXPathContext().getValue("/granteeGroups"));
 			
 			for (String td: normalize(values) ) {
 				RoleGrant rg = new RoleGrant();
@@ -614,4 +616,72 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		getWindowModify().setVisible(false);
 	}
 
+	public void displayRemoveButton(boolean display) {
+		HtmlBasedComponent d = (HtmlBasedComponent) getListbox().getNextSibling();
+		if (d != null && d instanceof Div) {
+			d =  (HtmlBasedComponent) d.getFirstChild();
+			if (d != null && "deleteButton".equals(d.getSclass())) {
+				d.setVisible(display);
+			}
+		}
+	}
+	
+	public void multiSelect(Event event) {
+		DataTable lb = (DataTable) getListbox();
+		displayRemoveButton( lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+	}
+
+	public void deleteSelected(Event event0) {
+		Component lb = getListbox();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							displayRemoveButton(false);
+						}
+					});
+		}
+	}
+
+	public void displayRemoveButton2(Component lb, boolean display) {
+		HtmlBasedComponent d = (HtmlBasedComponent) lb.getNextSibling();
+		if (d != null && d instanceof Div) {
+			d =  (HtmlBasedComponent) d.getFirstChild();
+			if (d != null && "deleteButton".equals(d.getSclass())) {
+				d.setVisible(display);
+			}
+		}
+	}
+	
+	public void multiSelect2(Event event) {
+		DataTable lb = (DataTable) event.getTarget();
+		displayRemoveButton2(lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+	}
+
+	public void deleteSelected2(Event event0) {
+		Component b = event0.getTarget();
+		final Component lb = b.getParent().getPreviousSibling();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							displayRemoveButton2(lb, false);
+						}
+					});
+		}
+	}
 }

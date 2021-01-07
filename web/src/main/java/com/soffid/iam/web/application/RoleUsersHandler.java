@@ -15,6 +15,7 @@ import javax.naming.NamingException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -63,6 +64,8 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 	
 	private UserService userService;
 	private Role currentRole;
+
+	List<String> accountOwners = new LinkedList<String>();
 	
 	public RoleUsersHandler() throws NamingException, CreateException {
 		userService = EJBLocator.getUserService();
@@ -197,6 +200,7 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 		List<String> v2 = (List<String>) input2.getValue();
 
 		List<String> accounts = new LinkedList<>();
+		accountOwners = new LinkedList<String>(v);
 		if (v != null) for (String userName: v) {
 			Collection<UserAccount> ua = EJBLocator.getAccountService().findUsersAccounts(userName, currentRole.getSystem());
 			if (ua.isEmpty())
@@ -267,9 +271,11 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 		for (int i = 0; i < accounts.size(); i++) {
 			String accountName = accounts.get(i);
 			Account account = accountService.findAccount(accountName, systemName);
-			if (account != null) {
-				String userName = null;
-				String fullName = account.getDescription();
+			if (account != null || i < accountOwners.size()) {
+				String userName = i < accountOwners.size() ? accountOwners.get(i): null;
+				String fullName = userName == null ?
+					fullName = account.getDescription():
+					EJBLocator.getUserService().findUserByUserName(userName).getFullName();
 				String group =null;
 				if (v != null && i < v.size()) {
 					userName = v.get(i);
@@ -444,4 +450,38 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
 	}
 
+	public void displayRemoveButton(Component lb, boolean display) {
+		HtmlBasedComponent d = (HtmlBasedComponent) lb.getNextSibling();
+		if (d != null && d instanceof Div) {
+			d =  (HtmlBasedComponent) d.getFirstChild();
+			if (d != null && "deleteButton".equals(d.getSclass())) {
+				d.setVisible(display);
+			}
+		}
+	}
+	
+	public void multiSelect(Event event) {
+		DataTable lb = (DataTable) event.getTarget();
+		displayRemoveButton( lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+	}
+
+	public void deleteSelected(Event event0) {
+		Component b = event0.getTarget();
+		final Component lb = b.getParent().getPreviousSibling();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							displayRemoveButton(lb, false);
+						}
+					});
+		}
+	}
 }

@@ -6,87 +6,10 @@
 	forced="true"
 	id="frame" saveContent="false" title="${c:l('changepassPerfil.Titol')}" use="com.soffid.iam.web.profile.PasswordChangeHandler"
 	style="">
+	<style src="/css/login.css"/>
 	<style>
-		body {
-			background-color: #5ec0a5;
-			background-image: url(${execution.contextPath}/anonymous/bg.jpeg);
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-position: center;
-			overflow: hidden;
-		}
-
 		div.login {
 			width: 550px;
-			font-size: 12pt;
-			background-color: #202020;
-			opacity: 1;
-			color: white;
-			top: 50%;
-		    position: absolute;
-		    left: 50%;
-			margin-top: -75px;
-			padding: 30px;
-			border-radius: 12px;
-			transition: transform 0.5s;
-			transform-style: preserve-3d ;
-		    transform: translateY(-50%)translateX(-50%);
-		}
-		div.login.progress {
-		    transform: translateY(-50%)translateX(-50%)rotateX( 90deg );
-		}
-		
-		div.login div.loginbox div.inputlogin {
-			font-weight: bold;
-		}		
-		div.loginbox {
-			width: 100%; 
-		}
-		
-		input, input[type="submit"] {
-			margin-top: 12px;
-			margin-bottom: 6px;
-			width: 100%;
-			margin-left: 0px;
-			font-size: 11pt;
-			padding: 6px;
-		}
-		
-		div.wait {
-			position: absolute;
-		    top: 50%;
-		    left: 50%;
-		    margin-top: -96px;
-		    margin-left: -96px;
-		    background: #202020;
-		    border-radius: 12px;
-		    width: 250px;
-		    height: 192px;
-/*		    display: none; */
-		    color: white;
-		    font-weight: bold;
-			text-align: center;
-			padding-top: 30px;
-			transition: transform 0.5s;
-			transform-style: preserve-3d ;
-		    transform: rotateX( 90deg );
-		}
-		
-		div.wait p {
-			font-weight: bold;
-		}
-		div.wait.progress {
-			display: block;
-		    transform: rotateX( 0deg );
-		}
-		div.wait img {
-			margin-top: 30px;
-			width: 48px;
-			height: 48px;
-		}
-		div.login span {
-			color: white;
-			word-break: break-word;
 		}
 	</style>
 	<div class="login">
@@ -120,7 +43,7 @@
 			</div>
 			<div id="info" style="text-align:left;">
 				<h:p>${c:l('changepass.Instruccio1')} <h:em>${c:l('changepass.zul.Acceptar')}</h:em>.</h:p>
-				<h:pre style="white-space: pre-line">${policyDescription}</h:pre>
+				<h:pre style="white-space: pre-line; font-size: small">${policyDescription}</h:pre>
 			</div>
 		</div>
 	</div>

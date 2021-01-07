@@ -488,7 +488,11 @@ public class InputField3 extends Databox
 	private SecureInterpreter createInterpreter() throws EvalError {
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = null;
-		value = getValue();
+		try {
+			value = parseUiValue(getValue());
+		} catch (Exception e) {
+			// Ignore parse error
+		}
 		ObjectAttributesDiv grandpa = getObjectContainer();
 		Map attributes = grandpa != null ? ((ObjectAttributesDiv) grandpa).getAttributesMap():
 			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$

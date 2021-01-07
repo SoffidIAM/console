@@ -39,7 +39,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<label value="&gt;" style="margin-left: 10px; margin-right: 10px"/>
 				<label id="form-label" />
-				<databutton image="/img/refresh.svg" label="${c:l('seyconserver.Refresca') }"
+				<databutton image="/img/refresh-r.svg" label="${c:l('seyconserver.Refresca') }"
 					 onClick="ref:frame.refreshTasks" 
 					 onlyIcon="true" id="refreshButton" 
 					 style="float:right"/>
@@ -106,8 +106,8 @@
 ]]>
 						</attribute>
 					</datatable>
-					<button label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove.svg" onClick="ref:frame.cancelUnscheduledTask"/>
-					<button label="${c:l('seyconserver.zul.Release') }" image="/img/play.svg" onClick="ref:frame.releaseTask"/>
+					<button label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove-r.svg" onClick="ref:frame.cancelUnscheduledTask"/>
+					<button label="${c:l('seyconserver.zul.Release') }" image="/img/play-r.svg" onClick="ref:frame.releaseTask"/>
 				</div>
 				
 
@@ -152,9 +152,9 @@
 		]]></attribute>
 		</datatable>
 		<div style="height: 24px">
-			<button label="${c:l('seyconserver.Log') }" onClick="ref:frame.downloadLog" image="/img/download.svg" id="log_button"/>
-			<button label="${c:l('seyconserver.zul.Reinicia') }" onClick="ref:frame.restartAgent" image="/img/restart.svg" id="restart_button"/>
-			<button label="${c:l('error.zul.Tancar') }" onClick="ref:frame.closeAgentWindow" style="float: right" image="/img/undo.svg"/>
+			<button label="${c:l('seyconserver.Log') }" onClick="ref:frame.downloadLog" image="/img/download-r.svg" id="log_button"/>
+			<button label="${c:l('seyconserver.zul.Reinicia') }" onClick="ref:frame.restartAgent" image="/img/restart-r.svg" id="restart_button"/>
+			<button label="${c:l('error.zul.Tancar') }" onClick="ref:frame.closeAgentWindow" style="float: right" image="/img/undo-r.svg"/>
 		</div>
 	</window>
 
@@ -172,9 +172,9 @@
 		<textbox id="tb" width="100%" height="350px" multiline="true" style="font-family: monospace; resize: vertical"/>
 
 		<div style="height: 24px">
-			<button label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove.svg" onClick="ref:frame.cancelTask"/>
-			<button label="${c:l('seyconserver.reschedule') }" image="/img/play.svg" onClick="ref:frame.reescheduleTask"/>
-			<button label="${c:l('error.zul.Tancar') }" image="/img/undo.svg" onClick="ref:frame.closeTaskWindow" style="float:right"/>
+			<button label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove-r.svg" onClick="ref:frame.cancelTask"/>
+			<button label="${c:l('seyconserver.reschedule') }" image="/img/play-r.svg" onClick="ref:frame.reescheduleTask"/>
+			<button label="${c:l('error.zul.Tancar') }" image="/img/undo-r.svg" onClick="ref:frame.closeTaskWindow" style="float:right"/>
 		</div>
 	</window>
 

@@ -10,6 +10,8 @@ import com.soffid.iam.api.Challenge;
 import com.soffid.iam.service.impl.OTPHandler;
 import com.soffid.iam.service.impl.linotp.LinotpHandler;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 	List <OTPHandler> handlers = new LinkedList<OTPHandler>();
 	Log log = LogFactory.getLog(getClass());
@@ -43,6 +45,8 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 					ch.setOtpHandler(handler.getClass().getName());
 					return ch;
 				}
+			} catch (InternalErrorException th) {
+				throw th;
 			} catch (Throwable th) {
 				log.warn(th);
 			}
@@ -55,4 +59,11 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 		handlers.add(handler);
 	}
 
+	@Override
+	protected boolean handleResetFailCount(String account) throws Exception {
+		for (OTPHandler handler: handlers) {
+			return handler.resetFailCount(account);
+		}
+		return false;
+	}
 }

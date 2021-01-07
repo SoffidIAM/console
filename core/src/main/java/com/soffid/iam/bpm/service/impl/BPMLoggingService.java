@@ -53,7 +53,7 @@ public class BPMLoggingService extends DbLoggingService {
 					if (processLog instanceof ActionLog)
 						if (processLog.getChildren() == null ||
 								processLog.getChildren().isEmpty())
-						it.remove();
+							it.remove();
 				}
 			}
 		}

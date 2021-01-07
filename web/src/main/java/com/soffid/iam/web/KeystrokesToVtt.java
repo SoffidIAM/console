@@ -71,7 +71,7 @@ public class KeystrokesToVtt extends OutputStream {
 	}
 
 	private void flushBuffer(long gap) throws UnsupportedEncodingException, IOException {
-		if ( sbNext.length() > 0 && previous > start)
+		if ( sbNext.length() > 0 && previous + gap - start - 1 > 0)
 		{
 			StringBuffer result = new StringBuffer();
 			result.append ( printTime ( previous - start - 1))
@@ -87,7 +87,10 @@ public class KeystrokesToVtt extends OutputStream {
 	}
 
 	private String printTime(long time) {
-		return String.format("%02d:%02d.000", (time / 60), time % 60);
+		if ( time < 0)
+			return "00:00.000";
+		else
+			return String.format("%02d:%02d.000", (time / 60), time % 60);
 	}
 
 }

@@ -38,9 +38,11 @@ import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 import org.json.JSONException;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
@@ -54,6 +56,7 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Printer;
@@ -80,6 +83,7 @@ import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordEntity;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SecretEntity;
@@ -2927,14 +2931,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected List<User> handleFindUserByJsonQuery(String query, Integer start, Integer end)
+	protected PagedResult<User> handleFindUserByJsonQuery(String query, Integer start, Integer end)
 			throws InternalErrorException, Exception {
 
 		LinkedList<User> result = new LinkedList<User>();
 
-		internalSearchUsersByJson(query, result, start, end);
-		
-		return result;
+		PagedResult<User>  r =  internalSearchUsersByJson(query, result, start, end);
+  
+		return r;
 	}
 
 	@Override
@@ -2949,8 +2953,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 
-	private void internalSearchUsersByJson(String query, Collection<User> result,
-			Integer start, Integer end)
+	private PagedResult<User> internalSearchUsersByJson(String query, List<User> result,
+			Integer start, Integer pageSize)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
@@ -2976,13 +2980,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		TimeOutUtils tou = new TimeOutUtils();
 		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
 		cfg.setFirstResult(start);
-		cfg.setMaximumResultSize(end);
+		cfg.setMaximumResultSize(pageSize);
+		int totalResults = 0;
 		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
 				paramArray, cfg)) {
 			if (result instanceof AsyncList)
 			{
 				if (((AsyncList) result).isCancelled())
-					return;
+					return null;
 			}
 			else
 			{
@@ -2992,10 +2997,29 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
 						Security.AUTO_USER_QUERY, ue)) {
+					totalResults ++;
 					result.add(u);
 				}
 			}
 		}
+		PagedResult<User> pagedResult = new PagedResult<>();
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( start != null ? start: 0);
+		pagedResult.setItemsPerPage( pageSize );
+		if ( pageSize  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query( (HibernateDaoSupport) getUserEntityDao(),
+							hql.toCountString(), 
+							paramArray,
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	@Override
@@ -3071,7 +3095,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected List<User> handleFindUserByTextAndFilter(String text, String filter,
+	protected PagedResult<User> handleFindUserByTextAndFilter(String text, String filter,
 			Integer start, Integer max) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())

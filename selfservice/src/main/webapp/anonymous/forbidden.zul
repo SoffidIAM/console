@@ -4,7 +4,7 @@
 	<style src="~./styles/estil.css" />
 	<style src="/css/localSEU.css" />
 		<zscript><![CDATA[
-		    if (execution.isUserInRole("SEYCON_CHANGE_PASSWORD"))
+		    if (execution.isUserInRole("PASSWORD:EXPIRED"))
 		    	execution.sendRedirect("/changepass.zul");
 		]]></zscript>
 		<html><![CDATA[

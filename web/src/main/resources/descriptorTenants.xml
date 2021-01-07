@@ -25,8 +25,8 @@
 				return new com.soffid.iam.utils.SoffidAuthorization (
 					"- Select -", null, null, null, null);
 			</script-finder>
-			<ejb-finder jndi="java:comp/env/ejb/v2/AuthorizationEJB"
-				method="findAuthorizations"> <!-- parameter:query -->
+			<ejb-finder jndi="java:/module/AuthorizationService-v2"
+				method="findAuthorizations">
 				<parameter value="" />
 				<parameter value="" />
 				<parameter value="" />

@@ -1309,6 +1309,7 @@ button:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
 
 button:disabled img, input[type="button"]:disabled img, input[type="submit"]:disabled img {
 	visibility: hidden;
+	display:none;
 }
 
 button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]:hover:disabled {
@@ -2111,6 +2112,13 @@ div.datatable.fixedlayout table {
 	table-layout: fixed;
 }
 
+div.datatable table.tbody tr td.minicolumn {
+	width: 25px;
+	text-align: center;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
 div.datatable table.tbody tr td.selector {
 	width: 50px;
 	text-align: center;
@@ -2661,6 +2669,7 @@ div.menu2 div.menu2starter:hover, button.icon-button:hover, button.grid-icon-but
 
 button img.menu2rev { display: none}
 button:hover img.menu2rev { display: inline-block}
+button:hover:disabled img.menu2rev { display: none}
 button:hover img.menu2std { display: none}
 
 div.navigation-bar span.pager span {

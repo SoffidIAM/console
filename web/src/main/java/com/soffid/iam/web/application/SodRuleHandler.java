@@ -1,15 +1,10 @@
 package com.soffid.iam.web.application;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.ejb.CreateException;
-import javax.json.JsonObject;
-import javax.naming.NamingException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,12 +17,9 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Window;
 
-import com.soffid.codemirror.Codemirror;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.Role;
-import com.soffid.iam.api.RoleAccount;
-import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.api.SoDRole;
 import com.soffid.iam.api.SoDRuleMatrix;
@@ -36,7 +28,6 @@ import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.MailListsService;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DomainValueField;
-import com.soffid.iam.web.component.FileDump;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.CsvParser;
@@ -45,7 +36,6 @@ import com.soffid.iam.web.popup.ImportCsvHandler;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
-import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Wizard;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
@@ -119,6 +109,8 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 		else
 			m.setRisk(SoDRisk.SOD_NA);
 		
+		cell.update();
+		
 		int tablerow = 0;
 		for (int i = 0; i < roles.size(); i++) {
 			DataNode dn = (DataNode) roles.get(i);
@@ -144,6 +136,7 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 		col0.put("name", Labels.getLabel("accounts.role"));
 		col0.put("value", "roleName");
 		col0.put("sort", false);
+		col0.put("vertical", false);
 		cols.put(col0);
 		for (int i = 0; i < roles.size(); i++) {
 			DataNode dn = (DataNode) roles.get(i);
@@ -152,8 +145,9 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 				SoDRole r = (SoDRole) dn.getInstance();
 				col.put("name", r.getRole().getName());
 				col.put("sort", false);
-				col.put("className", "centerColumn");
-				col.put("template", "<img #{r"+i+"_hidden} class='imageclic' onClick='zkDatatable.sendClientAction(this, \"onChangeLevel\", [#{row},"+r.getId()+"])' src='"+ getDesktop().getExecution().getContextPath()+ "/img/risk.#{r"+i+"}.svg'/>");
+				col.put("vertical", true);
+				col.put("className", "minicolumn");
+				col.put("template", "<img #{r"+i+"_hidden} class='imageclic' title='#{r"+i+"_title}' onClick='zkDatatable.sendClientAction(this, \"onChangeLevel\", [#{row},"+r.getId()+"])' src='"+ getDesktop().getExecution().getContextPath()+ "/img/risk.#{r"+i+"}.svg'/>");
 				cols.put(col);
 			}
 		}
@@ -189,8 +183,16 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 					row.put("r"+j+"_hidden", "style='display:none'");
 				} else {
 					JSONObject col = new JSONObject();
-					row.put("r"+j, getLevel ( r, r2 ) );
+					String level = getLevel ( r, r2 );
+					row.put("r"+j, level );
 					row.put("r"+j+"_hidden", "");
+					row.put("r"+j+"_title",
+						r.getRole().getName()+ 
+						(r2.getId().equals(r.getId()) ? "" : " + "+r2.getRole().getName())+
+						(SoDRisk.SOD_FORBIDDEN.getValue().endsWith(level) ? ": "+Labels.getLabel("es.caib.seycon.ng.comu.SoDRisk.SOD_FORBIDDEN") :
+						SoDRisk.SOD_HIGH.getValue().endsWith(level) ? ": "+Labels.getLabel("es.caib.seycon.ng.comu.SoDRisk.SOD_HIGH") :
+						SoDRisk.SOD_LOW.getValue().endsWith(level) ? ": "+Labels.getLabel("es.caib.seycon.ng.comu.SoDRisk.SOD_LOW"):
+						""));
 				}
 			}
 		}
@@ -211,7 +213,8 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 			DataNode dn = (DataNode) roles.get(i);
 			if (!dn.isDeleted()) {
 				SoDRuleMatrix cell = (SoDRuleMatrix) dn.getInstance();
-				if (cell.getRow().equals(r) && cell.getColumn().equals(r2))
+				if (cell.getRow().equals(r) && cell.getColumn().equals(r2) ||
+						cell.getRow().equals(r2) && cell.getColumn().equals(r))
 					return dn;
 			}
 		}
@@ -366,11 +369,14 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 		
 //		groupsDataSource.commit();
 		getWindowAdd().setVisible(false);
+		applyNoClose(event);
+		displayMatrix();
 	}
 
 	public void deleteRole(Event ev) {
 		DataTable lb = (DataTable) getFellow("roles");
 		lb.deleteSelectedItem();
+		displayMatrix();
 	}
 	
 	public void backAndRollback(Event ev) {

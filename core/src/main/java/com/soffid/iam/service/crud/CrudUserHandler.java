@@ -29,7 +29,7 @@ public class CrudUserHandler implements CrudHandler<User> {
 
 	@Override
 	public List<User> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findUserByTextAndFilter(text, filter, start, end);
+		return getService().findUserByTextAndFilter(text, filter, start, end).getResources();
 	}
 
 	@Override

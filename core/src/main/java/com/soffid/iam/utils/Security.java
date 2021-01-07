@@ -1,5 +1,6 @@
 package com.soffid.iam.utils;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
@@ -715,7 +717,15 @@ public class Security {
 	public static void setClientRequest (HttpServletRequest req)
 	{
 		String ip = req.getRemoteAddr();
-		String trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
+		String trustedProxies;
+		try {
+			if ( ! Config.getConfig().isAgent()) 
+				trustedProxies = System.getProperty("soffid.proxy.trustedIps");
+			else
+				trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
+		} catch (IOException e1) {
+			trustedProxies = null;
+		}
 		String forwardedFor = req.getHeader("x-forwarded-for");
 		if (trustedProxies != null)
 		{
@@ -747,6 +757,12 @@ public class Security {
 		for (String t: tp)
 			if (ip.equalsIgnoreCase(t))
 				return true;
+			else if (t.contains("*"))
+			{
+				String t2 = t.replaceAll("\\*", "[0-9]*");
+				if ( Pattern.matches(t2, ip))
+					return true;
+			}
 		return false;
 	}
 }

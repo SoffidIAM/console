@@ -112,7 +112,9 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 
 	@Override
 	public Object getObjectValue() {
-		if (getDataType().getType().equals( TypeEnumeration.BINARY_TYPE) ||
+		if (getDataType().getType() == null)
+			return getValue();
+		else if (getDataType().getType().equals( TypeEnumeration.BINARY_TYPE) ||
 				getDataType().getType().equals( TypeEnumeration.HTML) ||
 				getDataType().getType().equals( TypeEnumeration.PHOTO_TYPE))
 		{

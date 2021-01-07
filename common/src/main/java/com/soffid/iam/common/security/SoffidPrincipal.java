@@ -31,4 +31,8 @@ public interface SoffidPrincipal extends Principal {
 	public void setObligation(String obligation, Map<String,String> properties, long timeout);
 
 	public Map<String,String> getObligation(String obligation);
+	
+	public List<String> getHolderGroups();
+	
+	public void setHolderGroup(String holderGroup) ;
 }

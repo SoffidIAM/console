@@ -20,7 +20,7 @@ import es.caib.seycon.ng.model.GrupEntity;
 @ValueObject ( translatedName="Group",
 	cache=300,
 	 translatedPackage="com.soffid.iam.api")
-public class Grup {
+public abstract class Grup {
 
 	@Attribute(translated = "name", searchCriteria = true )
 	public java.lang.String codi;

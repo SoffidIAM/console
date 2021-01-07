@@ -203,7 +203,7 @@ public class Config {
             if (!dir.canWrite()) {
                 dir = new File(home, "logs"); //$NON-NLS-1$
             }
-         }
+        }
         dir.mkdirs();
         return dir;
     }

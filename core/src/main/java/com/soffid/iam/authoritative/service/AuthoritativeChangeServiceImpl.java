@@ -242,6 +242,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		boolean anyChange;
 		anyChange = detectUserChange (change) ;
 		anyChange = detectGroupChange (change) || anyChange;
+		anyChange = detectGroup2Change (change) || anyChange;
 		anyChange = detecteAttributeChange (change) || anyChange;
 		return anyChange;
 	}
@@ -327,6 +328,43 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	}
 	
 	
+	private boolean detectGroup2Change (AuthoritativeChange change) throws InternalErrorException
+	{
+		if (change.getGroups2() == null)
+			return false;
+		
+		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(change.getUser().getUserName());
+		
+		LinkedList<GroupUser> actualGroups = new LinkedList<GroupUser>(change.getGroups2());
+		
+		// First remove
+		for (Iterator<GroupUser> it = grups.iterator(); it.hasNext(); ) {
+            GroupUser ug = it.next();
+            GroupUser ug2 = findMembership (ug.getGroup(), change.getGroups2());
+            if (ug2 == null) {
+            	log.info("Received user without group " + ug.getGroup());
+            	return true;
+            }
+            if (ug2.getAttributes() != null && ! ug2.getAttributes().equals(ug.getAttributes()))
+            {
+            	log.info("Received group membership with different attributes in " + ug.getGroup());
+            	return true;
+            }
+            
+            actualGroups.remove(ug2);
+        }
+		
+		return ! actualGroups.isEmpty();
+	}
+	
+
+	private GroupUser findMembership(String group, Collection<GroupUser> groups2) {
+		for (GroupUser gu: groups2) {
+			if (gu.getGroup().equals(groups2))
+				return gu;
+		}
+		return null;
+	}
 
 	/**
 	 * @param change
@@ -377,6 +415,8 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	    			applyAttributesChange (user, tracker);
 	    		if (change.getGroups() != null)
 	    			applyGroupChange (user, tracker);
+	    		if (change.getGroups2() != null)
+	    			applyGroup2Change (user, tracker);
 			}
 			else if (change.getGroup() != null)
 			{
@@ -396,6 +436,41 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @param change
 	 * @throws InternalErrorException 
 	 */
+	private void applyGroup2Change(User user, ProcessTracker tracker) throws InternalErrorException {
+		Collection<GroupUser> currentGroups = getGroupService().findUsersGroupByUserName(user.getUserName());
+		
+		AuthoritativeChange change = tracker.change;
+		LinkedList<GroupUser> newGroups = new LinkedList<GroupUser>(change.getGroups2());
+		
+		// First remove
+		for (Iterator<GroupUser> it = currentGroups.iterator(); it.hasNext(); ) {
+            GroupUser currentGroup = it.next();
+            GroupUser newGroup = findMembership (currentGroup.getGroup(), newGroups);
+            if (newGroup == null) {
+                auditAuthoritativeChange(tracker);
+                getGroupService().delete(currentGroup);
+            } 
+            else 
+            {
+            	if (newGroup.getAttributes() != null && ! newGroup.getAttributes().equals(currentGroup.getAttributes()))
+	            {
+	                auditAuthoritativeChange(tracker);
+	                newGroup.setId(currentGroup.getId());
+	                newGroup.setUser(currentGroup.getGroup());
+	                getGroupService().update(newGroup);
+	            }
+	            newGroups.remove(newGroup);
+            }
+        }
+
+		// Now add
+		for (GroupUser groupUser : newGroups) {
+            auditAuthoritativeChange(tracker);
+            groupUser.setUser(user.getUserName());
+            getGroupService().create(groupUser);
+        }
+	}
+
 	private void applyGroupChange(User user, ProcessTracker tracker) throws InternalErrorException {
 		Collection<GroupUser> grups = getGroupService().findUsersGroupByUserName(user.getUserName());
 		

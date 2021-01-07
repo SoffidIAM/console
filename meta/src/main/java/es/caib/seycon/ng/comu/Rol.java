@@ -16,7 +16,7 @@ import es.caib.seycon.ng.model.RolEntity;
 	 cache=300,
 	 translatedPackage="com.soffid.iam.api")
 @JsonObject(hibernateClass=RolEntity.class)
-public class Rol {
+public abstract class Rol {
 
 	@Attribute(translated = "name", searchCriteria = true )
 	public java.lang.String nom;

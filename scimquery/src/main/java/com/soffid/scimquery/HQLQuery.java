@@ -27,6 +27,8 @@ public class HQLQuery {
 
 	StringBuffer queryString = new StringBuffer();
 	
+	StringBuffer countQueryString = new StringBuffer();
+	
 	StringBuffer joinString = new StringBuffer();
 	
 	StringBuffer whereString = new StringBuffer();
@@ -91,6 +93,17 @@ public class HQLQuery {
 	}
 	
 
+	public String toCountString ()
+	{
+		StringBuffer sb = new StringBuffer();
+		sb.append (getCountQueryString())
+			.append(getJoinString());
+		if (getWhereString().length() > 0)
+			sb.append("\nwhere ")
+			  .append(getWhereString());
+		return sb.toString();
+	}
+
 	public String toString ()
 	{
 		StringBuffer sb = new StringBuffer();
@@ -129,5 +142,13 @@ public class HQLQuery {
 
 	public void setRootObject(String rootObject) {
 		this.rootObject = rootObject;
+	}
+
+	public StringBuffer getCountQueryString() {
+		return countQueryString;
+	}
+
+	public void setCountQueryString(StringBuffer countQueryString) {
+		this.countQueryString = countQueryString;
 	}
 }

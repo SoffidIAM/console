@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -19,6 +20,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.Grup;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 
 @Service (translatedName="GroupService",
@@ -346,7 +348,7 @@ public abstract class GrupService {
 
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilter(
+	public PagedResult<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter,
 			@Nullable Integer first,
@@ -371,9 +373,9 @@ public abstract class GrupService {
 
 	@Operation(grantees = { roles.group_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Grup> findGroupByJsonQuery(@Nullable String query,
-			@Nullable Integer first,
-			@Nullable Integer pageSize)
+	public PagedResult<Grup> findGroupByJsonQuery(@Nullable String query,
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

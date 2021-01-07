@@ -30,9 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 import org.json.JSONException;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Group;
@@ -40,9 +43,11 @@ import com.soffid.iam.api.GroupRoles;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.User;
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -51,6 +56,7 @@ import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
@@ -771,7 +777,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	@Override
-	protected List<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
+	protected PagedResult<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
@@ -793,12 +799,13 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 
-	protected void findByJsonQuery ( AsyncList<Group> result, String query) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
+
+	protected PagedResult<Group> findByJsonQuery ( AsyncList<Group> result, String query, CriteriaSearchConfiguration cs) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError, InterruptedException, ExecutionException
 	{
-		findByJsonQuery(result, query, null, null);
+		return findByJsonQuery(result, query, null, null);
 	}
 
-	protected void findByJsonQuery ( AsyncList<Group> result, String query, Integer first, Integer pageSize) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError
+	protected PagedResult<Group> findByJsonQuery ( AsyncList<Group> result, String query, Integer first, Integer pageSize) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError, InterruptedException, ExecutionException
 	{
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
@@ -825,23 +832,43 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		cfg.setFetchSize(first);
 		cfg.setMaximumResultSize(pageSize);
 		// Execute HQL and generate result
+		int totalResults = 0;
 		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray, cfg )) {
 			if (result.isCancelled())
-				return;
+				return null;
 			Group g = getGroupEntityDao().toGroup(ge);
 			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
 				if (getAuthorizationService().hasPermission(Security.AUTO_GROUP_QUERY, ge)) {
 					result.add(g);
+					totalResults ++;
 				}
 			}
 		}
+		PagedResult<Group> pagedResult = new PagedResult<Group>();
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( first != null ? first: 0);
+		pagedResult.setItemsPerPage( pageSize );
+		if ( pageSize  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query( (HibernateDaoSupport) getGroupEntityDao(),
+							hql.toCountString(), 
+							paramArray,
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	@Override
 	protected List<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findByJsonQuery(result, query);
+		findByJsonQuery(result, query, new CriteriaSearchConfiguration());
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
@@ -849,14 +876,14 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	@Override
-	protected List<Group> handleFindGroupByJsonQuery(String query, Integer first, Integer pageSize) throws InternalErrorException, Exception {
+	protected PagedResult<Group> handleFindGroupByJsonQuery(String query, Integer first, Integer pageSize) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findByJsonQuery(result, query, first, pageSize);
+		PagedResult<Group> pr = findByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
-		return result.get();
+		return pr;
 	}
 
 
@@ -866,7 +893,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findByJsonQuery(result, query);
+					findByJsonQuery(result, query, new CriteriaSearchConfiguration());
 				} catch (Exception e) {
 					result.cancel(e);
 				}

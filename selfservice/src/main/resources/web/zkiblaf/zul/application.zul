@@ -46,8 +46,31 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 			<div sclass="benvingutmsg" if="${arg.embed}">
 				<label sclass="codiusuari" value="${usuari1}"/>
 			</div>
-			<div>
-				<label if="${!arg.showProfile}" id="otherlogoutButton" sclass="menuperfil menu-display shadow-window" style="display:none;" value="${c:l('zkiblaf.tancarSessio')}" width="15em"/>
+			<div id="otherlogoutButton" sclass="menuperfil menu-display shadow-window" style="display:none;" >
+				<attribute name="onCreate"><![CDATA[
+				p = com.soffid.iam.utils.Security.getSoffidPrincipal();
+				if (p.getHolderGroups() != null) {
+					for (String hg: p.getHolderGroups()) {
+						try {
+							g = com.soffid.iam.ServiceLocator.instance().getGroupService().findGroupByGroupName(hg);
+							if (g != null) {
+								Div d = new Div();
+								Label l = new Label();
+								l.setValue(g.name+" "+g.description);
+								d.appendChild(l);
+								self.appendChild(d);
+								d.setAttribute("holderGroup",g.name);
+								d.addEventListener("onClick", new com.soffid.selfservice.web.ChangeHolderGroupListener());
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				]]></attribute>
+				<div if="${!arg.showProfile}" style="min-width: 15em">
+					<label value="${c:l('zkiblaf.tancarSessio')}" /> 
+				</div>
 			</div>
 		</div>
 

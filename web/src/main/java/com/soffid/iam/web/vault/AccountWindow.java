@@ -748,11 +748,6 @@ public class AccountWindow extends Window implements AfterCompose {
 								}
 							});
 				}
-			} else if (account.getType().equals(AccountType.SHARED)) {
-				newPasswordS.setAttribute("acco", account);
-				newPasswordS.setVisible(true);
-				newPasswordS.setMode("highlighted");
-				((Textbox)newPasswordS.getFellow("p1")).focus();
 			} else if (account.getType().equals(AccountType.PRIVILEGED)) {
 				newPassword.setAttribute("acco", account);
 				java.util.Calendar dia = java.util.Calendar.getInstance();
@@ -762,6 +757,11 @@ public class AccountWindow extends Window implements AfterCompose {
 				newPassword.setVisible(true);
 				newPassword.setMode("highlighted");
 				((Textbox)newPassword.getFellow("password")).focus();
+			} else {
+				newPasswordS.setAttribute("acco", account);
+				newPasswordS.setVisible(true);
+				newPasswordS.setMode("highlighted");
+				((Textbox)newPasswordS.getFellow("p1")).focus();
 			}
 		} catch (InterruptedException e) {
 		}

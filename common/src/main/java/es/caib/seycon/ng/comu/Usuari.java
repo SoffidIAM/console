@@ -3,6 +3,9 @@ package es.caib.seycon.ng.comu;
 import java.util.Calendar;
 import java.util.Map;
 
+import com.soffid.iam.api.PagedResult;
+import com.soffid.iam.api.User;
+
 public class Usuari extends AbstractUsuari {
 
 	public Usuari() {
@@ -69,6 +72,15 @@ public class Usuari extends AbstractUsuari {
 		} else {
 			super.setEmailAddress(getNomCurt()+"@"+getEmailAddress());
 		}
+	}
+
+	public static PagedResult<Usuari> toUsuariList(PagedResult<User> s) {
+		PagedResult<Usuari> r = new PagedResult<Usuari>();
+		r.setItemsPerPage(s.getItemsPerPage());
+		r.setStartIndex(s.getStartIndex());
+		r.setTotalResults(s.getTotalResults());
+		r.setResources(toUsuariList(s.getResources()));
+		return r;
 	}
 
 }

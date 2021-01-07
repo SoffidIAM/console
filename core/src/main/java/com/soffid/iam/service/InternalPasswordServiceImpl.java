@@ -60,11 +60,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -783,6 +785,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			throws java.lang.Exception {
 		return false;
 	}
+	
+	private Set<String> currentValidationRequests = new java.util.HashSet<String>();
 
 	/**
 	 * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPassword(es.caib.seycon.ng.model.UsuariEntity,
@@ -816,21 +820,35 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		boolean taskQueue = false;
 		try {
 			if (checkTrusted && getTaskQueue() != null) {
-				log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Creating task");
-				taskQueue = true;
-				final long timeToWait = 60000; // 1 minute
-				TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(),
-						password, false, true);
-
-				th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
-				synchronized (th) {
-					if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
-						th.wait(timeToWait);
-					}
+				String hash = user.getUserName()+":"+passwordDomain.getName()+":"+password.getPassword();
+				MessageDigest digest = MessageDigest.getInstance("SHA-256"); //$NON-NLS-1$
+				byte r[] = digest.digest(hash.getBytes("UTF-8"));
+				hash = Base64.encodeBytes(r);
+				if ( currentValidationRequests.contains(hash))
+				{
+					log.info("Detected recursive password validation for "+user.getUserName()+"/"+passwordDomain.getName());
+					return PasswordValidation.PASSWORD_WRONG;
 				}
-				if (th.isValidated())
-					updateAccountLastLogin(user, passwordDomain);
-				return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+				else
+				{
+					currentValidationRequests.add(hash);
+					log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Creating task");
+					taskQueue = true;
+					final long timeToWait = 60000; // 1 minute
+					TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(),
+							password, false, true);
+	
+					th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
+					synchronized (th) {
+						if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
+							th.wait(timeToWait);
+						}
+					}
+					if (th.isValidated())
+						updateAccountLastLogin(user, passwordDomain);
+					currentValidationRequests.remove(hash);
+					return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+				}
 			}
 		} catch (NoSuchBeanDefinitionException e) {
 
@@ -839,7 +857,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
 			for (UserAccountEntity userAccount : user.getAccounts()) {
 				AccountEntity ae = userAccount.getAccount();
-				if (!ae.isDisabled() && ae.getSystem().getPasswordDomain() == passwordDomain) {
+				if (!ae.isDisabled() && ae.getSystem().getPasswordDomain().getId().equals(passwordDomain.getId())) {
 					PasswordValidation status = validatePasswordOnServer(ae, password);
 					if (status.equals(PasswordValidation.PASSWORD_GOOD)) {
 						updateAccountLastLogin(user, passwordDomain);
@@ -1182,6 +1200,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 	}
 
+	Set<String> currentAccountValidationRequests = new HashSet<String>();
 	@Override
 	protected PasswordValidation handleCheckAccountPassword(AccountEntity account, Password password,
 			boolean checkTrusted, boolean checkExpired) throws Exception {
@@ -1212,17 +1231,31 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 			try {
 				if (checkTrusted && getTaskQueue() != null) {
-					final long timeToWait = 60000; // 1 minute
-					TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(),
-							account.getSystem().getName(), password, false, null);
-
-					th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
-					synchronized (th) {
-						if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
-							th.wait(timeToWait);
-						}
+					String hash = account.getName()+":"+account.getSystem().getName()+":"+password.getPassword();
+					MessageDigest digest = MessageDigest.getInstance("SHA-256"); //$NON-NLS-1$
+					byte r[] = digest.digest(hash.getBytes("UTF-8"));
+					hash = Base64.encodeBytes(r);
+					if ( currentAccountValidationRequests.contains(hash))
+					{
+						log.info("Detected recursive password validation for "+account.getName()+"/"+account.getSystem().getName());
+						return PasswordValidation.PASSWORD_WRONG;
 					}
-					return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+					else
+					{
+						currentAccountValidationRequests.add(hash);
+						log.info("Received password validation for "+account.getName()+"/"+account.getSystem().getName()+". Forwarding task to trusted dispatchers");
+						final long timeToWait = 60000; // 1 minute
+						TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(),
+								account.getSystem().getName(), password, false, null);
+	
+						th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
+						synchronized (th) {
+							if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
+								th.wait(timeToWait);
+							}
+						}
+						return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+					}
 				} else if (checkTrusted && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
 					return validatePasswordOnServer(account, password);
 				}
@@ -1698,4 +1731,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		return getAccountPasswordsStatus(accountEntity);
 	}
 
+	@Override
+	protected Calendar handleGetPasswordExpiredDate(long user, long passwordDomain) throws Exception {
+		UserEntity ue = getUserEntityDao().load(user);
+		PasswordDomainEntity pde = getPasswordDomainEntityDao().load(passwordDomain);
+		for (PasswordEntity pe : getPasswordEntityDao().findLastByUserDomain(ue, pde)) {
+			if (pe==null || pe.getExpirationDate()==null)
+				return null;
+			Calendar c = Calendar.getInstance();
+			c.setTime(pe.getExpirationDate());
+			return c;
+		}
+		return null;
+	}
 }

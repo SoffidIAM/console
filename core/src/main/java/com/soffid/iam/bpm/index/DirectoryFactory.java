@@ -24,6 +24,20 @@ import org.jbpm.JbpmContext;
 public class DirectoryFactory {
 	private static Log logger = LogFactory.getLog(DirectoryFactory.class);
 	private static Directory d;
+	
+	public static boolean isEmpty(Session ctx) {
+		File f = getFile(ctx);
+		if (!f.isDirectory()) {
+			logger.info("Directory "+f.getPath()+" is empty");
+			try {
+				if (d != null) d.close();
+			} catch (IOException e) { }
+			d = null;
+			return true;
+		} else 
+			return false;
+	}
+	
 	public static synchronized Directory getDirectory (Session s) throws IOException {
 		if (d == null)
 		{

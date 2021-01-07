@@ -232,12 +232,16 @@ public class MailServiceImpl extends MailServiceBase {
 
 	private Address[] getAddress(String[] actors) throws UnsupportedEncodingException, InternalErrorException {
 		Set<String> users  = new HashSet<String>();
+		Set<Address> addresses = new HashSet<Address>();
 		for (String actor: actors)
 		{
-			users.addAll( getNameUsers(actor));
+			Set<String> namedUsers = getNameUsers(actor);
+			if (namedUsers != null)
+				users.addAll( namedUsers );
+			else if (actor.contains("@"))
+				addresses.add( new InternetAddress(actor, actor));
 		}
 		
-		Set<Address> addresses = new HashSet<Address>();
 		for (String user: users)
 		{
 			InternetAddress addr = getUserAddress(user);
@@ -276,7 +280,9 @@ public class MailServiceImpl extends MailServiceBase {
 				if (domain != null)
 					rol = rol + "/" + domain; //$NON-NLS-1$
 				rol = rol+"@"+ar.getRole().getSystem(); //$NON-NLS-1$
-				result.addAll(getNameUsers(rol));
+				Set<String> nameUsers = getNameUsers(rol);
+				if (nameUsers != null)
+					result.addAll(nameUsers);
 			}
 			return result;
 			
@@ -332,8 +338,10 @@ public class MailServiceImpl extends MailServiceBase {
     					roleName = roleName.substring(0, i);
     				}
     				ApplicationService aplicacioService = getApplicationService();
-					for (Role role: aplicacioService.findRolesByFilter(roleName, "%", "%", dispatcher, "%", "%")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-    				{
+    				Role role = aplicacioService.findRoleByNameAndSystem(roleName, dispatcher);
+    				if (role == null) {
+    					return null;
+    				} else {
     					for (RoleGrant grant: aplicacioService.findEffectiveRoleGrantsByRoleId(role.getId()))
     					{
     						if (grant.getUser() != null && (scope == null || scope.equals (grant.getDomainValue())))

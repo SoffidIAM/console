@@ -33,14 +33,37 @@
 		     else reason = (code != null ? code : type);
 		     
 		     org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog("HtmlError");
+		     
 		     if (th == null) 
 		    	 log.warn("Error on "+uri+": "+reason+" - "+message);
 		     else 
+		     {
+		    	 Throwable root = th;
+		    	 do
+		    	 {
+			    	 if (root instanceof javax.security.auth.login.LoginException)
+			    	 {
+			    		 session.invalidate();
+	 					 closeSession = true;
+			    	 }
+		    		 if (root instanceof OutOfMemoryError)
+		    			 session.invalidate();
+		    		 if (root instanceof javax.ejb.EJBException)
+		    		 {
+		    			 if (root.getCausedByException() == null) break;
+		    			 else root = root.getCausedByException();
+		    		 }
+		    		 else if (root.getCause() == null || root.getCause() == root)
+		    			 break;
+		    		 else
+		    			 root = root.getCause ();
+		    	 } while (true);
+		    	 message = message + " "+root.toString ();
 		    	 log.warn("Error on "+uri+": "+reason+" - "+message, th);
-		     
+			 }		     
 		    	 
 		     
-
+		     
 		]]></zscript>
 		<html><![CDATA[
 		

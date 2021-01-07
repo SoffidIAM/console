@@ -11,6 +11,7 @@ import java.util.Collection;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.UserPreferenceEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
@@ -664,9 +665,10 @@ public abstract class UsuariService {
 
 	@Operation(grantees = { roles.user_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Usuari> findUserByJsonQuery(
+	public PagedResult<es.caib.seycon.ng.comu.Usuari> findUserByJsonQuery(
 			@Nullable String query,
-			@Nullable Integer start, @Nullable Integer end)
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -696,7 +698,7 @@ public abstract class UsuariService {
 
 	@Operation(grantees = { roles.user_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilter(
+	public PagedResult<es.caib.seycon.ng.comu.Usuari> findUserByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter,
 			@Nullable Integer start, @Nullable Integer end) {

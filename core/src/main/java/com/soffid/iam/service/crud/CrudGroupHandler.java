@@ -29,7 +29,7 @@ public class CrudGroupHandler implements CrudHandler<Group> {
 
 	@Override
 	public List<Group> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findGroupByTextAndFilter(text, filter, start, end);
+		return getService().findGroupByTextAndFilter(text, filter, start, end).getResources();
 	}
 
 	@Override

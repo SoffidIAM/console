@@ -8,6 +8,7 @@ import java.util.Date;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 
 public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity {
+
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
 	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
 
@@ -19,6 +20,7 @@ public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity
 			setBlobDataValue(null);
 		}
 		else if (getMetadata().getType().equals( TypeEnumeration.BINARY_TYPE) ||
+				getMetadata().getType().equals( TypeEnumeration.HTML) ||
 				getMetadata().getType().equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			setBlobDataValue( (byte[]) value);
@@ -37,6 +39,7 @@ public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity
 	@Override
 	public Object getObjectValue() {
 		if (getMetadata().getType().equals( TypeEnumeration.BINARY_TYPE) ||
+				getMetadata().getType().equals( TypeEnumeration.HTML) ||
 				getMetadata().getType().equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			return getBlobDataValue();
@@ -59,5 +62,4 @@ public class CustomObjectAttributeEntityImpl extends CustomObjectAttributeEntity
 		else
 			return getValue();
 	}
-
 }

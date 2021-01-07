@@ -17,6 +17,10 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Configuration;
+import com.soffid.iam.service.ConfigurationService;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class MailUtils {
@@ -80,6 +84,11 @@ public class MailUtils {
 		            "com.soffid.iam.utils.CustomSSLFactory");
 		    props.put("mail.smtp.socketFactory.fallback", "false");
 		    props.put("mail.smtp.starttls.enable", "true");
+		} 
+		
+		String startTls = ConfigurationCache.getProperty("mail.smtp.starttls.enable");
+		if (startTls != null) {
+			props.put("mail.smtp.starttls.enable", startTls); 
 		}
 		String auth = getConfigValue("mail.auth", "false");
 		if ("true".equals(auth))
@@ -92,16 +101,29 @@ public class MailUtils {
 				props.put("mail.smtp.user", user);
 				props.put("mail.smtps.user", user);
 			}
-			final String password = getConfigValue("mail.password", null);
+			String password = getConfigValue("mail.password", null);
 			if (password != null)
 			{
+				if (password.startsWith("{") && password.endsWith("}"))
+				{
+					Password p = Password.decode(password.substring(1, password.length()-1));
+					password = p.getPassword();
+				}
+				else { 
+					try {
+						encryptPassword(password);
+					} catch (InternalErrorException e) {
+						// Ignore
+					}
+				}
 				props.put("password", password);
 				props.put("mail.smtp.password", password);
 				props.put("mail.smtps.password", password);
 			}
+			final String password2 = password; 
 			authenticator = new javax.mail.Authenticator() {
 	            protected PasswordAuthentication getPasswordAuthentication() {
-	            	return new PasswordAuthentication(user, password);
+	            	return new PasswordAuthentication(user, password2);
 	            }
 			};
 		}
@@ -122,6 +144,16 @@ public class MailUtils {
 	}
 	
 	
+
+	private static void encryptPassword(String password) throws InternalErrorException {
+		ConfigurationService cfgSvc = ServiceLocator.instance().getConfigurationService();
+		Configuration cfg = cfgSvc.findParameterByNameAndNetworkName("mail.password", null);
+		if (cfg != null) {
+			Password p = new Password(password);
+			cfg.setValue("{"+p.toString()+"}");
+			cfgSvc.update(cfg);
+		}
+	}
 
 	private static String getConfigValue(String string, String defaultValue) {
 		String v = ConfigurationCache.getProperty(string);

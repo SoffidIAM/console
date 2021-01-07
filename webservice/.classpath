@@ -35,5 +35,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/home/gbuades/.m2/repository/org/apache/tomee/openejb-cxf-transport/7.0.3/openejb-cxf-transport-7.0.3.jar" sourcepath="/home/gbuades/.m2/repository/org/apache/tomee/openejb-cxf-transport/7.0.3/openejb-cxf-transport-7.0.3-sources2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

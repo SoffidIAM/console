@@ -2,6 +2,9 @@ package es.caib.seycon.ng.comu;
 
 import java.util.Map;
 
+import com.soffid.iam.api.Application;
+import com.soffid.iam.api.PagedResult;
+
 public class Aplicacio extends AbstractAplicacio {
 
 	public Aplicacio() {
@@ -45,6 +48,15 @@ public class Aplicacio extends AbstractAplicacio {
 				super.setRelativeName(nom.substring(i+1));
 			}
 		}
+	}
+
+	public static PagedResult<Aplicacio> toAplicacioList(PagedResult<Application> s) {
+		PagedResult<Aplicacio> r = new PagedResult<Aplicacio>();
+		r.setItemsPerPage(s.getItemsPerPage());
+		r.setStartIndex(s.getStartIndex());
+		r.setTotalResults(s.getTotalResults());
+		r.setResources(toAplicacioList(s.getResources()));
+		return r;
 	}
 
 

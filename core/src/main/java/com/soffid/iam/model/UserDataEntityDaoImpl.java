@@ -72,7 +72,7 @@ public class UserDataEntityDaoImpl
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			e.printStackTrace();
-			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.0"), dadaUsuari.getValue(), message));
+			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.0"), dadaUsuari.getValue(), message));  //$NON-NLS-1$
 		}
 	}
 	
@@ -95,7 +95,7 @@ public class UserDataEntityDaoImpl
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.1"), dadaUsuariEntity.getValue(), message));
+			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.1"), dadaUsuariEntity.getValue(), message));  //$NON-NLS-1$
 		}		
 	}	
 	
@@ -106,7 +106,7 @@ public class UserDataEntityDaoImpl
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.2"), dadaUsuari.getValue(), message));
+			throw new SeyconException(String.format(Messages.getString("UserDataEntityDaoImpl.2"), dadaUsuari.getValue(), message));  //$NON-NLS-1$
 		}
 	}
 	

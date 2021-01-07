@@ -9,6 +9,7 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('vault.title')}"
 	 id="topframe" width="100%" use="com.soffid.iam.web.vault.VaultFrame" >
+	<script src="/js/ssokm.js"/>
 	<datamodel id="model" rootNode="root" src="descriptorVault.xml" />
 	<zscript>
 		model.getVariables().declareVariable("enabled", false);

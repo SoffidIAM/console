@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -690,10 +691,10 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByJsonQuery(
+	public PagedResult findRoleByJsonQuery(
 			@Nullable String query,
-			@Nullable Integer first,
-			@Nullable Integer pageSize)
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -732,10 +733,10 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
+	public PagedResult<es.caib.seycon.ng.comu.Aplicacio> findApplicationByJsonQuery(
 			@Nullable String query,
-			@Nullable Integer start,
-			@Nullable Integer pageSize)
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -774,7 +775,7 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilter(
+	public PagedResult<es.caib.seycon.ng.comu.Aplicacio> findApplicationByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter,
 			@Nullable Integer first,
@@ -792,7 +793,7 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilter(
+	public PagedResult<es.caib.seycon.ng.comu.Rol> findRoleByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter,
 			@Nullable Integer first,

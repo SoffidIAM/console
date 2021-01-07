@@ -4,10 +4,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+
+import com.soffid.iam.ServiceLocator;
 
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
 public class QueryBuilder {
+	static SessionFactory sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+	
     public List query(org.springframework.orm.hibernate3.support.HibernateDaoSupport dao,
             String queryString, Parameter[] parameters) throws HibernateException {
         org.hibernate.Query queryObject = dao.getSessionFactory().getCurrentSession()

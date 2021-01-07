@@ -24,7 +24,10 @@
 					List result = new LinkedList();
 					for (item: listbox.getSelectedItems())
 					{
-						result.add ( item.getValue().getInstance().getName()); 
+						if (item.getValue() == null)
+							listbox.renderItem(item);
+						if (item.getValue() != null)
+							result.add ( item.getValue().getInstance().getName()); 
 					}
 					Events.postEvent ("onActualitza", formComponent, result);						
 				} else { 

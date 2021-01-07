@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
@@ -57,6 +58,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.NetworkAuthorization;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleDependencyStatus;
@@ -77,6 +79,7 @@ import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntityImpl;
@@ -2064,7 +2067,7 @@ public class ApplicationServiceImpl extends
 	            if (hierarchy && ra.getRule() != null) {
 	            	n.parent = createRuleRoleAccountDetail(rad, ra.getRule());
 	            }
-	            if (!rad.contains(n) && !ra.isApprovalPending() && ra.isEnabled()) {
+	            if (!rad.contains(n) && !ra.isApprovalPending() && shouldBeEnabled(ra) && ra.isEnabled()) {
 	                if (type == DIRECT || type == ALL) rad.add(n);
 	                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) 
 	                	populateRoleRoles(rad, ALL, n, user, account, hierarchy);
@@ -2778,7 +2781,7 @@ public class ApplicationServiceImpl extends
 	}
 
 
-	private void findRoleByJsonQuery(AsyncList<Role> result, String query, Integer first, Integer pageSize) throws Exception {
+	private PagedResult<Role> findRoleByJsonQuery(AsyncList<Role> result, String query, Integer first, Integer pageSize) throws Exception {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
@@ -2800,18 +2803,39 @@ public class ApplicationServiceImpl extends
 		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
 		cfg.setFirstResult(first);
 		cfg.setMaximumResultSize(pageSize);
-		for (RoleEntity ue : getRoleEntityDao().query(hql.toString(),
-				paramArray, cfg )) {
+		List <RoleEntity> roles = getRoleEntityDao().query(hql.toString(),
+				paramArray, cfg );
+		int totalResults = 0;
+		for (RoleEntity ue : roles) {
 			if (result.isCancelled())
-				return;
+				return null;
 			Role u = getRoleEntityDao().toRole(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
 						Security.AUTO_ROLE_QUERY, ue)) {
 					result.add(u);
+					totalResults ++;
 				}
 			}
 		}
+		PagedResult<Role> pagedResult = new PagedResult<Role>();
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( first != null ? first: 0);
+		pagedResult.setItemsPerPage( pageSize );
+		if ( pageSize  != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query( (HibernateDaoSupport) getApplicationAttributeEntityDao(),
+							hql.toCountString(), 
+							paramArray,
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	@Override
@@ -2867,15 +2891,16 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected List<Application> handleFindApplicationByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
+	protected PagedResult<Application> handleFindApplicationByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
 		AsyncList<Application> result = new AsyncList<Application>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findApplicationByJsonQuery(result, query, first, pageSize);
+		PagedResult<Application> pr = findApplicationByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
-		return result.get();
+		return pr;
 	}
+
 
 	@Override
 	protected AsyncList<Application> handleFindApplicationByJsonQueryAsync(final String query) throws Exception {
@@ -2892,7 +2917,7 @@ public class ApplicationServiceImpl extends
 		return result;
 	}
 
-	protected void findApplicationByJsonQuery ( AsyncList<Application> result, String query, Integer first, Integer pageSize) 
+	protected PagedResult<Application> findApplicationByJsonQuery ( AsyncList<Application> result, String query, Integer first, Integer pageSize) 
 			throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException
 	{
 
@@ -2921,16 +2946,36 @@ public class ApplicationServiceImpl extends
 		cfg.setFirstResult(first);
 		cfg.setMaximumResultSize(pageSize);
 		// Execute HQL and generate result
+		int totalResults = 0;
 		for (InformationSystemEntity applicationEntity : getInformationSystemEntityDao().query(hql.toString(), paramArray, cfg )) {
 			if (result.isCancelled())
-				return;
+				return null;
 			Application ApplicationVO = getInformationSystemEntityDao().toApplication(applicationEntity);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(ApplicationVO)) {
 				if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_QUERY, applicationEntity)) {
+					totalResults ++;
 					result.add(ApplicationVO);
 				}
 			}
 		}
+		PagedResult<Application> pagedResult = new PagedResult<Application>();
+		pagedResult.setResources(result);
+		pagedResult.setStartIndex( first != null ? first: 0);
+		pagedResult.setItemsPerPage( pageSize );
+		if ( pageSize != null) {
+			@SuppressWarnings("unchecked")
+			List <Long> ll = ( List <Long>) new QueryBuilder()
+					.query( (HibernateDaoSupport) getApplicationAttributeEntityDao(),
+							hql.toCountString(), 
+							paramArray,
+							null);
+			for ( Long l: ll ) {
+				pagedResult.setTotalResults( new Integer(l.intValue()) );
+			}
+		} else {
+			pagedResult.setTotalResults(totalResults);
+		}
+		return pagedResult;
 	}
 
 	String generateQuickSearchQuery (String text) {
@@ -2982,7 +3027,7 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected List<Application> handleFindApplicationByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
+	protected PagedResult<Application> handleFindApplicationByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
@@ -3614,11 +3659,11 @@ public class ApplicationServiceImpl extends
 
 	@Override
 	public List<Role> handleFindRoleByTextAndFilter(String text, String filter) throws Exception {
-		return handleFindRoleByTextAndFilter(text, filter, null, null);
+		return handleFindRoleByTextAndFilter(text, filter, null, null).getResources();
 	}
 	
 	@Override
-	public List<Role> handleFindRoleByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
+	public PagedResult<Role> handleFindRoleByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
 		String q = generateRoleQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
@@ -3654,14 +3699,14 @@ public class ApplicationServiceImpl extends
 	}
 
 	@Override
-	protected List<Role> handleFindRoleByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
+	protected PagedResult<Role> handleFindRoleByJsonQuery(String query, Integer first, Integer pageSize) throws Exception {
 		AsyncList<Role> result = new AsyncList<Role>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findRoleByJsonQuery(result, query, first, pageSize);
+		PagedResult<Role> pr = findRoleByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
-		return result.get();
+		return pr;
 	}
 	
 	@Override

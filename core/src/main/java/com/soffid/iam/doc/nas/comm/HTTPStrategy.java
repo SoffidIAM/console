@@ -1,9 +1,15 @@
 package com.soffid.iam.doc.nas.comm;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,10 +36,6 @@ public class HTTPStrategy implements CommunicationStrategy
 	private String tempPath= null;
 	/** El listado de archivos a limpiar */
 	private List filesToClean= null;
-	/** El getter de archivos */
-	private JWGet fileGetter= null;
-	/** El putter de archivos */
-	private JWPut filePutter= null;
 	
 	Log log = LogFactory.getLog(getClass());
 	private String user;
@@ -62,7 +64,7 @@ public class HTTPStrategy implements CommunicationStrategy
 				throw new NASException("No se encontro el archivo con el path: " + path);
 			}
 			
-			this.fileGetter.get(archivoSalida, urlPath, true);
+			get(archivoSalida, urlPath);
 			
 			this.filesToClean.add(archivoSalida);
 		}
@@ -86,6 +88,59 @@ public class HTTPStrategy implements CommunicationStrategy
 		}
 		
 		return archivoSalida;
+	}
+
+	private void get(File archivoSalida, String urlPath) throws IOException {
+		HttpURLConnection conn = generateConnection(urlPath);
+		conn.connect();
+		InputStream in = conn.getInputStream();
+		FileOutputStream out = new FileOutputStream(archivoSalida);
+		for (int read = in.read(); read >= 0; read = in.read())
+			out.write(read);
+		in.close();
+		out.close();
+	}
+
+	public HttpURLConnection generateConnection(String urlPath)
+			throws MalformedURLException, IOException, UnsupportedEncodingException {
+		URL url = new URL(urlPath);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		String auth = user+":"+password;
+		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBytes(auth.getBytes("UTF-8")));
+		conn.setDoInput(true);
+		conn.setDoOutput(false);
+		return conn;
+	}
+
+
+	private void put(File archivoSalida, String urlPath) throws IOException {
+		URL url = new URL(urlPath);
+		log.info("Putting "+urlPath);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		String auth = user+":"+password;
+		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBytes(auth.getBytes("UTF-8")));
+		conn.setDoOutput(true);
+		conn.setRequestMethod("PUT");
+		OutputStream out = conn.getOutputStream();
+		log.info("Source file "+archivoSalida+" size "+archivoSalida.length());
+		FileInputStream in = new FileInputStream(archivoSalida);
+		for (int read = in.read(); read >= 0; read = in.read())
+			out.write(read);
+		in.close();
+		out.close();
+		conn.getInputStream().close();
+		log.info("End putting "+urlPath);
+	}
+
+	private void delete(String urlPath) throws IOException {
+		URL url = new URL(urlPath);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		String auth = user+":"+password;
+		conn.addRequestProperty("Authorization", "Basic "+Base64.encodeBytes(auth.getBytes("UTF-8")));
+		conn.setDoInput(false);
+		conn.setDoOutput(false);
+		conn.setRequestMethod("DELETE");
+		conn.connect();
 	}
 
 	/**
@@ -119,10 +174,6 @@ public class HTTPStrategy implements CommunicationStrategy
 		}
 		
 		
-		this.fileGetter= new JWGet(properties);
-		this.filePutter= new JWPut("application/octet-stream", properties);
-		
-
 		this.filesToClean= new ArrayList();
 		
 	}
@@ -143,7 +194,7 @@ public class HTTPStrategy implements CommunicationStrategy
 		
 		try
 		{
-			this.filePutter.putFile(nuevoArchivo, urlPath);
+			put (nuevoArchivo, urlPath);
 		}
 		catch(Exception ex)
 		{
@@ -173,7 +224,7 @@ public class HTTPStrategy implements CommunicationStrategy
 		{
 			urlPath= this.rootURL + path.substring(1);
 			
-			this.filePutter.delete(urlPath);
+			delete(urlPath);
 			
 		}
 		catch(Exception ex)

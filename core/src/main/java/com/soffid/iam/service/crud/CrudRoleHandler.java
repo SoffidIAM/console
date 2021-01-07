@@ -29,7 +29,7 @@ public class CrudRoleHandler implements CrudHandler<Role> {
 
 	@Override
 	public List<Role> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findRoleByTextAndFilter(text, filter, start, end);
+		return getService().findRoleByTextAndFilter(text, filter, start, end).getResources();
 	}
 
 	@Override

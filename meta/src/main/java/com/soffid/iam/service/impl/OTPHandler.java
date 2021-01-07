@@ -5,5 +5,7 @@ import es.caib.seycon.ng.comu.Challenge;
 public interface OTPHandler {
 	Challenge selectToken (Challenge challenge);
 	
-	boolean validatePin (Challenge challenge, String pin) ;
+	boolean validatePin (Challenge challenge, String pin);
+
+	boolean resetFailCount (String account);
 }

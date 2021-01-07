@@ -796,6 +796,7 @@ public class InputField2 extends Div implements XPathSubscriber
 				if (getFellowIfAny(removeIconId) != null )
 					getFellowIfAny(removeIconId).setVisible( value != null && ! value.equals(""));			 //$NON-NLS-1$
 			}
+
 	
 			
 			
@@ -2247,7 +2248,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		binder.setValue(URLEncoder.encode(values[0], "UTF-8") //$NON-NLS-1$
 				+ "=" //$NON-NLS-1$
 				+URLEncoder.encode(values[1], "UTF-8")); //$NON-NLS-1$
-		attributeValidate( null, null );
+		attributeValidate( null, binder.getValue() );
 
 		Component c = this;
 		do
@@ -2327,6 +2328,8 @@ public class InputField2 extends Div implements XPathSubscriber
 			return true;		
 		try {
 			SecureInterpreter i = createInterpreter();
+			i.set("value", currentValue);
+			
 			Object o = i.eval(dataType.getValidationExpression());
 			if (o == null)
 				throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
@@ -2476,12 +2479,12 @@ public class InputField2 extends Div implements XPathSubscriber
 					int i;
 					for ( i = 0; i < l.size(); i++)
 					{
-						attributeValidate(new Integer(i), null);
+						attributeValidate(new Integer(i), l.get(i));
 					}
 				}
 			}
 			else
-				attributeValidate(null, null);
+				attributeValidate(null, value);
 		}
 		return true;
 	}
@@ -2604,3 +2607,4 @@ public class InputField2 extends Div implements XPathSubscriber
 		}
 	}
 }
+

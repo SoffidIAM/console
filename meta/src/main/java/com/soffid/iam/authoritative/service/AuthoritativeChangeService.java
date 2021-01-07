@@ -4,6 +4,7 @@ import com.soffid.iam.authoritative.model.AuthoritativeChangeEntity;
 import com.soffid.iam.service.CustomObjectService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 

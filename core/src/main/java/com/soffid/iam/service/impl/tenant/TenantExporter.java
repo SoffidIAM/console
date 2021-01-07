@@ -1,9 +1,13 @@
 package com.soffid.iam.service.impl.tenant;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -69,6 +73,7 @@ public class TenantExporter extends TenantDataManager {
 	}
 
 	public void export(Action action) throws IOException, SQLException, InternalErrorException {
+		log.info(action.table.name);
 		if (action.operation == Action.Operation.EXPORT_FULL)
 			exportFull ( action.table );
 		if (action.operation == Action.Operation.EXPORT_NOFK)
@@ -118,8 +123,7 @@ public class TenantExporter extends TenantDataManager {
 			}
 			else
 			{
-				log.info(sb.toString());
-				throw e;
+				throw new InternalErrorException("Error dumping table "+table.name, e);
 			}
 		}
 		out.writeObject(null);
@@ -230,7 +234,22 @@ public class TenantExporter extends TenantDataManager {
 			if (value instanceof Blob)
 			{
 				Blob blob = (Blob) value;
-				value = blob.getBytes(0, (int) blob.length());
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				InputStream in = blob.getBinaryStream();
+				for (int ch = in.read(); ch >= 0; ch = in.read())
+					out.write(ch);
+				out.close();
+				value = out.toByteArray();
+				blob.free();
+			}
+			if (value instanceof Clob)
+			{
+				Clob blob = (Clob) value;
+				StringBuffer sb = new StringBuffer();
+				Reader in = blob.getCharacterStream();
+				for (int ch = in.read(); ch >= 0; ch = in.read())
+					sb.append((char) ch);
+				value = sb.toString();
 				blob.free();
 			}
 			if (foreignColumns.containsKey(columnName))

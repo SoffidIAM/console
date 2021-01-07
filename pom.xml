@@ -21,7 +21,7 @@
       <url>http://www.gnu.org/licenses/gpl.html</url>
     </license>
   </licenses>
-  <url>http://www.soffid.com/doc/console</url>
+  <url>http://www.soffid.com/doc/console/${project.version}</url>
   <scm>
         <connection>scm:git:ssh://git@stash.dev.lab:7999/iam2/console.git</connection>
   </scm>
@@ -447,7 +447,7 @@
     <site>
       <id>soffid-open-site</id>
       <name>Soffid Maven site repository</name>
-      <url>${soffid.deploy.site.url}/console</url>
+      <url>${soffid.deploy.site.url}/console/${project.version}</url>
     </site>
   </distributionManagement>
   <profiles>

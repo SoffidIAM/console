@@ -299,7 +299,8 @@ public class SAMLServiceInternal {
 			return null;
 		}
 		
-		if (nameID.getFormat().equals(NameID.PERSISTENT) ||
+		if (nameID.getFormat() == null ||
+				nameID.getFormat().equals(NameID.PERSISTENT) ||
 				nameID.getFormat().equals(NameID.TRANSIENT) ||
 				nameID.getFormat().equals(NameID.UNSPECIFIED) ||
 				nameID.getFormat().equals(NameID.EMAIL))
@@ -348,13 +349,13 @@ public class SAMLServiceInternal {
 		KeyDescriptor kd = new KeyDescriptorBuilder ().buildObject();
 		spsso.getKeyDescriptors().add(kd);
 		kd.setUse(UsageType.SIGNING);
-		KeyInfo keyInfo = generateKeyInfo();
+		KeyInfo keyInfo = generateKeyInfo(true);
 		kd.setKeyInfo(keyInfo);
 
 		KeyDescriptor kdCrypt = new KeyDescriptorBuilder ().buildObject();
 		spsso.getKeyDescriptors().add(kdCrypt);
 		kdCrypt.setUse(UsageType.ENCRYPTION);
-		KeyInfo keyInfoCrypt = generateKeyInfo();
+		KeyInfo keyInfoCrypt = generateKeyInfo(true);
 		kdCrypt.setKeyInfo(keyInfoCrypt);
 
 		// Generate Login services
@@ -403,14 +404,16 @@ public class SAMLServiceInternal {
 		return generateString(xml, true);
 	}
 
-	private KeyInfo generateKeyInfo() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
+	private KeyInfo generateKeyInfo(boolean complete) throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
 			IOException, InternalErrorException, InvalidKeyException, NoSuchProviderException, SignatureException,
 			CertificateEncodingException {
 		KeyInfo keyInfo = new KeyInfoBuilder().buildObject();
 
-		KeyName keyName = new KeyNameBuilder().buildObject();
-		keyName.setValue(SAML_KEY);
-		keyInfo.getKeyNames().add(keyName);
+		if (complete) {
+			KeyName keyName = new KeyNameBuilder().buildObject();
+			keyName.setValue(SAML_KEY);
+			keyInfo.getKeyNames().add(keyName);
+		}
 		
 		X509Data data = new X509DataBuilder ().buildObject();
 		keyInfo.getX509Datas().add(data);
@@ -419,7 +422,8 @@ public class SAMLServiceInternal {
 		X509Certificate cert = (X509Certificate) ks.getCertificate(SAML_KEY);
 		
 		X509SubjectName sn = new X509SubjectNameBuilder ().buildObject();
-		data.getX509SubjectNames().add(sn);
+		if (complete)
+			data.getX509SubjectNames().add(sn);
 		sn.setValue(cert.getSubjectDN().getName());
 		
 		
@@ -592,7 +596,7 @@ public class SAMLServiceInternal {
 		signature.setSigningCredential(cred);
 		signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
 		signature.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256);
-		signature.setKeyInfo(generateKeyInfo());
+		signature.setKeyInfo(generateKeyInfo(false));
 		req.setSignature(signature);
 		
 		// Get the marshaller factory

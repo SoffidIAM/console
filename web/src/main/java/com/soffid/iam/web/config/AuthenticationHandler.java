@@ -37,6 +37,8 @@ import es.caib.zkib.component.Select;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.zkiblaf.Application;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class AuthenticationHandler extends FrameHandler {
 	private Form samlform;
@@ -72,5 +74,6 @@ public class AuthenticationHandler extends FrameHandler {
 
 	public void commit() throws CommitException {
 		model.commit();
+		Application.goBack();
 	}
 }

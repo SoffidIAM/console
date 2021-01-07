@@ -1,0 +1,24 @@
+.grid {
+  width: 160px;
+  display: grid;
+  grid-template-columns: 160px 50px;
+  height: 304px;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-board {
+  border: solid 2px;
+  background-color: #c0c0c0;
+}
+
+.play-button {
+  background-color: #4caf50;
+  font-size: 16px;
+  padding: 15px 30px;
+  cursor: pointer;
+}

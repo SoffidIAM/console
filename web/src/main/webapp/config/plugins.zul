@@ -8,6 +8,7 @@
 <frame xmlns:h="http://www.w3.org/1999/xhtml" 
 	use="com.soffid.iam.web.plugin.PluginHandler" >
 
+	<style src="/config/tetris/styles.css"/>
 	<script>
 	function renderName(td, col, value)
 	{
@@ -32,7 +33,7 @@
 	</script>
 
 	<datamodel id="model" rootNode="serverPlugins" src="descriptorPlugins.xml"/>
-	
+
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
@@ -43,6 +44,8 @@
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/serverPlugin"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
 					<![CDATA[
@@ -59,6 +62,7 @@
 				</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right" if="${canUpdatePlugins}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -130,14 +134,29 @@
 		</div>		
 	</div>
 	<window id="popupRefreshPage" visible="false" position="center">
-		<vbox pack="center" align="center" style="border: #bdd3ea 2px solid;
-			padding:20px 40px; display:inline-block; padding: 5px 5px 20px 5px;">
-			<label id="popupRefresh" style="font-family: Arial; font-size: 13px;"
+		<div style="border: #bdd3ea 2px solid;
+			padding:20px 40px; display:inline-block; padding: 5px 5px 20px 5px; text-align: center;">
+			<label id="popupRefresh" style="font-family: Arial; font-size: 13px; display:block"
 				value="${c:l('plugins.zul.RestartServerMsg')}"/>
-			<image src="/img/tetris.gif" style="width: 105px; height: 210px;"/>
+			<html style="display: inline-block; text-align: center"><![CDATA[
+				<div class="grid">
+				     <canvas id="board" class="game-board"></canvas>
+				     <div class="right-column">
+				         <div>
+				             <canvas id="next" class="next"></canvas>
+				         </div>
+				     </div>
+				 </div>
+				<script type="text/javascript" src="${execution.contextPath }/config/tetris/constants.js"></script>
+				<script type="text/javascript" src="${execution.contextPath }/config/tetris/board.js"></script>
+				<script type="text/javascript" src="${execution.contextPath }/config/tetris/piece.js"></script>
+				<script type="text/javascript" src="${execution.contextPath }/config/tetris/main.js"></script>
+			]]></html>
 			
-			<h:input type="button" value="${c:l('plugins.zul.Reload')}"
-				onClick="location.reload()" />
-		</vbox>
+			<div style="text-align: center">
+				<h:input type="button" value="${c:l('plugins.zul.Reload')}"
+					onClick="location.reload()" />
+			</div>
+		</div>
 	</window>
 </frame>

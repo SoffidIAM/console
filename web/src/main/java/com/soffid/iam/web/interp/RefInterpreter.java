@@ -80,14 +80,20 @@ public class RefInterpreter extends GenericInterpreter implements
 			throw new UiException(e);
 		} catch (InvocationTargetException e) {
 			Throwable te = e.getTargetException();
-			if (te instanceof ObserveObligationException) {
-				ObserveObligationException oe = (ObserveObligationException) te;
-				ObligationManager om = new ObligationManager();
-				om.setCurrentObligations(event, oe.getObligations());
-				throw new UiException(oe);
-			} else {
-				throw new UiException(e.getTargetException());
+			Throwable current = te;
+			while (current != null) {
+				if (current instanceof ObserveObligationException) {
+					ObserveObligationException oe = (ObserveObligationException) current;
+					ObligationManager om = new ObligationManager();
+					om.setCurrentObligations(event, oe.getObligations());
+					throw new UiException(oe);
+				}
+				if (current.getCause() == current) 
+					current = null;
+				else
+					current = current.getCause();
 			}
+			throw new UiException(te);
 		}
 	}
 

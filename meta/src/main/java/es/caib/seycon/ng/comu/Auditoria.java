@@ -147,6 +147,7 @@ public class Auditoria {
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute="date")
+	@Attribute(type = "DATE_TIME")
 	public java.util.Calendar calendar;
 
 	@Nullable

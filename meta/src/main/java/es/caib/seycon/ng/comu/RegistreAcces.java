@@ -22,11 +22,11 @@ public class RegistreAcces {
 	public java.lang.String idSessio;
 
 	@Nullable
-	@Attribute(translated = "startDate" )
+	@Attribute(translated = "startDate" , type = "DATE_TIME")
 	public java.util.Calendar dataInici;
 
 	@Nullable
-	@Attribute(translated = "endDate" )
+	@Attribute(translated = "endDate", type = "DATE_TIME")
 	public java.util.Calendar dataFi;
 
 	@Nullable

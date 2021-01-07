@@ -40,7 +40,7 @@ public class FrameFilter implements Filter {
 		if (app == null && target != null && 
 				!target.isEmpty() &&
 				!target.equals("/index.zul") &&
-				!target.equals("/anonymous/logout.zul"))
+				!target.startsWith("/anonymous/"))
 		{
 			HttpServletRequestWrapper req2 = new IndexRequestWrapper(req, "/index.zul", target);
 			req.setAttribute("$soffid$target", target);

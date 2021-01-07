@@ -22,10 +22,11 @@ public class LoginFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse resp = (HttpServletResponse) response;
 		
-		if ( ! req.getRequestURI().startsWith("/logout") && 
+		if ( ! req.getRequestURI().equals("/favicon.ico") &&
+				! req.getRequestURI().startsWith("/logout") && 
 				! req.getRequestURI().startsWith("/soffid")) {
 			Configuration cfg = Configuration.getConfiguration();
-			if (cfg.isConfigured())
+			if (cfg.isConfigured()) 
 				resp.sendRedirect("/soffid");
 			else
 				chain.doFilter(request, response);

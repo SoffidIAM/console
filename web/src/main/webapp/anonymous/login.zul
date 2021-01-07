@@ -31,84 +31,7 @@
 	  		}
 		}
 		</script>
-	<style>
-		body {
-			background-color: #5ec0a5;
-			background-image: url(${execution.contextPath}/anonymous/bg.jpeg);
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-position: center;
-			overflow: hidden;
-		}
-
-		div.login {
-			font-size: 12pt;
-			background-color: #202020;
-			opacity: 1;
-			color: white;
-			top: 50%;
-		    position: absolute;
-		    left: 50%;
-			margin-top: -125px;
-			padding: 30px;
-			border-radius: 12px;
-			transition: transform 0.5s;
-			transform-style: preserve-3d ;
-		    transform: translateY(-50%)translateX(-50%);
-		}
-		div.login.progress {
-		    transform: translateY(-50%)translateX(-50%)rotateX( 90deg );
-		}
-		
-		div.login div.loginbox div.inputlogin {
-			font-weight: bold;
-		}		
-		div.loginbox {
-			width: 100%; 
-		}
-		
-		input, input[type="submit"] {
-			margin-top: 12px;
-			margin-bottom: 6px;
-			width: 100%;
-			margin-left: 0px;
-			font-size: 11pt;
-			padding: 6px;
-		}
-		
-		div.wait {
-			position: absolute;
-		    top: 50%;
-		    left: 50%;
-		    margin-top: -96px;
-		    margin-left: -96px;
-		    background: #202020;
-		    border-radius: 12px;
-		    width: 250px;
-		    height: 192px;
-/*		    display: none; */
-		    color: white;
-		    font-weight: bold;
-			text-align: center;
-			padding-top: 30px;
-			transition: transform 0.5s;
-			transform-style: preserve-3d ;
-		    transform: rotateX( 90deg );
-		}
-		
-		div.wait p {
-			font-weight: bold;
-		}
-		div.wait.progress {
-			display: block;
-		    transform: rotateX( 0deg );
-		}
-		div.wait img {
-			margin-top: 30px;
-			width: 48px;
-			height: 48px;
-		}
-	</style>
+	<style src="/css/login.css" />
 	<html id="htmlData" use="com.soffid.iam.web.main.LoginPage"><![CDATA[
 		<div class="wait" id="wait">
 			<p>${c:l('login.connecting') }</p>
@@ -135,8 +58,9 @@
 				</p>
 ]]></html>
 <html if="${saml }"><![CDATA[
-   				<input type="button" value="${c:l('configure.samlLogin')}" onClick="location.href='${rootPath }/saml'"/>
-                             
+            	<p>
+   					<input style="margin: 15px 0px 0px 0px" type="button" value="${c:l('configure.samlLogin')}" onClick="location.href='${execution.contextPath }/saml'"/>
+				</p>                             
 ]]></html>
 <html><![CDATA[
 			</form>
@@ -148,8 +72,7 @@
 			// <!--
 			if (document.getElementById('loginbox'))
 				document.getElementById('loginbox').setAttribute("style","display: none");
-			if (document.getElementById('loginForm'))
-				document.getElementById('loginForm').submit();
+			preparesubmit();
 			// -->
 			</script>
    		]]></html>

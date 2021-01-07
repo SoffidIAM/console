@@ -17,6 +17,7 @@ import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Fileupload;
@@ -30,6 +31,7 @@ import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.service.workflow.JbpmSchedulerServiceInterface;
 import com.soffid.iam.web.bpm.BPMApplication;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.seycon.ng.EJBLocator;
 import es.caib.seycon.ng.comu.Configuracio;
@@ -384,8 +386,10 @@ public class ConfigureIndex extends FrameHandler
 	}
 
 	public void importDocs () throws InternalErrorException, NamingException, CreateException, IOException, InterruptedException {
-		Media media = Fileupload.get(true);
-		com.soffid.iam.EJBLocator.getDocumentService().importDocuments(media.getStreamData());
+        FileUpload2.get((event) -> {
+        	org.zkoss.util.media.Media media = ((UploadEvent)event).getMedia();
+        	com.soffid.iam.EJBLocator.getDocumentService().importDocuments(media.getStreamData());
+        });
 	}
 }
 

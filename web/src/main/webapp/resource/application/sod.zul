@@ -6,10 +6,15 @@
 	use="com.soffid.iam.web.application.SodRuleHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="sodDescriptor.xml"/>
 
+<style>
+	td.centerColumn {
+		text-align: center;
+	}
+</style>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
-				<menu2>
+				<menu2>a
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('sod:create')}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('sod:creat')}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
@@ -24,6 +29,8 @@
 
 			<datatable id="listbox" autocommit="true" dataPath="/model:/rule"
 			    maxheight="70vh"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
 			    enablefilter="false"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">
@@ -36,6 +43,7 @@
 				</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('sod:create')}" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
 		</div>
@@ -59,25 +67,26 @@
 						<customfield3 bind="application" dataType="APPLICATION" 
 							maxlength="150" required="true" 
 							label="${c:l('aplica_rolsllista.zul.Aplicacia-2') }"/>
+						<customfield3 bind="type" dataType="STRING"
+							enumeration="com.soffid.iam.api.SodRuleType" 
+							onChange="ref:frame.onChangeType"
+							required="true" 
+							label="${c:l('aplicacionsIntranet.zul.Tipus') }"/>
 						<customfield3 bind="risk" dataType="STRING" 
 							enumeration="es.caib.seycon.ng.comu.SoDRisk" 
 							maxlength="150"  required="true" 
 							label="${c:l('com.soffid.iam.api.RoleAccount.risk') }"/>
-						<customfield3 bind="risk" dataType="NUMBER" 
-							maxlength="10"  required="false" 
+						<customfield3 bind="number" dataType="NUMBER" 
+							maxlength="10"  required="false" id="number"
 							label="${c:l('com.soffid.iam.api.SodRule.number') }"/>
 					</div>
 					<div sclass="section">
-						<label sclass="separator" value="${c:l('rules.roles') }"/>
-						<datatable dataPath="/role" id="roles" onDeleteRole="ref:frame.deleteRole">
+						<label sclass="separator" value="${c:l('aplica_rolsllista.Titol') }"/>
+						<datatable dataPath="/role" id="roles"
+							multiselect="true"
+							onSelect="ref:frame.multiSelect"
+							onMultiSelect="ref:frame.multiSelect">
 						<attribute name="columns"><![CDATA[
-						- name: ""
-						  template: >-
-						     <button class="icon-button" onclick="zkDatatable.sendClientAction(this, 'onDeleteRole')">
-						     <img src="${execution.contextPath}/img/remove.svg" class="menu2std"></img>
-						     <img src="${execution.contextPath}/img/remove-white.svg" class="menu2rev"></img>
-						     </button>
-						  className: selector
 						- name: ${c:l('com.soffid.iam.api.Role.name')}
 						  value: role.name
 						- name: ${c:l('com.soffid.iam.api.Role.description')}
@@ -88,9 +97,12 @@
 						</attribute>
 						</datatable>
 						<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >
+							<div class="deleteButton" onClick="ref:frame.deleteRole" visible="false">-</div>
 							<div class="addButton" onClick="ref:frame.addNewRole">+</div>
 						</div>
 					</div>
+					<datatable id="matrix" sclass="datatable matrix" enablefilter="false" onChangeLevel="ref:frame.onChangeLevel">
+					</datatable>
 					<div style="width: 100%">
 						<div style="float: right">
 							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">

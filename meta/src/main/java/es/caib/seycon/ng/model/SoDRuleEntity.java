@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.api.SodRuleType;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -25,6 +26,11 @@ public abstract class SoDRuleEntity {
 	@Column (name="SOD_RISK")
 	public es.caib.seycon.ng.comu.SoDRisk risk;
 
+	@Column(name="SOD_TYPE")
+	@Description("Type of SoDRule")
+	@Nullable
+	SodRuleType type;
+	
 	@Column (name="SOD_NUMBER")
 	@Description("Number of roles to match to trigger the risk")
 	@Nullable

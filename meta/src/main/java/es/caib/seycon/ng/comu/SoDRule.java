@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.comu;
+import com.soffid.iam.api.SodRuleType;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.SoDRuleEntity;
@@ -22,6 +23,10 @@ public class SoDRule {
 	public Integer number;
 
 	public es.caib.seycon.ng.comu.SoDRisk risk;
+
+	@Nullable
+	@Description("Type of SoDRule")
+	SodRuleType type;
 
 	@JsonAttribute(hibernateAttribute = "application.name")
 	public java.lang.String application;

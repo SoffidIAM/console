@@ -8,6 +8,8 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.SoDRuleMatrix;
+import com.soffid.iam.model.SoDRuleMatrixEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -25,6 +27,7 @@ import es.caib.seycon.ng.comu.SoDRule;
 	es.caib.seycon.ng.servei.AplicacioService.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.servei.ConfiguracioService.class,
+	SoDRuleMatrixEntity.class,
 	AsyncRunnerService.class})
 public abstract class SoDRuleService {
 
@@ -44,6 +47,16 @@ public abstract class SoDRuleService {
 			translated="findRolesByRule")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.SoDRole> findRolesByRule(
+		java.lang.Long ruleId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
+	@Operation ( grantees={roles.sod_query.class,
+			roles.application_query.class},
+			translated="findMatrixByRule")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<SoDRuleMatrix> findMatrixByRule(
 		java.lang.Long ruleId)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
@@ -87,12 +100,38 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
+	@Operation ( grantees={roles.sod_update.class},
+			translated="remove")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void remove(SoDRuleMatrix role)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	
 	
 	@Operation ( grantees={roles.sod_update.class},
 			translated="create")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.SoDRole create(
 		es.caib.seycon.ng.comu.SoDRole role)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
+	
+	@Operation ( grantees={roles.sod_update.class},
+			translated="create")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public SoDRuleMatrix create(
+		SoDRuleMatrix role)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
+	@Operation ( grantees={roles.sod_update.class},
+			translated="update")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public SoDRuleMatrix update(
+		SoDRuleMatrix role)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

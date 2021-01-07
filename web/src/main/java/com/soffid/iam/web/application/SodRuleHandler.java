@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
+import javax.json.JsonObject;
 import javax.naming.NamingException;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xel.fn.CommonFns;
+import org.zkoss.zk.au.out.AuInvoke;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -26,6 +30,8 @@ import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.api.SoDRole;
+import com.soffid.iam.api.SoDRuleMatrix;
+import com.soffid.iam.api.SodRuleType;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.MailListsService;
 import com.soffid.iam.web.component.CustomField3;
@@ -36,6 +42,7 @@ import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
+import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
@@ -55,9 +62,162 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 		
 	}
 
-	public void onChangeForm() {
+	public void onChangeForm(Event event) {
+		DataTable lb = (DataTable) getListbox();
+		if (lb.getSelectedIndex() >= 0) {
+			displayNumber();
+			displayMatrix();
+		}
+	}
+
+	public void onChangeType(Event event ) {
+		displayNumber();
+		displayMatrix();
 	}
 	
+	public void displayNumber() {
+		SodRuleType type = (SodRuleType) XPathUtils.eval(getForm(), "type");
+		getFellow("number").setVisible(type == SodRuleType.MATCH_SOME);
+	}
+
+	public void displayMatrix() {
+		SodRuleType type2 = (SodRuleType) XPathUtils.eval(getForm(), "type");
+		if (type2 == SodRuleType.MATCH_MATRIX) {
+			createMatrix();
+		} else {
+			DataTable matrix = (DataTable) getFellow("matrix");
+			matrix.setVisible(false);
+		}
+	}
+	
+	public void onChangeLevel(Event event) throws Exception {
+		String[] data = (String[]) event.getData();
+		long rownum = Integer.parseInt( data[0] );
+		long colnum = Integer.parseInt( data[1] );
+		DataNodeCollection roles = (DataNodeCollection) XPathUtils.eval(getForm(), "role");
+
+		DataNodeCollection cells = (DataNodeCollection) XPathUtils.eval(getForm(), "cell");
+		DataNode cell = getCell(rownum, colnum);
+		SoDRuleMatrix m;
+		if (cell == null) {
+			cell =  (DataNode) cells.newInstance();
+			m = (SoDRuleMatrix) cell.getInstance();
+			m.setColumn(colnum);
+			m.setRow(rownum);
+			m.setRisk(SoDRisk.SOD_NA);
+			m.setRuleId((Long) XPathUtils.eval(getForm(), "@id"));
+		} else {
+			m = (SoDRuleMatrix) cell.getInstance();
+		}
+		
+		if (m.getRisk() == SoDRisk.SOD_NA)
+			m.setRisk(SoDRisk.SOD_LOW);
+		else if (m.getRisk() == SoDRisk.SOD_LOW)
+			m.setRisk(SoDRisk.SOD_HIGH);
+		else if (m.getRisk() == SoDRisk.SOD_HIGH)
+			m.setRisk(SoDRisk.SOD_FORBIDDEN);
+		else
+			m.setRisk(SoDRisk.SOD_NA);
+		
+		int tablerow = 0;
+		for (int i = 0; i < roles.size(); i++) {
+			DataNode dn = (DataNode) roles.get(i);
+			if ( !dn.isDeleted()) {
+				SoDRole r = (SoDRole) dn.getInstance();
+				if (r.getId().longValue() == rownum) {
+					JSONObject jsonRow = gernerateRow(roles, dn);
+					DataTable dt = (DataTable) getFellow("matrix");
+		            dt.response("update_"+tablerow, new AuInvoke(dt, "updateRow", Integer.toString(tablerow), jsonRow.toString()));
+				}
+				tablerow ++;
+			}
+		}
+		
+	}
+	
+	private void createMatrix() {
+		DataTable matrix = (DataTable) getFellow("matrix");
+		DataNodeCollection roles = (DataNodeCollection) XPathUtils.eval(getForm(), "role");
+		
+		JSONArray cols = new JSONArray();
+		JSONObject col0 = new JSONObject();
+		col0.put("name", Labels.getLabel("accounts.role"));
+		col0.put("value", "roleName");
+		col0.put("sort", false);
+		cols.put(col0);
+		for (int i = 0; i < roles.size(); i++) {
+			DataNode dn = (DataNode) roles.get(i);
+			if ( !dn.isDeleted()) {
+				JSONObject col = new JSONObject();
+				SoDRole r = (SoDRole) dn.getInstance();
+				col.put("name", r.getRole().getName());
+				col.put("sort", false);
+				col.put("className", "centerColumn");
+				col.put("template", "<img #{r"+i+"_hidden} class='imageclic' onClick='zkDatatable.sendClientAction(this, \"onChangeLevel\", [#{row},"+r.getId()+"])' src='"+ getDesktop().getExecution().getContextPath()+ "/img/risk.#{r"+i+"}.svg'/>");
+				cols.put(col);
+			}
+		}
+		matrix.setColumns(cols.toString());
+		
+		JSONArray rows = new JSONArray();
+		for (int i = 0; i < roles.size(); i++) {
+			DataNode dn = (DataNode) roles.get(i);
+			if ( !dn.isDeleted()) {
+				JSONObject row = gernerateRow(roles, dn);
+				rows.put(row);
+			}
+		}
+		
+		matrix.invalidate();
+		matrix.setData(rows);
+		matrix.setVisible(true);
+	}
+
+	public JSONObject gernerateRow(DataNodeCollection roles, DataNode dn) {
+		JSONObject row = new JSONObject();
+		SoDRole r = (SoDRole) dn.getInstance();
+		row.put("roleName", r.getRole().getName());
+		row.put("row", r.getId().toString());
+		boolean skip = true;
+		for (int j = 0; j < roles.size(); j++) {
+			DataNode dn2 = (DataNode) roles.get(j);
+			if ( !dn2.isDeleted()) {
+				SoDRole r2 = (SoDRole) dn2.getInstance();
+				if (r2.getId().equals(r.getId())) skip = false;					
+				if (skip) {
+					row.put("r"+j, "" );
+					row.put("r"+j+"_hidden", "style='display:none'");
+				} else {
+					JSONObject col = new JSONObject();
+					row.put("r"+j, getLevel ( r, r2 ) );
+					row.put("r"+j+"_hidden", "");
+				}
+			}
+		}
+		return row;
+	}
+
+	private String getLevel(SoDRole r, SoDRole r2) {
+		DataNode cell = getCell(r.getId(), r2.getId());
+		if (cell == null)
+			return SoDRisk.SOD_NA.getValue();
+		else
+			return ((SoDRuleMatrix) cell.getInstance()).getRisk().toString();
+	}
+
+	private DataNode getCell(Long r, Long r2) {
+		DataNodeCollection roles = (DataNodeCollection) XPathUtils.eval(getForm(), "cell");
+		for (int i = 0; i < roles.getSize(); i++) {
+			DataNode dn = (DataNode) roles.get(i);
+			if (!dn.isDeleted()) {
+				SoDRuleMatrix cell = (SoDRuleMatrix) dn.getInstance();
+				if (cell.getRow().equals(r) && cell.getColumn().equals(r2))
+					return dn;
+			}
+		}
+		return null;
+	}
+
 	public void importCsv () throws IOException, CommitException {
 		getModel().commit();
 		
@@ -210,7 +370,7 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 
 	public void deleteRole(Event ev) {
 		DataTable lb = (DataTable) getFellow("roles");
-		lb.delete();
+		lb.deleteSelectedItem();
 	}
 	
 	public void backAndRollback(Event ev) {

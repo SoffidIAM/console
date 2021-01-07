@@ -8,6 +8,7 @@ package com.soffid.iam.model;
 import es.caib.seycon.ng.model.*;
 
 import com.soffid.iam.api.SoDRule;
+import com.soffid.iam.api.SodRuleType;
 
 /**
  * DAO SoDRuleEntity implementation
@@ -19,7 +20,9 @@ public class SoDRuleEntityDaoImpl extends com.soffid.iam.model.SoDRuleEntityDaoB
     public void toSoDRule(com.soffid.iam.model.SoDRuleEntity source, SoDRule target) {
 		super.toSoDRule(source, target);
 		target.setApplication(source.getApplication().getName());
-
+		if ( source.getType() == null) {
+			target.setType(source.getNumber() == null ? SodRuleType.MATCH_ALL : SodRuleType.MATCH_SOME);
+		}
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SoDRoleEntity;
 import com.soffid.iam.model.SoDRuleEntity;
+import com.soffid.iam.model.SoDRuleMatrixEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.Security;
@@ -34,6 +35,9 @@ import com.soffid.scimquery.parser.ParseException;
 import es.caib.seycon.ng.comu.SoDRisk;
 import com.soffid.iam.api.SoDRole;
 import com.soffid.iam.api.SoDRule;
+import com.soffid.iam.api.SoDRuleMatrix;
+import com.soffid.iam.api.SodRuleType;
+
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.io.UnsupportedEncodingException;
@@ -82,6 +86,20 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 			return Collections.EMPTY_LIST;
 		else
 			return getSoDRoleEntityDao().toSoDRoleList(rule.getRoles());
+	}
+
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.SoDRuleServiceBase#handleFindRolesByRule(java.lang.Long)
+	 */
+	@SuppressWarnings ("unchecked")
+	@Override
+	protected Collection<SoDRuleMatrix> handleFindMatrixByRule (Long ruleId) throws Exception
+	{
+		SoDRuleEntity rule = getSoDRuleEntityDao().load(ruleId);
+		if (rule == null)
+			return Collections.EMPTY_LIST;
+		else
+			return getSoDRuleMatrixEntityDao().toSoDRuleMatrixList(rule.getMatrixCells());
 	}
 
 	/* (non-Javadoc)
@@ -165,20 +183,35 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	@Override
     protected SoDRule handleIsAllowed(RoleAccount ra) throws Exception {
 		SoDRuleEntity affectingRule = null;
-		for (SoDRuleEntity rule: doFindAffectingRulesByRolAccount(ra))
+		for (AppliedRule rule: doFindAffectingRulesByRolAccount(ra))
 		{
-			if (rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
+			if (rule.cell != null) {
+				if (rule.cell.getRisk() == SoDRisk.SOD_FORBIDDEN)
+				{
+					affectingRule  = rule.rule;
+					break;
+				}
+				else if (rule.cell.getRisk() == SoDRisk.SOD_HIGH)
+				{
+					affectingRule  = rule.rule;
+				}
+				else if (rule.cell.getRisk() == SoDRisk.SOD_LOW && affectingRule == null)
+				{
+					affectingRule  = rule.rule;
+				}
+			}
+			else if (rule.rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
 			{
-				affectingRule  = rule;
+				affectingRule  = rule.rule;
 				break;
 			}
-			else if (rule.getRisk() == SoDRisk.SOD_HIGH)
+			else if (rule.rule.getRisk() == SoDRisk.SOD_HIGH)
 			{
-				affectingRule  = rule;
+				affectingRule  = rule.rule;
 			}
-			else if (rule.getRisk() == SoDRisk.SOD_LOW && affectingRule == null)
+			else if (rule.rule.getRisk() == SoDRisk.SOD_LOW && affectingRule == null)
 			{
-				affectingRule  = rule;
+				affectingRule  = rule.rule;
 			}
 		}
 		if (affectingRule == null)
@@ -200,12 +233,18 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                     targetList = generateTargetList(ra, rolAccount);
                 }
                 SoDRisk risk = null;
-                Collection<SoDRuleEntity> rules = doFindSodNonCompliances(role, targetList);
-                for (SoDRuleEntity rule : rules) {
-                    if (risk == null || isGreater(rule.getRisk(), risk)) risk = rule.getRisk();
+                Collection<AppliedRule> rules = doFindSodNonCompliances(role, targetList);
+                LinkedList<SoDRule> l = new LinkedList<SoDRule>();
+                for (AppliedRule rule : rules) {
+                	SoDRisk ruleRisk = rule.cell != null ? rule.cell.getRisk() : rule.rule.getRisk();
+                	if (ruleRisk != null && ruleRisk != SoDRisk.SOD_NA) {
+                		l.add(getSoDRuleEntityDao().toSoDRule(rule.rule));
+                		if (risk == null || isGreater(ruleRisk, risk)) 
+                			risk = ruleRisk;
+                	}
                 }
                 rolAccount.setSodRisk(risk);
-                rolAccount.setSodRules(getSoDRuleEntityDao().toSoDRuleList(rules));
+                rolAccount.setSodRules(l);
             } else {
                 rolAccount.setSodRisk(null);
                 rolAccount.setSodRules(null);
@@ -246,7 +285,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		return targetList;
 	}
 
-	protected Collection<SoDRuleEntity> doFindAffectingRulesByRolAccount(RoleAccount ra) throws Exception {
+	protected Collection<AppliedRule> doFindAffectingRulesByRolAccount(RoleAccount ra) throws Exception {
 		RoleEntity role = getRoleEntityDao().findByNameAndSystem(ra.getRoleName(), ra.getSystem());
 		if (role == null)
 			return Collections.emptyList();
@@ -275,7 +314,11 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	 */
 	@Override
     protected Collection<SoDRule> handleFindAffectingRulesByRolAccount(RoleAccount ra) throws Exception {
-		return getSoDRuleEntityDao().toSoDRuleList(doFindAffectingRulesByRolAccount(ra));
+		Collection<SoDRule> rules = new LinkedList<>();
+		for (AppliedRule appliedRule: doFindAffectingRulesByRolAccount(ra)) {
+			rules.add( getSoDRuleEntityDao().toSoDRule(appliedRule.rule));
+		}
+		return rules;
 	}
 
 	/**
@@ -283,37 +326,57 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	 * @param rols
 	 * @return
 	 */
-	private Collection<SoDRuleEntity> doFindSodNonCompliances(RoleEntity role, Collection<RoleGrant> rols) {
-		List<SoDRuleEntity> rules = new LinkedList<SoDRuleEntity>();
+	private Collection<AppliedRule> doFindSodNonCompliances(RoleEntity role, Collection<RoleGrant> rols) {
+		List<AppliedRule> rules = new LinkedList<AppliedRule>();
 		for (SoDRoleEntity sourceSodRole : role.getSodRules()) {
             SoDRuleEntity rule = sourceSodRole.getRule();
             if ((rule.getNumber() == null || rule.getNumber().intValue() > 0) && 
             		(!rule.getRoles().isEmpty())) {
             	int failures = rule.getNumber() == null ? 0 : rule.getRoles().size() - rule.getNumber().intValue();
                 boolean add = true;
-                for (SoDRoleEntity targetSodRole : rule.getRoles()) {
-                    if (targetSodRole.getId().equals(sourceSodRole.getId())) {
-                    } else {
-                        boolean found = false;
-                        for (RoleGrant rolGrant : rols) {
-                            if (rolGrant.getRoleName().equals(targetSodRole.getRole().getName()) && rolGrant.getSystem().equals(targetSodRole.getRole().getSystem().getName())) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                        	if (failures > 0)
-                        		failures --;
-                        	else
-                        	{
-	                            add = false;
-	                            break;
-                        	}
-                        }
-                    }
-                }
-                if (add) {
-                    rules.add(rule);
+                
+                if (rule.getType() == SodRuleType.MATCH_MATRIX) {
+	                for (SoDRuleMatrixEntity cell : rule.getMatrixCells()) {
+	                    if (cell.getRow().getId().equals(sourceSodRole.getId())) {
+	                        for (RoleGrant rolGrant : rols) {
+	                            if (rolGrant.getRoleId().equals(cell.getColumn().getRole().getId())) {
+	                            	rules.add(new AppliedRule(rule, cell));
+	                            }
+	                        }	                    	
+	                    }
+	                    if (cell.getColumn().getId().equals(sourceSodRole.getId())) {
+	                        for (RoleGrant rolGrant : rols) {
+	                            if (rolGrant.getRoleId().equals(cell.getRow().getRole().getId())) {
+	                            	rules.add(new AppliedRule(rule, cell));
+	                            }
+	                        }	                    	
+	                    }
+	                }
+                } else {
+	                for (SoDRoleEntity targetSodRole : rule.getRoles()) {
+	                    if (targetSodRole.getId().equals(sourceSodRole.getId())) {
+	                    } else {
+	                        boolean found = false;
+	                        for (RoleGrant rolGrant : rols) {
+	                            if (rolGrant.getRoleName().equals(targetSodRole.getRole().getName()) && rolGrant.getSystem().equals(targetSodRole.getRole().getSystem().getName())) {
+	                                found = true;
+	                                break;
+	                            }
+	                        }
+	                        if (!found) {
+	                        	if (failures > 0)
+	                        		failures --;
+	                        	else
+	                        	{
+		                            add = false;
+		                            break;
+	                        	}
+	                        }
+	                    }
+	                }
+	                if (add) {
+	                    rules.add(new AppliedRule(rule, null));
+	                }
                 }
             }
         }
@@ -416,4 +479,38 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		}
 	}
 
+	@Override
+	protected SoDRuleMatrix handleCreate(SoDRuleMatrix role) throws Exception {
+		SoDRuleMatrixEntity entity  = getSoDRuleMatrixEntityDao().soDRuleMatrixToEntity(role);
+		getSoDRuleMatrixEntityDao().create(entity);
+		
+		
+		return getSoDRuleMatrixEntityDao().toSoDRuleMatrix(entity);
+	}
+
+	@Override
+	protected SoDRuleMatrix handleUpdate(SoDRuleMatrix role) throws Exception {
+		SoDRuleMatrixEntity entity  = getSoDRuleMatrixEntityDao().soDRuleMatrixToEntity(role);
+		getSoDRuleMatrixEntityDao().update(entity);
+		
+		
+		return getSoDRuleMatrixEntityDao().toSoDRuleMatrix(entity);
+	}
+
+	@Override
+	protected void handleRemove(SoDRuleMatrix role) throws Exception {
+		getSoDRuleMatrixEntityDao().remove(role.getId());
+	}
+
+}
+
+
+class AppliedRule {
+	SoDRuleEntity rule;
+	SoDRuleMatrixEntity cell;
+	public AppliedRule(SoDRuleEntity rule, SoDRuleMatrixEntity cell) {
+		super();
+		this.rule = rule;
+		this.cell = cell;
+	}
 }

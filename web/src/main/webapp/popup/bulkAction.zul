@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="bulkaction"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+<window id="window" closable="true" position="top, center"
+	use="com.soffid.iam.web.popup.BulkActionHandler"
+	sizable="false" 
+	visible="false"
+	onDisplay="ref:window.start"
+	onClose="ref:window.close" 
+	style="min-width: 40em; width: 80%">
+
+	<wizard id="wizard">
+			<attribute name="steps"><![CDATA[
+	- ${c:l("bulk.selectActions")}
+	- ${c:l("bulk.confirm")}
+	- ${c:l("user-account-new.Finish")}
+			]]>
+			</attribute>
+		<div id="step1" >
+			<grid id="actions1" fixedLayout="true">
+				<columns visible="false">
+					<column width="200px"/>
+					<column width="200px"/>
+					<column />
+				</columns>
+				<rows/>
+			</grid>
+			<div style="text-align: right; width: 100%">
+				<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step1back" />
+				<button label="${c:l('user_createaccount.Next')}" image="/img/next-r.svg" onClick="ref:window.step1next" />
+			</div>
+		</div>
+		<div id="step2" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
+			<grid id="actions2" fixedLayout="true">
+				<columns visible="false">
+					<column width="200px"/>
+					<column width="200px"/>
+					<column />
+				</columns>
+				<rows/>
+			</grid>
+			<label id="actionMsg"/>
+			<div style="text-align: right; width: 100%">
+				<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step2back" />
+				<button label="${c:l('rules.apply')}" image="/img/save-r.svg" onClick="ref:window.step2next" />
+			</div>
+		</div>
+		<div id="step3" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
+			<progressmeter id="progress" style="width: 100%"/>
+			<label id="results" multiline="true"/>
+			<div style="text-align: right; width: 100%">
+				<button label="${c:l('accounts.setPassword.Cancel')}" id="cancelButton" onClick="ref:window.cancel" />
+				<button label="${c:l('error.zul.Tancar')}" id="closeButton" onClick="ref:window.close" />
+			</div>
+			<timer delay="100" repeats="true" running="false" id="timer"/>
+		</div>
+	</wizard>	
+</window>
+

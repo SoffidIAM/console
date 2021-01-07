@@ -5,6 +5,8 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.EJBException;
 
@@ -162,6 +164,8 @@ public class SoffidStackTrace
 		StringBuffer sb = new StringBuffer();
 	   	Throwable root = e;
 	   	String last = null;
+	   	String lastMessage = null;
+	   	LinkedList<String> significantExceptions = new LinkedList<>();
 	   	do
 	   	{
 	   		String next ;
@@ -171,19 +175,33 @@ public class SoffidStackTrace
 	   			next = root.toString();
 	   		if (next != null)
 	   		{
-		   		if (last == null || ! last.contains(next))
+	   			if ( root instanceof EJBException) {
+	   				// Ignore
+	   			}
+	   			else if (last == null || ! last.contains(next))
 		   		{
-		   			if ( sb.length() > 0)
-		   				sb.append("\ncaused by ");
-		   			sb.append(next);
+		   			significantExceptions.add(next);
 		   			last = next;
-		   		} 
+		   			lastMessage = root.getMessage();
+		   		}
+		   		else if (lastMessage.equals(root.toString()))
+		   		{
+		   			significantExceptions.removeLast();
+		   			significantExceptions.add(next);
+		   			last = next;
+		   			lastMessage = root.getMessage();
+		   		}
 	   		}
 	   		if (root.getCause() == null || root.getCause() == root)
 	   			break;
 	   		else
 	   			root = root.getCause ();
 	   	} while (true);
+	   	for ( String s: significantExceptions) {
+   			if ( sb.length() > 0)
+   				sb.append("\ncaused by ");
+   			sb.append(s);
+	   	}
 	   	return sb.toString();
 	}
 

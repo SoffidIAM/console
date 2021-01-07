@@ -38,7 +38,7 @@
   value: author
   template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(author)}" target="_blank" class="shylink">#{author }</a>
 - name:	${c:l('com.soffid.iam.api.Audit.sourceIp')}
-  value: sourceId
+  value: sourceIp
   default: true
 - name: ${c:l('auditoria.zul.Objecte-2')}
   value: object

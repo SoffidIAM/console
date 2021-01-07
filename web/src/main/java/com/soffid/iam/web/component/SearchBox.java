@@ -133,13 +133,13 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		});
 	}
 	
-	public void search() {
+	public void search(boolean force) {
 		if (dataPath != null)
 		{
 			SingletonBinder binder = new SingletonBinder(this);
 			binder.setDataPath(dataPath);
 			DataSource ds = binder.getDataSource();
-			if (ds.isCommitPending()) {
+			if (! force && ds.isCommitPending()) {
 				Missatgebox.avis(org.zkoss.util.resource.Labels
 							.getLabel("usuaris.Confirmar"),
 						org.zkoss.util.resource.Labels
@@ -419,12 +419,14 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		
 		if (jsonObject != null && dictionary == null)
 			dictionary = SearchDictionaryBuilder.build(jsonObject);
-		
-		for (String att: defaultAttributes.split("[ ,]+"))
-		{
-			addAttribute(att);
+	
+		if (defaultAttributes != null) {
+			for (String att: defaultAttributes.split("[ ,]+"))
+			{
+				addAttribute(att);
+			}
 		}
-
+		
 		advancedSearch = new Textbox();
 		advancedSearch.setMultiline(true);
 		advancedSearch.setRows(2);
@@ -659,6 +661,9 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	}
 
 	private boolean areAttributesToAdd() {
+		if (dictionary == null)
+			return false;
+		
 		for (final SearchAttributeDefinition def : dictionary.getAttributes()) {
 			boolean found = false;
 			for (Component component : (List<Component>) getChildren()) {
@@ -878,5 +883,9 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	
 	public void setEnableAdvanced(boolean enableAdvanced) {
 		this.enableAdvanced = enableAdvanced;
+	}
+
+	public void search() {
+		search (false);
 	}
 }

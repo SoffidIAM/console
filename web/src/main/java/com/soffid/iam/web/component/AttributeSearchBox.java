@@ -91,8 +91,22 @@ public class AttributeSearchBox extends XulElement {
 				operator.equals("lt") ? Labels.getLabel("attributeQuery.LessThan") :
 				operator;
 			humanExpression = humanExpression + ": \""+search +"\"";
-			textValue = search;
-			textOperation = 0;
+			if (attributeDef.getType() == TypeEnumeration.DATE_TIME_TYPE ||
+					attributeDef.getType() == TypeEnumeration.DATE_TYPE) {
+				Date dt = new Date (attributeDef.getType() == TypeEnumeration.DATE_TIME_TYPE ?
+							ISODateTimeFormat.dateTime().parseDateTime(search).getMillis() :
+							ISODateTimeFormat.date().parseDateTime(search).getMillis() );
+				if (operator.equals("eq"))
+					since = until = dt;
+				else if (operator.equals("gt"))
+					since = dt;
+				else if (operator.equals("lt"))
+					until = dt;
+			}
+			else {
+				textValue = search;
+				textOperation = 0;
+			}
 		}
 		invalidate();
 	}
@@ -233,7 +247,8 @@ public class AttributeSearchBox extends XulElement {
 		w.setSclass("search-popup");
 		w.setPosition("parent,parent");
 
-		if (attributeDef.getType().equals(TypeEnumeration.DATE_TYPE) )
+		if (attributeDef.getType() == TypeEnumeration.DATE_TYPE ||
+				attributeDef.getType() == TypeEnumeration.DATE_TIME_TYPE)
 		{
 			createDateSearch(w, bg);
 		}

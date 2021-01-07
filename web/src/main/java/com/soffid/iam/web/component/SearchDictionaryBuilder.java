@@ -133,7 +133,7 @@ public class SearchDictionaryBuilder {
 					if (Date.class.isAssignableFrom(t) ||
 							Calendar.class.isAssignableFrom(t))
 					{
-						sad.setType(TypeEnumeration.DATE_TYPE);
+						sad.setType(TypeEnumeration.DATE_TIME_TYPE);
 					}
 					else if (String.class.isAssignableFrom(t) ||
 							Integer.class.isAssignableFrom(t) || 

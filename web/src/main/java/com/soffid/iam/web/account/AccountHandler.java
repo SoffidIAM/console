@@ -35,6 +35,7 @@ import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
@@ -42,6 +43,7 @@ import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
+import com.soffid.iam.web.user.UserBulkAction;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -219,7 +221,7 @@ public class AccountHandler extends FrameHandler {
 			Textbox password = (Textbox) w.getFellow("password");
 			EJBLocator.getAccountService().setAccountPassword(account, new Password( password.getValue()) );
 			es.caib.zkib.zkiblaf.Missatgebox
-					.confirmaOK(org.zkoss.util.resource.Labels
+					.avis(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
 		}
 		else
@@ -368,6 +370,15 @@ public class AccountHandler extends FrameHandler {
 		boolean b = super.applyNoClose(event);
 		updateStatus();
 		return b;
+	}
+
+	public void bulkAction(Event event) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		DataTable listbox = (DataTable) getListbox();
+		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
+			BulkAction ba = new AccountBulkAction( ) ; 
+			ba.setSearchBox ( (SearchBox) getFellow("searchBox") );
+			ba.start(listbox ) ;
+		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.soffid.iam.web.user;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -8,8 +9,10 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.zkoss.util.TimeZones;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -19,6 +22,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
 
+import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.SyncAgentTaskLog;
@@ -74,6 +78,14 @@ public class UserHandler extends FrameHandler {
 	
 	public void importCsv () throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
 		new UserImporter().importCsv(this);
+	}
+	
+	public void bulkAction(Event event) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		DataTable listbox = (DataTable) getListbox();
+		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
+			UserBulkAction ba = new UserBulkAction( ); 
+			ba.start(listbox ) ;
+		}
 	}
 
 	private void importCsv(CsvParser parser) {
@@ -199,5 +211,43 @@ public class UserHandler extends FrameHandler {
 	public void closeTaskWindow(Event event) {
 		Window w = (Window) getFellow("tasksWindow");
 		w.setVisible(false);
+	}
+	
+	public void audit (Event ev) {
+		String user = (String) XPathUtils.eval(getForm(), "userName");
+		Execution exec = Executions.getCurrent();
+		Calendar c = Calendar.getInstance();
+		c.setTimeZone(TimeZones.getCurrent());
+		c.add(Calendar.DAY_OF_MONTH, -1);
+		c.set(Calendar.HOUR, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		c.set(Calendar.AM_PM, Calendar.AM);
+		String d = ISODateTimeFormat.dateTime().print(c.getTimeInMillis()); 
+		exec.sendRedirect("/monitor/audit.zul?filter=user eq \""+ user.replace("\\", "\\\\").replace("\"","\\\"")+ "\" and calendar gt \""+d+"\"",
+				"_blank");
+	}
+
+	public void accessLog (Event ev) {
+		String user = (String) XPathUtils.eval(getForm(), "userName");
+		Execution exec = Executions.getCurrent();
+		Calendar c = Calendar.getInstance();
+		c.setTimeZone(TimeZones.getCurrent());
+		c.add(Calendar.DAY_OF_MONTH, -1);
+		c.set(Calendar.HOUR, 0);
+		c.set(Calendar.MINUTE, 0);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		c.set(Calendar.AM_PM, Calendar.AM);
+		String d = ISODateTimeFormat.dateTime().print(c.getTimeInMillis()); 
+		exec.sendRedirect("/monitor/access.zul?filter=userName eq \""+ user.replace("\\", "\\\\").replace("\"","\\\"")+ "\" and startDate gt \""+d+"\"",
+				"_blank");
+	}
+	
+	public void refresh(Event ev) throws InternalErrorException, NamingException, CreateException {
+		String user = (String) XPathUtils.eval(getForm(), "userName");
+		EJBLocator.getUserService().refreshChanges(user);
+		
 	}
 }

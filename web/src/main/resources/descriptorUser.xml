@@ -93,16 +93,6 @@
 					<parameter value="${instance.userName}"/>
 			</ejb-finder>
 		</finder>
-		<script-handler>
-			<insert-script>
-				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
-				obj.checkRequiredAttributes(self); 
-			</insert-script>
-			<update-script>
-				obj = new com.soffid.iam.web.users.additionalData.ShowAdditionalData();
-				obj.checkRequiredAttributes(self); 
-			</update-script>
-		</script-handler>
 		<ejb-handler jndi="java:/module/UserService-v2">
 			<insert-method method="create" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>

@@ -14,6 +14,7 @@ import javax.naming.NamingException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -85,6 +86,7 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 		w.setVisible(false);
 		if (event != null)
 			event.stopPropagation();
+		getListbox().setSelectedIndex(-1);
 	}
 	
 	public void delete(Event event) {
@@ -116,6 +118,7 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 	public void undoAdd(Event ev) {
 		Window w = getWindowAdd();
 		w.setVisible(false);
+		getListbox().setSelectedIndex(-1);
 	}
 	
 	public void selectDomain(Event ev) throws InternalErrorException, NamingException, CreateException, IOException {
@@ -149,7 +152,6 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 				coll.setActiveNode(coll.getDataModel(coll.getSize()-1));
 				getWizard().next();
 				if (currentRole.getDomain() == null) {
-					getWizard().next();
 					setProperties(ev);
 				} else {
 					DomainValueField dvf = (DomainValueField) getWindowAdd().getFellow("domainValues");
@@ -168,6 +170,7 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 		List<String> domains = (List<String>) input.getValue();
 		DomainValueField input2 = (DomainValueField) w.getFellow("domainValues2");
 		input2.setValue(domains);
+		getWizard().next();
 	}
 
 
@@ -197,8 +200,6 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 		if ( currentRole.getDomain() !=  null && domains != null && ! domains.isEmpty()) {
 			lb.delete();
 			DataTable usersListbox = getUsersListbox();
-			String userName = (String) XPathUtils.getValue((DataSource) usersListbox, "@userName");
-			String fullName = (String) XPathUtils.getValue((DataSource) usersListbox, "@fullName");
 
 			for (String domain: domains) {
 				RoleAccount ra = new RoleAccount(currentRoleAccount);
@@ -216,14 +217,15 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 	}
 
 	public void backAndRollback(Event ev) {
-		DataTable dt = getListbox();
-		dt.delete();
 		getWizard().previous();
-		if (currentRole.getDomain() == null) 
-			getWizard().previous();
+		if (currentRole.getDomain() == null)  {
+			back(ev);
+		}
 	}
 
 	public void back(Event ev) {
+		DataTable dt = getListbox();
+		dt.delete();
 		getWizard().previous();
 	}
 
@@ -341,4 +343,38 @@ public class AccountRolesHandler extends Div implements AfterCompose {
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
 	}
 
+	public void displayRemoveButton(Component lb, boolean display) {
+		HtmlBasedComponent d = (HtmlBasedComponent) lb.getNextSibling();
+		if (d != null && d instanceof Div) {
+			d =  (HtmlBasedComponent) d.getFirstChild();
+			if (d != null && "deleteButton".equals(d.getSclass())) {
+				d.setVisible(display);
+			}
+		}
+	}
+	
+	public void multiSelect(Event event) {
+		DataTable lb = (DataTable) event.getTarget();
+		displayRemoveButton( lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+	}
+
+	public void deleteSelected(Event event0) {
+		Component b = event0.getTarget();
+		final Component lb = b.getParent().getPreviousSibling();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							displayRemoveButton(lb, false);
+						}
+					});
+		}
+	}
 }

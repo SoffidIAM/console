@@ -851,8 +851,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			@SuppressWarnings("unchecked")
 			List <Long> ll = ( List <Long>) new QueryBuilder()
 					.query( hql.toCountString(), 
-							paramArray,
-							null);
+							paramArray);
 			for ( Long l: ll ) {
 				pagedResult.setTotalResults( new Integer(l.intValue()) );
 			}

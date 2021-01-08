@@ -2,7 +2,6 @@ package com.soffid.iam.service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,17 +31,14 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
-import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
-import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.SyncAgentTaskLog;
-import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
@@ -56,11 +52,9 @@ import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
-import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
-import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -2379,10 +2373,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		@SuppressWarnings("unchecked")
 		List <AccountEntity> r = ( List <AccountEntity>) new QueryBuilder()
-				.query( (HibernateDaoSupport) getAccountEntityDao(),
-						hql.toString(), 
+				.query( hql.toString(), 
 						paramArray,
-						cs.getMaximumResultSize());
+						cs == null ? null: cs.getMaximumResultSize());
 		PagedResult<Account> pagedResult = new PagedResult<Account>();
 		int totalResults = 0;
 		for (AccountEntity ue :r) {
@@ -2402,10 +2395,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if ( cs.getMaximumResultSize()  != null) {
 			@SuppressWarnings("unchecked")
 			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( (HibernateDaoSupport) getAccountEntityDao(),
-							hql.toCountString(), 
-							paramArray,
-							null);
+					.query( hql.toCountString(), 
+							paramArray);
 			for ( Long l: ll ) {
 				pagedResult.setTotalResults( new Integer(l.intValue()) );
 			}

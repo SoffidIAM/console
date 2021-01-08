@@ -41,7 +41,6 @@ import org.json.JSONException;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.soffid.iam.api.AccessTreeAuthorization;
 import com.soffid.iam.api.Account;
@@ -2825,10 +2824,8 @@ public class ApplicationServiceImpl extends
 		if ( pageSize  != null) {
 			@SuppressWarnings("unchecked")
 			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( (HibernateDaoSupport) getApplicationAttributeEntityDao(),
-							hql.toCountString(), 
-							paramArray,
-							null);
+					.query( hql.toCountString(), 
+							paramArray);
 			for ( Long l: ll ) {
 				pagedResult.setTotalResults( new Integer(l.intValue()) );
 			}
@@ -2965,10 +2962,8 @@ public class ApplicationServiceImpl extends
 		if ( pageSize != null) {
 			@SuppressWarnings("unchecked")
 			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( (HibernateDaoSupport) getApplicationAttributeEntityDao(),
-							hql.toCountString(), 
-							paramArray,
-							null);
+					.query( hql.toCountString(), 
+							paramArray);
 			for ( Long l: ll ) {
 				pagedResult.setTotalResults( new Integer(l.intValue()) );
 			}

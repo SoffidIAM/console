@@ -33,7 +33,6 @@ import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONException;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
@@ -851,8 +850,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if ( pageSize  != null) {
 			@SuppressWarnings("unchecked")
 			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( (HibernateDaoSupport) getGroupEntityDao(),
-							hql.toCountString(), 
+					.query( hql.toCountString(), 
 							paramArray,
 							null);
 			for ( Long l: ll ) {

@@ -15,40 +15,69 @@ public class QueryBuilder {
 	
     public List query(org.springframework.orm.hibernate3.support.HibernateDaoSupport dao,
             String queryString, Parameter[] parameters) throws HibernateException {
-        org.hibernate.Query queryObject = dao.getSessionFactory().getCurrentSession()
-                .createQuery(queryString);
-        for (int i = 0; parameters != null && i < parameters.length; i++) {
-        	if (parameters[i].getValue() == null)
-        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
-            		org.hibernate.Hibernate.STRING);
-        	else
-        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
-        }
-        java.util.List results = queryObject.list();
-        return results;
-
+    	return query(dao.getSessionFactory(), queryString, parameters);
     }
 
     public List query(org.springframework.orm.hibernate3.support.HibernateDaoSupport dao,
-            String queryString, Parameter[] parameters, int maxResults) throws HibernateException {
-        org.hibernate.Query queryObject = dao.getSessionFactory().getCurrentSession()
-                .createQuery(queryString);
-        for (int i = 0; parameters != null && i < parameters.length; i++) {
-        	if (parameters[i].getValue() == null)
-        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
-            		org.hibernate.Hibernate.STRING);
-        	else
-        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
-        }
-        queryObject.setMaxResults(maxResults);
-        java.util.List results = queryObject.list();
-        return results;
-
+            String queryString, Parameter[] parameters, Integer maxResults) throws HibernateException {
+    	return query(dao.getSessionFactory(), queryString, parameters, maxResults);
     }
 
     public List query(org.springframework.orm.hibernate3.support.HibernateDaoSupport dao,
             String queryString, Parameter[] parameters, CriteriaSearchConfiguration conf) throws HibernateException {
-        org.hibernate.Query queryObject = dao.getSessionFactory().getCurrentSession()
+    	return query(dao.getSessionFactory(), queryString, parameters, conf);
+    }
+    
+    public List query(String queryString, Parameter[] parameters) throws HibernateException {
+    	return query(getSessionFactory(), queryString, parameters);
+    }
+
+    public List query(String queryString, Parameter[] parameters, Integer maxResults) throws HibernateException {
+    	return query(getSessionFactory(), queryString, parameters, maxResults);
+    }
+
+    public List query(String queryString, Parameter[] parameters, CriteriaSearchConfiguration conf) throws HibernateException {
+    	return query(getSessionFactory(), queryString, parameters, conf);
+    }
+    
+
+    public List query(SessionFactory sessionFactory,
+            String queryString, Parameter[] parameters) throws HibernateException {
+        org.hibernate.Query queryObject = sessionFactory.getCurrentSession()
+                .createQuery(queryString);
+        for (int i = 0; parameters != null && i < parameters.length; i++) {
+        	if (parameters[i].getValue() == null)
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
+            		org.hibernate.Hibernate.STRING);
+        	else
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
+        }
+        java.util.List results = queryObject.list();
+        return results;
+
+    }
+
+    public List query(SessionFactory sessionFactory,
+            String queryString, Parameter[] parameters, Integer maxResults) throws HibernateException {
+        org.hibernate.Query queryObject = sessionFactory.getCurrentSession()
+                .createQuery(queryString);
+        for (int i = 0; parameters != null && i < parameters.length; i++) {
+        	if (parameters[i].getValue() == null)
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
+            		org.hibernate.Hibernate.STRING);
+        	else
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
+        }
+        if (maxResults != null)
+        	queryObject.setMaxResults(maxResults);
+        java.util.List results = queryObject.list();
+        return results;
+
+    }
+
+    public List query(SessionFactory sessionFactory,
+            String queryString, Parameter[] parameters, CriteriaSearchConfiguration conf) throws HibernateException {
+        org.hibernate.Query queryObject = sessionFactory.getCurrentSession()
                 .createQuery(queryString);
         for (int i = 0; parameters != null && i < parameters.length; i++) {
         	if (parameters[i].getValue() == null)
@@ -67,4 +96,10 @@ public class QueryBuilder {
         return results;
 
     }
+
+    protected SessionFactory getSessionFactory() { 
+    	return (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+    }
+    		
+
 }

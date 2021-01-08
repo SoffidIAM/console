@@ -38,7 +38,6 @@ import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 import org.json.JSONException;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -3009,10 +3008,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if ( pageSize  != null) {
 			@SuppressWarnings("unchecked")
 			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( (HibernateDaoSupport) getUserEntityDao(),
-							hql.toCountString(), 
-							paramArray,
-							null);
+					.query( hql.toCountString(), 
+							paramArray);
 			for ( Long l: ll ) {
 				pagedResult.setTotalResults( new Integer(l.intValue()) );
 			}

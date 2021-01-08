@@ -484,6 +484,7 @@
     		<module>webservice</module>
     		<module>upload-components</module>
     		<module>ear</module>
+                <module>juli</module>
     		<module>install</module>
   		</modules>
 	 </profile>

@@ -2115,8 +2115,8 @@ div.datatable.fixedlayout table {
 div.datatable table.tbody tr td.minicolumn {
 	width: 25px;
 	text-align: center;
-	padding-left: 2px;
-	padding-right: 2px;
+	padding-left: 0px;
+	padding-right: 0px;
 }
 
 div.datatable table.tbody tr td.selector {

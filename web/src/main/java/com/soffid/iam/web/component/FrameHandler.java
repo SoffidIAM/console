@@ -164,7 +164,9 @@ public class FrameHandler extends Frame {
 		if (isSingleFaceCard()) return;
 		getCard().setSclass ( "card is-flipped" );
 		focusElement (getCard().getLastChild());
-		displayRemoveButton(getListbox(), false);
+		try {
+			displayRemoveButton(getListbox(), false);
+		} catch (ComponentNotFoundException e) {}
 	}
 
 	private boolean focusElement(Component c) {

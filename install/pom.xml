@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.0-beta-1</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>install</artifactId>
@@ -92,45 +92,43 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3" >
+								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3">
 									<fileset dir="${basedir}/src/main/install4j/resources/iam-console" includes="**/*" />
 								</copy>
-								<copy tofile="${basedir}/target/dist/opt/soffid/iam-console-3/webapps/ROOT.war" 
-									  file="${basedir}/target/lib/iam-webroot.war" />
-								<copy tofile="${basedir}/target/dist/opt/soffid/iam-console-3/bin/tomcat-juli.jar" 
-									  file="${basedir}/target/lib/iam-juli.jar" />
-								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid/bpm" >
+								<copy tofile="${basedir}/target/dist/opt/soffid/iam-console-3/webapps/ROOT.war" file="${basedir}/target/lib/iam-webroot.war" />
+								<copy tofile="${basedir}/target/dist/opt/soffid/iam-console-3/bin/tomcat-juli.jar" file="${basedir}/target/lib/iam-juli.jar" />
+								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid/bpm">
 									<fileset dir="${basedir}/target/lib" includes="*.par" />
 								</copy>
-								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid/plugins" >
+								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid/plugins">
 									<fileset dir="${basedir}/target/lib" includes="sso-plugin.jar" />
 								</copy>
-								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid" >
+								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid">
 									<fileset dir="${basedir}/target/lib" includes="iam-ear.ear" />
 								</copy>
-								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/lib" >
+								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/lib">
 									<fileset dir="${basedir}/target/lib">
-										<include name="iam-tomee.jar"/>
-										<include name="mariadb-java-client.jar"/>
-										<include name="ojdbc7.jar"/>
-										<include name="sqljdbc4.jar"/>
-										<include name="postgresql.jar"/>
+										<include name="iam-tomee.jar" />
+										<include name="mariadb-java-client.jar" />
+										<include name="ojdbc7.jar" />
+										<include name="sqljdbc4.jar" />
+										<include name="postgresql.jar" />
 									</fileset>
 								</copy>
-								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/apps" >
+								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/apps">
 									<fileset dir="${basedir}/target/lib" includes="deployer.jar" />
 								</copy>
 								<mkdir dir="${basedir}/target/dist/opt/soffid/iam-console-3/temp" />
-								<chmod dir="${basedir}/target/dist/opt/soffid/iam-console-3/bin" perm="555" includes="**"/>
+								<chmod dir="${basedir}/target/dist/opt/soffid/iam-console-3/bin" perm="555" includes="**" />
 								<tar destfile="${basedir}/target/Soffid-iamconsole.tar.gz" compression="gzip">
 									<tarfileset dir="${basedir}/target/dist/opt/soffid" username="root" group="root" filemode="0660">
-										<include name="**"/>
-										<exclude name="iam-console-3/bin/soffid-iamconsole"/>
-										<exclude name="iam-console-3/bin/run"/>
+										<include name="**" />
+										<exclude name="iam-console-3/bin/soffid-iamconsole" />
+										<exclude name="iam-console-3/bin/run" />
 									</tarfileset>
-									<tarfileset dir="${basedir}/target/dist/opt/soffid" username="root" group="root" filemode="0550" >
-										<include name="iam-console-3/bin/soffid-iamconsole"/>
-										<include name="iam-console-3/bin/run"/>
+									<tarfileset dir="${basedir}/target/dist/opt/soffid" username="root" group="root" filemode="0550">
+										<include name="iam-console-3/bin/soffid-iamconsole" />
+										<include name="iam-console-3/bin/run" />
 									</tarfileset>
 								</tar>
 							</tasks>
@@ -144,11 +142,11 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<copy todir="${basedir}/target/deb" >
-									<fileset dir="${basedir}/target/dist" includes="**/*"/>
+								<copy todir="${basedir}/target/deb">
+									<fileset dir="${basedir}/target/dist" includes="**/*" />
 								</copy>
-								<chmod dir="${basedir}/target/deb/DEBIAN" perm="755" includes="p*"/>
-								<chmod dir="${basedir}/target/deb/opt/soffid/iam-console-3/bin" perm="750" includes="**"/>
+								<chmod dir="${basedir}/target/deb/DEBIAN" perm="755" includes="p*" />
+								<chmod dir="${basedir}/target/deb/opt/soffid/iam-console-3/bin" perm="750" includes="**" />
 								<exec executable="fakeroot" failonerror="true">
 									<arg value="dpkg-deb" />
 									<arg value="-b" />
@@ -166,10 +164,10 @@
 						<phase>package</phase>
 						<configuration>
 							<tasks>
-								<copy todir="${basedir}/target/rpm/dist" >
-									<fileset dir="${basedir}/target/dist" includes="**/*"/>
+								<copy todir="${basedir}/target/rpm/dist">
+									<fileset dir="${basedir}/target/dist" includes="**/*" />
 								</copy>
-								<chmod dir="${basedir}/target/rpm/dist/opt/soffid/iam-console-3/bin" perm="750" includes="**"/>
+								<chmod dir="${basedir}/target/rpm/dist/opt/soffid/iam-console-3/bin" perm="750" includes="**" />
 								<exec executable="fakeroot" failonerror="true">
 									<arg value="rpmbuild" />
 									<arg value="--target=noarch" />

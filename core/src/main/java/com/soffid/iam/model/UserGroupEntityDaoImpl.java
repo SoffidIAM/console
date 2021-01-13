@@ -445,16 +445,17 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
     }
 
     public void remove(Collection entities) {
-        if (entities != null)
-            for (Iterator it = entities.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj instanceof UserGroupEntity) {
-                UserGroupEntity entity = (UserGroupEntity) obj;
-                this.remove(entity);
-            }
+        if (entities != null) {
+        	List<Object> uge = new LinkedList(entities);
+            for (Iterator it = uge.iterator(); it.hasNext(); ) {
+	            Object obj = it.next();
+	            if (obj instanceof UserGroupEntity) {
+	                UserGroupEntity entity = (UserGroupEntity) obj;
+	                this.remove(entity);
+	            }
+	        }
         }
     }
-
 
     private void createMailTask(UserGroupEntity ug) throws InternalErrorException {
         //  Now, updates any mail lists the users belongs

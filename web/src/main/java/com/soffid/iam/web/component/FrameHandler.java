@@ -313,7 +313,7 @@ public class FrameHandler extends Frame {
 				Missatgebox.confirmaYES_NO(Labels.getLabel("task.msgDeseaSalir"), //$NON-NLS-1$
 						Labels.getLabel("task.titleDeseaSalir"), //$NON-NLS-1$
 						(event2) -> {
-							if (event2.equals("onYes"))
+							if (event2.getName().equals("onYes"))
 							{
 								Component c = getModel();
 								if (c != null && c instanceof DataModel)

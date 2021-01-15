@@ -81,9 +81,18 @@
             <asyncCollectionClass>com.soffid.iam.api.AsyncList</asyncCollectionClass>
           </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-      </plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.9.1</version>
+          <dependencies>
+            <dependency><!-- add support for ssh/scp -->
+              <groupId>org.apache.maven.wagon</groupId>
+              <artifactId>wagon-ssh-external</artifactId>
+              <version>3.4.2</version>
+            </dependency>
+          </dependencies>
+        </plugin>      </plugins>
     </pluginManagement>
   </build>
   <dependencies>
@@ -447,7 +456,6 @@
     <site>
       <id>soffid-open-site</id>
       <name>Soffid Maven site repository</name>
-      <url>${soffid.deploy.site.url}/console/${project.version}</url>
     </site>
   </distributionManagement>
   <profiles>

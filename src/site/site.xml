@@ -31,9 +31,9 @@
   </bannerRight>
   <body>
     <menu name="Overview" inherit="top">
-      <item name="UML Model" href="http://www.soffid.com/doc/console/iam-meta/model/index.html"/>
+      <item name="UML Model" href="iam-meta/uml/index.html"/>
       <item name="Documentation" href="http://confluence.soffid.org"/>
-      <item name="Download" href="http://www.sourceforge.net/projects/soffid/files"/>
+      <item name="Download" href="http://www.soffid.com/download"/>
     </menu>
     <menu name="Parent module" ref="parent" inherit="bottom"/>
     <menu name="Children modules" ref="modules"/>

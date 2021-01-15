@@ -370,14 +370,6 @@
 			<type>ear</type>
 		</dependency>
 		<dependency>
-			<groupId>install4j</groupId>
-			<artifactId>install4j</artifactId>
-			<version>4.1</version>
-			<scope>system</scope>
-			<systemPath>${env.INSTALL4J_HOME}/resource/i4jruntime.jar</systemPath>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.ddlutils</groupId>
 			<artifactId>ddlutils</artifactId>
 			<version>1.0</version>

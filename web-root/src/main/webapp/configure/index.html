@@ -14,7 +14,7 @@ function onChangeType() {
   if (type == "postgresql") 
     d.value = "jdbc:postgresql://<host>/<database>";
   if (type == "sqlserver") 
-    d.value = "jdbc:sqlserver://<server>\<instance>;databaseName=<database>";
+    d.value = "jdbc:sqlserver://<server>\\<instance>;databaseName=<database>";
   if (type == "oracle") 
     d.value = "jdbc:oracle:thin:@<server>:<port>:<sid>";
 }

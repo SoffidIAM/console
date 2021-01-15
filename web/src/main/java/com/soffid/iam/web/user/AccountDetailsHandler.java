@@ -147,7 +147,7 @@ public class AccountDetailsHandler extends Window implements AfterCompose {
 			es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
 			return;
 		}
-		Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
+		Component c = Path.getComponent("//objectAttributes/window");
 		for (Object key: map.keySet())
 		{
 			map.put(key, stringify(map.get(key), ""));

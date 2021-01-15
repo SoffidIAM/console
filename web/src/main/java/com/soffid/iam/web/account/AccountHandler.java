@@ -1,6 +1,9 @@
 package com.soffid.iam.web.account;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -14,9 +17,11 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Image;
@@ -30,10 +35,13 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
+import com.soffid.iam.service.ejb.DispatcherService;
+import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
@@ -381,4 +389,78 @@ public class AccountHandler extends FrameHandler {
 		}
 	}
 
+	public String stringify (Object obj, String indent)
+	{
+		if (obj == null) return "";
+		
+		if (obj instanceof java.util.Calendar)
+		{
+			return new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("selfService.Format"))
+					.format(((Calendar)obj).getTime());
+		}
+		if (obj instanceof java.util.Date)
+		{
+			return new java.text.SimpleDateFormat(org.zkoss.util.resource.Labels.getLabel("selfService.Format"))
+					.format((Date)obj);
+		}
+		if (obj instanceof java.util.Collection)
+		{
+			String r = "[";
+			for ( Object obj2 : (Collection)obj) {
+				if (!r.isEmpty()) r = r + ",\n"+indent;
+				r = r + stringify(obj2, indent+"  ");
+			}
+			return r + "]";
+		}
+		if (obj instanceof java.util.Map)
+		{
+			String r = "{";
+			Map map = (Map)obj;
+			for ( Object k : map.keySet()) {
+				if (!r.isEmpty()) r = r + ",\n";
+				r = r + stringify(k, indent+" ") + ": "+stringify (map.get(k), indent+"  ");
+			}
+			return r + "}";
+		}
+		if (obj.getClass().isArray())
+		{
+			String r = "";
+			Object[] array = (Object[]) obj; 
+			for ( Object obj2 : array) {
+				if (r.isEmpty()) r = "[";
+				else r = r + ",\n"+indent;
+				r = r + stringify(obj2, indent+"  ");
+			}
+			return r + "]";
+		}
+		return obj.toString();
+	}
+
+	public void doQuery () throws NamingException, CreateException, InternalErrorException
+	{
+		DispatcherService svc = EJBLocator.getDispatcherService();
+		
+		String name = (String) XPathUtils.eval(getForm(), "/@name");
+		String system = (String) XPathUtils.eval(getForm(), "/@system");
+
+		GetObjectResults result = svc.getNativeObject(
+				system,
+				SoffidObjectType.OBJECT_ACCOUNT,
+				name, system);
+		Map map = result.getObject();
+		if (map == null)
+		{
+			es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
+			return;
+		}
+		Component c = Path.getComponent("//objectAttributes/window");
+		for (Object key: map.keySet())
+		{
+			map.put(key, stringify(map.get(key), ""));
+		}
+		Events.postEvent("onStart", c, new Object[]{
+				name,
+				result
+		});
+	}
 }

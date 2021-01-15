@@ -388,7 +388,7 @@ public class AttributeMappingHandler extends DataGrid {
 			es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
 			return;
 		}
-		Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
+		Component c = Path.getComponent("//objectAttributes/window");
 		for (String key: map.keySet())
 		{
 			map.put(key, stringify(map.get(key), ""));
@@ -434,7 +434,7 @@ public class AttributeMappingHandler extends DataGrid {
 			es.caib.zkib.zkiblaf.Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("agents.zul.notFound"));
 			return;
 		}
-		Component c = Path.getComponent("//objectAttributes/objectAttributesWindow");
+		Component c = Path.getComponent("//objectAttributes/window");
 		for (String key: map.keySet())
 		{
 			map.put(key, stringify(map.get(key), ""));

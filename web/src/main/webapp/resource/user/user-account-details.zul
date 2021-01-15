@@ -16,7 +16,7 @@
 				<menu2item if="${soffid:isUserInRole('user:update')}" image="/img/trash.svg" 
 					label="${c:l('plugins.zul.Delete') }" 
 					onClick="ref:window.delete"/>
-				<menu2item label="${c:l('vault.details')}" onClick="ref:window.doQuery()" 
+				<menu2item image="/img/question.svg" label="${c:l('vault.details')}" onClick="ref:window.doQuery()" 
 					id="detailsButton"/>
 			</menu2>
 		</div>

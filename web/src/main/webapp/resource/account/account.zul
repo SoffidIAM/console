@@ -62,6 +62,7 @@
 							<menu2> 
 								<menu2item if="${soffid:isUserInRole('account:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 								<menu2item if="${soffid:isUserInRole('account:update')}" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
+								<menu2item image="/img/question.svg" label="${c:l('vault.details')}" onClick="ref:frame.doQuery()" id="detailsButton"/>
 							</menu2>
 						</div> 
 						<div id="dades"> 
@@ -151,5 +152,6 @@
 		</hbox>
 	</window>
 	
+	<include src="/popup/agent_objectAttributes.zul" />
 </frame>
 

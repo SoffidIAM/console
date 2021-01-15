@@ -771,4 +771,5 @@
 		<html id="content" sclass="svg-container"/>
 	</window>
 
+	<include src="/popup/agent_objectAttributes.zul"/>
 </frame>

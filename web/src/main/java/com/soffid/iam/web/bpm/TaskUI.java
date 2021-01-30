@@ -96,7 +96,6 @@ import es.caib.zkib.zkiblaf.Frame;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class TaskUI extends FrameHandler implements EventListener {
-	
 	private Long taskId = null;
     Label proceso = null;
     Label tarea = null;
@@ -186,10 +185,14 @@ public class TaskUI extends FrameHandler implements EventListener {
         
 		if (taskId != null) {
 			TaskInstance ti = engine.getTask(taskId);
-			if (ti == null)
-				Application.goBack();
-			else
+			if (ti != null)
 				openTaskInstance(ti);
+			else {
+				Missatgebox.avis("This task does not exist", 
+						(event) -> {
+							Application.goBack();
+						});
+			}
 		} else if (definitionId != null)
 		{
 			TaskInstance ti = engine.createDummyTask(definitionId);
@@ -970,5 +973,6 @@ public class TaskUI extends FrameHandler implements EventListener {
 	public void closeProcessViewer (Event event) {
 		event.getTarget().getFellow("visorProcesoWnd").setVisible(false);
 	}
+
 }
 

@@ -8,6 +8,7 @@ import javax.servlet.http.*;
 import com.soffid.iam.init.Configuration;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.Locale;
 
 @WebFilter(urlPatterns="/*")
@@ -26,9 +27,20 @@ public class LoginFilter implements Filter {
 				! req.getRequestURI().startsWith("/logout") && 
 				! req.getRequestURI().startsWith("/soffid")) {
 			Configuration cfg = Configuration.getConfiguration();
-			if (cfg.isConfigured()) 
-				resp.sendRedirect("/soffid");
-			else
+			if (cfg.isConfigured())  {
+				if ( req.getRequestURI().startsWith("/selfservice/task.zul")) {
+					resp.sendRedirect("/soffid/wf/task.zul?"+req.getQueryString());
+				}
+				else if ( req.getRequestURI().startsWith("/selfservice/index.zul") &&
+						req.getParameter("target") != null &&
+						req.getParameter("target").startsWith("sharedAccounts/sharedAccounts.zul")) {
+					String qs = req.getQueryString();
+					if (qs.contains("?")) qs = qs.substring(qs.indexOf("?")+1);
+					resp.sendRedirect("/soffid/resource/account/vault.zul?"+qs);
+				}
+				else
+					resp.sendRedirect("/soffid");
+			} else
 				chain.doFilter(request, response);
 		}
 		else

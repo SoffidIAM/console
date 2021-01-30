@@ -1,27 +1,21 @@
 package com.soffid.iam.web.account;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
-import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
@@ -29,6 +23,7 @@ import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.TreeModel;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
@@ -42,12 +37,8 @@ import com.soffid.iam.service.ejb.AccountService;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
-import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.SearchBox;
-import com.soffid.iam.web.popup.CsvParser;
-import com.soffid.iam.web.popup.ImportCsvHandler;
-import com.soffid.iam.web.popup.SelectColumnsHandler;
 import com.soffid.iam.web.vault.LaunchHelper;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -55,18 +46,19 @@ import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
+import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
-import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class VaultHandler extends FrameHandler {
+	private Account account;
+
 	public VaultHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
-
 	}
 
 	@Override
@@ -174,24 +166,23 @@ public class VaultHandler extends FrameHandler {
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
-		SearchBox sb = (SearchBox) getFellow("searchBox");
-		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
-		String user = req.getParameter("name");
-		String system = req.getParameter("system");
-		if (user != null && system != null) {
-			sb.setBasicMode();
-			sb.addAttribute("name").setSearchFilter(user);
-			sb.addAttribute("system").setSearchFilter(system);
-			sb.search();
-		} else {
-			HashSet<String> s = new HashSet<String>();
-			s.add("P");
-			s.add("S");
-			s.add("I");
-			
-			sb.addAttribute("type").setSelectedValues(s);
+		if (account != null) {
+			DataTree2 tree = (DataTree2) getListbox();
+			int l = 0;
+			TreeModel treeModel = tree.getModel();
+			Object node = treeModel.getRoot();
+			while (node != null) {
+				if (treeModel.isLeaf(node) || treeModel.getChildCount(node) <= 0)
+					node = null;
+				else {
+					l ++;
+					node = treeModel.getChild(node, 0);
+				}
+			}
+			tree.setSelectedIndex(new int[l]);
+			showDetails();
+			getModel().getVariables().declareVariable("id", null);
 		}
-
 	}
 
 	public void setPassword(Event event) throws InternalErrorException, NamingException, CreateException, CommitException {
@@ -520,4 +511,26 @@ public class VaultHandler extends FrameHandler {
 		Account account = (Account) XPathUtils.getValue(getForm(), "/.");
 		new LaunchHelper().launchAccount(account);
 	}
+
+	@Override
+	public boolean insertBefore(Component newChild, Component refChild) {
+		boolean b = super.insertBefore(newChild, refChild);
+		if ( newChild instanceof DataModel) {
+			HttpServletRequest request = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+			String requestedAccount = request.getParameter("account");
+			String requestedSystem = request.getParameter("system");
+			if (requestedAccount != null && requestedSystem != null)
+			{
+				try {
+					account = EJBLocator.getAccountService().findAccount(requestedAccount, requestedSystem);
+					if (account != null)
+						((DataModel)newChild).getVariables().declareVariable("id", account.getId());
+				} catch (InternalErrorException | NamingException | CreateException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return b;
+	}
+	
 }

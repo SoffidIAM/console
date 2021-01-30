@@ -6,7 +6,7 @@ import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.InputFieldUIHandler;
 
 
-public class IpHandler extends InputFieldUIHandler {
+public class IPHandler extends InputFieldUIHandler {
 
 	@Override
 	public void afterCreate(InputField3 field) throws Exception {

@@ -194,9 +194,6 @@ public class FrameHandler extends Frame {
 		if (getModel() != null)
 			getModel().commit();
 		
-		if (isSingleFaceCard()) return;
-
-		getCard().setSclass ( "card" );
 		try {
 			Component lb = getListbox();
 			if (lb != null) {
@@ -209,9 +206,13 @@ public class FrameHandler extends Frame {
 		} catch (ComponentNotFoundException e) {
 			
 		}
+
 		try {
 			displayRemoveButton(getListbox(), false);
 		} catch (ComponentNotFoundException e) {} // Ignore
+		
+		if (!isSingleFaceCard()) 
+			getCard().setSclass ( "card" );
 	}
 	
 	protected Component getListbox() {
@@ -369,7 +370,7 @@ public class FrameHandler extends Frame {
 	}
 
 	
-	private boolean validateAttributes(Component form) {
+	public boolean validateAttributes(Component form) {
 		if (form == null || !form.isVisible()) return true;
 		if (form instanceof ObjectAttributesDiv) {
 			return ((ObjectAttributesDiv) form).validate();

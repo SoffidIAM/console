@@ -77,6 +77,8 @@ public class CheckPasswordLoginFilter implements Filter {
 				String url = req.getRequestURI();
 				if (req.getQueryString() != null && req.getQueryString().length() > 0)
 					url = url + "?" + URLEncoder.encode(req.getQueryString(), "ISO-8859-1");
+				if (url .startsWith("/soffid/"))
+					url = url.substring(7);
 				session.setAttribute("$$SoffidPassswordBack$$", url);
 			}
 			request.getRequestDispatcher(

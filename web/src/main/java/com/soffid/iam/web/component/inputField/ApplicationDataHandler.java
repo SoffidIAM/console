@@ -36,7 +36,7 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Application> r = handler.read(null, q, null, null);
+		List<Application> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -72,7 +72,7 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Application> r = handler.read(null, q, null, null);
+		List<Application> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

@@ -35,7 +35,7 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 		String q = "name eq \"" + quote(roleName)+ "\" and system eq \""+quote(systemName)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Role> r = handler.read(null, q, null, null);
+		List<Role> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -73,7 +73,7 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 		String q = "name eq \"" + quote(roleName)+ "\" and system eq \""+quote(systemName)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Role> r = handler.read(null, q, null, null);
+		List<Role> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

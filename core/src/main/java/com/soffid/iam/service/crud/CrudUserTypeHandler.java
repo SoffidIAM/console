@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.service.ejb.UserDomainService;
 
@@ -28,7 +29,7 @@ public class CrudUserTypeHandler implements CrudHandler<UserType> {
 	}
 
 	@Override
-	public List<UserType> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<UserType> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findUserTypeByTextAndFilter(text, filter, start, end);
 	}
 

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
@@ -385,7 +386,7 @@ public abstract class LlistesDeCorreuService {
 
 	@Operation(grantees = { roles.mail_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public List<DominiCorreu> findMailDomainsByJsonQuery(@Nullable String query, 
+	public PagedResult<DominiCorreu> findMailDomainsByJsonQuery(@Nullable String query, 
 			@Nullable Integer first,
 			@Nullable Integer max)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -401,7 +402,7 @@ public abstract class LlistesDeCorreuService {
 
 	@Operation(grantees = { roles.mail_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public List<DominiCorreu> findMailDomainsByTextAndFilter(
+	public PagedResult<DominiCorreu> findMailDomainsByTextAndFilter(
 			@Nullable String text, 
 			@Nullable String query, 
 			@Nullable Integer first,
@@ -421,7 +422,7 @@ public abstract class LlistesDeCorreuService {
 
 	@Operation(grantees = { roles.mail_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public List<LlistaCorreu> findMailListByTextAndFilter(
+	public PagedResult<LlistaCorreu> findMailListByTextAndFilter(
 			@Nullable String text, 
 			@Nullable String query, 
 			@Nullable Integer first,

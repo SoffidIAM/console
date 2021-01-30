@@ -4,12 +4,26 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import es.caib.seycon.ng.comu.ControlAcces;
+
 public class PagedResult<E>  {
 	private static final long serialVersionUID = 1L;
 	Integer startIndex;
 	Integer itemsPerPage;
 	Integer totalResults;
 	List<E> resources;
+	
+	public PagedResult() {
+		
+	}
+	
+	public PagedResult(PagedResult<?> source, List<E> resources) {
+		this.startIndex = source.startIndex;
+		this.itemsPerPage = source.itemsPerPage;
+		this.totalResults = source.totalResults;
+		this.resources = resources;
+	}
+	
 	public Integer getStartIndex() {
 		return startIndex;
 	}

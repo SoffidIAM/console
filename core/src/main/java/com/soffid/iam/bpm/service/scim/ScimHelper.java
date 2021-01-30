@@ -31,6 +31,8 @@ public class ScimHelper {
 	private Class objectClass;
 	private ValueObjectGenerator generator;
 	AdditionalDataService svc = com.soffid.iam.ServiceLocator.instance().getAdditionalDataService();
+	private HQLQuery hql;
+	Integer count = null;
 	
 	public ScimHelper (Class objectClass) {
 		this.objectClass = objectClass;
@@ -50,7 +52,7 @@ public class ScimHelper {
 		}
 		
 		AbstractExpression expr = ExpressionParser.parse(q2);
-		HQLQuery hql = expr.generateHSQLString( objectClass );
+		hql = expr.generateHSQLString( objectClass );
 		qs = hql.getWhereString().toString();
 		if (tenantFilter != null) {
 			if (qs.isEmpty())
@@ -60,10 +62,12 @@ public class ScimHelper {
 			hql.setWhereString(new StringBuffer(qs));
 		}
 		
-
 		SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		String q = hql.toString();
+		if (order != null)
+			q = q + " order by "+ order;
 		org.hibernate.Query queryObject = sf.getCurrentSession()
-				.createQuery( hql.toString() );
+				.createQuery( q );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
 		for (String s : params.keySet())
@@ -89,7 +93,8 @@ public class ScimHelper {
 		}
 		
         java.util.List l = queryObject.list();
-
+        count = null;
+        
 		for (Object e : l) {
 			if (result instanceof AsyncList)
 			{
@@ -105,6 +110,8 @@ public class ScimHelper {
 			if (vo != null)
 				result.add(vo);
 		}
+		
+		count = new Integer(result.size());
 	}
 
 	String generateQuickSearchQuery (String text) throws InternalErrorException {
@@ -139,6 +146,39 @@ public class ScimHelper {
 			sb.append(")");
 		}
 		return sb.toString();
+	}
+	
+	public int count() {
+		if (hql == null)
+			return 0;
+
+		if (count != null)
+			return count.intValue();
+		
+		SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		
+		org.hibernate.Query queryObject = sf.getCurrentSession()
+				.createQuery( hql.toCountString() );
+		int i = 0;
+		Map<String, Object> params = hql.getParameters();
+		for (String s : params.keySet())
+		{
+			Object v = params.get(s);
+			if (v == null)
+				queryObject.setParameter(s, v, 
+						org.hibernate.Hibernate.STRING);
+			else
+				queryObject.setParameter(s, v);
+		}
+		queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+
+		for (Object o: queryObject.list()) {
+			if (o instanceof Long)
+				return ((Long) o).intValue();
+			else if (o instanceof Integer)
+				return ((Integer) o).intValue();
+		}
+		return 0;
 	}
 
 	public String[] getPrimaryAttributes() {

@@ -5,6 +5,7 @@ import java.util.List;
 import roles.Tothom;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.api.VaultFolderPermissions;
@@ -85,7 +86,7 @@ public class VaultService {
 	public List<VaultElement> findVaultElementByText (@Nullable String filter){ return null;}
 
 	@Operation(grantees = { Tothom.class })
-	public java.util.List<VaultFolder> findFolderByTextAndJsonQuery(
+	public PagedResult<VaultFolder> findFolderByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {

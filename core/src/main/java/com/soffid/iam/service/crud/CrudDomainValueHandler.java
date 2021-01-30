@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.service.ejb.DomainService;
 import com.soffid.iam.service.ejb.MailListsService;
@@ -30,7 +31,7 @@ public class CrudDomainValueHandler implements CrudHandler<com.soffid.iam.api.Do
 	}
 
 	@Override
-	public List<DomainValue> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<DomainValue> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findDomainValueByTextAndFilter(text, filter, start, end);
 	}
 

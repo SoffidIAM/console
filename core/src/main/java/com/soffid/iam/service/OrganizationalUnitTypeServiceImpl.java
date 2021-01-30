@@ -18,9 +18,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.OUType;
+import com.soffid.iam.api.PagedResult;
+import com.soffid.iam.api.System;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.GroupTypeEntity;
+import com.soffid.iam.model.GroupTypeEntityDao;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -176,20 +183,29 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	}
 
 	@Override
-	protected List<OUType> handleFindOUTypeByTextAndFilter(String text, String filter, Integer first, Integer pageSize)
+	protected PagedResult<OUType> handleFindOUTypeByTextAndFilter(String text, String filter, Integer first, Integer pageSize)
 			throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
-		AsyncList<OUType> result = new AsyncList<OUType>();
-		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		findByJsonQuery(result, q, first, pageSize);
-		if (result.isCancelled())
-			TimeOutUtils.generateException();
-		result.done();
-		return result.get();
+
+		final GroupTypeEntityDao dao = getGroupTypeEntityDao();
+		ScimHelper h = new ScimHelper(OUType.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(first);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toOUType((GroupTypeEntity) entity);
+		}); 
+		LinkedList<OUType> result = new LinkedList<OUType>();
+		h.search(text, filter, (Collection) result); 
+		PagedResult<OUType> pr = new PagedResult<>();
+		pr.setStartIndex(first);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
+
 	}
 	
 	protected void findByJsonQuery ( AsyncList<OUType> result, String query, Integer first, Integer pageSize) 

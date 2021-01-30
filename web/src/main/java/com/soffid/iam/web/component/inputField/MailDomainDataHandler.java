@@ -34,7 +34,7 @@ public class MailDomainDataHandler extends InputFieldDataHandler<MailDomain> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<MailDomain> r = handler.read(null, q, null, null);
+		List<MailDomain> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -70,7 +70,7 @@ public class MailDomainDataHandler extends InputFieldDataHandler<MailDomain> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<MailDomain> r = handler.read(null, q, null, null);
+		List<MailDomain> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

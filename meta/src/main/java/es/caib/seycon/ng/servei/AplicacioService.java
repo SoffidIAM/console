@@ -22,6 +22,7 @@ import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
+import com.soffid.mda.annotation.Role;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.bpm.servei.BpmEngine;
@@ -691,7 +692,7 @@ public abstract class AplicacioService {
 
 	@Operation(grantees = { roles.role_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public PagedResult findRoleByJsonQuery(
+	public PagedResult<Rol> findRoleByJsonQuery(
 			@Nullable String query,
 			@Nullable Integer startIndex,
 			@Nullable Integer count)

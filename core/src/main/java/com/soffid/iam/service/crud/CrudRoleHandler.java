@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.service.ejb.ApplicationService;
 
@@ -28,8 +29,8 @@ public class CrudRoleHandler implements CrudHandler<Role> {
 	}
 
 	@Override
-	public List<Role> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findRoleByTextAndFilter(text, filter, start, end).getResources();
+	public PagedResult<Role> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+		return getService().findRoleByTextAndFilter(text, filter, start, end);
 	}
 
 	@Override

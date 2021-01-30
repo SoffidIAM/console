@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.CustomObjectService;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -31,7 +32,7 @@ public class CrudCustomObjectHandler implements CrudHandler<CustomObject> {
 	}
 
 	@Override
-	public List<CustomObject> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<CustomObject> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		if (objectType != null) {
 			if (filter == null || filter.trim().isEmpty())
 				filter = "type eq \""+ objectType.replace("\\", "\\\\").replace("\"","\\\"")+"\"";

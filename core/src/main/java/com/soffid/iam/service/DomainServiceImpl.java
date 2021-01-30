@@ -18,6 +18,7 @@ import es.caib.seycon.ng.servei.*;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.System;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.ApplicationDomainEntity;
@@ -354,16 +355,15 @@ public class DomainServiceImpl extends
 	}
 
 	@Override
-	protected List<DomainValue> handleFindDomainValueByTextAndFilter(String text, String query, Integer first,
+	protected PagedResult<DomainValue> handleFindDomainValueByTextAndFilter(String text, String query, Integer first,
 			Integer pageSize) throws Exception {
 		final LinkedList<DomainValue> result = new LinkedList<DomainValue>();
-		doFindDomainValueByTextAndJsonQuery(text, query, first, pageSize, result);
-		return result;
+		return doFindDomainValueByTextAndJsonQuery(text, query, first, pageSize, result);
 	}
 
-	private void doFindDomainValueByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<DomainValue> doFindDomainValueByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<DomainValue> result) throws ClassNotFoundException, InternalErrorException, UnsupportedEncodingException, JSONException, EvalException, ParseException, TokenMgrError {
+			List<DomainValue> result) throws ClassNotFoundException, InternalErrorException, UnsupportedEncodingException, JSONException, EvalException, ParseException, TokenMgrError {
 		final DomainValueEntityDao dao = getDomainValueEntityDao();
 		ScimHelper h = new ScimHelper(DomainValue.class);
 		h.setPrimaryAttributes(new String[] { "value", "description"});
@@ -376,6 +376,12 @@ public class DomainServiceImpl extends
 			return dao.toDomainValue((DomainValueEntity) entity);
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<DomainValue> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 	
 }

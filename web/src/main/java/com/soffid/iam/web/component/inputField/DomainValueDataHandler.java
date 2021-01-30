@@ -39,7 +39,7 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 		String q = "value eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+quote(app)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<DomainValue> r = handler.read(null, q, null, null);
+		List<DomainValue> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -81,7 +81,7 @@ public class DomainValueDataHandler extends InputFieldDataHandler<DomainValue> {
 		String q = "value eq \"" + quote(name)+ "\" and domain.name eq \""+quote(domain)+"\" and domain.informationSystem.name eq \""+quote(app)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<DomainValue> r = handler.read(null, q, null, null);
+		List<DomainValue> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

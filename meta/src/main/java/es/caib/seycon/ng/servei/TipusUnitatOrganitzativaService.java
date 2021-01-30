@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -80,7 +81,7 @@ public abstract class TipusUnitatOrganitzativaService {
 
 	@Operation(grantees = { roles.organizationalUnit_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.List<es.caib.seycon.ng.comu.TipusUnitatOrganitzativa> findOUTypeByTextAndFilter(
+	public PagedResult<es.caib.seycon.ng.comu.TipusUnitatOrganitzativa> findOUTypeByTextAndFilter(
 			@Nullable String text,
 			@Nullable String filter,
 			@Nullable Integer first,

@@ -2681,9 +2681,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return result;
 	}
 
-	private void doFindAccountByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<Account> doFindAccountByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<Account> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, 
+			List<Account> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, 
 				EvalException, JSONException, ParseException, TokenMgrError {
 		final AccountEntityDao dao = getAccountEntityDao();
 		final AuthorizationService authorizationService = getAuthorizationService();
@@ -2708,14 +2708,19 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<Account> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 	@Override
-	protected List<Account> handleFindAccountByTextAndJsonQuery(String text, String jsonQuery,
+	protected PagedResult<Account> handleFindAccountByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<Account> result = new LinkedList<Account>();
-		doFindAccountByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
-		return result;
+		return doFindAccountByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 	}
 
 	@Override

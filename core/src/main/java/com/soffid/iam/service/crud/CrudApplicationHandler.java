@@ -29,8 +29,8 @@ public class CrudApplicationHandler implements CrudHandler<Application> {
 	}
 
 	@Override
-	public List<Application> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findApplicationByTextAndFilter(text, filter, start, end).getResources();
+	public PagedResult<Application> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+		return getService().findApplicationByTextAndFilter(text, filter, start, end);
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<OUType> r = handler.read(null, q, null, null);
+		List<OUType> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -72,7 +72,7 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<OUType> r = handler.read(null, q, null, null);
+		List<OUType> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

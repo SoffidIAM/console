@@ -34,7 +34,7 @@ public class CustomObjectDataHandler extends InputFieldDataHandler<CustomObject>
 		String q = "name eq \"" + quote(name)+ "\" and type.name eq\""+quote(dataType.getCustomObjectType())+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<CustomObject> r = handler.read(null, q, null, null);
+		List<CustomObject> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -74,7 +74,7 @@ public class CustomObjectDataHandler extends InputFieldDataHandler<CustomObject>
 		String q = "name eq \"" + quote(name)+ "\" and type.name eq\""+quote(dataType.getCustomObjectType())+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<CustomObject> r = handler.read(null, q, null, null);
+		List<CustomObject> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

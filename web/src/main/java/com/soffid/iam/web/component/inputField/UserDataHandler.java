@@ -36,7 +36,7 @@ public class UserDataHandler extends InputFieldDataHandler<User> {
 		String q = "userName eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<User> r = handler.read(null, q, null, null);
+		List<User> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getFullName();
 		else
@@ -73,7 +73,7 @@ public class UserDataHandler extends InputFieldDataHandler<User> {
 		String q = "userName eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<User> r = handler.read(null, q, null, null);
+		List<User> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

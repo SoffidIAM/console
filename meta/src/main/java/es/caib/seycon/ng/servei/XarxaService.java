@@ -9,6 +9,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -584,7 +585,7 @@ public abstract class XarxaService {
 	public Xarxa findNetworkByIpAddress(String ipAdress) {return null;}
 
 	@Operation(grantees = { roles.host_all_query.class })
-	public java.util.List<Maquina> findHostByTextAndJsonQuery(
+	public PagedResult<Maquina> findHostByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {
@@ -600,7 +601,7 @@ public abstract class XarxaService {
 
 
 	@Operation(grantees = { roles.network_all_query.class })
-	public java.util.List<Xarxa> findNetworkByTextAndJsonQuery(
+	public PagedResult<Xarxa> findNetworkByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {
@@ -613,4 +614,6 @@ public abstract class XarxaService {
 			@Nullable String jsonQuery) {
 		return null;
 	}
+	
+	boolean canLogin(String user, String host) { return false; }
 }

@@ -17,9 +17,11 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.ForbiddenWord;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.PasswordDomain;
 import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PasswordPolicyForbbidenWord;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
@@ -494,9 +496,9 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 		return result;
 	}
 
-	private void doFindUserTypeByTextAndFilter(String text, String jsonQuery,
+	private PagedResult<UserType> doFindUserTypeByTextAndFilter(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<UserType> result) throws Exception {
+			List<UserType> result) throws Exception {
 		final UserTypeEntityDao dao = getUserTypeEntityDao();
 		ScimHelper h = new ScimHelper(UserType.class);
 		h.setPrimaryAttributes(new String[] { "code", "description"});
@@ -509,14 +511,19 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 			return dao.toUserType((UserTypeEntity) entity);
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<UserType> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 	
 	@Override
-	protected List<UserType> handleFindUserTypeByTextAndFilter(String text, String jsonQuery,
+	protected PagedResult<UserType> handleFindUserTypeByTextAndFilter(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<UserType> result = new LinkedList<UserType>();
-		doFindUserTypeByTextAndFilter(text, jsonQuery, start, pageSize, result);
-		return result;
+		return doFindUserTypeByTextAndFilter(text, jsonQuery, start, pageSize, result);
 	}
 
 }

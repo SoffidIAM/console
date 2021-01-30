@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.Network;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.NetworkService;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -28,7 +29,7 @@ public class CrudNetworkHandler implements CrudHandler<Network> {
 	}
 
 	@Override
-	public List<Network> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<Network> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findNetworkByTextAndJsonQuery(text, filter, start, end);
 	}
 

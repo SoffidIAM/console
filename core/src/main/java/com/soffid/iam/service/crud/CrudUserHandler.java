@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.User;
 import com.soffid.iam.service.ejb.UserService;
 
@@ -28,8 +29,8 @@ public class CrudUserHandler implements CrudHandler<User> {
 	}
 
 	@Override
-	public List<User> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findUserByTextAndFilter(text, filter, start, end).getResources();
+	public PagedResult<User> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+		return getService().findUserByTextAndFilter(text, filter, start, end);
 	}
 
 	@Override

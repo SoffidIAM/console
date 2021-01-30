@@ -554,7 +554,7 @@ public abstract class AccountService {
 
 	@Operation(grantees = { account_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public PagedResult findAccountByJsonQuery(
+	public PagedResult<Account> findAccountByJsonQuery(
 			@Nullable String query,
 			@Nullable Integer first, @Nullable Integer num)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -587,7 +587,7 @@ public abstract class AccountService {
 
 
 	@Operation(grantees = { roles.account_query.class })
-	public java.util.List<Account> findAccountByTextAndJsonQuery(
+	public PagedResult<Account> findAccountByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {

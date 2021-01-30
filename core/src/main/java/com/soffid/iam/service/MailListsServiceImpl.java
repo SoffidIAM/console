@@ -23,6 +23,8 @@ import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MailListRelated;
 import com.soffid.iam.api.MailListRoleMember;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.PagedResult;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
@@ -988,24 +990,22 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	@Override
-	protected List<MailDomain> handleFindMailDomainsByJsonQuery(String query, Integer first, Integer pageSize)
+	protected PagedResult<MailDomain> handleFindMailDomainsByJsonQuery(String query, Integer first, Integer pageSize)
 			throws Exception {
 		final LinkedList<MailDomain> result = new LinkedList<MailDomain>();
-		doFindMailDomainByTextAndJsonQuery(null, query, first, pageSize, result);
-		return result;
+		return doFindMailDomainByTextAndJsonQuery(null, query, first, pageSize, result);
 	}
 
 	@Override
-	protected List<MailDomain> handleFindMailDomainsByTextAndFilter(String text, String query, Integer first,
+	protected PagedResult<MailDomain> handleFindMailDomainsByTextAndFilter(String text, String query, Integer first,
 			Integer pageSize) throws Exception {
 		final LinkedList<MailDomain> result = new LinkedList<MailDomain>();
-		doFindMailDomainByTextAndJsonQuery(text, query, first, pageSize, result);
-		return result;
+		return doFindMailDomainByTextAndJsonQuery(text, query, first, pageSize, result);
 	}
 	
-	private void doFindMailDomainByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<MailDomain> doFindMailDomainByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<MailDomain> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+			List<MailDomain> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final EmailDomainEntityDao dao = getEmailDomainEntityDao();
 		ScimHelper h = new ScimHelper(MailDomain.class);
 		h.setPrimaryAttributes(new String[] { "name", "description"});
@@ -1018,18 +1018,23 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 			return dao.toMailDomain((EmailDomainEntity) entity);
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<MailDomain> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 	
-	protected List<MailList> handleFindMailListByTextAndFilter(String text, String query, Integer first,
+	protected PagedResult<MailList> handleFindMailListByTextAndFilter(String text, String query, Integer first,
 			Integer pageSize) throws Exception {
 		final LinkedList<MailList> result = new LinkedList<MailList>();
-		doFindMailListByTextAndJsonQuery(text, query, first, pageSize, result);
-		return result;
+		return doFindMailListByTextAndJsonQuery(text, query, first, pageSize, result);
 	}
 	
-	private void doFindMailListByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<MailList> doFindMailListByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<MailList> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+			List<MailList> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final EmailListEntityDao dao = getEmailListEntityDao();
 		ScimHelper h = new ScimHelper(MailList.class);
 		h.setPrimaryAttributes(new String[] { "name", "domain", "description"});
@@ -1042,6 +1047,12 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 			return dao.toMailList((EmailListEntity) entity);
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<MailList> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 	
 	@Override

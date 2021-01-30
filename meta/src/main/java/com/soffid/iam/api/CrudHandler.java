@@ -12,7 +12,7 @@ public class CrudHandler<E> {
 	public E create (E object) {return null;}
 	
 	@Operation(grantees = {Tothom.class})
-	public List<E> read (String filter, Integer start, Integer end ) {return null;}
+	public PagedResult<E> read (String filter, Integer start, Integer end ) {return null;}
 	
 	@Operation(grantees = {Tothom.class})
 	public List<E> read (String filter ) {return null;}

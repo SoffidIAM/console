@@ -12,7 +12,9 @@ import java.util.Vector;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.api.VaultFolder;
@@ -994,6 +996,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected VaultFolder handleFindFolder(long id) throws Exception {
 		VaultFolderEntity entity = getVaultFolderEntityDao().load(id);
+		if (entity == null)
+			return null;
+		
 		VaultFolder folder = getVaultFolderEntityDao().toVaultFolder(entity);
 		
 		if (folder.getAccessLevel().equals (AccountAccessLevelEnum.ACCESS_NONE))
@@ -1041,9 +1046,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 		return result;
 	}
 
-	private void doFindFolderByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<VaultFolder> doFindFolderByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<VaultFolder> result) throws Exception {
+			List<VaultFolder> result) throws Exception {
 		final VaultFolderEntityDao dao = getVaultFolderEntityDao();
 		ScimHelper h = new ScimHelper(VaultFolder.class);
 		h.setPrimaryAttributes(new String[] { "name", "description"});
@@ -1061,14 +1066,19 @@ public class VaultServiceImpl extends VaultServiceBase {
 				return folder;
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<VaultFolder> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 	
 	@Override
-	protected List<VaultFolder> handleFindFolderByTextAndJsonQuery(String text, String jsonQuery,
+	protected PagedResult<VaultFolder> handleFindFolderByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<VaultFolder> result = new LinkedList<VaultFolder>();
-		doFindFolderByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
-		return result;
+		return doFindFolderByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 	}
 
 	@Override

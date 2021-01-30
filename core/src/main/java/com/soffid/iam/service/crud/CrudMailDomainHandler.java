@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.MailDomain;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.MailListsService;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -28,7 +29,7 @@ public class CrudMailDomainHandler implements CrudHandler<MailDomain> {
 	}
 
 	@Override
-	public List<MailDomain> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<MailDomain> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findMailDomainsByTextAndFilter(text, filter, start, end);
 	}
 

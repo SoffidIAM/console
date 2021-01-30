@@ -42,9 +42,11 @@ import com.soffid.iam.api.AccessControl;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Configuration;
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.ObjectMapping;
 import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.ObjectMappingTrigger;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.ScheduledTask;
@@ -1884,11 +1886,10 @@ public class DispatcherServiceImpl extends
 	}
 
 	@Override
-	protected Collection<com.soffid.iam.api.System> handleFindSystemByTextAndJsonQuery(String text, String jsonQuery,
+	protected PagedResult<com.soffid.iam.api.System> handleFindSystemByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<com.soffid.iam.api.System> result = new LinkedList<com.soffid.iam.api.System>();
-		handleFindSystemByTextAndJsonQueryAsync(text, jsonQuery, start, pageSize, result);
-		return result;
+		return doFindSystemByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 	}
 	
 	private void handleFindSystemByTextAndJsonQueryAsync(String text, String jsonQuery,
@@ -1926,16 +1927,15 @@ public class DispatcherServiceImpl extends
 	}
 
 	@Override
-	protected List<System> handleFindSystemByTextAndFilter(String text, String query, Integer first,
+	protected PagedResult<System> handleFindSystemByTextAndFilter(String text, String query, Integer first,
 			Integer pageSize) throws Exception {
 		final LinkedList<System> result = new LinkedList<System>();
-		doFindSystemByTextAndJsonQuery(text, query, first, pageSize, result);
-		return result;
+		return doFindSystemByTextAndJsonQuery(text, query, first, pageSize, result);
 	}
 	
-	private void doFindSystemByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<System> doFindSystemByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<System> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+			List<System> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final SystemEntityDao dao = getSystemEntityDao();
 		ScimHelper h = new ScimHelper(System.class);
 		h.setPrimaryAttributes(new String[] { "name", "description"});
@@ -1948,6 +1948,14 @@ public class DispatcherServiceImpl extends
 			return dao.toSystem((SystemEntity) entity);
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+
+
+		PagedResult<System> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 

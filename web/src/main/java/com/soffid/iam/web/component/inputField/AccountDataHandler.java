@@ -37,7 +37,7 @@ public class AccountDataHandler extends InputFieldDataHandler<Account> {
 		String q = "name eq \"" + quote(accountName)+ "\" and system eq \""+quote(systemName)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Account> r = handler.read(null, q, null, null);
+		List<Account> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
 		else
@@ -78,7 +78,7 @@ public class AccountDataHandler extends InputFieldDataHandler<Account> {
 		String q = "name eq \"" + quote(accountName)+ "\" and system eq \""+quote(systemName)+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Account> r = handler.read(null, q, null, null);
+		List<Account> r = handler.read(null, q, null, 2).getResources();
 		if (! r.isEmpty())
 			return r.iterator().next();
 		else

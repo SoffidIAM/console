@@ -18,12 +18,16 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
+import com.soffid.iam.model.CustomObjectEntityDao;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleAttributeEntity;
@@ -370,7 +374,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 	}
 
 	@Override
-	protected List<CustomObject> handleFindCustomObjectByTextAndJsonQuery(String text, String filter,
+	protected PagedResult<CustomObject> handleFindCustomObjectByTextAndJsonQuery(String text, String filter,
 			Integer start, Integer end) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
@@ -379,53 +383,35 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			q = filter;
 		LinkedList<CustomObject> result = new LinkedList<CustomObject>();
 
-		internalSearchCustomObjectsByJson(q, result, start, end);
-		
-		return result;
+		return internalSearchCustomObjectsByJson(q, result, start, end);
 	}
 
-	private void internalSearchCustomObjectsByJson(String query, Collection<CustomObject> result,
+	private PagedResult<CustomObject> internalSearchCustomObjectsByJson(String query, List<CustomObject> result,
 			Integer start, Integer end)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
-
-		AbstractExpression expr = ExpressionParser.parse(query);
-		HQLQuery hql = expr.generateHSQLString(CustomObject.class);
-		String qs = hql.getWhereString().toString();
-		if (qs.isEmpty())
-			qs = "o.tenant.id = :tenantId";
-		else
-			qs = "("+qs+") and o.tenant.id = :tenantId";
 		
-		qs = qs + " order by o.name";
+		final CustomObjectEntityDao dao = getCustomObjectEntityDao();
+		ScimHelper h = new ScimHelper(CustomObject.class);
+		h.setPrimaryAttributes(new String[] { "name", "description"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(end);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setOrder("o.name");
+		h.setGenerator((entity) -> {
+			return dao.toCustomObject((CustomObjectEntity) entity);
+		}); 
 
-		hql.setWhereString(new StringBuffer(qs));
-		Map<String, Object> params = hql.getParameters();
-		Parameter paramArray[] = new Parameter[params.size()+1];
-		int i = 0;
-		for (String s : params.keySet())
-			paramArray[i++] = new Parameter(s, params.get(s));
-		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		TimeOutUtils tou = new TimeOutUtils();
-		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
-		cfg.setFirstResult(start);
-		cfg.setMaximumResultSize(end);
-		for (CustomObjectEntity ue : getCustomObjectEntityDao().query(hql.toString(),
-				paramArray, cfg)) {
-			if (result instanceof AsyncList)
-			{
-				if (((AsyncList) result).isCancelled())
-					return;
-			}
-			else
-			{
-				tou.checkTimeOut();
-			}
-			CustomObject c = getCustomObjectEntityDao().toCustomObject(ue);
-			result.add(c);
-		}
+		PagedResult<CustomObject> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(end);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 }

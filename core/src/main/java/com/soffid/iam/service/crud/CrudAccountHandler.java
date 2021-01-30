@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.AccountService;
 
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
@@ -29,7 +30,7 @@ public class CrudAccountHandler implements CrudHandler<Account> {
 	}
 
 	@Override
-	public List<Account> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<Account> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findAccountByTextAndJsonQuery(text, filter, start, end);
 	}
 

@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.OUType;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.OrganizationalUnitTypeService;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -28,7 +29,7 @@ public class CrudOUTypeHandler implements CrudHandler<OUType> {
 	}
 
 	@Override
-	public List<OUType> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<OUType> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findOUTypeByTextAndFilter(text, filter, start, end);
 	}
 

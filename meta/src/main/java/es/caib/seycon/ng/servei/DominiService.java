@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -151,7 +152,7 @@ public abstract class DominiService {
 
 	@Operation(grantees = { roles.application_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public List<ValorDomini> findDomainValueByTextAndFilter(
+	public PagedResult<ValorDomini> findDomainValueByTextAndFilter(
 			@Nullable String text, 
 			@Nullable String query, 
 			@Nullable Integer first,

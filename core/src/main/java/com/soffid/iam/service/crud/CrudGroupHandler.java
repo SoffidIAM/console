@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.GroupService;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -28,8 +29,8 @@ public class CrudGroupHandler implements CrudHandler<Group> {
 	}
 
 	@Override
-	public List<Group> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
-		return getService().findGroupByTextAndFilter(text, filter, start, end).getResources();
+	public PagedResult<Group> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+		return getService().findGroupByTextAndFilter(text, filter, start, end);
 	}
 
 	@Override

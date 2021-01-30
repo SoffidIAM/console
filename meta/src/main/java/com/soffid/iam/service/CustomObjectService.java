@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
@@ -68,7 +69,7 @@ public class CustomObjectService {
 
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	@Operation(grantees={customObject_query.class})
-	public List<CustomObject> findCustomObjectByTextAndJsonQuery(@Nullable String text, @Nullable String filter, @Nullable Integer start, @Nullable Integer end) { return null; }
+	public PagedResult<CustomObject> findCustomObjectByTextAndJsonQuery(@Nullable String text, @Nullable String filter, @Nullable Integer start, @Nullable Integer end) { return null; }
 
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	@Operation(grantees={customObject_query.class})

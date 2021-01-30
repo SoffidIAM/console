@@ -9,6 +9,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.MailList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.MailListsService;
 
@@ -29,7 +30,7 @@ public class CrudMailListHandler implements CrudHandler<MailList> {
 	}
 
 	@Override
-	public List<MailList> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
+	public PagedResult<MailList> read(String text, String filter, Integer start, Integer end) throws InternalErrorException, NamingException, CreateException {
 		return getService().findMailListByTextAndFilter(text, filter, start, end);
 	}
 

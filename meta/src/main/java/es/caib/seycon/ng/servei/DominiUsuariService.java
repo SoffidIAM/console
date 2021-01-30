@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -81,7 +82,7 @@ public abstract class DominiUsuariService {
 	
 	@Operation(grantees = { roles.userType_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public List<TipusUsuari> findUserTypeByTextAndFilter(
+	public PagedResult<TipusUsuari> findUserTypeByTextAndFilter(
 			@Nullable String text, 
 			@Nullable String query, 
 			@Nullable Integer first,

@@ -34,7 +34,7 @@ public class HostDataHandler extends InputFieldDataHandler<Host> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Host> r = handler.read(null, q, null, null);
+		List<Host> r = handler.read(null, q, null, 2).getResources();
 		
 		if (! r.isEmpty())
 			return r.iterator().next().getDescription();
@@ -72,7 +72,7 @@ public class HostDataHandler extends InputFieldDataHandler<Host> {
 		String q = "name eq \"" + quote(name)+ "\" ";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		List<Host> r = handler.read(null, q, null, null);
+		List<Host> r = handler.read(null, q, null, 2).getResources();
 		
 		if (! r.isEmpty())
 			return r.iterator().next();

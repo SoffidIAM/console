@@ -13,6 +13,7 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
@@ -476,7 +477,7 @@ public abstract class DispatcherService {
 	
 
 	@Operation(grantees = { roles.agent_query.class })
-	public java.util.Collection<Dispatcher> findSystemByTextAndJsonQuery(
+	public PagedResult<Dispatcher> findSystemByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
 			@Nullable Integer start, @Nullable Integer pageSize) {
@@ -492,7 +493,7 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public List<Dispatcher> findSystemByTextAndFilter(
+	public PagedResult<Dispatcher> findSystemByTextAndFilter(
 			@Nullable String text, 
 			@Nullable String query, 
 			@Nullable Integer first,

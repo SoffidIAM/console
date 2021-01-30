@@ -42,7 +42,7 @@ public class SystemFieldHandler extends InputFieldUIHandler {
 	@Override
 	public void afterCreate(InputField3 field) throws Exception {
 		field.setType(Type.LIST);
-		LinkedList<System> all = new LinkedList<>( EJBLocator.getDispatcherService().findSystemByTextAndFilter("", "", null, null) );
+		LinkedList<System> all = new LinkedList<>( EJBLocator.getDispatcherService().findSystemByTextAndFilter("", "", null, null).getResources() );
 		Collections.sort(all, new Comparator<System>() {
 			@Override
 			public int compare(System o1, System o2) {

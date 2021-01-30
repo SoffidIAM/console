@@ -1,31 +1,15 @@
 package com.soffid.iam.web.custom;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ejb.CreateException;
-import javax.naming.NamingException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.zkoss.image.AImage;
-import org.zkoss.image.Image;
-import org.zkoss.zk.ui.Executions;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.AccessTree;
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.CustomObjectType;
-import com.soffid.iam.api.VaultFolder;
-import com.soffid.iam.bpm.api.ProcessDefinition;
 import com.soffid.iam.web.menu.DynamicMenuHandler;
 import com.soffid.iam.web.menu.MenuOption;
-
-import es.caib.bpm.exception.BPMException;
-import es.caib.seycon.ng.exception.InternalErrorException;
 
 
 public class CustomObjectMenuHandler implements DynamicMenuHandler {
@@ -58,4 +42,14 @@ public class CustomObjectMenuHandler implements DynamicMenuHandler {
 		return null;
 	}
 
+	@Override
+	public boolean isVisible(MenuOption option) {
+		return true;
+	}
+
+
+	@Override
+	public boolean isLeaf() {
+		return false;
+	}
 }

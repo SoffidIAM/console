@@ -210,6 +210,25 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>docker-push</id>
+						<phase>deploy</phase>
+						<configuration>
+							<tasks>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="push" />
+									<arg value="soffid/iam-console:${pom.version}" />
+								</exec>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="push" />
+									<arg value="soffid/iam-console:latest" />
+								</exec>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>

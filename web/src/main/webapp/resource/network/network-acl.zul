@@ -13,6 +13,7 @@
 		</menu2>
 	</div>
 
+	<customfield3 label="${c:l('com.soffid.iam.api.Network.loginRestriction')}" bind="${arg.listbox}:/loginRestriction" dataType="BOOLEAN"/> 
 	<datatable id="listbox" autocommit="true" 
 		dataPath="${arg.listbox }:/acl" maxheight="70vh" sortColumn="0"
 		multiselect="true"
@@ -20,7 +21,12 @@
 		onSelect="ref:handler.showDetails" enablefilter="true">
 			<attribute name="columns"><![CDATA[
 - name: ${c:l('xarxes.zul.Nivell')}
-  template: #{level == 0? "Query": level == 1 ? "Support" : level == 2 ? "Administration": "No access"}
+  template: >-
+     #{level == 0? "${c:l('xarxesACL.zul.Consulta') }": 
+     level == 1 ? "${c:l('xarxesACL.zul.Suport')}" : 
+     level == 2 ? "${c:l('xarxesACL.zul.Administracia') }": 
+     level == 3 ? "${c:l('xarxesACL.zul.Login')}": 
+     "${c:l('xarxesACL.zul.Senseaccas')}"}
 - name: ${c:l('xarxes.zul.Maquines')}
   value: mask
 - name: ${c:l('xarxes.zul.Identitat')}
@@ -35,6 +41,7 @@
 		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false">-</div>
 		<div class="addButton" onClick="ref:handler.addNew">+</div>
 	</div>
+	
 
 	<window 
 	    closable="false"
@@ -72,7 +79,7 @@
 			<customfield3 dataType="STRING" id="level3"
 				bind="level"
 				label="${c:l('network-acl.selectLevel')}"
-				listOfValues="-1: ${c:l('xarxesACL.zul.Senseaccas')}, 0: ${c:l('xarxesACL.zul.Consulta') }, 1: ${c:l('xarxesACL.zul.Suport')}, 2: ${c:l('xarxesACL.zul.Administracia') }"
+				listOfValues="-1: ${c:l('xarxesACL.zul.Senseaccas')}, 0: ${c:l('xarxesACL.zul.Consulta') }, 1: ${c:l('xarxesACL.zul.Suport')}, 2: ${c:l('xarxesACL.zul.Administracia') }, 3: ${c:l('xarxesACL.zul.Login') }"
 				required="true" />
 
 			<customfield3 dataType="STRING" id="pattern3"
@@ -156,7 +163,7 @@
 					
 				<customfield3 dataType="STRING" id="level"
 					label="${c:l('network-acl.selectLevel')}"
-					listOfValues="-1: ${c:l('xarxesACL.zul.Senseaccas')}, 0: ${c:l('xarxesACL.zul.Consulta') }, 1: ${c:l('xarxesACL.zul.Suport')}, 2: ${c:l('xarxesACL.zul.Administracia') }"
+					listOfValues="-1: ${c:l('xarxesACL.zul.Senseaccas')}, 0: ${c:l('xarxesACL.zul.Consulta') }, 1: ${c:l('xarxesACL.zul.Suport')}, 2: ${c:l('xarxesACL.zul.Administracia') }, 3: ${c:l('xarxesACL.zul.Login') }"
 					required="true" />
 
 				<customfield3 dataType="STRING" id="pattern"

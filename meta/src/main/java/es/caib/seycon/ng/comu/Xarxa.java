@@ -41,4 +41,7 @@ public class Xarxa {
 
 	public boolean dhcpSupport;
 
+	@Nullable
+	public java.lang.Boolean loginRestriction;
+
 }

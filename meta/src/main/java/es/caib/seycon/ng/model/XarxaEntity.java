@@ -54,6 +54,10 @@ public abstract class XarxaEntity {
 	@Column (name="XAR_DHCPSUP")
 	public boolean dchpSupport;
 
+	@Column (name="XAR_LOGREC")
+	@Nullable
+	public java.lang.Boolean loginRestriction;
+
 	@Operation (translated="findByName")
 	@DaoFinder
 	public es.caib.seycon.ng.model.XarxaEntity findByCodi(

@@ -87,7 +87,7 @@ public class NetworkHandler extends FrameHandler {
 		try {
 			NetworkService svc = EJBLocator.getNetworkService();
 			Map<String, Network> current = new HashMap<String, Network>();
-			for (Network ut: svc.findNetworkByTextAndJsonQuery(null, null, null, null))
+			for (Network ut: svc.findNetworkByTextAndJsonQuery(null, null, null, null).getResources())
 				current.put(ut.getName(), ut);
 			
 			for ( Iterator<Map<String, String>> iterator = parser.iterator(); iterator.hasNext(); )

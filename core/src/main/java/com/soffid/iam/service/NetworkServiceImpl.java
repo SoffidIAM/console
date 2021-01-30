@@ -25,8 +25,11 @@ import com.soffid.iam.api.Identity;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.api.OsType;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Session;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
@@ -63,6 +66,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownHostException;
 import es.caib.seycon.ng.exception.UnknownNetworkException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.seycon.util.TimedOutException;
 import es.caib.seycon.util.TimedProcess;
 
@@ -87,6 +91,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.bouncycastle.util.Arrays;
 import org.json.JSONException;
 
 /**
@@ -104,6 +109,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     public static final int CONSULTA = 0;
     public static final int SUPORT = 1;
     public static final int ADMINISTRACIO = 2;
+    public static final int LOGIN = 3;
 
     protected Boolean handleHasManagedNetwork() throws Exception {
         User usuari = getUserService().getCurrentUser();
@@ -134,7 +140,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Long handleFindAccessLevelByHostNameAndNetworkName(String nomMaquina, String codiXarxa) throws Exception {
-        String codiUsuari = Security.getCurrentUser();
+    	if ( Security.isUserInRole(Security.AUTO_HOST_ALL_UPDATE))
+    		return new Long(ADMINISTRACIO);
+
+    	String codiUsuari = Security.getCurrentUser();
         if (codiUsuari == null)
         	return new Long(SENSE_PERMISOS);
         
@@ -1011,6 +1020,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     private static boolean teAcces(String codiMaquina, String expresio) {
+    	if (expresio == null || expresio.trim().isEmpty())
+    		return true;
         Pattern pattern = Pattern.compile("^" + expresio + "$"); //$NON-NLS-1$ //$NON-NLS-2$
         Matcher matcher = pattern.matcher(codiMaquina);
         boolean matches = matcher.find();
@@ -1087,7 +1098,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             if (codiXarxa.compareTo(networkAuthorization.getNetworkCode()) == 0) {
                 if (teAcces(nomMaquina, networkAuthorization.getMask())) {
                     int nivell = networkAuthorization.getLevel();
-                    if (nivell > maximNivell)
+                    if ( nivell != LOGIN && nivell > maximNivell)
                         maximNivell = nivell;
                 }
             }
@@ -1543,7 +1554,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Boolean handleHasAnyACLNetworks(String codiUsuari) throws Exception {
-        return hasNetworkAuthorizations(codiUsuari, null, new int[] { ADMINISTRACIO, CONSULTA,
+        return hasNetworkAuthorizations(codiUsuari,(String) null, new int[] { ADMINISTRACIO, CONSULTA,
                 SUPORT });
     }
 
@@ -1721,7 +1732,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
         if (anyChange || 
         		maquina.getLastSeen() == null ||
-        		System.currentTimeMillis() - maquina.getLastSeen().getTime() > 8 * 60L * 60L * 1000L) // each 8 hours update last seen
+        		java.lang.System.currentTimeMillis() - maquina.getLastSeen().getTime() > 8 * 60L * 60L * 1000L) // each 8 hours update last seen
         {
         	maquina.setLastSeen(new Date());
         	getHostEntityDao().update(maquina);
@@ -1891,9 +1902,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		return result;
 	}
 
-	private void doFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<Network> doFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<Network> result) throws TokenMgrError, Exception {
+			List<Network> result) throws TokenMgrError, Exception {
 		final NetworkEntityDao dao = getNetworkEntityDao();
 		ScimHelper h = new ScimHelper(Network.class);
 		h.setPrimaryAttributes(new String[] { "name", "description", "address"});
@@ -1922,11 +1933,17 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 				return null;
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<Network> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 	
-	private void doFindHostByTextAndJsonQuery(String text, String jsonQuery,
+	private PagedResult<Host> doFindHostByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			Collection<Host> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+			List<Host> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final HostEntityDao dao = getHostEntityDao();
 		ScimHelper h = new ScimHelper(Host.class);
 		h.setPrimaryAttributes(new String[] { "name", "description", "ip"});
@@ -1939,23 +1956,79 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 			return dao.toHost((HostEntity) entity);
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<Host> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 	@Override
-	protected List<Host> handleFindHostByTextAndJsonQuery(String text, String jsonQuery,
+	protected PagedResult<Host> handleFindHostByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<Host> result = new LinkedList<Host>();
-		doFindHostByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
-		return result;
+		return doFindHostByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 	}
 
 	@Override
-	protected List<Network> handleFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
+	protected PagedResult<Network> handleFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize) throws Exception {
 		final LinkedList<Network> result = new LinkedList<Network>();
-		doFindNetworkByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
-		return result;
+		return doFindNetworkByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 	}
 
 
+    private boolean hasNetworkAuthorizations(UserEntity userEntity, HostEntity host,
+            int autoritzacions[]) throws InternalErrorException, UnknownUserException {
+        Collection<RoleGrant> grants = null;
+        Collection<Group> groups  = null;
+        for (NetworkAuthorizationEntity auth: host.getNetwork().getAuthorizations()) {
+        	if (Arrays.contains(autoritzacions, auth.getLevel().intValue()) &&
+        			teAcces(host.getName(), auth.getHostsName())) {
+        		if (auth.getUser() == userEntity )
+        			return true;
+        		if (auth.getRole() != null) {
+        			if (grants == null) grants = getApplicationService().findEffectiveRoleGrantByUser(userEntity.getId());
+        			for (RoleGrant grant: grants) {
+        				if (grant.getRoleId().equals(auth.getRole().getId()))
+        					return true;
+        			}
+        		}
+        		if (auth.getGroup() == null) {
+        			if (groups == null) groups = getUserService().getUserGroupsHierarchy(userEntity.getId());
+        			for (Group group: groups) {
+        				if (group.getId().equals(auth.getGroup().getId()))
+        					return true;
+        			}
+        		}
+        	}
+        }
+        return false; // Not found
+    }
+
+    @Override
+	protected boolean handleCanLogin(String user, String host) throws Exception {
+        HostEntity maquinaEntity = getHostEntityDao().findByName(host);
+        if (maquinaEntity == null)  {
+        	for (HostEntity hostEntity: getHostEntityDao().findByIP(host)) {
+        		if ( ! Boolean.TRUE.equals( hostEntity.getDeleted()))
+        			maquinaEntity = hostEntity;
+        	}
+        }
+        if (maquinaEntity == null)
+        	return false;
+        
+        if (! Boolean.TRUE.equals(maquinaEntity.getNetwork().getLoginRestriction() ))
+        	return true;
+        
+    	if (user == null)
+    		return false;
+    	
+        UserEntity userEntity = getUserEntityDao().findByUserName(user);
+        if (userEntity == null)
+        	return false;
+
+        return hasNetworkAuthorizations(userEntity, maquinaEntity, new int[] { LOGIN, SUPORT });
+	}
 }

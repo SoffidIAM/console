@@ -14,6 +14,7 @@ public class Sessio {
 	@Attribute(translated = "userName" )
 	public java.lang.String codiUsuari;
 
+	@Nullable
 	@Attribute(translated = "serverHostName" )
 	public java.lang.String nomMaquinaServidora;
 

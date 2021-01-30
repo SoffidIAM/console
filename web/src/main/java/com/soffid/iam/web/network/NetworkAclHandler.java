@@ -116,10 +116,29 @@ public class NetworkAclHandler extends Div implements AfterCompose {
 				});
 	}
 	
+	public boolean validateAttributes(Component form) {
+		if (form == null || !form.isVisible()) return true;
+		if (form instanceof ObjectAttributesDiv) {
+			return ((ObjectAttributesDiv) form).validate();
+		}
+		if (form instanceof InputField3) {
+			InputField3 inputField = (InputField3)form;
+			if (inputField.isReadonly() || inputField.isDisabled())
+				return true;
+			else
+				return inputField.attributeValidateAll();
+		}
+		boolean ok = true;
+		for (Component child = form.getFirstChild(); child != null; child = child.getNextSibling())
+			if (! validateAttributes(child))
+				ok = false;
+		return ok;
+	}
+
+
 	public void onChange() {
 		Window w = getWindowModify();
-		ObjectAttributesDiv d = (ObjectAttributesDiv) w.getFellow("attributes");
-		if (d.validate()) {
+		if (validateAttributes(w.getFellow("form"))) {
 			DataTable dt = getListbox();
 			dt.commit();
 			closeDetails(null);

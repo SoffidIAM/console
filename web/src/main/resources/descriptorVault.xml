@@ -4,8 +4,12 @@
 	<datanode name="root">
 		<finder name="vault" type="vault">
 			<ejb-finder jndi="java:/module/VaultService-v2"
-				method="findVaultElementByText" >
+				method="findVaultElementByText"  if="${id == null}">
 				<parameter value="${textQuery}" />
+			</ejb-finder>
+			<ejb-finder jndi="java:/module/VaultService-v2"
+				method="findVaultElement"  if="${id != null}">
+				<parameter value="${id}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.VaultElement"/> 
 		</finder>

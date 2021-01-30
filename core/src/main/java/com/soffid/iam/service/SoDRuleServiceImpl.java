@@ -339,14 +339,23 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	                for (SoDRuleMatrixEntity cell : rule.getMatrixCells()) {
 	                    if (cell.getRow().getId().equals(sourceSodRole.getId())) {
 	                        for (RoleGrant rolGrant : rols) {
-	                            if (rolGrant.getRoleId().equals(cell.getColumn().getRole().getId())) {
+	                        	if (rolGrant.getRoleId() != null ?
+	                        			rolGrant.getRoleId().equals(cell.getColumn().getRole().getId()) :
+	                        		rolGrant.getSystem() != null && rolGrant.getRoleName() != null ?
+	                        			rolGrant.getRoleName().equals(cell.getColumn().getRole().getName()) &&
+	                        			rolGrant.getSystem().equals(cell.getColumn().getRole().getSystem().getName()):
+	                        			false) 
+								{
 	                            	rules.add(new AppliedRule(rule, cell));
 	                            }
 	                        }	                    	
 	                    }
 	                    if (cell.getColumn().getId().equals(sourceSodRole.getId())) {
 	                        for (RoleGrant rolGrant : rols) {
-	                            if (rolGrant.getRoleId().equals(cell.getRow().getRole().getId())) {
+	                            if (rolGrant.getRoleId() != null ?
+	                            		rolGrant.getRoleId().equals(cell.getRow().getRole().getId()) :
+	                            			rolGrant.getRoleName().equals(cell.getRow().getRole().getName()) &&
+		                        			rolGrant.getSystem().equals(cell.getRow().getRole().getSystem().getName())) {
 	                            	rules.add(new AppliedRule(rule, cell));
 	                            }
 	                        }	                    	

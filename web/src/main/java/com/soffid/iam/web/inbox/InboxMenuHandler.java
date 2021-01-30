@@ -38,4 +38,13 @@ public class InboxMenuHandler implements DynamicMenuHandler {
 			return Integer.toString(c);
 	}
 
+	@Override
+	public boolean isVisible(MenuOption option) {
+		return true;
+	}
+
+	@Override
+	public boolean isLeaf() {
+		return false;
+	}
 }

@@ -448,6 +448,56 @@
     ]]>
   </query>
 
+  <query name="TaskMgmtSession.countPooledTaskInstancesByActorIds">
+    <![CDATA[
+      select count(*)
+      from com.soffid.iam.bpm.task.BPMTaskInstance as ti
+        join ti.pooledActors pooledActor
+      where pooledActor.actorId in ( :actorIds )
+        and ti.actorId is null
+        and ti.isSuspended != true
+        and ti.isOpen = true
+        and ti.tenantId = :tenant
+    ]]>
+  </query>
+
+  <query name="TaskMgmtSession.countPooledNewTaskInstancesByActorIds">
+    <![CDATA[
+      select count(*)
+      from com.soffid.iam.bpm.task.BPMTaskInstance as ti
+        join ti.pooledActors pooledActor
+      where pooledActor.actorId in ( :actorIds )
+        and ti.actorId is null
+        and ti.isSuspended != true
+        and ti.isOpen = true
+        and ti.start is null
+        and ti.tenantId = :tenant
+    ]]>
+  </query>
+
+  <query name="TaskMgmtSession.countTaskInstancesByActorId">
+    <![CDATA[
+      select count(*)
+      from com.soffid.iam.bpm.task.BPMTaskInstance as ti
+      where ti.actorId = :actorId
+        and ti.isSuspended != true
+        and ti.isOpen = true
+        and ti.tenantId = :tenant
+    ]]>
+  </query>
+
+  <query name="TaskMgmtSession.countNewTaskInstancesByActorId">
+    <![CDATA[
+      select count(*)
+      from com.soffid.iam.bpm.task.BPMTaskInstance as ti
+      where ti.actorId = :actorId
+        and ti.isSuspended != true
+        and ti.isOpen = true
+        and ti.start is null
+        and ti.tenantId = :tenant
+    ]]>
+  </query>
+
 <!-- old one from camunda, I think we can sjip that, but not sure yet 
   <query name="TaskMgmtSession.findPooledTaskInstancesByActorId">
     <![CDATA[

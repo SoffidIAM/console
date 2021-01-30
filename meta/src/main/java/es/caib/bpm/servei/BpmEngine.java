@@ -137,6 +137,19 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
+	
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public int countMyTasks()
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
+	 return 0;
+	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public int countNewTasks()
+		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
+	 return 0;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<TaskInstance> findGroupTasks()
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {

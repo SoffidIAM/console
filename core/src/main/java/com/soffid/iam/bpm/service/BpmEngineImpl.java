@@ -3428,4 +3428,88 @@ public class BpmEngineImpl extends BpmEngineBase {
 			flushContext(context);
 		}
 	}
+
+	@Override
+	protected int handleCountMyTasks() throws Exception {
+		JbpmContext context = getContext();
+		try {
+			int count = 0;
+			int groupIndex = 0;
+			List tasks = new LinkedList();
+			String[] userGroups = getUserGroups(); // mai null
+			while (groupIndex < userGroups.length) {
+				// Recuperem les tasques de 1000 en 1000
+				Vector ugVector = new Vector(1000);
+				for (int max = groupIndex + 1000; groupIndex < max
+						&& groupIndex < userGroups.length; groupIndex++) {
+					ugVector.add(userGroups[groupIndex]);
+				}
+				Query q = context.getSession().getNamedQuery("TaskMgmtSession.countPooledTaskInstancesByActorIds");
+				q.setParameterList("actorIds", ugVector);
+				q.setParameter("tenant", Security.getCurrentTenantId());
+				for (Object o : q.list()) {
+					if (o instanceof Integer)
+						count += ((Integer) o).intValue();
+					else if (o instanceof Long)
+						count += ((Long) o).intValue();
+				}
+			}
+
+			Query q = context.getSession().getNamedQuery("TaskMgmtSession.countTaskInstancesByActorId");
+			q.setParameter("actorId", getUserName());
+			q.setParameter("tenant", Security.getCurrentTenantId());
+			for (Object o : q.list()) {
+				if (o instanceof Integer)
+					count += ((Integer) o).intValue();
+				else if (o instanceof Long)
+					count += ((Long) o).intValue();
+			}
+
+			return count;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected int handleCountNewTasks() throws Exception {
+		JbpmContext context = getContext();
+		try {
+			int count = 0;
+			int groupIndex = 0;
+			List tasks = new LinkedList();
+			String[] userGroups = getUserGroups(); // mai null
+			while (groupIndex < userGroups.length) {
+				// Recuperem les tasques de 1000 en 1000
+				Vector ugVector = new Vector(1000);
+				for (int max = groupIndex + 1000; groupIndex < max
+						&& groupIndex < userGroups.length; groupIndex++) {
+					ugVector.add(userGroups[groupIndex]);
+				}
+				Query q = context.getSession().getNamedQuery("TaskMgmtSession.countPooledNewTaskInstancesByActorIds");
+				q.setParameterList("actorIds", ugVector);
+				q.setParameter("tenant", Security.getCurrentTenantId());
+				for (Object o : q.list()) {
+					if (o instanceof Integer)
+						count += ((Integer) o).intValue();
+					else if (o instanceof Long)
+						count += ((Long) o).intValue();
+				}
+			}
+
+			Query q = context.getSession().getNamedQuery("TaskMgmtSession.countNewTaskInstancesByActorId");
+			q.setParameter("actorId", getUserName());
+			q.setParameter("tenant", Security.getCurrentTenantId());
+			for (Object o : q.list()) {
+				if (o instanceof Integer)
+					count += ((Integer) o).intValue();
+				else if (o instanceof Long)
+					count += ((Long) o).intValue();
+			}
+
+			return count;
+		} finally {
+			flushContext(context);
+		}
+	}
 }

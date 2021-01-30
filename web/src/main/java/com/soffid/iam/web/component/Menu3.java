@@ -63,7 +63,7 @@ public class Menu3 extends Div implements AfterCompose {
 			optionsArray.add(option);
 			if (option.getOptions() != null && !option.getOptions().isEmpty()) 
 				o.put("options", generateJsonMenu(option.getOptions()));
-			if (option.getHandler() != null)
+			if (option.getHandler() != null && !option.getHandler().isLeaf())
 				o.put("dynamic", true);
 			array.put(o);
 		}

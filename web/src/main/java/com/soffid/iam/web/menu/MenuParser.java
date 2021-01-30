@@ -17,16 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
-import org.zkoss.zk.ui.UiException;
-import org.zkoss.zk.ui.metainfo.ComponentDefinition;
 import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.metainfo.PageDefinition;
 import org.zkoss.zk.ui.metainfo.Property;
 
 import com.soffid.iam.utils.Security;
-
-import es.caib.zkdb.yaml.Yaml2Json;
-import es.caib.zkib.zkiblaf.Application;
 
 public class MenuParser {
 	static Map<String,List<MenuOption>> maps = new HashMap<String,List<MenuOption>>();
@@ -50,9 +45,6 @@ public class MenuParser {
 			MenuOption src = iterator.next();
 			MenuOption option = (MenuOption) src.clone();
 			List<MenuOption> children = option.getOptions();
-//			if (option.getHandler() != null) {
-//				children = option.getHandler().getOptions(option);
-//			}
 			if (children != null ) {
 				option.setOptions( applyPermissions(children) );
 				if (option.getOptions().isEmpty())

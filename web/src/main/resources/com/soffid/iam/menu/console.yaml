@@ -2,6 +2,7 @@
   img: /img/menu/tasks.svg
   url: /wf/inbox.zul
   permissions: ["selfservice:tasks"]
+  handler: com.soffid.iam.web.bpm.MyTasksMenuHandler
 - name: selfService.Applications
   img: /img/menu/app-launcher.svg
   handler: com.soffid.iam.web.launcher.LauncherMenuHandler

@@ -143,46 +143,54 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		optionsDiv.getChildren().clear();
 		for ( MenuOption option: currentOptions) {
 			String tip = null;
-			
-			Div d = new Div();
-			d.setSclass("menuoption");
-			d.addEventHandler("onClick", new EventHandler(ZScript.parseContent("ref:"+getId()+".openMenu"), null));
-			d.setAttribute("menuOption", option);
-			optionsDiv.appendChild(d);
-			if (option.getImg() != null)
-			{
-				Img img = new Img();
-				if (option.getImg().startsWith("data:"))
-					img.setDynamicProperty("src", option.getImg());
-				else
-					img.setDynamicProperty("src", getDesktop().getExecution().getContextPath() + option.getImg());
-				d.appendChild(img);
-			}
-			if (option.getLiteral() != null) {
-				Label l = new Label( option.getLiteral());
-				l.setSclass("menuoption-title");
-				d.appendChild(l);
-			} else if (option.getLabel() != null) {
-				Label l = new Label( Labels.getLabel(option.getLabel()));
-				l.setSclass("menuoption-title");
-				d.appendChild(l);
-			}
-			if (option.getHandler() != null) {
-				tip = option.getHandler().getTip(option);
-			}
-			if (option.getOptions() != null && !option.getOptions().isEmpty()) {
-				Div d2 = new Div ();
-				d2.setSclass("menuoption-suboptions");
-				d.appendChild(d2);
-				boolean first = true;
-				for (MenuOption suboption: option.getOptions())
+
+			if (option.getHandler() == null || option.getHandler().isVisible(option)) {
+				Div d = new Div();
+				d.setSclass("menuoption");
+				d.addEventHandler("onClick", new EventHandler(ZScript.parseContent("ref:"+getId()+".openMenu"), null));
+				d.setAttribute("menuOption", option);
+				optionsDiv.appendChild(d);
+				if (option.getImg() != null)
 				{
-					if (!first)
-						d2.appendChild(new Label(", "));
-					first = false;
-					Label l = new Label( suboption.getLiteral() != null ? suboption.getLiteral(): Labels.getLabel( suboption.getLabel()));
-					l.setSclass("menusuboption-title");
-					d2.appendChild(l);
+					Img img = new Img();
+					if (option.getImg().startsWith("data:"))
+						img.setDynamicProperty("src", option.getImg());
+					else
+						img.setDynamicProperty("src", getDesktop().getExecution().getContextPath() + option.getImg());
+					d.appendChild(img);
+				}
+				if (option.getHandler() != null) {
+					tip = option.getHandler().getTip(option);
+					if (tip != null) {
+						Label d3 = new Label();
+						d3.setSclass("menuoption-tip");
+						d3.setValue(tip);
+						d.appendChild(d3);
+					}
+				}
+				if (option.getLiteral() != null) {
+					Label l = new Label( option.getLiteral());
+					l.setSclass("menuoption-title");
+					d.appendChild(l);
+				} else if (option.getLabel() != null) {
+					Label l = new Label( Labels.getLabel(option.getLabel()));
+					l.setSclass("menuoption-title");
+					d.appendChild(l);
+				}
+				if (option.getOptions() != null && !option.getOptions().isEmpty()) {
+					Div d2 = new Div ();
+					d2.setSclass("menuoption-suboptions");
+					d.appendChild(d2);
+					boolean first = true;
+					for (MenuOption suboption: option.getOptions())
+					{
+						if (!first)
+							d2.appendChild(new Label(", "));
+						first = false;
+						Label l = new Label( suboption.getLiteral() != null ? suboption.getLiteral(): Labels.getLabel( suboption.getLabel()));
+						l.setSclass("menusuboption-title");
+						d2.appendChild(l);
+					}
 				}
 			}
 		}

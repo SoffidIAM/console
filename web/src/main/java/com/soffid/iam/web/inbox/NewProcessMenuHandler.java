@@ -51,4 +51,14 @@ public class NewProcessMenuHandler implements DynamicMenuHandler {
 		return null;
 	}
 
+	@Override
+	public boolean isVisible(MenuOption option) {
+		return true;
+	}
+
+	@Override
+	public boolean isLeaf() {
+		return false;
+	}
+
 }

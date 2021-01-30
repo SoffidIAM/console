@@ -3055,14 +3055,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				sb.append(" and ");
 			sb.append("(");
 			sb.append("userName co \""+t+"\"");
-			sb.append(" or firstName co \""+t+"\"");
-			sb.append(" or lastName co \""+t+"\"");
-			sb.append(" or middleName co \""+t+"\"");
 			for (MetaDataEntity att: atts)
 			{
-				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue() &&
+						!att.getName().equals("userName"))
 				{
-					sb.append(" or userData."+att.getName()+" co \""+t+"\"");
+					if ( Boolean.TRUE.equals(att.getBuiltin()))
+						sb.append(" or "+att.getName()+" co \""+t+"\"");
+					else
+						sb.append(" or userData."+att.getName()+" co \""+t+"\"");
 				}
 			}
 			sb.append(")");

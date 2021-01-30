@@ -61,6 +61,7 @@ import com.soffid.iam.web.component.inputField.RoleDataHandler;
 import com.soffid.iam.web.component.inputField.UserDataHandler;
 import com.soffid.iam.web.popup.Editor;
 import com.soffid.iam.web.popup.FileUpload2;
+import com.soffid.iam.web.popup.HtmlEditor;
 import com.soffid.iam.web.users.additionalData.AttributesDiv;
 import com.soffid.iam.web.users.additionalData.SearchFilter;
 
@@ -99,6 +100,7 @@ public class InputField3 extends Databox
 	boolean visible = true;
 	String keysPath = null;
 	String valuesPath = null;
+	String javascript = null;
 	
 	private SearchFilter filter;
 
@@ -912,8 +914,11 @@ public class InputField3 extends Databox
 	        	invalidate();
 			});
 		}
+		else if (dataType.getType() == TypeEnumeration.HTML) {
+			HtmlEditor.edit(this);
+		}
 		else if (isMultiline()) {
-			Editor.edit(this, "{}");
+			Editor.edit(this, javascript == null ? "{}" : javascript);
 		}
 	}
 
@@ -1114,5 +1119,15 @@ public class InputField3 extends Databox
 		}
 		else
 			return super.setVisible(visible);
+	}
+
+	
+	public String getJavascript() {
+		return javascript;
+	}
+
+	
+	public void setJavascript(String javascript) {
+		this.javascript = javascript;
 	}
 }

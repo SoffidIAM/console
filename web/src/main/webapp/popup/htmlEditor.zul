@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="htmlEditor" title="" ?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_dada" macro-uri="../comu/input_dada.zul"?>
+<?component name="input_etiqueta" macro-uri="../comu/input_etiqueta.zul"?>
+<window xmlns:h="http://www.w3.org/1999/xhtml" closable="false" 
+	id="htmlEditorWindow" 
+	position="top, center" onCancel="" title="${c:l('editorJS.Titol')}" width="90%"
+	mode="highlighted"
+	use="com.soffid.iam.web.popup.HtmlEditor">
+
+	<ckeditor id="editor" value=""
+		height="400px"
+		width="100%"
+		/>
+
+	<separator spacing="5px"/>
+
+	<div align="right">
+		<button id="finishButton" label="${c:l('editorJS.zul.Accepta')}" onClick="ref:htmlEditorWindow.accept"/>
+		<button label="${c:l('editorJS.zul.Cancel·la')}" onClick="ref:htmlEditorWindow.cleanWindow"/>
+	</div>								
+</window>

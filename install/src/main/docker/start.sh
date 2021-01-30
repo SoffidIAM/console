@@ -31,12 +31,6 @@ function configure {
 	    exit 1
 	fi
 	
-	if [[ "$SECURE" == "true" ]]
-	then
-	    echo "-Djava.security.manager" >>/opt/soffid/iam-console-2/bin/run.vmoptions
-        echo "-Djava.security.policy=/opt/soffid/iam-console-2/conf/catalina.policy" >>/opt/soffid/iam-console-2/bin/run.vmoptions
-    fi
-    
 	if [[ "$DB_URL" == *:oracle:* ]] 
 	then
 		DB_DRIVER=oracle.jdbc.driver.OracleDriver

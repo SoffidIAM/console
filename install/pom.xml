@@ -168,14 +168,7 @@
 									<fileset dir="${basedir}/target/dist" includes="**/*" />
 								</copy>
 								<chmod dir="${basedir}/target/rpm/dist/opt/soffid/iam-console-3/bin" perm="750" includes="**" />
-								<exec executable="fakeroot" failonerror="true">
-									<arg value="rpmbuild" />
-									<arg value="--target=noarch" />
-									<arg value="--buildroot" />
-									<arg value="${basedir}/target/rpm/dist" />
-									<arg value="-bb" />
-									<arg value="${basedir}/target/rpm/soffid-iamconsole.spec" />
-								</exec>
+								<exec executable="src/main/rpm/generaterpm.sh" failonerror="true"/>
 							</tasks>
 						</configuration>
 						<goals>

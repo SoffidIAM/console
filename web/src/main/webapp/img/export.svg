@@ -1,8 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 32 32" style="enable-background:new 0 0 32 32;" xml:space="preserve">
-<style type="text/css">
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Capa_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 32 32"
+   style="enable-background:new 0 0 32 32;"
+   xml:space="preserve"
+   sodipodi:docname="export.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
+   id="metadata2770"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs2768" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1027"
+   id="namedview2766"
+   showgrid="false"
+   inkscape:zoom="29.5"
+   inkscape:cx="16"
+   inkscape:cy="22.779661"
+   inkscape:window-x="0"
+   inkscape:window-y="27"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Capa_1" />
+<style
+   type="text/css"
+   id="style2745">
 	.st0{fill:#17B5C8;}
 	.st1{fill:#11828F;}
 	.st2{fill:none;}
@@ -13,14 +54,51 @@
 	.st7{fill:#FFFFFF;}
 	.st8{fill:#3A5368;}
 </style>
-<path class="st0" d="M17.5,10.9V16c0,0.8-0.7,1.5-1.5,1.5c-0.8,0-1.5-0.7-1.5-1.5v-5.1L0,16.2l16,7.6l16-7.6L17.5,10.9z"/>
-<polygon class="st3" points="32,16.2 32,22.1 16,29.8 16,23.8 "/>
-<g>
-	<path class="st5" d="M15.1,7.1h1.8V16c0,0.5-0.4,0.9-0.9,0.9h0c-0.5,0-0.9-0.4-0.9-0.9V7.1z"/>
-	<path class="st5" d="M15.8,2.4l-2.5,4.3c-0.1,0.2,0,0.4,0.2,0.4h5c0.2,0,0.4-0.2,0.2-0.4l-2.5-4.3C16.1,2.2,15.9,2.2,15.8,2.4z"/>
-	<path class="st6" d="M16.9,7.5V7.1h-1.8v0.4v2.3C15.1,9.8,15.5,7.5,16.9,7.5z"/>
+<path
+   class="st0"
+   d="M17.5,10.9V16c0,0.8-0.7,1.5-1.5,1.5c-0.8,0-1.5-0.7-1.5-1.5v-5.1L0,16.2l16,7.6l16-7.6L17.5,10.9z"
+   id="path2747" />
+<polygon
+   class="st3"
+   points="32,16.2 32,22.1 16,29.8 16,23.8 "
+   id="polygon2749" />
+<path
+   style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:#ffffff;stroke-width:1.00157475;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+   d="m 12.847458,9.6949148 h 6.033898 v 8.5423732 c -2.011299,1.039548 -4.022599,1.039548 -6.033898,0 z"
+   id="rect3315"
+   inkscape:connector-curvature="0"
+   sodipodi:nodetypes="ccccc" /><g
+   id="g2757"
+   transform="matrix(2.6574468,0,0,1.1851102,-26.555291,-1.7724302)">
+	<path
+   class="st5"
+   d="m 15.1,7.1 h 1.8 V 16 c 0,0.5 -0.4,0.9 -0.9,0.9 v 0 c -0.5,0 -0.9,-0.4 -0.9,-0.9 z"
+   id="path2751"
+   inkscape:connector-curvature="0"
+   style="fill:#5f7993" />
+	<path
+   class="st5"
+   d="m 15.8,2.4 -2.5,4.3 c -0.1,0.2 0,0.4 0.2,0.4 h 5 c 0.2,0 0.4,-0.2 0.2,-0.4 L 16.2,2.4 c -0.1,-0.2 -0.3,-0.2 -0.4,0 z"
+   id="path2753"
+   inkscape:connector-curvature="0"
+   style="fill:#5f7993" />
+	<path
+   class="st6"
+   d="M 16.9,7.5 V 7.1 h -1.8 v 0.4 2.3 c 0,0 0.4,-2.3 1.8,-2.3 z"
+   id="path2755"
+   inkscape:connector-curvature="0"
+   style="fill:#405162" />
 </g>
-<polygon class="st5" points="0,16.2 0,22.1 16,29.8 16,23.8 "/>
-<path class="st6" d="M2.6,17.4c0,0-2.6,2.2,0,5.9L0,22.1v-5.9L2.6,17.4z"/>
-<path class="st4" d="M29.4,17.4c0,0,2.6,2.2,0,5.9l2.6-1.2v-5.9L29.4,17.4z"/>
+<polygon
+   class="st5"
+   points="0,16.2 0,22.1 16,29.8 16,23.8 "
+   id="polygon2759" />
+<path
+   class="st6"
+   d="M2.6,17.4c0,0-2.6,2.2,0,5.9L0,22.1v-5.9L2.6,17.4z"
+   id="path2761" />
+<path
+   class="st4"
+   d="M29.4,17.4c0,0,2.6,2.2,0,5.9l2.6-1.2v-5.9L29.4,17.4z"
+   id="path2763" />
 </svg>

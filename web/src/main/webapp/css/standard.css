@@ -410,6 +410,7 @@ button, input[type="button"], input[type="submit"] {
 	color: {SKYTEXT};
 }	
 
+
 /* Buttons */
 button.small-button:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover {
 	background-image: none;
@@ -1766,7 +1767,8 @@ tr.grid td.gc {
 	box-sizing: content-box; padding: 2px;
 }
 
-input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text, div.text {
+input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text, div.text,
+	div.databox div.datahtml {
     box-sizing: border-box;
     padding: 2px;
     border: 4px solid #e0e0e0;
@@ -2747,6 +2749,21 @@ div.options {
 	display: none;
 }
 
+.options span.menuoption-tip {
+    display: block;
+    position: relative;
+    /* left: 400px; */
+    background-color: {GREEN};
+    border: solid 4px {GREEN};
+    text-color: {GREENTEXT};
+    font-weight: bold;
+    border-radius: 8px;
+    top: -45px;
+    padding-left: 10px;
+    padding-right: 10px;
+    float: right;
+}
+
 .options .menuoption:hover img {
 	box-shadow: 12px 12px 8px {GREEN};
 	padding-left: 9px;
@@ -3470,3 +3487,83 @@ img.small-picture {
 	max-width: 32px;
 	max-height: 32px;	
 }
+
+div.ck button {
+	box-shadow: none;
+}
+
+div.databox div.datahtml *, div.ck, div.ck ol, div.ck ul, div.ck li {
+	margin: inherit;
+	padding: revert;
+}
+
+div.databox div.datahtml {
+	min-height: 32px;
+}
+
+div.ck.ck-editor__main {
+	min-height: 400px;
+} 
+
+/** Accept / reject checkbox **/
+.custom-checkbox {
+	display: inline-block; position: relative;
+	cursor: pointer; 
+	height: 24px; width:32px;
+	-webkit-user-select: none; 
+	-moz-user-select: none; -ms-user-select: none; user-select: none; 
+	float:left; 
+}
+
+/* Hide the browser's default checkbox */ 
+.custom-checkbox input { 
+	position: absolute; opacity: 0; cursor: pointer;
+	height: 0; width: 0; 
+}
+
+/* Create a custom checkbox */ 
+.custom-checkbox > label {
+	position: absolute; top: 0; left: 0; height: 25px; width: 25px; background-color: #eee; 
+}
+
+/* On mouse-over, add a grey background color */
+.custom-checkbox:hover input ~ label 
+{
+	background-color: #ccc; 
+	display: block;
+}
+
+.custom-checkbox-red:hover input ~ label {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wQOFBgWJLs02wAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAA/ElEQVQ4y43TQUoDQRCF4S9eQDdCmGyMxIAaQw6QrV5WvICokEWIoCAICSFugwuvIKibamya6WhD0Yuqv/pVzRt+zzlu0Fc/+7jHRZk4wTu+Ma80OcA6arYY5y8n+CvuBwwyuItV5FK8YSpk53C6b0PJMV4LOMWdKJpXmlxjWYEfMUkS+yG7rUlbPGFULmkQsv+CXzAMplM26YfsGjxDkwN7RYMOznb44BSftWR3x7bz2JQqkklW/4BTLNHL7bneMfNHJfeMI+Ht2rYbHIbstpqF+DG2Ld95mI3YtBhqg6tUMA5vJ4eNWpbcC9kJviwLpuHtSc0kMfMie7nzAzAUjZ0bw7t3AAAAAElFTkSuQmCC);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.custom-checkbox-green:hover input ~ label { 
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wocEDI7TCYtLwAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAyklEQVQY043RMYqDUBDG8f/IY5EYXmcVCKS0SA7gGexyk4U9yTZbBxb2ACFlukgwoIhCqlTWbmEjwoOXQmITI5ny4zfFfCNf/z9MzUw++HS2tmkasixDvYO11mitAXDewY+p67pfiIrARkVgp3Ce5/wuz6KiIrBhGPZpjD1ubvIKA0jbttZ1XQCMMXRdh+d5oxjASZIEYwwASqlJDODs11eJ4/jp6LIsn/DQ0n59lTRNh7CqKnaLk4y1N/zhb3URUqzv+3zPD/Kq7jsrRlP0CTOLEAAAAABJRU5ErkJggg==);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+/* When the checkbox is checked, add a blue background */
+.custom-checkbox-green input:checked ~ label {
+	background-color: lightgreen; 
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAKCAYAAACALL/6AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wocEDI7TCYtLwAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAyklEQVQY043RMYqDUBDG8f/IY5EYXmcVCKS0SA7gGexyk4U9yTZbBxb2ACFlukgwoIhCqlTWbmEjwoOXQmITI5ny4zfFfCNf/z9MzUw++HS2tmkasixDvYO11mitAXDewY+p67pfiIrARkVgp3Ce5/wuz6KiIrBhGPZpjD1ubvIKA0jbttZ1XQCMMXRdh+d5oxjASZIEYwwASqlJDODs11eJ4/jp6LIsn/DQ0n59lTRNh7CqKnaLk4y1N/zhb3URUqzv+3zPD/Kq7jsrRlP0CTOLEAAAAABJRU5ErkJggg==);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+/* When the checkbox is checked, add a blue background */
+.custom-checkbox-red input:checked ~ label {
+	background-color: #e00000; 
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wQOFBgWJLs02wAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAA/ElEQVQ4y43TQUoDQRCF4S9eQDdCmGyMxIAaQw6QrV5WvICokEWIoCAICSFugwuvIKibamya6WhD0Yuqv/pVzRt+zzlu0Fc/+7jHRZk4wTu+Ma80OcA6arYY5y8n+CvuBwwyuItV5FK8YSpk53C6b0PJMV4LOMWdKJpXmlxjWYEfMUkS+yG7rUlbPGFULmkQsv+CXzAMplM26YfsGjxDkwN7RYMOznb44BSftWR3x7bz2JQqkklW/4BTLNHL7bneMfNHJfeMI+Ht2rYbHIbstpqF+DG2Ld95mI3YtBhqg6tUMA5vJ4eNWpbcC9kJviwLpuHtSc0kMfMie7nzAzAUjZ0bw7t3AAAAAElFTkSuQmCC);
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.custom-checkbox label:after { 
+	content: ""; position: absolute; display: none; 
+}
+
+	

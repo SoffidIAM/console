@@ -190,7 +190,7 @@ public class Identity implements Comparable<Identity>{
 		Div d = new Div();
 		d.setSclass("identity-selector");
 		d.setAttribute("identity", this);
-		Image img = new Image (type == Type.USER ? "/img/user.png" :
+		Image img = new Image (type == Type.USER ? "/img/user.svg" :
 			type == Type.GROUP ? "/img/group.svg" :
 			type == Type.ROLE ? "/img/role.svg":
 			type == Type.GRANT ? "/img/role.svg":

@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Window;
 
@@ -14,10 +16,12 @@ import com.soffid.iam.api.ObjectMapping;
 import com.soffid.iam.api.ObjectMappingProperty;
 
 import es.caib.seycon.ng.comu.AttributeDirection;
+import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 
 
@@ -60,7 +64,7 @@ public class PropertiesWindow extends Window implements AfterCompose {
 								ObjectMappingProperty mapping = (ObjectMappingProperty) dn2.getInstance();
 								
 								if ( m2.containsKey(mapping.getProperty())) {
-									m2.remove(mapping);
+									m2.remove(mapping.getProperty());
 								}
 							}
 						}
@@ -83,4 +87,11 @@ public class PropertiesWindow extends Window implements AfterCompose {
 	public void afterCompose() {
 	}
 
+	public void doClose(Event event) throws CommitException, InterruptedException {
+		DataModel model = (DataModel) Path.getComponent("/model");
+		if (model.isCommitPending()) {
+			model.commit();
+			Thread.sleep(3000);
+		}
+	}
 }

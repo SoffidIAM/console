@@ -38,6 +38,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataGrid;
 import es.caib.zkib.component.DataModel;
+import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -466,8 +467,10 @@ public class AttributeMappingHandler extends DataGrid {
 				(SoffidObjectType) XPathUtils.getValue(g, "@soffidObject"),
 				o1, o2);
 		Window testWindow = (Window) getFellow("testWindow");
+		testWindow.setAttribute("logText", r.getLog());
 		((Label)testWindow.getFellow("status")).setValue(r.getStatus());
-		((Textbox)testWindow.getFellow("log")).setValue(r.getLog());
+		DataTree2 tree = (DataTree2)testWindow.getFellow("log");
+		new LogParser().parseLog(r.getLog(), tree);
 		testWindow.doHighlighted();
 	}
 	
@@ -505,15 +508,19 @@ public class AttributeMappingHandler extends DataGrid {
 	}
 
 	public void onNewTrigger(Event event) {
-		Row r = (Row) event.getData();
-		String triggerType = (String) getVariable("triggerType", false);
-		if (triggerType != null) {
-			SoffidObjectTrigger tr = SoffidObjectTrigger.fromString(triggerType); 
-			SoffidObjectTrigger type = (SoffidObjectTrigger) XPathUtils.getValue(r, "@trigger");
-			if ( type == null)
-				XPathUtils.setValue(r, "@trigger", tr);
-			else if ( type != tr)
-				r.setVisible(false);
+		try {
+			Row r = (Row) event.getData();
+			String triggerType = (String) getVariable("triggerType", false);
+			if (triggerType != null) {
+				SoffidObjectTrigger tr = SoffidObjectTrigger.fromString(triggerType); 
+				SoffidObjectTrigger type = (SoffidObjectTrigger) XPathUtils.eval(r, "@trigger");
+				if ( type == null)
+					XPathUtils.setValue(r, "@trigger", tr);
+				else if ( type != tr)
+					r.setVisible(false);
+			}
+		} catch (Exception e)
+		{
 		}
 	}
 }

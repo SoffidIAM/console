@@ -14,6 +14,7 @@
 	mode="highlighted"
 	closable="true"
 	mold="soffid"
+	onClose="ref:agentTriggersWindow.doClose"
 	width="80%"
 	height="80vh"
 	title="Output triggers"
@@ -27,7 +28,7 @@
 				<column label="System objects" valign="top">
 				</column>
 				<column label="" width="40px"  valign="top" align="center">
-					<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+					<imageclic  align="center" src="/img/add-w.svg" if="${canUpdateAgent}"
 						onClick="ref:objectsGrid.addObject" />
 				</column>
 			</columns>
@@ -57,11 +58,11 @@
 								</column>
 								<column label="" width="40px"/>
 								<column label="" width="40px">
-									<imageclic  align="right" src="/img/add.svg" onClick="ref:objectsGrid.createTrigger">
+									<imageclic  align="right" src="/img/add-w.svg" onClick="ref:objectsGrid.createTrigger">
 									</imageclic>
 								</column>
 							</columns>
-							<datarow>
+							<datarow> 
 								<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" style="vertical-align: top;" disabled="true">
 									<dataitem bind="@value">
 										<listcell bind="@literal"/>

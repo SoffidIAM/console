@@ -707,86 +707,20 @@ public class AgentHandler extends FrameHandler {
 	}
 	
 	public void downloadPropagateLog (Event event) {
-		AMedia media = new AMedia("Synchronize-log.txt", null, "text/plain", propagateLog.getLog());
+		Window testWindow = (Window) getFellow("testWindow");
+		String log = (String) testWindow.getAttribute("logText");
+		AMedia media = new AMedia("Synchronize-log.txt", null, "text/plain", log);
 		Filedownload.save(media);
 	}
 	
 	private void testPropagateObject(String system, SoffidObjectType objectType, String object1, String object2) throws InternalErrorException, NamingException, CreateException {
 		propagateLog = EJBLocator.getDispatcherService().testPropagateObject(system, objectType, object1, object2);
 		Window testWindow = (Window) getFellow("testWindow");
+		testWindow.setAttribute("logText", propagateLog.getLog());
 		((Label)testWindow.getFellow("status")).setValue(propagateLog.getStatus());
 		DataTree2 tree = (DataTree2)testWindow.getFellow("log");
-		JSONObject logRoot = new JSONObject();
-		JSONArray children = new JSONArray();
-		logRoot.put("children", children);
-		if (propagateLog.getLog() != null) {
-			int i = 0;
-			int j;
-			Stack<JSONObject> stack = new Stack<JSONObject>();
-			stack.push(logRoot);
-			do {
-				JSONObject log = new JSONObject();
-				log.put("type", "log");
-				
-				j = propagateLog.getLog().indexOf("\n", i);
-				String s;
-				if (j < 0) {
-					s = propagateLog.getLog().substring(i);
-				} else {
-					s =  propagateLog.getLog().substring(i, j);
-					i = j+1;
-				}
-				int n = s.indexOf(" INFO BEGIN ");
-				if (n > 0 && !hasChars(s.substring(0, n))) {
-					children.put(log);
-					children = new JSONArray();
-					log.put("header", s.substring(n+12));
-					log.put("children", children);
-					log.put("type", "header");
-					log.put("collapsed", true);
-					stack.push(log);
-				} else {
-					if (s.endsWith(" INFO END") &&
-							!hasChars(s.substring(0, s.length()-8)) && 
-							stack.size() > 1 ){
-						stack.pop();
-						JSONObject parent = stack.peek();
-						children = parent.getJSONArray("children");
-					} else if (!s.trim().isEmpty()) {
-						children.put(log);
-						log.put("log", s);
-						if (s.contains(" WARN "))
-						{
-							log.put("style", "style='color: red'");
-							for (JSONObject parents: stack)
-								parents.put("collapsed", false);
-						}
-						else
-							log.put("style", "");
-					}
-				}
-			} while (j >= 0);
-			
-		}
-		tree.setData(logRoot);
+		new LogParser().parseLog(propagateLog.getLog(), tree);
 		testWindow.doHighlighted();
-	}
-
-	private boolean hasChars(String substring) {
-		int letters = 0;
-		for (int i = 0; i < substring.length(); i++)
-			if (Character.isAlphabetic(substring.charAt(i)))
-			{
-				if (substring.charAt(i) == 'P' ||
-						substring.charAt(i) == 'A' ||
-						substring.charAt(i) == 'M')
-				{
-					letters ++;
-					if (letters > 2)
-						return true;
-				}
-			}
-		return false;
 	}
 
 	public void hideTestRow (Event event)

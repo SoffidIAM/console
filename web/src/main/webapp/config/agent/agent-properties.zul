@@ -13,6 +13,7 @@
 	position="center,center"
 	mode="highlighted"
 	closable="true"
+	onClose="ref:agentPropertiesWindow.doClose"
 	mold="soffid"
 	width="80%"
 	height="80vh"
@@ -27,7 +28,7 @@
 				<column label="System objects" valign="top">
 				</column>
 				<column label="" width="40px"  valign="top" align="center">
-					<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+					<imageclic  align="center" src="/img/add-w.svg" if="${canUpdateAgent}"
 						onClick="ref:objectsGrid.addObject" />
 				</column>
 			</columns>
@@ -56,7 +57,7 @@
 									<column label="Value">
 									</column>
 									<column label="" width="30px">
-										<imageclic align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
+										<imageclic align="middle" src="/img/add-w.svg" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
 										</imageclic>
 									</column>
 								</columns>

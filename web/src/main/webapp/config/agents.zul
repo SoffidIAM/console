@@ -53,7 +53,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar"
 				frame="frame">
 				<menu2>
-					<menu2item image="/img/add.svg"
+					<menu2item image="/img/add-r.svg"
 						label="${c:l('agents.zul.Afegeixnou') }"
 						if="${canCreateAgent}" onClick="ref:frame.addNew" />
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
@@ -102,7 +102,7 @@
 						onClick="ref:frame.delete" />
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:frame.importMapping"/>
 					<menu2item image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.exportMapping"/>
-					<menu2item image="/img/add.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
+					<menu2item image="/img/add-w.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
 					<menu2item image="/img/question.svg" label="${c:l('agents.zul.Test') }" if="${canQueryAgent}" onClick="ref:frame.test"/>
 				</menu2>
 
@@ -300,7 +300,7 @@
 								<column label="System objects" valign="top">
 								</column>
 								<column label="" width="40px"  valign="top" align="center">
-									<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+									<imageclic  align="center" src="/img/add-w.svg" if="${canUpdateAgent}"
 										onClick="ref:objectsGrid.addObject" />
 								</column>
 							</columns>
@@ -336,7 +336,7 @@
 														<column label="Properties">
 														</column>
 														<column label="" width="30px">
-															<imageclic align="center" src="/img/add.svg" onClick="ref:propertiesGrid2.createMethod"/>
+															<imageclic align="center" src="/img/add-w.svg" onClick="ref:propertiesGrid2.createMethod"/>
 														</column>
 													</columns>
 												</grid>
@@ -363,7 +363,7 @@
 														<column label="Value">
 														</column>
 														<column label="" width="30px">
-															<imageclic align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
+															<imageclic align="middle" src="/img/add-w.svg" onClick="ref:objectsGrid.createProperty" if="${canUpdateAgent }">
 															</imageclic>
 														</column>
 													</columns>
@@ -409,7 +409,7 @@
 														<column label="Test result" id="testColumn" visible="false">
 														</column>
 														<column label="" width="30px">
-															<imageclic  align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" >
+															<imageclic  align="middle" src="/img/add-w.svg" onClick="ref:objectsGrid.createProperty" >
 															</imageclic>
 														</column>
 													</columns>
@@ -436,7 +436,7 @@
 														</imageclic>
 														<div>
 															<label multiline="true"/>
-															<imageclic src="/img/exclamation.png" visible="false"/>
+															<imageclic src="/img/warning.svg" visible="false"/>
 														</div>
 														<imageclic align="right" src="/img/remove.svg" onClick="ref:objectsGrid.removeProperty"
 															if="${canUpdateAgent }">
@@ -486,7 +486,7 @@
 														</column>
 														<column label="" width="40px"/>
 														<column label="" width="40px">
-															<imageclic  align="right" src="/img/add.svg" onClick="ref:objectsGrid.createTrigger">
+															<imageclic  align="right" src="/img/add-w.svg" onClick="ref:objectsGrid.createTrigger">
 															</imageclic>
 														</column>
 													</columns>
@@ -547,7 +547,7 @@
 								</column>
 								<column label="" width="2em"/>
 								<column label="" width="2em">
-									<imageclic  align="right" src="/img/add.svg" onClick="ref:tabReconcileTriggers.addTrigger" if="${canUpdateAgent }">
+									<imageclic  align="right" src="/img/add-w.svg" onClick="ref:tabReconcileTriggers.addTrigger" if="${canUpdateAgent }">
 									</imageclic>
 								</column>
 							</columns>
@@ -713,7 +713,7 @@
 			sortable="false"
 			maxheight="70vh"
 			onAddPolicy="ref:frame.addPolicy"
-			style="height: 500px; min-height: 80vh"
+			style="height: 500px; min-height: 60vh"
 			onSelect="ref:frame.showDetails">
 			<attribute name="finders">
 			<![CDATA[

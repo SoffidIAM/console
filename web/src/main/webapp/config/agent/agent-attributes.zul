@@ -8,11 +8,13 @@
 <?component name="accountMetadata" macro-uri="/config/account_metadata.zul"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
+
 <window xmlns:h="http://www.w3.org/1999/xhtml"
 	use="com.soffid.iam.web.agent.AttributeMappingWindow"
 	position="center,center"
 	mode="highlighted"
 	closable="true"
+	onClose="ref:agentAttributesWindow.doClose"
 	mold="soffid"
 	width="80%"
 	height="80vh"
@@ -27,7 +29,7 @@
 				<column label="System objects" valign="top">
 				</column>
 				<column label="" width="40px"  valign="top" align="center">
-					<imageclic  align="center" src="/img/add.svg" if="${canUpdateAgent}"
+					<imageclic  align="center" src="/img/add-w.svg" if="${canUpdateAgent}"
 						onClick="ref:objectsGrid.addObject" />
 				</column>
 			</columns>
@@ -60,7 +62,7 @@
 								<column label="Test result" id="testColumn" visible="false">
 								</column>
 								<column label="" width="30px">
-									<imageclic  align="middle" src="/img/add.svg" onClick="ref:objectsGrid.createProperty" >
+									<imageclic  align="middle" src="/img/add-w.svg" onClick="ref:objectsGrid.createProperty" >
 									</imageclic>
 								</column>
 							</columns>

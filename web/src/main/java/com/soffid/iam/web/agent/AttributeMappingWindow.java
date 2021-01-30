@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Window;
 
@@ -12,8 +14,10 @@ import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.ObjectMapping;
 
 import es.caib.seycon.ng.comu.AttributeDirection;
+import es.caib.zkib.component.DataModel;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 
 
@@ -68,6 +72,14 @@ public class AttributeMappingWindow extends Window implements AfterCompose {
 
 	@Override
 	public void afterCompose() {
+	}
+
+	public void doClose(Event event) throws CommitException, InterruptedException {
+		DataModel model = (DataModel) Path.getComponent("/model");
+		if (model.isCommitPending()) {
+			model.commit();
+			Thread.sleep(3000);
+		}
 	}
 
 }

@@ -457,7 +457,6 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         }
     }
 
-
     private void createMailTask(UserGroupEntity ug) throws InternalErrorException {
         //  Now, updates any mail lists the users belongs
         for (MailListGroupMemberEntity lce : ug.getGroup().getMailLists()) {

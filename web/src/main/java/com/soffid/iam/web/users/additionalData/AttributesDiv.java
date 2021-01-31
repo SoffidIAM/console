@@ -291,7 +291,9 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 			InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
 			input.setOwnerObject(ownerObject);
 			input.setOwnerContext(ownerContext);
-			d.setVisible(input.attributeVisible());
+			boolean v = input.attributeVisible();
+			d.setVisible(v);
+			input.setVisible(v);
 		}
 	}
 

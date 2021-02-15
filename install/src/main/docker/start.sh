@@ -114,6 +114,29 @@ do
    fi
 done
 
+if [[ "$PROXY_HOST" != "" ]] 
+then
+   cp /opt/soffid/iam-console-3/conf/server.xml /opt/soffid/iam-console-3/conf/server.xml.template
+   cat /opt/soffid/iam-console-3/conf/server.xml.template |
+     sed -e "s/port=\"8080\"/port=\"8080\" proxyName=\"$PROXY_HOST\"/g"  \
+     >opt/soffid/iam-console-3/conf/server.xml
+fi
+
+if [[ "$PROXY_PORT" != "" ]] 
+then
+   cp /opt/soffid/iam-console-3/conf/server.xml /opt/soffid/iam-console-3/conf/server.xml.template
+   cat /opt/soffid/iam-console-3/conf/server.xml.template |
+     sed -e "s/port=\"8080\"/port=\"8080\" proxyPort=\"$PROXY_PORT\"/g"  \
+     >opt/soffid/iam-console-3/conf/server.xml
+fi
+
+if [[ "$PROXY_SCHEME" != "" ]] 
+then
+   cp /opt/soffid/iam-console-3/conf/server.xml /opt/soffid/iam-console-3/conf/server.xml.template
+   cat /opt/soffid/iam-console-3/conf/server.xml.template |
+     sed -e "s/port=\"8080\"/port=\"8080\" scheme=\"$PROXY_SCHEME\"/g" \
+     >opt/soffid/iam-console-3/conf/server.xml
+fi
 
 if [[ "$SECURE" == "true" ]]
 then

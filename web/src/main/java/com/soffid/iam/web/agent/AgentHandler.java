@@ -331,7 +331,7 @@ public class AgentHandler extends FrameHandler {
 				values.add (iterator.next());
 			box.setSelectedValues(values);
 		}			
-		searchBox.search();
+//		searchBox.search();
 		
 		DataNodeCollection servers = (DataNodeCollection) getModel().getValue("/server");
 		if (servers.isEmpty())

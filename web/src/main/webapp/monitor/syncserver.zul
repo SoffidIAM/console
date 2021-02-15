@@ -39,7 +39,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
 				<label value="&gt;" style="margin-left: 10px; margin-right: 10px"/>
 				<label id="form-label" />
-				<databutton image="/img/refresh-r.svg" label="${c:l('seyconserver.Refresca') }"
+				<databutton image="/img/refresh.svg" label="${c:l('seyconserver.Refresca') }"
 					 onClick="ref:frame.refreshTasks" 
 					 onlyIcon="true" id="refreshButton" 
 					 style="float:right"/>

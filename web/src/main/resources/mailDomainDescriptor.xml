@@ -5,8 +5,8 @@
 	<datanode name="root">		
 		<finder name="mailDomain" type="mailDomain">  <!-- mail:query, user:create, user:update -->
 			<ejb-finder jndi="java:/module/MailListsService-v2"
-				method="findMailDomainsByJsonQuery">
-				<parameter value="${query}"/>
+				method="findMailDomainsByFilter">
+				<parameter value="${null}"/>
 				<parameter value="${null}"/>
 				<parameter value="${null}"/>
 			</ejb-finder>

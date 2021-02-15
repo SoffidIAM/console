@@ -99,11 +99,11 @@ fi
 
 if [[ "$JAVA_OPT" == "" ]]
 then
-    CATALINA_OPTIONS="-Xmx2048m -Xms256m"
+    CATALINA_OPTS="-Xmx2048m -Xms256m"
 else
-    CATALINA_OPTIONS="$JAVA_OPT"
+    CATALINA_OPTS="$JAVA_OPT"
 fi
-export CATALINA_OPTIONS
+export CATALINA_OPTS
 
 for trustedcert in /opt/soffid/iam-console-3/trustedcerts/*
 do   

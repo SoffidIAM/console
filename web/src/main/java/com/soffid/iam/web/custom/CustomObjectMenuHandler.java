@@ -19,7 +19,6 @@ public class CustomObjectMenuHandler implements DynamicMenuHandler {
 	public List<MenuOption> getOptions(MenuOption option) {
 		if (option.getOptions() != null && !option.getOptions().isEmpty())
 			return option.getOptions();
-		log.info("Fetching menus for "+option.getMenuType()+": "+option.getMenuId());
 		List<MenuOption> list = new LinkedList<MenuOption>();
 		try {
 			for (CustomObjectType cu: EJBLocator.getAdditionalDataService().findCustomObjectTypeByJsonQuery("builtin eq \"false\"")) {

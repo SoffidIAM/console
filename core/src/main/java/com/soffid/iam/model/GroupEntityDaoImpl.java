@@ -55,6 +55,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.HibernateException;
+
 /**
  * @see es.caib.seycon.ng.model.GrupEntity
  */
@@ -519,6 +521,8 @@ public class GroupEntityDaoImpl extends
 		Collection totsPares = new HashSet();
 		GroupEntity pare = grupAnalitzar.getParent();
 		while (pare !=null) {
+			if (totsPares.contains(pare))
+				throw new HibernateException("Nested groups failure: "+pare.getName()+" parent is twice parent parent of "+grupAnalitzar.getName());
 			totsPares.add(pare);
 			pare = pare.getParent();
 		}

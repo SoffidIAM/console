@@ -349,6 +349,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	protected Group handleUpdate(Group grup) throws Exception {
 		GroupEntity entity = getGroupEntityDao().groupToEntity(grup);
+		// Check for loops
+		for (GroupEntity e = entity.getParent(); e != null; e = e.getParent()) {
+			if (e == entity) {
+				throw new InternalErrorException("The new parent for group "+grup.getName()+" cannot be "+grup.getParentGroup()+", as it would create a loop");
+			}
+		}
 		getGroupEntityDao().update(entity);
 		updateGroupAttributes(grup, entity);
 		return getGroupEntityDao().toGroup(entity);

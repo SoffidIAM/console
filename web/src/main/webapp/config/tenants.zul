@@ -38,7 +38,7 @@
 		  value: description
 		- name: ${c:l('tenant.zul.enabled')}
 		  value: enabled
-		  template: ${"${"}renderDetails ? '${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}' : '${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}' ${"}"}
+		  template: #{enabled ? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}" : "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}" }
 					]]>
 				</attribute>
 			</datatable>
@@ -139,7 +139,7 @@
 											image="/img/add.svg"
 											label="${c:l('usuaris.zul.Afegeixnou')}"
 											visible="${canUpdateTenant}"
-											onClick="ref:frame.addNewServer">
+											onClick="ref:frame.addServer">
 										</button>
 									</div>
 								</row>

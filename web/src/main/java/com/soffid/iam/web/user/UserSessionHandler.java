@@ -47,7 +47,11 @@ public class UserSessionHandler extends Div implements AfterCompose {
 	}
 	
 	public void refresh(Event event) throws Exception {
-		DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval( Path.getComponent(listboxPath), "/session");
-		coll.refresh();
+		try {
+			DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval( Path.getComponent(listboxPath), "/session");
+			coll.refresh();
+		} catch (Exception e) {
+			// No user selected
+		}
 	}
 }

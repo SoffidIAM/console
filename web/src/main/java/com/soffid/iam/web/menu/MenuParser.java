@@ -119,7 +119,15 @@ public class MenuParser {
 			if (o == null)
 			{
 				o = new MenuOption();
-				options.add(o);
+				if ( obj.has("position")) {
+					int pos = obj.getInt("position");
+					if (pos >= options.size())
+						options.add(o);
+					else
+						options.add(pos, o);
+				}
+				else
+					options.add(o);
 				o.setLabel(name);
 			}
 			String pagePermissions[] = null;

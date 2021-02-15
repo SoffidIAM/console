@@ -2469,6 +2469,7 @@ div.datatable div.sort-indicator-disabled {
 }
 
 .card__face--front {
+	pointer-events: auto;
 }
 
 .card__face--back {
@@ -2478,6 +2479,14 @@ div.datatable div.sort-indicator-disabled {
 .card.is-flipped {
   transform: rotateY(180deg);
 }
+
+.card.is-flipped .card__face--front, .card__face--back {
+	pointer-events: none;
+}
+.card.is-flipped .card__face--back, .card__face--front {
+	pointer-events: auto;
+}
+
 
 div.addButton, div.deleteButton {
 	display: inline-block;

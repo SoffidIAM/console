@@ -242,7 +242,8 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		entity.setError(false);
 		getScheduledTaskEntityDao().update(entity);
 		getScheduledTaskEntityDao().toScheduledTask(entity, task);
-		audit (task.getName(), "S"); //$NON-NLS-1$
+		if ( ! task.getHandlerName().equals(SystemScheduledTasks.UPDATE_STATS))
+			audit (task.getName(), "S"); //$NON-NLS-1$
 	}
 
 	/* (non-Javadoc)
@@ -270,7 +271,8 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		} catch (IOException e) {
 		}
 		getScheduledTaskEntityDao().update(entity);
-		audit (task.getName(), "F"); //$NON-NLS-1$
+		if ( ! task.getHandlerName().equals(SystemScheduledTasks.UPDATE_STATS))
+			audit (task.getName(), "F"); //$NON-NLS-1$
 		
 		if (task.isError())
 		{

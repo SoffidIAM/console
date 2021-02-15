@@ -20,6 +20,7 @@ import com.soffid.iam.api.StatsSample;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.StatsEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -91,10 +92,16 @@ public class StatsServiceImpl extends StatsServiceBase {
 
 	@Override
 	protected void handlePurge() throws Exception {
-		// TODO Auto-generated method stub
-
+		String days = ConfigurationCache.getMasterProperty("stats.days");
+		int daysNumber = 30;
+		try {
+			daysNumber = Integer.parseInt(days);
+		} catch (Exception e) {}
+		if (days == null) days = "30";
+		getStatsEntityDao().purge(daysNumber);
 	}
 
+	static int lastRun = 0;
 	@Override
 	protected void handleUpdateStats() throws Exception {
 		updatePamUsers();
@@ -102,7 +109,9 @@ public class StatsServiceImpl extends StatsServiceBase {
 		updateHpaAccounts();
 		updatePamAccounts();
 		updatePamStorage();
-	}
+		if (System.currentTimeMillis() - lastRun > 24 * 60  * 60 * 1000L)
+			handlePurge();
+ 	}
 
 	private void updatePamStorage() throws InternalErrorException {
 		String date = getDateString();

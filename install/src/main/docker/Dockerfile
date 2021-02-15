@@ -1,6 +1,6 @@
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
-RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y openjdk-8-jre-headless
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y openjdk-11-jre-headless
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 

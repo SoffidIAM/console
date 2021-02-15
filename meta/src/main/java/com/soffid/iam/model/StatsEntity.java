@@ -7,6 +7,7 @@ import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.DaoFinder;
+import com.soffid.mda.annotation.DaoOperation;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Entity;
@@ -43,6 +44,8 @@ public class StatsEntity {
 	@Column(name="STA_TEN_ID")
 	TenantEntity tenant;
 
+	@DaoOperation
+	public void purge (int days) {}
 	@DaoFinder("select x from com.soffid.iam.model.StatsEntity as x "
 			+ "where x.name=:name and x.date between :since and :until and tenant.id=:tenantId "
 			+ "order by x.date, x.serie")

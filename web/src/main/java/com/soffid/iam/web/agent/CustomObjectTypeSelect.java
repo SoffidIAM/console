@@ -49,9 +49,9 @@ public class CustomObjectTypeSelect extends Select implements XPathSubscriber {
 		String path = valueBinder.getXPath();
 		if (!path.endsWith("/"))
 			path = path + "/";
-		ds.getJXPathContext().setValue(path+"/@soffidObject", 
+		ds.getJXPathContext().setValue(path+"@soffidObject", 
 				type);
-		ds.getJXPathContext().setValue(path+"/@soffidCustomObject", 
+		ds.getJXPathContext().setValue(path+"@soffidCustomObject", 
 				customObjectType);
 		
 		selectedValue = value;

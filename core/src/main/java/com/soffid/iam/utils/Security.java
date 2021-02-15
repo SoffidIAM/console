@@ -630,7 +630,7 @@ public class Security {
     		Tenant tenant = tenantName == null ? 
     			getTenantService().getMasterTenant() :
     			getTenantService().getTenant(tenantName);
-    		if (tenant != null)
+    		if (tenant != null && tenant.isEnabled())
     		{
     			id = tenant.getId();
     			tenants.put(tenantName, id);
@@ -760,7 +760,7 @@ public class Security {
 			else if (t.contains("*"))
 			{
 				String t2 = t.replaceAll("\\*", "[0-9]*");
-				if ( Pattern.matches(t2, ip))
+				if ( Pattern.matches("^"+t2+"$", ip))
 					return true;
 			}
 		return false;

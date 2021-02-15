@@ -844,8 +844,11 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							th.wait(timeToWait);
 						}
 					}
-					if (th.isValidated())
+					if (th.isValidated()) {
 						updateAccountLastLogin(user, passwordDomain);
+						log.info("Storing password validate on trusted system");
+						handleStoreAndForwardPassword(user, passwordDomain, password, false);
+					}
 					currentValidationRequests.remove(hash);
 					return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
 				}

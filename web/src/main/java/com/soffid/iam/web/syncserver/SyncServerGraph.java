@@ -120,7 +120,6 @@ public class SyncServerGraph extends HttpServlet {
 			resp.sendRedirect("/");
 			return;
 		}
-		log.info("Referrer: " + req.getHeader("Referer"));
 		if (req.getPathInfo() == null)
 			resp.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE, "Missing server id");
 		else {

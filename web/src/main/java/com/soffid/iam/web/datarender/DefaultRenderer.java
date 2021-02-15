@@ -46,6 +46,10 @@ public class DefaultRenderer extends DataTypeRenderer {
 			o.put("template", "${"+prefix+dt.getName()+ "? '" +yes+ "' : '"+no+ "' }");
 			o.put("className", "statusColumn");
 		}
+		else if (dt.getType() == TypeEnumeration.NUMBER_TYPE) {
+			o.put("value", "parseInt ("+prefix+dt.getName()+")");
+			o.put("className", "statusColumn");
+		}
 		else if (dt.getType() == TypeEnumeration.PHOTO_TYPE) {
 			o.put("template", "<img class='small-picture' style='display:${"+prefix+dt.getName()+"?'inline-block':'none'}' "
 					+ "src='data:${"+prefix+dt.getName()+"_contentType};base64,${"+

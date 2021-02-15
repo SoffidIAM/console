@@ -20,7 +20,6 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
@@ -202,7 +201,6 @@ public class SAMLServiceInternal {
 	}
 	
 	public String[] authenticate(String hostName, String path, String protocol, Map<String, String> response) throws Exception {
-
 		String samlResponse = response.get("SAMLResponse");
 		
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -327,7 +325,7 @@ public class SAMLServiceInternal {
 			requestEntity.setKey(sb.toString());
 			requestDao.update(requestEntity);
 			log.info("Authenticated user "+user);
-			return new String[]{requestEntity.getExternalId(), sb.toString()};
+			return new String[]{ requestEntity.getHostName() + "\\"+ requestEntity.getExternalId(), sb.toString()};
 		}
 		log.info("Cannot get user name. Format "+nameID.getFormat()+" not supported");
 		
@@ -434,14 +432,31 @@ public class SAMLServiceInternal {
 	}
 
 	public String checkAuthenticationToken(String[] token) {
-		SamlRequestEntity requestEntity = requestDao.findByExternalId(token[0]);
-		if (requestEntity == null)
-			return null;
-		if (!requestEntity.isFinished())
-			return null;
-		if (!requestEntity.getKey().equals(token[1]))
-			return null;
-		return requestEntity.getHostName()+"\\"+requestEntity.getUser();
+		String user = token[0];
+		String tenant = null;
+		int i = user.indexOf("\\");
+		if ( i > 0)
+		{
+			tenant = user.substring(0, i);
+			user = user.substring(i+1);
+		} else {
+			tenant = "master";
+		}
+		com.soffid.iam.utils.Security.nestedLogin(tenant, "anonymous", com.soffid.iam.utils.Security.ALL_PERMISSIONS);
+		try {
+			SamlRequestEntity requestEntity = requestDao.findByExternalId(user);
+			if (requestEntity == null)
+				return null;
+			if (!requestEntity.isFinished())
+				return null;
+			if (!requestEntity.getHostName().equals(tenant))
+				return null;
+			if (!requestEntity.getKey().equals(token[1]))
+				return null;
+			return tenant+"\\"+requestEntity.getUser();
+		} finally {
+			com.soffid.iam.utils.Security.nestedLogoff();
+		}
 	}
 
 	public SamlRequest generateSamlRequest(String hostName, String path) throws InternalErrorException {
@@ -630,9 +645,9 @@ public class SAMLServiceInternal {
 		return xmlString;
 	}
 
-	private String getBaseURL(String hostName) 
+	private String getBaseURL(String hostName) throws InternalErrorException 
 	{
-		String url = ConfigurationCache.getTenantProperty(hostName, "soffid.externalURL");
+		String url = ConfigurationCache.getTenantProperty(com.soffid.iam.utils.Security.getCurrentTenantName(), "soffid.externalURL");
 		if (url == null)
 			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null)
@@ -645,7 +660,7 @@ public class SAMLServiceInternal {
 		return url;
 	}
 
-	private String getEntityId(String hostName, Boolean console) 
+	private String getEntityId(String hostName, Boolean console) throws InternalErrorException 
 	{
 		if (console)
 			return getBaseURL(hostName)+"soffid-iam-console";
@@ -673,7 +688,7 @@ public class SAMLServiceInternal {
 	}
 
 	private KeyStore generateKeys() throws KeyStoreException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException, CertificateException, IOException {
-        Security.addProvider( new BouncyCastleProvider() );
+        java.security.Security.addProvider( new BouncyCastleProvider() );
 
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
         SecureRandom random = new SecureRandom();

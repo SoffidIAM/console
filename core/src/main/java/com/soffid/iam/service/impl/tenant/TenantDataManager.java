@@ -30,7 +30,7 @@ import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantDataManager {
-
+	boolean debug;
 	protected Database db;
 	protected Connection conn;
 	protected boolean ignoreFailures;
@@ -130,8 +130,8 @@ public class TenantDataManager {
 					" WHERE RIS_TEN_ID=${tenantId}",
 				"SCV_RECGRO",
 					" WHERE RGR_TEN_ID=${tenantId}",
-				"SC_SCTAHA",
-					" WHERE 1=0",
+//				"SC_SCTAHA",
+//					" WHERE 1=0",
 				"SC_USUPRO",
 					"WHERE UPR_IDPROC IN (SELECT JBPM_MODULEINSTANCE.PROCESSINSTANCE_ FROM  JBPM_MODULEINSTANCE "
 						+ "WHERE JBPM_MODULEINSTANCE.TENANT_=${tenantId})"
@@ -301,13 +301,19 @@ public class TenantDataManager {
 		sp.path.add(table.name);
 		list.add(sp);
 		String s = generateDirectQuery(forDelete, list);
-		if (!s.isEmpty())
+		if (!s.isEmpty()) {
+			if (debug)
+				log.info(table.name+" >> "+s);
 			return s;
+		}
 	
 		s = generateIndirectQuery ( table, forDelete, sp.path);
 		if (s.isEmpty())
 		{
-			throw new InternalErrorException("There is no filter for table "+table.name);
+			String d = generateIndirectQueryDiag (table, forDelete, sp.path);
+			if (debug)
+				log.info(table.name+" ** "+d);
+			throw new InternalErrorException("There is no filter for table "+table.name+": "+d);
 		}
 		return s;
 	}
@@ -338,6 +344,41 @@ public class TenantDataManager {
 						.append(s)
 						.append(")");
 				}
+			}
+		}
+		return query.toString();
+	}
+
+	private String generateIndirectQueryDiag(Table table, boolean forDelete, Set<String> forbiddenTables) throws InternalErrorException {
+		StringBuffer query = new StringBuffer();
+		for ( ForeignKey fk: references (table.name))
+		{
+			if (! forbiddenTables.contains(fk.tableName))
+			{
+				Table master = db.findTable(fk.tableName, false);
+				String s = null;
+				try {
+					s = generateQuery ( master, forDelete, forbiddenTables );
+				} catch (InternalErrorException e) {}
+				if (s != null && ! s.isEmpty())
+				{
+					if (query.length() > 0) query.append(" OR ");
+					else query.append(" WHERE ");
+					query.append(table.name +"."+table.getPrimaryKey())
+						.append(" IN ( SELECT ");
+					for (String columnName: fk.columns)
+					{
+						query.append( fk.tableName+"."+columnName);
+					}
+					query.append(" FROM ")
+						.append(fk.tableName)
+						.append(s)
+						.append(")");
+				} else {
+					query.append(fk.tableName+" has no query");
+				}
+			} else {
+				query.append(fk.tableName+" is forbidden\n");
 			}
 		}
 		return query.toString();
@@ -492,6 +533,14 @@ public class TenantDataManager {
 				return true;
 		}
 		return false;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 }

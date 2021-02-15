@@ -204,7 +204,7 @@ public class TenantHandler extends FrameHandler {
 		es.caib.zkib.binder.BindContext bindCtx = es.caib.zkib.datasource.XPathUtils.getComponentContext(ev.getTarget());
 		es.caib.zkib.datasource.XPathUtils.createPath(
 				bindCtx.getDataSource(),
-				"/server");
+				"/servers");
 	}
 
 	public void addPermission(Event ev) throws Exception {

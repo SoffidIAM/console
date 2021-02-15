@@ -28,7 +28,7 @@ import org.zkoss.zul.Rows;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.event.ListDataListener;
 
-import es.caib.seycon.ng.comu.ObjectMappingProperty;
+import com.soffid.iam.api.ObjectMappingProperty;
 
 import es.caib.zkib.binder.CollectionBinder;
 import es.caib.zkib.component.DataGrid;

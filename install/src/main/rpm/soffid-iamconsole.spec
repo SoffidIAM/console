@@ -5,7 +5,8 @@ Release: 1
 Summary: Soffid IAM Console
 License: GPL
 Distribution: Soffid IAM
-Group: Administration/Netwokr
+Group: Administration/Network
+Requires: java
 
 %define _rpmdir target
 %define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm

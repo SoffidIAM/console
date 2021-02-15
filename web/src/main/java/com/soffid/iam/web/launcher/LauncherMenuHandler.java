@@ -34,7 +34,7 @@ public class LauncherMenuHandler implements DynamicMenuHandler {
 	public List<MenuOption> getOptions(MenuOption option) {
 		if (option.getOptions() != null && !option.getOptions().isEmpty())
 			return option.getOptions();
-		log.info("Fetching menus for "+option.getMenuType()+": "+option.getMenuId());
+//		log.info("Fetching menus for "+option.getMenuType()+": "+option.getMenuId());
 		List<MenuOption> list = new LinkedList<MenuOption>();
 		try {
 			if (option.getMenuType() == null) {

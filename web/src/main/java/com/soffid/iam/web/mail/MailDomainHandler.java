@@ -1,7 +1,6 @@
 package com.soffid.iam.web.mail;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -10,26 +9,18 @@ import javax.servlet.http.HttpServletRequest;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xel.fn.CommonFns;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.MailDomain;
-import com.soffid.iam.service.ejb.ApplicationService;
-import com.soffid.iam.service.ejb.AuthorizationService;
-import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.service.ejb.MailListsService;
-import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
-import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datasource.CommitException;
-import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class MailDomainHandler extends FrameHandler {

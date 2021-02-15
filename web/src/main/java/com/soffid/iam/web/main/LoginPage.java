@@ -75,7 +75,7 @@ public class LoginPage extends Html {
 					boolean classic = ! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic"));
 					if (!classic)
 					{
-						currentExecution.sendRedirect( currentExecution.getContextPath()+"/saml");
+						currentExecution.sendRedirect( "/saml");
 					}
 				} else {
 					setVariable("user", user, false);

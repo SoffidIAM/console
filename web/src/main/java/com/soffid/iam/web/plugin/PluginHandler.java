@@ -129,10 +129,10 @@ public class PluginHandler extends FrameHandler {
 		String fileName = "reset console.txt"; //$NON-NLS-1$
 		String fileContent = "File to check reset console"; //$NON-NLS-1$
 		File file = new File(fileName);
-		FileWriter wr = new FileWriter(file, true);
+		FileWriter wr = null;
 		String home = System.getProperty ("catalina.home"); //$NON-NLS-1$
 		File addonFolder = new File(new File(home, "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		try
 		{
 			addonFolder.mkdirs();
@@ -142,7 +142,7 @@ public class PluginHandler extends FrameHandler {
 		}
 		finally
 		{
-			wr.close();
+			if (wr != null) wr.close();
 		}
     }
 	

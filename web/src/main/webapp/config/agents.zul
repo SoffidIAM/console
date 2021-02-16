@@ -703,15 +703,15 @@
 		closable="true"
 		onClose="self.setVisible(false); event.stopPropagation();">
 		<div>
-			<label class = "separator_label" value="${c:l('job.status') }: "/>
-			<label class = "separator_label" id="status"/>
+			<label class = "separator_label" value="${c:l('job.status') }: "  style="width: auto"/>
+			<label class = "separator_label" id="status" style="margin-left: 20px; width: auto"/>
 		</div>
 		<datatree2 id="log"
 			header="Test log" 
 			enablefilter="true"
-			sortDirection="0"
+			sortDirection="500"
 			sortable="false"
-			maxheight="70vh"
+			maxheight="480px"
 			onAddPolicy="ref:frame.addPolicy"
 			style="height: 500px; min-height: 60vh"
 			onSelect="ref:frame.showDetails">
@@ -724,7 +724,7 @@
 			  leaf: true
 			  ]]>
 			</attribute>
- 			</datatree2>
+ 		</datatree2>
 		<div style="text-align: right; margin: 2em">
 			<button image="/img/download-r.svg" label="${c:l('contenidoTarea.btnDescargar') }" onClick="ref:frame.downloadPropagateLog"/>
 			<button label="${c:l('error.zul.Tancar')}">

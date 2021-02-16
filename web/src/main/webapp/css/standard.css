@@ -2142,6 +2142,8 @@ div.datatable table.tbody tr td.dateColumn {
 }
 
 div.datatable table.tbody tr.dashed td,
+div.datatree div.tree-label.dashed,
+div.datatree div.tree-label.dashed div.tree-cell,
 div.databox.dashed select {
 	text-decoration: line-through;
 }

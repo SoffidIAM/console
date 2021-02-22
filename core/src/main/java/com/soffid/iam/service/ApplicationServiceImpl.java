@@ -1081,7 +1081,8 @@ public class ApplicationServiceImpl extends
      * @throws UnknownUserException 
 	 */
 	private void checkGroupHolder(RoleAccount rolsUsuaris) throws InternalErrorException, UnknownUserException {
-		if ("never".equals(ConfigurationCache.getProperty("soffid.entitlement.group.holder")))
+		if ("never".equals(ConfigurationCache.getProperty("soffid.entitlement.group.holder")) || 
+				rolsUsuaris.getRuleId() != null)
 			rolsUsuaris.setHolderGroup(null);
 		else
 		{

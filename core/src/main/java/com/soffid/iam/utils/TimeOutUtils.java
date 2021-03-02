@@ -39,7 +39,7 @@ public class TimeOutUtils {
 		try {
 			return Integer.parseInt(ConfigurationCache.getMasterProperty(PROPERTY_TIMEOUT));
 		} catch (Exception e) {
-			throw new InternalErrorException(String.format(Messages.getString(MESSAGE_NONPROPERTY), PROPERTY_TIMEOUT));
+			return 10000;
 		}
 	}
 }

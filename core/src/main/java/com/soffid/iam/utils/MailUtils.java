@@ -138,7 +138,7 @@ public class MailUtils {
 		// -- Attaching to default Session, or we could start a new one --
 		props.put("mail.smtp.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
 		props.put("mail.smtps.host", getConfigValue("mail.host", "localhost")); //$NON-NLS-1$ //$NON-NLS-2$
-		Session session = Session.getDefaultInstance(props, authenticator);
+		Session session = Session.getInstance(props, authenticator);
 		session.setDebug( "true".equals( getConfigValue("mail.debug", "false")) );
 		return session;
 	}

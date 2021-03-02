@@ -1159,7 +1159,8 @@ public class ApplicationServiceImpl extends
      * @throws UnknownUserException 
 	 */
 	private void checkGroupHolder(RoleAccount rolsUsuaris) throws InternalErrorException, UnknownUserException {
-		if ("never".equals(ConfigurationCache.getProperty("soffid.entitlement.group.holder")))
+		if ("never".equals(ConfigurationCache.getProperty("soffid.entitlement.group.holder")) || 
+				rolsUsuaris.getRuleId() != null)
 			rolsUsuaris.setHolderGroup(null);
 		else
 		{
@@ -1449,7 +1450,9 @@ public class ApplicationServiceImpl extends
     }
 
     private Collection<RoleAccount> internalFindUserRolesByUserName(String codiUsuari, boolean sod, boolean history) throws InternalErrorException {
-    	List<RoleAccountEntity> rolusus = getRoleAccountEntityDao().findByUserName(codiUsuari);
+    	List<RoleAccountEntity> rolusus = history ? 
+    			getRoleAccountEntityDao().findHistoryByUserName(codiUsuari):
+    			getRoleAccountEntityDao().findByUserName(codiUsuari);
     	
     	if (rolusus != null) {
     		// Filtrem per autoritzacions

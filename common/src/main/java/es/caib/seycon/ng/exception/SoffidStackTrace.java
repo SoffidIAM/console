@@ -29,6 +29,7 @@ public class SoffidStackTrace
     {
     	String cn = stackElement.getClassName();
     	if (cn.startsWith("org.hibernate.") || //$NON-NLS-1$
+    			cn.startsWith("java.base/") || //$NON-NLS-1$
     			cn.startsWith("org.jboss.") || //$NON-NLS-1$
     			cn.startsWith("org.springframework.") || //$NON-NLS-1$
     			cn.startsWith("org.apache.catalina.") || //$NON-NLS-1$
@@ -133,29 +134,28 @@ public class SoffidStackTrace
         	if (c != null) {
                 s.print(Messages.getString("InternalErrorException.CausedBy")); //$NON-NLS-1$
         		s.print(c);
+        		return;
         	}
 
-        } else {
-            // Compute number of frames in common between this and caused
-            int m = trace.length - 1, n = causedTrace.length - 1;
-            while (m >= 0 && n >= 0 && trace[m].equals(causedTrace[n])) {
-                m--;
-                n--;
-            }
-            int framesInCommon = trace.length - 1 - m;
+        }
+        // Compute number of frames in common between this and caused
+        int m = trace.length - 1, n = causedTrace.length - 1;
+        while (m >= 0 && n >= 0 && trace[m].equals(causedTrace[n])) {
+            m--;
+            n--;
+        }
+        int framesInCommon = trace.length - 1 - m;
 
-	        for (int i = 0; i <= m; i++) {
-	            if (i == 0 || displayStackTrace(trace[i]))
-	            {
-	            	printStackTrace (trace[i], s);
-	            }
-	        }
-	        if (framesInCommon != 0) {
-	            s.print("\t"); //$NON-NLS-1$
-	            s.printf(Messages.getString("InternalErrorException.more"), framesInCommon); //$NON-NLS-1$
-	            s.println();
-	        }
-	
+        for (int i = 0; i <= m; i++) {
+            if (i == 0 || displayStackTrace(trace[i]))
+            {
+            	printStackTrace (trace[i], s);
+            }
+        }
+        if (framesInCommon != 0) {
+            s.print("\t"); //$NON-NLS-1$
+            s.printf(Messages.getString("InternalErrorException.more"), framesInCommon); //$NON-NLS-1$
+            s.println();
         }
         s.flush();
     }

@@ -11,7 +11,7 @@
 		title="${c:l('user_renameaccount.Titol')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:window.onWindowClose">
 
-		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<div class="navigation-bar">
 			<menu2>
 				<menu2item if="${soffid:isUserInRole('user:update')}" image="/img/trash.svg" 
 					label="${c:l('plugins.zul.Delete') }" 

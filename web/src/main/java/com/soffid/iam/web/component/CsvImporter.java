@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,6 +128,11 @@ public abstract class CsvImporter<E> {
 					}
 				} else {
 					Map<String,Object> attributes = (Map<String, Object>) PropertyUtils.getProperty(object, "attributes");
+					if (attributes == null)
+					{
+						attributes = new HashMap<>();
+						PropertyUtils.setProperty(object, "attributes", attributes);
+					}
 					Object vv = attributes.get(dt.getName());
 					if ( ! v.equals(vv)) {
 						attributes.put(dt.getName(), v);

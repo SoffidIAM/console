@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.web.component.SearchDictionaryBuilder;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.datamodel.DataContext;
@@ -31,16 +32,17 @@ public class FinderHandlerModel implements FinderHandler {
 			return null;
 		
 		Class clazz;
-		try {
-			clazz = Class.forName(className);
-		} catch (ClassNotFoundException e) {
+		if (className.startsWith(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT)) {
 			clazz = CustomObject.class;
-			String q2 = "type.name eq \""+className.replaceAll ("\"", "\\\\\"")+"\"";
+			String objectName = className.substring(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT.length());
+			String q2 = "type.name eq \""+  objectName.replaceAll ("\"", "\\\\\"")+"\"";
 			if (query == null || query.trim().isEmpty()) {
 				query = q2;
 			} else {
 				query = q2 +"("+query+")";
 			}
+		} else {
+			clazz = Class.forName(className);
 		}
 
 		CrudHandler crud = EJBLocator.getCrudRegistryService().getHandler(clazz);

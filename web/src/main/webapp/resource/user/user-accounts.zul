@@ -49,7 +49,7 @@
 	</div>
 
 	<!--  Window to set the password -->
-	<window closable="true"
+	<window closable="false"
 		id="newPassword2" position="top, center"
 		sizable="true" title="${c:l('accounts.setPassword.title')}"
 		visible="false" width="34em"

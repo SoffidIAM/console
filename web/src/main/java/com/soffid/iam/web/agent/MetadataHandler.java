@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -166,6 +167,16 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 		}
 		collection.sort(new OrderComparator());
 		
+	}
+
+	@Override
+	public void onPageAttached(Page newpage, Page oldpage) {
+		super.onPageAttached(newpage, oldpage);
+		try {
+			newpage.setVariable("js_template", new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
+		} catch (InternalErrorException | NamingException | CreateException e) {
+			throw new UiException("Error generating javascript template", e);
+		}
 	}
 	
 }

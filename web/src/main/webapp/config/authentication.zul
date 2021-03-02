@@ -91,7 +91,7 @@
 							</div>
 							<div>
 								<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpPassord')}: "/>
-								<input_password width_custom="30em" bind="linotpPassword"/>
+								<input_password width_custom="30em" bind="linotpPassword" style="display: inline-block"/>
 							</div>
 							<div>
 								<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpUserDomain')}: "/>

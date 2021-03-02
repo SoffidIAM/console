@@ -1776,6 +1776,11 @@ input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, in
     border-radius: 4px;
 }
 
+div.databox.databox-label div.datahtml {
+	border-color: transparent;
+	background: transparent;	
+}
+
 input.textbox2::placeholder, input.textbox2m::placeholder, input.textbox::placeholder, 
 	input.dateboxinp::placeholder, input.text::placeholder,
 	input.description::placeholder,
@@ -1900,7 +1905,8 @@ div.record-form > div > img.imageclic {
 	animation-duration: 0.7s;
 }
 
-a.change-mode-label {
+a.change-mode-label, a.change-mode-label:visited {
+	color: {SKY};
 }
 
 a.change-mode-label-hidden {
@@ -1908,6 +1914,7 @@ a.change-mode-label-hidden {
 }
 
 a.change-mode-label-selected {
+	color: {SKY};
 	font-weight: bold;
 	text-decoration: none;
 }

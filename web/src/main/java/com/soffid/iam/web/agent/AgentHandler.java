@@ -379,11 +379,11 @@ public class AgentHandler extends FrameHandler {
 				String url = (String) ((Select) getFellow("url")).getSelectedValue();
 				if(url == null || url.trim().length() == 0)
 				{
-					( (Button) getFellow("imgPropaga")).setDisabled(true);
+					getFellow("imgPropaga").setVisible(false);
 				}
 				else
 				{
-					( (Button) getFellow("imgPropaga")).setDisabled(false);
+					getFellow("imgPropaga").setVisible(true);
 				}
 			} 
 			((Intbox) getFellow("agentThreadsBox")).setDisabled(Boolean.TRUE.equals ( system.getSharedDispatcher() ) );

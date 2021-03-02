@@ -75,6 +75,7 @@ public class LoginPage extends Html {
 					boolean classic = ! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic"));
 					if (!classic)
 					{
+						response("hide-loginbox", new org.zkoss.zk.au.out.AuScript(this, "document.getElementById('loginbox').setAttribute(\"style\",\"display: none\");"));
 						currentExecution.sendRedirect( "/saml");
 					}
 				} else {

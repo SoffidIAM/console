@@ -123,7 +123,7 @@
 		id="objectAttributeWindow"
 		closable="false">
 		
-		<form dataPath="../metadataGrid:/" id="form">
+		<form2 dataPath="../metadataGrid:/" id="form">
 			<div sclass='navigation-bar'>
 				${c:l('dadesAddicionals.zul.attribute') } <pager datatable="../metadataGrid" />
 				<menu2>
@@ -133,166 +133,94 @@
 				</menu2>
 				
 			</div>
-			<grid width="100%" sclass="noBorderGrid">
-				<rows>
-					<row>
-						${c:l('dadesAddicionals.zul.Codi-2')} : 
-						<textbox bind="@name" id="detall_codi" readonly="${!canModifyMetadata}" style="width:100%; max-width:25em"
-							maxlength="25" constraint="no empty" />
-					</row>
-					<row>
-						${c:l('dadesAddicionals.zul.Label')} :
-						<textbox bind="@label" maxlength="50" sclass="textbox"
-							readonly="${!canModifyMetadata}" width="80%" onChange="" />
-					</row>
-					<row>
-						${c:l('dadesAddicionals.zul.Type')} :
+			<div>
+				<customfield3 label="${c:l('dadesAddicionals.zul.Codi-2')}" bind="@name" id="detall_codi" readonly="${!canModifyMetadata}"
+							maxlength="150" required="true" dataType="STRING" />
+				<customfield3 label="${c:l('dadesAddicionals.zul.Label')}" bind="@label" dataType="STRING"
+							readonly="${!canModifyMetadata}" maxlength="150" />
+				<div>
+						<label sclass="label" value="${c:l('dadesAddicionals.zul.Type')}:" />
 						<select visible="true" bind="."
 							use="com.soffid.iam.web.agent.CustomDataTypeSelect"
 							disabled="${!canModifyMetadata}"
 							onSelect='ref:frame.onChangeDataType(self)' />
-					</row>
-					<row>
-						${c:l('dadesAddicionals.zul.Required')} :
-						<switch bind="@required" disabled="${!canModifyMetadata}"
-							onClick="" onCheck="" />
-					</row>
-					<row>
-						${c:l('dadesAddicionals.zul.IncludeInSearch')} :
-						<switch bind="@searchCriteria" disabled="${!canModifyMetadata}"
-							onClick="" onCheck="" />
-					</row>
-					<row >
-						${c:l('dadesAddicionals.zul.Unique')} :
-						<switch bind="@unique" disabled="${!canModifyMetadata}"
-							onClick="" onCheck="" />
-					</row>
-					<row >
-						${c:l('dadesAddicionals.zul.Multivalued')} :
-						<switch bind="@multiValued" disabled="${!canModifyMetadata}"
-								onClick="" onCheck="ref:frame.onChangeMultipleValues" />
-					</row>
-					<row id="multiRowRow">
-						${c:l('dadesAddicionals.zul.MultivaluedRows')} :
-						<intbox bind="@multiValuedRows" onChange=""/>
-					</row>
-					<row >
-						${c:l('dadesAddicionals.zul.Size')} :
-						<textbox bind="@size" id="detail_size" maxlength="50" sclass="textbox"
-							readonly="${!canModifyMetadata}" width="8em" onChange="" />
-					</row>
-					<row id="valuesRow">
-						${c:l('dadesAddicionals.zul.Values')} :
-						<grid dataPath="/values" id="gridValues">
+				</div>
+				<customfield3 label="${c:l('dadesAddicionals.zul.Required')}" dataType="BOOLEAN" 
+						bind="@required" disabled="${!canModifyMetadata}" />
+				<customfield3 label="${c:l('dadesAddicionals.zul.IncludeInSearch')}" dataType="BOOLEAN"
+					bind="@searchCriteria" disabled="${!canModifyMetadata}" />
+				<customfield3 label="${c:l('dadesAddicionals.zul.Unique')}" dataType="BOOLEAN"
+					bind="@unique" disabled="${!canModifyMetadata}"/>
+				<customfield3 label="${c:l('dadesAddicionals.zul.Multivalued')}" dataType="BOOLEAN"
+						bind="@multiValued" disabled="${!canModifyMetadata}"
+								onClick="" onChange="ref:frame.onChangeMultipleValues" />
+				<customfield3 id="multirow" label="${c:l('dadesAddicionals.zul.MultivaluedRows')}" dataType="BOOLEAN"
+						bind="@multiValuedRows" onChange=""/>
+				<customfield3 label="${c:l('dadesAddicionals.zul.Size')}" dataType="NUMBER"
+							bind="@size" id="detail_size"
+							readonly="${!canModifyMetadata}" onChange="" />
+				<div id="valuesRow">
+					<label sclass="label" value="${c:l('dadesAddicionals.zul.Values')} :"></label>
+					<div style='width: 400px; width: calc( 100% - 200px ); display: inline-block'>
+						<grid dataPath="/values" id="gridValues" width="100%" fixedLayout="true">
 							<columns>
 								<column label="${c:l('dadesAddicionals.zul.Values')}"></column>
-								<column visible="${canModifyMetadata}" width="2em">
+								<column visible="${canModifyMetadata}" width="48px">
 									<imageclic align="center" src="~./img/list-add.gif" onClick="ref:frame.addValue"/>
 								</column>
 							</columns>
 							<datarow>
-								<textbox bind="." maxlength="50" sclass="textbox" readonly="false"
-									width="80%" onChange="" />
+								<textbox bind="." sclass="textbox" readonly="false"
+									width="100%" onChange="" />
 								<imageclic align="center" src="~./img/list-remove.gif" onClick="ref:frame.removeValue">
 								</imageclic>
 							</datarow>
 						</grid>
-					</row>
-					<row visible="false" id="admvisrow">
-						<label value="${c:l('dadesAddicionals.zul.AdminVisibility')}" />
-						<div width="100%">
-							<listbox width="90%" visible="true" bind="@adminVisibility"
-								mold="select" disabled="${!canModifyMetadata}" style="font-size: 10px"
-								dataPath="/model:/visibility">
-								<dataitem bind="@value">
-									<listcell bind="@literal" />
-								</dataitem>
-							</listbox>
-							<label value="*" />
-						</div>
-					</row>
-					<row visible="false"  id="opevisrow">
-						<label value="${c:l('dadesAddicionals.zul.OperatorVisibility')}" />
-						<div width="100%">
-							<listbox width="90%" visible="true" bind="@operatorVisibility"
-								mold="select" disabled="${!canModifyMetadata}" style="font-size: 10px"
-								dataPath="/model:/visibility">
-								<dataitem bind="@value">
-									<listcell bind="@literal" />
-								</dataitem>
-							</listbox>
-							<label value="*" />
-						</div>
-					</row>
-					<row visible="false"  id="usevisrow">
-						<label value="${c:l('dadesAddicionals.zul.UserVisibility')}" />
-						<div width="100%">
-							<listbox width="90%" visible="true" bind="@userVisibility"
-								mold="select" disabled="${!canModifyMetadata}" style="font-size: 10px"
-								dataPath="/model:/visibility">
-								<dataitem bind="@value">
-									<listcell bind="@literal" />
-								</dataitem>
-							</listbox>
-							<label value="*" />
-						</div>
-					</row>
-					<row id="visibility4">
-						<div>
-							${c:l('dadesAddicionals.zul.VisibilityExpr')} :
-							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
-						</div>
-						<hbox width="100%"  widths="*, 24px">
-							<textbox width="100%" visible="true" style="resize: vertical"  bind="@visibilityExpression" rows="1" multiline="true"  onChange=""/>
-							<imageclic src="/img/pencil.svg" width="24px" onClick="ref:frame.editScript" />
-						</hbox>
-					</row>
-					<row id="visibility5">
-						<div>
-							${c:l('dadesAddicionals.zul.ValidExpr')} :
-							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;value: ${c:l('dadesAddicionals.zul.var4')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}" />
-						</div>
-						<hbox width="100%"  widths="*, 24px">
-							<textbox width="100%" visible="true" style="resize: vertical" bind="@validationExpression" rows="1" multiline="true"  onChange=""/>
-							<imageclic src="/img/pencil.svg" width="24px" onClick="ref:frame.editScript" />
-						</hbox>
-					</row>
-					<row id="visibility6">
-						<div>
-							${c:l('dadesAddicionals.zul.FilterExpr')} :
-							<imageclic src="/img/info.svg" title="${c:l('dadesAddicionals.zul.var6') }" />
-						</div>
-						<hbox width="100%"  widths="*, 24px">
-							<textbox width="100%" visible="true" style="resize: vertical"  bind="@filterExpression" multiline="true" onChange=""/>
-							<label value=""/>
-						</hbox>
-					</row>
-					<row >
-						<div>
-							${c:l('dadesAddicionals.zul.onLoadTrigger')} :
-							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
-						</div>
-						<hbox width="100%"  widths="*, 24px">
-							<textbox width="100%" visible="true" style="resize: vertical"  bind="@onLoadTrigger" multiline="true" onChange=""/>
-							<imageclic src="/img/pencil.svg" width="24px" onClick="ref:frame.editScript" />
-						</hbox>
-					</row>
-					<row >
-						<div>
-							${c:l('dadesAddicionals.zul.onChangeTrigger')} :
-							<imageclic src="/img/info.svg" title="${c:l('rules.availableVariables') }&#10;serviceLocator: ${c:l('rules.var1')} &#10;object: ${c:l('dadesAddicionals.zul.var3')}&#10;attributes: ${c:l('dadesAddicionals.zul.var2')}&#10;requestContext: ${c:l('dadesAddicionals.zul.var5')}&#10;inputField: ${c:l('dadesAddicionals.zul.var8')}"/>
-						</div>
-						<hbox width="100%" widths="*, 24px">
-							<textbox width="100%" visible="true" style="resize: vertical"  bind="@onChangeTrigger" multiline="true" onChange=""/>
-							<imageclic src="/img/pencil.svg" width="24px" onClick="ref:frame.editScript" />
-						</hbox>
-					</row>
-				</rows>
-			</grid>
+					</div>
+				</div>
+				<customfield3 dataType="STRING" visible="false" id="admvisrow"
+						label="${c:l('dadesAddicionals.zul.AdminVisibility')}"
+						keysPath="/model:/visibility/value"
+						valuesPath="/model:/visibility/literal"
+						bind="@adminVisibility"
+						disabled="${!canModifyMetadata}" />
+				<customfield3 dataType="STRING" visible="false"  id="opevisrow"
+						label="${c:l('dadesAddicionals.zul.OperatorVisibility')}"
+						bind="@operatorVisibility"
+						keysPath="/model:/visibility/value"
+						valuesPath="/model:/visibility/literal"
+						disabled="${!canModifyMetadata}"></customfield3>
+				<customfield3 dataType="STRING" visible="false"  id="usevisrow"
+						label="${c:l('dadesAddicionals.zul.OperatorVisibility')}"
+						bind="@userVisibility"
+						keysPath="/model:/visibility/value"
+						valuesPath="/model:/visibility/literal"
+						disabled="${!canModifyMetadata}"></customfield3>
+				<customfield3 dataType="STRING" multiline="true" id="visibility4"
+					label="${c:l('dadesAddicionals.zul.VisibilityExpr')}"
+					visible="true" bind="@visibilityExpression" selectIcon="/img/pencil.svg" 
+					javascript="${js_template}"/>
+				<customfield3 dataType="STRING" multiline="true" id="visibility5"
+					label="${c:l('dadesAddicionals.zul.ValidExpr')}"
+					visible="true" bind="@validationExpression" selectIcon="/img/pencil.svg"
+					javascript="${js_template}"/>
+				<customfield3 dataType="STRING" multiline="true" id="visibility6"
+					label="${c:l('dadesAddicionals.zul.var6')}"
+					visible="true" bind="@filterExpression"
+					/>
+				<customfield3 dataType="STRING" multiline="true"
+					label="${c:l('dadesAddicionals.zul.onLoadTrigger')}"
+					visible="true" bind="@onLoadTrigger" selectIcon="/img/pencil.svg"
+					javascript="${js_template}"/>
+				<customfield3 dataType="STRING" multiline="true"
+					label="${c:l('dadesAddicionals.zul.onChangeTrigger')}"
+					visible="true" bind="@onChangeTrigger" selectIcon="/img/pencil.svg"
+					javascript="${js_template}"/>
+			</div>
 			<div style="text-align: right ">
 				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.undoAttribute"/>
 				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyAttribute"/>
 			</div>
-		</form>
+		</form2>
 	</window>
  </frame>

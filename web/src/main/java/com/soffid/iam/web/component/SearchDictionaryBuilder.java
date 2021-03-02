@@ -35,7 +35,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class SearchDictionaryBuilder {
 
-	private static final String COM_SOFFID_IAM_API_CUSTOM_OBJECT = "com.soffid.iam.api.CustomObject#";	
+	public static final String COM_SOFFID_IAM_API_CUSTOM_OBJECT = "com.soffid.iam.api.CustomObject#";	
 	@SuppressWarnings("serial")
 	private static LinkedList<String> EXCLUSIONS = new LinkedList<String>() {{
 		 add("com.soffid.iam.api.User.passwordMaxAge");

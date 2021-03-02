@@ -192,10 +192,12 @@ public class HostHandler extends FrameHandler {
 		String hostName = (String) XPathUtils.getValue((DataSource)getListbox(), "name");
 
 		String[] dadesAdmin = svc.getHostAdminUserAndPassword( hostName );
-		if (dadesAdmin!=null && dadesAdmin.length==3) {
+		if (dadesAdmin!=null && dadesAdmin.length==3 && dadesAdmin[1] != null) {
 			Missatgebox.info (String.format(org.zkoss.util.resource.Labels.getLabel("maquines.DadesUsuari"), 
 					new Object [] {dadesAdmin[0], dadesAdmin[1],dadesAdmin[2]}),
 				org.zkoss.util.resource.Labels.getLabel("maquines.InformacioAdministracio"));
+		} else {
+			Missatgebox.info(Labels.getLabel("hosts.passwordNotAvailable"));
 		}
 		
 	}

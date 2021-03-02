@@ -73,6 +73,11 @@
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
+						<div class="navigation-bar">
+							<menu2>
+								<menu2item if="${soffid:isUserInRole('group:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+							</menu2>
+						</div>
 						<div id="dades"> 
 							<form id="form" onChangeXPath="ref:frame.onChangeForm"
 								dataPath="/listbox:/." width="100%">

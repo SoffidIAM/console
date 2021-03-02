@@ -260,38 +260,45 @@ public class FrameHandler extends Frame {
 	}
 	
 	public void undo(Event ev) throws CommitException {
-		Component lb = getListbox();
-		Long id = null;
 		try {
-			id = (Long) XPathUtils.getValue( getForm(), "/@id");
-		} catch (Exception e) {
-		}
-		int pos[] = null;
-		if (lb instanceof DataTree2)
-			pos = ((DataTree2) lb).getSelectedItem();
-		getModel().refresh();
-		SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
-		if (sb != null)
-			sb.updateProgress();
-		if (id != null && lb instanceof DataTable)
-		{
+			Component lb = getListbox();
+			Long id = null;
 			try {
-				ListModel model = ((DataTable) lb).getModel();
-				for (int i = 0; i < model.getSize(); i++)
-				{
-					Object o = ((DataNode)model.getElementAt(i)).getInstance();
-					if (id.equals( PropertyUtils.getProperty(o, "id")))
-					{
-						((DataTable) lb).setSelectedIndex(i);
-						return;
-					}
-				}
+				id = (Long) XPathUtils.getValue( getForm(), "/@id");
 			} catch (Exception e) {
 			}
-		}
-		if (pos != null && lb instanceof DataTree2)
-		{
-			((DataTree2)lb).setSelectedIndex(pos);
+			int pos[] = null;
+			if (lb instanceof DataTree2)
+				pos = ((DataTree2) lb).getSelectedItem();
+			getModel().refresh();
+			SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
+			if (sb != null)
+				sb.updateProgress();
+			if (id != null && lb instanceof DataTable)
+			{
+				try {
+					ListModel model = ((DataTable) lb).getModel();
+					for (int i = 0; i < model.getSize(); i++)
+					{
+						Object o = ((DataNode)model.getElementAt(i)).getInstance();
+						if (id.equals( PropertyUtils.getProperty(o, "id")))
+						{
+							((DataTable) lb).setSelectedIndex(i);
+							return;
+						}
+					}
+				} catch (Exception e) {
+				}
+			}
+			if (pos != null && lb instanceof DataTree2)
+			{
+				((DataTree2)lb).setSelectedIndex(pos);
+			}
+		} catch (ComponentNotFoundException e) {
+			getModel().refresh();
+			SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
+			if (sb != null)
+				sb.updateProgress();
 		}
 		hideDetails();
 	}

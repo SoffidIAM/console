@@ -1,12 +1,9 @@
 package com.soffid.iam.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.hibernate.Hibernate;
-
-import com.ibm.icu.text.SimpleDateFormat;
-
-import es.caib.seycon.ng.utils.Security;
 
 public class StatsEntityDaoImpl extends StatsEntityDaoBase {
 

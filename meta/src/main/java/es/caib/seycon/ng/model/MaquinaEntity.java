@@ -78,7 +78,7 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public java.lang.String usuariAdministrador;
 
-	@Column (name="MAQ_CONTRA", length=50, translated="administratorPassword")
+	@Column (name="MAQ_CONTRA", length=150, translated="administratorPassword")
 	@Nullable
 	public java.lang.String contrasenyaAdministrador;
 

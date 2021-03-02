@@ -13,6 +13,9 @@ public class AccountHistory {
 	public Account account;
 
 	@Nullable
+	AccountAccessLevelEnum level;
+	
+	@Nullable
 	public Date start;
 
 	@Nullable

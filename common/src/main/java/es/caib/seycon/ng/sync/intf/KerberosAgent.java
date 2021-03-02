@@ -20,4 +20,6 @@ public interface KerberosAgent extends Remote {
     public String[] getRealmServers () throws InternalErrorException;
 
     public String parseKerberosToken ( String serverPrincipal, byte[] keytab, byte token[] ) throws InternalErrorException ;
+
+    public String findPrincipalAccount (String principal) throws InternalErrorException ;
 }

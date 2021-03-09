@@ -11,135 +11,98 @@
 	<datamodel id="model" class="com.soffid.web.saml.SamlDataModel"/>
 
 	<form dataPath="model:/conf" id="samlform" width="100%">
-		<grid sclass="noBorderGrid" width="100%">
-			<rows>
-				<row>
-					<label value="${c:l('parametres.zul.classicMethod')}"/>
-					<label/>
-				</row>
-				<row>
-					<label/>
-					<div>
-						<div width="100%">
-							<switch bind="classicMethod"  ></switch>
-							<label value="${c:l('deploy.lblEnable')}"  style="margin-left: 16px" />
-						</div>
-						<div width="100%">
-							<switch bind="trustedAuthentication"></switch>
-							<label value="${c:l('parametres.zul.trustedAuthentication')}"  style="margin-left: 16px" />
-						</div>
-					</div>
-				</row>
-				<row>
-					<label value="${c:l('parametres.zul.samlMethod')}"/>
-					<label/>
-				</row>
-				<row>
-					<label/>
-					<div  width="100%">
-						<div>
-							<div>
-								<switch bind="samlMethod" /> 
-								<label value="${c:l('deploy.lblEnable') }" style="margin-left: 16px" /> 
-							</div>
-							<div>
-								<label sclass="label longlabel" value="${c:l('parametres.zul.hostName')}: "/>
-								<textbox bind="hostName" width="30em"/>
-							</div>
-							<div>
-								<label sclass="label longlabel" value="${c:l('parametres.zul.metadataURL')}: "/>
-								<textbox bind="metadata" width="30em"
-									onChange="ref:frame.refreshIDP"
-									onOK=""/>
-							</div>
-							<div>
-								<label sclass="label longlabel" value="${c:l('parametres.zul.cacheLimit')}: "/>
-								<intbox bind="cache"/>
-							</div>
-							<div>
-								<label sclass="label longlabel" value="${c:l('parametres.zul.IDP')}: "/>
-								<listbox mold="select" bind="idp" id="idpselect"
-									dataPath="/model:/idps">
-									<dataitem bind="/value">
-										<listcell bind="/value"/>
-									</dataitem>
-								</listbox>
-							</div>
-						</div>
-					</div>
-				</row>
-				<row>
-					<label value="${c:l('parametres.zul.linotpIntegration')}"/>
-					<label/>
-				</row>
-				<row>
-					<label/>
-					<div  width="100%">
-						<div>
-							<div>
-								<switch bind="enableLinotp"  /> 
-								<label sclass="label" value="${c:l('deploy.lblEnable') }" /> 
-							</div>
-							<div>
-								<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpServer')}: "/>
-								<textbox bind="linotpServer" width="30em"/>
-							</div>
-							<div>
-								<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpUser')}: "/>
-								<textbox bind="linotpUser" width="30em"
-									onOK=""/>
-							</div>
-							<div>
-								<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpPassord')}: "/>
-								<input_password width_custom="30em" bind="linotpPassword" style="display: inline-block"/>
-							</div>
-							<div>
-								<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpUserDomain')}: "/>
-								<listbox mold="select" bind="linotpUserDomain"
-									dataPath="/model:/userDomain">
-									<dataitem bind="/code">
-										<listcell bind="/description"/>
-									</dataitem>
-								</listbox>
-							</div>
-						</div>
-					</div>
-				</row>
-				<row>
-					<label value="${c:l('parametres.zul.otpUsage')}"/>
-					<label/>
-				</row>
-				<row>
-					<label/>
-					<div  width="100%">
-						<div>
-							<div>
-								<label   value="${c:l('parametres.zul.otpOptional')}: "/>
-								<textbox bind="optionalToken" width="100%" multiline="true" rows="5" maxlength="500"/>
-							</div>
-							<div>
-								<label  value="${c:l('parametres.zul.otpRequired')}: "/>
-								<textbox bind="requireToken" width="100%" multiline="true" rows="5" maxlength="500"/>
-							</div>
-							<div>
-								<label  sclass="label longlabel" value="${c:l('parametres.zul.otpTimeout')}: "/>
-								<intbox bind="tokenTimeout" width="30" maxlength="500"/>
-								<label value="${c:l('parametres.zul.otpTimeout2')}: "/>
-								
-							</div>
-						</div>
-					</div>
-				</row>
-				<row>
-					<label/>
-					<div style="margin-top: 2em">
-						<button image="/img/download-r.svg" label="${c:l('parametres.zul.downloadMetadata') }" onClick="ref:frame.downloadMetadata"/>
-						<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.commit"
-							style="text-align:right"/>
-					</div>
-			
-				</row>
-			</rows>
-		</grid>
+		<div>
+			<label value="${c:l('parametres.zul.classicMethod')}"/>
+		</div>
+		<div style="margin-left: 150px">
+			<div width="100%">
+				<switch bind="classicMethod"  ></switch>
+				<label value="${c:l('deploy.lblEnable')}"  style="margin-left: 16px" />
+			</div>
+			<div width="100%">
+				<switch bind="trustedAuthentication"></switch>
+				<label value="${c:l('parametres.zul.trustedAuthentication')}"  style="margin-left: 16px" />
+			</div>
+		</div>
+		<label value="${c:l('parametres.zul.samlMethod')}"/>
+		<div style="margin-left: 150px">
+			<div>
+				<switch bind="samlMethod" /> 
+				<label value="${c:l('deploy.lblEnable') }" style="margin-left: 16px" /> 
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.hostName')}: "/>
+				<textbox bind="hostName" width="30em"/>
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.metadataURL')}: "/>
+				<textbox bind="metadata" width="30em"
+					onChange="ref:frame.refreshIDP"
+					onOK=""/>
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.cacheLimit')}: "/>
+				<intbox bind="cache"/>
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.IDP')}: "/>
+				<listbox mold="select" bind="idp" id="idpselect"
+					dataPath="/model:/idps">
+					<dataitem bind="/value">
+						<listcell bind="/value"/>
+					</dataitem>
+				</listbox>
+			</div>
+		</div>
+		<label value="${c:l('parametres.zul.linotpIntegration')}"/>
+		<div style="margin-left: 150px">
+			<div>
+				<switch bind="enableLinotp"  /> 
+				<label sclass="label" value="${c:l('deploy.lblEnable') }" /> 
+			</div>
+			<div>
+				<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpServer')}: "/>
+				<textbox bind="linotpServer" width="30em"/>
+			</div>
+			<div>
+				<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpUser')}: "/>
+				<textbox bind="linotpUser" width="30em"
+					onOK=""/>
+			</div>
+			<div>
+				<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpPassord')}: "/>
+				<input_password width_custom="30em" bind="linotpPassword" style="display: inline-block"/>
+			</div>
+			<div>
+				<label  sclass="label longlabel" value="${c:l('parametres.zul.linotpUserDomain')}: "/>
+				<listbox mold="select" bind="linotpUserDomain"
+					dataPath="/model:/userDomain">
+					<dataitem bind="/code">
+						<listcell bind="/description"/>
+					</dataitem>
+				</listbox>
+			</div>
+		</div>
+		<label value="${c:l('parametres.zul.otpUsage')}"/>
+		<div style="margin-left: 150px">
+			<div>
+				<label   value="${c:l('parametres.zul.otpOptional')}: "/>
+				<textbox bind="optionalToken" width="100%" multiline="true" rows="5" maxlength="500"/>
+			</div>
+			<div>
+				<label  value="${c:l('parametres.zul.otpRequired')}: "/>
+				<textbox bind="requireToken" width="100%" multiline="true" rows="5" maxlength="500"/>
+			</div>
+			<div>
+				<label  sclass="label longlabel" value="${c:l('parametres.zul.otpTimeout')}: "/>
+				<intbox bind="tokenTimeout" width="30" maxlength="500"/>
+				<label value="${c:l('parametres.zul.otpTimeout2')}" sclass="label"/>
+			</div>
+		</div>
+		<div style="margin-top: 2em">
+			<button image="/img/download-r.svg" label="${c:l('parametres.zul.downloadMetadata') }" onClick="ref:frame.downloadMetadata"/>
+			<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.commit"
+				style="text-align:right"/>
+		</div>
 	</form>				
 </frame>

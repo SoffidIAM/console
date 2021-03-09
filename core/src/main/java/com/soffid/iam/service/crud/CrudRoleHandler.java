@@ -25,7 +25,7 @@ public class CrudRoleHandler implements CrudHandler<Role> {
 	
 	@Override
 	public Role create(Role object) throws InternalErrorException, NamingException, CreateException {
-		return getService().create(object);
+		return getService().create2(object);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class CrudRoleHandler implements CrudHandler<Role> {
 
 	@Override
 	public Role update(Role object) throws InternalErrorException, NamingException, CreateException {
-		getService().update(object);
+		getService().update2(object);
 		return object;
 	}
 

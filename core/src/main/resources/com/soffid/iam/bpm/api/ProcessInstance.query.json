@@ -1,0 +1,12 @@
+{
+  "hibernateClass": "org.jbpm.graph.exe.ProcessInstance",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"processDefinition", "hibernateName":"processDefinition.name"},
+    {"name":"start", "hibernateName":"start"},
+    {"name":"end", "hibernateName":"end"},
+    {"name":"variables"},
+    {"name":"currentTask"},
+    {"name":"description"}
+  ]
+}

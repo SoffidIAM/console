@@ -9,12 +9,14 @@ import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
@@ -24,11 +26,13 @@ import com.soffid.iam.service.crud.CrudApplicationHandler;
 import com.soffid.iam.service.crud.CrudCustomObjectHandler;
 import com.soffid.iam.service.crud.CrudDomainValueHandler;
 import com.soffid.iam.service.crud.CrudGroupHandler;
+import com.soffid.iam.service.crud.CrudGroupUserHandler;
 import com.soffid.iam.service.crud.CrudHostHandler;
 import com.soffid.iam.service.crud.CrudMailDomainHandler;
 import com.soffid.iam.service.crud.CrudMailListHandler;
 import com.soffid.iam.service.crud.CrudNetworkHandler;
 import com.soffid.iam.service.crud.CrudOUTypeHandler;
+import com.soffid.iam.service.crud.CrudRoleAccountHandler;
 import com.soffid.iam.service.crud.CrudRoleHandler;
 import com.soffid.iam.service.crud.CrudSystemHandler;
 import com.soffid.iam.service.crud.CrudUserHandler;
@@ -60,6 +64,8 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(Account.class.getName(), new CrudAccountHandler());
 		registry.put(MailList.class.getName(), new CrudMailListHandler());
 		registry.put(CustomObject.class.getName(), new CrudCustomObjectHandler());
+		registry.put(GroupUser.class.getName(), new CrudGroupUserHandler());
+		registry.put(RoleAccount.class.getName(), new CrudRoleAccountHandler());
 	}
 
 	@Override

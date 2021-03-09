@@ -5,6 +5,7 @@
 //
 
 package es.caib.bpm.servei;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.mda.annotation.*;
 
@@ -511,4 +512,16 @@ public abstract class BpmEngine {
 	}
 	
 	public void linkProcesses (Long parentProcess, Long childProcess) { }
+	
+	public PagedResult<ProcessDefinition> findProcessDefinitionByTextAndJsonQuery(
+		@Nullable String text, @Nullable String jsonQuery,
+		@Nullable Integer start, @Nullable Integer pageSize) {return null;}
+
+	public PagedResult<ProcessInstance> findProcessInstanceByTextAndJsonQuery(
+			@Nullable String text, @Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {return null;}
+
+	public PagedResult<TaskInstance> findTasksByTextAndJsonQuery(
+			@Nullable String text, @Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {return null;}
 }

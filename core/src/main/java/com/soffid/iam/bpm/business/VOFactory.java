@@ -195,21 +195,23 @@ public class VOFactory {
 			});
 			process.setComments(comments);
 			Token t = instance.getRootToken();
-			Node n = t.getNode();
-			if (n instanceof TaskNode)
-			{
-				StringBuffer tasks = new StringBuffer();
-				for( Iterator it = instance.getTaskMgmtInstance().getUnfinishedTasks(t).iterator();
-					it.hasNext();) {
-					TaskInstance ti = (TaskInstance) it.next();
-					tasks.append(ti.getName());
-					tasks.append(" "); //$NON-NLS-1$
+			if (t != null) {
+				Node n = t.getNode();
+				if (n instanceof TaskNode)
+				{
+					StringBuffer tasks = new StringBuffer();
+					for( Iterator it = instance.getTaskMgmtInstance().getUnfinishedTasks(t).iterator();
+						it.hasNext();) {
+						TaskInstance ti = (TaskInstance) it.next();
+						tasks.append(ti.getName());
+						tasks.append(" "); //$NON-NLS-1$
+					}
+					process.setCurrentTask(tasks.toString());
 				}
-				process.setCurrentTask(tasks.toString());
-			}
-			else if (n != null)
-			{
-				process.setCurrentTask(n.getName());
+				else if (n != null)
+				{
+					process.setCurrentTask(n.getName());
+				}
 			}
 			
 			if (process.getVariables().containsKey("$title"))
@@ -255,11 +257,11 @@ public class VOFactory {
 		}
 
 		Token t = instance.getRootToken();
-		do
+		while (t != null)
 		{
 			populateTokenComments(t, comments);
 			t = t.getProcessInstance().getSuperProcessToken();
-		} while (t != null);
+		} 
 	}
 
 	private static void populateTokenComments(Token token, Vector<Comment> comments) {

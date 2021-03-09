@@ -138,7 +138,7 @@ public class CreateDisableUserServiceImpl extends com.soffid.iam.service.workflo
 	protected String handleSetInitialPasswordToUser(String codiUsuari, String codiDominiContrasenyes) throws Exception {
 		UserService usuariService = getUserService();
 		//String dominiDefecte = getDominiCorreuEntityDao()
-		String password = usuariService.setInitialPassword(codiUsuari, codiDominiContrasenyes);
+		String password = usuariService.setTemporaryPassword(codiUsuari, codiDominiContrasenyes);
 		return password;
 	}
 

@@ -3,6 +3,7 @@ package com.soffid.scimquery;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -92,6 +93,16 @@ public class HQLQuery {
 		return whereString;
 	}
 	
+	public StringBuffer getOrderByString() {
+		StringBuffer sb = new StringBuffer();
+		
+		if (orderBy == null || orderBy.isEmpty()) return sb;
+		for (String s: orderBy) {
+			if (sb.length() > 0 ) sb.append(", ");
+			sb.append(s);
+		}
+		return sb;
+	}
 
 	public String toCountString ()
 	{
@@ -112,6 +123,9 @@ public class HQLQuery {
 		if (getWhereString().length() > 0)
 			sb.append("\nwhere ")
 			  .append(getWhereString());
+		if (getOrderByString().length() > 0)
+			sb.append("\norder by ")
+				.append(getOrderByString());
 		return sb.toString();
 	}
 
@@ -136,6 +150,8 @@ public class HQLQuery {
 	}
 
 	String rootObject = null;
+
+	private List<String> orderBy;
 	public String getRootObject() {
 		return rootObject;
 	}
@@ -150,5 +166,13 @@ public class HQLQuery {
 
 	public void setCountQueryString(StringBuffer countQueryString) {
 		this.countQueryString = countQueryString;
+	}
+
+	public void setOrderBy(List<String> orderBy) {
+		this.orderBy = orderBy;
+	}
+
+	public List<String> getOrderBy() {
+		return orderBy;
 	}
 }

@@ -204,4 +204,43 @@ public class ParseTest extends TestCase {
 	ParseException, TokenMgrError {
 		expressionTester("active eq true", User.class);
 	}
+
+	public void testSort() throws UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException,
+	ParseException, TokenMgrError {
+		expressionTester("name eq \"User'Name\" $orderby name", User.class);
+		expressionTester("name eq 'User\"Name' $orderby name", User.class);
+		expressionTester("name eq UserName $orderby name", User.class);
+	}
+
+	// Test corró d’avall
+	public void testSort2 () throws Exception
+	{
+		ClassConfig config = new ClassConfig();
+		config.setClazz(AttributeValueEntity.class.getCanonicalName());
+		config.setHibernateClass(AttributeValueEntity.class.getCanonicalName());
+		AttributeConfig attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("numericValue");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		attributeConfig.setAttributeName("employee");
+		config.getAttributes().put("employee", attributeConfig);
+
+		attributeConfig = new AttributeConfig();
+		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setVirtualAttributeValue("value");
+		attributeConfig.setVirtualAttributeName("attribute.name");
+		config.setDefaultVirtualAttribute(attributeConfig);
+
+		Configuration.registerClass(config);
+
+		expressionTester2(
+				"attributes.employee co \"corró d’avall\" $orderby attributes.employee",
+				Account.class ,
+				false);
+		
+		expressionTester2(
+				"attributes.employee co \"corró d’avall\" $orderby attributes.employee",
+				Account.class ,
+				true);
+	}
 }

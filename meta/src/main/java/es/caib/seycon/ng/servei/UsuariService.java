@@ -280,13 +280,14 @@ public abstract class UsuariService {
 		return null;
 	}
 
-	@Operation(translated = "setInitialPassword")
+	@Description("Generates a password for a user")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.lang.String assignaPasswordInicial(java.lang.String codiUsuari,
+	public java.lang.String setPassword(java.lang.String codiUsuari,
 			java.lang.String codiDominiContrasenyes)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
 
 	@Operation(grantees = { roles.Tothom.class }, translated = "findUserByUserName")
 	@Transactional(noRollbackFor={java.lang.Exception.class},readOnly=true,rollbackFor={})
@@ -334,7 +335,7 @@ public abstract class UsuariService {
 	}
 
 	@Description("Generates a random temporary password for a user")
-	@Operation(grantees = { roles.user_password_update.class }, translated = "changePassword")
+	@Operation(grantees = { roles.user_password_update.class }, translated = "setTemporaryPassword")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.lang.String canviPassword(java.lang.String codiUsuari,
 			java.lang.String codiDominiContrasenyes)
@@ -343,13 +344,23 @@ public abstract class UsuariService {
 	}
 
 	@Description("Sets a temporary password for a user")
-	@Operation(grantees = { roles.user_password_update.class }, translated = "changePassword")
+	@Operation(grantees = { roles.user_password_update.class }, translated = "setTemporaryPassword")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void setTemporaryPassword(java.lang.String codiUsuari,
 			java.lang.String codiDominiContrasenyes, Password newPassword)
 			throws es.caib.seycon.ng.exception.InternalErrorException,
 			BadPasswordException {
 	}
+
+	@Description("Sets a password for a user")
+	@Operation(grantees = { roles.user_password_update.class }, translated = "setPassword")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void setPassword(java.lang.String codiUsuari,
+			java.lang.String codiDominiContrasenyes, Password newPassword)
+			throws es.caib.seycon.ng.exception.InternalErrorException,
+			BadPasswordException {
+	}
+
 
 	@Operation(grantees = { roles.user_refresh.class, roles.user_query.class }, translated = "getTasks")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
@@ -476,13 +487,6 @@ public abstract class UsuariService {
 			@Nullable java.lang.String tipusUsuari)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
-	}
-
-	@Operation(translated = "spreadPassword")
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void propagaContrasenya(java.lang.String codiUsuari,
-			java.lang.String contrasenya)
-			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
 	@Operation(translated = "generateRandomPassword")

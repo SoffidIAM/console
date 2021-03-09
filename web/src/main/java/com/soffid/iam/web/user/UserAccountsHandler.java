@@ -92,14 +92,14 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
-			userService.changePassword(user, domain, new Password(password.getValue()));
+			userService.setTemporaryPassword(user, domain, new Password(password.getValue()));
 			es.caib.zkib.zkiblaf.Missatgebox
 					.avis(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
 		}
 		else
 		{
-			String nouPassword = userService.changePassword(user, domain);
+			String nouPassword = userService.setTemporaryPassword(user, domain);
 			showPasswordAssist(domain, nouPassword);
 		}
 

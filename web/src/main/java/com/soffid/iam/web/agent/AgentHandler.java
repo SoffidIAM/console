@@ -553,7 +553,9 @@ public class AgentHandler extends FrameHandler {
 					byte[] data = ad.getUserInterface();
 	
 					// Clear methodDescriptor variable
-					getPage().setVariable("methodDescriptor", null);
+					Map pageScope = (Map) getPage().getVariable("pageScope");
+					if (pageScope != null)
+						pageScope.remove("methodDescriptor");
 	
 					//System.out.println("AgentDescriptor = "+data.getClass().getName());
 					java.io.ByteArrayInputStream in = new java.io.ByteArrayInputStream(data);

@@ -27,8 +27,10 @@ import org.zkoss.zul.Row;
 import org.zkoss.zul.Rows;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.event.ListDataListener;
+import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.api.ObjectMappingProperty;
+import com.soffid.iam.web.popup.Editor;
 
 import es.caib.zkib.binder.CollectionBinder;
 import es.caib.zkib.component.DataGrid;
@@ -122,12 +124,7 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 
 		@Override
 		public void onEvent(Event event) throws Exception {
-			Events.sendEvent(new Event ("onEdit", 
-				getDesktop().getPage("editor").getFellow("top"),
-				new Object[] {
-				    event.getTarget().getPreviousSibling(),
-				    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(event.getTarget())
-				}));
+			Editor.edit( (InputElement) event.getTarget().getPreviousSibling(), new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(event.getTarget()));
 		}
 	}
 
@@ -234,6 +231,7 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 		row.setValign("top");
 		HashMap<String, String> method = methods.get(methodName);
 		PropertyTextbox tb = new PropertyTextbox();
+		tb.setSclass("noborder-textbox");
 		tb.setAttribute("method", methodName);
 		tb.setAttribute("methodName", Boolean.TRUE);
 		tb.setValue(methodName);
@@ -246,15 +244,16 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 			d.setSclass("method-collapsed-div");
 		row.appendChild(d);
 		Grid g = new Grid();
+		g.setFixedLayout(true);
 		Columns columns = new Columns();
 		g.appendChild(columns);
 		Column column = new Column();
-		column.setWidth("150px");
+		column.setWidth("200px");
 		columns.appendChild(column);
 		column = new Column();
 		columns.appendChild(column);
 		column = new Column();
-		column.setWidth("24px");
+		column.setWidth("40px");
 		columns.appendChild(column);
 		createMethodProperties (methodName, method, g);
 		d.appendChild(g);
@@ -289,6 +288,7 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 			g.getRows().appendChild(row);
 			row.appendChild(new Label(label));
 			PropertyTextbox tb = new PropertyTextbox();
+			tb.setSclass("noborder-textbox");
 			tb.setAttribute("method", methodName);
 			tb.setAttribute("methodName", Boolean.FALSE);
 			tb.setAttribute("property", name);
@@ -303,7 +303,7 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 			row.appendChild(tb);		
 			if ("beanshell".equals(type))
 			{
-				ImageClic ic = new ImageClic("/img/pencil.png");
+				ImageClic ic = new ImageClic("/img/pencil.svg");
 				ic.setWidth("24px");
 				ic.addEventListener("onClick", onEditListener);
 				row.appendChild(ic);

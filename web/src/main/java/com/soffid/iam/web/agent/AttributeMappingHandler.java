@@ -60,8 +60,16 @@ public class AttributeMappingHandler extends DataGrid {
 		Div triggersBlock = (Div) r.getFirstChild().getFellowIfAny("triggersBlock"); 
 		Div methodsBlock = (Div) r.getFirstChild().getFellowIfAny("methodsBlock");
 		
-		if (methodsBlock != null)
-			methodsBlock.setVisible( getPage().getVariable("methodDescriptor") != null);
+		if (methodsBlock != null) {
+			methodsBlock.setVisible(false);
+			Map pageScope = (Map) getPage().getVariable("pageScope");
+			if (pageScope != null) {
+				String[][] methodDescriptor = (String[][]) pageScope.get("methodDescriptor");
+				if (methodDescriptor != null) {
+					methodsBlock.setVisible( true);
+				}
+			}
+		}
 
 		if (triggersBlock != null) {
 			try {

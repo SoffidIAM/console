@@ -884,4 +884,14 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
+	@Operation(grantees = { roles.user_role_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult<es.caib.seycon.ng.comu.RolAccount> findRoleAccountByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 }

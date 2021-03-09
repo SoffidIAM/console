@@ -51,6 +51,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.ContainerRole;
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.DomainValue;
@@ -66,9 +67,12 @@ import com.soffid.iam.api.RoleGrantHierarchy;
 import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.AuthorizationEntity;
+import com.soffid.iam.model.CustomObjectEntity;
+import com.soffid.iam.model.CustomObjectEntityDao;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -80,6 +84,7 @@ import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleAccountEntityDao;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntityImpl;
 import com.soffid.iam.model.RoleDependencyEntity;
@@ -3969,6 +3974,35 @@ public class ApplicationServiceImpl extends
 				it.remove();
 		}
 		return r;
+	}
+	@Override
+	protected PagedResult<RoleAccount> handleFindRoleAccountByJsonQuery(String query, Integer startIndex, Integer count)
+			throws Exception {
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+		
+		final RoleAccountEntityDao dao = getRoleAccountEntityDao();
+		ScimHelper h = new ScimHelper(RoleAccount.class);
+		h.setPrimaryAttributes(new String[] { "accountName", "roleName"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(startIndex);
+		config.setMaximumResultSize(count);
+		h.setConfig(config);
+		h.setTenantFilter("account.system.tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toRoleAccount((RoleAccountEntity) entity);
+		}); 
+
+		
+		LinkedList<RoleAccount> result = new LinkedList<RoleAccount>();
+		h.search(null, query, (Collection) result); 
+
+		PagedResult<RoleAccount> pr = new PagedResult<>();
+		pr.setStartIndex(startIndex);
+		pr.setItemsPerPage(count);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 

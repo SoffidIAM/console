@@ -52,6 +52,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.ConstantScoreQuery;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Scorer;
@@ -94,10 +95,14 @@ import org.jbpm.taskmgmt.def.Task;
 import org.jbpm.taskmgmt.exe.PooledActor;
 import org.jbpm.taskmgmt.exe.SwimlaneInstance;
 import org.jbpm.taskmgmt.log.TaskAssignLog;
+import org.json.JSONException;
 import org.xml.sax.SAXException;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Network;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.api.BPMUser;
@@ -123,17 +128,28 @@ import com.soffid.iam.bpm.model.TenantModuleDefinition;
 import com.soffid.iam.bpm.model.UserInterface;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
 import com.soffid.iam.bpm.service.impl.UserContextCache;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.bpm.utils.ColeccionesUtils;
 import com.soffid.iam.bpm.utils.FechaUtils;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomDialect;
+import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.HostEntityDao;
+import com.soffid.iam.model.NetworkEntity;
+import com.soffid.iam.model.NetworkEntityDao;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
+import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.bpm.classloader.UIClassLoader;
 import es.caib.bpm.exception.BPMErrorCodes;
@@ -473,6 +489,10 @@ public class BpmEngineImpl extends BpmEngineBase {
 					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
+
+				TermsFilter fTenant = new TermsFilter( new Term("$tenant", Security.getCurrentTenantName() ));
+				b.add(new FilterClause(fTenant, BooleanClause.Occur.MUST));
+				complexQuery = true;
 
 				DocumentCollector collector = new DocumentCollector();
 				collector.setResult (resultado);
@@ -3512,4 +3532,229 @@ public class BpmEngineImpl extends BpmEngineBase {
 			flushContext(context);
 		}
 	}
+	
+	@Override
+	protected PagedResult<com.soffid.iam.bpm.api.ProcessDefinition> handleFindProcessDefinitionByTextAndJsonQuery(
+			java.lang.String text, 
+			java.lang.String jsonQuery, 
+			java.lang.Integer start, 
+			java.lang.Integer pageSize) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			AbstractExpression expr = ExpressionParser.parse(jsonQuery);
+			List <ProcessDefinition> r = new LinkedList<>();
+			
+			List<ProcessDefinition> s = handleFindInitiatorProcessDefinitions();
+			for (ProcessDefinition def: s) {
+				if (text == null || text.trim().isEmpty() || def.getName().toLowerCase().contains(text.toLowerCase())) {
+					if (expr.evaluate(def))
+						r.add(def);
+				}
+			}
+			PagedResult<ProcessDefinition> pr = new PagedResult<>();
+			pr.setStartIndex(start);
+			pr.setItemsPerPage(pageSize);
+			pr.setTotalResults(r.size());
+			pr.setResources(r);
+			return pr;
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected PagedResult<ProcessInstance> handleFindProcessInstanceByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final JbpmContext context = getContext();
+		try {
+			ProcessDefinitionRolesBusiness business = new ProcessDefinitionRolesBusiness();
+			business.setContext(context);
+
+			List<org.jbpm.graph.exe.ProcessInstance> procs = new LinkedList<>();
+			if (jsonQuery == null || jsonQuery.trim().isEmpty()) {
+				LinkedList<ProcessInstance> procInstances = new LinkedList<ProcessInstance>();
+				if (text == null || text.isEmpty()) {
+					List<org.jbpm.graph.exe.ProcessInstance> list = context.getSession().createQuery("select p from org.jbpm.graph.exe.ProcessInstance as p").list();
+					for (org.jbpm.graph.exe.ProcessInstance process: list) 
+					{
+						ProcessInstance proc = handleGetProcess(process.getId());
+						if (proc != null)
+							procInstances.add(proc);
+					}
+				} else {
+					for (Long l: findProcessInstancesByText(context, text)) {
+						ProcessInstance proc = handleGetProcess(l);
+						if (proc != null)
+							procInstances.add( proc );
+					}
+				}
+				int position = 0;
+				int s = start == null? 0: start.intValue();
+				int e = pageSize == null ? procInstances.size(): s + pageSize.intValue();
+				PagedResult<ProcessInstance> pr = new PagedResult<>();
+				pr.setStartIndex(start);
+				pr.setItemsPerPage(pageSize);
+				pr.setTotalResults(procInstances.size());
+				pr.setResources(procInstances.subList(s, e > procInstances.size() ? procInstances.size(): e));
+				return pr;
+			} else {
+				CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+				if (text != null && ! text.trim().isEmpty()) {
+					config.setFirstResult(start);
+					config.setMaximumResultSize(pageSize);					
+				}
+				ScimHelper h = new ScimHelper(ProcessInstance.class);
+				h.setSession(context.getSession());
+				h.setPrimaryAttributes(new String[] { "description"});
+				h.setConfig(config);
+				h.setGenerator((entity) -> {
+					try {
+						return handleGetProcess( ((org.jbpm.graph.exe.ProcessInstance) entity).getId());
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}); 
+				LinkedList<ProcessInstance> procInstances = new LinkedList<ProcessInstance>();
+				h.search(null, jsonQuery, (Collection) procInstances); 
+				if (text != null && ! text.trim().isEmpty()) {
+					Set<Long> ids = new HashSet<Long>(findProcessInstancesByText(context, text));
+					for (Iterator<org.jbpm.graph.exe.ProcessInstance> it = procs.iterator(); it.hasNext();) {
+						org.jbpm.graph.exe.ProcessInstance proc = it.next();
+						if (! ids.contains(proc.getId()) ) {
+							it.remove();
+						}
+					}
+				}
+				PagedResult<ProcessInstance> pr = new PagedResult<>();
+				pr.setStartIndex(start);
+				pr.setItemsPerPage(pageSize);
+				pr.setTotalResults(h.count());
+				pr.setResources(procInstances);
+				return pr;
+			}
+		} finally {
+			flushContext(context);
+		}
+	}
+
+	@Override
+	protected PagedResult<TaskInstance> handleFindTasksByTextAndJsonQuery(String text, String jsonQuery, Integer start,
+			Integer pageSize) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			AbstractExpression expr = ExpressionParser.parse(jsonQuery);
+			List <TaskInstance> r = handleFindMyTasks();
+			int position = 0;
+			int s = start == null ? 0 : start.intValue();
+			int e = pageSize != null ? s + pageSize.intValue(): Integer.MAX_VALUE;
+			for (Iterator<TaskInstance> it = r.iterator(); it.hasNext();) {
+				TaskInstance ti = it.next();
+				if (! expr.evaluate(ti))
+					it.remove();
+				else
+				{
+					if (position >= e || position < s ) 
+						it.remove();
+					position ++;
+				}
+			}
+			
+			PagedResult<TaskInstance> pr = new PagedResult<>();
+			pr.setStartIndex(start);
+			pr.setItemsPerPage(pageSize);
+			pr.setTotalResults(position);
+			pr.setResources(r);
+			return pr;
+		} finally {
+			flushContext(context);
+		}
+		
+	}
+
+	protected List<Long> findProcessInstancesByText(JbpmContext context, String query)
+			throws Exception {
+		LinkedList<Long> resultado = new LinkedList<>();
+		
+		try {
+			Directory dir = DirectoryFactory.getDirectory(context
+					.getSession());
+			IndexReader reader = DirectoryReader.open(dir);
+			IndexSearcher is;
+			is = new IndexSearcher(reader);
+			QueryParser qp = new QueryParser(Version.LUCENE_CURRENT,
+					"$contents", //$NON-NLS-1$
+					DirectoryFactory.getAnalyzer());
+			org.apache.lucene.search.Query q = null;
+			if (query != null && query.trim().length() > 0)
+				q = qp.parse(query);
+			else
+				q = new MatchAllDocsQuery();
+
+			TermsFilter f = new TermsFilter( new Term("$end", "false") );
+			BooleanFilter b = new BooleanFilter();
+			b.add(new FilterClause(f, BooleanClause.Occur.MUST));
+
+			DocumentCollector2 collector = new DocumentCollector2();
+			collector.setResult (resultado);
+			
+			is.search(q, b, collector); // Sense cap filtre
+			reader.close();
+			return resultado;
+		} catch (CorruptIndexException e) {
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.CorruptedIndex"), e, -1); //$NON-NLS-1$
+		} catch (IOException e) {
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.CorruptedIndex"), e, -1); //$NON-NLS-1$
+		} catch (ParseException e) {
+			throw new BPMException(String.format(
+					Messages.getString("BpmEngineImpl.SearchParamError"), //$NON-NLS-1$
+					e.getMessage()), -1);
+		} catch (ArrayIndexOutOfBoundsException e) { 
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.VeryRegFinded"), //$NON-NLS-1$
+					-1);
+		} catch (Exception e) {
+			throw new BPMException(
+					String.format(
+							Messages.getString("BpmEngineImpl.Error"), e.getMessage()), -1); 
+		}
+	}
+
+	private final class DocumentCollector2 extends Collector {
+		private List<Long> result;
+		private AtomicReaderContext ctx;
+		private Scorer scorer;
+	
+		@Override
+		public void setScorer(Scorer scorer) throws IOException {
+			this.scorer = scorer;
+		}
+	
+		public void setResult(List<Long> resultado) {
+			this.result = resultado;
+		}
+	
+		@Override
+		public void setNextReader(AtomicReaderContext ctx) throws IOException {
+			this.ctx = ctx;
+		}
+	
+		@Override
+		public void collect(int id) throws IOException {
+			org.apache.lucene.document.Document d = ctx.reader().document(id);
+			IndexableField f = d.getField("$id"); //$NON-NLS-1$
+			if (f != null) {
+				long processId = Long.parseLong(f.stringValue());
+				result.add(processId);
+			}
+			
+		}
+	
+		@Override
+		public boolean acceptsDocsOutOfOrder() {
+			return false;
+		}
+	}
+
 }

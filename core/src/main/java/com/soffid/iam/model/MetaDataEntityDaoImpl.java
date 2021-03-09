@@ -145,6 +145,14 @@ public class MetaDataEntityDaoImpl extends
 		if (cot == null)
 			throw new RuntimeException("Invalid object type "+sourceVO.getCustomObjectType());
 		targetEntity.setObjectType(cot);
+		if (sourceVO.getDataObjectType() == null)
+			targetEntity.setDataObjectType(null);
+		else {
+			CustomObjectTypeEntity vdt = getCustomObjectTypeEntityDao().findByName(sourceVO.getDataObjectType());
+			if (vdt == null)
+				throw new RuntimeException("Invalid object type "+sourceVO.getDataObjectType());
+			targetEntity.setDataObjectType(vdt);
+		}
 	}
 	
 	public void create(Collection entities) {

@@ -19,6 +19,7 @@
 				required="true" bind="exec/content"
 				selectIcon="/img/pencil.svg"/>
 			<customfield3 dataType="HTML" multiline="true"
+				sclass="databox databox-label"
 			    disabled="true"
 				readonly="true" bind="explanation" />
 			<button label="${c:l('agents.zul.Test') } " image="/img/link-r.svg" onClick="ref:handler.test"/>

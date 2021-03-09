@@ -31,6 +31,7 @@ public abstract class Aplicacio {
 	public java.lang.String codi;
 
 	@Attribute(translated = "parent", type = "APPLICATION")
+	@JsonAttribute(hibernateAttribute = "parent.name")
 	@Nullable
 	public java.lang.String parent;
 

@@ -148,6 +148,23 @@ public abstract class RolAccountEntity {
 		return null;
 	}
 
+
+	/// **************************** DAOs ******************************
+	@DaoFinder("select ra" 
+			+ " from com.soffid.iam.model.RoleAccountEntity ra\n"
+			+ "inner join    ra.account as account\n"
+			+ "inner join    account.system as dispatcher\n"
+			+ "inner join    account.users as users\n"
+			+ "inner join    users.user as user\n"
+			+ "inner join    ra.role as role\n"
+			+ "where user.userName = :userName and account.type='U' and user.tenant.id=:tenantId \n"
+			+ "order by dispatcher.name, role.name\n")
+	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findHistoryByUserName(
+			java.lang.String userName) {
+		return null;
+	}
+
+
 	public java.lang.String toString() {
 		return null;
 	}

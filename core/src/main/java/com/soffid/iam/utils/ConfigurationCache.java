@@ -15,7 +15,7 @@ import com.soffid.iam.utils.Security;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class ConfigurationCache {
-	static HashMap<String, HashMap<String, String>> cache = new HashMap<String,HashMap<String,String>>();
+	static HashMap<String, HashMap<String, TimedValue<String>>> cache = new HashMap<String,HashMap<String,TimedValue<String>>>();
 	static String masterTenantName =  null;
 	
 	private static String getMasterTenantName () throws InternalErrorException
@@ -57,23 +57,26 @@ public class ConfigurationCache {
 		
 			if (tenant == null)
 				return null;
-			HashMap<String, String> map = cache.get(tenant);
+			HashMap<String, TimedValue<String>> map = cache.get(tenant);
 			if (map == null)
 			{
-				map = new HashMap<String, String>();
+				map = new HashMap<String, TimedValue<String>>();
 				cache.put(tenant, map);
 			}
 			String value;
-			if (!map.containsKey(property))
+			if (!map.containsKey(property) || map.get(property).isExpired())
 			{
-				if (System.getProperty("java.naming.factory.initial") == null)
+				if (System.getProperty("java.naming.factory.initial") == null) {
 					value = ServiceLocator.instance().getConfigurationService().findTenantParameter(tenant, property);
-				else
+					map.put(property, new TimedValue<String>(value, -1)); // Forever
+				}
+				else {
 					value = EJBLocator.getConfigurationService().findTenantParameter(tenant, property);
-				map.put(property, value);
+					map.put(property, new TimedValue<String>(value, System.currentTimeMillis() + 60_000L)); // 1 minute
+				}
 			}
 			else
-				value = map.get(property);
+				value = map.get(property).getValue();
 
 			if (value == null && !tenant.equals(getMasterTenantName()))
 				return getProperty(getMasterTenantName(), property);
@@ -87,22 +90,20 @@ public class ConfigurationCache {
 			String tenant = Security.getCurrentTenantName();
 			if (tenant == null)
 				return;
-			HashMap<String, String> map = cache.get(tenant);
+			HashMap<String, TimedValue<String>> map = cache.get(tenant);
 			if (map == null)
 			{
-				map = new HashMap<String, String>();
+				map = new HashMap<String, TimedValue<String>>();
 				cache.put(tenant, map);
 			}
-			map.put(property, value);
+			map.put(property, new TimedValue<String>(value, Security.isSyncServer() ? 0:  System.currentTimeMillis() + 60_000L));
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public static String getMasterProperty(String property) {
-//		Tenant tenant;
 		try {
-//    		tenant = ServiceLocator.instance().getTenantService ().getMasterTenant();
 			return getProperty ("master", property);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -114,10 +115,10 @@ public class ConfigurationCache {
 			String tenant = Security.getCurrentTenantName();
 			if (tenant == null)
 				return;
-			HashMap<String, String> map = cache.get(tenant);
+			HashMap<String, TimedValue<String>> map = cache.get(tenant);
 			if (map == null)
 			{
-				map = new HashMap<String, String>();
+				map = new HashMap<String, TimedValue<String>>();
 				cache.put(tenant, map);
 			}
 			map.remove(property);

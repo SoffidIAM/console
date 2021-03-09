@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
 
@@ -33,6 +34,7 @@ public class ScimHelper {
 	AdditionalDataService svc = com.soffid.iam.ServiceLocator.instance().getAdditionalDataService();
 	private HQLQuery hql;
 	Integer count = null;
+	Session session;
 	
 	public ScimHelper (Class objectClass) {
 		this.objectClass = objectClass;
@@ -62,12 +64,15 @@ public class ScimHelper {
 			hql.setWhereString(new StringBuffer(qs));
 		}
 		
-		SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		if (session == null) {
+			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+			session = sf.getCurrentSession();
+		}
+					
 		String q = hql.toString();
-		if (order != null)
+		if (order != null && hql.getOrderByString().length() == 0)
 			q = q + " order by "+ order;
-		org.hibernate.Query queryObject = sf.getCurrentSession()
-				.createQuery( q );
+		org.hibernate.Query queryObject = session.createQuery( q );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
 		for (String s : params.keySet())
@@ -79,7 +84,8 @@ public class ScimHelper {
 			else
 				queryObject.setParameter(s, v);
 		}
-		queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+		if (tenantFilter != null)
+			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
 		TimeOutUtils tou = new TimeOutUtils();
 
 		if (config != null)
@@ -107,11 +113,14 @@ public class ScimHelper {
 			}
 			
 			Object vo = generator.toValueObject(e);
-			if (vo != null)
-				result.add(vo);
+			if (vo != null) {
+				if (! hql.isNonHQLAttributeUsed() || expr.evaluate(vo))
+					result.add(vo);
+			}
 		}
 		
-		count = new Integer(result.size());
+		if (config.getMaximumResultSize() == null && config.getFetchSize() == null)
+			count = new Integer(result.size());
 	}
 
 	String generateQuickSearchQuery (String text) throws InternalErrorException {
@@ -155,10 +164,12 @@ public class ScimHelper {
 		if (count != null)
 			return count.intValue();
 		
-		SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		if (session == null) {
+			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+			session = sf.getCurrentSession();
+		}
 		
-		org.hibernate.Query queryObject = sf.getCurrentSession()
-				.createQuery( hql.toCountString() );
+		org.hibernate.Query queryObject = session.createQuery( hql.toCountString() );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
 		for (String s : params.keySet())
@@ -219,5 +230,13 @@ public class ScimHelper {
 
 	public void setGenerator(ValueObjectGenerator generator) {
 		this.generator = generator;
+	}
+
+	public Session getSession() {
+		return session;
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
 	}
 }

@@ -2569,6 +2569,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 					aae.getEnd():
                 					rg.getEndDate());
                 	h.setAccount( getAccountEntityDao().toAccount(aae.getAccount()));
+                	h.setLevel(aae.getLevel());
                 	accounts.add(h);
                 	ids.add(aae.getAccount().getId());
                 }
@@ -2585,6 +2586,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             	h.setStart( aae.getStart());
             	h.setEnd( aae.getEnd());
             	h.setAccount( getAccountEntityDao().toAccount(aae.getAccount()));
+            	h.setLevel(aae.getLevel());
             	accounts.add(h);
             	ids.add(aae.getAccount().getId());
             }
@@ -2607,6 +2609,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 					aae.getEnd():
                 					rg.getEnd());
                 	h.setAccount( getAccountEntityDao().toAccount(aae.getAccount()));
+                	h.setLevel(aae.getLevel());
                 	accounts.add(h);
                 	ids.add(aae.getAccount().getId());
                 }

@@ -21,6 +21,7 @@ import org.zkoss.zk.ui.sys.SessionCtrl;
 
 @WebListener
 public class SessionListener implements HttpSessionListener {
+	Log log = LogFactory.getLog(getClass());
 	static List<HttpSession> sessions = new LinkedList<>();
 	static SessionListenerThread thread = null;
 	public SessionListener () {
@@ -29,6 +30,7 @@ public class SessionListener implements HttpSessionListener {
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
 		synchronized (sessions) {
+			log.info("Created console session");
 			sessions.add(se.getSession());
 			if (thread == null || !thread.isAlive()) {
 				thread = new SessionListenerThread();
@@ -70,7 +72,10 @@ class SessionListenerThread extends Thread {
 		synchronized (sessions) {
 			long pct = free * 100L / max;
 			if (pct < 15) {
-				log.warn("Number of active sessions: "+sessions.size()+" "+pct+"% free memory");
+				log.warn("Number of Console active sessions: "+sessions.size()+" "+pct+"% free memory");
+				for ( HttpSession session: sessions) {
+					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+				}
 				int num = sessions.size() / 2; 
 				if (num > 10) num = 10;
 				for (HttpSession session: sessions) {
@@ -80,8 +85,12 @@ class SessionListenerThread extends Thread {
 				}
 				runtime.gc();
 			}
-			else if (pct <25)
+			else if (pct <25) {
 				log.info("Number of active sessions: "+sessions.size()+" "+pct+"% free memory");
+				for ( HttpSession session: sessions) {
+					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+				}
+			}
 		}
 	}
 }

@@ -6,6 +6,7 @@ PARSER_BEGIN(ExpressionParser)
 package com.soffid.scimquery.parser;
 
 import com.soffid.scimquery.expr.*;
+import java.util.*;
 
 public class ExpressionParser
 {
@@ -47,9 +48,9 @@ TOKEN : { < DOUBLE : (["0"-"9"])*"."(["0"-"9"])+ > }
 TOKEN : { < TRUE : "true" > }
 TOKEN : { < FALSE : "false" > }
 TOKEN : { < IDENTIFIER : ["A"-"Z","a"-"z",".","_"](["A"-"Z","a"-"z",".","_","0"-"9"])* > }
-TOKEN : { < QUOTEDTEXT : ["\""]
-			(  ["\\"] ~[] | ~["\"", "\\"] | ["\u0100" - "\uffff"] )*
-			["\""] > }
+TOKEN : { < QUOTEDTEXT : ( ["\""] (  ["\\"] ~[] | ~["\"", "\\"] | ["\u0100" - "\uffff"] )* ["\""] ) | 
+						 ( ["\'"] (  ["\\"] ~[] | ~["\'", "\\"] | ["\u0100" - "\uffff"] )* ["\'"] )> }
+TOKEN : { < ORDERBY : "$" ["O","o"] ["R","r"] ["D","d"] ["E","e"] ["R","r"] ["B","b"] ["Y","y"] > }
 
 Object Constant ():
 {
@@ -60,7 +61,7 @@ Object Constant ():
 {
 	(t = <QUOTEDTEXT> {
 	    sb = new StringBuffer();
-	    for (int i = 0; i < t.image.length(); i++)
+	    for (int i = 1; i < t.image.length() - 1; i++)
 	    {
 	       char ch = t.image.charAt(i);
 	       if (slash) {
@@ -75,7 +76,7 @@ Object Constant ():
 	          slash = false; 
 	       }
 	       else if (ch == '\\') slash = true;
-	       else if (ch != '\"') sb.append (ch);
+	       else sb.append (ch);
 	    } 
 		return sb.toString(); 
 	} ) |
@@ -88,7 +89,8 @@ Object Constant ():
 ComparisonExpression Comparison () : 
 {
 	Token i1 = null;
-	Object i2 = null;
+	Token i2 = null;
+	Object i3 = null;
 	Token operator = null;
 	ComparisonExpression ce = new ComparisonExpression ();
 }
@@ -105,7 +107,7 @@ ComparisonExpression Comparison () :
 			  operator = <CO> |
 			  operator = <NE> |
 			  operator = <LE>)
-			i2 = Constant ()
+			(i2 = <IDENTIFIER> | i3 = Constant())
 		) | 
 		(
 			operator = <PR> 
@@ -113,12 +115,11 @@ ComparisonExpression Comparison () :
 	)
 	{
 		ce.setAttribute (i1.image);
-		ce.setValue (i2);
+		ce.setValue (i2 == null ? i3: i2.image);
 		ce.setOperator (operator.image);
 		
 		return ce;
 	}
-	
 }
 
 AbstractExpression Or () : 
@@ -172,11 +173,26 @@ AbstractExpression ParenthesisExpression () :
 	)
 }
 
-AbstractExpression Expression () :
+List OrderBy() : 
 {
-	AbstractExpression e;
+   List orderBy = new LinkedList();
+   Token i1;
 }
 {
-	e = Or () { return e;}
+   <ORDERBY> ( i1=<IDENTIFIER>  {orderBy.add(i1.image);} )* {return orderBy;}
+}
+
+AbstractExpression Expression () :
+{
+    AbstractExpression e1;
+    List e2;
+	OrderByExpression e = new OrderByExpression();
+}
+{
+	e1 = Or () {e.setExpression(e1);}
+	(e2=OrderBy() { e.setOrderBy(e2);}  )? 
+	{
+		return e;	
+	}
 }
 

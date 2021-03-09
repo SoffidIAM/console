@@ -390,4 +390,13 @@ public abstract class GrupService {
 	@Transactional(readOnly=true)
 	public Collection<String>findGroupNames () { return null; }
 
+	@Operation(grantees = { roles.user_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult<es.caib.seycon.ng.comu.UsuariGrup> findGroupUserByJsonQuery(
+			@Nullable String query,
+			@Nullable Integer startIndex,
+			@Nullable Integer count)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 }

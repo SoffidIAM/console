@@ -136,6 +136,9 @@ public class OtpPageHandler {
 	
 	public boolean needsOtp (Component comp, String resource) 
 	{
+		if (hasPreviousOtp())
+			return false;
+		
 		component = comp;
 		page = resource;
 		try

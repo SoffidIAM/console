@@ -17,8 +17,8 @@ import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 
 public abstract class AbstractExpression implements Serializable {
-	private static final String ROOT_OBJECT_NAME = "o";
-	private static final String ROOT_OBJECT_NAME2 = "p";
+	protected static final String ROOT_OBJECT_NAME = "o";
+	protected static final String ROOT_OBJECT_NAME2 = "p";
 	private boolean oracleWorkaround = false;
 	
 	/**

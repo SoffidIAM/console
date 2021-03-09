@@ -18,6 +18,7 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.web.component.DatatypeColumnsDatatable;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
+import com.soffid.iam.web.component.SearchDictionaryBuilder;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -28,6 +29,8 @@ public class FinderDatatable extends DatatypeColumnsDatatable {
 
 	public FinderDatatable() throws Exception {
 		className = (String) Executions.getCurrent().getAttribute("className");
+		if ( className.startsWith(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT) )
+			className = className.substring(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT.length());
 	}
 	
 	
@@ -73,6 +76,8 @@ public class FinderDatatable extends DatatypeColumnsDatatable {
 	
 	public void setClassName(String className) {
 		this.className = className;
+		if ( className.startsWith(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT) )
+			this.className = className.substring(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT.length());
 	}
 
 }

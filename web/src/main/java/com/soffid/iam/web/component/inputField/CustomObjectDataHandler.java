@@ -15,6 +15,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.web.component.InputField3;
+import com.soffid.iam.web.component.SearchDictionaryBuilder;
 import com.soffid.iam.web.popup.FinderHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -31,7 +32,7 @@ public class CustomObjectDataHandler extends InputFieldDataHandler<CustomObject>
 
 	@Override
 	public String getDescription(String name, String filter) throws Exception {
-		String q = "name eq \"" + quote(name)+ "\" and type.name eq\""+quote(dataType.getCustomObjectType())+"\"";
+		String q = "name eq \"" + quote(name)+ "\" and type.name eq\""+quote(dataType.getDataObjectType())+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
 		List<CustomObject> r = handler.read(null, q, null, 2).getResources();
@@ -43,15 +44,18 @@ public class CustomObjectDataHandler extends InputFieldDataHandler<CustomObject>
 
 	@Override
 	public AsyncList<CustomObject> search(String text, String filter) throws Exception {
-		return handler.readAsync(text, filter);
+		String q = "type.name eq\""+quote(dataType.getDataObjectType())+"\"";
+		if (filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+") and ("+q+")";
+		return handler.readAsync(text, q);
 	}
 
 	@Override
 	public void openFinder(String filter, boolean multiple, Databox databox, EventListener listener) throws Exception {
-		String q = "typename eq\""+quote(dataType.getCustomObjectType())+"\"";
+		String q = "type.name eq\""+quote(dataType.getDataObjectType())+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
-		FinderHandler.startWizard("Select "+dataType.getCustomObjectType(), CustomObject.class.getName(),
+		FinderHandler.startWizard("Select "+dataType.getDataObjectType(), SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT+dataType.getDataObjectType(),
 				databox, multiple, 
 				filter,
 				listener);
@@ -71,7 +75,7 @@ public class CustomObjectDataHandler extends InputFieldDataHandler<CustomObject>
 
 	@Override
 	public CustomObject getObject(String name, String filter) throws Exception {
-		String q = "name eq \"" + quote(name)+ "\" and type.name eq\""+quote(dataType.getCustomObjectType())+"\"";
+		String q = "name eq \"" + quote(name)+ "\" and type.name eq\""+quote(dataType.getDataObjectType())+"\"";
 		if (filter != null && ! filter.trim().isEmpty())
 			q = "("+filter+") and ("+q+")";
 		List<CustomObject> r = handler.read(null, q, null, 2).getResources();

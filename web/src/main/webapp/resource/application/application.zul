@@ -15,7 +15,6 @@
 	
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
-					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('application:create')}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" 
 						if="${soffid:isUserInRole('application:create') &amp;&amp; soffid:isUserInRole('application:update') &amp;&amp; soffid:isUserInRole('application:delete')}" 

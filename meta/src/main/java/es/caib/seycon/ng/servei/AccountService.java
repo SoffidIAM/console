@@ -35,6 +35,7 @@ import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PasswordValidation;
 import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.comu.Usuari;
+import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import roles.account_attribute_query;
 import roles.account_attribute_update;
@@ -394,7 +395,7 @@ public abstract class AccountService {
 	public void setAccountPassword(
 		es.caib.seycon.ng.comu.Account account, 
 		es.caib.seycon.ng.comu.Password password)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
+		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
 	}
 	
 	@Description("Sets the account temporary password")
@@ -403,7 +404,7 @@ public abstract class AccountService {
 	public void setAccountTemporaryPassword(
 		es.caib.seycon.ng.comu.Account account, 
 		es.caib.seycon.ng.comu.Password password)
-		throws es.caib.seycon.ng.exception.InternalErrorException {
+		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
 	}
 	
 	@Description("Generates a temporary password for the account")

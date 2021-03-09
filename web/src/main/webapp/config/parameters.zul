@@ -57,13 +57,13 @@
 								<row>
 									<label value="${c:l('parametres.zul.Parametre-2')} :"/>
 									
-									<textbox sclass="text required" bind="@code" readonly="${!canUpdateParameter}" maxlength="50"
+									<textbox sclass="text required" bind="@code" readonly="${!canUpdateParameter}" maxlength="100"
 											width="100%" constraint="no empty"/>
 								</row>
 								
 								<row>
 									<label value="${c:l('parametres.zul.Valor-2')} :"/>
-									<textbox bind="@value" readonly="${!canUpdateParameter}" maxlength="50"
+									<textbox bind="@value" readonly="${!canUpdateParameter}" maxlength="500"
 											width="100%" constraint="no empty"/>
 								</row>
 

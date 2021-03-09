@@ -380,7 +380,13 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		}
 	}
 
-	private void initialize() throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
+	
+	public void reload() throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
+		dictionary = null;
+		initialize();
+	}
+	
+	protected void initialize() throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
 		
 		getChildren().clear();
 		
@@ -388,10 +394,15 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		if ( mode == BASIC &&  ! enableBasic) mode = TEXT;
 		if ( mode == ADVANCED && ! enableAdvanced) mode = enableBasic ? BASIC: TEXT;
 		
+		if (progressImage != null)
+			progressImage.detach();
 		progressImage = new Image("~./img/soffid-progress.gif");
 		progressImage.setVisible(false);
 		progressImage.setSclass("progress");
 		progressImage.setParent(this);
+		if (timer != null)
+			timer.detach();
+
 		timer = new Timer();
 		timer.setParent(this);
 		timer.setDelay(300);
@@ -427,11 +438,15 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 			}
 		}
 		
+		if (advancedSearch != null)
+			advancedSearch.detach();
 		advancedSearch = new Textbox();
 		advancedSearch.setMultiline(true);
 		advancedSearch.setRows(2);
 		appendChild(advancedSearch);
 
+		if (textSearchBox != null)
+			textSearchBox.detach();
 		textSearchBox = new Textbox();
 		appendChild(textSearchBox);
 		textSearchBox.setClass("textsearch textbox");
@@ -443,6 +458,8 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		});
 		
 
+		if (addAttributeButton != null)
+			addAttributeButton.detach();
 		addAttributeButton = new Button(Labels.getLabel("searchBox.addAttribute"));
 		addAttributeButton.addEventListener("onClick", new SerializableEventListener() {
 			
@@ -453,6 +470,9 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		});
 		addAttributeButton.setClass("searchbox-addcriteria");
 		appendChild(addAttributeButton);
+		
+		if (menu != null)
+			menu.detach();
 		menu = new Menupopup();
 		appendChild(menu);
 		setChildrenVisibility();

@@ -17,13 +17,16 @@ import es.caib.seycon.ng.model.UsuariGrupEntity;
 	 translatedPackage="com.soffid.iam.api")
 public class UsuariGrup {
 
+	@JsonAttribute(hibernateAttribute = "user.userName")
 	@Attribute(translated = "user", type = "USER", searchCriteria = true )
 	public java.lang.String codiUsuari;
 
+	@JsonAttribute(hibernateAttribute = "group.name")
 	@Attribute(translated = "group", type = "GROUP", searchCriteria = true )
 	public java.lang.String codiGrup;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "group.description")
 	@Attribute(translated = "groupDescription", hidden = true )
 	public java.lang.String descripcioGrup;
 

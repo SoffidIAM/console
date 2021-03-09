@@ -325,7 +325,7 @@ public class ScriptEnviroment {
 		for (Iterator<Pointer> it = ctx.iteratePointers("/metadata"); it.hasNext(); )
 		{
 			Pointer p = it.next();
-			String name = (String) ctx.getValue(p.asPath()+"/@code");
+			String name = (String) ctx.getValue(p.asPath()+"/@name");
 			TypeEnumeration t = (TypeEnumeration) ctx.getValue(p.asPath()+"/@type");
 			if ( sb.length() > 0)
 				sb.append(",");

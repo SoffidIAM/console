@@ -60,6 +60,7 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 		String url = (String) event.getTarget().getAttribute("url");
 		if (url != null)
 		{
+			if (!url.startsWith("/")) url = "/"+url;
 			if ( (event.getKeys() & MouseEvent.CTRL_KEY) != 0)
 				Executions.getCurrent().sendRedirect(url, "_blank");
 			else

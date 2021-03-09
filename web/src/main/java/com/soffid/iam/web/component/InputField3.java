@@ -668,12 +668,11 @@ public class InputField3 extends Databox
 				Object o = i.eval(dataType.getValidationExpression());
 				if (o == null)
 					throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
+
 				if (o != null && ! Boolean.TRUE.equals(o))
 				{
-					if  (!((Boolean) o).booleanValue()) {
-						setWarning(position, o instanceof String ? (String) o: "Wrong value"); //$NON-NLS-1$
-						return false;
-					}
+					setWarning(position, o instanceof String ? o.toString(): "Wrong value"); //$NON-NLS-1$
+					return false;
 				}
 			} catch ( TargetError e) {
 				setWarning(position, "Internal error" );

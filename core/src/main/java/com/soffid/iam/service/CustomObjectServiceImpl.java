@@ -400,11 +400,13 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		config.setFirstResult(start);
 		config.setMaximumResultSize(end);
 		h.setConfig(config);
-		h.setTenantFilter("tenant.id");
+		h.setTenantFilter("type.tenant.id");
 		h.setOrder("o.name");
 		h.setGenerator((entity) -> {
 			return dao.toCustomObject((CustomObjectEntity) entity);
 		}); 
+
+		h.search("", query, (Collection) result); 
 
 		PagedResult<CustomObject> pr = new PagedResult<>();
 		pr.setStartIndex(start);

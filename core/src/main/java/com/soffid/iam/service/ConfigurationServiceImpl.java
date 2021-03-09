@@ -318,7 +318,7 @@ public class ConfigurationServiceImpl
 
 	@Override
 	protected String handleFindTenantParameter(String tenant, String parameter) throws Exception {
-		if (Security.isMasterTenant() || Security.getCurrentTenantName().equals(tenant))
+		if (Security.isMasterTenant() || "master".equals(tenant) || Security.getCurrentTenantName().equals(tenant))
 		{
 			ConfigEntity configuracioEntity = getConfigEntityDao().findByTenantNameAndNetwork(tenant, parameter, null);
 			if(configuracioEntity != null){

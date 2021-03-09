@@ -16,6 +16,19 @@
 		function diagramAction(action, arg0, arg1, arg2) {
 			zkau.send ({uuid: '${frame.uuid}', cmd: "diagramAction", data: [action, JSON.stringify(arg0), JSON.stringify(arg1), JSON.stringify(arg2)]}, 5);
 		}
+	function collapse(id) {
+		e = document.getElementById(id);
+		if (e) {
+			i = e.firstElementChild.nextElementSibling.firstElementChild;
+			if (e.className == 'method-collapsed-div') {
+				e.className = 'method-full-div';
+				i.src = "${execution.contextPath }/icons/up.png";
+			} else {
+				e.className = 'method-collapsed-div';
+				i.src = "${execution.contextPath }/icons/down.png";
+			}
+		}
+	}
 	</script>
 
 	<style>
@@ -23,7 +36,7 @@
 		div.cell-inner input.text { background-color: #D3D3D3; }
 		.readonly {background-color: transparent !important}
 
-		div.method-collapsed-div div.grid { max-height:48px; overflow:
+		div.method-collapsed-div div.grid { max-height:77px; overflow:
 		hidden; }
 
 		div.method-full-div div.grid { max-height: inherit; overflow:
@@ -102,7 +115,7 @@
 						onClick="ref:frame.delete" />
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:frame.importMapping"/>
 					<menu2item image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.exportMapping"/>
-					<menu2item image="/img/add-w.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
+					<menu2item image="/img/add.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
 					<menu2item image="/img/question.svg" label="${c:l('agents.zul.Test') }" if="${canQueryAgent}" onClick="ref:frame.test"/>
 				</menu2>
 
@@ -583,20 +596,23 @@
 						<div style="margin-bottom: 10px;">
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 						</div>
-						<vbox>
-							<button image="/img/user-r.svg" label="${c:l('agents.PropagaUsuaris')}"
-									id="imgPropaga" if="${canPropagateAgentUsers}" onClick='ref:frame.propagaCanvisAgent_Usuaris'> 
-							</button>
-							<space width="4px"/>
-							<button id="imgPropagaRols" if="${canPropagateAgentRoles}" image="/img/role-r.svg" label="${c:l('agents.PropagaRols')}"
-								onClick="ref:frame.propagaCanvisAgent_Rols"> 
-							</button>
-							<space width="4px"/>
-							<button id="imgPropagaGroups" if="${canPropagateAgentGroups}" image="/img/group-r.svg" label="${c:l('agents.PropagaGroups')}"
-								onClick="ref:frame.propagaCanvisAgent_Groups()"> 
-							</button>
-							<space width="4px"/>
-							<div id="reconcileDiv">
+						<div>
+							<div style="margin-top: 20px" id="imgPropaga">
+								<button image="/img/user-r.svg" label="${c:l('agents.PropagaUsuaris')}"
+										if="${canPropagateAgentUsers}" onClick='ref:frame.propagaCanvisAgent_Usuaris'> 
+								</button>
+							</div>
+							<div style="margin-top: 20px" id="imgPropagaRols">
+								<button  if="${canPropagateAgentRoles}" image="/img/role-r.svg" label="${c:l('agents.PropagaRols')}"
+									onClick="ref:frame.propagaCanvisAgent_Rols"> 
+								</button>
+							</div>
+							<div style="margin-top: 20px" id="imgPropagaGroups">
+								<button  if="${canPropagateAgentGroups}" image="/img/group-r.svg" label="${c:l('agents.PropagaGroups')}"
+									onClick="ref:frame.propagaCanvisAgent_Groups()"> 
+								</button>
+							</div>
+							<div style="margin-top: 20px" id="reconcileDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.reconcile')}" onClick="ref:frame.startReconcile"> 
 								</button>
 								<label value="Last run:" id="reconcileLabel"/> 
@@ -605,8 +621,7 @@
 								<datebox id="reconcileLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
 								<image visible="false" id="reconcileStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showReconcileTaskMessage'/>
 							</div>
-							<space width="4px"/>
-							<div id="importDiv">
+							<div style="margin-top: 20px" id="importDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.loadAuhtoratitve')}" onClick="ref:frame.startImportTask"> 
 								</button>
 								<label value="Last run:" id="importLabel"/> 
@@ -615,8 +630,7 @@
 								<datebox id="importLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
 								<image visible="false" id="importStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showImportTaskMessage'/>
 							</div>
-							<space width="4px"/>
-							<div  id="impactDiv">
+							<div style="margin-top: 20px" id="impactDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.impactAnalyis')}" onClick="ref:frame.startImpactTask"> 
 								</button>
 								<label value="Last run:" id="impactLabel"/> 
@@ -625,7 +639,7 @@
 								<datebox id="impactLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
 								<image visible="false" id="impactStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showImpactTaskMessage'/>
 							</div>
-						</vbox>
+						</div>
 					</tabpanel>
 
 					<tabpanel id="tabControlAcces" use="com.soffid.iam.web.agent.AccessControlHandler">

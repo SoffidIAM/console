@@ -1794,11 +1794,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return new LinkedList();
 	}
 
-	protected String handleSetInitialPassword(String codiUsuari,
-			String codiDominiContrasenyes) throws Exception {
-		return handleChangePassword(codiUsuari, codiDominiContrasenyes);
-	}
-
 	private Group getGrupByTipus(String codiGrup, String tipus)
 			throws InternalErrorException {
 		if (codiGrup != null) {// ?
@@ -1939,8 +1934,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return new String[0];
 	}
 
-	protected String handleChangePassword(String codiUsuari,
+	@Override
+	protected String handleSetTemporaryPassword(String codiUsuari,
 			String codiDominiContrasenyes) throws Exception {
+		return setRandomPassword(codiUsuari, codiDominiContrasenyes, true);
+	}
+
+	@Override
+	protected String handleSetPassword(String codiUsuari,
+			String codiDominiContrasenyes) throws Exception {
+		return setRandomPassword(codiUsuari, codiDominiContrasenyes, false);
+	}
+
+	public String setRandomPassword(String codiUsuari, String codiDominiContrasenyes, boolean mustChange) throws InternalErrorException {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
 			if (getAuthorizationService().hasPermission(
@@ -1948,7 +1954,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				PasswordDomainEntity dominiContrasenyes = getPasswordDomainEntityDao()
 						.findByName(codiDominiContrasenyes);
 				Password pass = getInternalPasswordService()
-						.generateNewPassword(usuari, dominiContrasenyes, true);
+						.generateNewPassword(usuari, dominiContrasenyes, mustChange);
 				if (pass == null)
 					throw new InternalErrorException("Unable to generate password. Missing password policy");
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getName());
@@ -2902,8 +2908,21 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected void handleChangePassword(String codiUsuari,
+	protected void handleSetTemporaryPassword(String codiUsuari,
 			String codiDominiContrasenyes, Password newPassword)
+			throws Exception {
+		setPassword(codiUsuari, codiDominiContrasenyes, newPassword, true);
+	}
+
+	@Override
+	protected void handleSetPassword(String codiUsuari,
+			String codiDominiContrasenyes, Password newPassword)
+			throws Exception {
+		setPassword(codiUsuari, codiDominiContrasenyes, newPassword, false);
+	}
+
+	protected void setPassword(String codiUsuari,
+			String codiDominiContrasenyes, Password newPassword, boolean mustChange)
 			throws Exception {
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
@@ -2916,7 +2935,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				if (!validation.isValid())
 					throw new BadPasswordException(validation.getReason());
 				getInternalPasswordService().storeAndForwardPassword(usuari,
-						dominiContrasenyes, newPassword, true);
+						dominiContrasenyes, newPassword, false);
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getName());
 			} else {
 				throw new SecurityException(
@@ -2967,7 +2986,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		else
 			qs = "("+qs+") and o.tenant.id = :tenantId";
 		
-		qs = qs + " order by o.userName";
+		if (hql.getOrderByString().length() == 0)
+			qs = qs + " order by o.userName";
 
 		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();

@@ -30,6 +30,7 @@ import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.User;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.SearchBox;
+import com.soffid.iam.web.component.SearchDictionaryBuilder;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -82,11 +83,14 @@ public class FinderHandler extends Window implements AfterCompose {
 	}
 	
 	protected static String defaultColumns(String className) throws InternalErrorException, NamingException, CreateException {
+		String objectType = className.startsWith(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT) ?
+				className.substring(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT.length()) :
+				className;
 		StringBuffer sb = new StringBuffer();
 		LinkedList<DataType> l = new LinkedList<DataType>( 
 				EJBLocator
 					.getAdditionalDataService()
-					.findDataTypesByObjectTypeAndName2(className, null) );
+					.findDataTypesByObjectTypeAndName2(objectType, null) );
 		Collections.sort(l, new Comparator<DataType>() {
 			@Override
 			public int compare(DataType o1, DataType o2) {
@@ -104,7 +108,11 @@ public class FinderHandler extends Window implements AfterCompose {
 			}
 		}
 		if (sb.length() == 0) {
-			sb.append(l.getFirst().getCode());
+			for (int i = 0; i < 2; i++) {
+				if (i > 0)
+					sb.append(", ");
+				sb.append(l.get(i).getCode());
+			}
 		}
 		return sb.toString();
 	
@@ -129,6 +137,8 @@ public class FinderHandler extends Window implements AfterCompose {
 			i.setPage(invoker.getPage());
 		} else {
 			FinderHandler h = (FinderHandler) p.getFellow("window");
+			
+			h.setTitle(title);
 
 			boolean sameFilter = filter == null && h.filter == null ||
 					filter != null && filter.equals(h.filter);
@@ -137,7 +147,8 @@ public class FinderHandler extends Window implements AfterCompose {
 				searchBox.setDefaultAttributes( defaultColumns(className));
 				searchBox.setPreference(className+"-query");
 				searchBox.setEnforcedFilter(filter);
-				searchBox.invalidate();
+				searchBox.setJsonObject(className);
+				searchBox.reload();
 				
 				FinderDatatable table = (FinderDatatable) h.getFellow("listbox");
 				table.setClassName(className);

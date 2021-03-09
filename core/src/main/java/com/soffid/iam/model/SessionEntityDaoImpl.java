@@ -75,6 +75,7 @@ public class SessionEntityDaoImpl extends
 			targetVO.setAccountName(sourceEntity.getLoginLogInfo().getAccountName());
 			targetVO.setSessionUrl(sourceEntity.getLoginLogInfo().getInformation());
 		}
+		targetVO.setTenantName(sourceEntity.getUser().getTenant().getName());
 	}
 
 	/**

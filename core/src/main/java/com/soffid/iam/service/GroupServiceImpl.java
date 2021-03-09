@@ -46,6 +46,7 @@ import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
@@ -57,6 +58,7 @@ import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleAccountEntityDao;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
@@ -64,6 +66,7 @@ import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.UserGroupEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.attribute.AttributePersister;
 import com.soffid.iam.service.impl.AttributeValidationService;
@@ -1046,5 +1049,35 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			return new LinkedList<GroupUser>();
 		
 		return getUserGroupEntityDao().toGroupUserList(userEntity.getSecondaryGroups());
+	}
+
+	@Override
+	protected PagedResult<GroupUser> handleFindGroupUserByJsonQuery(String query, Integer startIndex, Integer count)
+			throws Exception {
+		// Register virtual attributes for additional data
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+		
+		final UserGroupEntityDao dao = getUserGroupEntityDao();
+		ScimHelper h = new ScimHelper(GroupUser.class);
+		h.setPrimaryAttributes(new String[] { "user", "group"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(startIndex);
+		config.setMaximumResultSize(count);
+		h.setConfig(config);
+		h.setTenantFilter("user.tenant.id");
+		h.setGenerator((entity) -> {
+			return dao.toGroupUser((UserGroupEntity) entity);
+		}); 
+
+		
+		LinkedList<GroupUser> result = new LinkedList<GroupUser>();
+		h.search(null, query, (Collection) result); 
+
+		PagedResult<GroupUser> pr = new PagedResult<>();
+		pr.setStartIndex(startIndex);
+		pr.setItemsPerPage(count);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 }

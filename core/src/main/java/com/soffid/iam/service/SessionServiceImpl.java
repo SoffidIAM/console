@@ -25,6 +25,7 @@ import com.soffid.iam.model.ServiceEntityDao;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SessionEntityDao;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.exception.UnknownUserException;
@@ -333,10 +334,12 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         LinkedList<Session> sessions = new LinkedList<Session>();
         for (Iterator<SessionEntity> it = dao.loadAll().iterator(); it.hasNext(); ) {
             SessionEntity sessioEntity = it.next();
-            Session s = dao.toSession(sessioEntity);
-            s.setKey(null);
-            s.setTemporaryKey(null);
-            sessions.add(s);
+            if (sessioEntity.getUser().getTenant().getId().equals(Security.getCurrentTenantId())) {
+	            Session s = dao.toSession(sessioEntity);
+	            s.setKey(null);
+	            s.setTemporaryKey(null);
+	            sessions.add(s);
+            }
         }
         return sessions;
 	}

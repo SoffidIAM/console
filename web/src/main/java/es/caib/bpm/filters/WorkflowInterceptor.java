@@ -92,8 +92,8 @@ public class WorkflowInterceptor implements Filter {
 		{
 			String requestURI = ((HttpServletRequest) request).getRequestURI();
 			if ( ((HttpServletRequest) request).getSession(false) == null && 
-            (requestURI.startsWith("/anonymous/") ||
-            requestURI.startsWith("/selfservice/ananymous/"))) {
+					(requestURI.startsWith("/anonymous/") ||
+						requestURI.startsWith("/selfservice/ananymous/"))) {
 				filter.doFilter(request, response);
 			} else {
 				HttpSession sesion = ((HttpServletRequest) request).getSession();
@@ -101,40 +101,41 @@ public class WorkflowInterceptor implements Filter {
 					sesion.setAttribute("soffid-remoteIp", request.getRemoteAddr());
 					sesion.setAttribute("soffid-remoteProxy", ((HttpServletRequest)request).getHeader("X-Forwarded-For"));
 				}
+				try {
+					Principal principal = ((HttpServletRequest) request)
+							.getUserPrincipal();
+					if (principal != null) {
+						String sessionId = (String) sesion
+								.getAttribute(SOFFID_SESSION_CACHE_ATTR);
+						if (sessionId == null) {
+							sessionId = sessionCacheService.createSession();
+							sesion.setAttribute(SOFFID_SESSION_CACHE_ATTR,
+									sessionId);
+						} else {
+							sessionCacheService.setSession(sessionId);
+						}
+					}
 
-				HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-				httpServletResponse.addHeader("X-UA-Compatible", "IE=Edge");
-				httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
-				
-				
-				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
-						.getAttribute(SOFFID_NESTED_PRINCIPAL);
-				
-				if (sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA) == null)
-					ConfigureUserSettings.configuraUsuariSEU((HttpServletRequest) request);
+					HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+					httpServletResponse.addHeader("X-UA-Compatible", "IE=Edge");
+					httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
+					
+					
+					SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
+							.getAttribute(SOFFID_NESTED_PRINCIPAL);
+					
+					if (sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA) == null)
+						ConfigureUserSettings.configuraUsuariSEU((HttpServletRequest) request);
 
-				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
-				if (forcedLocale != null)
-				{
-					Locale locale = new Locale(forcedLocale);
-					sesion.setAttribute(Attributes.PREFERRED_LOCALE, locale);
-					org.zkoss.util.Locales.setThreadLocal(locale);
-					MessageFactory.setThreadLocale(locale);
-				} else {
-					String lang = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA);			
-					if (lang != null)
+					String forcedLocale = ConfigurationCache.getProperty("soffid.language");
+					if (forcedLocale != null)
 					{
 						Locale locale = new Locale(forcedLocale);
 						sesion.setAttribute(Attributes.PREFERRED_LOCALE, locale);
 						org.zkoss.util.Locales.setThreadLocal(locale);
 						MessageFactory.setThreadLocale(locale);
 					} else {
-						String lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);			
-						if (lang == null)
-						{
-							ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
-							lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);
-						}
+						String lang = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA);			
 						if (lang != null)
 						{
 							Locale locale = new Locale (lang);
@@ -142,67 +143,67 @@ public class WorkflowInterceptor implements Filter {
 							MessageFactory.setThreadLocale(locale);
 						}
 					}
-				}
-				TimeZone timezone = (TimeZone) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEZONE);
-				if (timezone != null)
-					TimeZones.setThreadLocal(timezone);
-				String dateFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_DATEFORMAT);
-				String timeFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEFORMAT);
-				String sourceIP = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IP);
-				if (dateFormat != null) {
-					DateFormats.setThreadLocal(new String[] {
-							dateFormat,
-							timeFormat == null ? "HH:mm:ss": timeFormat
-					});
-				}
-				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
-					
-					Security.nestedLogin(nestedPrincipal);
-					try {
-						filter.doFilter(request, response);
+					TimeZone timezone = (TimeZone) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEZONE);
+					if (timezone != null)
+						TimeZones.setThreadLocal(timezone);
+					String dateFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_DATEFORMAT);
+					String timeFormat = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEFORMAT);
+					String sourceIP = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IP);
+					if (dateFormat != null) {
+						DateFormats.setThreadLocal(new String[] {
+								dateFormat,
+								timeFormat == null ? "HH:mm:ss": timeFormat
+						});
 					}
-	
+					if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
+						
+						Security.nestedLogin(nestedPrincipal);
+						try {
+							filter.doFilter(request, response);
+						} finally {
+							Security.nestedLogoff();
+						}
+					} 
+					else if (principal == null)
+					{
+						String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
+						Security.nestedLogin(tenant, "anonymous", new String[0]);
+						try {
+							filter.doFilter(request, response);
+						} finally {
+							Security.nestedLogoff();
+						}
+					}
+					else
+					{
+						String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
+						Security.nestedLogin( (SoffidPrincipal) ((HttpServletRequest) request).getUserPrincipal());
+						try {
+							filter.doFilter(request, response);
+						} finally {
+							Security.nestedLogoff();
+						}
+					}
+
 				} catch (Exception e) {
 					throw new ServletException(
 							Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
 				} finally {
+					Security.clearNestedLogins();
 					try {
 						MessageFactory.setThreadLocale(null);
 						org.zkoss.util.Locales.setThreadLocal(null);
+						TimeZones.setThreadLocal(null);
+						DateFormats.setThreadLocal(null);
 						sessionCacheService.clearSession();
 					} catch (InternalErrorException e) {
 						e.printStackTrace();
 					}
 				}
-				else
-				{
-					String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
-					Security.nestedLogin( (SoffidPrincipal) ((HttpServletRequest) request).getUserPrincipal());
-					try {
-						filter.doFilter(request, response);
-					} finally {
-						Security.nestedLogoff();
-					}
-				}
-
-			} catch (Exception e) {
-				throw new ServletException(
-						Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
-			} finally {
-				Security.clearNestedLogins();
-				try {
-					MessageFactory.setThreadLocale(null);
-					org.zkoss.util.Locales.setThreadLocal(null);
-					TimeZones.setThreadLocal(null);
-					DateFormats.setThreadLocal(null);
-					sessionCacheService.clearSession();
-				} catch (InternalErrorException e) {
-					e.printStackTrace();
-				}
 			}
-
-		} else
+		} else {
 			filter.doFilter(request, response);
+		}
 	}
 
 	private void generateScript(ServletRequest request,

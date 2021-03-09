@@ -30,7 +30,7 @@ import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantDataManager {
-	boolean debug;
+	static boolean debug;
 	protected Database db;
 	protected Connection conn;
 	protected boolean ignoreFailures;
@@ -389,41 +389,6 @@ public class TenantDataManager {
 		return query.toString();
 	}
 
-	private String generateIndirectQueryDiag(Table table, boolean forDelete, Set<String> forbiddenTables) throws InternalErrorException {
-		StringBuffer query = new StringBuffer();
-		for ( ForeignKey fk: references (table.name))
-		{
-			if (! forbiddenTables.contains(fk.tableName))
-			{
-				Table master = db.findTable(fk.tableName, false);
-				String s = null;
-				try {
-					s = generateQuery ( master, forDelete, forbiddenTables );
-				} catch (InternalErrorException e) {}
-				if (s != null && ! s.isEmpty())
-				{
-					if (query.length() > 0) query.append(" OR ");
-					else query.append(" WHERE ");
-					query.append(table.name +"."+table.getPrimaryKey())
-						.append(" IN ( SELECT ");
-					for (String columnName: fk.columns)
-					{
-						query.append( fk.tableName+"."+columnName);
-					}
-					query.append(" FROM ")
-						.append(fk.tableName)
-						.append(s)
-						.append(")");
-				} else {
-					query.append(fk.tableName+" has no query");
-				}
-			} else {
-				query.append(fk.tableName+" is forbidden\n");
-			}
-		}
-		return query.toString();
-	}
-
 	public String generateDirectQuery(boolean forDelete, LinkedList<SearchPath> list) {
 		SearchPath sp;
 		while ( ! list.isEmpty())
@@ -593,8 +558,8 @@ public class TenantDataManager {
 		return debug;
 	}
 
-	public void setDebug(boolean debug) {
-		this.debug = debug;
+	public static void setDebug(boolean debug) {
+		TenantDataManager.debug = debug;
 	}
 
 }

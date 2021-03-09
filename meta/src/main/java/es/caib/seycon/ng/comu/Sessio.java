@@ -10,7 +10,6 @@ import com.soffid.mda.annotation.*;
 @ValueObject ( translatedName="Session",
 	 translatedPackage="com.soffid.iam.api")
 public class Sessio {
-
 	@Attribute(translated = "userName" )
 	public java.lang.String codiUsuari;
 
@@ -71,4 +70,8 @@ public class Sessio {
 	@Nullable
 	@Description("Account name for PAM sessions")
 	public String accountName;
+	
+	@Nullable
+	@Description("Tenant name")
+	public String tenantName;
 }

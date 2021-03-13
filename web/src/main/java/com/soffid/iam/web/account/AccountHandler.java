@@ -36,6 +36,8 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.SoffidObjectType;
+import com.soffid.iam.api.System;
+import com.soffid.iam.api.UserType;
 import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.AuthorizationService;
@@ -53,6 +55,7 @@ import com.soffid.iam.web.popup.ImportCsvHandler;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
 import com.soffid.iam.web.user.UserBulkAction;
 
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
@@ -192,17 +195,63 @@ public class AccountHandler extends FrameHandler {
 
 	public void setPassword(Event event) {
 		DataSource listbox = (DataSource) getListbox();
-		Boolean disabled = (Boolean) listbox.getJXPathContext().getValue("disabled");
-		if (Boolean.FALSE.equals(disabled)) {
-			Window w = (Window) getFellow("newPassword2");
-			Radiogroup gt = (Radiogroup) w.getFellow("generationType");
-			Radio radioRandom = (Radio) w.getFellow("generationRandom");
-			gt.setSelectedItem(radioRandom);
-			onChangeSelectedGeneration(null);
-			w.doHighlighted();
-		} else {
-			Missatgebox.avis("The account is disabled. The password cannot be changed yet");
+		Account acc = (Account) listbox.getJXPathContext().getValue("instance");
+		try {
+			for (UserType ut: EJBLocator.getUserDomainService().findAllUserType()) {
+				if (ut.getName().equals(acc.getPasswordPolicy())) {
+					if (ut.isUnmanaged())
+					{
+						Missatgebox.avis( String.format("Warning. The account policy [%s] is marked as unmanaged. The password will not be sent to the target system", 
+								ut.getDescription()),
+								(ev2) -> doPasswordChange() );
+						return;
+					}
+				}
+			}
+		} catch (Exception e) {
+			// Ignore errors due to lack of permissions
 		}
+		try {
+			System system = EJBLocator.getDispatcherService().findDispatcherByName(acc.getSystem());
+			System soffid = EJBLocator.getDispatcherService().findSoffidDispatcher();
+			if (system == null || ! system.getName().equals(soffid.getName())) {
+				
+				if (system == null ||
+						system.getUrl() == null ||
+						system.getUrl().trim().isEmpty())
+				{
+					Missatgebox.avis( 
+							String.format("Warning: The system [%s] is disconnected. The password will not be sent to the target system",system.getDescription()),
+							(ev2) -> doPasswordChange() );
+					return;
+				}
+				else if ( system.isReadOnly() ) {
+					Missatgebox.avis( String.format("Warning: The system [%s] is in read-only mode. The password will not be sent to the target system",system.getDescription()),
+							(ev2) -> doPasswordChange() );
+					return;
+				}
+			}
+		} catch (Exception e) {
+			// Ignore errors due to lack of permissions
+		}
+		if (acc.isDisabled()) {
+			Missatgebox.avis("The account is disabled. The password cannot be changed yet");
+		} else if ( acc.getType() == AccountType.IGNORED ) {
+			Missatgebox.avis("Warning: The account is unmanaged. The password will not be sent to the target system",
+					(ev2) -> doPasswordChange() );
+			return;
+		} else {
+			doPasswordChange();
+		}
+	}
+
+	public void doPasswordChange() {
+		Window w = (Window) getFellow("newPassword2");
+		Radiogroup gt = (Radiogroup) w.getFellow("generationType");
+		Radio radioRandom = (Radio) w.getFellow("generationRandom");
+		gt.setSelectedItem(radioRandom);
+		onChangeSelectedGeneration(null);
+		w.doHighlighted();
 	}
 	
 	public void onCancelPassword(Event event) {

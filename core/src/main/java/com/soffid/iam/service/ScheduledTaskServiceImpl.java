@@ -140,6 +140,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	protected void handleRemove (ScheduledTask task) throws Exception
 	{
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
+		getScheduledTaskLogEntityDao().remove(entity.getLogs());
 		getScheduledTaskEntityDao().remove(entity);
 		audit (task.getName(), "R"); //$NON-NLS-1$
 		reconfigureTasks();

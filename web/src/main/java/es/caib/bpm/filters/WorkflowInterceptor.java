@@ -176,7 +176,6 @@ public class WorkflowInterceptor implements Filter {
 					}
 					else
 					{
-						String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
 						Security.nestedLogin( (SoffidPrincipal) ((HttpServletRequest) request).getUserPrincipal());
 						try {
 							filter.doFilter(request, response);

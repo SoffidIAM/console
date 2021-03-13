@@ -26,7 +26,7 @@
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
 				if = '${(queryText == null || queryText == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
 				<parameter value=""/>
-				<parameter value="not parent.name pr"/>
+				<parameter value="not parent pr"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Application"></new-instance-bean>
 		</finder>

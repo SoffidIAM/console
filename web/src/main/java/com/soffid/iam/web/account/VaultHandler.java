@@ -31,6 +31,8 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
+import com.soffid.iam.api.System;
+import com.soffid.iam.api.UserType;
 import com.soffid.iam.api.VaultElement;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.AccountService;
@@ -187,33 +189,79 @@ public class VaultHandler extends FrameHandler {
 
 	public void setPassword(Event event) throws InternalErrorException, NamingException, CreateException, CommitException {
 		getForm().getDataSource().commit();
-		Boolean disabled = (Boolean) XPathUtils.getValue(getForm(), "disabled");
-		AccountType type = (AccountType) XPathUtils.getValue(getForm(), "type");
-		if (Boolean.FALSE.equals(disabled)) {
-			String name = (String) XPathUtils.getValue(getForm(), "name");
-			String system = (String) XPathUtils.getValue(getForm(), "system");
-			if (type == AccountType.PRIVILEGED) {
-				Window w = (Window) getFellow("newPasswordPriv");
-				((CustomField3)w.getFellow("checkpwd")).setValue(false);
-				((CustomField3)w.getFellow("password")).setValue("");
-				Calendar c = Calendar.getInstance();
-				c.add(Calendar.DAY_OF_MONTH, 1);
-				((CustomField3)w.getFellow("timepwd")).setValue(c.getTime());
-				
-				String p = EJBLocator.getPasswordService().getPolicyDescription(name, system);
-				((Label)w.getFellow("policy_text")).setValue(p);
-				
-				w.doHighlighted();
-			} else {
-				Window w = (Window) getFellow("newPassword2");
-				Radiogroup gt = (Radiogroup) w.getFellow("generationType");
-				Radio radioRandom = (Radio) w.getFellow("generationRandom");
-				gt.setSelectedItem(radioRandom);
-				onChangeSelectedGeneration(null);
-				w.doHighlighted();
+		Account acc = (Account) XPathUtils.eval(getForm(), "instance");
+		try {
+			for (UserType ut: EJBLocator.getUserDomainService().findAllUserType()) {
+				if (ut.getName().equals(acc.getPasswordPolicy())) {
+					if (ut.isUnmanaged())
+					{
+						Missatgebox.avis( String.format("Warning. The account policy [%s] is marked as unmanaged. The password will not be sent to the target system", 
+								ut.getDescription()),
+								(ev2) -> doPasswordChange() );
+						return;
+					}
+				}
 			}
-		} else {
+		} catch (Exception e) {
+			// Ignore errors due to lack of permissions
+		}
+		try {
+			System system = EJBLocator.getDispatcherService().findDispatcherByName(acc.getSystem());
+			System soffid = EJBLocator.getDispatcherService().findSoffidDispatcher();
+			if (system == null || ! system.getName().equals(soffid.getName())) {
+				
+				if (system == null ||
+						system.getUrl() == null ||
+						system.getUrl().trim().isEmpty())
+				{
+					Missatgebox.avis( 
+							String.format("Warning: The system [%s] is disconnected. The password will not be sent to the target system",system.getDescription()),
+							(ev2) -> doPasswordChange() );
+					return;
+				}
+				else if ( system.isReadOnly() ) {
+					Missatgebox.avis( String.format("Warning: The system [%s] is in read-only mode. The password will not be sent to the target system",system.getDescription()),
+							(ev2) -> doPasswordChange() );
+					return;
+				}
+			}
+		} catch (Exception e) {
+			// Ignore errors due to lack of permissions
+		}
+		if (acc.isDisabled()) {
 			Missatgebox.avis("The account is disabled. The password cannot be changed yet");
+		} else if ( acc.getType() == AccountType.IGNORED ) {
+			Missatgebox.avis("Warning: The account is unmanaged. The password will not be sent to the target system",
+					(ev2) -> doPasswordChange() );
+			return;
+		} else {
+			doPasswordChange();
+		}
+	}
+
+	public void doPasswordChange() throws InternalErrorException, NamingException, CreateException {
+		AccountType type = (AccountType) XPathUtils.eval(getForm(), "type");
+		String name = (String) XPathUtils.eval(getForm(), "name");
+		String system = (String) XPathUtils.eval(getForm(), "system");
+		if (type == AccountType.PRIVILEGED) {
+			Window w = (Window) getFellow("newPasswordPriv");
+			((CustomField3)w.getFellow("checkpwd")).setValue(false);
+			((CustomField3)w.getFellow("password")).setValue("");
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DAY_OF_MONTH, 1);
+			((CustomField3)w.getFellow("timepwd")).setValue(c.getTime());
+			
+			String p = EJBLocator.getPasswordService().getPolicyDescription(name, system);
+			((Label)w.getFellow("policy_text")).setValue(p);
+			
+			w.doHighlighted();
+		} else {
+			Window w = (Window) getFellow("newPassword2");
+			Radiogroup gt = (Radiogroup) w.getFellow("generationType");
+			Radio radioRandom = (Radio) w.getFellow("generationRandom");
+			gt.setSelectedItem(radioRandom);
+			onChangeSelectedGeneration(null);
+			w.doHighlighted();
 		}
 	}
 	

@@ -1457,7 +1457,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
 			if (caller == null)
 				throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
-			if (caller.getId() != ae.getId())
+			if (! caller.getId().equals( ae.getId()))
 			{
 				UserEntity callerUe = getUserForAccount(caller);
 				if (ae.getType().equals(AccountType.USER))
@@ -1527,7 +1527,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
 		Exception lastException = null;
-		if ( ! account.isDisabled() )
+		if ( ! account.isDisabled() && account.getSystem().getUrl() != null)
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {

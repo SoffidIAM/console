@@ -48,6 +48,7 @@ public class TenantFilter implements Filter {
 				throw new ServletException(e);
 			}
 	
+			Security.clearNestedLogins();
 			Security.setClientRequest(httpReq);
 
 			HttpSession s = httpReq.getSession(false);

@@ -37,7 +37,7 @@ public class JobExecutor {
 	protected static String hostName;
 
 	public synchronized void start() {
-		if ("false".equals(System.getProperty("soffid.jobscheduler.disabled"))) {
+		if ("true".equals(System.getProperty("soffid.jobscheduler.disabled"))) {
 			log.info("Job scheduler is disabled. Not starting");
 		}
 		else if (!isStarted) {

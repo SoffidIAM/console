@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.2-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>install</artifactId>
@@ -168,7 +168,7 @@
 									<fileset dir="${basedir}/target/dist" includes="**/*" />
 								</copy>
 								<chmod dir="${basedir}/target/rpm/dist/opt/soffid/iam-console-3/bin" perm="750" includes="**" />
-								<exec executable="src/main/rpm/generaterpm.sh" failonerror="true"/>
+								<exec executable="src/main/rpm/generaterpm.sh" failonerror="true" />
 							</tasks>
 						</configuration>
 						<goals>

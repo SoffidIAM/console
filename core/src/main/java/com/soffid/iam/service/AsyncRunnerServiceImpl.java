@@ -24,6 +24,8 @@ public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
 					ars.runInternal(runnable, result);
 				} catch (Throwable e) {
 					result.cancel(e);
+				} finally {
+					Security.nestedLogoff();
 				}
 			}
 		}.start();

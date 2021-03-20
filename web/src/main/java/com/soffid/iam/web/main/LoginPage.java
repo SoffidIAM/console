@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zul.Html;
 
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.zk.BPMLabelLocator;
 import com.soffid.iam.web.zk.V2LabelLocator;
 
@@ -24,6 +25,8 @@ public class LoginPage extends Html {
 		Execution execution = Executions.getCurrent();
 		javax.servlet.http.HttpServletRequest req = (HttpServletRequest) execution.getNativeRequest();
 	
+		Security.clearNestedLogins();
+		
 		if (org.zkoss.util.resource.Labels.getLabel("login.lblUser") == null)
 		{
 			org.zkoss.util.resource.Labels.register(new V2LabelLocator());
@@ -58,6 +61,7 @@ public class LoginPage extends Html {
 		try {
 			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
 			boolean saml = "true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml"));
+			setVariable("tenant", tenant, false);
 			if (saml)
 			{
 				String user = "";

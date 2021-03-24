@@ -1,4 +1,5 @@
 <zk>
+<!-- 
 	<listener>
 		<description>ZK thread start event</description>
 		<listener-class>com.soffid.iam.web.zk.EventThreadInit</listener-class>
@@ -7,6 +8,7 @@
 		<description>ZK thread end event</description>
 		<listener-class>com.soffid.iam.web.zk.EventThreadCleanup</listener-class>
 	</listener>
+ -->
 	<error-page>
 		<exception-type>java.lang.Throwable</exception-type>
 		<location>/error.zul</location>

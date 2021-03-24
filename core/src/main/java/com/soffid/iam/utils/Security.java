@@ -22,6 +22,8 @@ import javax.transaction.UserTransaction;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Tenant;
@@ -43,6 +45,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
  * 
  */
 public class Security {
+	static Log log = LogFactory.getLog(Security.class);
     public static final String SC_ADM_APLICACIONS = "SC_ADM_APLICACIONS"; //$NON-NLS-1$
     public static final String SC_ADMINISTRADOR = "SC_ADMINISTRADOR"; //$NON-NLS-1$
     public static final String SC_ADMIN_SEG_ORG_USUARI = "SC_ADMIN_SEG_ORG_USUARI"; //$NON-NLS-1$
@@ -413,11 +416,7 @@ public class Security {
             		null, null, null,
             		Collections.singletonList(AUTO_AUTHORIZATION_ALL), null, null );
         } else {
-        	try {
-        		return (SoffidPrincipal) TomeePrincipalRetriever.getPrincipal ();
-        	} catch (Throwable th) {
-        		return null;
-        	}
+       		return null;
         }
     }
 
@@ -443,7 +442,11 @@ public class Security {
 		        p = new SoffidPrincipalImpl(tenant+"\\"+user, null, null, null, Arrays.asList(roles), null, null);
     		} else {
     			SoffidPrincipal currentPrincipal = Security.getSoffidPrincipal();
-    			
+    			if (debugNestedLogin()) {
+    				log.info("Nested login from: "+(currentPrincipal == null? "NONE": currentPrincipal.getName()));
+    				log.info("Nested login to:   "+tenant+"\\"+user);
+    				dumpStack();
+    			}
 				Long tenantId = getTenantId(tenant);
 				if ( tenantId == null)
 					throw new RuntimeException("Invalid tenant: "+tenant);
@@ -495,6 +498,13 @@ public class Security {
         getIdentities().push(p);
     }
 
+	public static void dumpStack() {
+		StackTraceElement[] st = Thread.currentThread().getStackTrace();
+		for (int i = 2; i <= 5 && i < st.length; i++) {
+			log.info("Stack trace: "+ st[i].toString());
+		}
+	}
+
     public static void nestedLogin(String user, String roles[])  {
     	assertCanSetIdentity();
     	
@@ -522,6 +532,12 @@ public class Security {
         	assertCanSetTenant(principal.getName().substring(0, i));
     	assertCanSetIdentity();
     	
+		if (debugNestedLogin()) {
+			SoffidPrincipal soffidPrincipal = Security.getSoffidPrincipal();
+			log.info("Nested login from: "+(soffidPrincipal == null ? "NONE": soffidPrincipal.getName()));
+			log.info("Nested login to:   "+principal.getName());
+			dumpStack();
+		}
     	getIdentities().push((SoffidPrincipal) principal);
     }
 
@@ -535,7 +551,13 @@ public class Security {
     }
 
     public static void nestedLogoff() {
-        getIdentities().pop();
+    	SoffidPrincipal soffidPrincipal = getIdentities().pop();
+		if (debugNestedLogin()) {
+	    	SoffidPrincipal newPrincipal = Security.getSoffidPrincipal();
+			log.info("Nested logoff from: "+(soffidPrincipal == null ? "NONE": soffidPrincipal.getName()));
+			log.info("Nested logoff to:   "+(newPrincipal == null ? "NONE": newPrincipal.getName()));
+			dumpStack();
+		}
     }
 
     public static void onSyncServer() {
@@ -764,6 +786,10 @@ public class Security {
 					return true;
 			}
 		return false;
+	}
+	
+	static boolean debugNestedLogin() {
+		return "true".equals(System.getProperty("soffid.nestedLogin.debug"));
 	}
 }
 

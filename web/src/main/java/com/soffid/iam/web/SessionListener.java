@@ -30,7 +30,6 @@ public class SessionListener implements HttpSessionListener {
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
 		synchronized (sessions) {
-			log.info("Created console session");
 			sessions.add(se.getSession());
 			if (thread == null || !thread.isAlive()) {
 				thread = new SessionListenerThread();

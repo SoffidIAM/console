@@ -178,12 +178,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<filter-mapping>
-		<filter-name>CheckPasswordLoginFilter</filter-name>
-		<url-pattern>*.zul</url-pattern>
-		<url-pattern>*.html</url-pattern>
-	</filter-mapping>
-
 	<!-- Workflow FILTERS -->
 	<filter>
 		<filter-name>securityFilter</filter-name>
@@ -192,6 +186,12 @@
 	<filter-mapping>
 		<filter-name>securityFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>CheckPasswordLoginFilter</filter-name>
+		<url-pattern>*.zul</url-pattern>
+		<url-pattern>*.html</url-pattern>
 	</filter-mapping>
 
 	<filter-mapping>

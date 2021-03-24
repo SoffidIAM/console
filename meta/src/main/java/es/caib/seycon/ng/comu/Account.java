@@ -20,15 +20,15 @@ public class Account {
 	@Attribute(hidden = true)
 	public java.lang.Long id;
 
-	@Description("Account name")
-	@Attribute(separator = "_commonAttributes", searchCriteria = true, customUiHandler = "com.soffid.iam.web.account.AccountNameHandler")
-	public java.lang.String name;
-	
 	@Description("System where the acounts lives")
-	@Attribute(translated = "system", customUiHandler = "com.soffid.iam.web.account.SystemFieldHandler" )
+	@Attribute(separator = "_commonAttributes", translated = "system", customUiHandler = "com.soffid.iam.web.account.SystemFieldHandler" )
 	@JsonAttribute(hibernateAttribute="system.name")
 	public java.lang.String dispatcher;
-
+	
+	@Description("Account name")
+	@Attribute(searchCriteria = true, customUiHandler = "com.soffid.iam.web.account.AccountNameHandler")
+	public java.lang.String name;
+	
 	@Description("Old account name")
 	@Nullable
 	@Attribute(hidden = true)
@@ -108,6 +108,16 @@ public class Account {
 	@Attribute(hidden=true)
 	AccountAccessLevelEnum accessLevel;
 	
+	@Description("Server type for password synchronization")
+	@Nullable
+	@Attribute(separator = "_passwordProperties", customUiHandler = "com.soffid.iam.web.account.ServerTypeHandler", listOfValues = {"Windows", "Linux", "Database"})
+	String serverType;
+	
+	@Description("Server name. Used for SSO accounts")
+	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.account.ServerNameHandler")
+	String serverName;
+	
 	@Nullable
 	@Attribute(customUiHandler = "com.soffid.iam.web.account.VaultFieldHandler", separator = "_vault")
 	Long vaultFolderId;
@@ -119,22 +129,13 @@ public class Account {
 	@Attribute(defaultValue="false")
 	boolean inheritNewPermissions;
 
-	@Description("Server name. Used for SSO accounts")
-	@Nullable
-	@Attribute(customUiHandler = "com.soffid.iam.web.account.ServerNameHandler")
-	String serverName;
-	
-	@Description("Server type for password synchronization")
-	@Nullable
-	@Attribute(separator = "_passwordProperties", customUiHandler = "com.soffid.iam.web.account.ServerTypeHandler", listOfValues = {"Windows", "Linux", "Database"})
-	String serverType;
-
 	@Description("Login URL")
 	@Nullable
 	@Attribute(separator = "_launchProperties")
 	String loginUrl;
 
 	@Description("Login name. Used for SSO accounts")
+	@Attribute(customUiHandler="com.soffid.iam.web.account.LoginNameHandler")
 	@Nullable
 	String loginName;
 

@@ -51,6 +51,7 @@ import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
+import es.caib.zkib.component.Form2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
@@ -188,8 +189,9 @@ public class VaultHandler extends FrameHandler {
 	}
 
 	public void setPassword(Event event) throws InternalErrorException, NamingException, CreateException, CommitException {
-		getForm().getDataSource().commit();
-		Account acc = (Account) XPathUtils.eval(getForm(), "instance");
+		Form2 form = (Form2) getFellow("accountProperties");
+		form.getDataSource().commit();
+		Account acc = (Account) XPathUtils.eval(form, "/.");
 		try {
 			for (UserType ut: EJBLocator.getUserDomainService().findAllUserType()) {
 				if (ut.getName().equals(acc.getPasswordPolicy())) {

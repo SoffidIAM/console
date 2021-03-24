@@ -19,7 +19,24 @@ public class AccountNameHandler extends InputFieldUIHandler {
 				desc.invalidate();
 			}
 		}
-		
+	}
+
+	@Override
+	public boolean isVisible(InputField3 field) throws Exception {
+		ObjectAttributesDiv d = field.getObjectContainer();
+		if (d != null) {
+			String system = (String) XPathUtils.getValue(field, "system");			
+			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+			boolean ro = ssoSystem != null && ssoSystem.equals(system);
+			if (field.isReadonly() != ro) {
+				field.setReadonly(ro);
+				field.createField();
+			}
+			return ssoSystem == null || ! ssoSystem.equals(system) || 
+					(field.getValue() != null && ! field.getValue().toString().trim().isEmpty());
+		}
+		else
+			return true;
 	}
 
 }

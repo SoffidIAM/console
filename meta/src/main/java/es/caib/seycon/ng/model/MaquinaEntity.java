@@ -186,7 +186,8 @@ columns={"MAQ_TEN_ID", "MAQ_SERIAL"})
 abstract class MaquinaSerialIndex {
 }
 
-@Index (name="MAQ_NDX_NAME",	unique=true,
+/* Cannot be unique, as a host can be removed */
+@Index (name="MAQ_NDX_NAME",	unique=false, 
 entity=es.caib.seycon.ng.model.MaquinaEntity.class,
 columns={"MAQ_TEN_ID", "MAQ_NOM"})
 abstract class MaquinaNameIndex {

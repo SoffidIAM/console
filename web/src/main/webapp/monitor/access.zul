@@ -52,8 +52,11 @@
   value: clientName
   default: true
 - name: ${c:l('registreAcces.zul.Usuari-2')}
-  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(user)}" target="_blank" class="shylink">#{user }</a>
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(userCode)}" target="_blank" class="shylink">#{userCode }</a>
   default: true
+- name: ${c:l('com.soffid.iam.api.User.fullName')}
+  template: <a href="/soffid/resource/user/user.zul?userName=#{encodeURIComponent(userCode)}" target="_blank" class="shylink">#{userFullName }</a>
+  default: false
 - name: ${c:l('registreAcces.zul.Agent')}
   value: codeAge
 - name: ${c:l('registreAcces.zul.jumpServerGroup')}

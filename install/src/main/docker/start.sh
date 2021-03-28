@@ -138,7 +138,7 @@ then
      >opt/soffid/iam-console-3/conf/server.xml
 fi
 
-if [[ "$SECURE" == "true" ]]
+if [[ "$SECURE" != "true" ]]
 then
     echo "Starting SECURE Soffid IAM Console"
 	exec /opt/soffid/iam-console-3/bin/catalina.sh run 

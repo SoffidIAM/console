@@ -829,6 +829,10 @@ public class DispatcherServiceImpl extends
 			vo.setAuth(null);
 			vo.setPk(null);
 			vo.setPublicKey(null);
+			if (! Security.getMasterTenantName().equals(Security.getCurrentTenantName()) &&
+					server.getTenants().size() > 1) {
+				vo.setJavaOptions(null);
+			}
 			servers.add(vo);
 		}
 		
@@ -846,11 +850,11 @@ public class DispatcherServiceImpl extends
 		ServerEntityDao dao = getServerEntityDao();
 		ServerEntity entity = dao.load(server.getId());
 		
-		if (entity.getType() == ServerType.MASTERSERVER && 
+		if ( (entity.getType() == ServerType.MASTERSERVER || entity.getType() == ServerType.GATEWAY) && 
 				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_SERVER) )
 			throw new InternalErrorException("Not authorized to manage servers");
 		
-		if (entity.getType() == ServerType.PROXYSERVER && 
+		if ((entity.getType() == ServerType.PROXYSERVER || entity.getType() == ServerType.REMOTESERVER) && 
 				!Security.isUserInRole(Security.AUTO_SERVER_MANAGE_PROXY) )
 			throw new InternalErrorException("Not authorized to manage servers");
 

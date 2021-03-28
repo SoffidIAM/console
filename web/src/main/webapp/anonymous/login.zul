@@ -3,10 +3,19 @@
 <?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
 		<script>
+		function loadTenant() 
+		{
+			var tenant = localStorage.getItem("tenant", tenant);
+			if (tenant) {
+				document.getElementById("j_tenant").value = tenant;
+			}
+		}
+		
 		function updateUsername ()
 		{
 			var tenant = document.getElementById("j_tenant").value;
 			var account = document.getElementById("j_account").value;
+			localStorage.setItem("tenant", tenant);
 			if (tenant == null || tenant.length == 0)
 			{
 				document.getElementById("j_username").value = account;
@@ -45,7 +54,9 @@
 				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8" onsubmit="preparesubmit(event)">
 				<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 				<input name="j_username" id="j_username" type="hidden" value="${user }">
-				<input name="j_tenant" id="j_tenant" type="hidden" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>
+				<p style="${tenantStyle }">
+					<input placeholder="${c:l('login.lblTenant')}" name="j_tenant" id="j_tenant" autocomplete="off"  onChange="updateUsername()" value="${tenant}"/>
+				</p>
 				<p>
 					<input placeholder="${c:l('login.lblUser')}" name="j_account" id="j_account" type="text" autocomplete="off" autofocus="true" onChange="updateUsername ()" />
 				</p>
@@ -73,6 +84,13 @@
 			if (document.getElementById('loginbox'))
 				document.getElementById('loginbox').setAttribute("style","display: none");
 			preparesubmit();
+			// -->
+			</script>
+   		]]></html>
+		<html if="${showTenant}"><![CDATA[
+			<script type="text/javascript">
+			// <!--
+			loadTenant();
 			// -->
 			</script>
    		]]></html>

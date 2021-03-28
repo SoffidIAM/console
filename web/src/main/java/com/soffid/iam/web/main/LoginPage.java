@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zul.Html;
 
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.zk.BPMLabelLocator;
 import com.soffid.iam.web.zk.V2LabelLocator;
@@ -61,6 +62,9 @@ public class LoginPage extends Html {
 		try {
 			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
 			boolean saml = "true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml"));
+			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
+			setVariable("showTenant", showTenant? "true": "false", false);
+			setVariable("tenantStyle", showTenant? "": "display:none", false);
 			setVariable("tenant", tenant, false);
 			if (saml)
 			{

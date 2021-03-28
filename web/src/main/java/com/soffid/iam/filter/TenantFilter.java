@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.juli.AsyncFileHandler;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -53,7 +54,8 @@ public class TenantFilter implements Filter {
 
 			HttpSession s = httpReq.getSession(false);
 			Principal principal = httpReq.getUserPrincipal();
-			if (s == null) {
+			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
+			if (s == null || showTenant) {
 				chain.doFilter(request, response);
 			}
 			else if (principal != null && ! principal.getName().startsWith(tenantHost+"\\"))

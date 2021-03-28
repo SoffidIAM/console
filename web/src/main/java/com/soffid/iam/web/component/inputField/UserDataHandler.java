@@ -59,7 +59,7 @@ public class UserDataHandler extends InputFieldDataHandler<User> {
 
 	@Override
 	public String followLink(String value) throws UnsupportedEncodingException {
-		return "/soffid/resource/network/network.zul?userName="+URLEncoder.encode(value,"UTF-8"); 
+		return "/soffid/resource/user/user.zul?userName="+URLEncoder.encode(value,"UTF-8"); 
 	}
 
 

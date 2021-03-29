@@ -86,93 +86,133 @@ public class WorkflowInterceptor implements Filter {
 		}
 		if (request instanceof HttpServletRequest) 
 		{
-			
-			HttpSession sesion = ((HttpServletRequest) request).getSession();
+			String threadName = Thread.currentThread().getName();
 			try {
-				Principal principal = ((HttpServletRequest) request)
-						.getUserPrincipal();
-				if (principal != null) {
-					String sessionId = (String) sesion
-							.getAttribute(SOFFID_SESSION_CACHE_ATTR);
-					if (sessionId == null) {
-						sessionId = sessionCacheService.createSession();
-						sesion.setAttribute(SOFFID_SESSION_CACHE_ATTR,
-								sessionId);
-					} else {
-						sessionCacheService.setSession(sessionId);
-					}
-				}
-
-				HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-				httpServletResponse.addHeader("X-UA-Compatible", "IE=11;IE=8");
-				httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
-				
-				
-				SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
-						.getAttribute(SOFFID_NESTED_PRINCIPAL);
-				
-				String forcedLocale = ConfigurationCache.getProperty("soffid.language");
-				if (forcedLocale != null)
-				{
-					Locale locale = new Locale(forcedLocale);
-					sesion.setAttribute(Attributes.PREFERRED_LOCALE, locale);
-					org.zkoss.util.Locales.setThreadLocal(locale);
-					MessageFactory.setThreadLocale(locale);
-				} else {
-					String lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);			
-					if (lang == null)
-					{
-						ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
-						lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);
-					}
-					if (lang != null)
-					{
-						Locale locale = new Locale (lang);
-						org.zkoss.util.Locales.setThreadLocal( locale );
-						MessageFactory.setThreadLocale(locale);
-					}
-				}
-
-				if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
+				HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+				setNewThreadName(httpServletRequest);
 					
-					Security.nestedLogin(nestedPrincipal);
-					try {
-						filter.doFilter(request, response);
-					} finally {
-						Security.nestedLogoff();
-					}
-				} 
-				else if (principal == null)
-				{
-					String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
-					Security.nestedLogin(tenant, "anonymous", new String[0]);
-					try {
-						filter.doFilter(request, response);
-					} finally {
-						Security.nestedLogoff();
-					}
-				}
-				else
-				{
-					Security.clearNestedLogins();
+				String requestURI = httpServletRequest.getRequestURI();
+				
+				if (requestURI.startsWith("/anonymous/") ||
+						requestURI.startsWith("/selfservice/anonymous/")) {
 					filter.doFilter(request, response);
+				} else {
+					HttpSession sesion = httpServletRequest.getSession();
+					if (sesion.getAttribute("soffid-remoteIp") == null) {
+						sesion.setAttribute("soffid-remoteIp", request.getRemoteAddr());
+						sesion.setAttribute("soffid-remoteProxy", httpServletRequest.getHeader("X-Forwarded-For"));
+					}
+					try {
+						Principal principal = httpServletRequest
+								.getUserPrincipal();
+						if (principal != null) {
+							String sessionId = (String) sesion
+									.getAttribute(SOFFID_SESSION_CACHE_ATTR);
+							if (sessionId == null) {
+								sessionId = sessionCacheService.createSession();
+								sesion.setAttribute(SOFFID_SESSION_CACHE_ATTR,
+										sessionId);
+								sesion.setAttribute("soffid-principal", principal.getName());
+							} else {
+								sessionCacheService.setSession(sessionId);
+							}
+						}
+		
+						HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+						httpServletResponse.addHeader("X-UA-Compatible", "IE=11;IE=8");
+						httpServletResponse.addHeader("X-Frame-Options", "SAMEORIGIN");
+						
+						
+						SoffidPrincipal nestedPrincipal = (SoffidPrincipal) sesion
+								.getAttribute(SOFFID_NESTED_PRINCIPAL);
+						
+						String forcedLocale = ConfigurationCache.getProperty("soffid.language");
+						if (forcedLocale != null)
+						{
+							Locale locale = new Locale(forcedLocale);
+							sesion.setAttribute(Attributes.PREFERRED_LOCALE, locale);
+							org.zkoss.util.Locales.setThreadLocal(locale);
+							MessageFactory.setThreadLocale(locale);
+						} else {
+							String lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);			
+							if (lang == null)
+							{
+								ConfiguraSEU.configuraUsuariSEU((HttpServletRequest) request);
+								lang = (String) sesion.getAttribute(ConfiguraSEU.SESSIO_IDIOMA);
+							}
+							if (lang != null)
+							{
+								Locale locale = new Locale (lang);
+								org.zkoss.util.Locales.setThreadLocal( locale );
+								MessageFactory.setThreadLocale(locale);
+							}
+						}
+		
+						if (nestedPrincipal != null && principal.getName().startsWith("master\\")) {
+							
+							Security.nestedLogin(nestedPrincipal);
+							try {
+								filter.doFilter(request, response);
+							} finally {
+								Security.nestedLogoff();
+							}
+						} 
+						else if (principal == null)
+						{
+							String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant((HttpServletRequest) request);
+							Security.nestedLogin(tenant, "anonymous", new String[0]);
+							try {
+								filter.doFilter(request, response);
+							} finally {
+								Security.nestedLogoff();
+							}
+						}
+						else
+						{
+							Security.clearNestedLogins();
+							filter.doFilter(request, response);
+						}
+		
+					} catch (Exception e) {
+						throw new ServletException(
+								Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
+					} finally {
+						try {
+							MessageFactory.setThreadLocale(null);
+							org.zkoss.util.Locales.setThreadLocal(null);
+							sessionCacheService.clearSession();
+						} catch (InternalErrorException e) {
+							e.printStackTrace();
+						}
+					}
 				}
-
-			} catch (Exception e) {
-				throw new ServletException(
-						Messages.getString("WorkflowInterceptor.ServerConfigError"), e); //$NON-NLS-1$ 
 			} finally {
-				try {
-					MessageFactory.setThreadLocale(null);
-					org.zkoss.util.Locales.setThreadLocal(null);
-					sessionCacheService.clearSession();
-				} catch (InternalErrorException e) {
-					e.printStackTrace();
-				}
+				Thread.currentThread().setName(threadName);
 			}
 
 		} else
 			filter.doFilter(request, response);
+	}
+
+	public void setNewThreadName(HttpServletRequest httpServletRequest) {
+		StringBuffer newThreadName = new StringBuffer();
+		if ( httpServletRequest.getUserPrincipal() != null )
+			newThreadName.append(httpServletRequest.getUserPrincipal().getName()).append(": ");
+		else
+			newThreadName.append("Anonymous: ");
+		String referer = httpServletRequest.getHeader("Referer");
+		if (referer != null)
+			newThreadName.append(" ").append(referer).append(" -> ");
+		newThreadName.append(httpServletRequest.getRequestURI());
+		if (httpServletRequest.getQueryString() != null)
+			newThreadName.append("?").append(httpServletRequest.getQueryString());
+		
+		newThreadName.append(" [ ");
+		if (httpServletRequest.getHeader("X-Forwarded-For") != null)
+			newThreadName.append(httpServletRequest.getHeader("X-Forwarded-For") ).append(" > ");		
+		newThreadName.append(httpServletRequest.getRemoteAddr());
+		newThreadName.append(" ]");
+		Thread.currentThread().setName(newThreadName.toString());
 	}
 
 	private void generateScript(ServletRequest request,

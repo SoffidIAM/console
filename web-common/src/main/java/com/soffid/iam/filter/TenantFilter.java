@@ -49,9 +49,12 @@ public class TenantFilter implements Filter {
 	
 			Security.setClientRequest(httpReq);
 
-			HttpSession s = httpReq.getSession(true);
+			HttpSession s = httpReq.getSession(false);
 			Principal principal = httpReq.getUserPrincipal();
-			if (principal != null && ! principal.getName().startsWith(tenantHost+"\\"))
+			if (s == null) {
+				chain.doFilter(request, response);
+			}
+			else if (principal != null && ! principal.getName().startsWith(tenantHost+"\\"))
 			{
 				log.info("Received request on server "+httpReq.getServerName()+"(tenant "+tenantHost+") for user "+principal.getName());
 				s.invalidate();

@@ -21,6 +21,7 @@ import org.zkoss.zk.ui.sys.SessionCtrl;
 
 @WebListener
 public class SessionListener implements HttpSessionListener {
+	Log log = LogFactory.getLog(getClass());
 	static List<HttpSession> sessions = new LinkedList<HttpSession>();
 	static SessionListenerThread thread = null;
 	public SessionListener () {
@@ -29,6 +30,7 @@ public class SessionListener implements HttpSessionListener {
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {
 		synchronized (sessions) {
+			log.info("Created self service session");
 			sessions.add(se.getSession());
 			if (thread == null || !thread.isAlive()) {
 				thread = new SessionListenerThread();
@@ -69,8 +71,11 @@ class SessionListenerThread extends Thread {
 		List<HttpSession> sessions = SessionListener.sessions;
 		synchronized (sessions) {
 			long pct = free * 100L / max;
-			if (pct < 12) {
-				log.info("Number of active sessions: "+sessions.size()+" "+pct+"%free memory");
+			if (pct < 15) {
+				log.info("Number of Self-Service active sessions: "+sessions.size()+" "+pct+"%free memory");
+				for ( HttpSession session: sessions) {
+					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+				}
 				int num = sessions.size() / 2; 
 				if (num > 10) num = 10;
 				for (HttpSession session: sessions) {
@@ -79,7 +84,12 @@ class SessionListenerThread extends Thread {
 					zkSession.invalidateNow();
 				}
 				runtime.gc();
-				
+			}
+			else if (pct <25) {
+				log.info("Number of Self-Service active sessions: "+sessions.size()+" "+pct+"% free memory");
+				for ( HttpSession session: sessions) {
+					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+				}
 			}
 		}
 	}

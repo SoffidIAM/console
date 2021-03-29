@@ -522,7 +522,8 @@ public abstract class XarxaService {
 	}
 	@Operation ( grantees={roles.Tothom.class},
 			translated="registerDynamicIP")
-	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"es.caib.seycon.ng.exception.UnknownNetworkException","es.caib.seycon.ng.exception.UnknownHostException"})
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,
+		rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"es.caib.seycon.ng.exception.UnknownNetworkException","es.caib.seycon.ng.exception.UnknownHostException"})
 	public es.caib.seycon.ng.comu.Maquina registerDynamicIP(
 		java.lang.String nomMaquina, 
 		java.lang.String ip, 

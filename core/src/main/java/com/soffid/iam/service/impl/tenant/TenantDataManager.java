@@ -30,7 +30,7 @@ import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class TenantDataManager {
-
+	static boolean debug = true;
 	protected Database db;
 	protected Connection conn;
 	protected boolean ignoreFailures;
@@ -288,7 +288,10 @@ public class TenantDataManager {
 		String hint = generateHint(table);
 		if (hint != null)
 			return hint;
-		
+
+		if (debug) {
+			log.info(table.name+": Generating query; forbiiden "+forbiddenTables);
+		}
 		LinkedList<SearchPath> list = new LinkedList<SearchPath>();
 		SearchPath sp = new SearchPath();
 		sp.from = "";
@@ -301,23 +304,31 @@ public class TenantDataManager {
 		sp.path.add(table.name);
 		list.add(sp);
 		String s = generateDirectQuery(forDelete, list);
-		if (!s.isEmpty())
+		if (!s.isEmpty()) {
+			if (debug)
+				log.info(table.name+" >> "+s);
 			return s;
+		}
 	
 		s = generateIndirectQuery ( table, forDelete, sp.path);
 		if (s.isEmpty())
 		{
-			throw new InternalErrorException("There is no filter for table "+table.name);
+			String d = generateIndirectQueryDiag (table, forDelete, sp.path);
+			if (debug)
+				log.info(table.name+" ** "+d);
+			throw new InternalErrorException("There is no filter for table "+table.name+": "+d);
 		}
 		return s;
 	}
 
 	private String generateIndirectQuery(Table table, boolean forDelete, Set<String> forbiddenTables) throws InternalErrorException {
 		StringBuffer query = new StringBuffer();
+		log.info("          Searching indirect path from "+table.name+" forbidden: "+forbiddenTables);
 		for ( ForeignKey fk: references (table.name))
 		{
 			if (! forbiddenTables.contains(fk.tableName))
 			{
+				log.info("          Searching indirect path from "+table.name+" to "+fk.tableName);
 				Table master = db.findTable(fk.tableName, false);
 				String s = null;
 				try {
@@ -343,6 +354,41 @@ public class TenantDataManager {
 		return query.toString();
 	}
 
+	private String generateIndirectQueryDiag(Table table, boolean forDelete, Set<String> forbiddenTables) throws InternalErrorException {
+		StringBuffer query = new StringBuffer();
+		for ( ForeignKey fk: references (table.name))
+		{
+			if (! forbiddenTables.contains(fk.tableName))
+			{
+				Table master = db.findTable(fk.tableName, false);
+				String s = null;
+				try {
+					s = generateQuery ( master, forDelete, forbiddenTables );
+				} catch (InternalErrorException e) {}
+				if (s != null && ! s.isEmpty())
+				{
+					if (query.length() > 0) query.append(" OR ");
+					else query.append(" WHERE ");
+					query.append(table.name +"."+table.getPrimaryKey())
+						.append(" IN ( SELECT ");
+					for (String columnName: fk.columns)
+					{
+						query.append( fk.tableName+"."+columnName);
+					}
+					query.append(" FROM ")
+						.append(fk.tableName)
+						.append(s)
+						.append(")");
+				} else {
+					query.append(fk.tableName+" has no query ");
+				}
+			} else {
+				query.append(fk.tableName+" is forbidden ");
+			}
+		}
+		return query.toString();
+	}
+
 	public String generateDirectQuery(boolean forDelete, LinkedList<SearchPath> list) {
 		SearchPath sp;
 		while ( ! list.isEmpty())
@@ -350,8 +396,10 @@ public class TenantDataManager {
 			sp = list.poll();
 			for ( ForeignKey fk: mandatoryForeignKeys(sp.lastTable))
 			{
+				log.info("          Searching path from "+sp.lastTable);
 				if (fk.foreignTable.equals("SC_TENANT"))
 				{
+					log.info("          Found path from "+sp.lastTable+" -> SC_TENANT");
 					for ( String col: fk.columns)
 					{
 						if (! sp.where.isEmpty())
@@ -371,6 +419,7 @@ public class TenantDataManager {
 				}
 				else if ( !sp.path.contains(fk.foreignTable))
 				{
+					log.info("          Following path from "+sp.lastTable+" -> "+fk.foreignTable);
 					Table table = db.findTable(fk.foreignTable, false);
 					String hint = generateHint( table );
 					if (hint == null)
@@ -442,6 +491,10 @@ public class TenantDataManager {
 							return sp.from + " WHERE " + where;
 					}
 						
+				} else {
+					if (debug) {
+						log.info("          Ignoring path from "+sp.lastTable+" -> "+fk.foreignTable);
+					}
 				}
 			}
 		}
@@ -452,7 +505,8 @@ public class TenantDataManager {
 		List<ForeignKey> result = new LinkedList<ForeignKey>();
 		
 		Table t = db.findTable(lastTable, true);
-		
+		if (debug)
+			log.info("           Searching foregin keys for "+lastTable);
 		for ( ForeignKey fk: db.foreignKeys)
 		{
 			if (fk.tableName.equals(t.name) )
@@ -465,8 +519,14 @@ public class TenantDataManager {
 							!col.name.equals("TENANT_")) // Hack for JBPM modules
 						mandatory = false;
 				}
-				if (mandatory)
+				if ( mandatory) {
 					result.add(fk);
+					if (debug) log.info("              Got "+fk.foreignTable);
+				}
+				else 
+				{
+					if (debug) log.info("              Ignore nullable relation to "+fk.foreignTable);
+				}
 			}
 		}
 		return result;
@@ -492,6 +552,14 @@ public class TenantDataManager {
 				return true;
 		}
 		return false;
+	}
+
+	public static boolean isDebug() {
+		return debug;
+	}
+
+	public static void setDebug(boolean debug) {
+		TenantDataManager.debug = debug;
 	}
 
 }

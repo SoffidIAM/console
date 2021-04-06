@@ -5,28 +5,14 @@ package es.caib.seycon.ng.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
-import org.hibernate.EntityMode;
-import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.metadata.ClassMetadata;
-import org.hibernate.persister.entity.AbstractEntityPersister;
-import org.hibernate.type.Type;
 
 import com.soffid.iam.api.Tenant;
-import com.soffid.iam.model.UserEntityImpl;
 import com.soffid.iam.service.TenantService;
+import com.soffid.iam.service.impl.tenant.TenantDataManager;
 import com.soffid.iam.service.impl.tenant.TenantExporter;
 import com.soffid.iam.service.impl.tenant.TenantImporter;
 import com.soffid.iam.service.impl.tenant.TenantRemover;
 import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.comu.PoliticaContrasenya;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.servei.AutoritzacioService;
 
 public class TenantTest extends AbstractTest
 {
@@ -35,6 +21,7 @@ public class TenantTest extends AbstractTest
 	{
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
 
+		TenantDataManager.setDebug(true);
 		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
 			TenantService tenantService = com.soffid.iam.ServiceLocator.instance().getTenantService();
@@ -55,6 +42,7 @@ public class TenantTest extends AbstractTest
 	public void testImport() throws Exception
 	{
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
+		TenantDataManager.setDebug(true);
 
 		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {
@@ -81,6 +69,7 @@ public class TenantTest extends AbstractTest
 	public void testRemove() throws Exception
 	{
 		com.soffid.iam.ServiceLocator.instance().init("testBeanRefFactory.xml", "beanRefFactory");
+		TenantDataManager.setDebug(true);
 
 		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
 		try {

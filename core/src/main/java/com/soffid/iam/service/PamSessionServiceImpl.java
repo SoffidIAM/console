@@ -138,7 +138,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		JumpServerGroupEntity jumpServerGroup = getJumpServerGroupEntityDao().findByName(serverGroup);
 		if (jumpServerGroup == null)
 			throw new InternalErrorException(String.format("Cannot start session. Server group %s does not exist",serverGroup));
-		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl());
+		return createJumpServerSession (entity, jumpServerGroup, url);
 	}
 
 	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl) throws InternalErrorException, MalformedURLException, JSONException

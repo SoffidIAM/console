@@ -3102,8 +3102,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		else
 			qs = "("+qs+") and o.tenant.id = :tenantId";
 		
-		qs = qs + " order by o.userName";
-
 		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();
 		Parameter paramArray[] = new Parameter[params.size()+1];

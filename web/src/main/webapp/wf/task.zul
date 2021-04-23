@@ -40,9 +40,9 @@
 			<tab id="tabAnexos" label="${c:l('inbox.lblAnexos')}"/>
 			<tab label="${c:l('task.comentari')}"/>
 		</tabs>
-		<tabpanels>
-			<tabpanel id="tarea" style="overflow:auto; min-height:20em;">
-				<form2 dataPath="model:/taskInstance[1]/variables" style="width:100%; height: calc( 100vh - 340px )">
+		<tabpanels style="height: calc(70vh - 30px); overflow: auto;">
+			<tabpanel id="tarea" style="min-height:20em; ">
+				<form2 dataPath="model:/taskInstance[1]/variables" style="width:100%; height: auto">
 					<div id="datosElementoWorkflow" style="width: 90vw; width: calc( 100vw - 80px ); overflow-x: auto; padding-right: 24px">
 				
 					</div>

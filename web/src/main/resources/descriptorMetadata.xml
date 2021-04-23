@@ -11,7 +11,7 @@
 			<script-finder>
 				import es.caib.seycon.ng.comu.TypeEnumeration;
 				list = new java.util.LinkedList();
-				list.add (new String(""));
+//				list.add (new String(""));
 				for (l: TypeEnumeration.literals())
 				{
 					list.add (l);
@@ -22,7 +22,7 @@
 		<finder name="visibility" type="visibility">
 			<script-finder>
 				list = new java.util.LinkedList();
-				list.add (new String(""));
+//				list.add (new String(""));
 				for (l: com.soffid.iam.api.AttributeVisibilityEnum.literals())
 				{
 					list.add (l);

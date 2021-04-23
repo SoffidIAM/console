@@ -20,7 +20,7 @@ public class IPHandler extends InputFieldUIHandler {
 	@Override
 	public boolean isVisible(InputField3 field) throws Exception {
 		Object o = field.getOwnerObject();
-		if (Boolean.TRUE.equals( PropertyUtils.getProperty(o, "dhcp"))) {
+		if (o != null && Boolean.TRUE.equals( PropertyUtils.getProperty(o, "dhcp"))) {
 			field.setReadonly(true);
 			field.invalidate();
 		}

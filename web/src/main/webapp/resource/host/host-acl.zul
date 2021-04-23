@@ -31,8 +31,6 @@
 		  value: requestDate_datetime
 		- name: ${c:l('maquines.zul.DataCaducitat')}
 		  value: authorizationAccessExpirationDate_datetime
-		- name: ""
-		  value: domainValue/value
 		]]>
 		</attribute>
 	</datatable>

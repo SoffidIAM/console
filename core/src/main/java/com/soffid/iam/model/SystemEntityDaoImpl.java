@@ -40,6 +40,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.hibernate.Query;
+
 /**
  * @see es.caib.seycon.ng.model.DispatcherEntity
  */
@@ -105,19 +107,30 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 	public void remove(com.soffid.iam.model.SystemEntity dispatcherEntity) throws RuntimeException {
 		try
 		{
-			String codiDispatcher = dispatcherEntity.getName();
-			getAccountEntityDao().remove(dispatcherEntity.getAccounts());
-			dispatcherEntity.getAccounts().clear();
-
-			getRoleEntityDao().remove(dispatcherEntity.getRole());
-			dispatcherEntity.getRole().clear();
-
+	 		// Remove account attributes
+			getSession().createQuery("delete from com.soffid.iam.model.AccountAttributeEntity where metadata.system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+	 		// Remove accounts
+			getSession().createQuery("delete from com.soffid.iam.model.AccountEntity where system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			// Remove roles
+			getSession().createQuery("delete from com.soffid.iam.model.RoleEntity where system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			// Remove metadata
+			getSession().createQuery("delete from com.soffid.iam.model.AccountMetadataEntity where system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			
 			for ( EntryPointEntity ep: dispatcherEntity.getEntryPoints())
 			{
 				ep.setSystem(null);
 				getEntryPointEntityDao().update(ep);
 			}
 			
+			String codiDispatcher = dispatcherEntity.getName();
 			super.remove(dispatcherEntity);
 			getSession(false).flush();
 			auditarDispatcher("D", codiDispatcher); //$NON-NLS-1$

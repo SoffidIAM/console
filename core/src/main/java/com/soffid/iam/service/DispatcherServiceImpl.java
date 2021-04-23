@@ -430,10 +430,7 @@ public class DispatcherServiceImpl extends
 		getAccessControlEntityDao()
 				.remove(dispatcherEntity.getAccessControls());
 
-		for (AccountMetadataEntity att: dispatcherEntity.getMetaData())
-		{
-			att.getData();
-		}
+		getHostSystemEntityDao().remove(dispatcherEntity.getHosts());
 		for (ObjectMappingEntity om : dispatcherEntity.getObjectMappings()) {
 			for (AttributeMappingEntity am : om.getAttributeMappings()) {
 				getAttributeMappingEntityDao().remove(am);

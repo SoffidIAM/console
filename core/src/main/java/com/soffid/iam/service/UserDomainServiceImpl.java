@@ -359,6 +359,7 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 	@Override
     protected void handleDelete(PasswordPolicy politicaContrasenyaDomini) throws Exception {
 		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().passwordPolicyToEntity(politicaContrasenyaDomini);
+		getPolicyForbiddenWordEntityDao().remove(entity.getForbiddenWords());
 		getPasswordPolicyEntityDao().remove(entity);
 	}
 
@@ -407,6 +408,10 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 	@Override
     protected void handleDelete(PasswordDomain dominiContrasenya) throws Exception {
 		PasswordDomainEntity contrasenyaDominiEntity = getPasswordDomainEntityDao().passwordDomainToEntity(dominiContrasenya);
+		if (!contrasenyaDominiEntity.getSystems().isEmpty()) {
+			throw new InternalErrorException("Cannot remove password domain "+contrasenyaDominiEntity.getName()+" as it is being used in system "+
+					contrasenyaDominiEntity.getSystems().iterator().next().getName());
+		}
 
 		getPasswordDomainEntityDao().remove(contrasenyaDominiEntity);
 	}

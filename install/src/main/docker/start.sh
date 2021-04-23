@@ -85,6 +85,15 @@ function configure {
 		echo "dbStatus=1"
 	) > /opt/soffid/iam-console-3/conf/system.properties		
 
+    cp /opt/soffid/iam-console-3/conf/tomee.xml /opt/soffid/iam-console-3/conf/tomee.xml.template
+	if [[ "$DB_URL" == *:oracle:* ]] 
+	then
+       cat /opt/soffid/iam-console-3/conf/tomee.xml.template | sed -e 's/validationQuery.*/validationQuery = select 1 from dual/'> /opt/soffid/iam-console-3/conf/tomee.xml 
+	elif [[ "$DB_URL" == *:sqlserver:* ]] 
+	then
+       cat /opt/soffid/iam-console-3/conf/tomee.xml.template | sed -e 's/validationQuery.*/validationQuery = select 1 from sysobjects/'> /opt/soffid/iam-console-3/conf/tomee.xml 
+	fi
+
 	touch /opt/soffid/iam-console-3/conf/configured 
 	
 	true

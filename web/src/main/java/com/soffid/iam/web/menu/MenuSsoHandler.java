@@ -40,13 +40,11 @@ public class MenuSsoHandler extends Div implements AfterCompose {
 
 	@Override
 	public void afterCompose() {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	
 	public void validaXML() {
-		DataTree2 listbox = (DataTree2) org.zkoss.zk.ui.Path.getComponent(getSpaceOwner(), listboxPath);
+		DataTree2 listbox = (DataTree2) XPathUtils.getPath(this, listboxPath);
 		DataNode dn = (DataNode) XPathUtils.eval( listbox , "/.");
 		AccessTree data = (AccessTree) dn.getInstance();
 		try {		

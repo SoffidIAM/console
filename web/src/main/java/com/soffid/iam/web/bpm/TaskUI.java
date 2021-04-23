@@ -69,6 +69,7 @@ import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.bpm.api.TaskInstance;
 import com.soffid.iam.bpm.service.ejb.BpmEngine;
 import com.soffid.iam.common.TransactionalTask;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
@@ -280,8 +281,7 @@ public class TaskUI extends FrameHandler implements EventListener {
         ByteArrayOutputStream streamSalidaImagen;
 
         String user = Security.getCurrentUser();
-        boolean canManage = user.equals(task.getActorId())
-                && task.getStart() != null;
+        boolean canManage = user != null && user.equals(task.getActorId()) && task.getStart() != null;
 
         Application.setTitle(task.getName());
         setCurrentTask(task);
@@ -690,7 +690,6 @@ public class TaskUI extends FrameHandler implements EventListener {
                     throw new UiException(message, ex);
                 }
                 try {
-
                     final TaskInstance task = new TaskInstance( currentTask );
                     EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
 						@Override

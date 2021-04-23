@@ -15,12 +15,12 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 			<image src="/img/question-black.svg"/>
 		</div>
 		 
-		<image src="anonymous/small-logo.png" sclass="logo col_der"/>
+		<image src="/anonymous/small-logo.png" sclass="logo col_der"/>
 		
 		<div sclass="col_izq">
 			<image src="/img/menu/ninedots.svg" onClick="ref:appWindow.menu" sclass="menu3starter"/>
 			<menu3 id="menu3" style="display: inline-block"/>			
-			<image src="icons/logo-letras-color.png" id="logo"/>
+			<image src="/anonymous/logo-letras-color.png" id="logo"/>
 		</div>
 
 		<div sclass="col_cen">

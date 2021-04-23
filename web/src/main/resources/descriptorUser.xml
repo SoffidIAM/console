@@ -16,8 +16,11 @@
 				method="findUserByJsonQuery" if = "${query != null &amp;&amp; synchro != null}">
 				<parameter value="${query}"/>
 			</ejb-finder>
-			<new-instance-bean className="com.soffid.iam.api.User">
-			</new-instance-bean>
+			<new-instance-script >
+				u = new com.soffid.iam.api.User();
+				u.setAttributes(new java.util.HashMap());
+				return u;
+			</new-instance-script>
 		</finder>
 		
 	</datanode>

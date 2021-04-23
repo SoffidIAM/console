@@ -145,7 +145,7 @@
 			</div>
 			<div>
 				<customfield3 dataType="NETWORK" bind="${arg.listbox }:/name" readonly="true"
-					label="${c:l('com.soffid.iam.api.Host.networkCode') }"/>
+					label="${c:l('aplica_permisosRol.zul.entryPoint') }"/>
 				<customfield3 dataType="USER" id="user2"
 					label="${c:l('aplicaIntranet_autoritzacio.User')}"
 					readonly="true" />

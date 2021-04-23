@@ -351,7 +351,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 	public void onChangeMultipleValues() {
 		Component lb = getFellow("metadataGrid");
     	Boolean multivalue = (Boolean) XPathUtils.getValue(lb,"multiValued");
-    	objectAttributeWindow.getFellow("multiRowRow").setVisible(Boolean.TRUE.equals( multivalue));
+//    	objectAttributeWindow.getFellow("multiRowRow").setVisible(Boolean.TRUE.equals( multivalue));
 	}
 
 	public void onChangeDataType() {

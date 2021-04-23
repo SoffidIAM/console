@@ -490,7 +490,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					complexQuery = true;
 				}
 
-				TermsFilter fTenant = new TermsFilter( new Term("$tenant", Security.getCurrentTenantName() ));
+				TermsFilter fTenant = new TermsFilter( new Term("$tenant", Long.toString( Security.getCurrentTenantId() )) );
 				b.add(new FilterClause(fTenant, BooleanClause.Occur.MUST));
 				complexQuery = true;
 
@@ -2716,7 +2716,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			if (task == null)
 				return null;
 
-			if (business.canAccess(getUserGroups(), task)) {
+			if (isInternalService() || business.canAccess(getUserGroups(), task)) {
 				return VOFactory.newTaskInstance(task);
 			} else {
 				return null;

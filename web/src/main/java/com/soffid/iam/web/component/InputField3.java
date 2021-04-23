@@ -1008,7 +1008,7 @@ public class InputField3 extends Databox
 		if (path == null) return v;
 		Component c = this;
 		if (path.contains(":")) {
-			c = Path.getComponent(getSpaceOwner(), keysPath.substring(0,path.indexOf(":")));
+			c = XPathUtils.getPath(this, keysPath.substring(0,path.indexOf(":")));
 			path = path.substring(path.indexOf(":")+1);
 		}
 		if (c instanceof DataSource) {

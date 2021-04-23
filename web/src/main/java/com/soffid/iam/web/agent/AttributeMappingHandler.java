@@ -420,7 +420,7 @@ public class AttributeMappingHandler extends DataGrid {
 	}
 
 	private DataModel getDataModel() {
-		return (DataModel) Path.getComponent( getSpaceOwner(), "/model");
+		return (DataModel) XPathUtils.getPath(this, "/model");
 	}
 
 	public void doQueryTest (Event event) throws InternalErrorException, NamingException, CreateException

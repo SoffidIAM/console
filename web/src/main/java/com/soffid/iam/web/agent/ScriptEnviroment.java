@@ -320,7 +320,7 @@ public class ScriptEnviroment {
 	{
 		StringBuffer sb = new StringBuffer();
 				
-		DataSource lb = (DataSource) Path.getComponent(c.getPage(), "listbox");
+		DataSource lb = (DataSource) XPathUtils.getPath(c.getPage(), "listbox");
 		JXPathContext ctx = lb.getJXPathContext();
 		for (Iterator<Pointer> it = ctx.iteratePointers("/metadata"); it.hasNext(); )
 		{

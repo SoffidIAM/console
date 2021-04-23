@@ -78,7 +78,7 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 	public void addNew (Event event) throws NamingException, CreateException, InternalErrorException, IOException {
 		Window w = (Window) getFellow("add-window");
 		getWizard().setSelected(0);
-		Component c = Path.getComponent(getSpaceOwner(), listboxPath);
+		Component c = XPathUtils.getPath(this, listboxPath);
 		String system = (String) XPathUtils.eval(c, "system");
 		CustomField3 account = (CustomField3) w.getFellow("account");
 		account.setFilterExpression("system eq \""+system+"\"");
@@ -161,7 +161,7 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 			input.setWarning(0, "Select any user");
 		}
 		if (input.attributeValidateAll() && input2.attributeValidateAll()) {
-			Component c = Path.getComponent(getSpaceOwner(), listboxPath);
+			Component c = XPathUtils.getPath(this, listboxPath);
 			String systemName = (String) XPathUtils.eval(c, "system");
 			String roleName = (String) XPathUtils.eval(c, "name");
 			String domain = (String) XPathUtils.eval(c, "domain");
@@ -253,7 +253,7 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 		InputField3 input2 = (InputField3) w.getFellow("account");
 		CustomField3 input3 = (CustomField3) w.getFellow("account2");
 
-		Component c = Path.getComponent(getSpaceOwner(), listboxPath);
+		Component c = XPathUtils.getPath(this, listboxPath);
 		String systemName = (String) XPathUtils.eval(c, "system");
 		String roleName = (String) XPathUtils.eval(c, "name");
 		String domain = (String) XPathUtils.eval(c, "domain");

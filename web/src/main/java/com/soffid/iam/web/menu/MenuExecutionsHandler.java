@@ -71,7 +71,7 @@ public class MenuExecutionsHandler extends Div implements AfterCompose {
 	}
 	
 	public void test(Event event) throws Exception {
-		DataSource tree = (DataSource) Path.getComponent(getPage(), listboxPath);
+		DataSource tree = (DataSource) XPathUtils.getPath(getPage(), listboxPath);
 		tree.commit();
 		
 		AccessTree at = (AccessTree) ((DataNode)XPathUtils.getValue( tree, "/.")).getInstance();

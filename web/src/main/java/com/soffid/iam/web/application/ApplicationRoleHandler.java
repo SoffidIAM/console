@@ -75,7 +75,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	public void addNew (Event event) {
 		DataTree2 dt = (DataTree2) Path.getComponent(listboxPath);
 		DataSource dataSource = (DataSource) dt;
-		DataSource rootDs = (DataSource) Path.getComponent(getSpaceOwner(), "/model");
+		DataSource rootDs = (DataSource) XPathUtils.getPath(this, "/model");
 		String name = (String) XPathUtils.getValue (dataSource, "/name");
 		
 		getListbox().addNew();

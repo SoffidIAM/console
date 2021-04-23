@@ -30,6 +30,7 @@ import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 
@@ -55,7 +56,7 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 	}
 	
 	public void openPasswordWindow(Event event) {
-		DataSource listbox = (DataSource) Path.getComponent(getPage(), listboxPath);
+		DataSource listbox = (DataSource) XPathUtils.getPath(getPage(), listboxPath);
 		Boolean active = (Boolean) listbox.getJXPathContext().getValue("active");
 		if (Boolean.TRUE.equals(active)) {
 			Window w = (Window) getFellow("newPassword2");
@@ -79,7 +80,7 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 	
 	public void onSetPassword(Event event) throws CommitException, WrongValueException, InternalErrorException, BadPasswordException
 	{
-		DataSource listbox = (DataSource) Path.getComponent(getPage(), listboxPath);
+		DataSource listbox = (DataSource) XPathUtils.getPath(getPage(), listboxPath);
 		listbox.commit();
 
 		Window w = (Window) getFellow("newPassword2");

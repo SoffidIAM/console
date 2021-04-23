@@ -43,6 +43,7 @@ import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 
@@ -72,7 +73,7 @@ public class AccountDetailsHandler extends Window implements AfterCompose {
 
 	
 	public void afterCompose() {
-		dataSource = (DataSource) Path.getComponent(getPage(), dataSourcePath);
+		dataSource = (DataSource) XPathUtils.getPath(getPage(), dataSourcePath);
 	}
 	
 	public void onWindowClose(Event event) {

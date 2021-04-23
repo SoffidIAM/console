@@ -12,6 +12,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Window;
 
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.ApplicationComponent;
 
@@ -56,7 +57,7 @@ public class ApplicationTreecell extends Treecell {
 		ApplicationComponent app = Application.getApplication();
 		
 		// Tanquem el menu
-		Window menu = (Window) Path.getComponent(app.getSpaceOwner(), app.getMenu());
+		Window menu = (Window) XPathUtils.getPath(app, app.getMenu());
 		if (menu!=null)
 		{
 			menu.setVisible(true);

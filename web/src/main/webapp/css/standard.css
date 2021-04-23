@@ -2997,6 +2997,7 @@ div.datatree div.tree-label.dashed {
 
 div.datatree div.tree-label:hover {
 	background-color: {BLUELIGHT};
+	color: {BLUETEXT};
 }
 
 div.datatree div.tree-label.selected {

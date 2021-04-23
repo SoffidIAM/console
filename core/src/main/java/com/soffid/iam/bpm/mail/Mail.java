@@ -343,6 +343,8 @@ public class Mail implements ActionHandler {
 			String externalURL = ConfigurationCache.getProperty("soffid.externalURL");
 			if (externalURL == null)
 				externalURL = ConfigurationCache.getProperty("AutoSSOURL");
+			if (!externalURL.endsWith("/"))
+				externalURL = externalURL + "/";
 			prop.put("AutoSSOURL", externalURL);
 			variableResolver = new MailVariableResolver(
 					from, to,

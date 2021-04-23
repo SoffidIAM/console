@@ -30,6 +30,7 @@ import com.soffid.scimquery.expr.AndExpression;
 import com.soffid.scimquery.expr.ComparisonExpression;
 import com.soffid.scimquery.expr.NotExpression;
 import com.soffid.scimquery.expr.OrExpression;
+import com.soffid.scimquery.expr.OrderByExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -49,7 +50,6 @@ public class FrameHandler extends Frame {
 	boolean registerUrl = true;
 	
 	public FrameHandler() throws InternalErrorException {
-		setMold("div");
 		setStyle("position:relative");
 		setSaveContent(true);
 		setId("frame");
@@ -73,28 +73,31 @@ public class FrameHandler extends Frame {
 	}
 	@Override
 	public void afterCompose() {
-		setUrl(getPage().getRequestPath());
-		
-		MenuParser menuParser = new MenuParser();
-		List<MenuOption> options;
-		MenuOption option = null;
-		try {
-			options = menuParser.getMenus(menu);
-			option = menuParser.findMenuOption(options, getPage());
-		} catch (Exception e) {
-		}
-		if (option != null)
-		{
-			setTitle(Labels.getLabel(option.getLabel()));
-		} else {
-			setTitle ("");
-			if (! nomenu) {
-				setVisible(false);
-				throw new SecurityException("This URL is forbidden");
+		if (getPage() != null) {
+			setUrl(getPage().getRequestPath());
+			
+			MenuParser menuParser = new MenuParser();
+			List<MenuOption> options;
+			MenuOption option = null;
+			try {
+				options = menuParser.getMenus(menu);
+				option = menuParser.findMenuOption(options, getPage());
+			} catch (Exception e) {
 			}
+			if (option != null)
+			{
+				setTitle(Labels.getLabel(option.getLabel()));
+			} else {
+				setTitle ("");
+				if (! nomenu) {
+					setVisible(false);
+					throw new SecurityException("This URL is forbidden");
+				}
+			}
+			
+			Application.registerPage(this);
+			
 		}
-
-		Application.registerPage(this);
 		super.afterCompose();
 		
 		SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
@@ -137,16 +140,20 @@ public class FrameHandler extends Frame {
 				applyFilter (sb, se);
 			}
 		}
-		if (e instanceof OrExpression) {
+		else if (e instanceof OrExpression) {
 			List<AbstractExpression> members = ((OrExpression) e).getMembers();
 			if (members.size() == 1)
 				applyFilter(sb, members.get(0));
 			else
 				throw new Exception("Or is not supported");
 		}
-		if (e instanceof NotExpression)
+		else if (e instanceof OrderByExpression) {
+			AbstractExpression ee = ((OrderByExpression)e).getExpression();
+			applyFilter(sb, ee);
+		}
+		else if (e instanceof NotExpression)
 			throw new Exception("Not is not supported");
-		if (e instanceof ComparisonExpression) {
+		else if (e instanceof ComparisonExpression) {
 			ComparisonExpression ce = (ComparisonExpression) e;
 			AttributeSearchBox att = sb.addAttribute(ce.getAttribute());
 			if (att.getQueryExpression() == null)

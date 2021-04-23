@@ -5,20 +5,25 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.au.out.AuScript;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
 
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
 
+import es.caib.zkib.component.Div;
 import es.caib.zkib.zkiblaf.Application;
+import es.caib.zkib.zkiblaf.Frameable;
 
-public class Frame extends es.caib.zkib.zkiblaf.Frame implements AfterCompose {
+public class Frame extends Div implements AfterCompose, Frameable {
 	String permissions[];
+	public boolean saveContent;
+	public boolean canClose = true;
+	
+	public Frame() {
+	}
 
 	@Override
 	public void afterCompose() {
@@ -47,6 +52,7 @@ public class Frame extends es.caib.zkib.zkiblaf.Frame implements AfterCompose {
 		if (new OtpPageHandler().needsOtp(this))
 			setVisible(false);
 	}
+	
 
 	public String[] getPermissions() {
 		return permissions;
@@ -59,4 +65,18 @@ public class Frame extends es.caib.zkib.zkiblaf.Frame implements AfterCompose {
 	public void setPermissions(String permissions) {
 		this.permissions = permissions.split(" +");
 	}
+
+	public boolean canClose(EventListener action) {
+		return canClose;
+	}
+	public void setCanClose(boolean canClose) {
+		this.canClose = canClose;
+	}
+	public boolean isSaveContent() {
+		return saveContent;
+	}
+	public void setSaveContent(boolean saveContent) {
+		this.saveContent = saveContent;
+	}
+
 }

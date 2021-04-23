@@ -131,6 +131,9 @@ public class OtpPageHandler {
 	public boolean needsOtp (Component comp) 
 	{
 		Page p = comp.getPage();
+		if (p == null)
+			return false;
+		
 		return needsOtp( comp, p.getRequestPath());
 	}
 	

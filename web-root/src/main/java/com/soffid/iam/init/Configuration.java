@@ -17,11 +17,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.tomcat.SoffidPasswordCipher;
 
 public class Configuration {
 	boolean userAlreadyExist;
 	Properties props; 
+	Log log = LogFactory.getLog(getClass());
 
 	public static Configuration instance = null;
 	
@@ -117,7 +121,7 @@ public class Configuration {
 	private void updateDriverName(String validationString) throws IOException {
 		String tomcat_home = System.getProperty("catalina.home");
 		String srcName = tomcat_home+"/conf/tomee.xml.template";
-		String targetName = tomcat_home+"/webapps/context.xml";
+		String targetName = tomcat_home+"/conf/tomee.xml";
 		
 		if (! new File(srcName).canRead())
 			srcName = tomcat_home+"/conf/tomee.xml";
@@ -128,7 +132,7 @@ public class Configuration {
 		for ( String line = reader.readLine(); line != null; line = reader.readLine()) {
 			if (line.contains("testOnBorrow"))
 				line = "    testOnBorrow = true";
-			if (line.contains("jdbcDriver"))
+			if (line.contains("validationQuery"))
 				line = "    validationQuery = "+validationString;
 			full.append(line).append("\n");
 		}
@@ -136,10 +140,6 @@ public class Configuration {
 		in.close();
 		
 		FileOutputStream out = new FileOutputStream(targetName);
-		out.write(full.toString().getBytes());
-		out.close();
-
-		out = new FileOutputStream(targetName);
 		out.write(full.toString().getBytes());
 		out.close();
 	}

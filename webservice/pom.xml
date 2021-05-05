@@ -209,5 +209,10 @@
 			<version>1.3.2</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>iam-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

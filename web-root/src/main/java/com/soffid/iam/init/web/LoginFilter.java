@@ -33,6 +33,7 @@ public class LoginFilter implements Filter {
 				}
 				else if ( req.getRequestURI().startsWith("/webservice")) {
 					resp.sendRedirect("/soffid"+req.getRequestURI()+"?"+req.getQueryString());
+					resp.setStatus(308); // Permanent redirect
 				}
 				else if ( req.getRequestURI().startsWith("/selfservice/index.zul") &&
 						req.getParameter("target") != null &&

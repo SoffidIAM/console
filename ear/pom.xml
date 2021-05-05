@@ -76,13 +76,13 @@
 					<modules>
 						<webModule>
 							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-web</artifactId>
-							<contextRoot>/soffid</contextRoot>
+							<artifactId>iam-webservice</artifactId>
+							<contextRoot>/soffid/webservice</contextRoot>
 						</webModule>
 						<webModule>
 							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-webservice</artifactId>
-							<contextRoot>/soffid/webservice</contextRoot>
+							<artifactId>iam-web</artifactId>
+							<contextRoot>/soffid</contextRoot>
 						</webModule>
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>

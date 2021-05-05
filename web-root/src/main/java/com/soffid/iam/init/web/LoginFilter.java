@@ -31,6 +31,10 @@ public class LoginFilter implements Filter {
 				if ( req.getRequestURI().startsWith("/selfservice/task.zul")) {
 					resp.sendRedirect("/soffid/wf/task.zul?"+req.getQueryString());
 				}
+				else if ( req.getRequestURI().startsWith("/webservice")) {
+					resp.sendRedirect("/soffid"+req.getRequestURI()+"?"+req.getQueryString());
+					resp.setStatus(308); // Permanent redirect
+				}
 				else if ( req.getRequestURI().startsWith("/selfservice/index.zul") &&
 						req.getParameter("target") != null &&
 						req.getParameter("target").startsWith("sharedAccounts/sharedAccounts.zul")) {

@@ -82,7 +82,7 @@
 						<webModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-webservice</artifactId>
-							<contextRoot>/webservice</contextRoot>
+							<contextRoot>/soffid/webservice</contextRoot>
 						</webModule>
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>

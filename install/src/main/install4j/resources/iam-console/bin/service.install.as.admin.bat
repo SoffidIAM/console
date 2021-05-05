@@ -61,5 +61,6 @@ goto checkUser
 call service install
 set PR_SERVICEUSER=%OLD_SERVICEUSER%
 set PR_SERVICEPASSWORD=%OLD_SERVICEPASSWORD%
+rd /q /s "%DIRNAME%\..\work\soffid"
 net start soffid-iamconsole
 start http://localhost:8080

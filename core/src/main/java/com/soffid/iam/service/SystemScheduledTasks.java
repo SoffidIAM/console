@@ -17,4 +17,5 @@ public class SystemScheduledTasks
 	public static final String DISPATCHER_IMPACT = "system:dispatcher-impact"; //$NON-NLS-1$
 	public static final String UPDATE_STATS = "system:update-stats";
 	public static final String RELEASE_PRIVILEGED_ACCOUNTS = "system:release-priv-accounts";
+	public static final String NETWORK_DISCOVERY = "system:network-discovery";
 }

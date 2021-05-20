@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<div xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
+	id="frame" 
+	use="com.soffid.iam.web.task.ScheduledTaskHandler" 
+	mold="default"
+	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />
+	<form2 dataPath="." width="100%" onChangeXPath="ref:frame.onChangeForm" id="form">
+		<div sclass="section">
+			<customfield3 label="${c:l('scheduledTask.schedule') }" dataType="SEPARATOR"/>
+			<customfield3 label="${c:l('jobadmin.enable')}" readonly="${! soffid:isUserInRole('schedule:admin') }" bind="enabled" dataType="BOOLEAN" maxlength="12"/>
+			<customfield3 label="${c:l('jobadmin.task')}" readonly="true" bind="@name" dataType="STRING"/>
+			<customfield3 label="${c:l('jobadmin.month')}" bind="monthsPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+			<customfield3 label="${c:l('jobadmin.day')}" bind="dayPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+			<customfield3 label="${c:l('jobadmin.hour')}" bind="hoursPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+			<customfield3 label="${c:l('jobadmin.minute')}" bind="minutesPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+			<customfield3 label="${c:l('jobadmin.dayOfWeek')}" bind="dayOfWeekPattern" dataType="STRING" maxlength="20" required="true" readonly="${! soffid:isUserInRole('schedule:admin') }" />
+			<customfield3 label="${c:l('jobadmin.server')}" bind="serverName" dataType="STRING" maxlength="20"  disabled="${! soffid:isUserInRole('schedule:admin') }" uiHandler="com.soffid.iam.web.task.ServerSelector" required="true"/>
+		</div>
+		<div sclass="section">
+			<customfield3 label="${c:l('scheduledTask.currentExecution') }" dataType="SEPARATOR"/>
+			<button label="${c:l('scheduledTask.startNow') }" image="/img/play-r.svg"  id="status-stopped"
+				onClick="ref:frame.start"/>
+			<div id="status-running">
+				<imageclic src="/img/wait.gif"/>
+				<label sclass="black label" value="${c:l('scheduledTask.running') }"></label> 
+			</div>
+		</div>
+		<div sclass="section" id="logSection">
+			<customfield3 label="${c:l('scheduledTask.lastExecution') }" dataType="SEPARATOR"/>
+			<div id="warning">
+				<label sclass="label" value="${c:l('accounts.status') }:"></label>
+				<imageclic src="/img/warning.svg">
+				</imageclic>
+				<label value="${c:l('aplica_rolinfo.Error2') }" sclass="label"/>
+			</div>
+			<customfield3 label="${c:l('llistaRegistreAccesUsuari.zul.Datainici')}" bind="lastExecution" dataType="DATE_TIME" readonly="true"/>
+			<customfield3 label="${c:l('llistaRegistreAccesUsuari.zul.Datafi')}" bind="lastEnd" dataType="DATE_TIME" readonly="true"/>
+			<databox label="${c:l('scheduledTask.executionLog')}:" id="log" type="STRING" multiline="true" readonly="true" disabled="true"
+				onOpen="ref:frame.downloadLog"
+				sclass="databox fixedtext"/>
+		</div>
+		<div sclass="section" id="logsSection">
+			<customfield3 label="${c:l('scheduledTask.proviousExecution') }" dataType="SEPARATOR"/>
+			<datatable dataPath="logs" id="logs" onDownloadLog="ref:frame.downloadOtherLog" enablefilter="false">
+			<attribute name="columns"><![CDATA[
+	- name: ${c:l('llistaRegistreAccesUsuari.zul.Datainici') }
+	  value: time
+	  template: #{time_datetime}
+	  className: datatimeColumn
+	- name: ${c:l('jobadmin.status') }
+	  template: <img class="small-icon" src="${execution.contextPath }/img/#{error ? 'warning.svg': 'ok.svg'}">
+	  value: error
+	  className: statusColumn
+	- name: ${c:l('scheduledTask.executionLog') }
+	  template: <img class="imageclic" title="${c:l('scheduledTask.downloadLog') }" src="${execution.contextPath }/img/download.svg" onClick='zkDatatable.sendClientAction(this,"onDownloadLog")'>
+	  className: statusColumn
+		  				]]></attribute>
+			</datatable>
+		</div>				
+		<div style="text-align: right; width: 100%">
+			<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo"/>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+		</div>
+	</form2>
+</div>

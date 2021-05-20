@@ -128,6 +128,19 @@
 									<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
 										objectType="com.soffid.iam.api.Account"
 										dataPath="/." id="userAttributes"/>
+									<div sclass="section" id="servicesSection">
+										<customfield3 sclass="databox separator" type="SEPARATOR" label="${c:l('seu.serveis') }" />
+										<datatable dataPath="../services" enablefilter="false" style="margin-left: 200px">
+										<attribute name="columns">
+										<![CDATA[
+- name: ${c:l('auditoria.zul.maquina') }
+  value: hostName
+- name: ${c:l('account.serviceName') }
+  value: service
+										]]>
+										</attribute>
+										</datatable>
+									</div>
 									<div style="text-align: right; width: 100%">
 										<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 										</databutton>

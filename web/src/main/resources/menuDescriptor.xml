@@ -29,7 +29,11 @@
 		</finder>
 	</datanode>
 
-	<datanode name="app">
+	<datanode name="app" parentProperty="parentId" childProperty="app" idProperty="id">
+		<ejb-parent-loader jndi="java:/module/EntryPointService-v2" 
+			method="findApplicationAccessById">
+			<parameter value="${instance.parentId}"/>
+		</ejb-parent-loader>
 		<finder name="app" type="app">  <!-- intranetMenus:query -->
 			<ejb-finder jndi="java:/module/EntryPointService-v2"
 				method="findChildren">

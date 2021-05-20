@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.ServerEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.XarxaEntity;
 
@@ -44,4 +45,9 @@ public class Xarxa {
 	@Nullable
 	public java.lang.Boolean loginRestriction;
 
+	@Nullable
+	Boolean discovery;
+
+	@Nullable
+	String discoveryServer;
 }

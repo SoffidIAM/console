@@ -57,6 +57,14 @@ public abstract class XarxaEntity {
 	@Column (name="XAR_LOGREC")
 	@Nullable
 	public java.lang.Boolean loginRestriction;
+	
+	@Column (name="XAR_DISCOV")
+	@Nullable
+	Boolean discovery;
+
+	@Column (name="XAR_SER_ID", reverseAttribute = "networks")
+	@Nullable
+	ServerEntity discoveryServer;
 
 	@Operation (translated="findByName")
 	@DaoFinder

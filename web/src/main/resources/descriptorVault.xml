@@ -47,7 +47,7 @@
 		<finder name="role" type="role" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
 				method="findRoleAccountByAccount"
-				if="${instance.type='account'}">
+				if="${instance.type=='account'}">
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.RoleAccount"> 
@@ -56,11 +56,19 @@
 		<finder name="effectiveRole" type="effectiveRole" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
 				method="findRoleGrantHierarchyByAccount" 
-				if="${instance.type='account'}">
+				if="${instance.type=='account'}">
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 		</finder>
 		
+		<finder name="services" type ="service">
+			<ejb-finder jndi="java:/module/AccountService-v2"
+				method="findAccountServices"
+				if="${instance.type=='account'}">
+				<parameter value="${instance.account}"/>
+			</ejb-finder>
+		</finder>
+
 	</datanode>
 
 	<datanode name="folder2">
@@ -92,6 +100,9 @@
 				<parameter value="${instance.holderGroup}" />
 			</ejb-finder>
 		</finder>
+	</datanode>
+	
+	<datanode name="service" transient="true">
 	</datanode>
 	
 	<datanode name="tipusUsuari">

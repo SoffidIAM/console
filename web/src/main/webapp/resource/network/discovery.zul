@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="group"?>
+<?component name="scheduled_task" macro-uri="scheduled-task.zul"?>
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.discovery.DiscoveryHandler" id="frame">
+	<datamodel id="model" rootNode="root" src="networkDiscoveryDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			</div>
+			<timer delay="300" repeats="true" running="true" onTimer="ref:frame.updateTree"/>
+			<datatree2 id="listbox"
+				width="100%" dataPath="/model:/"
+				header="${c:l('com.soffid.iam.api.Group.name') }" 
+				openLevels="1"
+				enablefilter="true"
+				maxheight="70vh"
+				onOpenAccounts="ref:frame.openAccounts"
+				onOpenSystem="ref:frame.openSystem"
+				onAddSystem="ref:frame.addSystem"
+				onAddEntryPoint="ref:frame.addEntryPoint"
+				onSelect="ref:frame.showDetails">
+				<attribute name="finders">
+				<![CDATA[
+				- path: /network
+				  icon: /img/network.svg
+				  value: name
+				  leaf: false
+				- path: /host
+				  icon: #{os == "NTS" ? "/img/windows.svg" : os == "LIN" ? "/img/linux.svg" : "/img/host.svg"}
+				  value: name
+				  leaf: false
+				- path: /serviceHolder
+				  value: instance[2]
+				  leaf: false
+				- path: /service
+				  template: >-
+				    #{service}: <a href="${execution.contextPath }/resource/account/account.zul?name=#{accountName}&system=#{accountSystem}" target="_blank">
+				    #{accountName} </a>
+				  leaf: true
+				- path: /system
+				  template: >-
+				    #{name} 
+				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenSystem')">${c:l('discovery.agent')}</button> 
+				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenAccounts')">${c:l('seu.accounts')}</button>
+				  leaf: true
+				- path: /dispatcherHolder
+				  value: instance[2]
+				  leaf: false
+				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddSystem')">${c:l('agents.zul.Afegeixnou')}</button>
+				- path: /entryPointHolder
+				  value: instance[2]
+				  leaf: false
+				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddEntryPoint')">${c:l('agents.zul.Afegeixnou')}</button>
+				- path: /entryPoint
+				  template: >-
+				    <a href="${execution.contextPath }/resource/menu/menu.zul?filter=id eq #{id}" target="_blank">
+				    #{name}</a> 
+				  leaf: true
+				  ]]>
+  				</attribute>
+  			</datatree2>
+
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatree2="listbox"/>
+				
+				<menu2>
+					<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+				</menu2>
+				
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
+			</div>
+			<form2 id="form" onChangeXPath="ref:frame.onChangeForm"
+					dataPath="/listbox:/." width="100%">
+				<div id="networkDiv">
+					<customfield3
+						label="${c:l('com.soffid.iam.api.Network.name') }"
+						dataType="string"
+						readonly="true" disabled="true"
+						bind="name"
+						maxlength="10"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.Network.description') }"
+						dataType="string"
+						readonly="true"
+						bind="description"
+						maxlength="50"/>
+					<customfield3
+						use="com.soffid.iam.web.network.IpField"
+						label="${c:l('com.soffid.iam.api.Network.ip') }"
+						dataType="string"
+						readonly="true"
+						bind="ip"
+						maxlength="50"/>
+					<customfield3
+						use="com.soffid.iam.web.network.MaskField"
+						label="${c:l('com.soffid.iam.api.Network.mask') }"
+						dataType="string"
+						readonly="true"
+						bind="mask"
+						maxlength="50"/>
+					<div id="taskdiv">
+						<customfield3
+							use="com.soffid.iam.web.network.DiscoveryServerField"
+							label="${c:l('agents.zul.Server') }"
+							dataType="string"
+							readonly="false"
+							bind="discoveryServer"
+							onChange="ref:frame.onChangeServer"
+							maxlength="50"/>
+						<label style="width: 192px; float: left" sclass="label" value="${c:l('discovery.credentialsProbe') }: "></label>
+						<datatable style="width: calc( 100% - 200 px);" dataPath="account" multiselect="true"
+							id="networkAccounts"
+							onSelect="ref:frame.multiSelect"
+							enablefilter="false"
+							onMultiSelect="ref:frame.multiSelect"
+							>
+							<attribute name="columns"><![CDATA[
+							- name: ${c:l('com.soffid.iam.api.Account.loginName') }
+							  value: loginName
+							]]></attribute>
+							</datatable>
+						<div style="width: calc( 100% - 200 px); margin-left: 192px; text-align: right"  if="${soffid:isUserInRole('network:all:create')}" >
+							<div class="deleteButton" onClick="ref:frame.deleteAccount" visible="false" id="deleteAccountButton">-</div>
+							<div class="addButton" onClick="ref:frame.addAccount">+</div>
+						</div>
+					</div>
+					<datadiv dataPath="task">
+						<scheduled_task id="scheduledTaskDiv" />
+					</datadiv>
+					<div id="notaskdiv">
+						<div>
+							<label value="${c:l('discovery.networkIsDisabled') }"/>
+						</div>
+						<button label="${c:l('discovery.enableNetwork') }" onClick="ref:frame.enableNetwork"/>
+					</div>
+				</div>
+				<div id="hostDiv">
+					<standardfield3 bind="name" attribute="com.soffid.iam.api.Host.name" readonly="true"/>
+					<standardfield3 bind="ip" attribute="com.soffid.iam.api.Host.ip" readonly="true"/>
+					<standardfield3 bind="description" attribute="com.soffid.iam.api.Host.description"/>
+					<standardfield3 bind="os" attribute="com.soffid.iam.api.Host.os"/>
+					<datatable dataPath="port">
+					<attribute name="columns"><![CDATA[
+- name: ${c:l('maquines.zul.Port')}
+  value: port
+- name: ${c:l('maquines.zul.OSDesc')}
+  value: description
+					]]></attribute>
+					</datatable>
+				</div>
+			</form2>
+		</div>
+	</div>
+
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add_system"
+		position="top, center" sizable="true"
+		title="${c:l('user-groups.new')}" visible="false"
+		style="width: 80%; max-width: 800px">
+	
+		<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("discovery.selectSystemType")}
+	- ${c:l("discovery.selectExistingSystem")}
+	- ${c:l("discovery.enterCredentials")}
+	- ${c:l("user-account-new.Finish")}
+			</attribute>
+			<div id="step1">
+
+				<customfield3 dataType="STRING" id="type"
+					label="${c:l('discovery.selectSystemType') }"
+					required="true">
+				</customfield3>		
+			
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.undoAdd" />
+					<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onClick="ref:frame.setSystemCredentials"/>
+				</div>
+						
+			</div>
+			<div>
+				<datamodel id="model" rootNode="root" src="descriptorFinder.xml"/>
+
+				<searchbox auto="true" id="searchBox" 
+						jsonObject="com.soffid.iam.api.System"
+						defaultAttributes="name, description"
+						preference="system-query"
+						dataPath="/add_system/model:/objects" 
+						style="width: calc(100% - 32px)"
+						variableName="query" variableNameText="textQuery"/>
+						
+				<datatable id="listbox" autocommit="true" 
+		 			use="com.soffid.iam.web.agent.AgentsTable"
+					dataPath="/add_system/model:/objects" maxheight="50vh" sortColumn="0"
+					enablefilter="false">
+						<attribute name="columns"><![CDATA[
+		- name: ${c:l('agents.zul.Codi')} 
+		  value: name 
+		- name: ${c:l('parametres.zul.Descripcia-2')}
+		  value: description 
+		- name: ${c:l('agents.zul.Classe-2')} 
+		  value: className 
+		- name: ${c:l('agents.zul.Url-2')}
+		  value: url ]]>
+						</attribute>
+				</datatable>
+	
+				
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.back" />
+					<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onClick="ref:frame.linkSystem"/>
+				</div>
+						
+			</div>
+			<div>
+				<customfield3 dataType="STRING" id="loginName"
+					label="${c:l('com.soffid.iam.api.Account.loginName') }"
+					required="true">
+				</customfield3>		
+
+				<customfield3 dataType="PASSWORD" id="password"
+					label="${c:l('accounts.setPassword.label') }"
+					required="true">
+				</customfield3>		
+
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+						onClick="ref:frame.back" />
+					<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+						onClick="ref:frame.applyAddSystem"/>
+				</div>
+			</div>
+		</wizard>
+	</window>
+
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add_account"
+		position="top, center" sizable="true"
+		title="${c:l('discovery.addAccount')}" visible="false"
+		style="width: 80%; max-width: 800px">
+
+		<radiogroup id="radio">
+			<radio id="radio_new_account" label="${c:l('discovery.newAccount') }" onCheck="ref:frame.setNewAccount"></radio>
+			<radio id="radio_existing_account" label="${c:l('discovery.existingAccount') }" onCheck="ref:frame.setExistingAccount"></radio>
+		</radiogroup>	
+
+		<div id="div_new_account">
+			<standardfield3 id="new_account" attribute="com.soffid.iam.api.Account.loginName" required="true"/>
+			<customfield3 id="new_password" dataType="PASSWORD" label="${c:l('accounts.setPassword.label') }" required="true"/>
+		</div>		
+		
+		<div id="div_existing_account">
+			<customfield3 id="existing_account" dataType="ACCOUNT" label="${c:l('accounts.setPassword.label') }" required="true"
+				filterExpression="secrets pr and not type eq U"/>
+		</div>		
+
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+				onClick="ref:frame.closeWindow" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:frame.applyAddAccount"/>
+		</div>
+	</window>
+	
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add_entrypoint"
+		position="top, center" sizable="true"
+		title="${c:l('discovery.addAccount')}" visible="false"
+		style="width: 80%; max-width: 800px">
+
+		<customfield3 id="type" dataType="STRING" label="${c:l('discovery.entryPointType') }" required="true"/>
+
+		<label sclass="label" style="float: left" value="${c:l('aplica_permisosRol.zul.entryPoint') } :"/>
+		<datatree2 id="listbox"
+			style="margin-left: 200px; width: 100%; width: calc( 100% - 200px )"
+			dataPath="/model:/"
+			header="${c:l('discovery.selectEntryPointType') }" 
+			openLevels="1"
+			enablefilter="false"
+			maxheight="70vh">
+			<attribute name="finders">
+			<![CDATA[
+			- path: /app
+			  icon: /img/container-green.svg 
+			  value: name
+			  ]]>
+ 				</attribute>
+ 			</datatree2>
+
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+				onClick="ref:frame.closeWindow" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:frame.applyAddEntryPoint"/>
+		</div>
+	</window>
+
+</frame>

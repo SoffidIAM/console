@@ -33,6 +33,12 @@
 				<parameter value="${instance.id}"/>
 			</ejb-finder>
 		</finder>
+		<finder name="services" type ="service">
+			<ejb-finder jndi="java:/module/AccountService-v2"
+				method="findAccountServices">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
 		<script-handler>
 			<update-script>
 				as = com.soffid.iam.EJBLocator.getAccountService();
@@ -77,6 +83,9 @@
 	</datanode>
 	
 	<datanode name="tipusUsuari">
+	</datanode>
+	
+	<datanode name="service" transient="true">
 	</datanode>
 	
 

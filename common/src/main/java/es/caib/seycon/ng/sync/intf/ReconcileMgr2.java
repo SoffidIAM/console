@@ -6,6 +6,8 @@ package es.caib.seycon.ng.sync.intf;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import com.soffid.iam.api.HostService;
+
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
@@ -114,4 +116,7 @@ public interface ReconcileMgr2 extends java.rmi.Remote
 	public List<String[]> getAccountChangesToApply (Account account) throws RemoteException, InternalErrorException;
 
 	public List<String[]> getRoleChangesToApply (Rol role) throws RemoteException, InternalErrorException;
+
+	public List<HostService> getHostServices() throws RemoteException, InternalErrorException;
+
 }

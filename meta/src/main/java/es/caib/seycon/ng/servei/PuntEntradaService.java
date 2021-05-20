@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.model.EntryPointAccountEntity;
+import com.soffid.iam.model.HostEntryPointEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -44,7 +45,8 @@ import roles.Tothom;
 	EntryPointAccountEntity.class,
 	AccountEntity.class,
 	XarxaService.class,
-	es.caib.seycon.ng.servei.UsuariService.class})
+	es.caib.seycon.ng.servei.UsuariService.class,
+	HostEntryPointEntity.class})
 public abstract class PuntEntradaService {
 
 	@Operation(translated="create")

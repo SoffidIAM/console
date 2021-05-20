@@ -78,6 +78,10 @@
           url: /resource/menu/menu.zul
           img: /img/menu/launcher-editor.svg
           permissions: ["seu:menusIntranet:show"]
+        - name: seu.networkDiscovery
+          url: /resource/network/discovery.zul
+          permissions: ["seu:networkDiscovery:show"]
+          img: /img/menu/network-discovery.svg
         - name: seu.vault
           url: /resource/account/vault.zul
           permissions: ["sso:manageAccounts"]

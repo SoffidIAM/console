@@ -15,6 +15,7 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AdministratorAuthorizationToAccessHost;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
@@ -33,11 +34,14 @@ import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.EntryPointEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostAdminEntity;
 import com.soffid.iam.model.HostAliasEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.HostEntityDao;
+import com.soffid.iam.model.HostEntryPointEntity;
+import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.NetworkEntityDao;
@@ -46,6 +50,7 @@ import com.soffid.iam.model.OsTypeEntityDao;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SessionEntity;
+import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
@@ -408,9 +413,31 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		// Check associated printers
         		if (getPrinterService().findPrintersByFilter(null, null, null, maquina.getName()).isEmpty())
         		{
-        			getHostEntityDao().remove(getHostEntityDao().hostToEntity(maquina));
+        			HostEntity entity = getHostEntityDao().load(maquina.getId());
+        			for (HostEntryPointEntity hep: entity.getEntryPoints()) {
+        				EntryPointEntity ep = hep.getEntryPoint();
+						ep.getHosts().remove(hep);
+        				getHostEntryPointEntityDao().remove(hep);
+        				if (ep.getHosts().isEmpty()) {
+	        				AccessTree at = getEntryPointEntityDao().toAccessTree(ep);
+	        				getEntryPointService().delete(at);
+        				}
+        			}
+        			entity.getEntryPoints().clear();
+        			for (HostSystemEntity hse: entity.getSystems()) {
+        				SystemEntity se = hse.getSystem();
+        				se.getHosts().remove(hse);
+        				getHostSystemEntityDao().remove(hse);
+        				if (se.getHosts().isEmpty()) {
+	        				System s = getSystemEntityDao().toSystem(se);
+	        				s.setUrl(null);
+	        				s.setUrl2(null);
+	        				getDispatcherService().update(s);
+        				}
+        			}
+        			entity.getSystems().clear();
+        			getHostEntityDao().remove(entity);
         		}
-        		
         		else
         		{
         			throw new InternalErrorException(

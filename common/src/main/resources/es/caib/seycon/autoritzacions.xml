@@ -1731,4 +1731,22 @@
 		<ambit>SelfService</ambit>
 	</autoritzacio>
 
+	<autoritzacio>
+		<codi>seu:networkDiscovery:show</codi>
+		<descripcio>Network discovery tool</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>networkDiscovery:query</codi>
+		<descripcio>Query network discovery results</descripcio>
+		<ambit>NetworkDiscovery</ambit>
+	</autoritzacio>
+	
+	<autoritzacio>
+		<codi>networkDiscovery:schedule</codi>
+		<descripcio>Start network discovery</descripcio>
+		<ambit>NetworkDiscovery</ambit>
+	</autoritzacio>
+	
 </autoritzacions>

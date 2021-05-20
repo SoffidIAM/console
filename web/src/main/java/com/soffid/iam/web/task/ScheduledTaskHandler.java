@@ -32,8 +32,10 @@ import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.bpm.exception.BPMException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Databox;
+import es.caib.zkib.component.Form2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
@@ -59,60 +61,64 @@ public class ScheduledTaskHandler extends FrameHandler {
 	}
 
 	public void onChangeForm(Event event) throws Exception {
-		DataTable dt = (DataTable) getListbox();
-		if (dt.getSelectedIndex() >= 0) {
-			Calendar last = (Calendar) XPathUtils.eval(getForm(), "lastEnd");
-			Boolean active = (Boolean) XPathUtils.eval(getForm(), "active");
-			Boolean error = (Boolean) XPathUtils.eval(getForm(), "error");
-			String ref = (String) XPathUtils.eval(getForm(), "logReferenceID");
-			List<ScheduledTaskLog> logs = (List<ScheduledTaskLog>) XPathUtils.eval(getForm(), "logs");
-			
-			getFellow("status-running").setVisible(Boolean.TRUE.equals(active));
-			getFellow("status-stopped").setVisible(!Boolean.TRUE.equals(active));
-			getFellow("warning").setVisible(Boolean.TRUE.equals(error));
-
-			getFellow("logsSection").setVisible(logs != null && !logs.isEmpty());
-			dt.sendEvent(new XPathRerunEvent(dt, "/logs"));
-			
-			if (last == null || Boolean.TRUE.equals(active))
-				getFellow("logSection").setVisible(false);
-			else {
-				getFellow("logSection").setVisible(true);
-				Databox logField = (Databox) getFellow("log");
-				if (last == null || ref == null)
-				{
-					logField.setVisible(false);
-				} else {
-					logField.setVisible(true);
-					com.soffid.iam.doc.service.ejb.DocumentService doc = es.caib.seycon.ng.EJBLocator.getDocumentService();
-					doc.openDocument(new com.soffid.iam.doc.api.DocumentReference(ref));
-					java.io.InputStream in = new com.soffid.iam.doc.api.DocumentInputStream(doc);
-					InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-					int lines = 0;
-					int ch;
-					StringBuffer sb = new StringBuffer();
-					for (ch = reader.read(); ch >= 0 && lines < 10; ch = reader.read()) {
-						sb.append((char) ch);
-						if (ch == '\n') lines ++;
-					}
-					reader.close();
-					in.close();
-					if (ch >= 0) {
-						logField.setSelectIcon("/img/download.svg");
-						logField.setSelectIcon2("/img/download-white.svg");
-						logField.setForceSelectIcon(true);
-						sb.append("...");
-					} else {
-						logField.setSelectIcon(null);
-						logField.setSelectIcon2(null);
-						logField.setForceSelectIcon(false);
-					}
-					logField.setValue(sb.toString());
-					logField.invalidate();
-				}
-			}
-			updateStatus(event);
+		BindContext ctx = getForm();
+		try {
+			XPathUtils.eval(ctx, "instance");
+		} catch (Exception e) {
+			return;
 		}
+		Calendar last = (Calendar) XPathUtils.eval(getForm(), "lastEnd");
+		Boolean active = (Boolean) XPathUtils.eval(getForm(), "active");
+		Boolean error = (Boolean) XPathUtils.eval(getForm(), "error");
+		String ref = (String) XPathUtils.eval(getForm(), "logReferenceID");
+		List<ScheduledTaskLog> logs = (List<ScheduledTaskLog>) XPathUtils.eval(getForm(), "logs");
+		
+		getFellow("status-running").setVisible(Boolean.TRUE.equals(active));
+		getFellow("status-stopped").setVisible(!Boolean.TRUE.equals(active));
+		getFellow("warning").setVisible(Boolean.TRUE.equals(error));
+
+		getFellow("logsSection").setVisible(logs != null && !logs.isEmpty());
+		
+		ctx.getDataSource().sendEvent(new XPathRerunEvent(ctx.getDataSource(), ctx.getXPath()+"/logs"));
+		
+		if (last == null || Boolean.TRUE.equals(active))
+			getFellow("logSection").setVisible(false);
+		else {
+			getFellow("logSection").setVisible(true);
+			Databox logField = (Databox) getFellow("log");
+			if (last == null || ref == null)
+			{
+				logField.setVisible(false);
+			} else {
+				logField.setVisible(true);
+				com.soffid.iam.doc.service.ejb.DocumentService doc = es.caib.seycon.ng.EJBLocator.getDocumentService();
+				doc.openDocument(new com.soffid.iam.doc.api.DocumentReference(ref));
+				java.io.InputStream in = new com.soffid.iam.doc.api.DocumentInputStream(doc);
+				InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+				int lines = 0;
+				int ch;
+				StringBuffer sb = new StringBuffer();
+				for (ch = reader.read(); ch >= 0 && lines < 10; ch = reader.read()) {
+					sb.append((char) ch);
+					if (ch == '\n') lines ++;
+				}
+				reader.close();
+				in.close();
+				if (ch >= 0) {
+					logField.setSelectIcon("/img/download.svg");
+					logField.setSelectIcon2("/img/download-white.svg");
+					logField.setForceSelectIcon(true);
+					sb.append("...");
+				} else {
+					logField.setSelectIcon(null);
+					logField.setSelectIcon2(null);
+					logField.setForceSelectIcon(false);
+				}
+				logField.setValue(sb.toString());
+				logField.invalidate();
+			}
+		}
+		updateStatus(event);
 	}
 	
 	public void downloadLog(Event event) throws IllegalArgumentException, InternalErrorException, DocumentBeanException, NamingException, CreateException {
@@ -127,32 +133,36 @@ public class ScheduledTaskHandler extends FrameHandler {
 	}
 
 	public void updateStatus(Event event) {
-		DataTable dt = (DataTable) getListbox();
-		if (dt.getSelectedIndex() >= 0) {
-			Long taskId = (Long) dt.getJXPathContext().getValue("@id");
-			if (taskId != null) {
-				ScheduledTask task;
-				try {
-					task = EJBLocator.getScheduledTaskService().load(taskId);
-					Object lastExecution = dt.getJXPathContext().getValue("lastExecution");
-					Object lastEnd = dt.getJXPathContext().getValue("lastEnd");
-					if ((lastExecution == null ? 
-							task.getLastExecution() != null :
-							!lastExecution.equals(task.getLastExecution())) ||
-						(lastEnd == null ?
-							task.getLastEnd() != null:
-							!lastEnd.equals(task.getLastEnd())))
-					{
-						XPathUtils.setValue(dt, "lastEnd", task.getLastEnd());
-						XPathUtils.setValue(dt, "error", task.isError());
-						XPathUtils.setValue(dt, "active", task.isActive());
-						XPathUtils.setValue(dt, "lastExecution", task.getLastExecution());
-						XPathUtils.setValue(dt, "logReferenceID", task.getLogReferenceID());
-						XPathUtils.setValue(dt, "logs", task.getLogs());
-						onChangeForm(event);
-					}
-				} catch (Exception e) {
+		BindContext ctx = getForm();
+		try {
+			XPathUtils.eval(ctx, "instance");
+		} catch (Exception e) {
+			return;
+		}
+		
+		Long taskId = (Long) XPathUtils.eval(ctx, "@id");
+		if (taskId != null) {
+			ScheduledTask task;
+			try {
+				task = EJBLocator.getScheduledTaskService().load(taskId);
+				Object lastExecution = XPathUtils.eval(ctx, "lastExecution");
+				Object lastEnd = XPathUtils.eval(ctx, "lastEnd");
+				if ((lastExecution == null ? 
+						task.getLastExecution() != null :
+						!lastExecution.equals(task.getLastExecution())) ||
+					(lastEnd == null ?
+						task.getLastEnd() != null:
+						!lastEnd.equals(task.getLastEnd())))
+				{
+					XPathUtils.setValue(ctx, "lastEnd", task.getLastEnd());
+					XPathUtils.setValue(ctx, "error", task.isError());
+					XPathUtils.setValue(ctx, "active", task.isActive());
+					XPathUtils.setValue(ctx, "lastExecution", task.getLastExecution());
+					XPathUtils.setValue(ctx, "logReferenceID", task.getLogReferenceID());
+					XPathUtils.setValue(ctx, "logs", task.getLogs());
+					onChangeForm(event);
 				}
+			} catch (Exception e) {
 			}
 		}
 	}

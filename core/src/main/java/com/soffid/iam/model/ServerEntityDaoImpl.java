@@ -78,6 +78,10 @@ public class ServerEntityDaoImpl
 			te.setServer(null);
 			getScheduledTaskEntityDao().update(te);
 		}
+		for (NetworkEntity n: entity.getNetworks()) {
+			n.setDiscoveryServer(null);
+			getNetworkEntityDao().update(n);
+		}
 		super.remove(entity);
 	}
 

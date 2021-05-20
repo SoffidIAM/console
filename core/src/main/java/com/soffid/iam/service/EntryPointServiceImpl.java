@@ -423,8 +423,9 @@ public class EntryPointServiceImpl extends
 
 		// Actualiztem l'arbre del pare (reordenació de nodes i esborrat del pue
 		// actual)
-		if (arbreEsborrar != null)
+		if (arbreEsborrar != null) {
 			getEntryPointTreeEntityDao().remove(arbreEsborrar);
+		}
 		getEntryPointTreeEntityDao().update(arbrePare);
 
 		if (!enlazado) {
@@ -465,6 +466,9 @@ public class EntryPointServiceImpl extends
 				entity.setIcon2(null);
 			}
 
+			getHostEntryPointEntityDao().remove(entity.getHosts());
+			entity.getHosts().clear();
+			
 			getEntryPointEntityDao().remove(entity);
 			auditarPuntEntrada(
 					"D", "Esborrat punt d\'entrada \'" + entity.getName() + "\'"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -2432,6 +2436,9 @@ public class EntryPointServiceImpl extends
 			throws Exception {
 		EntryPointEntity pueEntity = getEntryPointEntityDao().load(id);
 		AccessTree pue = getEntryPointEntityDao().toAccessTree(pueEntity);
+		for (EntryPointTreeEntity p: pueEntity.getParentEntryPointTree()) {
+			pue.setParentId(p.getParent().getId());
+		}
 
 		if (canView(pue))
 			return pue;
@@ -2556,7 +2563,12 @@ public class EntryPointServiceImpl extends
 		h.setConfig(config);
 		h.setTenantFilter("tenant.id");
 		h.setGenerator((entity) -> {
-			return dao.toAccessTree((EntryPointEntity) entity);
+			EntryPointEntity source = (EntryPointEntity) entity;
+			AccessTree target = dao.toAccessTree(source);
+			for (EntryPointTreeEntity p: source.getParentEntryPointTree()) {
+				target.setParentId(p.getParent().getId());
+			}
+			return target;
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
 	}

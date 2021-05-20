@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.PagedResult;
+import com.soffid.iam.model.HostEntryPointEntity;
+import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -18,6 +20,8 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Xarxa;
+import es.caib.seycon.ng.model.DispatcherEntity;
+import es.caib.seycon.ng.model.PuntEntradaEntity;
 import roles.Tothom;
 
 @Service (translatedName="NetworkService",
@@ -37,7 +41,13 @@ import roles.Tothom;
 	es.caib.seycon.ng.model.OsTypeEntity.class,
 	es.caib.seycon.ng.servei.ImpressoraService.class,
 	es.caib.seycon.ng.model.XarxaEntity.class,
-	es.caib.seycon.ng.model.XarxaACEntity.class, 
+	es.caib.seycon.ng.model.XarxaACEntity.class,
+	HostEntryPointEntity.class,
+	HostSystemEntity.class,
+	PuntEntradaService.class,
+	DispatcherService.class,
+	PuntEntradaEntity.class,
+	DispatcherEntity.class,
 	AsyncRunnerService.class})
 public abstract class XarxaService {
 
@@ -528,7 +538,9 @@ public abstract class XarxaService {
 	}
 	@Operation ( grantees={roles.Tothom.class},
 			translated="registerDynamicIP")
-	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED ,rollbackForClassName={"java.lang.Exception"},noRollbackForClassName={"es.caib.seycon.ng.exception.UnknownNetworkException","es.caib.seycon.ng.exception.UnknownHostException"})
+	@Transactional(propagation=org.springframework.transaction.annotation.Propagation.REQUIRED ,
+		rollbackForClassName={"java.lang.Exception"},
+		noRollbackForClassName={"es.caib.seycon.ng.exception.UnknownNetworkException","es.caib.seycon.ng.exception.UnknownHostException"})
 	public es.caib.seycon.ng.comu.Maquina registerDynamicIP(
 		java.lang.String nomMaquina, 
 		java.lang.String ip, 

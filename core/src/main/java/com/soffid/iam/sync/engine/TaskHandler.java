@@ -99,6 +99,7 @@ public class TaskHandler
     public static final String NOTIFY_PASSWORD_CHANGE = "NotifyChangePassword"; //$NON-NLS-1$
     public static final String UPDATE_OBJECT = "UpdateObject"; //$NON-NLS-1$
     public static final String DELETE_OBJECT = "DeleteObject"; //$NON-NLS-1$
+    public static final String UPDATE_SERVICE_PASSWORD = "UpdateServicePassword"; //$NON-NLS-1$
     
 	public Group getGroup() {
 		return grup;

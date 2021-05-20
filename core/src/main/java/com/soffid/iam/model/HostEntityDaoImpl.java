@@ -247,6 +247,12 @@ public class HostEntityDaoImpl extends
     public void remove(com.soffid.iam.model.HostEntity maquinaEntity) throws RuntimeException {
         try {
             String nomMaquina = maquinaEntity.getName();
+            getHostEntryPointEntityDao().remove(maquinaEntity.getEntryPoints());
+            getHostAliasEntityDao().remove(maquinaEntity.getHostAlias());
+            getHostAdminEntityDao().remove(maquinaEntity.getAdministratorAuthorizationAccess());
+            getHostPortEntityDao().remove(maquinaEntity.getPorts());
+            getHostServiceEntityDao().remove(maquinaEntity.getServices());
+            getHostSystemEntityDao().remove(maquinaEntity.getSystems());
             super.remove(maquinaEntity);
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));

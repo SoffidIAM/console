@@ -12,9 +12,11 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.HostServiceEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -70,7 +72,8 @@ import roles.account_query;
 	AttributeValidationService.class,
 	VaultFolderEntity.class,
 	JumpServerGroupEntity.class,
-	PamSecurityHandlerService.class})
+	PamSecurityHandlerService.class,
+	HostServiceEntity.class})
 public abstract class AccountService {
 
 	/// listUserAccounts
@@ -618,5 +621,8 @@ public abstract class AccountService {
 	public PasswordValidation checkPasswordSynchronizationStatus(Account account) throws InternalErrorException {
 		return null;
 	}
+	
+	@Operation(grantees= {roles.account_query.class} )
+	public Collection<HostService> findAccountServices(Account account) { return null; }
 
 }

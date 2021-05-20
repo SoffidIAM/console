@@ -85,6 +85,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
     public void remove(com.soffid.iam.model.NetworkEntity xarxa) throws RuntimeException {
         try {
             String codiXarxa = xarxa.getName();
+            getNetworkDiscoveryAccountEntityDao().remove(xarxa.getAccounts());
             super.remove(xarxa);
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
@@ -123,6 +124,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
     public void toXarxaCustom(com.soffid.iam.model.NetworkEntity sourceEntity, com.soffid.iam.api.Network targetVO) {
         targetVO.setLanAccess(new Boolean(sourceEntity.getNormalized().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setDhcpSupport(sourceEntity.isDchpSupport());
+        targetVO.setDiscoveryServer(sourceEntity.getDiscoveryServer() == null ? null: sourceEntity.getDiscoveryServer().getName());
     }
 
     /**
@@ -169,6 +171,10 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         targetEntity.setDchpSupport(sourceVO.isDhcpSupport());
         targetEntity.setAddress(sourceVO.getIp().trim());
         
+        if (sourceVO.getDiscoveryServer() == null || sourceVO.getDiscoveryServer().trim().isEmpty())
+        	targetEntity.setDiscoveryServer(null);
+        else
+        	targetEntity.setDiscoveryServer(getServerEntityDao().findByName(sourceVO.getDiscoveryServer()));
         // Check network mask
         if (sourceVO.getMask() != null)
         {

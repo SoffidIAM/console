@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="network" type="network">
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findNetworkByTextAndJsonQueryAsync">
+				<parameter value=""/>
+				<parameter value=""/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Network">
+			</new-instance-bean>
+		</finder>
+		<finder name="app" type="app" refreshAfterCommit="false">  <!-- intranetMenus:query -->
+			<ejb-finder jndi="java:/module/EntryPointService-v2"
+				method="findRoot" >
+			</ejb-finder>
+		</finder>
+	</datanode>
+	
+	<datanode name="network">
+		<finder name="acl" type="acl">
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="getACL">  <!-- network:query -->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.NetworkAuthorization"> 
+			</new-instance-bean>
+		</finder>						
+		<custom-handler className="com.soffid.iam.web.discovery.DummyPersistenceHandler"/>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="networks.CodeValidation"/>
+			<attribute-validator expr="${instance.ip}" notNull="true" friendlyName="networks.AddressValidation"/>
+			<attribute-validator expr="${instance.mask}" notNull="true" friendlyName="networks.MaskValidation"/>
+			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="networks.DescriptionValidation"/>
+		</validator>
+		<finder name="task" type="task" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2" method="findNetworkDiscoveryScheduledTask">  <!-- network:query -->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>						
+		<finder name="host" type="host">
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="findHostsByNetwork" if="${instance.discovery == true}">  <!-- network:query -->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Host"> 
+			</new-instance-bean>
+		</finder>						
+		<finder name="account" type="account">
+			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2" method="findNetworkAccount" if="${instance.discovery == true}">  <!-- network:query -->
+				<parameter value="${instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.Account"> 
+			</new-instance-bean>
+		</finder>						
+	</datanode>
+
+	<datanode name="account">
+		<ejb-handler jndi="java:/module/NetworkDiscoveryService-v2">
+			<insert-method method="createNetworkAccount">
+				<parameter value="${parent.instance}"/>
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="removeNetworkAccount">
+				<parameter value="${parent.instance}"/>
+				<parameter value="${instance}"/>
+			</delete-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="acl">	
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}"/>			
+			</update-method>
+		</ejb-handler>
+	</datanode>
+		
+	<datanode name="host">
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+		<finder name="serviceHolder" type="serviceHolder">
+			<script-finder>
+				if ("NTS".equals(instance.os))
+					return new String[] {"services", org.zkoss.util.resource.Labels.getLabel("discovery.services")};
+				else
+					return null;
+			</script-finder>
+		</finder>
+		<finder name="dispatcherHolder" type="dispatcherHolder">
+			<script-finder>
+				return new String[] {"systems", org.zkoss.util.resource.Labels.getLabel("discovery.systems")};
+			</script-finder>
+		</finder>
+		<finder name="entryPointHolder" type="entryPointHolder">
+			<script-finder>
+				return new String[] {"entryPoints", org.zkoss.util.resource.Labels.getLabel("discovery.entryPoints")};
+			</script-finder>
+		</finder>
+		<finder name="manager" type="manager">
+			<ejb-finder jndi="java:/module/NetworkService-v2"
+				method="findAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate"> <!--host:admin:query -->
+				<parameter value="${instance.name}" />
+				<parameter value="" />
+				<parameter value="hui" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.AdministratorAuthorizationToAccessHost" />
+		</finder>
+		<finder name="port" type="port">
+			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2"
+				method="findHostPorts"> <!--host:admin:query -->
+				<parameter value="${instance}" />
+			</ejb-finder>
+		</finder>
+		<validator>
+			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="hosts.nameValidation2"/>
+			<attribute-validator expr="${instance.os}" notNull="true" friendlyName="hosts.OSValidation2"/>
+		</validator>
+	</datanode>
+
+	<datanode name="serviceHolder" transient="true">	 
+		<finder name="service" type="service">
+			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2" method="findHostServices">
+				<parameter value="${parent.instance}"/>
+			</ejb-finder>
+		</finder>						
+	</datanode>
+
+	<datanode name="dispatcherHolder" transient="true">	 
+		<finder name="system" type="system">
+			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2" method="findHostSystems">
+				<parameter value="${parent.instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.System"> 
+			</new-instance-bean>
+		</finder>						
+	</datanode>
+
+	<datanode name="entryPointHolder" transient="true">	 
+		<finder name="entryPoint" type="entryPoint">
+			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2" method="findHostEntryPoints">
+				<parameter value="${parent.instance}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.EntryPoint"> 
+			</new-instance-bean>
+		</finder>						
+	</datanode>
+	
+	<datanode name="task">
+		<ejb-handler jndi="openejb:/local/soffid.ejb.com.soffid.iam.service.ScheduledTaskService">
+			<update-method method="update">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+		<validator>
+			<attribute-validator expr="${instance.dayPattern}" notNull="true" friendlyName="schedule.dayValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.monthsPattern}" notNull="true" friendlyName="scheduled.monthValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.hoursPattern}" notNull="true" friendlyName="scheduled.hourValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.minutesPattern}" notNull="true" friendlyName="scheduled.minuteValidation"/>
+		</validator>
+		<validator>
+			<attribute-validator expr="${instance.dayOfWeekPattern}" notNull="true" friendlyName="scheduled.dayOfWeeValidation"/>
+		</validator>
+	</datanode>
+
+	<datanode name="port" transient="true"/>
+	<datanode name="system" transient="true"/>
+	<datanode name="entryPoint" transient="true"/>
+	<datanode name="service" transient="true"/>
+
+	<datanode name="app">
+		<finder name="app" type="app">  <!-- intranetMenus:query -->
+			<script-finder>
+				l = new LinkedList();
+				for (child: com.soffid.iam.EJBLocator.getEntryPointService().findChildren(instance)) {
+					if (child.menu) l.add(child);
+				}
+				return l;
+			</script-finder>
+		</finder>
+	</datanode>
+
+</zkib-model>

@@ -31,6 +31,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
@@ -287,6 +288,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	@Override
     protected Account handleCreateAccount(com.soffid.iam.api.Account account) throws Exception {
+		String ssoSystem = ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+		if (account.getName().equals("?") && account.getSystem().equals(ssoSystem)) {
+			account.setName( Long.toString( findLastAccount(ssoSystem) ));
+		}
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(account.getName(), account.getSystem());
 		if (acc != null)
 		{
@@ -357,6 +362,39 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		createAccountTask(acc);
 		return account;
+	}
+
+	private long findLastAccount (String system) throws InternalErrorException
+	{
+		long bits = 0;
+		long top = 0;
+		long attempt = 1;
+		/**
+		 * Find radix the first account with number = 2 ^ radix
+		 */
+		do
+		{
+			AccountEntity acc = getAccountEntityDao().findByNameAndSystem( Long.toString(attempt), system);
+			if (acc == null) break;
+			top = attempt;
+			attempt = attempt + attempt;
+			bits ++ ;
+		} while (true);
+		/**
+		 * Now look for the other bits
+		 * top exists
+		 * attempt does not exist
+		 */
+		long step = top;
+		while (bits > 1)
+		{
+			step = step / 2;
+			attempt = top + step;
+			AccountEntity acc = getAccountEntityDao().findByNameAndSystem(Long.toString(attempt), system);
+			if (acc != null) top = attempt;
+			bits --;
+		}
+		return top+1;
 	}
 
 	@Override
@@ -2875,5 +2913,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		uac.setAccount(accountEntity);
 		uac.setWorkflowId(processId);
 		getUserAccountEntityDao().create(uac);
+	}
+
+	@Override
+	protected Collection<HostService> handleFindAccountServices(Account account) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		if (entity == null)
+			return null;
+		return getHostServiceEntityDao().toHostServiceList(entity.getServices());
 	}
 }

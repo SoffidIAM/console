@@ -17,6 +17,7 @@ import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -56,7 +57,8 @@ import roles.agent_update;
 		AccountMetadataEntity.class, AccountAttributeEntity.class, ScheduledTaskService.class,
 		ObjectMappingTriggerEntity.class, es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
 		SeyconServerService.class, AutoritzacioService.class, TenantEntity.class, ReconcileTriggerEntity.class,
-		AsyncRunnerService.class})
+		AsyncRunnerService.class,
+		HostSystemEntity.class})
 public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_create.class }, translated = "create")

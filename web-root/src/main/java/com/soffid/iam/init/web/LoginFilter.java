@@ -32,7 +32,10 @@ public class LoginFilter implements Filter {
 					resp.sendRedirect("/soffid/wf/task.zul?"+req.getQueryString());
 				}
 				else if ( req.getRequestURI().startsWith("/webservice")) {
-					resp.sendRedirect("/soffid"+req.getRequestURI()+"?"+req.getQueryString());
+					String target = "/soffid"+req.getRequestURI();
+					if (req.getQueryString() != null)
+						target = target + "?"+req.getQueryString();
+					resp.setHeader("Location",  target);
 					resp.setStatus(308); // Permanent redirect
 				}
 				else if ( req.getRequestURI().startsWith("/selfservice/index.zul") &&

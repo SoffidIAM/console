@@ -430,7 +430,7 @@ public class DispatcherServiceImpl extends
 		getAccessControlEntityDao()
 				.remove(dispatcherEntity.getAccessControls());
 
-//		getHostSystemEntityDao().remove(dispatcherEntity.getHosts());
+		getHostSystemEntityDao().remove(dispatcherEntity.getHosts());
 		for (ObjectMappingEntity om : dispatcherEntity.getObjectMappings()) {
 			for (AttributeMappingEntity am : om.getAttributeMappings()) {
 				getAttributeMappingEntityDao().remove(am);
@@ -786,11 +786,10 @@ public class DispatcherServiceImpl extends
 	 */
 	@Override
 	protected Collection<Server> handleFindAllServers() throws Exception {
-		ServerEntityDao dao = getServerEntityDao();
-		Collection<ServerEntity> db;
-		List<Server> servers = new LinkedList<Server>(); 
 		if (Security.isMasterTenant() && Security.isUserInRole(Security.AUTO_TENANT_QUERY))
 		{
+			ServerEntityDao dao = getServerEntityDao();
+			List<Server> servers = new LinkedList<Server>(); 
 			for (ServerEntity server: dao.loadAll())
 			{
 				Server vo = getServerEntityDao().toServer(server);
@@ -799,20 +798,10 @@ public class DispatcherServiceImpl extends
 				vo.setPublicKey(null);
 				servers.add(vo);
 			}
+			return servers;
 		}
 		else
-		{
-			for (ServerEntity server: dao.findByTenant(Security.getCurrentTenantName()))
-			{
-				Server vo = getServerEntityDao().toServer(server);
-				vo.setAuth(null);
-				vo.setPk(null);
-				vo.setPublicKey(null);
-				servers.add(vo);
-			}
-		}
-		
-		return servers;
+			return handleFindTenantServers();
 	}
 
 	@Override

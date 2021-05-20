@@ -37,6 +37,7 @@
 		  - value: name
 		  - value: lastUpdated
 		  - value: lastLogin
+		  - value: lastPasswordSet
 		  - value: passwordExpiration
 		  icon: #{ soffid:getStatusIcon( instance ) }
 		  icon2: /img/account.svg

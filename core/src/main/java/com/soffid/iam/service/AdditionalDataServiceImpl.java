@@ -632,6 +632,8 @@ public class AdditionalDataServiceImpl extends
 			cot.setScope(scope);
 			cot.setBuiltin(true);
 			getCustomObjectTypeEntityDao().create(cot);
+			if (scope != null)
+				last = upgradeMetadata(cot, scope );
 		} else {
 			cot.setScope(scope);
 			cot.setBuiltin(true);
@@ -712,6 +714,17 @@ public class AdditionalDataServiceImpl extends
 		}
 	}
 
+	private long upgradeMetadata(CustomObjectTypeEntity cot, MetadataScope scope) {
+		long last = 0;
+		for (MetaDataEntity dt: getMetaDataEntityDao().findByScope(scope)) {
+			dt.setObjectType(cot);
+			getMetaDataEntityDao().update(dt);
+			if (dt.getOrder() != null && dt.getOrder().longValue() > last)
+				last = dt.getOrder().longValue();
+		}
+		return last;
+	}
+	
 	private TypeEnumeration guessType(String type) throws InternalErrorException {
 		for (String value: (List<String>)TypeEnumeration.literals()) {
 			if ( value.equalsIgnoreCase(type))

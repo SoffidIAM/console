@@ -36,8 +36,19 @@ public class ApplicationAttributeEntityImpl extends com.soffid.iam.model.Applica
 		{
 			if (value instanceof Calendar)
 				setValue( DATE_FORMAT2.format(((Calendar) value).getTime()));
-			else 
+			else if (value instanceof Date)
 				setValue( DATE_FORMAT2.format((Date) value));
+			else {
+				try {
+					setValue( DATE_FORMAT2.format(DATE_FORMAT2.parse(value.toString())));
+				} catch (ParseException e) {
+					try {
+						setValue( DATE_FORMAT2.format(DATE_FORMAT.parse(value.toString())));
+					} catch (ParseException e2) { 
+						throw new RuntimeException("Bad date format for attribute "+getMetadata().getName()+": "+value.toString(), e2);
+					}
+				}
+			}
 		}
 		else
 			setValue(value.toString());

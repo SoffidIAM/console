@@ -246,6 +246,7 @@ public class FrameHandler extends Frame {
 	public void delete() throws CommitException {
 		Missatgebox.confirmaOK_CANCEL(Labels.getLabel("common.delete"), 
 				(event) -> {
+					((Component)event.getTarget().getSpaceOwner()).setVisible(false);
 					if (event.getName().equals("onOK")) {
 						Component lb = getListbox();
 						if (lb instanceof DataTable)

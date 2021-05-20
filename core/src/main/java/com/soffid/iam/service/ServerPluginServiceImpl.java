@@ -482,12 +482,17 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
 	        				damed.remove(dam);
 						for (DefaultObjectMappingPropertyEntity dop: dom.getProperties())
 	        				doped.remove(dop);
+						dom.getDefaultAttributeMappings().clear();
+						dom.getProperties().clear();
 						doed.remove(dom);
 	        		}
+	        		agent.getDefaultObjectMappings().clear();
 	        		aded.remove(agent);
 	        	}
+	        	module.getAgents().clear();
 	        	spmed.remove(module);
 	        }
+	        plugin.getModules().clear();
 	        sped.remove(plugin.getId());
 	        updateConfig();
         }

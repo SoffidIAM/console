@@ -54,6 +54,71 @@
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
+		<dependency>
+		  <groupId>commons-codec</groupId>
+		  <artifactId>commons-codec</artifactId>
+		  <version>1.14</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>commons-dbcp</groupId>
+		  <artifactId>commons-dbcp</artifactId>
+		  <version>1.3</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>commons-digester</groupId>
+		  <artifactId>commons-digester</artifactId>
+		  <version>1.8</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-jcs-core</artifactId>
+		  <version>2.2</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>org.cryptacular</groupId>
+		  <artifactId>cryptacular</artifactId>
+		  <version>1.2.4</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt.core.compiler</groupId>
+			<artifactId>ecj</artifactId>
+			<version>4.3.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-annotations</artifactId>
+		  <version>2.10.0</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-core</artifactId>
+		  <version>2.10.0</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-databind</artifactId>
+		  <version>2.10.0</version>
+		  <scope>provided</scope>
+		</dependency>
+		<dependency>
+		  <groupId>joda-time</groupId>
+		  <artifactId>joda-time</artifactId>
+		  <version>2.9</version>
+		  <scope>priveded</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.slf4j</groupId>
+		    <version>1.7.21</version>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>
@@ -74,16 +139,6 @@
 			        <defaultLibBundleDir>lib/</defaultLibBundleDir>
  		            <skinnyWars>false</skinnyWars>
 					<modules>
-						<webModule>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-webservice</artifactId>
-							<contextRoot>/soffid/webservice</contextRoot>
-						</webModule>
-						<webModule>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-web</artifactId>
-							<contextRoot>/soffid</contextRoot>
-						</webModule>
 						<ejbModule>
 							<groupId>${project.groupId}</groupId>
 							<artifactId>iam-core</artifactId>
@@ -97,7 +152,6 @@
 						<jarModule><groupId>asm</groupId><artifactId>asm</artifactId></jarModule>
 						<jarModule><groupId>asm</groupId><artifactId>asm-attrs</artifactId></jarModule>
 						<jarModule><groupId>cglib</groupId><artifactId>cglib</artifactId></jarModule>
-						<jarModule><groupId>commons-digester</groupId><artifactId>commons-digester</artifactId></jarModule>
 						<jarModule><groupId>commons-discovery</groupId><artifactId>commons-discovery</artifactId></jarModule>
 						<jarModule><groupId>commons-lang</groupId><artifactId>commons-lang</artifactId></jarModule>
 						<jarModule><groupId>net.sf.ehcache</groupId><artifactId>ehcache</artifactId></jarModule>
@@ -105,6 +159,16 @@
 						<jarModule><groupId>org.jbpm.jbpm3</groupId><artifactId>jbpm-jpdl</artifactId></jarModule>
 						<jarModule><groupId>junit</groupId><artifactId>junit</artifactId></jarModule>
 						<jarModule><groupId>org.springframework</groupId><artifactId>spring</artifactId></jarModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>iam-web</artifactId>
+							<contextRoot>/soffid</contextRoot>
+						</webModule>
+						<webModule>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>iam-webservice</artifactId>
+							<contextRoot>/soffid/webservice</contextRoot>
+						</webModule>
 					</modules>
 				</configuration>
 			</plugin>

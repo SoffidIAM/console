@@ -61,6 +61,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -81,6 +82,10 @@ public class AccountHandler extends FrameHandler {
 	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
 		updateStatus();
+		try {
+			DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "/services");
+			getFellow("servicesSection").setVisible(!coll.isEmpty());
+		} catch (Exception e) {}
 	}
 	
 	public void importCsv () throws IOException, CommitException {

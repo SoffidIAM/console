@@ -18,7 +18,7 @@ public class LoginNameHandler extends InputFieldUIHandler {
 	public void onChange(InputField3 field) throws Exception {
 		ObjectAttributesDiv d = field.getObjectContainer();
 		if (d != null) {
-			String system = (String) XPathUtils.getValue(field, "system");			
+			String system = (String) XPathUtils.eval(field, "system");			
 			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
 			if (ssoSystem != null && ssoSystem.equals(system)) {
 				Long id = (Long) XPathUtils.eval(field, "id");

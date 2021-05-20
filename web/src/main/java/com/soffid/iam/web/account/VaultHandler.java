@@ -53,6 +53,7 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Form2;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -89,6 +90,10 @@ public class VaultHandler extends FrameHandler {
 			} else {
 				updateAccountIcons();
 			}
+			try {
+				DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "../services");
+				getFellow("servicesSection").setVisible(!coll.isEmpty());
+			} catch (Exception e) {}
 		}
 		updateStatus();
 	}

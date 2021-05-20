@@ -65,12 +65,12 @@
 		<label style="display: inline-block; position: relative; bottom: 15px" value="Upload new image (250px wide):"/>
 		<fileupload mold="short" style="display:inline-block; width:500px; height:40px" onUpload="ref:frame.onUpload"/> 
 	</div>
-	<image style="max-width:250px; display:block; margin-left:175px" content="${logoImage }" id="logoImage"/>
+	<image style="max-width:250px; display:block; margin-left:175px; background-color:black" content="${logoImage }" id="logoImage"/>
 	<div >
 		<label style="display: inline-block; position: relative; bottom: 15px" value="Upload new header image (35px height):"/>
 		<fileupload mold="short" style="display:inline-block; width:500px; height:40px" onUpload="ref:frame.onUpload2"/> 
 	</div>
-	<image style="max-height:35px; display:block; margin-left:175px" content="${logoImage2 }" id="logoImage2"/>
+	<image style="max-height:35px; display:block; margin-left:175px; background-color:black" content="${logoImage2 }" id="logoImage2"/>
 	<div style="margin-top: 2em">
 		<button image="/img/undo-r.svg" label="${c:l('parametres.zul.Reset') }" onClick="ref:frame.reset"
 			style="text-align:right"/>

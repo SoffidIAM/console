@@ -93,6 +93,8 @@ public class AccountEntityDaoImpl extends
 		getRoleAccountEntityDao().remove(
 				new LinkedList<RoleAccountEntity>(entity.getRoles()));
 		entity.getRoles().clear();
+        getNetworkDiscoveryAccountEntityDao().remove(entity.getNetworkDiscovery());
+        entity.getNetworkDiscovery().clear();
 		try {
 			getAuditEntityDao().unlinkAccounts(entity);
 		} catch (InternalErrorException e) {

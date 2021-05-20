@@ -108,7 +108,8 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 		try
 		{
 	 		// Remove account attributes
-			getSession().createQuery("delete from com.soffid.iam.model.AccountAttributeEntity where metadata.system.id=:system")
+			getSession().createQuery("delete from com.soffid.iam.model.AccountAttributeEntity where metadata.id in "
+					+ "(select ame.id from com.soffid.iam.model.AccountMetadataEntity as ame where ame.system.id=:system)")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
 	 		// Remove accounts
@@ -121,6 +122,10 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 				.executeUpdate();
 			// Remove metadata
 			getSession().createQuery("delete from com.soffid.iam.model.AccountMetadataEntity where system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			// Remove tasklog
+			getSession().createQuery("delete from com.soffid.iam.model.TaskLogEntity where system.id=:system")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
 			

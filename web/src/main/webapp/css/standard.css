@@ -160,7 +160,7 @@ div.col_der.help {
 	vertical-align:middle;
 	padding: 0px;
 	background-color: #2b2b2b;
-	opacity: 0.8;
+	opacity: 1;
 }
 
 .col_der div.menu2starter {
@@ -178,13 +178,14 @@ div.col_der.help {
 	vertical-align:middle;
 	padding: 0px;
 	background-color: #2b2b2b;
-	opacity: 0.8;
+	opacity: 1;
 }
 
 .col_izq img {
 	height: 35px;
 	margin-right: 10px;
 	vertical-align: middle;
+	opacity: 1;
 }
 
 
@@ -1434,6 +1435,8 @@ span.search-box ul li {
 	margin-bottom: 5px
 }
 
+
+
 a.shylink, a.shylink:active, a.shylink:visited {
 	text-decoration:none;
 	color: black;
@@ -1483,6 +1486,13 @@ li.attribute-search-box > button {
     cursor: pointer;
     background-image: none;
     box-shadow: none;
+}
+
+li.attribute-search-box > button div.criteria-wrap {
+	max-width: 400px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 li.attribute-search-box:hover {

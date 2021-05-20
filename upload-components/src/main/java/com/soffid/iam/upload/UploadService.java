@@ -151,7 +151,7 @@ public class UploadService {
 		{
 			uploadComponents();
 		}
-		if (timer.getInfo().equals("BPM"))
+		if (timer.getInfo().equals("BPM") && jbpmScheduler != null)
 		{
 			jbpmScheduler.start();
 		}

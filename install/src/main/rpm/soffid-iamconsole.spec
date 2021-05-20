@@ -22,6 +22,9 @@ fi
 if ! getent passwd soffid >/dev/null 2>&1; then
     adduser --system --gid soffid --no-create-home --home-dir /opt/soffid soffid
 fi
+
+rm -rf /opt/soffid/iam-console-3/work/soffid || true
+
 chown -R soffid:soffid /opt/soffid/iam-console-3
 
 # This will only remove masks created by d-s-h on package removal.

@@ -101,10 +101,17 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 				setValue( DATE_FORMAT2.format(((Calendar) value).getTime()));
 			else if (value instanceof Date)
 				setValue( DATE_FORMAT2.format((Date) value));
-			else if (getDataType() == null)
-				throw new ClassCastException("Error trying to set value "+value+" for attribute of type date");
-			else
-				throw new ClassCastException("Error trying to set value "+value+" for attribute "+getDataType().getName());
+			else {
+				try {
+					setValue( DATE_FORMAT2.format(DATE_FORMAT2.parse(value.toString())));
+				} catch (ParseException e) {
+					try {
+						setValue( DATE_FORMAT2.format(DATE_FORMAT.parse(value.toString())));
+					} catch (ParseException e2) { 
+						throw new RuntimeException("Bad date format for attribute "+getDataType().getName()+": "+value.toString(), e2);
+					}
+				}
+			}
 		}
 		else
 			setValue(value.toString());

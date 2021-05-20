@@ -3552,9 +3552,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 				}
 			}
 			PagedResult<ProcessDefinition> pr = new PagedResult<>();
+			pr.setTotalResults(r.size());
+			if (start != null) {
+				for (int i = 0 ; i < start.intValue(); i++)
+					r.remove(0);
+			}
+			if (pageSize != null) {
+				while (r.size() > pageSize.intValue())
+					r.remove(r.size()-1);
+			}
 			pr.setStartIndex(start);
 			pr.setItemsPerPage(pageSize);
-			pr.setTotalResults(r.size());
 			pr.setResources(r);
 			return pr;
 		} finally {
@@ -3588,14 +3596,19 @@ public class BpmEngineImpl extends BpmEngineBase {
 							procInstances.add( proc );
 					}
 				}
-				int position = 0;
-				int s = start == null? 0: start.intValue();
-				int e = pageSize == null ? procInstances.size(): s + pageSize.intValue();
 				PagedResult<ProcessInstance> pr = new PagedResult<>();
+				pr.setTotalResults(procInstances.size());
+				if (start != null) {
+					for (int i = 0 ; i < start.intValue(); i++)
+						procInstances.remove(0);
+				}
+				if (pageSize != null) {
+					while (procInstances.size() > pageSize.intValue())
+						procInstances.remove(procInstances.size()-1);
+				}
 				pr.setStartIndex(start);
 				pr.setItemsPerPage(pageSize);
-				pr.setTotalResults(procInstances.size());
-				pr.setResources(procInstances.subList(s, e > procInstances.size() ? procInstances.size(): e));
+				pr.setResources(procInstances);
 				return pr;
 			} else {
 				CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
@@ -3626,9 +3639,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 					}
 				}
 				PagedResult<ProcessInstance> pr = new PagedResult<>();
+				pr.setTotalResults(procInstances.size());
+				if (start != null) {
+					for (int i = 0 ; i < start.intValue(); i++)
+						procInstances.remove(0);
+				}
+				if (pageSize != null) {
+					while (procInstances.size() > pageSize.intValue())
+						procInstances.remove(procInstances.size()-1);
+				}
 				pr.setStartIndex(start);
 				pr.setItemsPerPage(pageSize);
-				pr.setTotalResults(h.count());
 				pr.setResources(procInstances);
 				return pr;
 			}

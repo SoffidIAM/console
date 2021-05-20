@@ -171,7 +171,8 @@ public class EntryPointEntityDaoImpl extends
 		
 		target.setXmlAccessTree(source.getXmlEntryPoint());
 		target.setParentId(null);
-		if (source.getInformationSystem() == null)
+		if (source.getInformationSystem() == null || source.getInformationSystem().getId() == null || 
+				source.getInformationSystem().getId().longValue() == 0)
 			target.setInformationSystem(null);
 		else
 			target.setInformationSystem(source.getInformationSystem().getName());

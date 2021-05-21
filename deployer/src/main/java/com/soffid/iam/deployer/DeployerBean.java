@@ -1,5 +1,6 @@
 package com.soffid.iam.deployer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,6 +11,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -800,7 +802,7 @@ public class DeployerBean implements DeployerService {
 				log.info(Messages.getString("UploadService.StartedUploadInfo")); //$NON-NLS-1$
 				Connection conn = ds.getConnection();
 				QueryHelper qh = new QueryHelper(conn);
-				updateCacheProperties (qh);
+//				updateCacheProperties (qh);
 				try {
 					List<Object[]> result = null;
 					try {
@@ -935,7 +937,18 @@ public class DeployerBean implements DeployerService {
 						+ "FROM   SC_BLOCON "
 						+ "WHERE  BCO_NAME = 'soffid.cache.config'", new Object [0]))
 				{
-					System.setProperty  ((String) data[0], new String((byte[]) data[1], "UTF-8"));
+					byte b[];
+					if (data[1] instanceof Blob) {
+						ByteArrayOutputStream out = new ByteArrayOutputStream();
+						Blob blob = (Blob) data[1];
+						InputStream in = blob.getBinaryStream();
+						for (int read = in.read(); read >= 0; read = in.read())
+							out.write(read);
+						b = out.toByteArray();
+					} else {
+						b = (byte[]) data[1];
+					}
+					System.setProperty  ((String) data[0], new String(b, "UTF-8"));
 				}
 			}
 		} catch (Exception e) {

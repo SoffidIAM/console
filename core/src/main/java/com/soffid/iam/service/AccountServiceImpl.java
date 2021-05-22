@@ -145,8 +145,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (name == null)
 		{
 			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getName());
-			if (! existing.isEmpty())
-				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
+			for (AccountEntity accountEntity: existing) {
+				if ( ! accountEntity.isDisabled())
+					throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
+			}
 			// Search if already has a user name for this user domain
 			
 			if (!force && ! needsAccount(ue.getUserName(), de.getName()))

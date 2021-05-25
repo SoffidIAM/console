@@ -1395,9 +1395,10 @@ div.databox div.container, div.databox div.container span {
 	white-space: pre; 
 }
 
-div.databox div.container img.dataimage {
+div.databox div.container img.dataimage,
+div.databox img.dataimage {
 	max-width: 96px;
-	max-hight: 96px;
+	max-height: 96px;
 	object-fit: contain;
 }
 

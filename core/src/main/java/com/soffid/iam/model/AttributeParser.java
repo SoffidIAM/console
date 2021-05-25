@@ -9,14 +9,15 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.util.Base64;
 
 public class AttributeParser {
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd"); //$NON-NLS-1$
 	private static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
 	private static final SimpleDateFormat DATETIME_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATETIME_FORMAT3 = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss"); //$NON-NLS-1$
 	String value;
 	byte[] blobValue;
 	
-	public AttributeParser (String attributeName, TypeEnumeration type, Object value) {
-		if (value == null || value.equals(""))
+	public AttributeParser (String attributeName, TypeEnumeration type, Object v) {
+		if (v == null || v.equals(""))
 		{
 			value = null;
 			blobValue = null;
@@ -26,38 +27,42 @@ public class AttributeParser {
 				type.equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			value = null;
-			if (value instanceof byte[])
-				blobValue = (byte[]) value;
+			if (v instanceof byte[])
+				blobValue = (byte[]) v;
 			else
-				blobValue = Base64.decode(value.toString());
+				blobValue = Base64.decode(v.toString());
 		}
 		else if (type.equals( TypeEnumeration.DATE_TYPE) ||
 				type.equals( TypeEnumeration.DATE_TIME_TYPE))
 		{
-			if (value instanceof Calendar)
-				value = DATETIME_FORMAT2.format(((Calendar) value).getTime());
-			else if (value instanceof Date)
-				value = DATETIME_FORMAT2.format((Date) value);
+			if (v instanceof Calendar)
+				value = DATETIME_FORMAT2.format(((Calendar) v).getTime());
+			else if (v instanceof Date)
+				value = DATETIME_FORMAT2.format((Date) v);
 			else if (type.equals(TypeEnumeration.DATE_TYPE)) {
 				try {
-					value = ( DATETIME_FORMAT2.format(DATE_FORMAT.parse(value.toString())));
+					value = ( DATETIME_FORMAT2.format(DATE_FORMAT.parse(v.toString())));
 				} catch (ParseException e2) { 
-					throw new RuntimeException("Bad date format for attribute "+attributeName+": "+value.toString(), e2);
+					throw new RuntimeException("Bad date format for attribute "+attributeName+": "+v.toString(), e2);
 				}
 			} else {
 				try {
-					value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT2.parse(value.toString())));
+					value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT2.parse(v.toString())));
 				} catch (ParseException e) {
 					try {
-						value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT.parse(value.toString())));
+						value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT.parse(v.toString())));
 					} catch (ParseException e2) { 
-						throw new RuntimeException("Bad date format for attribute "+attributeName+": "+value.toString(), e2);
+						try {
+							value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT3.parse(v.toString())));
+						} catch (ParseException e3) { 
+							throw new RuntimeException("Bad date format for attribute "+attributeName+": "+v.toString(), e3);
+						}
 					}
 				}
 			}
 		}
 		else
-			value = value.toString();
+			value = v.toString();
 
 	}
 

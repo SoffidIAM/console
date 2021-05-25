@@ -264,8 +264,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			if (list.size() != 1)
 				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.MoreThanOneUserAccount"), account.getId())); //$NON-NLS-1$
 			
-			if (!acc.getRoles().isEmpty())
-				throw new NotAllowedException(String.format(Messages.getString("AccountServiceImpl.CannotDeleteAccount"), account.getName(), account.getSystem())); //$NON-NLS-1$
+//			if (!acc.getRoles().isEmpty())
+//				throw new NotAllowedException(String.format(Messages.getString("AccountServiceImpl.CannotDeleteAccount"), account.getName(), account.getSystem())); //$NON-NLS-1$
 			
 			UserAccountEntity ua = list.iterator().next();
 			

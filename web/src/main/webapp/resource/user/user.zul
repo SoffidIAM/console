@@ -25,6 +25,7 @@
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUser &amp;&amp; canUpdateUser &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 					<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:frame.bulkAction" />
+					<menu2item image="/img/merge.svg" label="${c:l('common.merge') }" onClick="ref:frame.mergeAction" />
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"

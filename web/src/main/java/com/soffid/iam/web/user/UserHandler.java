@@ -1,6 +1,7 @@
 package com.soffid.iam.web.user;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
+import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
@@ -85,6 +87,16 @@ public class UserHandler extends FrameHandler {
 		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
 			UserBulkAction ba = new UserBulkAction( ); 
 			ba.start(listbox ) ;
+		}
+	}
+
+	
+	public void mergeAction(Event event) throws IOException, CommitException, InternalErrorException, NamingException, CreateException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		DataTable listbox = (DataTable) getListbox();
+		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length == 2) {
+			new UserMergeAction().start((DataTable) getListbox());
+		} else {
+			Missatgebox.avis(Labels.getLabel("merge.warning"));
 		}
 	}
 

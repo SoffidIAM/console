@@ -1155,6 +1155,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected void handleDelete(User usuari) throws Exception {
 		UserEntity usuariEntity = getUserEntityDao().findByUserName(
 				usuari.getUserName());
+		if (usuariEntity == null) return; // Already deleted
+		
 		if (!getAuthorizationService().hasPermission(Security.AUTO_USER_DELETE,
 				usuariEntity)) {
 			throw new SeyconAccessLocalException(

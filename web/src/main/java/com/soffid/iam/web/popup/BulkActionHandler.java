@@ -8,15 +8,12 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Desktop;
-import org.zkoss.zk.ui.DesktopUnavailableException;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
-import org.zkoss.zk.ui.impl.EventProcessor;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zk.ui.util.Configuration;
@@ -31,14 +28,12 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.web.component.BulkAction;
-import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.InputField3;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Select;
-import es.caib.zkib.component.Switch;
 import es.caib.zkib.component.Wizard;
 
 

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 import org.jbpm.JbpmContext;
 import org.jbpm.logging.exe.LoggingInstance;
 import org.json.JSONException;
@@ -146,8 +147,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (name == null)
 		{
 			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getName());
-			if (! existing.isEmpty())
-				throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
+			for (AccountEntity accountEntity: existing) {
+				if ( ! accountEntity.isDisabled())
+					throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
+			}
 			// Search if already has a user name for this user domain
 			
 			if (!force && ! needsAccount(ue.getUserName(), de.getName()))
@@ -264,8 +267,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			if (list.size() != 1)
 				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.MoreThanOneUserAccount"), account.getId())); //$NON-NLS-1$
 			
-			if (!acc.getRoles().isEmpty())
-				throw new NotAllowedException(String.format(Messages.getString("AccountServiceImpl.CannotDeleteAccount"), account.getName(), account.getSystem())); //$NON-NLS-1$
+//			if (!acc.getRoles().isEmpty())
+//				throw new NotAllowedException(String.format(Messages.getString("AccountServiceImpl.CannotDeleteAccount"), account.getName(), account.getSystem())); //$NON-NLS-1$
 			
 			UserAccountEntity ua = list.iterator().next();
 			
@@ -749,8 +752,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     String u = (ua.getUser().getUserName());
                     getUserAccountEntityDao().remove(ua);
                     account.getOwnerUsers().add(u);
-                }
-				
+                    if (Hibernate.isInitialized(ua.getUser())) 
+                    	ua.getUser().getAccounts().clear();
+				}
+				ae.getUsers().clear();
 			}
 			if (account.getType().equals(AccountType.USER))
 			{

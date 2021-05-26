@@ -133,14 +133,14 @@ public abstract class RolAccountEntity {
 	public Date delegateUntil;
 
 	/// **************************** DAOs ******************************
-	@DaoFinder("select ra" 
-			+ " from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "inner join    ra.account as account\n"
-			+ "inner join    account.system as dispatcher\n"
-			+ "inner join    account.users as users\n"
-			+ "inner join    users.user as user\n"
+	@DaoFinder("select ra\n" 
+			+ "from com.soffid.iam.model.UserEntity user\n"
+			+ "inner join    user.accounts as accounts\n"
+			+ "inner join    accounts.account as account\n"
+			+ "inner join    account.roles as ra\n"
 			+ "inner join    ra.role as role\n"
-			+ "where user.userName = :userName and account.type='U' and user.tenant.id=:tenantId and ra.enabled = true \n"
+			+ "inner join    role.system as dispatcher\n"
+			+ "where ra.enabled = true and account.type='U' and user.userName = :userName and user.tenant.id=:tenantId\n"
 			+ "order by dispatcher.name, role.name\n")
 	@Operation(translated="findByUserName")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuari(
@@ -150,14 +150,14 @@ public abstract class RolAccountEntity {
 
 
 	/// **************************** DAOs ******************************
-	@DaoFinder("select ra" 
-			+ " from com.soffid.iam.model.RoleAccountEntity ra\n"
-			+ "inner join    ra.account as account\n"
-			+ "inner join    account.system as dispatcher\n"
-			+ "inner join    account.users as users\n"
-			+ "inner join    users.user as user\n"
+	@DaoFinder("select ra\n" 
+			+ "from com.soffid.iam.model.UserEntity user\n"
+			+ "inner join    user.accounts as accounts\n"
+			+ "inner join    accounts.account as account\n"
+			+ "inner join    account.roles as ra\n"
 			+ "inner join    ra.role as role\n"
-			+ "where user.userName = :userName and account.type='U' and user.tenant.id=:tenantId \n"
+			+ "inner join    role.system as dispatcher\n"
+			+ "where account.type='U' and user.userName = :userName and user.tenant.id=:tenantId\n"
 			+ "order by dispatcher.name, role.name\n")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findHistoryByUserName(
 			java.lang.String userName) {

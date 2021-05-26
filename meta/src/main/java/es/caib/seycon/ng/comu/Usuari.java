@@ -118,6 +118,6 @@ public abstract class Usuari {
 	@Description ("User attributes")
 	@Nullable
 	@Attribute(hidden = true)
-	@JsonAttribute(hibernateJoin="userData")
+	@JsonAttribute(hibernateAttribute = "userData")
 	Map<String, Object> attributes;
 }

@@ -1,4 +1,5 @@
 # Environment variables for Soffid-iamconsole
 #
 # JAVA_HOME=
-CATALINA_OPTIONS=-Xmx2048m
+CATALINA_OPTS=-Xmx2048m
+export CATALINA_OPTS

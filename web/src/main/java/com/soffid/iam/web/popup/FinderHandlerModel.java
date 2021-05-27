@@ -39,7 +39,7 @@ public class FinderHandlerModel implements FinderHandler {
 			if (query == null || query.trim().isEmpty()) {
 				query = q2;
 			} else {
-				query = q2 +"("+query+")";
+				query = q2 +" and ("+query+")";
 			}
 		} else {
 			clazz = Class.forName(className);

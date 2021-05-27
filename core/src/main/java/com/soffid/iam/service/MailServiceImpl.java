@@ -17,7 +17,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.soffid.iam.api.AuthorizationRole;
-import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Role;
@@ -25,6 +24,7 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
 
@@ -34,41 +34,25 @@ public class MailServiceImpl extends MailServiceBase {
 
 	String getMailHost ()
 	{
-		Configuration param1;
-		try {
-			ConfigurationService configService = getConfigurationService();
-			param1 = configService.findParameterByNameAndNetworkName("mail.host", null); //$NON-NLS-1$
-			if (param1 != null)
-				return param1.getValue();
-		} catch (Exception e) {
-		}
-		return "localhost";
+		String param1 = ConfigurationCache.getProperty("mail.host");
+		if (param1 == null || param1.trim().isEmpty())
+			return "localhost";
+		else
+			return param1;
 	}
 
 	String getConfigValue (String param)
 	{
-		Configuration param1;
-		try {
-			ConfigurationService configService = getConfigurationService();
-			param1 = configService.findParameterByNameAndNetworkName(param, null); //$NON-NLS-1$
-			if (param1 != null)
-				return param1.getValue();
-		} catch (Exception e) {
-		}
-		return null;
+		return ConfigurationCache.getProperty(param);
 	}
 
 	String getFrom () throws UnknownHostException
 	{
-		Configuration param1;
-		try {
-			ConfigurationService configService = getConfigurationService();
-			param1 = configService.findParameterByNameAndNetworkName("mail.from", null); //$NON-NLS-1$
-			if (param1 != null)
-				return param1.getValue();
-		} catch (Exception e) {
-		}
-		return "soffid@" + InetAddress.getLocalHost().getHostName() ;
+		String param1 = ConfigurationCache.getProperty("mail.from");
+		if (param1 == null || param1.trim().isEmpty())
+			return "soffid@" + InetAddress.getLocalHost().getHostName() ;
+		else
+			return param1;
 	}
 	
 

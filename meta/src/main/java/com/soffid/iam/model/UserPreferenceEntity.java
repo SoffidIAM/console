@@ -21,7 +21,7 @@ public class UserPreferenceEntity {
 	UsuariEntity user;
 	
 	@Description("Preference name")
-	@Column(name = "USP_NAME", length = 50)
+	@Column(name = "USP_NAME", length = 250)
 	String name;
 	
 	@Description("Preference value")

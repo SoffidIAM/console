@@ -41,7 +41,9 @@ public class HostSessionHandler extends Div  {
 	}
 
 	public void refresh(Event event) throws Exception {
-		DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(Path.getComponent(getListboxPath()), "/session");
-		coll.refresh();
+		try {
+			DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(Path.getComponent(getListboxPath()), "/session");
+			coll.refresh();
+		} catch (Exception e) {}
 	}
 }

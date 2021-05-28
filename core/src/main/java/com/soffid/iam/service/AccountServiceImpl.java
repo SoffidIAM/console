@@ -2559,6 +2559,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	public Password handleGenerateAccountTemporaryPassword(Account account)
 			throws  Exception {
+		return setAccountPassword(account, null, true);
+	}
+
+	public Password handleGenerateAccountPassword(Account account)
+			throws  Exception {
 		return setAccountPassword(account, null, false);
 	}
 

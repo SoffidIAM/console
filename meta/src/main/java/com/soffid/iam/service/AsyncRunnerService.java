@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
@@ -24,4 +25,8 @@ public class AsyncRunnerService {
 	@Operation(grantees={Tothom.class})
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public Object runTransaction (TransactionalTask runnable) { return null; }
+
+	@Operation(grantees={Tothom.class})
+	@Transactional(rollbackFor = { java.lang.Exception.class }, propagation = Propagation.REQUIRES_NEW)
+	public Object runNewTransaction (TransactionalTask runnable) { return null; }
 }

@@ -283,7 +283,7 @@ public class AccountHandler extends FrameHandler {
 		}
 		else
 		{
-			Password nouPassword =  EJBLocator.getAccountService().generateAccountTemporaryPassword(account);
+			Password nouPassword =  EJBLocator.getAccountService().generateAccountPassword(account);
 			showPasswordAssist(nouPassword.getPassword());
 		}
 

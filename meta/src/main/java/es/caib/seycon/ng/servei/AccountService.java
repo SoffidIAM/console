@@ -407,6 +407,14 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
 	}
 	
+	@Description("Generates a password for the account")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Password generateAccountPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
 	@Description("Generates a temporary password for the account")
 	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -414,7 +422,6 @@ public abstract class AccountService {
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
 	}
-
 	///
 	@Description ("Sets the high privileged account password. Returns false if the action is waiting for approval")
 	@Operation ( grantees={roles.Tothom.class},

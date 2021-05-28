@@ -49,4 +49,8 @@ public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
 		return runnable.run();
 	}
 
+	@Override
+	protected Object handleRunNewTransaction(TransactionalTask runnable) throws Exception {
+		return runnable.run();
+	}
 }

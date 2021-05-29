@@ -1440,11 +1440,19 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected void handleSetAccountPassword (Account account, Password password)
 					throws Exception
 	{
-		setAccountPassword(account, password, false);
+		setAccountPasswordInternal(account, password, false, true);
 	}
 
-	private Password setAccountPassword(Account account, Password password, boolean temporary)
+	@Override
+	protected Password handleSetAccountPassword (Account account, Password password, boolean temporary, boolean online)
+					throws Exception
+	{
+		return setAccountPasswordInternal(account, password, temporary, online);
+	}
+
+	private Password setAccountPasswordInternal(Account account, Password password, boolean temporary, boolean online)
 			throws InternalErrorException, BadPasswordException, Exception {
+		log.info("set account password");
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
 		String principal = Security.getCurrentAccount();
 		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
@@ -1513,16 +1521,26 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		/// Now, do the job
 		if (password == null)
 		{
+			log.info("generating new password");
 			result = ips.generateFakeAccountPassword(ae);
-	        sendPasswordNow (ae, result, temporary);
+	        if (online) { 
+	        	sendPasswordNow (ae, result, temporary);
+	        }
+	        else {
+	    		getInternalPasswordService().storeAndForwardAccountPassword(ae, result, temporary, null);
+	        }
 		}
 		else
 		{
+			result = password;
 	        PolicyCheckResult check = ips.checkAccountPolicy(ae, password);
 	        if (! check.isValid()) {
 	            throw new BadPasswordException(check.getReason());
 	        }
-	        sendPasswordNow (ae, password, temporary);
+	        if (online)
+	        	sendPasswordNow (ae, password, temporary);
+	        else
+	    		getInternalPasswordService().storeAndForwardAccountPassword(ae, password, temporary, null);
 		}
 		// Now, audit
 		audit("P", ae); //$NON-NLS-1$
@@ -1532,6 +1550,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
 		Exception lastException = null;
+		log.info("Seting password for "+account.getSystem().getName());
 		if ( ! account.isDisabled() && account.getSystem().getUrl() != null)
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
@@ -1542,7 +1561,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                    rsl.setAuthToken(se.getAuth());
 	                    sss = rsl.getSyncStatusService();
 	                } catch (Exception e) {
-	                    lastException = e;
+	                	lastException = e;
+	            		log.warn("Error sending password", e);
 	                }
 	                if (sss != null)
 	                {
@@ -1552,6 +1572,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	            }
 	        }
 		}
+		log.info("Cannot send. Store locally");
 		getInternalPasswordService().storeAndForwardAccountPassword(account, password, temporary, null);
 	}
 
@@ -2516,17 +2537,17 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	public void handleSetAccountTemporaryPassword(Account account, Password password)
 			throws Exception {
-		setAccountPassword(account, password, true);
+		setAccountPasswordInternal(account, password, true, true);
 	}
 
 	public Password handleGenerateAccountTemporaryPassword(Account account)
 			throws  Exception {
-		return setAccountPassword(account, null, true);
+		return setAccountPasswordInternal(account, null, true, true);
 	}
 
 	public Password handleGenerateAccountPassword(Account account)
 			throws  Exception {
-		return setAccountPassword(account, null, false);
+		return setAccountPasswordInternal(account, null, false, true);
 	}
 
 	@Override

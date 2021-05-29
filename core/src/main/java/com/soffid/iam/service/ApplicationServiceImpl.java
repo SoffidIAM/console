@@ -1862,53 +1862,33 @@ public class ApplicationServiceImpl extends
     	if (type == NONE)
     		return;
 
-    	if (false) {
-			for (UserAccountEntity ua2 : user.getAccounts()) {
-				AccountEntity account = ua2.getAccount();
-                if (ua2.getAccount().getType().equals(AccountType.USER) && !ua2.getAccount().isDisabled()) {
-	        		if (hierarchy && ! account.isDisabled()) {
-	        			RoleGrantHierarchy h = new RoleGrantHierarchy();
-	        			h.setAccountName(account.getName());
-	        			h.setSystem(account.getSystem().getName());
-	        			h.setAccountDescription(account.getDescription());
-	        			RolAccountDetail r = new RolAccountDetail(h, null);
-	        			rad.add(r);
-	        			populateAccountRoles (rad, type, account, user, holderGroup, true, r);
-	        		}
-	        		else
-	        			populateAccountRoles (rad, type, account, user, holderGroup, false, null);
-                }
-        	}
-
-    	} else {
-	    	Map<Long,RolAccountDetail> accounts = new HashMap<>();
-	    	List<AccountEntity> userAccounts = getAccountEntityDao().findByUser(user.getId());
-	    	if (hierarchy) {
-				for (AccountEntity account: userAccounts)
-		    	{
-		    		RolAccountDetail parent = null;
-		    		if (!account.isDisabled()) {
-	    				RoleGrantHierarchy h = new RoleGrantHierarchy();
-	    				h.setAccountName(account.getName());
-	    				h.setSystem(account.getSystem().getName());
-	    				h.setAccountDescription(account.getDescription());
-	    				RolAccountDetail r = new RolAccountDetail(h, null);
-	    				rad.add(r);
-	    				accounts.put(account.getId(), r);
-	    			}
-	    		}
-	    	}
-	    	
-	    	for (RoleAccountEntity ra: getRoleAccountEntityDao().findByUserName(user.getUserName())) {
-	    		if (!ra.getAccount().isDisabled()) {
-	    			if (hierarchy) 
-	    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, accounts.get(ra.getAccount().getId()), ra);
-	    			else
-	    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
-	    		}
-	    		
-	    	}
-    	}
+      Map<Long,RolAccountDetail> accounts = new HashMap<>();
+      List<AccountEntity> userAccounts = getAccountEntityDao().findByUser(user.getId());
+      if (hierarchy) {
+      for (AccountEntity account: userAccounts)
+        {
+          RolAccountDetail parent = null;
+          if (!account.isDisabled()) {
+            RoleGrantHierarchy h = new RoleGrantHierarchy();
+            h.setAccountName(account.getName());
+            h.setSystem(account.getSystem().getName());
+            h.setAccountDescription(account.getDescription());
+            RolAccountDetail r = new RolAccountDetail(h, null);
+            rad.add(r);
+            accounts.put(account.getId(), r);
+          }
+        }
+      }
+      
+      for (RoleAccountEntity ra: getRoleAccountEntityDao().findByUserName(user.getUserName())) {
+        if (!ra.getAccount().isDisabled()) {
+          if (hierarchy) 
+            populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, accounts.get(ra.getAccount().getId()), ra);
+          else
+            populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
+        }
+        
+      }
     	
     	if (type == INDIRECT || type == ALL)
     	{

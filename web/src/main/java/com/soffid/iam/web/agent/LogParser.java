@@ -2,6 +2,7 @@ package com.soffid.iam.web.agent;
 
 import java.util.Stack;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -47,7 +48,7 @@ public class LogParser {
 						children = parent.getJSONArray("children");
 					} else if (!s.trim().isEmpty()) {
 						children.put(log);
-						log.put("log", s);
+						log.put("log", StringEscapeUtils.escapeHtml(s));
 						if (s.contains(" WARN "))
 						{
 							log.put("style", "style='color: red'");

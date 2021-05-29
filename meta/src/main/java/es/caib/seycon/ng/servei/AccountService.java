@@ -425,6 +425,20 @@ public abstract class AccountService {
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
 	}
+
+	@Description("Sets the account password. Advanced method to set it online or offline")
+	@Operation ( grantees={roles.Tothom.class},
+			translated="setAccountPassword")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Password setAccountPassword(
+		es.caib.seycon.ng.comu.Account account, 
+		@Nullable es.caib.seycon.ng.comu.Password password,
+		boolean temporary,
+		boolean online)
+		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
+		return null;
+	}
+
 	///
 	@Description ("Sets the high privileged account password. Returns false if the action is waiting for approval")
 	@Operation ( grantees={roles.Tothom.class},

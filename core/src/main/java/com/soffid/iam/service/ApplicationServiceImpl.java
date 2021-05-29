@@ -1867,20 +1867,31 @@ public class ApplicationServiceImpl extends
     	if (type == NONE)
     		return;
 
-    	for (AccountEntity account: getAccountEntityDao().findByUser(user.getId()))
-    	{
-    		RolAccountDetail parent = null;
-    		if (hierarchy && ! account.isDisabled()) {
-    			RoleGrantHierarchy h = new RoleGrantHierarchy();
-    			h.setAccountName(account.getName());
-    			h.setSystem(account.getSystem().getName());
-    			h.setAccountDescription(account.getDescription());
-    			RolAccountDetail r = new RolAccountDetail(h, null);
-    			rad.add(r);
-    			populateAccountRoles (rad, type, account, user, holderGroup, true, r);
+    	Map<Long,RolAccountDetail> accounts = new HashMap<>();
+    	if (hierarchy) {
+	    	for (AccountEntity account: getAccountEntityDao().findByUser(user.getId()))
+	    	{
+	    		RolAccountDetail parent = null;
+	    		if (!account.isDisabled()) {
+    				RoleGrantHierarchy h = new RoleGrantHierarchy();
+    				h.setAccountName(account.getName());
+    				h.setSystem(account.getSystem().getName());
+    				h.setAccountDescription(account.getDescription());
+    				RolAccountDetail r = new RolAccountDetail(h, null);
+    				rad.add(r);
+    				accounts.put(account.getId(), r);
+    			}
     		}
-    		else
-    			populateAccountRoles (rad, type, account, user, holderGroup, false, null);
+    	}
+    	
+    	for (RoleAccountEntity ra: getRoleAccountEntityDao().findByUserName(user.getUserName())) {
+    		if (!ra.getAccount().isDisabled()) {
+    			if (hierarchy) 
+    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, accounts.get(ra.getAccount().getId()), ra);
+    			else
+    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
+    		}
+    		
     	}
     	
     	if (type == INDIRECT || type == ALL)
@@ -2066,21 +2077,25 @@ public class ApplicationServiceImpl extends
 	private void populateAccountRoles(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user, GroupEntity holderGroup, 
 			boolean hierarchy, RolAccountDetail parent) {
 		for (RoleAccountEntity ra : account.getRoles()) {
-			if (holderGroup == null || 
-				ra.getHolderGroup() == null ||
-				ra.getHolderGroup() == holderGroup)
-			{
-	            RolAccountDetail n = new RolAccountDetail(ra, account, parent);
-	            if (hierarchy && ra.getRule() != null) {
-	            	n.parent = createRuleRoleAccountDetail(rad, ra.getRule());
-	            }
-	            if (!rad.contains(n) && !ra.isApprovalPending() && shouldBeEnabled(ra) && ra.isEnabled()) {
-	                if (type == DIRECT || type == ALL) rad.add(n);
-	                if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) 
-	                	populateRoleRoles(rad, ALL, n, user, account, hierarchy);
-	            }
-			}
+			populateRoleAccount(rad, type, account, user, holderGroup, hierarchy, parent, ra);
         }
+	}
+	protected void populateRoleAccount(Set<RolAccountDetail> rad, int type, AccountEntity account, UserEntity user,
+			GroupEntity holderGroup, boolean hierarchy, RolAccountDetail parent, RoleAccountEntity ra) {
+		if (holderGroup == null || 
+			ra.getHolderGroup() == null ||
+			ra.getHolderGroup() == holderGroup)
+		{
+		    RolAccountDetail n = new RolAccountDetail(ra, account, parent);
+		    if (hierarchy && ra.getRule() != null) {
+		    	n.parent = createRuleRoleAccountDetail(rad, ra.getRule());
+		    }
+		    if (!rad.contains(n) && !ra.isApprovalPending() && shouldBeEnabled(ra) && ra.isEnabled()) {
+		        if (type == DIRECT || type == ALL) rad.add(n);
+		        if ((type == INDIRECT || type == ALL) && shouldBeEnabled(ra)) 
+		        	populateRoleRoles(rad, ALL, n, user, account, hierarchy);
+		    }
+		}
 	}
 
 	@Override

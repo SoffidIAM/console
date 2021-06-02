@@ -23,7 +23,7 @@ public class LoginNameHandler extends InputFieldUIHandler {
 			if (ssoSystem != null && ssoSystem.equals(system)) {
 				Long id = (Long) XPathUtils.eval(field, "id");
 				if (id == null) {
-					long l = findLastAccount(ssoSystem);
+					long l = findLastAccount(ssoSystem) + 1;
 					InputField3 desc = d.getInputFieldsMap().get("name");
 					desc.setValue(""+l);
 					desc.invalidate();

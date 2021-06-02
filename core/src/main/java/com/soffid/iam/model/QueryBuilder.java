@@ -49,6 +49,8 @@ public class QueryBuilder {
         	if (parameters[i].getValue() == null)
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
             		org.hibernate.Hibernate.STRING);
+        	else if (parameters[i].getValue() instanceof Collection) 
+        		queryObject.setParameterList(parameters[i].getName(), (Collection) parameters[i].getValue());
         	else
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
         }
@@ -65,6 +67,8 @@ public class QueryBuilder {
         	if (parameters[i].getValue() == null)
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
             		org.hibernate.Hibernate.STRING);
+        	else if (parameters[i].getValue() instanceof Collection) 
+        		queryObject.setParameterList(parameters[i].getName(), (Collection) parameters[i].getValue());
         	else
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
         }
@@ -83,6 +87,8 @@ public class QueryBuilder {
         	if (parameters[i].getValue() == null)
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
             		org.hibernate.Hibernate.STRING);
+        	else if (parameters[i].getValue() instanceof Collection) 
+        		queryObject.setParameterList(parameters[i].getName(), (Collection) parameters[i].getValue());
         	else
         		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
         }

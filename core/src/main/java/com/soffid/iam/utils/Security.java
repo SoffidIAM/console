@@ -458,18 +458,22 @@ public class Security {
 				{
 					if (auths == null)
 						auths = ServiceLocator.instance().getAuthorizationService().findAuthorizations(null, null, null);
-					List<String> dp = getTenantService().getDisabledPermissions(t);
 					LinkedList<String> auths2 = new LinkedList<String>();
-					for (SoffidAuthorization a: auths)
-					{
-						if (!dp.contains(a))
+					if ( ! onSyncServer ) {
+						List<String> dp = onSyncServer ? 
+								new LinkedList<String>() :
+									getTenantService().getDisabledPermissions(t);
+						for (SoffidAuthorization a: auths)
 						{
-							auths2.add(a.getCodi());
-							auths2.add(a.getCodi()+Security.AUTO_ALL);
+							if (!dp.contains(a))
+							{
+								auths2.add(a.getCodi());
+								auths2.add(a.getCodi()+Security.AUTO_ALL);
+							}
 						}
+						if ( !dp.contains (AUTO_METADATA_UPDATE_ALL))
+							auths2.add(AUTO_METADATA_UPDATE_ALL);
 					}
-					if ( !dp.contains (AUTO_METADATA_UPDATE_ALL))
-						auths2.add(AUTO_METADATA_UPDATE_ALL);
 			        p = new SoffidPrincipalImpl(tenant+"\\"+user, auths2, currentPrincipal);
 				}
 				else
@@ -741,7 +745,7 @@ public class Security {
 		String ip = req.getRemoteAddr();
 		String trustedProxies;
 		try {
-			if ( ! Config.getConfig().isAgent()) 
+			if ( Config.getConfig().isAgent()) 
 				trustedProxies = System.getProperty("soffid.proxy.trustedIps");
 			else
 				trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");

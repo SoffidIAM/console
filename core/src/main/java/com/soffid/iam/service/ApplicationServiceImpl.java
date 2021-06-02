@@ -824,12 +824,9 @@ public class ApplicationServiceImpl extends
         	{
         		if ( ! ra.isEnabled())
         		{
-        			log.info ("Removing roleAccount "+ra.getId());
         			getRoleAccountEntityDao().remove(ra);
         			rolEntity.getAccounts().remove(ra);
         		}
-        		else
-        			log.info ("Keeping roleAccount "+ra.getId());
         	}
             getRoleEntityDao().remove(rolEntity);
         } else {
@@ -1379,8 +1376,6 @@ public class ApplicationServiceImpl extends
 	        if (!rolsUsuaris.getAccountName().equals(oldRolsUsuaris.getAccountName()) || !rolsUsuaris.getAccountSystem().equals(oldRolsUsuaris.getAccountSystem()) || 
 	        		!rolsUsuaris.getSystem().equals(oldRolsUsuaris.getSystem()) || !rolsUsuaris.getRoleName().equals(oldRolsUsuaris.getRoleName()))
 	        {
-	        	log.info("Trying to modify " + oldRolsUsuaris);
-	        	log.info("To "+rolsUsuaris);
         		throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         				"Invalid rol grant change. Cannot change rol or account " )); //$NON-NLS-1$
 	        }
@@ -1867,31 +1862,52 @@ public class ApplicationServiceImpl extends
     	if (type == NONE)
     		return;
 
-    	Map<Long,RolAccountDetail> accounts = new HashMap<>();
-    	if (hierarchy) {
-	    	for (AccountEntity account: getAccountEntityDao().findByUser(user.getId()))
-	    	{
-	    		RolAccountDetail parent = null;
-	    		if (!account.isDisabled()) {
-    				RoleGrantHierarchy h = new RoleGrantHierarchy();
-    				h.setAccountName(account.getName());
-    				h.setSystem(account.getSystem().getName());
-    				h.setAccountDescription(account.getDescription());
-    				RolAccountDetail r = new RolAccountDetail(h, null);
-    				rad.add(r);
-    				accounts.put(account.getId(), r);
-    			}
-    		}
-    	}
-    	
-    	for (RoleAccountEntity ra: getRoleAccountEntityDao().findByUserName(user.getUserName())) {
-    		if (!ra.getAccount().isDisabled()) {
-    			if (hierarchy) 
-    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, accounts.get(ra.getAccount().getId()), ra);
-    			else
-    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
-    		}
-    		
+    	if (false) {
+			for (UserAccountEntity ua2 : user.getAccounts()) {
+				AccountEntity account = ua2.getAccount();
+                if (ua2.getAccount().getType().equals(AccountType.USER) && !ua2.getAccount().isDisabled()) {
+	        		if (hierarchy && ! account.isDisabled()) {
+	        			RoleGrantHierarchy h = new RoleGrantHierarchy();
+	        			h.setAccountName(account.getName());
+	        			h.setSystem(account.getSystem().getName());
+	        			h.setAccountDescription(account.getDescription());
+	        			RolAccountDetail r = new RolAccountDetail(h, null);
+	        			rad.add(r);
+	        			populateAccountRoles (rad, type, account, user, holderGroup, true, r);
+	        		}
+	        		else
+	        			populateAccountRoles (rad, type, account, user, holderGroup, false, null);
+                }
+        	}
+
+    	} else {
+	    	Map<Long,RolAccountDetail> accounts = new HashMap<>();
+	    	List<AccountEntity> userAccounts = getAccountEntityDao().findByUser(user.getId());
+	    	if (hierarchy) {
+				for (AccountEntity account: userAccounts)
+		    	{
+		    		RolAccountDetail parent = null;
+		    		if (!account.isDisabled()) {
+	    				RoleGrantHierarchy h = new RoleGrantHierarchy();
+	    				h.setAccountName(account.getName());
+	    				h.setSystem(account.getSystem().getName());
+	    				h.setAccountDescription(account.getDescription());
+	    				RolAccountDetail r = new RolAccountDetail(h, null);
+	    				rad.add(r);
+	    				accounts.put(account.getId(), r);
+	    			}
+	    		}
+	    	}
+	    	
+	    	for (RoleAccountEntity ra: getRoleAccountEntityDao().findByUserName(user.getUserName())) {
+	    		if (!ra.getAccount().isDisabled()) {
+	    			if (hierarchy) 
+	    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, accounts.get(ra.getAccount().getId()), ra);
+	    			else
+	    				populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
+	    		}
+	    		
+	    	}
     	}
     	
     	if (type == INDIRECT || type == ALL)
@@ -1992,25 +2008,56 @@ public class ApplicationServiceImpl extends
 			return;
 		
 		RoleEntity rol = currentRol.granted;
+
+		// Gets all dependencies
+		List<RoleDependencyEntity> deps = new LinkedList<>(rol.getContainedRoles());
+		List<RoleDependencyEntity> pendingDeps = new LinkedList<>(rol.getContainedRoles());
 		
-		for (RoleDependencyEntity ra : rol.getContainedRoles()) {
-			if ((ra.getMandatory() == null || ra.getMandatory().booleanValue()) &&
-					matchesGranteeDomainValue (currentRol, ra) && 
-					(ra.getStatus() == null || 
-					 ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) ||
-					 ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)))
-            if (matchesGranteeDomainValue(currentRol, ra)) {
-                for (AccountEntity ae : getAccountsForDispatcher(originUser, originAccount, ra.getContained().getSystem())) {
-                    RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
-                    n.granteeRol = rol;
-                    n.parent = currentRol;
-                    n.generateHash();
-                    if (! rad.contains(n)) {
-                        if (type == DIRECT || type == ALL) rad.add(n);
-                        if (type == INDIRECT || type == ALL) populateRoleRoles(rad, ALL, n, originUser, originAccount, hierarchy);
-                    }
-                }
-            }
+		if (type == INDIRECT || type == ALL) {
+			while (!pendingDeps.isEmpty()) {
+				LinkedList<Long> d = new LinkedList<Long>();
+				Iterator<RoleDependencyEntity> iterator = pendingDeps.iterator(); 
+				while (iterator.hasNext() && d.size() < 1000) {
+					d.add( iterator.next().getContained().getId() );
+					iterator.remove();
+				}
+				List<RoleDependencyEntity> d2 = getRoleDependencyEntityDao().query(
+						"select dep from com.soffid.iam.model.RoleDependencyEntity dep left join fetch dep.contained where dep.container.id in (:d)", 
+						new Parameter[] { new Parameter("d", d) });
+				deps.addAll(d2);
+				pendingDeps.addAll(d2);
+			}
+		}
+		
+		
+		
+		List<RolAccountDetail> parents = new LinkedList<>();
+		parents.add(currentRol);
+ 		
+		for (RoleDependencyEntity ra : deps) {
+			List<RolAccountDetail> parentsToAdd = new LinkedList<>();
+			for (RolAccountDetail parent: parents) {
+				if (parent.granted.getId().equals(ra.getContainer().getId())) {
+					if ((ra.getMandatory() == null || ra.getMandatory().booleanValue()) &&
+							matchesGranteeDomainValue (parent, ra) && 
+							(ra.getStatus() == null || 
+							 ra.getStatus().equals(RoleDependencyStatus.STATUS_ACTIVE) ||
+							 ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)))
+					{
+		                for (AccountEntity ae : getAccountsForDispatcher(originUser, originAccount, ra.getContained().getSystem())) {
+		                    RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
+		                    parentsToAdd.add(n);
+		                    n.granteeRol = rol;
+		                    n.parent = currentRol;
+		                    n.generateHash();
+		                    if (! rad.contains(n)) {
+		                        if (type == DIRECT || type == ALL) rad.add(n);
+		                    }
+		                }
+					}
+				}
+			}
+			parents.addAll(parentsToAdd);
         }
 	}
 

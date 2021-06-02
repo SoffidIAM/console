@@ -93,7 +93,7 @@ public class ComparisonExpression extends AbstractExpression {
 		else if (v2 instanceof Boolean)
 			return compareBoolean ((Boolean) v2, Boolean.parseBoolean(value.toString()));
 		else
-			return compareString (v2.toString(), value.toString());
+			return compareString (v2.toString(), value == null ? null: value.toString());
 	}
 	
 	private boolean compareString(String attributeValue, String matchValue) throws EvalException 
@@ -101,6 +101,10 @@ public class ComparisonExpression extends AbstractExpression {
 		if ("eq".equalsIgnoreCase(operator))
 		{
 			return attributeValue.equals((String)matchValue);
+		}
+		if ("eq_ci".equalsIgnoreCase(operator))
+		{
+			return attributeValue.equalsIgnoreCase((String)matchValue);
 		}
 		if ("gt".equalsIgnoreCase(operator))
 		{
@@ -144,7 +148,7 @@ public class ComparisonExpression extends AbstractExpression {
 
 	private boolean compareLong(Long attributeValue, Long matchValue) throws EvalException 
 	{
-		if ("eq".equalsIgnoreCase(operator))
+		if ("eq".equalsIgnoreCase(operator) || "eq_ci".equalsIgnoreCase(operator))
 		{
 			return attributeValue.equals(matchValue);
 		}
@@ -190,7 +194,7 @@ public class ComparisonExpression extends AbstractExpression {
 
 	private boolean compareDouble(Double attributeValue, Double matchValue) throws EvalException 
 	{
-		if ("eq".equalsIgnoreCase(operator))
+		if ("eq".equalsIgnoreCase(operator) || "eq_ci".equalsIgnoreCase(operator))
 		{
 			return attributeValue.equals(matchValue);
 		}
@@ -236,7 +240,7 @@ public class ComparisonExpression extends AbstractExpression {
 
 	private boolean compareDate(Date attributeValue, Date matchValue) throws EvalException 
 	{
-		if ("eq".equalsIgnoreCase(operator))
+		if ("eq".equalsIgnoreCase(operator) || "eq_ci".equalsIgnoreCase(operator))
 		{
 			return attributeValue.equals(matchValue);
 		}
@@ -282,7 +286,7 @@ public class ComparisonExpression extends AbstractExpression {
 
 	private boolean compareBoolean(Boolean attributeValue, Boolean matchValue) throws EvalException 
 	{
-		if ("eq".equalsIgnoreCase(operator))
+		if ("eq".equalsIgnoreCase(operator) || "eq_ci".equalsIgnoreCase(operator))
 		{
 			return attributeValue.equals(matchValue);
 		}
@@ -346,6 +350,13 @@ public class ComparisonExpression extends AbstractExpression {
 					query.getWhereString().append(ctx.objectName);
 					query.getWhereString().append(" =  ");
 					addParameter (query, value, ctx.hibernateClass);
+				}
+				else if ("eq_ci".equalsIgnoreCase(operator))
+				{
+					query.getWhereString().append("upper(");
+					query.getWhereString().append(ctx.objectName);
+					query.getWhereString().append(") =  ");
+					addParameter (query, value.toString().toUpperCase(), ctx.hibernateClass);
 				}
 				else if ("gt".equalsIgnoreCase(operator))
 				{

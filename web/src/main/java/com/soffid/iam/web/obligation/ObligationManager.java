@@ -69,7 +69,8 @@ public class ObligationManager {
 				return obligation;
 			Map<String, String> obligationAttributes = obligation.getAttributes();
 			for (String key: obligationAttributes.keySet()) {
-				if (! obligationAttributes.get(key).equals(principalAttributes.get(key))) {
+				if ( obligationAttributes.get(key) != null &&
+						! obligationAttributes.get(key).equals(principalAttributes.get(key))) {
 					return obligation;
 				}
 			}

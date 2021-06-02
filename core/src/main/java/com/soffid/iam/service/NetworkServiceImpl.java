@@ -381,14 +381,17 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     	for (HostAliasEntity hae: new LinkedList<HostAliasEntity>(host.getHostAlias())) {
     		if (l.contains(hae.getAlias()))
     			l.remove(hae.getAlias());
-    		else
+    		else {
+    			host.getHostAlias().remove(hae);
     			getHostAliasEntityDao().remove(hae);
+    		}
     	}
     	for (String s: l) {
     		HostAliasEntity ha = getHostAliasEntityDao().newHostAliasEntity();
     		ha.setHost(host);
     		ha.setAlias(s);
     		getHostAliasEntityDao().create(ha);
+    		host.getHostAlias().add(ha);
     	}
 	}
 

@@ -19,6 +19,7 @@
 						if="${soffid:isUserInRole('role:create') &amp;&amp; soffid:isUserInRole('role:update') &amp;&amp; soffid:isUserInRole('role:delete')}" 
 						onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:frame.bulkAction" />
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"

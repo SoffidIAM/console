@@ -27,6 +27,8 @@ import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.InputField3;
 
@@ -313,16 +315,20 @@ public class BulkActionHandler extends Window implements AfterCompose {
 		Timer timer = (Timer) getFellow("timer");
 		timer.start();
 		desktop.enableServerPush(true);
+		final SoffidPrincipal principal = Security.getSoffidPrincipal();
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				config.invokeEventThreadInits(inits, BulkActionHandler.this, event);
+				Security.nestedLogin(principal);
 				try {
 					bulkAction.apply(selectedAttributes, selectedActions, selectedValues, true,
 							desktop, p);
 					endMessage = Labels.getLabel("bulk.success");
 				} catch (Exception e) {
 					endMessage = SoffidStackTrace.generateShortDescription(e);
+				} finally {
+					Security.nestedLogoff();
 				}
 				try {
 					Executions.activate(desktop);

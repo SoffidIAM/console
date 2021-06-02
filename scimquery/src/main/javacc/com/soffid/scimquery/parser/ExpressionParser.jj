@@ -29,6 +29,7 @@ SKIP : { " " }
 SKIP : { "\n" | "\r" | "\r\n" }
 TOKEN : { < PLUS : "+" > }
 TOKEN : { < EQ : ["E","e"]["Q","q"] > }
+TOKEN : { < EQ_CI : ["E","e"]["Q","q"]["_"]["C","c"]["I","i"] > }
 TOKEN : { < GT : ["G","g"]["T","t"] > }
 TOKEN : { < GE : ["G","g"]["e","e"] > }
 TOKEN : { < LT : ["L","l"]["t","t"] > }
@@ -99,6 +100,7 @@ ComparisonExpression Comparison () :
 	(
 		(
 			( operator = <EQ> |
+			  operator = <EQ_CI> |
 			  operator = <GT> |
 			  operator = <GE> |
 			  operator = <LT> |

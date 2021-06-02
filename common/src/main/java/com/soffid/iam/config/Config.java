@@ -219,10 +219,17 @@ public class Config {
         theConfig = new Config(serverList, port);
     }
 
+    String serverListCache;
+    long lastServerLookup = 0;
     public String getServerList() throws RemoteException,
             InternalErrorException {
         if (isServer()) {
-            return serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
+        	if ( lastServerLookup + 10000 < System.currentTimeMillis()) // 10 seconds cache
+        	{
+        		serverListCache = serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
+        		lastServerLookup = System.currentTimeMillis();
+        	}
+        	return serverListCache;
         } else
             return prop.getProperty(SERVERLIST_PROPERTY); //$NON-NLS-1$
     }

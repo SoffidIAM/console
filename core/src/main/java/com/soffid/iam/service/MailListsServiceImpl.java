@@ -284,13 +284,12 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 
 	protected void handleDelete(MailList llistaCorreu) throws Exception {
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
-		if(!llistaCorreuEntity.getExternals().isEmpty() || !llistaCorreuEntity.getUserMailLists().isEmpty() || !llistaCorreuEntity.getMailListContent().isEmpty())
-			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.IntegrityException"), llistaCorreu.getName()));
-//		getMailListAttributeEntityDao().remove(llistaCorreuEntity.getAttributes());
+		
+		getExternEmailEntityDao().remove(llistaCorreuEntity.getExternals());
 		getUserEmailEntityDao().remove(llistaCorreuEntity.getUserMailLists());
+		getEmailListContainerEntityDao().remove(llistaCorreuEntity.getMailListContent());
 		getMailListGroupMemberEntityDao().remove(llistaCorreuEntity.getGroups());
 		getMailListRoleMemberEntityDao().remove(llistaCorreuEntity.getRoles());
-		getExternEmailEntityDao().remove(llistaCorreuEntity.getExternals());
 		getEmailListEntityDao().remove(llistaCorreuEntity);
 	}
 

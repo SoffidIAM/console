@@ -38,6 +38,7 @@ public abstract class Grup {
 
 	@Nullable
 	@Attribute(translated = "parentGroup", type="GROUP" )
+	@JsonAttribute(hibernateAttribute = "parent.name")
 	public java.lang.String codiPare;
 
 	@Nullable

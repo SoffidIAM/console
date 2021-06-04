@@ -39,10 +39,10 @@
 - name: ${c:l('aplica_rolinfo.zul.Descripcia')}
   value: roleDescription
 - name: ${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}
-  value: domainValue/value
+  value: domainValue.value
   default: false
 - name: ${c:l('aplicacions.zul.DomainDescription')}
-  value: domainValue/description
+  value: domainValue.description
   default: false
 - name: ${c:l('usuaris.zul.Bbdd')}
   width: 150px

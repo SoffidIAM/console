@@ -3506,6 +3506,15 @@ public class ApplicationServiceImpl extends
 						null
 						);
 				ra.addAll(getRoleAccountEntityDao().toRoleAccountList(grants));
+				Collection<RoleAccountEntity> grants2 = getRoleAccountEntityDao().findByRoleAndDomainValue(
+						role.getName(),
+						role.getSystem().getName(),
+						DomainType.GROUPS,
+						group,
+						null,
+						null
+						);
+				ra.addAll(getRoleAccountEntityDao().toRoleAccountList(grants2));
 			}
 		}
 		return ra;

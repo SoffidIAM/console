@@ -311,7 +311,7 @@ public abstract class RolEntity {
 	@Operation(grantees = { roles.application_query.class })
 	@DaoFinder("select u "
 			+ "from com.soffid.iam.model.RoleEntity as u "
-			+ "where u.domainType = 'APLICACIONS' and "
+			+ "where (u.domainType = 'APLICACIONS' or u.domainType = 'APPLICATIONS') and "
 			+ " u.id in (select e.role.id from com.soffid.iam.model.AuthorizationEntity e) and "
 			+ " u.system.tenant.id=:tenantId")
 	public java.util.Collection<RolEntity> findApplicationManagementRoles()
@@ -322,7 +322,7 @@ public abstract class RolEntity {
 	@Operation(grantees = { roles.application_query.class })
 	@DaoFinder("select distinct u "
 			+ "from com.soffid.iam.model.RoleEntity as u "
-			+ "where (u.domainType = 'GRUPS' or u.domainType='GRUPS_USUARI') and "
+			+ "where (u.domainType = 'GRUPS' or u.domainType='GRUPS_USUARI' or u.domainType='GROUPS' or u.domainType='MEMBERSHIPS') and "
 			+ " u.id in (select e.role.id from com.soffid.iam.model.AuthorizationEntity e) and "
 			+ " u.system.tenant.id=:tenantId")
 	public java.util.Collection<RolEntity> findGroupManagementRoles()

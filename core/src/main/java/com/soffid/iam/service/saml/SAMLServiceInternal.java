@@ -37,6 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterOutputStream;
 
 import javax.crypto.SecretKey;
 import javax.xml.namespace.QName;
@@ -478,19 +482,19 @@ public class SAMLServiceInternal {
 			
 			SamlRequest r = new SamlRequest();
 			r.setParameters(new HashMap<String, String>());
+			boolean compress = false;
 			for (SingleSignOnService sss : idpssoDescriptor.getSingleSignOnServices()) {
 				if (sss.getBinding().equals(SAMLConstants.SAML2_REDIRECT_BINDING_URI)) {
 					r.setMethod(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
 					r.setUrl(sss.getLocation());
-					req.setProtocolBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
 					req.setDestination(sss.getLocation());
+					compress = true;
 					break;
 				}
 				if (sss.getBinding().equals(SAMLConstants.SAML2_POST_BINDING_URI)) {
 					r.setMethod(SAMLConstants.SAML2_POST_BINDING_URI);
 					r.setUrl(sss.getLocation());
 					req.setDestination(sss.getLocation());
-					req.setProtocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
 					break;
 				}
 			}
@@ -500,6 +504,7 @@ public class SAMLServiceInternal {
 			if (path.startsWith("/")) path = path.substring(1);
 			if (!path.isEmpty() && ! path.endsWith("/")) path = path + "/";
 			req.setAssertionConsumerServiceURL(getBaseURL(hostName)+path+"saml/log/post");
+			req.setProtocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
 			req.setForceAuthn(false);
 			req.setID(newID);
 			req.setIssueInstant(new DateTime ());
@@ -513,7 +518,18 @@ public class SAMLServiceInternal {
 			String xmlString = generateString(xml, false);
 			
 			r.getParameters().put("RelayState", newID);
-			r.getParameters().put("SAMLRequest", Base64.encodeBytes(xmlString.getBytes("UTF-8")));
+			if (compress) {
+				ByteArrayOutputStream ba = new ByteArrayOutputStream();
+				DeflaterOutputStream out = new DeflaterOutputStream(ba, new Deflater(Deflater.DEFAULT_COMPRESSION, true));
+				out.write(xmlString.getBytes("UTF-8"));
+				out.flush();
+				out.close();
+				r.getParameters().put("SAMLRequest", Base64.encodeBytes(ba.toByteArray()));
+			}
+			else 
+			{
+				r.getParameters().put("SAMLRequest", Base64.encodeBytes(xmlString.getBytes("UTF-8")));
+			}
 //			encryptAssertion(req, r, idp, idpssoDescriptor);
 			
 			SamlRequestEntity reqEntity = requestDao.newSamlRequestEntity();
@@ -523,6 +539,7 @@ public class SAMLServiceInternal {
 			reqEntity.setFinished(false);
 			requestDao.create(reqEntity);
 
+			
 			return r;
 		} catch (Exception e) {
 			if (e instanceof InternalErrorException)

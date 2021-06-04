@@ -47,13 +47,6 @@
 			<new-instance-bean className="com.soffid.iam.api.Group">
 			</new-instance-bean>
 		</finder>
-		<finder name="impressora" type="impressora">
-			<ejb-finder jndi="java:comp/env/ejb/ImpressoraEJB" method="findGrupImpressoresByCodiGrup">  <!-- tothom -->
-				<parameter value="${instance.codi}" />
-			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.GrupImpressora">
-			</new-instance-bean>
-		</finder>
 		<finder name="grantedRoles" type="role">
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findRoleGrantsByGroup"
 				if="canQueryGroupRoles"> <!-- group:role:query -->
@@ -71,7 +64,7 @@
 			</new-instance-bean>
 		</finder>
 
-		<finder name="managementRole" type="managementRole" refreshAfterCommit="true">  <!-- application:query -->
+		<finder name="managementRole" type="managementRole" >  <!-- application:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
 				method="findGroupManagementRoles">
 			</ejb-finder>
@@ -79,10 +72,10 @@
 
 		<finder name="usuarisRolGrup" type="usuarisRolGrup">
 			<ejb-finder jndi="java:/module/GroupService-v2"
-				method="findRolsUsuarisTipusDominiGrupsAndGrupsUsuari" if="canQueryGroupRoles"> <!-- group:role:query -->
-				<parameter value="${instance.codi}" />
+				method="findUsersRolesDomainTypeAndUserGroups" if="canQueryGroupRoles"> <!-- group:role:query -->
+				<parameter value="${instance.name}" />
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.RolsUsuaris">
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount">
 			</new-instance-bean>
 		</finder>
 
@@ -140,10 +133,10 @@
 		<finder name="manager" type="manager">
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
 				method="findGroupManagers">
-				<parameter value="${parent.instance.codi}" />
-				<parameter value="${instance.nom}" />
+				<parameter value="${parent.instance.name}" />
+				<parameter value="${instance.name}" />
 			</ejb-finder>
-			<new-instance-bean className="es.caib.seycon.ng.comu.RolAccount">
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount">
 			</new-instance-bean>
 		</finder>
 	</datanode>

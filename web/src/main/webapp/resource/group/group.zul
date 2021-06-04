@@ -4,6 +4,7 @@
 <?page id="group"?>
 <?component name="group_users" macro-uri="group-users.zul"?>
 <?component name="group_roles" macro-uri="group-roles.zul"?>
+<?component name="group_managers" macro-uri="group-managers.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.group.GroupHandler" id="frame">
 	<datamodel id="model" rootNode="groups" src="descriptorGroup.xml"/>
@@ -70,6 +71,7 @@
 					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
 					<tab label="${c:l('aplicacions.zul.Usuaris')}" if="${soffid:isUserInRole('user:query') }" id="tabuser"/>
 					<tab if="${soffid:isUserInRole('group:role:query') }" label="${c:l('grups.zul.RolsAtorgats')}" id="tabroles" />
+					<tab if="${soffid:isUserInRole('user:role:query') }"  label="${c:l('aplicacions.zul.Responsables')}" id="tabmanagers"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
@@ -96,7 +98,10 @@
 						<group_users listbox="//group/listbox" id="group_users"/>
 					</tabpanel>
 					<tabpanel id="roles" fulfill="tabroles.onSelect" >
-						<group_roles listbox="//group/listbox" id="group_roles"/>
+						<group_roles listbox="//group/listbox" id="group_roles"  if="${soffid:isUserInRole('group:role:query') }" />
+					</tabpanel>
+					<tabpanel id="managers" fulfill="tabmanagers.onSelect"  if="${soffid:isUserInRole('user:role:query') }"  >
+						<group_managers listbox="//group/listbox" id="group_managers"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

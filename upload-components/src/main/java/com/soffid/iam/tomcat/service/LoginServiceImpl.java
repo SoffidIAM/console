@@ -63,16 +63,15 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	public SoffidPrincipal authenticate(String username, String credentials) {
+		String masterMessage = null;
 		try {
 			boolean samlAuthorized = false;
-		
 			if (username == null || username.trim().isEmpty())
 				return null;
 			
 			String account;
 			String holderGroup = null;
 			Tenant tenant;
-			log.info(username + " logging in");
 			ServiceLocator locator = ServiceLocator.instance();
 
 			SamlService saml = locator.getSamlService();
@@ -125,15 +124,15 @@ public class LoginServiceImpl implements LoginService {
 					try {
 						acc = as.findAccount(account, dispatcher);
 					} catch (IllegalArgumentException e) {
-						log.info("Login rejected: username and/or credentials are empty");
+						log.info(masterMessage = "Login rejected: username and/or credentials are empty");
 						return null;
 					}
 					if (acc == null) {
-						log.info(username + " login rejected. Unknown account");
+						log.info(masterMessage = username + " login rejected. Unknown account");
 						return null;
 					}
 					if (acc.isDisabled()) {
-						log.info(username + " login rejected. Disabled account");
+						log.info(masterMessage = username + " login rejected. Disabled account");
 						return null;
 					}
 	
@@ -162,6 +161,8 @@ public class LoginServiceImpl implements LoginService {
 								userName, fullName, holderGroup,
 								roles, groups, soffidRoles,
 								holder);
+						log.info(masterMessage = principal.getName() + " login accepted");
+
 						if (userName != null) {
 							prefsSvc.setUserPreference(userName,"last_login", "" + System.currentTimeMillis());
 						}
@@ -174,8 +175,9 @@ public class LoginServiceImpl implements LoginService {
 								roles,
 								groups, soffidRoles,
 								holder);
+						log.info(masterMessage = principal.getName() + " login accepted with expired password");
 					} else {
-						log.info(username + " login rejected. Invalid password");
+						log.info(masterMessage = username + " login rejected. Invalid password");
 						return null;
 					}
 					
@@ -204,6 +206,9 @@ public class LoginServiceImpl implements LoginService {
 			throw new SecurityException ("Error during login process", e);
 		} catch (InternalErrorException e) {
 			throw new SecurityException ("Error during login process", e);
+		} finally {
+			if (masterMessage != null)
+				log.info(masterMessage);
 		}
 	}
 

@@ -358,15 +358,7 @@ public class FrameHandler extends Frame {
 
 	
 	public void closeFrame() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, JSONException {
-		Page p = getPage();
-		String path = p.getRequestPath();
-		
-		List<MenuOption> options;
-		MenuParser menuParser = new MenuParser();
-		options = menuParser.parse(menu);
-		MenuOption o = menuParser.findMenu(options, path);
-		if (o != null)	
-			Application.setPage(o.getUrl());
+		Application.goBack();
 
 	}
 	

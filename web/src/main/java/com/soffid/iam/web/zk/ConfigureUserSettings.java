@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
+import java.security.Principal;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -33,6 +34,7 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.User;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -146,46 +148,58 @@ public class ConfigureUserSettings {
 	
 	/**
 	 * Obté les preferències de l'usuari a nivel de SEU
+	 * @param nestedPrincipal 
 	 * @throws Exception
 	 * @throws RemoteException
 	 * @throws NamingException
 	 * @throws CreateException
 	 */
-	public static void configuraUsuariSEU(HttpServletRequest req) throws Exception,
+	public static void configuraUsuariSEU(HttpServletRequest req, Principal principal) throws Exception,
 			RemoteException, NamingException, CreateException  {
 		
 		// Comprovem que no s'hagin obtinunnamed1()gut les dades en aquesta sessió
 		HttpSession sessio = req.getSession();
 		
-		User user = com.soffid.iam.EJBLocator.getUserService().getCurrentUser();
-		if (user == null)
-		{
-			Locale l = configuraLocale(null, req);
-			return;
+		if (principal != null && principal instanceof SoffidPrincipal) {
+			Security.nestedLogin((SoffidPrincipal)principal);
+			try {
+				User user = com.soffid.iam.EJBLocator.getUserService().getCurrentUser();
+				if (user == null)
+				{
+					Locale l = configuraLocale(null, req);
+					return;
+				}
+				
+				String preferredLanguage = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference(SEU_LANG);
+				Locale l  = configuraLocale(preferredLanguage, req);
+				sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());
+				
+				String timezone = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("timezone");
+				if (timezone == null)
+					timezone = ConfigurationCache.getProperty("soffid.timezone");
+				if (timezone != null)
+					sessio.setAttribute(SESSIO_TIMEZONE, TimeZone.getTimeZone(timezone));
+				String dateformat = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("dateformat");
+				if (dateformat == null)
+					dateformat = ConfigurationCache.getProperty("soffid.dateformat");
+				if (dateformat != null)
+					sessio.setAttribute(SESSIO_DATEFORMAT, dateformat.trim());
+				String timeformat = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("timeformat");
+				if (timeformat == null)
+					timeformat = ConfigurationCache.getProperty("soffid.timeformat");
+				if (timeformat != null)
+					sessio.setAttribute(SESSIO_TIMEFORMAT, timeformat.trim());
+				String sourceIP = Security.getClientIp();
+				sessio.setAttribute(SESSIO_IP, sourceIP);
+				com.soffid.iam.EJBLocator.getPreferencesService().updateMyPreference("last_ip", sourceIP);
+			} finally {
+				Security.nestedLogoff();
+			}
+		} else {
+			configuraLocale(null, req);
+			String sourceIP = Security.getClientIp();
+			sessio.setAttribute(SESSIO_IP, sourceIP);
 		}
-		
-		String preferredLanguage = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference(SEU_LANG);
-		Locale l  = configuraLocale(preferredLanguage, req);
-		sessio.setAttribute(SESSIO_IDIOMA, l.getLanguage());
-		
-		String timezone = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("timezone");
-		if (timezone == null)
-			timezone = ConfigurationCache.getProperty("soffid.timezone");
-		if (timezone != null)
-			sessio.setAttribute(SESSIO_TIMEZONE, TimeZone.getTimeZone(timezone));
-		String dateformat = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("dateformat");
-		if (dateformat == null)
-			dateformat = ConfigurationCache.getProperty("soffid.dateformat");
-		if (dateformat != null)
-			sessio.setAttribute(SESSIO_DATEFORMAT, dateformat.trim());
-		String timeformat = (String) com.soffid.iam.EJBLocator.getPreferencesService().findMyPreference("timeformat");
-		if (timeformat == null)
-			timeformat = ConfigurationCache.getProperty("soffid.timeformat");
-		if (timeformat != null)
-			sessio.setAttribute(SESSIO_TIMEFORMAT, timeformat.trim());
-		String sourceIP = Security.getClientIp();
-		sessio.setAttribute(SESSIO_IP, sourceIP);
-		com.soffid.iam.EJBLocator.getPreferencesService().updateMyPreference("last_ip", sourceIP);
 	}
 
 }

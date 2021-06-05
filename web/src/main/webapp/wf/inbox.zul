@@ -20,8 +20,8 @@
 			<datatable enablefilter="true" id="listbox" 
 				onSelect="ref:frame.openTask">
 			<attribute name="columns"><![CDATA[
-- name: ${c:l('inbox.lblIdentificador')}
-  value: id
+- name: ${c:l('deploy.lblIdProceso')}
+  value: processId
   className: datetimeColumn
 - name: ${c:l('deploy.lblProceso')}
   value: processName

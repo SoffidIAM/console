@@ -158,6 +158,7 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
 						o.put("actor", actors.toString());
 					}
 					o.put("processName", task.getProcessName());
+					o.put("processId", task.getProcessId());
 					o.put("id", task.getId());
 					sb.append(o.toString());
 				}

@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -327,40 +328,33 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         
         targetVO.setFullName(sourceEntity.getFullName());
 
-        fetchAccounts (targetVO, sourceEntity);
+        fetchAttributes(targetVO, sourceEntity);
         
     }
 
 
-    private void fetchAccounts(User target, UserEntity source) {
+    private void fetchAttributes(User target, UserEntity source) {
 		target.setAttributes(new HashMap<String, Object>());
 		Map<String, Object> attributes = target.getAttributes();
 		for (UserDataEntity att : source.getUserData()) {
-			UserData vd = getUserDataEntityDao().toUserData(att);
 			if (att.getDataType().getMultiValued() != null && att.getDataType().getMultiValued().booleanValue())
 			{
-				LinkedList<Object> r = (LinkedList<Object>) attributes.get(vd.getAttribute());
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getDataType().getName());
 				if (r == null)
 				{
 					r = new LinkedList<Object>();
-					attributes.put(vd.getAttribute(), r);
+					attributes.put(att.getDataType().getName(), r);
 				}
-				if (vd.getDateValue() != null)
-					r.add(vd.getDateValue());
-				else if (vd.getValue() != null)
-					r.add(vd.getValue());
-				else if (vd.getBlobDataValue() != null)
-					r.add(vd.getBlobDataValue());
+				r.add(att.getObjectValue());
 			}
 			else
 			{
-				if (vd.getDateValue() != null)
-					attributes.put(vd.getAttribute(), vd.getDateValue());
-				else if (vd.getValue() != null)
-					attributes.put(vd.getAttribute(), vd.getValue());
-				else if (vd.getBlobDataValue() != null)
-					attributes.put(vd.getAttribute(), vd.getBlobDataValue());
+				attributes.put(att.getDataType().getName(),att.getObjectValue());
 			}
+		}
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
 		}
 	}
 

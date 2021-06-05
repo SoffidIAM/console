@@ -66,8 +66,8 @@
 						</row>
 						<row>
 							<label value="${c:l('servers.zul.URL')} :"/>
-							<textbox readonly="true" bind="@url" maxlength="50"
-									style="width:100%; max-width: 50em" constraint="no empty"/>
+							<textbox readonly="true" bind="@url" 
+									style="width:100%; max-width: 50em" />
 						</row>
 						<row>
 							<label value="${c:l('servers.zul.Type')} :"/>

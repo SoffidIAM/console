@@ -41,7 +41,7 @@
 				onClick="ref:window.onWindowClose">
 			</button>
 			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
-				datamodel="${dataSource }" 
+				datamodel="//user/model" 
 				onClick="ref:window.onChange"/>
 		</div>
 	</window>

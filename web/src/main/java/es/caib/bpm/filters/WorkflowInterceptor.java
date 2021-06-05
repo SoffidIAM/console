@@ -125,7 +125,7 @@ public class WorkflowInterceptor implements Filter {
 							.getAttribute(SOFFID_NESTED_PRINCIPAL);
 					
 					if (sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA) == null)
-						ConfigureUserSettings.configuraUsuariSEU((HttpServletRequest) request);
+						ConfigureUserSettings.configuraUsuariSEU((HttpServletRequest) request, principal);
 
 					String forcedLocale = ConfigurationCache.getProperty("soffid.language");
 					if (forcedLocale != null)

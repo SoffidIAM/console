@@ -64,7 +64,9 @@
 						<![CDATA[
 						- name: ${c:l('autoritzacions.zul.Rol')}
 						  value: role.name
-						- name: ${c:l('autoritzacions.zul.Bbdd')}
+						- name: ${c:l('com.soffid.iam.api.Role.system')}
+						  value: role.system
+						- name: ${c:l('com.soffid.iam.api.Role.description')}
 						  value: role.description
 						- name: ${c:l('autoritzacions.zul.Aplicacia')}
 						  value: role.informationSystemName

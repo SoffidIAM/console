@@ -48,6 +48,6 @@
 			onClick="ref:window.cleanWindow()" />
 		<button label="${c:l('user_renameaccount.Load')}"
 			id="loadButton"
-			onClick="ref:window.doLoad()" />
+			onClick="ref:window.doLoad" />
 	</hbox>
 </window>

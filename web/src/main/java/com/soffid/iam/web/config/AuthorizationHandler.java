@@ -204,7 +204,8 @@ public class AuthorizationHandler extends FrameHandler {
 				m = iterator.next();
 				String name = m.get("name");
 				String roles = m.get("roles");
-				if (name != null && roles != null && !name.isEmpty()) {
+				if (roles == null) roles = "";
+				if (name != null && !name.isEmpty()) {
 					Set<String> newRoles = new HashSet<String>();
 					for (String s: roles.split(";"))
 						if ( ! s.trim().isEmpty())

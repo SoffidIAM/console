@@ -718,6 +718,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     	ua.getUser().getAccounts().clear();
 				}
 				ae.getUsers().clear();
+				if (ae.getSystem().isMainSystem() || ae.getSystem().getUrl() == null) {
+					ae.setLastPasswordSet(null);
+					ae.setPasswordExpiration(null);
+					account.setLastPasswordSet(null);
+					account.setPasswordExpiration(null);
+				}
 			}
 			if (account.getType().equals(AccountType.USER))
 			{
@@ -791,7 +797,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			anyChange = true;
 		}
-		else if (! ae.getJumpServerGroup().getName().equals(ae.getJumpServerGroup()))
+		else if (! ae.getJumpServerGroup().getName().equals(account.getJumpServerGroup()))
 		{
 			anyChange = true;
 		}

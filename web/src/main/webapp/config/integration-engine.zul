@@ -12,7 +12,7 @@
 		<rows>
 			<row>
 				<label value="${c:l('parametres.zul.taskMode')}"/>
-				<listbox mold="select" id="taskMode">
+				<listbox mold="select" id="taskMode" onSelect="ref:frame.enableButtons">
 					<listitem value="readonly" label="${c:l('parametres.zul.mode.readonly') }"></listitem>
 					<listitem value="manual" label="${c:l('parametres.zul.mode.manual') }"></listitem>
 					<listitem value="auto" label="${c:l('parametres.zul.mode.auto') }"></listitem>
@@ -21,15 +21,17 @@
 			<row>
 				<label value="${c:l('parametres.zul.limit')}"/>
 				<div width="100%">
-					<intbox id="taskLimit"/>
+					<intbox id="taskLimit" onChanging="ref:frame.enableButtons" onChange="ref:frame.enableButtons"/>
 					<label value="${c:l('parametres.zul.limit2')}"/>
 				</div>
 			</row>
 			<row>
 				<label/>
 				<div style="margin-top: 2em">
-					<button image="/img/undo-r.svg" label="${c:l('rolsllista.zul.Cancel·la') }" onClick="ref:frame.refreshTaskEngine"/>
-					<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.updateTaskEngine"
+					<button image="/img/undo-r.svg" label="${c:l('common.undo') }" onClick="ref:frame.refreshTaskEngine" id="undoButton"
+						disabled="true"/>
+					<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.updateTaskEngine" id="commitButton"
+						disabled="true"
 						style="text-align:right"/>
 				</div>
 			</row>

@@ -2569,7 +2569,7 @@ div.menu2modal table {
 
 div.menu2modal.open {
     position: fixed;
-    z-index: +31;
+    z-index: +32768;
     left: 0;
     top: 0;
     width: 100%;

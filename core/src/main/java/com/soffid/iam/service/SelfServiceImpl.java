@@ -75,6 +75,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		String filter = ConfigurationCache.getProperty("selfservice.account.filter");
 				
 		User u = getCurrentUser();
+		
 		Security.nestedLogin(u.getUserName(), new String[] {
 			Security.AUTO_USER_ROLE_QUERY+Security.AUTO_ALL,
 			Security.AUTO_ACCOUNT_QUERY,

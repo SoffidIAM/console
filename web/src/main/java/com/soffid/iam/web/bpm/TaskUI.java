@@ -131,6 +131,9 @@ public class TaskUI extends FrameHandler implements EventListener {
     
 	public TaskUI() throws InternalErrorException, NamingException, CreateException {
 		super();
+		
+		String user = Security.getCurrentUser();
+		
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 		String id = req.getParameter("id"); //$NON-NLS-1$
 		if (id != null) {

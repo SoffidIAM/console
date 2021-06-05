@@ -1,5 +1,6 @@
 package com.soffid.iam.model;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -23,7 +24,6 @@ public class AttributeParser {
 			blobValue = null;
 		} 
 		else if (type.equals( TypeEnumeration.BINARY_TYPE) ||
-				type.equals( TypeEnumeration.HTML) ||
 				type.equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			value = null;
@@ -31,6 +31,18 @@ public class AttributeParser {
 				blobValue = (byte[]) v;
 			else
 				blobValue = Base64.decode(v.toString());
+		}
+		else if (type.equals( TypeEnumeration.HTML))
+		{
+			value = null;
+			if (v instanceof byte[])
+				blobValue = (byte[]) v;
+			else
+				try {
+					blobValue = v.toString().getBytes("UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					blobValue = v.toString().getBytes();
+				}
 		}
 		else if (type.equals( TypeEnumeration.DATE_TYPE) ||
 				type.equals( TypeEnumeration.DATE_TIME_TYPE))
@@ -78,10 +90,17 @@ public class AttributeParser {
 		if (type == null)
 			return value2;
 		else if (type.equals( TypeEnumeration.BINARY_TYPE) ||
-				type.equals( TypeEnumeration.HTML) ||
 				type.equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			return blobDataValue;
+		}
+		else if (type.equals( TypeEnumeration.HTML) )
+		{
+			try {
+				return new String(blobDataValue, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				return new String(blobDataValue);
+			}
 		}
 		else if (type.equals( TypeEnumeration.DATE_TYPE) ||
 				type.equals( TypeEnumeration.DATE_TIME_TYPE))

@@ -8,6 +8,8 @@ import javax.naming.NamingException;
 
 import org.json.JSONException;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Intbox;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
@@ -50,6 +52,12 @@ public class IntegrationEngineHandler extends FrameHandler {
 				taskMode.setSelectedItem(item);
 		String max = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.limit");
 		taskLimit.setText(max);
+		
+		Button b = (Button) getFellow("undoButton");
+		b.setDisabled(true);
+		b = (Button) getFellow("commitButton");
+		b.setDisabled(true);
+
 	}
 
 	void updateAttribute(String param, String value, String desc) throws InternalErrorException, NamingException, CreateException {
@@ -78,4 +86,10 @@ public class IntegrationEngineHandler extends FrameHandler {
 		closeFrame();
 	}
 
+	public void enableButtons(Event ev) {
+		Button b = (Button) getFellow("undoButton");
+		b.setDisabled(false);
+		b = (Button) getFellow("commitButton");
+		b.setDisabled(false);
+	}
 }

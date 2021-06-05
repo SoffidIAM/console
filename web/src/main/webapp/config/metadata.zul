@@ -191,7 +191,7 @@
 						valuesPath="/model:/visibility/literal"
 						disabled="${!canModifyMetadata}"></customfield3>
 				<customfield3 dataType="STRING" visible="false"  id="usevisrow"
-						label="${c:l('dadesAddicionals.zul.OperatorVisibility')}"
+						label="${c:l('dadesAddicionals.zul.UserVisibility')}"
 						bind="@userVisibility"
 						keysPath="/model:/visibility/value"
 						valuesPath="/model:/visibility/literal"

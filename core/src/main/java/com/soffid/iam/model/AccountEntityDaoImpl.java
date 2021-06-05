@@ -206,34 +206,26 @@ public class AccountEntityDaoImpl extends
 			target.setAttributes(new HashMap<String, Object>());
 			Map<String, Object> attributes = target.getAttributes();
 			for (AccountAttributeEntity att : source.getAttributes()) {
-				UserData vd = getAccountAttributeEntityDao().toUserData(att);
 				if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
 				{
-					LinkedList<Object> r = (LinkedList<Object>) attributes.get(vd.getAttribute());
+					LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
 					if (r == null)
 					{
 						r = new LinkedList<Object>();
-						attributes.put(vd.getAttribute(), r);
+						attributes.put(att.getMetadata().getName(), r);
 					}
-					if (vd.getDateValue() != null)
-						r.add(vd.getDateValue());
-					else if (vd.getValue() != null)
-						r.add(vd.getValue());
-					else if (vd.getBlobDataValue() != null)
-						r.add(vd.getBlobDataValue());
+					r.add(att.getObjectValue());
 				}
 				else
 				{
-					if (vd.getDateValue() != null)
-						attributes
-								.put(vd.getAttribute(), vd.getDateValue());
-					else if (vd.getValue() != null)
-						attributes.put(vd.getAttribute(), vd.getValue());
-					else if (vd.getBlobDataValue() != null)
-						attributes.put(vd.getAttribute(), vd.getBlobDataValue());
+					attributes.put(att.getMetadata().getName(),att.getObjectValue());
 				}
 			}
-			
+			for (Object o: attributes.values())
+			{
+				if (o != null && o instanceof List) Collections.sort((List) o);
+			}
+
 			Object o = attributes.get("SSO:URL");
 			if (o != null) target.setLoginUrl(o.toString());
 	

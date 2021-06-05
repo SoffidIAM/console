@@ -3158,6 +3158,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	private void fetchUserAttributes(Map<String, Object> attributes, Collection<UserDataEntity> userData, boolean applyRestrictions) {
+		attributes.clear();
+
 		for (UserDataEntity att : userData) {
 			UserData vd = getUserDataEntityDao().toUserData(att);
 			if (! applyRestrictions || att.getAttributeVisibility() != AttributeVisibilityEnum.HIDDEN)

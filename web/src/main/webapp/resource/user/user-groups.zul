@@ -32,7 +32,7 @@
 		title="${c:l('user-groups.details')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
 
-		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<div class="navigation-bar dummy">
 			<databutton image="/img/trash.svg" onlyIcon="true"
 					 if="${soffid:isUserInRole('user:group:delete')}" 
 					label="${c:l('plugins.zul.Delete') }" 

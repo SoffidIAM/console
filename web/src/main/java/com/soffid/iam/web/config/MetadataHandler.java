@@ -55,6 +55,7 @@ import com.soffid.iam.web.util.RemoveOnCloseStream;
 import au.com.bytecode.opencsv.CSVWriter;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.ReorderEvent;
 import es.caib.zkib.datamodel.DataModelCollection;
@@ -325,25 +326,26 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		);
 	}
 
-	public void addNewAttribute(Event event) throws CommitException {
+	public void addNewAttribute(Event event) throws Exception {
 		Component lb = getFellow("metadataGrid");
 		if (lb instanceof DataTable && applyNoClose(event))
 		{
-			DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(getForm(), "/metadata");
+			BindContext form = getForm();
+			DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(form, "/metadata");
 			long next = 1;
 			for ( int i = 0; i < coll.getSize(); i++) {
 				DataNode dn = (DataNode) coll.get(i);
-				if (!dn.isDeleted())
+				if (dn != null && !dn.isDeleted())
 				{
 					DataType dt = (DataType) dn.getInstance();
 					if (dt.getOrder() != null && dt.getOrder().longValue() >= next)
 						next = dt.getOrder().longValue()+1;
 				}
 			}
-			((DataTable) lb).addNew();
-
-			XPathUtils.setValue(lb, "@order", next);
-			
+			DataType dt2 = new DataType();
+			dt2.setOrder(next);
+			XPathUtils.createPath(form.getDataSource(), "/metadata", dt2);
+			((DataTable)lb).setSelectedIndex(coll.getSize()-1);
 			objectAttributeWindow.doHighlighted();
 		}
 	}
@@ -397,14 +399,16 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		long order = 1;
 		for (int i = 0; i < collection.size(); i++) {
 			DataNode target = (DataNode) collection.get(i);
-			if ( ! target.isDeleted() && target != src) {
-				DataType datatype = (DataType) target.getInstance();
-				if (target == event.getInsertBeforeObject()) {
-					srcDatatype.setOrder(order++);
-					src.update();
+			if (target != null) {
+				if ( ! target.isDeleted() && target != src) {
+					DataType datatype = (DataType) target.getInstance();
+					if (target == event.getInsertBeforeObject()) {
+						srcDatatype.setOrder(order++);
+						src.update();
+					}
+					datatype.setOrder(order++);
+					target.update();
 				}
-				datatype.setOrder(order++);
-				target.update();
 			}
 		}
 		if (event.getInsertBeforeObject() == null) {
@@ -510,8 +514,9 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 	public void setToDefault(Event event) throws Exception {
 		getModel().commit();
 		String name = (String) XPathUtils.eval(getListbox(), "@name");
+		Boolean builtin = (Boolean) XPathUtils.eval(getListbox(), "@builtin");
 		MetadataScope scope = (MetadataScope) XPathUtils.eval(getListbox(), "@scope");
-		if (scope != null) {
+		if (Boolean.TRUE.equals(builtin)) {
 			EJBLocator.getAdditionalDataService().registerStandardObject(
 					name.replace('.', '/')+".ui.json", 
 					scope, true);

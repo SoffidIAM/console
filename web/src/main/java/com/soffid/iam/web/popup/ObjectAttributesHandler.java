@@ -109,7 +109,7 @@ public class ObjectAttributesHandler extends Window implements AfterCompose {
 		
 	}
 	
-	void doLoad() throws NamingException, CreateException, InternalErrorException 
+	public void doLoad() throws NamingException, CreateException, InternalErrorException 
 	{
 		com.soffid.iam.service.ejb.DispatcherService svc = com.soffid.iam.EJBLocator.getDispatcherService();
 		com.soffid.iam.sync.engine.intf.GetObjectResults o = svc.reconcile(

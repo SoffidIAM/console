@@ -40,6 +40,7 @@ import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.Host;
 import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
@@ -644,6 +645,9 @@ public class AdditionalDataServiceImpl extends
 			String type = att.optString("type");
 			String lettercase = att.optString("lettercase");
 			boolean required = att.optBoolean("required", false);
+			if ( resourceName.equals("com/soffid/iam/api/Host.ui.json") && 
+					name.equals("networkCode"))
+				required = true;
 			boolean readonly = att.optBoolean("readonly", false);
 			boolean hidden = att.optBoolean("hidden", false);
 			boolean multiline = att.optBoolean("multiline", false);
@@ -710,6 +714,7 @@ public class AdditionalDataServiceImpl extends
 				getMetaDataEntityDao().create(md);
 			}
 		}
+		
 	}
 
 	private TypeEnumeration guessType(String type) throws InternalErrorException {

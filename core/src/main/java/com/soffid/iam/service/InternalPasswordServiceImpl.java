@@ -1116,6 +1116,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (pcd == null || pcd.getRememberedPasswords() == null
 					|| ap.getOrder() + 1 >= pcd.getRememberedPasswords().longValue()) {
 				getAccountPasswordEntityDao().remove(ap);
+				account.getPasswords().remove(ap);
 			} else {
 				ap.setOrder(ap.getOrder() + 1);
 				getAccountPasswordEntityDao().update(ap);
@@ -1153,7 +1154,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		ce.setPassword2(getDigest2(account.getId(), password));
 		ce.setActive(estat);
 		getAccountPasswordEntityDao().create(ce);
-
+		account.getPasswords().add(ce);
 		if (account.getSystem().getUrl() == null || account.getSystem().getUrl().isEmpty()) {
 			account.setLastPasswordSet(new Date());
 			account.setPasswordExpiration(c.getTime());

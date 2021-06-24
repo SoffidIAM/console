@@ -248,7 +248,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			try {
 				ctx.close();
 			} catch (Exception e) {
-				log.info("Error closing BPM context", e); //$NON-NLS-1$
+				throw new RuntimeException(e);
 			}
 		}
 	}

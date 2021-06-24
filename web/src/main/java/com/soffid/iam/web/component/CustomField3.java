@@ -35,7 +35,6 @@ public class CustomField3 extends InputField3 {
 	String visibilityScript;
 	boolean visible = true;
 	boolean required = false;
-	boolean hideUserName = false;
 	boolean raisePrivileges = false;
 	boolean noLabel = false;
 	String enumeration = null;
@@ -256,14 +255,6 @@ public class CustomField3 extends InputField3 {
 	public void setRequired(boolean required) {
 		this.required = required;
 		super.setRequired(required);
-	}
-
-	public boolean isHideUserName() {
-		return hideUserName;
-	}
-
-	public void setHideUserName(boolean hideUserName) {
-		this.hideUserName = hideUserName;
 	}
 
 	public boolean isRaisePrivileges() {

@@ -11,6 +11,7 @@ import org.zkoss.zk.ui.Component;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.System;
 import com.soffid.iam.web.component.InputField3;
+import com.soffid.iam.web.component.InputFieldContainer;
 import com.soffid.iam.web.component.InputFieldUIHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 
@@ -33,10 +34,10 @@ public class AccountTypeHandler extends InputFieldUIHandler {
 	}
 
 	public void enableDescription(InputField3 field) {
-		ObjectAttributesDiv d = field.getObjectContainer();
+		InputFieldContainer d = field.getObjectContainer();
 		if (d != null) {
 			Object type = field.getValue();
-			ObjectAttributesDiv oad = (ObjectAttributesDiv) d;
+			InputFieldContainer oad = (InputFieldContainer) d;
 			InputField3 desc = oad.getInputFieldsMap().get("description");
 			if (type == null)
 				desc.setReadonly(false);

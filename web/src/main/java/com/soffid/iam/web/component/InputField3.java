@@ -128,13 +128,13 @@ public class InputField3 extends Databox
 		createField();
 	}
 
-	public ObjectAttributesDiv getObjectContainer () {
+	public InputFieldContainer getObjectContainer () {
 		Component c = this;
 		do
 		{
-			if (c instanceof ObjectAttributesDiv)
+			if (c instanceof InputFieldContainer)
 			{
-				return ((ObjectAttributesDiv) c);
+				return ((InputFieldContainer) c);
 			}
 			else
 				c = c.getParent();
@@ -153,9 +153,9 @@ public class InputField3 extends Databox
 				((AttributesDiv) c).adjustVisibility();
 				break;
 			}
-			else if (c instanceof ObjectAttributesDiv)
+			else if (c instanceof InputFieldContainer)
 			{
-				((ObjectAttributesDiv) c).adjustVisibility();
+				((InputFieldContainer) c).adjustVisibility();
 				break;
 			}
 			else
@@ -495,8 +495,8 @@ public class InputField3 extends Databox
 		} catch (Exception e) {
 			// Ignore parse error
 		}
-		ObjectAttributesDiv grandpa = getObjectContainer();
-		Map attributes = grandpa != null ? ((ObjectAttributesDiv) grandpa).getAttributesMap():
+		InputFieldContainer grandpa = getObjectContainer();
+		Map attributes = grandpa != null ? ((InputFieldContainer) grandpa).getAttributesMap():
 			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
 		SecureInterpreter i = new SecureInterpreter();
 
@@ -509,9 +509,9 @@ public class InputField3 extends Databox
 				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
-			else if (c instanceof ObjectAttributesDiv)
+			else if (c instanceof InputFieldContainer)
 			{
-				i.set("inputFields", ((ObjectAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
+				i.set("inputFields", ((InputFieldContainer) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else

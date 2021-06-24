@@ -260,7 +260,8 @@ public class VOFactory {
 		while (t != null)
 		{
 			populateTokenComments(t, comments);
-			t = t.getProcessInstance().getSuperProcessToken();
+			ProcessInstance proc = t.getProcessInstance();
+			t = proc == null ? null : proc.getSuperProcessToken();
 		} 
 	}
 

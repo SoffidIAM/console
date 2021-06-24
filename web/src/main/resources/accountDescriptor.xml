@@ -38,6 +38,8 @@
 				method="findAccountServices">
 				<parameter value="${instance}"/>
 			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.HostService"> 
+			</new-instance-bean>
 		</finder>
 		<script-handler>
 			<update-script>
@@ -85,7 +87,18 @@
 	<datanode name="tipusUsuari">
 	</datanode>
 	
-	<datanode name="service" transient="true">
+	<datanode name="service">
+		<ejb-handler jndi="java:/module/NetworkDiscoveryService-v2">
+			<insert-method method="createHostService" returnBean="true" > <!-- user:role:create -->
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="deleteHostService"  >  <!-- user:role:delete -->
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="updateHostService" returnBean="true"> 
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
 	</datanode>
 	
 

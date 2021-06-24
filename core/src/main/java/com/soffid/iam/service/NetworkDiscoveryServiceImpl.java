@@ -175,12 +175,14 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 
 		for (Iterator<HostServiceEntity> it = entity.getServices().iterator(); it.hasNext();) {
 			HostServiceEntity hse = it.next();
-			HostService hs = find(hse, services);
-			if (hs == null) {
-				getHostServiceEntityDao().remove(hse);
-				it.remove();
-			} else {
-				services.remove(hs);
+			if (! hse.isManual()) {
+				HostService hs = find(hse, services);
+				if (hs == null) {
+					getHostServiceEntityDao().remove(hse);
+					it.remove();
+				} else {
+					services.remove(hs);
+				}
 			}
 		}
 		
@@ -188,6 +190,7 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			HostServiceEntity pe = getHostServiceEntityDao().newHostServiceEntity();
 			service.setHostId(host.getId());
 			getHostServiceEntityDao().hostServiceToEntity(service, pe, true);
+			pe.setManual(false);
 			getHostServiceEntityDao().create(pe);
 			entity.getServices().add(pe);
 		}
@@ -321,6 +324,40 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			r.add(getHostEntityDao().toHost(hs.getHost()));
 		}
 		return r;
+	}
+
+
+	@Override
+	protected HostService handleCreateHostService(HostService service) throws Exception {
+		HostServiceEntity entity = getHostServiceEntityDao().hostServiceToEntity(service);
+		entity.setManual(true);
+		getHostServiceEntityDao().create(entity);
+		return getHostServiceEntityDao().toHostService(entity);
+	}
+
+
+	@Override
+	protected HostService handleUpdateHostService(HostService service) throws Exception {
+		HostServiceEntity entity = getHostServiceEntityDao().load(service.getId());
+		if (entity == null)
+			return null;
+		entity.setCommand(service.getCommand());
+		if (entity.isManual()) {
+			entity.setService(service.getService());
+			entity.setHost( getHostEntityDao().load(service.getHostId()) );
+			entity.setAccount( getAccountEntityDao().findByNameAndSystem(service.getAccountName(), service.getAccountSystem()) );
+		}
+		getHostServiceEntityDao().create(entity);
+		return getHostServiceEntityDao().toHostService(entity);
+	}
+
+
+	@Override
+	protected void handleDeleteHostService(HostService service) throws Exception {
+		HostServiceEntity entity = getHostServiceEntityDao().load(service.getId());
+		if (entity != null && entity.isManual()) {
+			getHostServiceEntityDao().remove(entity);
+		}
 	}
 
 }

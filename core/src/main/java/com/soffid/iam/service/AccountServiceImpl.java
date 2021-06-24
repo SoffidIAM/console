@@ -1670,7 +1670,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				throw new BadPasswordException(pcr.getReason());
 			
 			// Check user authorization
-			 			if (caller.getId() != ae.getId())
+			if (caller.getId() != ae.getId())
 			{
 				if (ae.getType().equals(AccountType.USER))
 				{

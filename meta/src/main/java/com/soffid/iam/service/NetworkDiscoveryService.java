@@ -69,6 +69,18 @@ public class NetworkDiscoveryService {
 	@Description("Internal method to register the account protected services")
 	void registerHostServices(Maquina host, Dispatcher dispatcher, List<HostService> services, Map<String,String> domainToSystemMap) { }
 	
+	@Operation (grantees= {networkDiscovery_schedule.class})
+	@Description("Method to register a manual host service")
+	HostService createHostService(HostService service) { return null;}
+	
+	@Operation (grantees= {networkDiscovery_schedule.class})
+	@Description("Method to register a manual host service")
+	HostService updateHostService(HostService service) { return null;}
+
+	@Operation (grantees= {networkDiscovery_schedule.class})
+	@Description("Method to register a manual host service")
+	void deleteHostService(HostService service) { }
+
 	@Operation (grantees= {networkDiscovery_query.class})
 	@Description("Gets the account protected services for a host")
 	List<Dispatcher> findHostSystems(Maquina host) { return null; }

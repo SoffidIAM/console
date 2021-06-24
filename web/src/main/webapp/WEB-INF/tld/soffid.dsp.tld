@@ -41,6 +41,15 @@
 	</function>
 
 	<function>
+		<name>getHostIcon</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String getHostIcon(es.caib.zkib.datamodel.DataNode node)</function-signature>
+		<description>
+		Gets the icon for a host in the discovery page
+		</description>
+	</function>
+
+	<function>
 		<name>dateformat</name>
 		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
 		<function-signature>java.lang.String getDateFormat()</function-signature>

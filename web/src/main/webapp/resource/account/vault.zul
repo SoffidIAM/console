@@ -128,7 +128,7 @@
 									<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
 										objectType="com.soffid.iam.api.Account"
 										dataPath="/." id="userAttributes"/>
-									<div sclass="section" id="servicesSection">
+									<div sclass="section" id="servicesSection" if="${soffid:isUserInRole('account:query') }">
 										<customfield3 sclass="databox separator" type="SEPARATOR" label="${c:l('seu.serveis') }" />
 										<datatable dataPath="../services" enablefilter="false" style="margin-left: 200px">
 										<attribute name="columns">

@@ -71,18 +71,23 @@
 								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
 									objectType="com.soffid.iam.api.Account"
 									dataPath="/." id="userAttributes"/>
-								<div sclass="section" id="servicesSection">
+								<div sclass="section" id="servicesSection" >
 									<customfield3 sclass="databox separator" type="SEPARATOR" label="${c:l('seu.serveis') }" />
-									<datatable dataPath="services" enablefilter="false" style="margin-left: 200px">
+									<datatable dataPath="services" enablefilter="false" style="margin-left: 200px" onSelect="ref:frame.openService" id="servicesList">
 									<attribute name="columns">
 									<![CDATA[
 - name: ${c:l('auditoria.zul.maquina') }
   value: hostName
 - name: ${c:l('account.serviceName') }
   value: service
+- name: ${c:l('account.commandLine')}
+  value: command
 									]]>
 									</attribute>
 									</datatable>
+									<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('networkDiscovery:schedule')}" >
+										<div class="addButton" onClick="ref:frame.addNewService">+</div>
+									</div>
 								</div>
 							</form>
 						</div>
@@ -165,6 +170,31 @@
 		</hbox>
 	</window>
 	
+	<window closable="false" id="serviceWindow" position="top,center" sizable="true"
+		title="${c:l('canviPassword.Titol')}" visible="false" style="min-width:600px; width: 80%"
+		if="${soffid:isUserInRole('account:query') }"
+		onClose="ref:frame.undoService">
+		<div sclass="navigation-bar dummy">
+	 		<label bind="/listbox:/@name"></label> - <label bind="/listbox:/@description"/>
+			<databutton image="/img/trash.svg" onlyIcon="true"
+					 if="${soffid:isUserInRole('user:group:delete')}" 
+					label="${c:l('plugins.zul.Delete') }" 
+					onClick="ref:frame.deleteService"/>
+		</div>
+
+		<form id="form" width="100%" dataPath="/servicesList:/">
+			<customfield3 bind="service" label="${c:l('account.serviceName') }" dataType="STRING" required="true" maxlength="150" id="service"/>
+			<customfield3 bind="hostName" label="${c:l('auditoria.zul.maquina') }" dataType="HOST" required="true" id="hostName" filterExpression="deleted eq false"/>
+			<customfield3 bind="command" label="${c:l('account.commandLine') }" dataType="STRING" maxlength="150" id="command"/>
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:frame.undoService" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:frame.applyService"/>
+		</div>
+	</window>
+
 	<include src="/popup/agent_objectAttributes.zul" />
 </frame>
 

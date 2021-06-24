@@ -1075,7 +1075,7 @@
 		<column name='TOKENVARIABLEMAP_' type='BIGINT'/>
 		<column name='PROCESSINSTANCE_' type='BIGINT'/>
 		<column name='BYTEARRAYVALUE_' type='BIGINT'/>
-		<column name='DATEVALUE_' type='TIMESTAMP'/>
+		<column name='DATEVALUE_' type='DATE'/>
 		<column name='DOUBLEVALUE_' type='DOUBLE'/>
 		<column name='LONGIDCLASS_' type='VARCHAR' length='255'/>
 		<column name='LONGVALUE_' type='BIGINT'/>

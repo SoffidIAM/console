@@ -61,7 +61,7 @@
 		</tabpanels>
 	</tabbox>
     <div style="width: 100%; text-align: right">
-		<button id="btnCerrarr" image="/img/back-r.svg" label="${c:l('task.btnCerrar')}" onClick="ref:frame.salvarTarea()"
+		<button id="btnCerrarr" image="/img/undo-r.svg" label="${c:l('task.btnCerrar')}" onClick="ref:frame.salvarTarea()"
 			style="float:left"/>
 		<button id="btnTomar" label="${c:l('task.btnTomar')}" onClick="ref:frame.tomarTarea()"/>
 		<div id="botonera"/>

@@ -39,7 +39,7 @@
 - name: ${c:l('usuaris.zul.Port')}
   value: port
 - name: ${c:l('usuaris.zul.DataInici')}
-  value: stardDate
+  value: startDate
   template: #{startDate_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Tipus') }

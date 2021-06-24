@@ -29,7 +29,7 @@
 				  value: name
 				  leaf: false
 				- path: /host
-				  icon: #{os == "NTS" ? "/img/windows.svg" : os == "LIN" ? "/img/linux.svg" : "/img/host.svg"}
+				  icon: #{soffid:getHostIcon(this)}
 				  value: name
 				  leaf: false
 				- path: /serviceHolder
@@ -42,7 +42,7 @@
 				  leaf: true
 				- path: /system
 				  template: >-
-				    #{name} 
+				    #{name}
 				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenSystem')">${c:l('discovery.agent')}</button> 
 				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenAccounts')">${c:l('seu.accounts')}</button>
 				  leaf: true

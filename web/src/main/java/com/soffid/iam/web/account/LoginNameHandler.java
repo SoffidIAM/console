@@ -7,6 +7,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.service.ejb.AccountService;
 import com.soffid.iam.web.component.InputField3;
+import com.soffid.iam.web.component.InputFieldContainer;
 import com.soffid.iam.web.component.InputFieldUIHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 
@@ -16,7 +17,7 @@ import es.caib.zkib.datasource.XPathUtils;
 public class LoginNameHandler extends InputFieldUIHandler {
 	@Override
 	public void onChange(InputField3 field) throws Exception {
-		ObjectAttributesDiv d = field.getObjectContainer();
+		InputFieldContainer d = field.getObjectContainer();
 		if (d != null) {
 			String system = (String) XPathUtils.eval(field, "system");			
 			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$

@@ -37,7 +37,7 @@ import es.caib.zkib.events.XPathEvent;
 import es.caib.zkib.events.XPathRerunEvent;
 import es.caib.zkib.events.XPathSubscriber;
 
-public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindContext {
+public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindContext, InputFieldContainer {
 
 	/**
 	 * 

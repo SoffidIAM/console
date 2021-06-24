@@ -17,6 +17,10 @@
 	width="100%"/>
 	<separator spacing="5px"/>
 	
+	<div id="env">
+		Available context variables:
+	</div>	
+	<html id="envtext" style="margin-left: 36px; display: block;"/>
 	<div>
 		Programming reference links:
 	</div>

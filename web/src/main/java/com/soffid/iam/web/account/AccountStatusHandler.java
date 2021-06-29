@@ -13,7 +13,7 @@ import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.System;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.InputFieldUIHandler;
-import com.soffid.iam.web.component.ObjectAttributesDiv;
+import com.soffid.iam.web.component.InputFieldContainer;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.zkib.component.Databox.Type;
@@ -22,7 +22,7 @@ import es.caib.zkib.datasource.XPathUtils;
 public class AccountStatusHandler extends InputFieldUIHandler {
 	@Override
 	public void onChange(InputField3 field) throws Exception {
-		ObjectAttributesDiv d = field.getObjectContainer();
+		InputFieldContainer d = field.getObjectContainer();
 		if (d != null)
 		{
 			Object o1 = field.getValue();

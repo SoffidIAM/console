@@ -916,34 +916,36 @@ public class ApplicationServiceImpl extends
 		   	// Test if role is already granted
 		   	for (RoleAccountEntity rg: new LinkedList<RoleAccountEntity> ( rolsUsuarisEntity.getAccount().getRoles()))
 		   	{
-		   		if (rg.getRole().getName().equals(ra.getRoleName()) && 
-		   				rg.getRole().getSystem().getName().equals(ra.getSystem()))
-		   		{
-		   			// Granted on another group
-		   			if (rg.getGroup() != null && 
-		   					! rg.getGroup().getName().equals( ra.getDomainValue().getValue()))
-		   				continue ;
-		   			// Granted on another information system
-		   			else if (rg.getInformationSystem() != null && 
-		   					! rg.getInformationSystem().getName().equals( ra.getDomainValue().getValue()))
-		   				continue;
-		   			// Granted on another custom domain value
-		   			else if (rg.getDomainValue() != null && 
-		   					! rg.getDomainValue().getValue().equals( ra.getDomainValue().getValue()))
-		   				continue ;
-		   			else if (rg.isEnabled() && (rg.getEndDate() == null || rg.getEndDate().after(new Date())))
-		   				return getRoleAccountEntityDao().toRoleAccount(rg);
-		   			else
-		   			{
+		   		if (rg.isEnabled()) {
+			   		if (rg.getRole().getName().equals(ra.getRoleName()) && 
+			   				rg.getRole().getSystem().getName().equals(ra.getSystem()))
+			   		{
+			   			// Granted on another group
+			   			if (rg.getGroup() != null && 
+			   					! rg.getGroup().getName().equals( ra.getDomainValue().getValue()))
+			   				continue ;
+			   			// Granted on another information system
+			   			else if (rg.getInformationSystem() != null && 
+			   					! rg.getInformationSystem().getName().equals( ra.getDomainValue().getValue()))
+			   				continue;
+			   			// Granted on another custom domain value
+			   			else if (rg.getDomainValue() != null && 
+			   					! rg.getDomainValue().getValue().equals( ra.getDomainValue().getValue()))
+			   				continue ;
+			   			else if (rg.isEnabled() && (rg.getEndDate() == null || rg.getEndDate().after(new Date())))
+			   				return getRoleAccountEntityDao().toRoleAccount(rg);
+			   			else
+			   			{
+			   				deleteRoleAccountEntity(rg, null, true);
+			   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
+			   			}
+			   		}
+			   		else if (rolsUsuarisEntity.getRole().getInformationSystem() == rg.getRole().getInformationSystem() &&
+			   			Boolean.TRUE.equals(rolsUsuarisEntity.getRole().getInformationSystem().getSingleRole()))
+			   		{
 		   				deleteRoleAccountEntity(rg, null, true);
 		   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
-		   			}
-		   		}
-		   		else if (rolsUsuarisEntity.getRole().getInformationSystem() == rg.getRole().getInformationSystem() &&
-		   			Boolean.TRUE.equals(rolsUsuarisEntity.getRole().getInformationSystem().getSingleRole()))
-		   		{
-	   				deleteRoleAccountEntity(rg, null, true);
-	   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
+			   		}
 		   		}
 		   	}
 		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);
@@ -980,7 +982,24 @@ public class ApplicationServiceImpl extends
 		           				ra2.setHolderGroup(inital.getHolderGroup());
 		           				ra2.setRoleName(grantedRole.getContained().getName());
 		           				ra2.setParentGrant(rolsUsuarisEntity.getId());
-		           				ra2.setDomainValue(inital.getDomainValue());
+		           				if ( grantedRole.getDomainApplication() != null) {
+		           					ra2.setDomainValue(new DomainValue());
+		           					ra2.getDomainValue().setValue(grantedRole.getDomainApplication().getName());
+		           				}
+		           				else if (grantedRole.getDomainApplicationValue() != null) {
+		           					ra2.setDomainValue(new DomainValue());
+		           					ra2.getDomainValue().setExternalCodeDomain(grantedRole.getDomainApplicationValue().getDomain().getName());
+		           					ra2.getDomainValue().setValue(grantedRole.getDomainApplicationValue().getValue());
+		           				}
+		           				else if (grantedRole.getDomainGroup() != null ) {
+		           					ra2.setDomainValue(new DomainValue());
+		           					ra2.getDomainValue().setValue(grantedRole.getDomainGroup().getName());
+		           				} else if ( grantedRole.getContainer().getDomainType() != null &&
+		           						grantedRole.getContainer().getDomainType().equals(grantedRole.getContained().getDomainType())) {
+		           					ra2.setDomainValue(inital.getDomainValue()); 
+		           				} else {
+		           					ra2.setDomainValue(new DomainValue());
+		           				}
 		           				grantsToCreate.add(ra2);
 		       				}
 		       			}

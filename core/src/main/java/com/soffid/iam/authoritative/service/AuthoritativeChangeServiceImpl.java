@@ -437,6 +437,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	 * @throws InternalErrorException 
 	 */
 	private void applyGroup2Change(User user, ProcessTracker tracker) throws InternalErrorException {
+		log.info("Applying secondary group change");
 		Collection<GroupUser> currentGroups = getGroupService().findUsersGroupByUserName(user.getUserName());
 		
 		AuthoritativeChange change = tracker.change;

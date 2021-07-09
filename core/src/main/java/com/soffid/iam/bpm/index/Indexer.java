@@ -32,6 +32,7 @@ import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.Comment;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.graph.exe.Token;
+import org.jbpm.job.Timer;
 
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.model.DBProperty;
@@ -42,8 +43,11 @@ import es.caib.seycon.ng.utils.Security;
 public class Indexer {
 	private Log log = LogFactory.getLog(Indexer.class);
 	private static Indexer theIndexer = null;
+	int maxFieldLength = 4000;
 	private Indexer () {
-		
+		try {
+			maxFieldLength = Integer.parseInt(System.getProperty("soffid.indexer.max-field-size"));
+		} catch (Exception e) {}
 	}
 	public static Indexer getIndexer () {
 		if (theIndexer == null)
@@ -64,11 +68,11 @@ public class Indexer {
 	}
 
 	public void flush(Session session, long then, long now) throws IOException {
-		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
 		if (DirectoryFactory.isEmpty(session)) {
 			log.info("Index is empty. Regenerating");
 			then = 0;
 		}
+		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
 		Collection<ProcessInstance> p = getProcesses (session, then, now);
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
@@ -84,15 +88,19 @@ public class Indexer {
 		try { 
 			for (ProcessInstance process: p)
 			{
-				log.debug("Indexing process "+process.getId());
-				d = generateDocument(process);
-				log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
-				// Delete pre-existing document
-				w.deleteDocuments(new Term ("$id", d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
-				// Create new document
-				log.debug(String.format(Messages.getString("Indexer.AddingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
-				w.addDocument(d);
-				log.debug(String.format(Messages.getString("Indexer.DoneDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+				try {
+					log.debug("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
+					d = generateDocument(process);
+					log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+					// Delete pre-existing document
+					w.deleteDocuments(new Term ("$id", d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+					// Create new document
+					log.debug(String.format(Messages.getString("Indexer.AddingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+					w.addDocument(d);
+					log.debug(String.format(Messages.getString("Indexer.DoneDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+				} catch (Throwable th) {
+					log.info("Error indexing process "+process.getId(), th);
+				}
 			}
 		} finally {
 			w.close();
@@ -154,11 +162,15 @@ public class Indexer {
 					Object value = m.get(key);
 					if (value != null) {
 						String s = toString(value);
-						d.add(new Field (prefix+key, 
-								s,
-								Field.Store.NO, Field.Index.ANALYZED));
-						contents.append(" "); //$NON-NLS-1$
-						contents.append(s);
+						if (s.length() < maxFieldLength) {
+							d.add(new Field (prefix+key, 
+									s,
+									Field.Store.NO, Field.Index.ANALYZED));
+							if (contents.length() < maxFieldLength) {
+								contents.append(" "); //$NON-NLS-1$
+								contents.append(s);
+							}
+						}
 					}
 				} catch (Throwable t) {
 					// Error deserializing data
@@ -217,6 +229,7 @@ public class Indexer {
 				if (s.length() > 0)
 					s = s + " ";
 				s = s + toString(t);
+				if (s.length() > maxFieldLength) break;
 			}
 				
 			return s;
@@ -229,6 +242,7 @@ public class Indexer {
 				if (s.length() > 0)
 					s = s + " ";
 				s = s + toString(t);
+				if (s.length() > maxFieldLength) break;
 			}
 				
 			return s;

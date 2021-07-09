@@ -69,10 +69,18 @@ class SessionListenerThread extends Thread {
 		long used = runtime.totalMemory() - runtime.freeMemory();
 		long free = max - used ;
 		List<HttpSession> sessions = SessionListener.sessions;
+		int threshold2 = 15;
+		try {
+			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit2"));
+		} catch (Exception e) {}
+		int threshold1 = 25;
+		try {
+			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
+		} catch (Exception e) {}
 		synchronized (sessions) {
 			long pct = free * 100L / max;
-			if (pct < 15) {
-				log.info("Number of Self-Service active sessions: "+sessions.size()+" "+pct+"%free memory");
+			if (pct < threshold1) {
+				log.warn("Number of Self-service active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
 					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
 				}
@@ -85,8 +93,8 @@ class SessionListenerThread extends Thread {
 				}
 				runtime.gc();
 			}
-			else if (pct <25) {
-				log.info("Number of Self-Service active sessions: "+sessions.size()+" "+pct+"% free memory");
+			else if (pct < threshold2) {
+				log.info("Number of Self-service active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
 					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
 				}

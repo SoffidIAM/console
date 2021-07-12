@@ -25,6 +25,7 @@ import es.caib.seycon.ng.model.ServeiEntity;
 import es.caib.seycon.ng.model.SessioEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.servei.AccountService;
+import es.caib.seycon.ng.servei.DispatcherService;
 import roles.Tothom;
 
 @Service
@@ -33,6 +34,7 @@ import roles.Tothom;
 	ServeiEntity.class,
 	RegistreAccesEntity.class, SessioEntity.class, UsuariEntity.class,
 	MaquinaEntity.class,
+	DispatcherService.class,
 	PamSecurityHandlerService.class})
 public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
@@ -54,6 +56,10 @@ public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor) {return null;}
+
+	@Operation(grantees = {Tothom.class})
+	@Description("Creates a jump server session and returns the session URL")
+	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor, String pamPolicy) {return null;}
 
 	@Description("Checks a server session is up")
 	boolean checkJumpServerSession (Sessio sessio) {return false;}

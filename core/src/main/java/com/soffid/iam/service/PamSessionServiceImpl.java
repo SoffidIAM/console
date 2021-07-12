@@ -33,12 +33,14 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.JumpServerGroup;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
+import com.soffid.iam.api.Server;
 import com.soffid.iam.api.Session;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -54,6 +56,7 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -135,11 +138,20 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		if (jumpServerGroup == null)
 			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
 		getPamSecurityHandlerService().checkPermission(entity, "launch");
-		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl());
+		String policyName = null;
+		if ( entity.getFolder() != null && entity.getFolder().getPamPolicy() != null )
+			policyName = entity.getFolder().getPamPolicy().getName();
+		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl(), policyName);
 	}
 	
 	@Override
 	protected NewPamSession handleCreateJumpServerSession(Account account, String entryPointDescriptor)
+			throws Exception {
+		return handleCreateJumpServerSession(account, entryPointDescriptor, null);
+	}
+	
+	@Override
+	protected NewPamSession handleCreateJumpServerSession(Account account, String entryPointDescriptor, String pamPolicy)
 			throws Exception {
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
 
@@ -156,15 +168,25 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		JumpServerGroupEntity jumpServerGroup = getJumpServerGroupEntityDao().findByName(serverGroup);
 		if (jumpServerGroup == null)
 			throw new InternalErrorException(String.format("Cannot start session. Server group %s does not exist",serverGroup));
-		return createJumpServerSession (entity, jumpServerGroup, url);
+
+		if ( pamPolicy == null && entity.getFolder() != null && entity.getFolder().getPamPolicy() != null )
+			pamPolicy = entity.getFolder().getPamPolicy().getName();
+		return createJumpServerSession (entity, jumpServerGroup, url, pamPolicy);
 	}
 
-	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl) throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException
+	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl, String pamPolicy) 
+			throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException
 	{
 		Password password = getAccountService().queryAccountPasswordBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
 		if (password == null)
 			throw new InternalErrorException("Cannot retrieve password for account "+entity.getDescription());
+
 		
+		if (entity.getStatus() == AccountStatus.LOCKED)
+			throw new InternalErrorException("Account is locked");
+		else if (entity.isDisabled())
+			throw new InternalErrorException("Account is disabled");
+			
 		Account account = getAccountEntityDao().toAccount(entity);
 		if ( account.getType() != AccountType.IGNORED) {
 			PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
@@ -180,8 +202,15 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		HashMap<String, Object> secrets = new HashMap<String, Object>();
 		data.put("serverUrl", targetUrl);
+		data.put("policyName", pamPolicy);
 		data.put("user", Security.getCurrentUser());
 		data.put("secrets", secrets);
+		List<String> syncServers = new LinkedList<>();
+		for (Server ss: getDispatcherService().findTenantServers()) {
+			if (ss.getType() == ServerType.MASTERSERVER)
+				syncServers.add(ss.getUrl());
+		}
+		data.put("syncServers", syncServers);
 		secrets.put("accountName", entity.getLoginName() == null? entity.getName(): entity.getLoginName());
 		secrets.put("password", password.getPassword());
 
@@ -265,6 +294,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			session.setStartDate(new Date());
 			session.setType(TipusSessio.PAM);
 			session.setUser(log.getUser());
+			session.setAccount(entity);
 			session.setWebHandler(base+"/store/session/check-alive");
 			session.setMonitorUrl(jumpServerUrlBase  + "/launch/connect?sessionId=" + URLEncoder.encode(sessionKey,"UTF-8"));
 			getSessionEntityDao().create(session);

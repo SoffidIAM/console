@@ -135,18 +135,23 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         }
         createGroupMailListTaks(usuari.getPrimaryGroup());
         // Next, secondary groups
-        for (UserGroupEntity uge : usuari.getSecondaryGroups()) {
-            for (MailListGroupMemberEntity mlge : uge.getGroup().getMailLists()) {
-                getEmailListEntityDao().generateUpdateTasks(mlge.getMailList());
-            }
+        for ( EmailListEntity email: getEmailListEntityDao().query("select o from com.soffid.iam.model.EmailListEntityImpl as o "
+        		+ "join o.groups as emailGroup "
+        		+ "join emailGroup.group.secondaryGroupUsers as userGroup "
+        		+ "where userGroup.user.id = :userId", new Parameter[] { 
+        				new Parameter("userId", usuari.getId())
+        		})) {
+           	getEmailListEntityDao().generateUpdateTasks(email);
         }
         // Finally roles
-        for (com.soffid.iam.model.UserAccountEntity uae : usuari.getAccounts()) {
-            if (uae.getAccount().getType().equals(AccountType.USER)) {
-                for (RoleAccountEntity rae : uae.getAccount().getRoles()) {
-                    getRoleEntityDao().updateMailLists(rae.getRole());
-                }
-            }
+        for ( EmailListEntity email: getEmailListEntityDao().query("select o from com.soffid.iam.model.EmailListEntityImpl as o "
+        		+ "join o.roles as emailRole "
+        		+ "join emailRole.role.accounts as roleAccount "
+        		+ "join roleAccount.account.users as userAccount "
+        		+ "where userAccount.user.id = :userId", new Parameter[] { 
+        				new Parameter("userId", usuari.getId())
+        		})) {
+           	getEmailListEntityDao().generateUpdateTasks(email);
         }
     }
 

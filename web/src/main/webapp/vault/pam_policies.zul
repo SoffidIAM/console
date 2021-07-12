@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?component name="network_acl" macro-uri="network-acl.zul"?>
+<?page id="network"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.vault.PamPolicyHandler" id="frame">
+	<datamodel id="model" rootNode="root" src="pamPolicyDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('pamPolicy:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('pamPolicy:create') &amp;&amp; soffid:isUserInRole('pamPolicy:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.PamPolicy" 
+				defaultAttributes="name, description"
+				preference="pamPolicys"
+				dataPath="/model:/policy" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+				preference="pamPolicies"
+				multiselect="true"
+				onMultiSelect="ref:frame.multiSelect"
+				dataPath="/model:/policy" maxheight="70vh" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="false">
+			<attribute name="allColumns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.PamPolicy.name') }
+  value: name
+  default: true
+- name: ${c:l('com.soffid.iam.api.PamPolicy.description')}
+  value: description
+  default: true
+- name: ${c:l('com.soffid.iam.api.PamPolicy.author')}
+  value: author
+  default: false
+- name: ${c:l('com.soffid.iam.api.PamPolicy.date')}
+  value: date_datetime
+  default: false
+]]></attribute>
+			</datatable>
+			<div width="100%" style="text-align: right" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false"   if="${soffid:isUserInRole('pamPolicy:delete')}">-</div>
+				<div class="addButton" onClick="ref:frame.addNew"   if="${soffid:isUserInRole('pamPolicy:create')}">+</div>
+			</div>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>
+								
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"
+					use="com.soffid.iam.web.component.DatasourceButton3"/>
+			</div>
+			<div class="navigation-bar">
+				<menu2>
+					<menu2item  image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"
+						if="${soffid:isUserInRole('pamPolicy:delete')}" />
+				</menu2>
+			</div>
+			<div id="dades"> 
+				<form id="form" onChangeXPath="ref:frame.onChangeDades"
+					dataPath="/listbox:/." width="100%">
+					<customfield3
+						label="${c:l('com.soffid.iam.api.PamPolicy.name') }"
+						dataType="string"
+						required="true"
+						readonly="${! soffid:isUserInRole('pamPolicy:create') &amp;&amp; !soffid:isUserInRole('pamPolicy:update')}"
+						bind="name"
+						maxlength="100"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.PamPolicy.description') }"
+						dataType="string"
+						required="false"
+						readonly="${! soffid:isUserInRole('pamPolicy:create') &amp;&amp; !soffid:isUserInRole('pamPolicy:update')}"
+						bind="description"
+						maxlength="100"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.PamPolicy.author') }"
+						dataType="USER"
+						readonly="true"
+						bind="author"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.PamPolicy.date') }"
+						dataType="DATE_TIME"
+						readonly="true"
+						bind="date"/>
+					<datatable id="actions" autocommit="true" 
+						dataPath="/action" maxheight="50vh" sortColumn="0"
+						onCheckCloseSession="ref:frame.checkCloseSession"
+						onCheckLockAccount="ref:frame.checkLockAccount"
+						onCheckIssue="ref:frame.checkIssue"
+						onCheckNotify="ref:frame.checkNotify"
+						enablefilter="false">
+						<attribute name="columns"><![CDATA[
+						- name: ${c:l('com.soffid.iam.api.PamAction.ruleName') }
+						  value: ruleName
+						- name: ${c:l('com.soffid.iam.api.PamAction.closeSession')}
+						  template: <input type="checkbox" #{var z = ""; for(var v = 0; v < actions.length; v++) if (actions[v].value=='C') z="checked"; z;} onChange="zkDatatable.sendClientAction(this, 'onCheckCloseSession', [this.checked])">
+						  className: statusColumn
+						- name: ${c:l('com.soffid.iam.api.PamAction.lockAccount')}
+						  template: <input type="checkbox" #{var z = ""; for(var v = 0; v < actions.length; v++) if (actions[v].value=='L') z="checked"; z;} onChange="zkDatatable.sendClientAction(this, 'onCheckLockAccount', [this.checked])">
+						  className: statusColumn
+						- name: ${c:l('com.soffid.iam.api.PamAction.issue')}
+						  template: <input type="checkbox" #{var z = ""; for(var v = 0; v < actions.length; v++) if (actions[v].value=='I') z="checked"; z;} onChange="zkDatatable.sendClientAction(this, 'onCheckIssue', [this.checked])">
+						  className: statusColumn
+						- name: ${c:l('com.soffid.iam.api.PamAction.notify')}
+						  template: <input type="checkbox" #{var z = ""; for(var v = 0; v < actions.length; v++) if (actions[v].value=='N') z="checked"; z;} onChange="zkDatatable.sendClientAction(this, 'onCheckNotify', [this.checked])">
+						  className: statusColumn
+						]]></attribute>
+					</datatable>
+				</form>
+			</div>
+			<div style="text-align: right; width: 100%">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply" />
+			</div>
+		</div>
+	</div>
+</frame>

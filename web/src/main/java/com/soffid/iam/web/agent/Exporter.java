@@ -82,40 +82,42 @@ public class Exporter {
 
 	private void serializeObjectMapping(Document doc, Element rootElement, JXPathContext ctx, Pointer p) {
 		DataNode dn = (DataNode) p.getValue();
-		ObjectMapping instance = (ObjectMapping) dn.getInstance();
-		
-		Element e = doc.createElement("objectMapping");
-		e.setAttribute("systemObject", instance.getSystemObject());
-		e.setAttribute("soffidObject", instance.getSoffidObject().getValue());
-		e.setAttribute("condition", instance.getCondition());
-		rootElement.appendChild(e);
-		
-		for ( Iterator it = ctx.iteratePointers(p.asPath()+"/property");
-				it.hasNext();)
-		{
-			Pointer p2 = (Pointer) it.next();
-			serializeProperty (doc, e, ctx, p2);
-		}
-		
-		for ( Iterator it = ctx.iteratePointers(p.asPath()+"/attributeMapping");
-				it.hasNext();)
-		{
-			Pointer p2 = (Pointer) it.next();
-			serializeAttribute (doc, e, ctx, p2);
-		}
-		
-		for ( Iterator it = ctx.iteratePointers(p.asPath()+"/objectMappingTrigger");
-				it.hasNext();)
-		{
-			Pointer p2 = (Pointer) it.next();
-			serializeTrigger (doc, e, ctx, p2);
-		}
-
-		for ( Iterator it = ctx.iteratePointers(p.asPath()+"/metadata");
-				it.hasNext();)
-		{
-			Pointer p2 = (Pointer) it.next();
-			serializeMetadata (doc, e, ctx, p2);
+		if (dn != null) {
+			ObjectMapping instance = (ObjectMapping) dn.getInstance();
+			
+			Element e = doc.createElement("objectMapping");
+			e.setAttribute("systemObject", instance.getSystemObject());
+			e.setAttribute("soffidObject", instance.getSoffidObject().getValue());
+			e.setAttribute("condition", instance.getCondition());
+			rootElement.appendChild(e);
+			
+			for ( Iterator it = ctx.iteratePointers(p.asPath()+"/property");
+					it.hasNext();)
+			{
+				Pointer p2 = (Pointer) it.next();
+				serializeProperty (doc, e, ctx, p2);
+			}
+			
+			for ( Iterator it = ctx.iteratePointers(p.asPath()+"/attributeMapping");
+					it.hasNext();)
+			{
+				Pointer p2 = (Pointer) it.next();
+				serializeAttribute (doc, e, ctx, p2);
+			}
+			
+			for ( Iterator it = ctx.iteratePointers(p.asPath()+"/objectMappingTrigger");
+					it.hasNext();)
+			{
+				Pointer p2 = (Pointer) it.next();
+				serializeTrigger (doc, e, ctx, p2);
+			}
+	
+			for ( Iterator it = ctx.iteratePointers(p.asPath()+"/metadata");
+					it.hasNext();)
+			{
+				Pointer p2 = (Pointer) it.next();
+				serializeMetadata (doc, e, ctx, p2);
+			}
 		}
 	}
 

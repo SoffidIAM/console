@@ -1749,4 +1749,64 @@
 		<ambit>NetworkDiscovery</ambit>
 	</autoritzacio>
 	
+	<autoritzacio>
+		<codi>pamPolicy:query</codi>
+		<descripcio>Query PAM policies</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamPolicy:create</codi>
+		<descripcio>Create PAM policies</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamPolicy:update</codi>
+		<descripcio>Update PAM policies</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamPolicy:delete</codi>
+		<descripcio>Delete PAM policies</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamRule:query</codi>
+		<descripcio>Query PAM rules</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamRule:create</codi>
+		<descripcio>Create PAM rules</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamRule:update</codi>
+		<descripcio>Update PAM rule</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>pamRule:delete</codi>
+		<descripcio>Delete PAM rules</descripcio>
+		<ambit>PAM Policy</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:pam-policy:show</codi>
+		<descripcio>Open PAM policies page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:pam-rule:show</codi>
+		<descripcio>Open PAM Rules page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
 </autoritzacions>

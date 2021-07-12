@@ -187,6 +187,12 @@ public class CustomField3 extends InputField3 {
 		this.listOfValues = listOfValues.trim().split("\\s*[,]+\\s*");
 	}
 
+	@Override
+	public void setValues(List<String> values) {
+		this.listOfValues = values.toArray(new String[values.size()]);
+		super.setValues(values);
+	}
+	
 	public void setReadonly(boolean readonly) {
 		if (readonly != isReadonly())
 		{

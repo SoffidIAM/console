@@ -171,14 +171,22 @@
             url: /config/authentication.zul
             img: /img/menu/authentication.svg
             permissions: ["seu:parametres:show"]
-          - name: seu.pam_config
-            img: /img/menu/pam-servers.svg
-            url: /vault/pam_config.zul
-            permissions: ["seu:pamSessionConfigure"]
           - name: seu.password-policies
             url: /config/password-policies.zul
             img: /img/menu/password-policy.svg
             permissions: ["seu:userTypes:show"]
+          - name: seu.pam_config
+            img: /img/menu/pam-servers.svg
+            url: /vault/pam_config.zul
+            permissions: ["seu:pamSessionConfigure"]
+          - name: seu.pam-policies
+            url: /vault/pam_policies.zul
+            img: /img/menu/pam-actions.svg
+            permissions: ["seu:pam-policy:show"]
+          - name: seu.pam-rules
+            url: /vault/pam_rules.zul
+            img: /img/menu/pam-rules.svg
+            permissions: ["seu:pam-rule:show"]
       - name: seu.monitoritzacio
         img: /img/menu/monitor.svg
         options:

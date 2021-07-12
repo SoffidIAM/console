@@ -126,6 +126,8 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 			LogFactory.getLog(getClass()).warn("Error gerating ACL for "+target, e);
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
 		}
+		
+		target.setPamPolicy(source.getPamPolicy() == null ? null: source.getPamPolicy().getName());
 	}
 	
 	@Override
@@ -136,6 +138,11 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 			target.setParent(null);
 		else
 			target.setParent( load (source.getParentId()));
+		
+		if (source.getPamPolicy() == null)
+			target.setPamPolicy(null);
+		else
+			target.setPamPolicy(getPamPolicyEntityDao().findByName(source.getPamPolicy()));
 	}
 
 	private AccountAccessLevelEnum getAccessLevel (VaultFolderEntity source) throws InternalErrorException {

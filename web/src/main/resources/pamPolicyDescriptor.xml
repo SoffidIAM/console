@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="policy" type="policy">
+			<ejb-finder jndi="java:/module/PamPolicyService-v2" method="findPolicyByJsonQueryAsync">
+				<parameter value="${textQuery}"/>
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.PamPolicy">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="policy">
+		<finder name="action" type="action">
+			<ejb-finder jndi="java:/module/PamPolicyService-v2" method="findPolicyActions">
+				<parameter value="${instance}"/>
+			</ejb-finder>
+		</finder>
+		<ejb-handler jndi="java:/module/PamPolicyService-v2">
+			<insert-method method="createPolicy" returnBean="true">
+				<parameter value="${instance}"/>
+			</insert-method>
+			<delete-method method="deletePolicy">
+				<parameter value="${instance}"/>
+			</delete-method>
+			<update-method method="updatePolicy" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="action">
+		<ejb-handler jndi="java:/module/PamPolicyService-v2">
+			<update-method method="updateAction" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

@@ -43,6 +43,10 @@ public class VaultFolderEntity {
 	@Column(name="VAF_PERSON", defaultValue="false")
 	Boolean personal;
 
+	@Nullable
+	@Column(name="VAF_PPO_ID", reverseAttribute = "vaultFolders")
+	PamPolicyEntity pamPolicy;
+	
 	@Column(name="VAF_TEN_ID")
 	TenantEntity tenant;
 	

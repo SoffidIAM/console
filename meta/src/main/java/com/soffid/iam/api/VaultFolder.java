@@ -92,4 +92,11 @@ public class VaultFolder
 	@Description("Effective access level")
 	@Nullable
 	public AccountAccessLevelEnum accessLevel;
+	
+	
+	@Description("PAM Policy")
+	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.vault.PamPolicyUiHandler")
+	public String pamPolicy;
+
 }

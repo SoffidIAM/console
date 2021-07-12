@@ -157,6 +157,8 @@
 								label="${c:l('com.soffid.iam.api.Account.name') }" 
 								dataType="STRING" required="true" />
 							<customfield3 bind="description" label="${c:l('com.soffid.iam.api.Account.description') }" dataType="STRING" multiline="true" required="true"  id="folder_description"/>
+							<customfield3 bind="pamPolicy" label="${c:l('com.soffid.iam.api.VaultFolder.pamPolicy') }" dataType="STRING"
+								uiHandler="com.soffid.iam.web.vault.PamPolicyUiHandler"/>
 						</div>
 						<div sclass="section" id="folder_acl1">
 							<customfield3 label="${c:l('com.soffid.iam.api.Account._owners') }" dataType="SEPARATOR" />

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_SESSIO", translatedName="SessionEntity", translatedPackage="com.soffid.iam.model" )
@@ -24,6 +26,11 @@ public abstract class SessioEntity {
 
 	@Column (name="SES_IDUSU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
+
+	@Nullable
+	@Description("Account used in PAM sessions")
+	@Column (name="SES_ACC_ID")
+	public AccountEntity account;
 
 	@Column (name="SES_IDMACL", translated="clientHost")
 	@Nullable
@@ -128,6 +135,12 @@ public abstract class SessioEntity {
 	@DaoFinder
 	public es.caib.seycon.ng.model.SessioEntity findById(
 		java.lang.Long id) {
+	 return null;
+	}
+
+	@DaoFinder
+	public Collection<es.caib.seycon.ng.model.SessioEntity> findByKey(
+		String key) {
 	 return null;
 	}
 

@@ -202,7 +202,7 @@
                 <dependency>
                         <groupId>org.zkoss.zk</groupId>
                         <artifactId>zk</artifactId>
-                        <version>3.0.8-2</version>
+                        <version>3.0.8-2b</version>
                 </dependency>
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>

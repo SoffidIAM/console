@@ -93,7 +93,7 @@ class SessionListenerThread extends Thread {
 		} catch (Exception e) {}
 		int threshold1 = 25;
 		try {
-			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
+			threshold1 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
 		} catch (Exception e) {}
 		synchronized (sessions) {
 			long pct = free * 100L / max;

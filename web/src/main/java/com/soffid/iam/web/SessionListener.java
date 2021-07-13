@@ -33,7 +33,6 @@ import es.caib.zkib.datamodel.DataModelCollection;
 @WebListener
 public class SessionListener implements HttpSessionListener {
 	Log log = LogFactory.getLog(getClass());
-	static boolean debug = false;
 	
 	static List<HttpSession> sessions = new LinkedList<>();
 	static SessionListenerThread thread = null;
@@ -47,7 +46,7 @@ public class SessionListener implements HttpSessionListener {
 			sessions.add(se.getSession());
 			if (thread == null || !thread.isAlive()) {
 				thread = new SessionListenerThread();
-				thread.setName("Memory-checker");
+				thread.setName("Console-Memory-checker");
 				thread.setDaemon(true);
 				thread.start();
 			}
@@ -87,18 +86,18 @@ class SessionListenerThread extends Thread {
 		long used = runtime.totalMemory() - runtime.freeMemory();
 		long free = max - used ;
 		List<HttpSession> sessions = SessionListener.sessions;
-		int threshold2 = 15;
+		int threshold2 = 20;
 		try {
 			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit2"));
 		} catch (Exception e) {}
-		int threshold1 = 25;
+		int threshold1 = 15;
 		try {
 			threshold1 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
 		} catch (Exception e) {}
 		synchronized (sessions) {
 			long pct = free * 100L / max;
 			if (pct < threshold1) {
-				log.warn("Number of Console active sessions: "+sessions.size()+" "+pct+"% free memory");
+				log.warn("SEVERE: Number of Console active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
 					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
 				}
@@ -112,7 +111,7 @@ class SessionListenerThread extends Thread {
 				runtime.gc();
 			}
 			else if (pct < threshold2) {
-				log.info("Number of console active sessions: "+sessions.size()+" "+pct+"% free memory");
+				log.info("WARNING: Number of console active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
 					Map<String, Long> sizes = new HashMap<>();
 					dumpSession(session, sizes);

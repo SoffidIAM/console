@@ -99,41 +99,49 @@ class SessionListenerThread extends Thread {
 			if (pct < threshold1) {
 				log.warn("SEVERE: Number of Console active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
-					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+					logSession(nf, session);
 				}
 				int num = sessions.size() / 2; 
 				if (num > 10) num = 10;
 				for (HttpSession session: new LinkedList<> (sessions) ) {
 					SimpleSession zkSession = (SimpleSession) session.getAttribute("javax.zkoss.zk.ui.Session");
-					log.warn("Closing session from "+zkSession.getRemoteAddr());
-					zkSession.invalidateNow();
+					if (zkSession != null) {
+						log.warn("Closing session from "+zkSession.getRemoteAddr());
+						zkSession.invalidateNow();
+					} else {
+						session.invalidate();
+					}
 				}
 				runtime.gc();
 			}
 			else if (pct < threshold2) {
 				log.info("WARNING: Number of console active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
-					Map<String, Long> sizes = new HashMap<>();
-					dumpSession(session, sizes);
-					log.info(" * ["+nf.format( size ) +"] "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
-					List<Entry<String, Long>> keySet = new LinkedList<>( sizes.entrySet() );
-					Collections.sort(keySet, new Comparator<Entry<String, Long>>() {
-						@Override
-						public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
-							return o2.getValue().compareTo(o1.getValue());
-						}
-					});
-					int num = 0;
-					for (Entry<String, Long> s: keySet) {
-						if (num++ > 10) break;
-						log.info(" * > "+nf.format(s.getValue())+" "+s.getKey());
-					}
-					log.info("* ------------------------------");
-					for (String key: components.keySet()) {
-						log.info("* > "+key+" "+components.get(key));
-					}
+					logSession(nf, session);
 				}
 			}
+		}
+	}
+
+	protected void logSession(NumberFormat nf, HttpSession session) {
+		Map<String, Long> sizes = new HashMap<>();
+		dumpSession(session, sizes);
+		log.info(" * ["+nf.format( size ) +"] "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+		List<Entry<String, Long>> keySet = new LinkedList<>( sizes.entrySet() );
+		Collections.sort(keySet, new Comparator<Entry<String, Long>>() {
+			@Override
+			public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+		int num = 0;
+		for (Entry<String, Long> s: keySet) {
+			if (num++ > 10) break;
+			log.info(" * > "+nf.format(s.getValue())+" "+s.getKey());
+		}
+		log.info("* ------------------------------");
+		for (String key: components.keySet()) {
+			log.info("* > "+key+" "+components.get(key));
 		}
 	}
 	

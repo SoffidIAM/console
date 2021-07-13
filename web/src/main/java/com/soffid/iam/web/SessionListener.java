@@ -93,7 +93,7 @@ class SessionListenerThread extends Thread {
 		} catch (Exception e) {}
 		int threshold1 = 25;
 		try {
-			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
+			threshold1 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
 		} catch (Exception e) {}
 		synchronized (sessions) {
 			long pct = free * 100L / max;
@@ -104,7 +104,7 @@ class SessionListenerThread extends Thread {
 				}
 				int num = sessions.size() / 2; 
 				if (num > 10) num = 10;
-				for (HttpSession session: sessions) {
+				for (HttpSession session: new LinkedList<> (sessions) ) {
 					SimpleSession zkSession = (SimpleSession) session.getAttribute("javax.zkoss.zk.ui.Session");
 					log.warn("Closing session from "+zkSession.getRemoteAddr());
 					zkSession.invalidateNow();

@@ -33,7 +33,6 @@ import es.caib.zkib.datamodel.DataModelCollection;
 @WebListener
 public class SessionListener implements HttpSessionListener {
 	Log log = LogFactory.getLog(getClass());
-	static boolean debug = false;
 	
 	static List<HttpSession> sessions = new LinkedList<>();
 	static SessionListenerThread thread = null;
@@ -47,7 +46,7 @@ public class SessionListener implements HttpSessionListener {
 			sessions.add(se.getSession());
 			if (thread == null || !thread.isAlive()) {
 				thread = new SessionListenerThread();
-				thread.setName("Memory-checker");
+				thread.setName("Console-Memory-checker");
 				thread.setDaemon(true);
 				thread.start();
 			}
@@ -87,54 +86,62 @@ class SessionListenerThread extends Thread {
 		long used = runtime.totalMemory() - runtime.freeMemory();
 		long free = max - used ;
 		List<HttpSession> sessions = SessionListener.sessions;
-		int threshold2 = 15;
+		int threshold2 = 20;
 		try {
 			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit2"));
 		} catch (Exception e) {}
-		int threshold1 = 25;
+		int threshold1 = 15;
 		try {
-			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
+			threshold1 =  Integer.parseInt(System.getProperty("soffid.memory.limit1"));
 		} catch (Exception e) {}
 		synchronized (sessions) {
 			long pct = free * 100L / max;
 			if (pct < threshold1) {
-				log.warn("Number of Console active sessions: "+sessions.size()+" "+pct+"% free memory");
+				log.warn("SEVERE: Number of Console active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
-					log.info(" * "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+					logSession(nf, session);
 				}
 				int num = sessions.size() / 2; 
 				if (num > 10) num = 10;
-				for (HttpSession session: sessions) {
+				for (HttpSession session: new LinkedList<> (sessions) ) {
 					SimpleSession zkSession = (SimpleSession) session.getAttribute("javax.zkoss.zk.ui.Session");
-					log.warn("Closing session from "+zkSession.getRemoteAddr());
-					zkSession.invalidateNow();
+					if (zkSession != null) {
+						log.warn("Closing session from "+zkSession.getRemoteAddr());
+						zkSession.invalidateNow();
+					} else {
+						session.invalidate();
+					}
 				}
 				runtime.gc();
 			}
 			else if (pct < threshold2) {
-				log.info("Number of console active sessions: "+sessions.size()+" "+pct+"% free memory");
+				log.info("WARNING: Number of console active sessions: "+sessions.size()+" "+pct+"% free memory");
 				for ( HttpSession session: sessions) {
-					Map<String, Long> sizes = new HashMap<>();
-					dumpSession(session, sizes);
-					log.info(" * ["+nf.format( size ) +"] "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
-					List<Entry<String, Long>> keySet = new LinkedList<>( sizes.entrySet() );
-					Collections.sort(keySet, new Comparator<Entry<String, Long>>() {
-						@Override
-						public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
-							return o2.getValue().compareTo(o1.getValue());
-						}
-					});
-					int num = 0;
-					for (Entry<String, Long> s: keySet) {
-						if (num++ > 10) break;
-						log.info(" * > "+nf.format(s.getValue())+" "+s.getKey());
-					}
-					log.info("* ------------------------------");
-					for (String key: components.keySet()) {
-						log.info("* > "+key+" "+components.get(key));
-					}
+					logSession(nf, session);
 				}
 			}
+		}
+	}
+
+	protected void logSession(NumberFormat nf, HttpSession session) {
+		Map<String, Long> sizes = new HashMap<>();
+		dumpSession(session, sizes);
+		log.info(" * ["+nf.format( size ) +"] "+session.getId()+" "+session.getAttribute("soffid-principal")+" IP "+session.getAttribute("soffid-remoteIp")+" X-Forwarded-For "+session.getAttribute("soffid-remoteProxy"));
+		List<Entry<String, Long>> keySet = new LinkedList<>( sizes.entrySet() );
+		Collections.sort(keySet, new Comparator<Entry<String, Long>>() {
+			@Override
+			public int compare(Entry<String, Long> o1, Entry<String, Long> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+		int num = 0;
+		for (Entry<String, Long> s: keySet) {
+			if (num++ > 10) break;
+			log.info(" * > "+nf.format(s.getValue())+" "+s.getKey());
+		}
+		log.info("* ------------------------------");
+		for (String key: components.keySet()) {
+			log.info("* > "+key+" "+components.get(key));
 		}
 	}
 	

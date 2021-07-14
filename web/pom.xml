@@ -175,11 +175,6 @@
 			<classifier>classes</classifier>
 			<scope>provided</scope>
 		</dependency>		
-         <dependency>
-            <groupId>org.zkoss.zk</groupId>
-            <artifactId>zk</artifactId>
-            <version>3.0.8-2</version>
-         </dependency>
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zul</artifactId>

@@ -720,7 +720,7 @@
 							<tab label="${c:l('usuaris.zul.RolsHeretats')}" />
 							<tab label="${c:l('usuaris.zul.Impressora')}" />
 							<tab label="${c:l('usuaris.zul.Sessions')}" />
-							<tab
+							<tab id="procstab"
 								label="${c:l('usuaris.zul.Processosdusuari')}" />
 						</tabs>
 
@@ -2587,7 +2587,7 @@ String nomRolsBorrar = "";
 								</vbox>
 							</tabpanel>
 
-							<tabpanel id="processos">
+							<tabpanel id="processos" fulfill="procstab.onSelect">
 								<vbox width="100%">
 									<listbox
 										dataPath="/esquema/lista/listbox:/processosUsuari"

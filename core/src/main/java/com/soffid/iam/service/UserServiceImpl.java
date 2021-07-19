@@ -2465,9 +2465,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					com.soffid.iam.bpm.api.ProcessInstance pi = getBpmEngine()
 							.getProcess(up.getProcessId());
 					if (pi != null) {
+						pi.getVariables().clear();
 						processos.add(pi);
 					}
 				} catch (Exception e) {
+					Throwable root = e;
+					while (root != null && root.getCause() != null && root.getCause() != root)
+						root = root.getCause();
+					if (root != null && (root instanceof OutOfMemoryError))
+						throw e;
 				}
 			}
 		}

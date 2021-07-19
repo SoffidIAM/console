@@ -3600,5 +3600,13 @@ div.ck.ck-editor__main {
 .custom-checkbox input:checked ~ label:after { display: block; }
 
 
+a.bookmark {
+	display: block;
+	color: {SKY};
+	cursor: pointer;	
+}
 
-	
+a.bookmark:hover {
+	text-decoration: underline;
+}
+

@@ -1,7 +1,9 @@
 package com.soffid.iam.service;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import com.soffid.iam.api.JumpServerGroup;
@@ -11,6 +13,7 @@ import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Role;
 import com.soffid.mda.annotation.Service;
@@ -86,6 +89,13 @@ public class PamSessionService {
 	
 	Long getConsoleUsedSpace(String jumpServerGroup)  {return null;}
 	
+	@Operation(grantees = {pamSession_query.class})
+	@Description("Searches in pam sessions log")
+	List<PamSession> search(
+			@Nullable String jumpServerGroup,
+			@Nullable String url, @Nullable String text,
+			@Nullable String user, @Nullable Date since, @Nullable Date until) {return null;}
+
 }
 
 @Role (name="seu:pamSessionConfigure" ) class Soffid_PamSessionConfigure { }

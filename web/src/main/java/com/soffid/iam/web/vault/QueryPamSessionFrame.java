@@ -30,7 +30,11 @@ public class QueryPamSessionFrame extends Frame implements AfterCompose {
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
-		
+
+//		generateVideo();
+	}
+
+	protected void generateVideo() {
 		PamSession session = (PamSession) getNamespace().getVariable("pamSession", true);
 		if (session != null)
 		{

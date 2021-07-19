@@ -650,4 +650,82 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throw new InternalErrorException("Error connecting to " + selected.getStoreUrl() + ": " + "HTTP/"
 					+ response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
 	}
+
+	@Override
+	protected List<PamSession> handleSearch(String jumpServerGroup, String url, String text, String user, Date since,
+			Date until) throws Exception {
+		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmssZ");
+		List<PamSession> list = new LinkedList<>();
+		for (JumpServerGroupEntity jsg: getJumpServerGroupEntityDao().loadAll()) {
+			if ( jumpServerGroup == null || jumpServerGroup.trim().isEmpty() || jsg.getName().equals(jumpServerGroup)) {
+				URL url2 = new URL(jsg.getStoreUrl());
+				String base = url2.getProtocol()+"://"+url2.getHost()+
+						(url2.getPort() == -1 ? "": ":"+url2.getPort());
+				String storeUrl = base+"/store/search?";
+				if (url != null)
+					storeUrl += "url="+URLEncoder.encode(url, "UTF-8")+"&";
+				if (text != null)
+					storeUrl += "keystrokes="+URLEncoder.encode(text, "UTF-8")+"&";
+				if (user != null)
+					storeUrl += "user="+URLEncoder.encode(user, "UTF-8")+"&";
+				if (since != null)
+					storeUrl += "since="+URLEncoder.encode(Long.toString(since.getTime()), "UTF-8")+"&";
+				if (until != null)
+					storeUrl += "until="+URLEncoder.encode(Long.toString(until.getTime()), "UTF-8")+"&";
+				Response response;
+				try {
+					response = 
+							WebClient
+							.create(storeUrl, jsg.getStoreUserName(), 
+									Password.decode(jsg.getPassword()).getPassword(), null)
+							.type(MediaType.APPLICATION_JSON)
+							.accept(MediaType.APPLICATION_JSON)
+							.get();
+					
+				} catch (Exception e) {
+					throw new InternalErrorException ("Error connecting to "+storeUrl+": "+e.getMessage() );
+				}
+				
+				if (response.getStatus() != 200)
+					throw new InternalErrorException("Error connecting to " + base + ": " + "HTTP/"
+							+ response.getStatusInfo().getStatusCode() + " " + response.getStatusInfo().getReasonPhrase());
+				
+				JSONObject result  = new JSONObject( new JSONTokener( response.readEntity( InputStream.class   ) ) );
+				if (result.getBoolean("success"))
+				{
+					JSONArray items = result.getJSONArray("result");
+					for (int num = 0; num < items.length(); num++) {
+						JSONObject item = items.getJSONObject(num);
+						JSONObject o = item.getJSONObject("session");
+						PamSession r = new PamSession();
+						r.setAccountName(o.optString("accountName"));
+						r.setChapters(new LinkedList<>());
+						JSONArray ch = o.optJSONArray("chapters");
+						for (int i = 0; i < ch.length(); i++)
+							r.getChapters().add(ch.getLong(i));
+						r.setId(o.optString("id"));
+						r.setPath(o.optString("path"));
+						if (o.has("serverEnd"))
+							r.setServerEnd(df.parse(o.optString("serverEnd")));
+						r.setServerUrl(o.optString("serverUrl"));
+						r.setUser(o.optString("user"));
+						r.setJumpServerGroup(jsg.getName());
+						if (o.has("serverStart") && item.has("timeOffsets"))
+						{
+							r.setServerStart(df.parse(o.optString("serverStart")));
+							r.setBookmarks(new LinkedList<>());
+							JSONArray timeOffsets = item.getJSONArray("timeOffsets");
+							for (int i = 0; i < timeOffsets.length(); i++) {
+								r.getBookmarks().add(timeOffsets.getLong(i));
+							}
+							list.add(r);
+						}
+					}
+				}
+				else 
+					throw new InternalErrorException("Error connecting to " + base + ": " + result.optString("reason"));
+			}
+		}
+		return list;
+	}
 }

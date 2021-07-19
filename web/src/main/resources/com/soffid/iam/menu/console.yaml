@@ -218,6 +218,10 @@
           url: /monitor/pam_dashboard.zul
           permissions: ["seu:pamDashboard"]
           img: /img/menu/pam-monitor.svg
+        - name: seu.pam_search
+          url: /monitor/pam_search.zul
+          permissions: ["seu:pamSearch"]
+          img: /img/menu/pam-search.svg
         - name: seu.console_log
           url: /monitor/console_log.zul
           permissions: ["seu:console-log:show"]

@@ -1702,6 +1702,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:pamSearch</codi>
+		<descripcio>Open PAM Search page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>selfservice:applications</codi>
 		<descripcio>View my applications</descripcio>
 		<ambit>SelfService</ambit>

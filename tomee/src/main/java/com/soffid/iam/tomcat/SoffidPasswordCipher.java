@@ -76,6 +76,7 @@ public class SoffidPasswordCipher implements PasswordCipher {
 
         
         public static void main (String args[]) {
+    		System.out.println( new SoffidPasswordCipher().decrypt("LqfNwe1AOUo=".toCharArray()));
         	for ( String s: args)
         	{
         		System.out.println( new SoffidPasswordCipher().encrypt(s));

@@ -34,5 +34,8 @@ public class PamSession {
 	
 	@Nullable
 	Date serverEnd;
+	
+	@Nullable
+	List<Long> bookmarks;
 
 }

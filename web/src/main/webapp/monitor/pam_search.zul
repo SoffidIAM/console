@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?component name="process" macroURI="process.zul"?>
+
+<frame id="frame"
+   xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	mold="div"
+	use="com.soffid.iam.web.pam.Search">
+		
+	<style>
+		div.grid td {vertical-align: top;}
+		div.grid td.gc div { min-height: 24px};
+video::-webkit-media-controls-enclosure {
+display:none !important;
+}
+
+.custom-video-controls {
+}
+
+		#video {
+			background-color: black;
+		}
+		div#videoContainer {
+			display: inline-block;
+			text-align: center;
+		}
+		div#videoContainer.min video  {
+			width: 640px;
+			height: 480px;
+		}
+
+		div#videoContainer.max video  {
+			height: 100vh ;
+		}
+			
+		div#videoContainer .video-control  {
+			background: white;
+			width: 100%
+		}
+
+		div#videoContainer.max .video-control  {
+		    position: absolute;
+			background: white;
+			bottom: 0;
+			z-index: 2147483648;
+		}
+
+	</style>
+
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+	
+			<div id="query-box">
+				<customfield3 label="${c:l('accounts.jumpServerGroup')}" id="jumpServerGroup" onOK="ref:frame.buscar"
+					dataType="STRING" />
+					
+				<customfield3 label="${c:l('accounts.url')}" onOK="ref:frame.buscar"
+					dataType="STRING" maxlength="100"
+					id="url"/>
+				
+				<customfield3 label="${c:l('pamSearch.text')}" onOK="ref:frame.buscar"
+					dataType="STRING" maxlength="200"
+					id="text"/>
+
+				<customfield3 label="${c:l('com.soffid.iam.api.User.userName')}" onOK="ref:frame.buscar"
+					dataType="USER" id="user"/>
+
+				<databox label="${c:l('observacion.lblFechaInicio')} :"  onOK="ref:frame.buscar"
+					type="DATE" maxlength="15" selectIcon=""
+					style="display: inline-block; width: 50%; min-width: 400px"
+					calendarIcon="/img/calendar.svg"
+					format="${soffid:dateformat() }"
+					id="startDate"/>
+	
+				<databox sclass="right-label databox" label="${c:l('attributeQuery.Until')} :"  onOK="ref:frame.buscar"
+					type="DATE" maxlength="15" selectIcon=""
+					style="display: inline-block; width: 50%; min-width: 400px"
+					calendarIcon="/img/calendar.svg"
+					format="${soffid:dateformat() }"
+					id="startDate2"/>
+
+				<div style="width: 100%; text-align: right; margin-bottom: 16px">
+					<button label="${c:l('observacion.btnBuscar')}" onClick="ref:frame.buscar()" image="/img/search2-r.svg"/>
+				</div>
+			</div>
+	
+			<datatable id="listbox"  onSelect="ref:frame.openSession">
+			<attribute name="columns"><![CDATA[
+- name: ${c:l('accounts.jumpServerGroup')}
+  value: jumpServerGroup
+  default: false
+- name: ${c:l('com.soffid.iam.api.User.userName')}
+  value: user
+  default: true
+- name: ${c:l('pamSession.accountName')}
+  value: accountName
+  default: true
+- name: ${c:l('accounts.url')}
+  value: serverUrl
+  default: true
+- name: ${c:l('registreAcces.zul.Datainici')}
+  value: serverStart
+  template: #{serverStart_datetime}
+  default: true
+- name: ${c:l('registreAcces.zul.Datafi')}
+  vaule: serverEnd
+  template: #{serverEnd_datetime}
+  default: true
+			]]></attribute>
+			</datatable>
+		</div>
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<pager datatable="listbox"/>								
+			</div>
+		<style>
+			div.grid td {vertical-align: top;}
+			div.grid td.gc div { min-height: 24px};
+		</style>
+	
+		<div>
+			<databox type="STRING" readonly="true" id="pamSession.jumpServerGroup" label="${c:l('pamSession.jumpServerGroup') } :" />
+			<databox type="STRING" readonly="true" id="pamSession.path" label="${c:l('pamSession.sessionId') } :" />
+			<customfield3 dataType="USER" readonly="true" id="pamSession.user" label="${c:l('pamSession.userName') }" />
+			<customfield3 dataType="DATE_TIME" readonly="true" id="pamSession.serverStart" label="${c:l('pamSession.start') }" />
+			<customfield3 dataType="DATE_TIME" readonly="true" id="pamSession.serverEnd" label="${c:l('pamSession.end') }" />
+			<databox type="STRING" readonly="true" id="pamSession.serverUrl" label="${c:l('pamSession.serviceUrl') } :" />
+			<databox type="STRING" readonly="true" id="pamSession.accountName" label="${c:l('pamSession.accountName') } :" />
+			<div sclass="section" id="videos">
+				<customfield3 label="${c:l('pamSession.recordings') }" dataType="SEPARATOR"/>
+				<div style="display:inline-block; width: 200px; float:right" id="bookmarks">
+				  	<label value="${c:l('pamSearch.bookmarks') }"/>
+				</div>
+			    <h:div id="videoContainer" class="min" >
+					<html><![CDATA[
+					  <video id="video" >
+						<source src="" type="video/ogg" id="videosrc">
+						<track src="" kind='subtitles' id="videocaption" label='Keystrokes'  mode="hidden" language="en"> 
+							Your browser does not support the video tag. 
+					  </video>
+					]]>
+					</html>
+				  <div id="video-controls" style="vertical-align: middle; display: flex; width: 100%" sclass="video-control">
+				    <imageclic src="/img/play.svg" style="vertical-align: middle;" id="playbutton"/>
+				    <h:input type="range" id="seekBar" value="0" style="vertical-align: middle; width: 100%"/>
+				    <h:span style="width: 150px; margin-top: 8px;" id="seekLabel"/>
+				    <imageclic src="/img/keyboard.svg" style="vertical-align: middle" id="keystrokes"/>
+				    <imageclic src="/img/max.svg" style="vertical-align: middle" id="fullScreen"/>
+				  </div>
+				</h:div>
+					  <script> <![CDATA[
+					  var soffidVideos ;
+					  var soffidCaptions ;
+					  var soffidChapters ;
+					  var videoStart;
+					  var videoEnd;
+					  var showCaptions = false;
+					  var video = document.getElementById("video");
+					  var videoContainer = document.getElementById("${videoContainer.uuid }");
+					  var playButton = document.getElementById("${playbutton.uuid }");
+					  var keyboardButton = document.getElementById("${keystrokes.uuid}");
+					  var fullScreenButton = document.getElementById("${fullScreen.uuid}");
+					  var seekBar = document.getElementById("${seekBar.uuid }");
+					  var seekLabel = document.getElementById("${seekLabel.uuid }");
+					  var currentChapter = 0;
+					  function initVideos(videos, captions, chapters, start, end) {
+					    video.pause();
+						currentChapter = 0;
+						soffidVideos = videos;
+						soffidCaptions = captions;
+						soffidChapters = chapters;
+						videoStart = start;
+						videoEnd = end;
+						document.getElementById("videosrc").setAttribute("src", soffidVideos[0]);
+						document.getElementById("videocaption").setAttribute("src", soffidCaptions[0]);
+				        playButton.src = "${execution.contextPath }/img/play.svg"
+				        video.textTracks[0].mode = "disabled";
+				        seekBar.value = 0;
+						var videoSize = videoEnd - videoStart;
+					    var t = new Date( videoStart * 1000);
+						seekLabel.innerText = zk.formatDate(t, "${timeFormat }");
+					    video.load();
+						video.play().then(function() {
+							  video.textTracks[0].mode =  showCaptions ? "showing": "disabled";
+							  video.pause();
+						});
+					  }
+					  // Event listener for the play/pause button
+					  playButton.addEventListener("click", function() {
+					    if (video.paused == true) {
+					      // Play the video
+					      video.play();
+					      playButton.src = "${execution.contextPath }/img/held.svg"
+					    } else {
+					      // Pause the video
+					      video.pause();
+					      playButton.src = "${execution.contextPath }/img/play.svg"
+					    }
+					  });
+					  // Event listener for the full-screen button
+					  fullScreenButton.addEventListener("click", function() {
+						 var isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+						        (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+						        (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+						        (document.msFullscreenElement && document.msFullscreenElement !== null);
+					    if (!isInFullScreen ) {
+						    if (videoContainer.requestFullscreen) {
+						      videoContainer.requestFullscreen();
+						    } else if (videoContainer.mozRequestFullScreen) {
+						      videoContainer.mozRequestFullScreen(); // Firefox
+						    } else if (video.webkitRequestFullscreen) {
+						      videoContainer.webkitRequestFullscreen(); // Chrome and Safari
+						    }
+						    videoContainer.setAttribute("class", "max");
+						    fullScreenButton.src = "${execution.contextPath }/img/min.svg"
+						 } else {
+					        if (document.exitFullscreen) {
+					            document.exitFullscreen();
+					        } else if (document.webkitExitFullscreen) {
+					            document.webkitExitFullscreen();
+					        } else if (document.mozCancelFullScreen) {
+					            document.mozCancelFullScreen();
+					        } else if (document.msExitFullscreen) {
+					            document.msExitFullscreen();
+					        }
+	   					    videoContainer.setAttribute("class", "min");
+						    fullScreenButton.src = "${execution.contextPath }/img/max.svg";
+						 }
+						 
+					  });
+					  keyboardButton.addEventListener("click", function() {
+						  showCaptions = !showCaptions;
+						  if (showCaptions) {
+							  video.textTracks[0].mode="showing";
+							  keyboardButton.src = "${execution.contextPath }/img/no-keyboard.svg";
+						  } else {
+							  video.textTracks[0].mode="disabled";
+							  keyboardButton.src = "${execution.contextPath }/img/keyboard.svg";
+						  }
+					  });
+					  document.addEventListener('fullscreenchange', function() {
+						    if (document.fullscreenElement == videoContainer) {
+							    videoContainer.setAttribute("class", "max");
+							    fullScreenButton.src = "${execution.contextPath }/img/min.svg"
+	  					    } else {
+		   					    videoContainer.setAttribute("class", "min");
+							    fullScreenButton.src = "${execution.contextPath }/img/max.svg"
+							}
+					  });
+					  function doJumpVideoTo(time, pause) {
+						  // Calculate the new time
+						  var newChapter = 0;
+						  for (var i = 0; i < soffidChapters.length; i++) {
+							  if ( time > soffidChapters[i]) {
+								     newChapter = i;
+							  }
+						  }
+						  // Update the video time
+						  var t = (time - soffidChapters[newChapter])  / 1000;
+						  if (t < 0) t = 0;
+						  if (newChapter != currentChapter) {
+							  currentChapter = newChapter;
+							  document.getElementById("videosrc").src = soffidVideos[currentChapter];
+						      document.getElementById("videocaption").src = soffidCaptions[currentChapter];							  
+							  video.currentTime = 0;
+							  video.textTracks[0].mode = "disabled";
+						      video.load();
+							  video.play().then(function() {
+								  video.textTracks[0].mode =  showCaptions ? "showing": "disabled";
+								  if (pause) {
+								      video.pause();
+								  }
+								  video.currentTime = t;
+							  });
+						  } else {
+							  video.currentTime = t;
+						  }
+					  }
+					  // Event listener for the seek bar
+	 				  seekBar.addEventListener("change", function() {
+						  var videoSize = videoEnd - videoStart;
+						  var time = videoSize * (seekBar.value / 100) + videoStart;
+	 					  doJumpVideoTo (time, true);
+						});
+	 				  seekBar.addEventListener("input", function() {
+						  // Calculate the new time
+						  video.pause();
+						  var videoSize = videoEnd - videoStart;
+						  var time = videoSize * (seekBar.value / 100) + videoStart;
+						  var t = new Date( time);
+						  seekLabel.innerText = zk.formatDate(t, "${timeFormat }");
+						});
+						// Update the seek bar as the video plays
+						video.addEventListener("timeupdate", function() {
+						  var videoSize = videoEnd - videoStart;
+						  var chapterStart = soffidChapters[currentChapter] ;
+						  var position = video.currentTime * 1000 + chapterStart - videoStart;
+						  seekBar.value = 100 * position / videoSize;
+						  var t = new Date( chapterStart + video.currentTime * 1000);
+						  seekLabel.innerText = zk.formatDate(t, "${timeFormat }");
+						});
+						video.addEventListener("ended", function() {
+						  if (soffidChapters.length > currentChapter + 1) {
+						     currentChapter ++;
+						     document.getElementById("videosrc").src = soffidVideos[currentChapter];
+						     document.getElementById("videocaption").src = soffidCaptions[currentChapter];
+						     playButton.src = "${execution.contextPath }/img/held.svg"
+						     video.textTracks[0].mode = "disabled";
+	
+						      video.load();
+							  video.play().then(function() {
+								  video.textTracks[0].mode =  showCaptions ? "showing": "disabled";
+							  });
+						  } else {
+						      playButton.src = "${execution.contextPath }/img/play.svg"
+						  } 
+						});
+						// Pause the video when the slider handle is being dragged
+						seekBar.addEventListener("mousedown", function() {
+						  video.pause();
+					      playButton.src = "${execution.contextPath }/img/play.svg"
+						});
+	
+					  ]]></script>
+				</div>
+			</div>
+		</div>
+	</div>
+</frame>

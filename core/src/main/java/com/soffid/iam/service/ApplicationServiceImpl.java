@@ -1035,11 +1035,11 @@ public class ApplicationServiceImpl extends
 	}
 
     /**
-     * @param RoleAccountEntity
+     * @param roleAccountEntity
      * @throws InternalErrorException 
 	 */
-	private void launchWorkflowApprovalProcess(RoleAccountEntity RoleAccountEntity, String action) throws InternalErrorException {
-		RoleEntity role = RoleAccountEntity.getRole();
+	private void launchWorkflowApprovalProcess(RoleAccountEntity roleAccountEntity, String action) throws InternalErrorException {
+		RoleEntity role = roleAccountEntity.getRole();
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
@@ -1051,7 +1051,7 @@ public class ApplicationServiceImpl extends
 				JbpmContext ctx = getBpmEngine().getContext();
 				try {
 					ProcessInstance pi = ctx.newProcessInstance(app.getApprovalProcess());
-					RoleAccount ra = getRoleAccountEntityDao().toRoleAccount(RoleAccountEntity);
+					RoleAccount ra = getRoleAccountEntityDao().toRoleAccount(roleAccountEntity);
 		            SoDRule rule = getSoDRuleService().isAllowed(ra);
 		            if (rule != null)
 		            	ra.setSodRisk(rule.getRisk());
@@ -1064,25 +1064,26 @@ public class ApplicationServiceImpl extends
 					pi.signal();
 					ctx.save(pi);
 					
-					for (UserAccountEntity ua : RoleAccountEntity.getAccount().getUsers()) {
+					for (UserAccountEntity ua : roleAccountEntity.getAccount().getUsers()) {
                         BpmUserProcess uwp = new BpmUserProcess();
                         uwp.setUserCode(ua.getUser().getUserName());
                         uwp.setProcessId(pi.getId());
                         uwp.setTerminated(false);
                         getUserService().create(uwp);
                     }
-					RoleAccountEntity.setApprovalProcess(pi.getId());
+					roleAccountEntity.setApprovalProcess(pi.getId());
 				} finally {
 					ctx.close();
 				}
-				getRoleAccountEntityDao().update(RoleAccountEntity);
+				getRoleAccountEntityDao().update(roleAccountEntity);
 			}
 		}
 	}
 
-	UserEntity getAccountUser(Long accountId) {
+	UserEntity getAccountUser(Long accountId) throws InternalErrorException {
     	// Guess usuari
     	AccountEntity acc = getAccountEntityDao().load(accountId);
+    	if (acc == null) throw new InternalErrorException("Cannot find account "+accountId);
     	if (acc.getType().equals(AccountType.USER))
     	{
     		for (UserAccountEntity ua: acc.getUsers())

@@ -45,7 +45,7 @@ public class UserDataEntityDaoImpl
 	/**
 	 * 
 	 */
-	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
+	private static final String DATE_FORMAT = ("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
 
 	public void create(com.soffid.iam.model.UserDataEntity dadaUsuari) throws RuntimeException {
 		try {

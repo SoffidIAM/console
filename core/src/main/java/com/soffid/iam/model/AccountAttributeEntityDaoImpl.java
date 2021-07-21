@@ -20,7 +20,7 @@ import org.hibernate.Hibernate;
 public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
 {
 
-	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
+	private static final String DATE_FORMAT = ("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
 
 
 	@Override

@@ -1955,7 +1955,7 @@ public class InputField2 extends Div implements XPathSubscriber
 					result = "<listitem><listcell>"+result+required+removeAction+"</listitem></listcell>"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			} else { // Listbox
-				result = "<div width=\"99%\">" //$NON-NLS-1$
+				result = "<div width=\"100%\">" //$NON-NLS-1$
 						+ "<textbox sclass=\"" + (dataType.isMultiValued()? "textbox2m": "textbox2")+ "\" maxlength=\"" + size +"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 						+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 						+ "readonly=\""+readonlyExpr+"\" onChange='self.parent.parent.onChildChange(event)' onOK=''/>"+required+removeAction+"</div>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

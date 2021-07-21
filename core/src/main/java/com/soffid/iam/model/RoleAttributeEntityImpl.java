@@ -62,7 +62,12 @@ public class RoleAttributeEntityImpl extends com.soffid.iam.model.RoleAttributeE
 					try {
 						return DATE_FORMAT.parse(getValue());
 					} catch (ParseException e2) {
-						return null;
+						try {
+							return AccountAttributeEntityImpl.DATE_FORMAT3.parse(getValue());
+						} catch (Exception e3) {
+							org.apache.commons.logging.LogFactory.getLog(getClass()).info("Error parsing date "+getValue()+" for attribute value "+getId());
+							return null;
+						}
 					}
 				}
 		}

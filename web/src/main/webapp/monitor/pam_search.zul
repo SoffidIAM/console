@@ -35,6 +35,7 @@ display:none !important;
 
 		div#videoContainer.max video  {
 			height: 100vh ;
+			height: calc(100vh - 40px);
 		}
 			
 		div#videoContainer .video-control  {
@@ -138,7 +139,7 @@ display:none !important;
 			<databox type="STRING" readonly="true" id="pamSession.accountName" label="${c:l('pamSession.accountName') } :" />
 			<div sclass="section" id="videos">
 				<customfield3 label="${c:l('pamSession.recordings') }" dataType="SEPARATOR"/>
-				<div style="display:inline-block; width: 200px; float:right" id="bookmarks">
+				<div style="display:inline-block; width: 200px; height: 480px; overflow-y: scroll; float:right" id="bookmarks">
 				  	<label value="${c:l('pamSearch.bookmarks') }"/>
 				</div>
 			    <h:div id="videoContainer" class="min" >

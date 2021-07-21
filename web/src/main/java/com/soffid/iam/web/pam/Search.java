@@ -3,6 +3,7 @@ package com.soffid.iam.web.pam;
 
 import java.rmi.RemoteException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.naming.NamingException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.zkoss.util.TimeZones;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zhtml.A;
 import org.zkoss.zhtml.Text;
@@ -23,7 +25,6 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.web.component.FrameHandler;
@@ -148,9 +149,11 @@ public class Search extends FrameHandler
 				
 				Div bookmarks = (Div) getFellow("bookmarks");
 				while (bookmarks.getChildren().size()>1) bookmarks.getLastChild().detach();
+				final SimpleDateFormat timeFormat = new SimpleDateFormat(DateFormats.getTimeFormatString());
+				timeFormat.setTimeZone(TimeZones.getCurrent());
 				for ( Long bookmark: session.getBookmarks()) {
 					Date d = new Date(bookmark.longValue()*1000L);
-					String s = new SimpleDateFormat(DateFormats.getTimeFormatString()).format(d);
+					String s = timeFormat.format(d);
 					AbstractTag l = new A();
 					l.appendChild(new Text(s));
 					l.setDynamicProperty("href", "#");

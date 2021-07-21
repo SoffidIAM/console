@@ -37,7 +37,10 @@ public class JobExecutor {
 	protected static String hostName;
 
 	public synchronized void start() {
-		if (!isStarted) {
+		if ("true".equals(System.getProperty("soffid.jobscheduler.disabled"))) {
+			log.info("Job scheduler is disabled. Not starting");
+		}
+		else if (!isStarted) {
 			log.debug(String.format(Messages.getString("JobExecutor.StartingThreadGroup"), name)); //$NON-NLS-1$
 			for (int i = 0; i < nbrOfThreads; i++) {
 				startThread();

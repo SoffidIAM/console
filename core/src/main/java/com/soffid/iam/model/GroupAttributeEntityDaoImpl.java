@@ -15,7 +15,7 @@ import es.caib.seycon.ng.exception.SeyconException;
 public class GroupAttributeEntityDaoImpl extends GroupAttributeEntityDaoBase
 {
 
-	private static final String DATE_FORMAT = "yyyy.MM.dd HH.mm.ss"; //$NON-NLS-1$
+	private static final String DATE_FORMAT = ("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
 
     @Override
 	public void create(GroupAttributeEntity entity) {

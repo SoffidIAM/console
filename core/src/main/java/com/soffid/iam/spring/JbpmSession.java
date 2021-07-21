@@ -6,11 +6,7 @@ package com.soffid.iam.spring;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.WeakHashMap;
 
 import org.apache.commons.logging.Log;
@@ -25,15 +21,11 @@ import org.hibernate.LockMode;
 import org.hibernate.Query;
 import org.hibernate.ReplicationMode;
 import org.hibernate.SQLQuery;
-import org.hibernate.classic.Session;
-import org.hibernate.event.FlushEvent;
-import org.hibernate.event.FlushEventListener;
-import org.hibernate.proxy.HibernateProxy;
-import org.hibernate.proxy.HibernateProxyHelper;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.stat.SessionStatistics;
-import org.hibernate.type.Type;
 
 import com.soffid.iam.utils.Security;
 
@@ -41,7 +33,7 @@ import com.soffid.iam.utils.Security;
  * @author bubu
  *
  */
-public class CustomSession implements Session
+public class JbpmSession implements Session
 {
 	Runtime runtime = Runtime.getRuntime();
 	static int threshold2 = 15;
@@ -67,129 +59,8 @@ public class CustomSession implements Session
 	Log log = LogFactory.getLog(getClass());
 	
 	private Session proxy;
-	public CustomSession (Session proxy) {
+	public JbpmSession (Session proxy) {
 		this.proxy = proxy;
-	}
-	public Object saveOrUpdateCopy (Object object) throws HibernateException
-	{
-		Object o = proxy.saveOrUpdateCopy(object);
-		registerDirtyEntity(o);
-		return o;
-	}
-	public Object saveOrUpdateCopy (Object object, Serializable id)
-					throws HibernateException
-	{
-		Object o = proxy.saveOrUpdateCopy(object, id);
-		registerDirtyEntity(o);
-		return o;
-	}
-	public Object saveOrUpdateCopy (String entityName, Object object)
-					throws HibernateException
-	{
-		Object o = proxy.saveOrUpdateCopy(entityName, object);;
-		registerDirtyEntity(o);
-		return o; 
-	}
-	public Object saveOrUpdateCopy (String entityName, Object object, Serializable id)
-					throws HibernateException
-	{
-		Object o = proxy.saveOrUpdateCopy(entityName, object, id);
-		registerDirtyEntity(object);
-		return o;
-	}
-	public List find (String query) throws HibernateException
-	{
-		checkMemoryUsage();
-		return proxy.find(query);
-	}
-	public List find (String query, Object value, Type type) throws HibernateException
-	{
-		checkMemoryUsage();
-		return proxy.find(query, value, type);
-	}
-	public List find (String query, Object[] values, Type[] types)
-					throws HibernateException
-	{
-		checkMemoryUsage();
-		return proxy.find(query, values, types);
-	}
-	public Iterator iterate (String query) throws HibernateException
-	{
-		checkMemoryUsage();
-		return proxy.iterate(query);
-	}
-	public Iterator iterate (String query, Object value, Type type)
-					throws HibernateException
-	{
-		checkMemoryUsage();
-		return proxy.iterate(query, value, type);
-	}
-	public Iterator iterate (String query, Object[] values, Type[] types)
-					throws HibernateException
-	{
-		checkMemoryUsage();
-		return proxy.iterate(query, values, types);
-	}
-	public Collection filter (Object collection, String filter)
-					throws HibernateException
-	{
-		return proxy.filter(collection, filter);
-	}
-	public Collection filter (Object collection, String filter, Object value, Type type)
-					throws HibernateException
-	{
-		return proxy.filter(collection, filter, value, type);
-	}
-	public Collection filter (Object collection, String filter, Object[] values,
-					Type[] types) throws HibernateException
-	{
-		return proxy.filter(collection, filter, values, types);
-	}
-	public int delete (String query) throws HibernateException
-	{
-		return proxy.delete(query);
-	}
-	public int delete (String query, Object value, Type type) throws HibernateException
-	{
-		return proxy.delete(query, value, type);
-	}
-	public int delete (String query, Object[] values, Type[] types)
-					throws HibernateException
-	{
-		return proxy.delete(query, values, types);
-	}
-	public Query createSQLQuery (String sql, String returnAlias, Class returnClass)
-	{
-		checkMemoryUsage();
-		return proxy.createSQLQuery(sql, returnAlias, returnClass);
-	}
-	public Query createSQLQuery (String sql, String[] returnAliases,
-					Class[] returnClasses)
-	{
-		checkMemoryUsage();
-		return proxy.createSQLQuery(sql, returnAliases, returnClasses);
-	}
-	public void save (Object object, Serializable id) throws HibernateException
-	{
-		proxy.save(object, id);
-		registerDirtyEntity(object);
-	}
-	public void save (String entityName, Object object, Serializable id)
-					throws HibernateException
-	{
-		proxy.save(entityName, object, id);
-		registerDirtyEntity(object);
-	}
-	public void update (Object object, Serializable id) throws HibernateException
-	{
-		proxy.update(object, id);
-		registerDirtyEntity(object);
-	}
-	public void update (String entityName, Object object, Serializable id)
-					throws HibernateException
-	{
-		proxy.update(entityName, object, id);
-		registerDirtyEntity(object);
 	}
 	public EntityMode getEntityMode ()
 	{

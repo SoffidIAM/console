@@ -185,6 +185,27 @@ public class WorkflowInterceptor implements Filter {
 			filter.doFilter(request, response);
 	}
 
+	public void setNewThreadName(HttpServletRequest httpServletRequest) {
+		StringBuffer newThreadName = new StringBuffer();
+		if ( httpServletRequest.getUserPrincipal() != null )
+			newThreadName.append(httpServletRequest.getUserPrincipal().getName()).append(": ");
+		else
+			newThreadName.append("Anonymous: ");
+		String referer = httpServletRequest.getHeader("Referer");
+		if (referer != null)
+			newThreadName.append(" ").append(referer).append(" -> ");
+		newThreadName.append(httpServletRequest.getRequestURI());
+		if (httpServletRequest.getQueryString() != null)
+			newThreadName.append("?").append(httpServletRequest.getQueryString());
+		
+		newThreadName.append(" [ ");
+		if (httpServletRequest.getHeader("X-Forwarded-For") != null)
+			newThreadName.append(httpServletRequest.getHeader("X-Forwarded-For") ).append(" > ");		
+		newThreadName.append(httpServletRequest.getRemoteAddr());
+		newThreadName.append(" ]");
+		Thread.currentThread().setName(newThreadName.toString());
+	}
+
 	private void generateScript(ServletRequest request,
 			ServletResponse response, String uri) throws ServletException,
 			IOException {

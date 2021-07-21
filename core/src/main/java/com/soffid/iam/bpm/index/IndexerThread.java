@@ -38,6 +38,8 @@ public class IndexerThread extends NotLoggedThread {
 	}
 
 	public void run() {
+		if ("true".equals(System.getProperty("soffid.indexer.disabled"))) 
+			return;
 		while (!finish)
 		{
 			BpmJobExecutor jobExecutor;

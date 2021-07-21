@@ -17,7 +17,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
  */
 public class RoleAttributeEntityImpl extends com.soffid.iam.model.RoleAttributeEntity {
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
-	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
 
 	@Override
 	public void setObjectValue(Object value) {

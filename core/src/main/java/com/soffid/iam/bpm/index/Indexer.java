@@ -127,22 +127,22 @@ public class Indexer {
 				Field.Store.NO, Field.Index.ANALYZED));
 		d.add(new Field ("$end",  //$NON-NLS-1$
 				pi.getEnd() == null ? "false": "true", //$NON-NLS-1$ //$NON-NLS-2$
-				Field.Store.NO, Field.Index.ANALYZED));
+				Field.Store.YES, Field.Index.ANALYZED));
 		
 		TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
 		if (tm != null && tm.getTenantId() != null)
 			d.add(new Field ("$tenant",  //$NON-NLS-1$
 				tm.getTenantId().toString(), //$NON-NLS-1$ //$NON-NLS-2$
-				Field.Store.NO, Field.Index.ANALYZED));
+				Field.Store.YES, Field.Index.ANALYZED));
 		else
 			d.add(new Field ("$tenant",  //$NON-NLS-1$
 				Long.toString( Security.getCurrentTenantId()), //$NON-NLS-1$ //$NON-NLS-2$
-				Field.Store.NO, Field.Index.ANALYZED));
+				Field.Store.YES, Field.Index.ANALYZED));
 		// Afegim data d'inici i de fi
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd"); //Formato 20100924 //$NON-NLS-1$
 		try {
-			d.add(new Field ("$startDate",sdf.format(pi.getStart()),Field.Store.NO,Field.Index.ANALYZED)); //$NON-NLS-1$
-			if (pi.getEnd()!=null) d.add(new Field ("$endDate",sdf.format(pi.getEnd()),Field.Store.NO,Field.Index.ANALYZED)); //$NON-NLS-1$
+			d.add(new Field ("$startDate",sdf.format(pi.getStart()),Field.Store.YES,Field.Index.ANALYZED)); //$NON-NLS-1$
+			if (pi.getEnd()!=null) d.add(new Field ("$endDate",sdf.format(pi.getEnd()),Field.Store.YES,Field.Index.ANALYZED)); //$NON-NLS-1$
 		} catch (Throwable th) {}
 		return d;
 	}

@@ -313,8 +313,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (account.getJumpServerGroup() != null && !account.getJumpServerGroup().trim().isEmpty())
 			acc.setJumpServerGroup( getJumpServerGroupEntityDao().findByName(account.getJumpServerGroup()) );
 		acc.setCreated(new Date());
-		acc.setDisabled(false);
-		acc.setStatus(AccountStatus.ACTIVE);
+		acc.setDisabled(account.isDisabled());
+		acc.setStatus(account.getStatus() == null? (account.isDisabled() ? AccountStatus.DISABLED : AccountStatus.ACTIVE): account.getStatus());
 		UserTypeEntity tu = getUserTypeEntityDao().findByName(account.getPasswordPolicy());
 		if (tu == null)
 			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.InvalidPolicy"), account.getPasswordPolicy())); //$NON-NLS-1$

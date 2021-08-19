@@ -123,6 +123,7 @@ public class TenantServiceImpl extends TenantServiceBase {
 			{
 				te.getDisabledPermissions().remove(tep);
 				getTenantDisabledPermissionEntityDao().remove(tep);
+				disabledPermissions.remove(tenant.getId());
 				break;
 			}
 		}

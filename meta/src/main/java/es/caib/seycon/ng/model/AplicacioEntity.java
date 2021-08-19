@@ -40,15 +40,15 @@ public abstract class AplicacioEntity {
 	@Column (name="APL_NOM", length=100, translated="description")
 	public java.lang.String nom;
 
-	@Column (name="APL_DIRFON", length=50, translated="sourceDir")
+	@Column (name="APL_DIRFON", length=150, translated="sourceDir")
 	@Nullable
 	public java.lang.String directoriFonts;
 
-	@Column (name="APL_DIRECT", length=50, translated="targetDir")
+	@Column (name="APL_DIRECT", length=150, translated="targetDir")
 	@Nullable
 	public java.lang.String directoriExecutable;
 
-	@Column (name="APL_BD", length=25, translated="dataBase")
+	@Column (name="APL_BD", length=150, translated="dataBase")
 	@Nullable
 	public java.lang.String bd;
 

@@ -42,7 +42,7 @@ public abstract class Aplicacio {
 
 	@Description("where source files are located")
 	@Nullable
-	@Attribute(translated = "source" )
+	@Attribute(translated = "source")
 	public java.lang.String directoriFonts;
 
 	@Description("User code of the responsible for the application.")

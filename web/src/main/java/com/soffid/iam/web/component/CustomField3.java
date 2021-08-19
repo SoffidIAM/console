@@ -294,6 +294,7 @@ public class CustomField3 extends InputField3 {
 
 	public void setPlaceholder(String placeholder) {
 		this.placeholder = placeholder;
+		super.setPlaceholder(placeholder);
 	}
 
 	
@@ -309,7 +310,8 @@ public class CustomField3 extends InputField3 {
 	public void setLabel(String label) {
 		this.label = label;
 		super.setLabel(label);
-		super.setPlaceholder(label);
+		if (placeholder != null)
+			super.setPlaceholder(label);
 	}
 	
 	public void afterCompose() {

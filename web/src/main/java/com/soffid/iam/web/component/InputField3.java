@@ -366,7 +366,8 @@ public class InputField3 extends Databox
 					super.setLabel(dataType.getLabel());
 				else {
 					super.setLabel(dataType.getLabel()+" :");
-					setPlaceholder(dataType.getLabel());
+					if (getPlaceholder() == null)
+						setPlaceholder(dataType.getLabel());
 				}
 			}
 			if (dataType.getSize() != null)
@@ -946,6 +947,13 @@ public class InputField3 extends Databox
 				try {
 					Class<?> cl = Class.forName(dataType.getEnumeration());
 					value = cl.getMethod("fromString", String.class).invoke(null, (String)value);
+				} catch (NoSuchMethodException e) {
+					try {
+						Class<?> cl = Class.forName(dataType.getEnumeration());
+						value = cl.getMethod("fromLong", Long.class).invoke(null, Long.decode(value.toString()));						
+					} catch (Exception e2) {
+						throw new UiException(e);
+					}
 				} catch (Exception e) {
 					throw new UiException(e);
 				}

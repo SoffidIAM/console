@@ -10,6 +10,11 @@
 	use="com.soffid.iam.web.main.MainPage"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	style="overflow: hidden">
+	
+	<!--  Chrome bug. script tags created on the fly are not loaded -->
+	<script src='~./js/codemirror/java-classes.js' />
+	<script src='/comu/syncserver-classes.js' />
+	
 	<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits"
 	    template="main/application.zul" 
 		initialPage="${initialPage}"

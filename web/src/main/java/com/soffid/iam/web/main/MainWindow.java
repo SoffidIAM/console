@@ -31,7 +31,7 @@ public class MainWindow extends Window {
 	}
 	
 	public void help (Event event) {
-		org.zkoss.zk.ui.Executions.getCurrent().sendRedirect("https://confluence.soffid.com", "_blank");
+		org.zkoss.zk.ui.Executions.getCurrent().sendRedirect("https://bookstack.soffid.com", "_blank");
 	}
 
 	@Override

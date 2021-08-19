@@ -4,13 +4,13 @@
 
 	<datanode name="federacioIdentitats">
 		<finder name="entitygroupmember" type="entitygroupmember">
-			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findEntityGroupByNom" if="${queryEnabled}">
+			<ejb-finder jndi="java:/module/FederationService-v2" method="findEntityGroupByNom" if="${queryEnabled}">
 				<parameter value="${name}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
 		</finder>
 		<finder name="policy" type="policy">
-			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findPolicies">
+			<ejb-finder jndi="java:/module/FederationService-v2" method="findPolicies">
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.Policy" />
 		</finder>
@@ -18,7 +18,7 @@
 
 	<datanode name="atribut">
 		<finder name="atribut" type="atribut">
-			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findAtributs" if="${queryEnabled}">
+			<ejb-finder jndi="java:/module/FederationService-v2" method="findAtributs" if="${queryEnabled}">
 				<parameter value="${name}" />
 				<parameter value="${shortname}" />
 				<parameter value="${oid}" />
@@ -29,20 +29,20 @@
 
 	<datanode name="entitygroupmember">
 		<finder name="entitygroupmember" type="entitygroupmember">
-			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findChildren">
+			<ejb-finder jndi="java:/module/FederationService-v2" method="findChildren">
 				<parameter value="${instance}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
 		</finder>
 		<finder name="profile" type="profile">
-			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB"
+			<ejb-finder jndi="java:/module/FederationService-v2"
 				method="findProfilesByFederationMember" if="${instance.federationMember != null}">
 				<parameter value="${instance.federationMember}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.SAMLProfile" />
 		</finder>
 
-		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+		<ejb-handler jndi="java:/module/FederationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -57,14 +57,14 @@
 
 	<datanode name="federationMember">
 		<finder name="federationMember" type="federationMember">
-			<ejb-finder jndi="java:comp/env/ejb/FederacioIdentitatsEJB" method="findFederationMemberByEntityGroupAndPublicIdAndTipus">
+			<ejb-finder jndi="java:/module/FederationService-v2" method="findFederationMemberByEntityGroupAndPublicIdAndTipus">
 				<parameter value="${entityGroupName}" />
 				<parameter value="${publicId}" />
 				<parameter value="${tipusFM}" />
 			</ejb-finder>
 			<new-instance-bean className="es.caib.seycon.ng.comu.EntityGroupMember" />
 		</finder>	
-		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+		<ejb-handler jndi="java:/module/FederationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -78,7 +78,7 @@
 	</datanode>
 
 	<datanode name="profile">
-		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+		<ejb-handler jndi="java:/module/FederationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -92,7 +92,7 @@
 	</datanode>
 
 	<datanode name="policy">
-		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+		<ejb-handler jndi="java:/module/FederationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>
@@ -106,7 +106,7 @@
 	</datanode>
 
 	<datanode name="atributPolicy">
-		<ejb-handler jndi="java:comp/env/ejb/FederacioIdentitatsEJB">
+		<ejb-handler jndi="java:/module/FederationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />
 			</insert-method>

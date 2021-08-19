@@ -54,8 +54,13 @@ zkMenu3.open=function(ed, parent, options, first) {
 		position = "";
 	} else {
 		var pos = parent.getClientRects()[0];
-		w.style.left = ""+(pos.x + pos.width) + "px";
-		w.style.top = ""+(pos.y + pos.height - 24) + "px";
+		if (pos.x + pos.width + 200 > window.innerWidth) {
+			w.style.left = ""+(pos.x + 64) + "px";
+			w.style.top = ""+(pos.y + pos.height - 10) + "px";
+		} else {
+			w.style.left = ""+(pos.x + pos.width) + "px";
+			w.style.top = ""+(pos.y + pos.height - 24) + "px";
+		}
 		position = parent.position + " ";
 	}
 	ed.modal.appendChild(w);
@@ -97,6 +102,7 @@ zkMenu3.open=function(ed, parent, options, first) {
 			var a = document.createElement("a");
 			a.href = option.full_url;
 			a.appendChild(document.createTextNode(option.label));
+			zk.listen(tr, "mouseover", zkMenu3.onMouseOver2);
 			zk.listen(a, "click", zkMenu3.prevent);
 			od.appendChild(a);
 			zk.listen(tr, "click", zkMenu3.onClick);
@@ -133,6 +139,14 @@ zkMenu3.onMouseOver=function(ev) {
 	} else {		
 		menu.openOption = zkMenu3.open(menu.master, option, option.option.options, false);
 	}
+} 
+
+zkMenu3.onMouseOver2=function(ev) {
+	var option = ev.currentTarget;
+	var menu = option.parentElement/*table*/.parentElement;
+	zkMenu3.closeMenu(menu);
+	menu.master.currentTR = option;
+	menu.master.currentPosition = option.position;
 } 
 
 zkMenu3.onCloseMenu=function(ev) {

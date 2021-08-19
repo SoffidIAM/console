@@ -171,6 +171,11 @@ public class SecureInterpreter {
 
 	public Object eval (final String expr) throws MalformedURLException, EvalError
 	{
+		return eval (expr, getNameSpace());
+	}
+
+	public Object eval (final String expr, final NameSpace ns) throws MalformedURLException, EvalError
+	{
 		Object [] result  = AccessController.doPrivileged(
 				new PrivilegedAction<Object[]>() {
 					public Object[] run() {
@@ -194,7 +199,7 @@ public class SecureInterpreter {
 						return AccessController.doPrivileged(new PrivilegedAction<Object[]>() {
 							public Object[] run() {
 								try {
-									return new Object[] { interp.eval(expr) };
+									return new Object[] { interp.eval(expr, ns) };
 								} catch (EvalError e) {
 									return new Object[] { null, e};
 								} catch (RuntimeException e) {

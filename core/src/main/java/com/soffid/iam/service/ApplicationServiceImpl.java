@@ -1144,7 +1144,7 @@ public class ApplicationServiceImpl extends
 	UserEntity getAccountUser(Long accountId) {
     	// Guess usuari
     	AccountEntity acc = getAccountEntityDao().load(accountId);
-    	if (acc.getType().equals(AccountType.USER))
+    	if (acc != null && acc.getType().equals(AccountType.USER))
     	{
     		for (UserAccountEntity ua: acc.getUsers())
     		{

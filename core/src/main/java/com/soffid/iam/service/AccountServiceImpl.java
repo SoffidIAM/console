@@ -992,6 +992,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         }
                     }
                 }
+            } else if ( "N".equals(ue.getActive())) { // Disable accounts in offline systems
+                LinkedList<AccountEntity> accs = new LinkedList<AccountEntity>();
+                for (AccountEntity account: accounts) {
+                	if (account.getSystem() == disEntity && 
+                			(account.getStatus() == AccountStatus.FORCED_ACTIVE || account.getStatus() == AccountStatus.ACTIVE ))
+                	{
+                        account.setDisabled(true);
+						account.setStatus(AccountStatus.DISABLED);
+                        getAccountEntityDao().update(account);
+                        audit("e", account);
+               		}
+                }
             }
         }
 	}

@@ -48,7 +48,7 @@
 			<form2>
 				<div id="tab_info">
 					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.Versia')}" id="ss_versio"/>
-					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.SSO')}"  id="ss_sso"/>
+					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.SSO')}"  id="ss_sso" visible="false"/>
 					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.Jetty')}" id="ss_jetty"/>
 					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.SSODaemon')}" id="ss_ssodaemon"/>
 					<customfield3 readonly="true" dataType="string" label="${c:l('seyconserver.zul.TaskGenerator')}" id="ss_taskgenerator"/>
@@ -130,7 +130,7 @@
 		<databox label="${c:l('agents.zul.Codi') }" type="STRING" readonly="true" id="name"/>
 		<databox label="${c:l('agents.zul.Url-2') }" type="STRING" readonly="true" id="url"/>
 		<databox label="${c:l('seyconserver.zul.Versia') }" type="STRING" readonly="true" id="version"/>
-		<databox label="${c:l('aplica_rolinfo.Error2') }" type="STRING" readonly="true" multiline="true" id="stackTrace"/>
+		<databox label="${c:l('aplica_rolinfo.Error2') }" type="STRING" readonly="true" multiline="true" id="stackTrace" rows="7"/>
 		<datatable id="table" style="width: 100%; min-width: 400px;" maxheight="50vh" onSelect="ref:frame.getAgentTaskDetails">
 		<attribute name="columns"><![CDATA[
 - name: ${c:l('seyconserver.zul.Tasca')}

@@ -62,6 +62,7 @@ import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
+import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -588,7 +589,19 @@ public class AdditionalDataServiceImpl extends
 	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName2(String objectType, String attribute)
 			throws Exception {
 		List<MetaDataEntity> r = getMetaDataEntityDao().findByObjectTypeAndName(objectType, attribute);
-		return getMetaDataEntityDao().toDataTypeList(r);
+		if (! r.isEmpty())
+			return getMetaDataEntityDao().toDataTypeList(r);
+		if (objectType == null)
+			return null;
+		
+		String fileName = objectType.replace(".", "/") + ".ui.json";
+		List<DataType> d = getDescriptorMetadata(fileName);
+		for (Iterator<DataType> it = d.iterator(); it.hasNext(); ) {
+			DataType dt = it.next();
+			if (attribute != null && ! attribute.equals(dt.getName()))
+				it.remove();
+		}
+		return d;
 	}
 
 	@Override
@@ -717,6 +730,80 @@ public class AdditionalDataServiceImpl extends
 			}
 		}
 		
+	}
+
+	protected List<DataType> getDescriptorMetadata(String resourceName)
+			throws Exception {
+		InputStream in = getClass().getClassLoader().getResourceAsStream(resourceName);
+		if (in == null)
+			return null;
+		
+		JSONObject o = new JSONObject(new JSONTokener(in));
+		in.close();
+		
+		String className = o.getString("class");
+
+		JSONArray atts = o.getJSONArray("attributes");
+		
+		long last =  0;
+		List<DataType> result = new LinkedList<>();
+		for (int i = 0; i < atts.length(); i++) {
+			JSONObject att = atts.getJSONObject(i);
+			String name = att.optString("name");
+			String type = att.optString("type");
+			String lettercase = att.optString("lettercase");
+			boolean required = att.optBoolean("required", false);
+			if ( resourceName.equals("com/soffid/iam/api/Host.ui.json") && 
+					name.equals("networkCode"))
+				required = true;
+			boolean readonly = att.optBoolean("readonly", false);
+			boolean hidden = att.optBoolean("hidden", false);
+			boolean multiline = att.optBoolean("multiline", false);
+			boolean searchCriteria = att.optBoolean("searchCriteria", false);
+			boolean multivalue = att.optBoolean("multivalue", false);
+			String customUiHandler = att.optString("custom_ui_handler");
+			String separator = att.optString("separator");
+			String validator = att.optString("validator");
+			String length = att.optString("length");
+			String filterExpression = att.optString("filter_expression");
+			String enumeration = att.optString("enumeration");
+			if (! hidden) {
+				DataType md = new DataType();
+				md.setAdminVisibility( hidden ? AttributeVisibilityEnum.HIDDEN :
+					readonly ? AttributeVisibilityEnum.READONLY :
+						AttributeVisibilityEnum.EDITABLE);
+				md.setBuiltin(true);
+				md.setEnumeration(enumeration);
+				md.setFilterExpression(filterExpression);
+				md.setLetterCase(lettercase != null && lettercase.toLowerCase().startsWith("u") ? LetterCaseEnum.UPPERCASE :
+					lettercase != null && lettercase.toLowerCase().startsWith("l") ? LetterCaseEnum.LOWERCASE:
+						LetterCaseEnum.MIXEDCASE);
+				md.setMultiValued(multivalue);
+				md.setName(name);
+				md.setNlsLabel(className+"."+name);
+				md.setOrder(last++);
+				md.setRequired(required);
+				md.setSearchCriteria(searchCriteria);
+				md.setMultiLine(multiline);
+				if (length != null && !length.trim().isEmpty())
+					md.setSize(Integer.parseInt(length));
+				md.setType(guessType (type));
+				md.setValidator(validator);
+				md.setReadOnly(readonly);
+				md.setBuiltinHandler(customUiHandler);
+				JSONArray values = att.optJSONArray("listOfValues");
+				if (values != null) {
+					List<String> v = new LinkedList<>();
+					for (int j = 0; j < values.length(); j++) {
+						v.add(values.optString(j));
+					}
+					md.setValues(v);
+				}
+
+				result.add(md);
+			}
+		}
+		return result;
 	}
 
 	private long upgradeMetadata(CustomObjectTypeEntity cot, MetadataScope scope) {

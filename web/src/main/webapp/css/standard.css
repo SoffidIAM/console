@@ -233,6 +233,8 @@ div.main-search.ctxpopup span.search-header {
 	color: {BLUE};
 	display: block;
 	border-top: solid 1px {BLUE};
+	padding-top: 4px;
+	padding-bottom: 4px;
 }
 
 
@@ -726,7 +728,7 @@ td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 /* Estil per als menubar */
 
 div.menubar{
-	color: #FFF;
+	color: {BLUETEXT};
 	padding: 1px 1px 1px 0px; border: 0px; 
 	border-top:0.1px solid white; 
 	background-color: {BLUE};
@@ -822,7 +824,7 @@ div.listbox-head th.sort-dsc div.head-cell-inner, div.grid-head th.sort-dsc div.
   background-repeat: no-repeat;
 }
 
-.listfilter {background-color: {GREEN}; width:90%; width:calc(100% - 12px); border: white solid 1px;}
+.listfilter {background-color: {GREEN}; color:{GREENTEXT}; width:90%; width:calc(100% - 12px); border: white solid 1px;}
 
 
 
@@ -1498,7 +1500,7 @@ li.attribute-search-box > button div.criteria-wrap {
 
 li.attribute-search-box:hover {
 	background-color: {GREEN};
-    color: white;
+	color: {GREENTEXT};
     cursor: pointer;
 }
 
@@ -1693,7 +1695,7 @@ div.displayedFromLeft {
 }
 .toolbarOnlyDetails a:hover {
 	background-color:{GREEN};
-	color:white
+	color:{GREENTEXT};
 }
 .toolbarOnlyDetails a img {
 	vertical-align:-3px
@@ -1781,9 +1783,9 @@ tr.grid td.gc {
 input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text, div.text,
 	div.databox div.datahtml {
     box-sizing: border-box;
-    padding: 2px;
-    border: 4px solid #e0e0e0;
-    background: #f8f8f8;
+    padding: 4px 5px 2px 5px;
+    border: 2px solid #e3e3e3;
+    background: #f9f9f9;
     border-radius: 4px;
 }
 
@@ -1936,8 +1938,8 @@ span.rbtnbk {
 }
 
 select {
-    border: 4px solid #e0e0e0;
-    padding: 2px;
+    padding: 4px 5px 2px 5px;
+    border: 2px solid #e3e3e3;
     color: black;
     margin-top: 2px;
     margin-bottom: 2px;
@@ -1956,7 +1958,7 @@ select {
 	-moz-appearance: none;
 	appearance: nane;
 	
-	background: #f8f8f8 url(../zkau/web/zul/img/combobtn.gif);
+	background: #f9f9f9 url(../zkau/web/zul/img/combobtn.gif);
 	background-position:
 	  calc(100% - 4px) calc(50%) ;
 	background-repeat: no-repeat;
@@ -2111,7 +2113,7 @@ div.scroll-listbox div.listbox-body {
 
 
 /*********** DATATABLE ************/
-div.datatable table, div.datatable table td {
+div.datatable table, div.datatable table td, table.preview-table {
 	border: solid 1px #c0c0c0;
 	border-collapse: collapse;
 	min-width: 80px;
@@ -2181,7 +2183,18 @@ div.datatable table.tbody tr.rule td {
 	color: {GREEN};
 }
 
-div.datatable table.thead td {
+table.preview-table {
+	width: 100%
+}
+
+table.preview-table thead tr {font-weight: normal}
+
+table.preview-table tr td.grant {color: green;}
+
+table.preview-table tr td.revoke {color: red;}
+
+div.datatable table.thead td,
+table.preview-table thead {
 	box-sizing: border-box;
 	background-color: {GREEN};
 	color: {GREENTEXT};
@@ -2540,6 +2553,7 @@ div.addButton:hover, div.deleteButton:hover {
 
 div.deleteButton:hover {
 	background-color: {SKY};
+	color: {SKYTEXT};
 }
 
 div.addButton span, div.deleteButton span {
@@ -2908,7 +2922,7 @@ div.datatree div.tree-collapse, div.collapser {
     height: 18px;
     vertical-align: top;
     padding: 0px;
-    margin-top: 3px;
+    margin-top: 6px;
 	margin-left: 6px;
 	margin-right: 6px;   
 	cursor: pointer;
@@ -2994,6 +3008,10 @@ img.small-icon {
 	margin-right: 4px;			
 }
 
+div.datatree div.tree-itemholder img.tree-icon {
+	vertical-align: top
+}
+
 div.datatree div.tree-label {
 	cursor: pointer;		
 	height: 32px;
@@ -3050,7 +3068,8 @@ div.datatree div.tbody div.tree-label div.tree-cell,
 div.datatree div.tbody div.tree-label.no-columns {
 	padding-left: 4px;
 	padding-right: 4px;
-	padding-top: 2px;
+	padding-top: 6px;
+	vertical-align: baseline;
 	padding-bottom: 2px;
 	height: 32px;
 }
@@ -3254,6 +3273,7 @@ div.tree-tail button {
 .inputfile + label:hover {
 	background-image: none;
 	background-color: {SKY};
+	color: {SKYTEXT};
 }
 
 form.upload-form input[type="submit"] {display:none;}
@@ -3314,6 +3334,12 @@ div.databox div.container {
 
 div.databox div.container.wrapped {
 	margin-left: 200px;
+	display: block;
+}
+
+div.databox.databox_switch div.container.wrapped {
+	margin-left: 0px;
+	display: inline-block;
 }
 
 div.databox div.container.datebox {
@@ -3383,14 +3409,20 @@ div.databox div.databox-popup div span.name span {
 }
 
 div.databox div.databox-popup div span.search-match{
-	color: {SKY}
+	color: {SKY};
 }
 
-div.databox div.databox-popup div:hover {
-	background-color: {BLUELIGHT};
-}
+div.databox div.databox-popup div:hover,
+div.databox div.databox-popup div:hover span ,
 div.databox div.databox-popup div:hover span.search-match {
-	color: black;
+	background-color: {BLUELIGHT};
+	color: {BLUETEXT};
+}
+
+div.databox div.databox-popup div.no-results,
+div.databox div.databox-popup div.no-results:hover {
+	background-color: white;
+	color: #606060;
 }
 
 div.databox button.icon-button, span.zbtnbk {

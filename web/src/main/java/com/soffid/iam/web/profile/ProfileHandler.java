@@ -33,6 +33,7 @@ import com.soffid.iam.service.ejb.PreferencesService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.common.ChangePass;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.OtpPageHandler;
 import com.soffid.iam.web.zk.ConfigureUserSettings;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
@@ -123,6 +124,9 @@ public class ProfileHandler extends FrameHandler {
 	    lb.setValue(DateFormats.getTimeFormatString());
 	    
 	    updateSample();
+
+		if (new OtpPageHandler().needsOtp(this))
+			setVisible(false);
 	}
 
 	public void updateSample() {

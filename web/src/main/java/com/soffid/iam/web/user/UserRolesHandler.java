@@ -197,7 +197,9 @@ public class UserRolesHandler extends Div implements AfterCompose {
 						
 				if (ra.getDomainValue() == null ||
 						ra.getDomainValue().getValue() == null ||
-						ra.getDomainValue() != null && ra.getDomainValue().getValue().equals(currentRoleAccount2.getDomainValue().getValue())) {
+						ra.getDomainValue() != null && currentRoleAccount2 != null &&
+								currentRoleAccount2.getDomainValue() != null &&
+								ra.getDomainValue().getValue().equals(currentRoleAccount2.getDomainValue().getValue())) {
 					return true;
 				}
 			}
@@ -206,6 +208,11 @@ public class UserRolesHandler extends Div implements AfterCompose {
 	}
 
 	public void setProperties(Event ev) throws InternalErrorException, NamingException, CreateException {
+		setProperties2();
+		getWizard().next();
+	}
+
+	protected void setProperties2() throws InternalErrorException, NamingException, CreateException {
 		Window w = getWindowAdd();
 		DomainValueField input = (DomainValueField) w.getFellow("domainValues");
 		List<String> domains = (List<String>) input.getValue();
@@ -226,7 +233,6 @@ public class UserRolesHandler extends Div implements AfterCompose {
 			sb.append("<BR>");
 		}
 		sodRules.setValue(sb.toString());
-
 	}
 
 

@@ -17,6 +17,7 @@
 			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
 			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('user:group:create')}" onClick="ref:handler.importCsv"/>
 			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+			<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:handler.bulkAction" />
 		</menu2>
 	</div>
 
@@ -213,9 +214,9 @@
 			</tabpanels>
 		</tabbox>
 		<div style="width: 100%">
-			<button label="${c:l('rules.preview')}" onClick="ref:handler.preview">
-			</button>
 			<div style="text-align: right; width: 100%">
+				<button label="${c:l('rules.preview')}" onClick="ref:handler.preview" style="float:left">
+				</button>
 				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
 					onClick="ref:handler.closeDetails">
 				</button>
@@ -454,7 +455,7 @@
 	</window>
 
 	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
-		closable="true"
+		closable="false"
 		onClose="self.setVisible(false); event.stopPropagation();">
 		<div style="max-height: 20em; overflow-y:scroll" >
 			<div use="com.soffid.iam.web.component.FileDump"

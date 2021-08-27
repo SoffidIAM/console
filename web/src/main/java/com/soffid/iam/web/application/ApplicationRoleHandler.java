@@ -24,6 +24,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.service.ejb.UserService;
+import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DomainValueField;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
@@ -684,4 +685,13 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 					});
 		}
 	}
+	
+	public void bulkAction(Event event) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		DataTable listbox = (DataTable) getListbox();
+		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
+			BulkAction ba = new BulkAction( Role.class.getName() ); 
+			ba.start(listbox ) ;
+		}
+	}
+
 }

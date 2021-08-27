@@ -19,11 +19,13 @@ public class VaultFolder
 	
 	String name;
 	
+	@Attribute(hidden = true)
 	boolean personal;
 	
 	String description;
 	
 	@Nullable
+	@Attribute(hidden = true)
 	Long parentId;
 	
 	@Nullable

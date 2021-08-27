@@ -154,7 +154,7 @@
 				<customfield3 label="${c:l('dadesAddicionals.zul.Multivalued')}" dataType="BOOLEAN"
 						bind="@multiValued" disabled="${!canModifyMetadata}"
 								onClick="" onChange="ref:frame.onChangeMultipleValues" />
-				<customfield3 id="multirow" label="${c:l('dadesAddicionals.zul.MultivaluedRows')}" dataType="BOOLEAN"
+				<customfield3 id="multirow" label="${c:l('dadesAddicionals.zul.MultivaluedRows')}" dataType="NUMBER"
 						bind="@multiValuedRows" onChange=""/>
 				<customfield3 label="${c:l('dadesAddicionals.zul.Size')}" dataType="NUMBER"
 							bind="@size" id="detail_size"

@@ -12,7 +12,7 @@
 
 	<form dataPath="model:/conf" id="samlform" width="100%">
 		<div>
-			<label value="${c:l('parametres.zul.classicMethod')}"/>
+			<label sclass="separator" value="${c:l('parametres.zul.classicMethod')}"/>
 		</div>
 		<div style="margin-left: 150px">
 			<div width="100%">
@@ -24,7 +24,7 @@
 				<label value="${c:l('parametres.zul.trustedAuthentication')}"  style="margin-left: 16px" />
 			</div>
 		</div>
-		<label value="${c:l('parametres.zul.samlMethod')}"/>
+		<label  sclass="separator" value="${c:l('parametres.zul.samlMethod')}"/>
 		<div style="margin-left: 150px">
 			<div>
 				<switch bind="samlMethod" /> 
@@ -54,7 +54,7 @@
 				</listbox>
 			</div>
 		</div>
-		<label value="${c:l('parametres.zul.linotpIntegration')}"/>
+		<label  sclass="separator" value="${c:l('parametres.zul.linotpIntegration')}"/>
 		<div style="margin-left: 150px">
 			<div>
 				<switch bind="enableLinotp"  /> 
@@ -83,7 +83,7 @@
 				</listbox>
 			</div>
 		</div>
-		<label value="${c:l('parametres.zul.otpUsage')}"/>
+		<label  sclass="separator"  value="${c:l('parametres.zul.otpUsage')}"/>
 		<div style="margin-left: 150px">
 			<div>
 				<label   value="${c:l('parametres.zul.otpOptional')}: "/>
@@ -99,7 +99,7 @@
 				<label value="${c:l('parametres.zul.otpTimeout2')}" sclass="label"/>
 			</div>
 		</div>
-		<div style="margin-top: 2em">
+		<div style="margin-top: 2em; width: 100%; text-align: right">
 			<button image="/img/download-r.svg" label="${c:l('parametres.zul.downloadMetadata') }" onClick="ref:frame.downloadMetadata"/>
 			<button image="/img/save-r.svg" label="${c:l('task.filter.lblConfirmaCambios') }" onClick="ref:frame.commit"
 				style="text-align:right"/>

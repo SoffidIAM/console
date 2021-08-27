@@ -108,7 +108,7 @@ public class FinderHandler extends Window implements AfterCompose {
 			}
 		}
 		if (sb.length() == 0) {
-			for (int i = 0; i < 2; i++) {
+			for (int i = 0; i < 2 && i < l.size(); i++) {
 				if (i > 0)
 					sb.append(", ");
 				sb.append(l.get(i).getCode());
@@ -222,6 +222,10 @@ public class FinderHandler extends Window implements AfterCompose {
 			name = (String) ds.getValue(path+"/name");
 			String domain = (String) ds.getValue(path+"/domainName");
 			name = name +"@"+domain;
+		} else if (className.equals("com.soffid.iam.api.VaultFolder")) 
+		{
+			Long id = (Long) ds.getValue(path+"/id");
+			return id.toString();
 		} else {
 			try {
 				name = (String) ds.getValue(path+"/userName");

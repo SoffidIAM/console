@@ -364,7 +364,7 @@ public class SyncserverHandler extends FrameHandler {
         agentStatus = new LinkedList<>( EJBLocator.getSyncServerService().getServerAgentStatus(serverUrl));
 		for ( AgentStatusInfo st: agentStatus ) {
         	JSONObject value = new JSONObject( st );
-        	if (! "Connected".equals( st.getStatus()))
+        	if (st.getStatusMessage() != null)
         		value.put("$class", "bold");
         	values.put(value);
         }

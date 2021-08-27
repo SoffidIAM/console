@@ -612,15 +612,6 @@
 									onClick="ref:frame.propagaCanvisAgent_Groups()"> 
 								</button>
 							</div>
-							<div style="margin-top: 20px" id="reconcileDiv">
-								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.reconcile')}" onClick="ref:frame.startReconcile"> 
-								</button>
-								<label value="Last run:" id="reconcileLabel"/> 
-								<datebox id="reconcileLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
-								<label id="reconcileSeparator" value="-"/>
-								<datebox id="reconcileLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
-								<image visible="false" id="reconcileStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showReconcileTaskMessage'/>
-							</div>
 							<div style="margin-top: 20px" id="importDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.loadAuhtoratitve')}" onClick="ref:frame.startImportTask"> 
 								</button>
@@ -629,6 +620,15 @@
 								<label id="importSeparator" value="-"/>
 								<datebox id="importLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
 								<image visible="false" id="importStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showImportTaskMessage'/>
+							</div>
+							<div style="margin-top: 20px" id="reconcileDiv">
+								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.reconcile')}" onClick="ref:frame.startReconcile"> 
+								</button>
+								<label value="Last run:" id="reconcileLabel"/> 
+								<datebox id="reconcileLast" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<label id="reconcileSeparator" value="-"/>
+								<datebox id="reconcileLastEnd" buttonVisible="false" disabled="true" format="${c:l('selfService.Format') }"></datebox>
+								<image visible="false" id="reconcileStatus" style="vertical-align: middle; cursor: pointer; height: 32px" onClick='ref:frame.showReconcileTaskMessage'/>
 							</div>
 							<div style="margin-top: 20px" id="impactDiv">
 								<button if="${canPropagateAgentUsers}" label="${c:l('agents.zul.impactAnalyis')}" onClick="ref:frame.startImpactTask"> 
@@ -695,7 +695,7 @@
 		</div>
 	</div>
 	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
-		closable="true"
+		closable="false"
 		onClose="self.setVisible(false); event.stopPropagation();">
 		<div style="max-height: 20em; overflow-y:scroll" >
 			<div use="com.soffid.iam.web.component.FileDump"
@@ -714,7 +714,7 @@
 	</window>
 
 	<window visible="false" width="80%" title="Test log" id="testWindow"
-		closable="true"
+		closable="false"
 		onClose="self.setVisible(false); event.stopPropagation();">
 		<div>
 			<label class = "separator_label" value="${c:l('job.status') }: "  style="width: auto"/>
@@ -749,12 +749,19 @@
 		</div>
 	</window>
 
-	<window closable="true" width="80%" id="logWindow"
+	<window width="80%" id="logWindow"
 		position="center,top"
 		title=""
 		onClose='self.visible=false; event.stopPropagation();'
 		visible="false">
 		<textbox id="tb" width="100%" height="150px" multiline="true" style="font-family: monospace; resize: vertical"/>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}">
+				<attribute name="onClick">
+					logWindow.setVisible(false);
+				</attribute>
+			</button>
+		</div>
 	</window>
 	
 	<window closable="false" width="80%" id="startTaskWindow"

@@ -309,6 +309,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		acc.setInheritNewPermissions(account.isInheritNewPermissions());
 		acc.setLoginName(account.getLoginName());
 		acc.setLoginUrl(account.getLoginUrl());
+		acc.setServerName(account.getServerName());
+		acc.setServerType(account.getServerType());
 		acc.setLaunchType(account.getLaunchType());
 		if (account.getJumpServerGroup() != null && !account.getJumpServerGroup().trim().isEmpty())
 			acc.setJumpServerGroup( getJumpServerGroupEntityDao().findByName(account.getJumpServerGroup()) );
@@ -1055,6 +1057,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                             getAccountEntityDao().update(acc);
                         }
                     }
+                }
+            } else if ( "N".equals(ue.getActive())) { // Disable accounts in offline systems
+                LinkedList<AccountEntity> accs = new LinkedList<AccountEntity>();
+                for (AccountEntity account: accounts) {
+                	if (account.getSystem() == disEntity && 
+                			(account.getStatus() == AccountStatus.FORCED_ACTIVE || account.getStatus() == AccountStatus.ACTIVE ))
+                	{
+                        account.setDisabled(true);
+						account.setStatus(AccountStatus.DISABLED);
+                        getAccountEntityDao().update(account);
+                        audit("e", account);
+               		}
                 }
             }
         }

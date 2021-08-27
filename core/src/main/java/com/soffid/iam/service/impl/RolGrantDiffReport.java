@@ -112,15 +112,6 @@ public class RolGrantDiffReport {
 		outFile = File.createTempFile("ruleEngine", ".html");
 		out = new PrintStream(outFile, "UTF-8");
 		
-		out.println("<style>");
-		out.println(".preview-table {border-collapse: collapse;}");
-		out.println(".preview-table tr {padding-left: 1em; padding-right: 1em;}");
-		out.println(".preview-table tr td {padding-left: 1em; padding-right: 1em;}");
-		out.println(".preview-table .head {background-color: rgba(23, 181, 200, 1); border: 1px solid rgba(23, 181, 200, 1);}");
-		out.println(".preview-table .line {border: 1px solid black;}");
-		out.println(".preview-table .grant {color: green;}");
-		out.println(".preview-table .revoke {color: red;}");
-		out.println("</style>");
 		out.print("<table class='preview-table'><thead><tr class='head'><td>");
 		out.print("Action");
 		out.print("</td><td>");

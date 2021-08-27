@@ -495,11 +495,15 @@ public class AttributeMappingHandler extends DataGrid {
 			AttributeDirection expected = direction.toUpperCase().startsWith("OUT") ?
 					AttributeDirection.OUTPUT :
 					AttributeDirection.INPUT;
-			AttributeDirection type = (AttributeDirection) XPathUtils.getValue(r, "@direction");
-			if ( type == null)
-				XPathUtils.setValue(r, "@direction", expected);
-			else if ( type != expected)
-				r.setVisible(false);
+			try {
+				AttributeDirection type = (AttributeDirection) XPathUtils.eval(r, "@direction");
+				if ( type == null)
+					XPathUtils.setValue(r, "@direction", expected);
+				else if ( type != expected)
+					r.setVisible(false);
+			} catch (Exception e) {
+				// Ignore
+			}
 		}
 
 	}

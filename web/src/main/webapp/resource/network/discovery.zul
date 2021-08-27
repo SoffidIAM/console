@@ -162,7 +162,7 @@
 		xmlns:h="http://www.w3.org/1999/xhtml"
 		id="add_system"
 		position="top, center" sizable="true"
-		title="${c:l('user-groups.new')}" visible="false"
+		title="${c:l('discovery.newAgent')}" visible="false"
 		style="width: 80%; max-width: 800px">
 	
 		<wizard id="wizard">
@@ -258,7 +258,7 @@
 		</div>		
 		
 		<div id="div_existing_account">
-			<customfield3 id="existing_account" dataType="ACCOUNT" label="${c:l('accounts.setPassword.label') }" required="true"
+			<customfield3 id="existing_account" dataType="ACCOUNT" label="${c:l('aplica_usuarisRolllista.zul.Codi') }" required="true"
 				filterExpression="secrets pr and not type eq U"/>
 		</div>		
 

@@ -40,6 +40,7 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.User;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
+import com.soffid.scimquery.parser.ParseException;
 
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -171,6 +172,11 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 				modelCollection = (DataModelCollection) v;
 				try {
 					modelCollection.refresh();
+				} catch (UiException e) {
+					if (e.getCause() instanceof ParseException)
+						throw new UiException(new InternalErrorException(Labels.getLabel("searchbox.badSyntax"), e.getCause()));
+					else
+						throw (UiException) e;
 				} catch (Exception e) {
 					throw new UiException(e);
 				}
@@ -197,6 +203,11 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		{
 			try {
 				modelCollection.updateProgressStatus();
+			} catch (UiException e) {
+				if (e.getCause() instanceof ParseException)
+					throw new UiException(new InternalErrorException(Labels.getLabel("searchbox.badSyntax"), e.getCause()));
+				else
+					throw (UiException) e;
 			} catch (Exception e) {
 				throw new UiException(e);
 			}

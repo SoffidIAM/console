@@ -3,10 +3,6 @@
   url: /wf/inbox.zul
   permissions: ["selfservice:tasks"]
   handler: com.soffid.iam.web.bpm.MyTasksMenuHandler
-- name: selfService.Applications
-  img: /img/menu/app-launcher.svg
-  handler: com.soffid.iam.web.launcher.LauncherMenuHandler
-  permissions: ["selfservice:applications"]
 - name: seu.startWorkflow
   img: /img/menu/start-wf.svg
   handler: com.soffid.iam.web.inbox.NewProcessMenuHandler
@@ -15,6 +11,10 @@
   img: /img/menu/process.svg
   url: /wf/search.zul
   permissions: ["selfservice:search-process"]
+- name: selfService.Applications
+  img: /img/menu/app-launcher.svg
+  handler: com.soffid.iam.web.launcher.LauncherMenuHandler
+  permissions: ["selfservice:applications"]
 - name: seu.myAccounts
   img: /img/menu/accounts.svg
   url: /self/account.zul

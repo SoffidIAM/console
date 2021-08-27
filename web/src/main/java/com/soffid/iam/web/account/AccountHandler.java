@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -82,12 +83,31 @@ public class AccountHandler extends FrameHandler {
 	}
 		
 
+	Map<String, Boolean> visibilityCache = new HashMap<>();
 	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
 		updateStatus();
 		try {
 			DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "/services");
 			getFellow("servicesSection").setVisible(!coll.isEmpty());
+			
+			Component b = getFellow("detailsButton");
+			
+			String system = (String) XPathUtils.eval(getForm(), "@system");
+			Boolean visible = visibilityCache.get(system);
+			if (visible == null) {
+				visible = false;
+				try {
+					System s = EJBLocator.getDispatcherService().findDispatcherByName(system);
+					if (s != null && s.getUrl() != null)
+						visible = true;
+				} catch (Exception e ) {
+					// Probably lack of permissions
+				}
+				visibilityCache.put(system, visible);
+			}
+			b.setVisible( visible.booleanValue() );
+
 		} catch (Exception e) {}
 	}
 	

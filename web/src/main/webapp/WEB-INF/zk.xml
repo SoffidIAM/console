@@ -96,7 +96,23 @@ zk.error = function (msg) {
 	function $int(v, b) {
 		v = v ? parseFloat(v, b || 10): 0;
 		return isNaN(v) ? 0: v;
-	};
+ };
+  zkau.doCmds = function() {
+     if (zkau._doingCmds) {
+         setTimeout(zkau.doCmds, 10)
+     } else {
+         zkau._doingCmds = true;
+         try {
+             zkau._doCmds0()
+             if (zkau.currentFocus && zkau.currentFocus.id) {
+	             var w = document.getElementById(zkau.currentFocus.id);
+	             if (w != null && w != zkau.currentFocus.id) w.focus();
+	         }
+         } finally {
+             zkau._doingCmds = false
+         }
+     }
+ }
  </script>
      ]]></embed>
 	</device-config>

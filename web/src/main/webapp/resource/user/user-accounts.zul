@@ -89,7 +89,7 @@
 	</window>
 	
 	<!-- Window to show the random password -->
-	<window closable="true" id="displayNewPassword" position="top,center" sizable="true"
+	<window closable="false" id="displayNewPassword" position="top,center" sizable="true"
 		title="${c:l('canviPassword.Titol')}" visible="false" width="600px"
 		onClose="ref:handler.onCancelDisplayPassword">
 		

@@ -979,7 +979,7 @@
 			</detalls>
 		</esquemavertical>
 		
-		<window closable="true" id="newPassword" position="center, center"
+		<window closable="false" id="newPassword" position="center, center"
 			sizable="true" title="${c:l('accounts.setPassword.title')}"
 			visible="false" width="34em"
 			onClose="onCancelPassword(); event.stopPropagation();">

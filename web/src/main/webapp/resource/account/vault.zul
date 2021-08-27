@@ -196,7 +196,7 @@
 	</div>
 
 	<!--  Window to set the password -->
-	<window closable="true"
+	<window closable="false"
 		id="newPassword2" position="top, center"
 		sizable="true" title="${c:l('accounts.setPassword.title')}"
 		visible="false" width="34em"
@@ -235,7 +235,7 @@
 	</window>
 	
 	<!-- Window to show the random password -->
-	<window closable="true" id="displayNewPassword" position="top,center" sizable="true"
+	<window closable="false" id="displayNewPassword" position="top,center" sizable="true"
 		title="${c:l('canviPassword.Titol')}" visible="false" width="600px"
 		onClose="ref:frame.onCancelDisplayPassword">
 		

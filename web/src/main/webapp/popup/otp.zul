@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="otp" title="SOFFID IAM OTP" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
-		<window closable="true" id="w" position="center, center"
+		<window closable="false" id="w" position="center, center"
 			handler="${arg.handler}"
 			sizable="true" title="Enter your OTP value"
 			mode="highlighted" width="34em"

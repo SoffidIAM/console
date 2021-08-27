@@ -3,7 +3,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
 <?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
-<window id="window" closable="true" position="top, center"
+<window id="window" closable="false" position="top, center"
 	use="com.soffid.iam.web.popup.FinderHandler"
 	sizable="true" 
 	style="min-width: 40em;"

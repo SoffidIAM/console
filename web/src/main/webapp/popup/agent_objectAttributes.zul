@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="objectAttributes"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <window xmlns:h="http://www.w3.org/1999/xhtml"
-		closable="true" id="window" position="center, center"
+		closable="false" id="window" position="center, center"
 		use="com.soffid.iam.web.popup.ObjectAttributesHandler"
 		sizable="true" title="${c:l('agents.zul.ObjectDetails')}"
 		style="min-width:40em"

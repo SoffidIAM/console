@@ -632,7 +632,7 @@
 	</window>
 
 	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
-		closable="true"
+		closable="false"
 		onClose="self.setVisible(false); event.stopPropagation();">
 		<div style="max-height: 20em; overflow-y:scroll" >
 			<div use="com.soffid.iam.web.component.FileDump"

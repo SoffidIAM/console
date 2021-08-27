@@ -2,7 +2,7 @@
 <?page id="identity" title="Search for identities"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
-<window id="identityWindow" closable="true" position="center, center"
+<window id="identityWindow" closable="false" position="center, center"
 	use="com.soffid.iam.web.popup.IdentityHandler"
 	sizable="false" 
 	style="min-width: 60em; width:60%"

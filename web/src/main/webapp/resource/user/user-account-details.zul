@@ -4,7 +4,7 @@
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <zk xmlns:h="http://www.w3.org/1999/xhtml">
 
-	<window closable="true"
+	<window closable="false"
 		use="com.soffid.iam.web.user.AccountDetailsHandler"
 		id="window"
 		position="center, center" sizable="true"

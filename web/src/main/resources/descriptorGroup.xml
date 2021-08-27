@@ -15,17 +15,17 @@
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = "${queryText != null  &amp;&amp; queryText != '' &amp;&amp; synchro == null}">
-				<parameter value="${queryText}"/>
+				if = "${textQuery != null  &amp;&amp; textQuery != '' &amp;&amp; synchro == null}">
+				<parameter value="${textQuery}"/>
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = "${queryText != null &amp;&amp; synchro != null}">
-				<parameter value="${queryText}"/>
+				if = "${textQuery != null &amp;&amp; synchro != null}">
+				<parameter value="${textQuery}"/>
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = '${(queryText == null || queryText == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
+				if = '${(textQuery == null || queryText == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
 				<parameter value=""/>
 				<parameter value="not parent.name pr"/>
 			</ejb-finder>

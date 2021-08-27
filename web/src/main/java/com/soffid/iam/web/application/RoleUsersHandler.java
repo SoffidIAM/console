@@ -171,7 +171,7 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 			getWizard().next();
 			if (domain == null) {
 				getWizard().next();
-				setProperties(ev);
+				setProperties2();
 			} else {
 				DomainValueField dvf = (DomainValueField) getWindowAdd().getFellow("domainValues");
 				dvf.setApplication(currentRole.getInformationSystemName());
@@ -183,6 +183,11 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 	}
 
 	public void setProperties(Event ev) throws InternalErrorException, NamingException, CreateException {
+		setProperties2();
+		getWizard().next();
+	}
+
+	protected void setProperties2() throws InternalErrorException, NamingException, CreateException {
 		Window w = getWindowAdd();
 		DomainValueField input = (DomainValueField) w.getFellow("domainValues");
 		List<String> domains = (List<String>) input.getValue();
@@ -307,9 +312,9 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 						DomainValue dv = new DomainValue();
 						dv.setDomainName(currentRole.getDomain());
 						dv.setExternalCodeDomain(currentRole.getInformationSystemName());
-						dv.setValue(domain);
-						ra.setDomainValue(dv);
-						coll.add(ra);
+						dv.setValue(domainValue);
+						ra2.setDomainValue(dv);
+						coll.add(ra2);
 					}
 				} else {
 					DomainValue dv = new DomainValue();

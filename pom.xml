@@ -370,7 +370,11 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkdb</artifactId>
+<<<<<<< HEAD
         <version>2.1.8</version>
+=======
+        <version>2.1.8-SNAPSHOT</version>
+>>>>>>> 0df8d4ce... ES-2920 Fix table columns
       </dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -424,7 +428,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>2.0</zkiblaf.version>
-    <zkdb.version>2.1.8</zkdb.version>
+    <zkdb.version>2.1.9</zkdb.version>
 		<maven.compile.source>1.8</maven.compile.source>
     <maven.compile.target>1.8</maven.compile.target>
   </properties>

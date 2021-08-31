@@ -1797,7 +1797,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			for (UserAccountEntity uae: acc.getUsers())
 			{
-				ue = uae.getUser();
+				if ( Boolean.TRUE.equals( uae.getApproved()) &&
+						uae.getUntilDate() != null &&
+						uae.getUntilDate().after(new Date()))
+					ue = uae.getUser();
 			}
 		}
 		return ue;

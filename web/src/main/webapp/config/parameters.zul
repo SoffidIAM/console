@@ -80,7 +80,7 @@
 								
 								<row>
 									<label value="${c:l('parametres.zul.Descripcia-2')} :"/>
-									<textbox bind="@description" readonly="${!canUpdateParameter}" maxlength="50"
+									<textbox bind="@description" readonly="${!canUpdateParameter}" maxlength="255"
 											width="100%"/>
 								</row>
 

@@ -221,7 +221,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 							Password.decode(jumpServerGroup.getPassword()).getPassword(), null)
 					.type(MediaType.APPLICATION_JSON)
 					.accept(MediaType.APPLICATION_JSON)
-					.post(data);
+					.post( JSONObject.wrap(data).toString());
 					
 		} catch (Exception e) {
 			throw new InternalErrorException ("Error connecting to "+storeUrl+": "+e.getMessage() );

@@ -1,21 +1,23 @@
 package com.soffid.iam.model;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.jcs.access.behavior.ICacheAccess;
+
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.Group;
 import com.soffid.iam.api.PasswordValidation;
-import com.soffid.iam.api.Role;
-import com.soffid.iam.api.User;
-import com.soffid.iam.api.UserData;
-import com.soffid.iam.model.AuditEntity;
-import com.soffid.iam.model.RoleAccountEntity;
-import com.soffid.iam.model.SystemEntity;
-import com.soffid.iam.model.TaskEntity;
-import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import com.soffid.iam.spring.DummyCache;
 import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
@@ -23,22 +25,6 @@ import com.soffid.iam.utils.Security;
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-
-import java.io.Serializable;
-import java.security.Principal;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.jcs.access.CacheAccess;
-import org.apache.commons.jcs.access.behavior.ICacheAccess;
 
 public class AccountEntityDaoImpl extends
 		com.soffid.iam.model.AccountEntityDaoBase {
@@ -364,27 +350,7 @@ public class AccountEntityDaoImpl extends
 		String u = Security.getCurrentUser();
 		if ( u != null)
 		{
-			UserEntity ue = getUserEntityDao().findByUserName(u);
-			if (ue != null)
-			{
-				if (source.getType().equals(AccountType.USER))
-				{
-					for (UserAccountEntity uac: source.getUsers())
-					{
-						if (uac.getUser().getId().equals (ue.getId()))
-							return AccountAccessLevelEnum.ACCESS_OWNER;
-					}
-				}
-				for (AccountAccessLevelEnum al: new AccountAccessLevelEnum [] {
-						AccountAccessLevelEnum.ACCESS_OWNER,
-						AccountAccessLevelEnum.ACCESS_MANAGER,
-						AccountAccessLevelEnum.ACCESS_USER})
-				{
-					AccessControlList acl = generateAcl (source, al);
-					if ( getACLService().isUserIncluded(ue.getId(), acl))
-						return al;
-				}
-			}			
+			return handleGetAccessLevel(source, u);
 		}
 		return AccountAccessLevelEnum.ACCESS_NONE;
 	}
@@ -553,6 +519,31 @@ public class AccountEntityDaoImpl extends
 		getCache().remove(entity.getId());
 	}
 
+	@Override
+	protected AccountAccessLevelEnum handleGetAccessLevel(AccountEntity source, String user) throws InternalErrorException {
+		UserEntity ue = getUserEntityDao().findByUserName(user);
+		if (ue != null)
+		{
+			if (source.getType().equals(AccountType.USER))
+			{
+				for (UserAccountEntity uac: source.getUsers())
+				{
+					if (uac.getUser().getId().equals (ue.getId()))
+						return AccountAccessLevelEnum.ACCESS_OWNER;
+				}
+			}
+			for (AccountAccessLevelEnum al: new AccountAccessLevelEnum [] {
+					AccountAccessLevelEnum.ACCESS_OWNER,
+					AccountAccessLevelEnum.ACCESS_MANAGER,
+					AccountAccessLevelEnum.ACCESS_USER})
+			{
+				AccessControlList acl = generateAcl (source, al);
+				if ( getACLService().isUserIncluded(ue.getId(), acl))
+					return al;
+			}
+		}		
+		return AccountAccessLevelEnum.ACCESS_NONE;
+	}
 }
 
 

@@ -1,4 +1,4 @@
-package com.soffid.iam.security;
+package com.soffid.iam.common.security;
 
 import java.util.Map;
 

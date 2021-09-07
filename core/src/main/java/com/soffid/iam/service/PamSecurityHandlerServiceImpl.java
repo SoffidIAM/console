@@ -19,10 +19,10 @@ import com.soffid.iam.api.RequestedObligationEnum;
 import com.soffid.iam.api.RequestedObligationEnumEnum;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.bpm.model.AuthenticationLog;
+import com.soffid.iam.common.security.Obligation;
+import com.soffid.iam.common.security.ObserveObligationException;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.UserAccountEntity;
-import com.soffid.iam.security.Obligation;
-import com.soffid.iam.security.ObserveObligationException;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.catalina.realm.GenericPrincipal;
 
+import com.soffid.iam.common.security.Obligation;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
 
@@ -156,10 +157,10 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		synchronized (obligations) {
 			for (Iterator<Obligation> it = obligations.iterator(); it.hasNext();) {
 				Obligation obligation = it.next();
-				if (obligation.timeout < System.currentTimeMillis())
+				if (obligation.getTimeout() < System.currentTimeMillis())
 					it.remove();
 				else {
-					o.put(obligation.obligation, obligation.attributes);
+					o.put(obligation.getObligation(), obligation.getAttributes());
 				}
 			}
 		}
@@ -169,9 +170,9 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	@Override
 	public void setObligation(String obligation, Map<String, String> properties, long timeout) {
 		Obligation o = new Obligation();
-		o.obligation = obligation;
-		o.attributes = properties == null ? new HashMap<>(): properties;
-		o.timeout = timeout;
+		o.setObligation(obligation);
+		o.setAttributes(properties == null ? new HashMap<>(): properties);
+		o.setTimeout(timeout);
 		
 		obligations.add(o);
 	}
@@ -182,15 +183,15 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		synchronized (obligations) {
 			for (Iterator<Obligation> it = obligations.iterator(); it.hasNext();) {
 				Obligation obligation = it.next();
-				if (obligation.timeout < System.currentTimeMillis())
+				if (obligation.getTimeout() < System.currentTimeMillis())
 					it.remove();
 				else {
-					if (obligationName.equals(obligation.obligation))
+					if (obligationName.equals(obligation.getObligation()))
 						o = obligation;
 				}
 			}
 		}
-		return o == null ? null : new HashMap<>(o.attributes);
+		return o == null ? null : new HashMap<>(o.getAttributes());
 	}
 	public SoffidPrincipalImpl(SoffidPrincipal p)  {
 		this(p.getName(),

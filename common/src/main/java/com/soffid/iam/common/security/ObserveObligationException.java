@@ -1,10 +1,14 @@
-package com.soffid.iam.security;
+package com.soffid.iam.common.security;
 
 import java.util.List;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class ObserveObligationException extends InternalErrorException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	List<Obligation> obligations;
 	
 	public ObserveObligationException(List<Obligation> obligations) {

@@ -186,7 +186,7 @@ public class UploadService {
 			uploadComponentVersion("antlr", "2.7.6", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cron4j", "2.2.5", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-			uploadComponentVersion("json", "20080701", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("json", "20190722", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			uploadComponentVersion("lucene-core", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("lucene-queries", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

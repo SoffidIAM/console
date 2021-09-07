@@ -10,6 +10,7 @@ import com.soffid.iam.model.RuleEntity;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.RolEntity;
+import es.caib.seycon.ng.servei.UsuariService;
 
 import java.io.File;
 
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	com.soffid.iam.service.SoffidEventListener.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
+	UsuariService.class,
 	RolEntity.class})
 public abstract class RuleEvaluatorService {
 

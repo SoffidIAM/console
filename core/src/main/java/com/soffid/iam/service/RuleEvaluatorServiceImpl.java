@@ -15,6 +15,7 @@ import bsh.ParseException;
 import bsh.TargetError;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DelegationStatus;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
@@ -24,6 +25,7 @@ import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -53,12 +55,14 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -407,17 +411,18 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	class InterpreterEnvironment {
 		
 		private User userVO;
-		private HashMap<String, String> attributes;
+		private Map<String, Object> attributes;
 		private HashMap<String, Group> groups;
 		
 		public InterpreterEnvironment(UserEntity user) {
 			User usuariVO = getUserEntityDao().toUser(user);
 			userVO = (usuariVO);
 			
-			attributes = new HashMap<String, String>();
-			for (UserDataEntity dada : user.getUserData()) {
-                attributes.put(dada.getDataType().getName(), dada.getValue());
-            }
+			try {
+				attributes = getUserService().findUserAttributes(user.getUserName());
+			} catch (InternalErrorException e) {
+				attributes = null;
+			}
 			
 			groups = new HashMap<String, Group>();
 			addGroups(groups, user.getPrimaryGroup());

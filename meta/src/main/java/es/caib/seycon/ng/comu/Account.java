@@ -185,6 +185,7 @@ public class Account {
 	@JsonAttribute(hibernateJoin="attributes")
 	@Attribute(hidden=true, defaultValue = "new java.util.HashMap<String,Object>()")
 	Map<String, Object> attributes;
+	
 }
 
 

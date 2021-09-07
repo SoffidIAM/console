@@ -15,6 +15,7 @@ import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.PasswordValidation;
 
 @Entity(table = "SC_ACCOUN", translatedName = "AccountEntity", translatedPackage = "com.soffid.iam.model",
@@ -266,6 +267,8 @@ public abstract class AccountEntity {
 			+ "where a.launchType = 'P' and a.passwordStatus = 'PASSWORD_GOOD_EXPIRED' and a.system.tenant.id=:tenantId")
 	public Long getPamAccountsExpiredPassword() {return null;}
 
+	@DaoOperation
+	AccountAccessLevelEnum getAccessLevel(AccountEntity account, String user) {return null;}
 }
 
 @Index (name="SC_ACCOUN_NAME",	unique=true,

@@ -112,7 +112,7 @@
 		  <groupId>joda-time</groupId>
 		  <artifactId>joda-time</artifactId>
 		  <version>2.9</version>
-		  <scope>priveded</scope>
+		  <scope>provided</scope>
 		</dependency>
 		<dependency>
 		    <groupId>org.slf4j</groupId>

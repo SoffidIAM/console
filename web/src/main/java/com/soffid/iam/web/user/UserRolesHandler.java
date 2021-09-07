@@ -177,7 +177,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 				getWizard().next();
 				if (currentRole.getDomain() == null) {
 					getWizard().next();
-					setProperties(ev);
+					setProperties2();
 				} else {
 					DomainValueField dvf = (DomainValueField) getWindowAdd().getFellow("domainValues");
 					dvf.setApplication(currentRole.getInformationSystemName());
@@ -344,14 +344,17 @@ public class UserRolesHandler extends Div implements AfterCompose {
 	}
 
 	public void backAndRollback(Event ev) {
-		DataTable dt = getListbox();
-		dt.delete();
 		getWizard().previous();
-		if (currentRole.getDomain() == null) 
+		if (currentRole.getDomain() == null) {
+			DataTable dt = getListbox();
+			dt.delete();
 			getWizard().previous();
+		}
 	}
 
 	public void back(Event ev) {
+		DataTable dt = getListbox();
+		dt.delete();
 		getWizard().previous();
 	}
 

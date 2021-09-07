@@ -29,9 +29,9 @@ public class JCSCacheProvider implements CacheProvider
 		{
 			String enableCache = System.getProperty("soffid.cache.enable");
 			if ( enableCache != null && ! "false".equals(enableCache))
-				return true;
+				enabled = true;
 			else
-				return false;
+				enabled = false;
 		}
 		return enabled.booleanValue();
 	}
@@ -72,6 +72,8 @@ public class JCSCacheProvider implements CacheProvider
 			
 			p.put("cs.auxiliary.DC.attributes.DiskPath", cacheDir);		
 			JCS.setConfigProperties(p);
+
+			initialised = true;
 		}
 	}
 

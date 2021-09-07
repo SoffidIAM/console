@@ -14,7 +14,7 @@ import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 
-import com.soffid.iam.security.ObserveObligationException;
+import com.soffid.iam.common.security.ObserveObligationException;
 import com.soffid.iam.web.obligation.ObligationManager;
 
 public class RefInterpreter extends GenericInterpreter implements

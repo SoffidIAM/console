@@ -1,6 +1,6 @@
 package com.soffid.iam.web.obligation;
 
-import com.soffid.iam.security.Obligation;
+import com.soffid.iam.common.security.Obligation;
 import com.soffid.iam.web.component.OtpPageHandler;
 import com.soffid.iam.web.obligation.ObligationManager;
 

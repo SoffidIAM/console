@@ -15,7 +15,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import com.soffid.iam.security.ObserveObligationException;
+import com.soffid.iam.common.security.ObserveObligationException;
 import com.soffid.iam.web.obligation.ObligationManager;
 
 import es.caib.zkib.zkiblaf.Missatgebox;

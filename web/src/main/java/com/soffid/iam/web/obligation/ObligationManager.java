@@ -15,8 +15,8 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.sys.ExecutionCtrl;
 
 import com.soffid.iam.api.RequestedObligationEnum;
+import com.soffid.iam.common.security.Obligation;
 import com.soffid.iam.common.security.SoffidPrincipal;
-import com.soffid.iam.security.Obligation;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 

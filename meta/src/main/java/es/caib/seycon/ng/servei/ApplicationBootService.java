@@ -15,6 +15,7 @@ import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.AgentDescriptorEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 
 @Service (translatedName="ApplicationBootService",
@@ -39,6 +40,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	TipusDadaEntity.class,
 	CustomObjectTypeEntity.class,
 	com.soffid.iam.service.ScheduledTaskService.class,
+	AgentDescriptorEntity.class,
 	CrudRegistryService.class})
 public abstract class ApplicationBootService {
 

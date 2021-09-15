@@ -120,7 +120,15 @@ public class AttributeParser {
 					try {
 						return DATETIME_FORMAT.parse(value2);
 					} catch (ParseException e2) {
-						return null;
+						try {
+							return DATETIME_FORMAT3.parse(value2);
+						} catch (ParseException e3) { 
+							try {
+								return DATETIME_FORMAT4.parse(value2);
+							} catch (ParseException e4) { 
+								return null;
+							}
+						}
 					}
 				}
 		}

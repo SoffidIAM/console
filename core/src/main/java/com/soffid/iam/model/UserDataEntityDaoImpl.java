@@ -124,7 +124,8 @@ public class UserDataEntityDaoImpl
         if(sourceEntity.getDataType() != null && sourceEntity.getValue() != null){
         	if(sourceEntity.getDataType().getType() != null){
         		targetVO.setDateValue(null);
-        		if(sourceEntity.getDataType().getType().toString().equals("D")){ //$NON-NLS-1$
+        		if(sourceEntity.getDataType().getType() == TypeEnumeration.DATE_TYPE ||
+        				sourceEntity.getDataType().getType() == TypeEnumeration.DATE_TIME_TYPE) { //$NON-NLS-1$
         			Date dateObj = (Date) sourceEntity.getObjectValue();
         			if (dateObj != null)
         			{

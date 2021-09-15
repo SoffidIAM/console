@@ -3178,22 +3178,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 						r = new LinkedList<Object>();
 						attributes.put(vd.getAttribute(), r);
 					}
-					if (vd.getDateValue() != null)
-						r.add(vd.getDateValue().getTime());
-					else if (vd.getValue() != null)
-						r.add(vd.getValue());
-					else if (vd.getBlobDataValue() != null)
-						r.add(vd.getBlobDataValue());
+					r.add(att.getObjectValue());
 				}
 				else
 				{
-					if (vd.getDateValue() != null)
-						attributes
-								.put(vd.getAttribute(), vd.getDateValue().getTime());
-					else if (vd.getValue() != null)
-						attributes.put(vd.getAttribute(), vd.getValue());
-					else if (vd.getBlobDataValue() != null)
-						attributes.put(vd.getAttribute(), vd.getBlobDataValue());
+					attributes.put(vd.getAttribute(), att.getObjectValue());
 				}
 			}
 		}

@@ -55,6 +55,7 @@ import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
+import com.soffid.iam.model.AgentDescriptorEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.impl.DatabaseParser;
@@ -452,9 +453,18 @@ public class ApplicationBootServiceImpl extends
 		}
 		if (cfg.getValue().equals("105"))
 		{
-			createStandardAttributes();
-			cfg.setValue("200");
+			fixAgentDescriptor();
+			cfg.setValue("106");
 			configSvc.update(cfg);
+		}
+	}
+
+	private void fixAgentDescriptor() {
+		for (AgentDescriptorEntity ad: getAgentDescriptorEntityDao().loadAll()) {
+			if (ad.getService() == null) {
+				ad.setService(false);
+				getAgentDescriptorEntityDao().update(ad);
+			}
 		}
 	}
 
@@ -589,6 +599,24 @@ public class ApplicationBootServiceImpl extends
 			conn.close();
 		}
 	}
+
+	private void fixServiec() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			Statement stmt = conn.createStatement();
+			executeSentence(conn, "UPDATE SC_AGEDES SET ADE_SERVIC=? WHERE ADE_SERVIC IS NULL",
+								new Object[] {false});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
 
 	private void updateBlobTenant() throws IOException, Exception 
 	{

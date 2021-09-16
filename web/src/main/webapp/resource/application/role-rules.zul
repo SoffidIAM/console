@@ -52,7 +52,7 @@
 					<div sclass="section">
 						<label sclass="separator" value="${c:l('rules.rule') }"/>
 						<customfield3 bind="name" dataType="STRING" maxlength="150" required="true" label="${c:l('rules.name') }"/>
-						<customfield3 bind="description" dataType="STRING" maxlength="150" required="false" label="${c:l('rules.description') }"/>
+						<customfield3 bind="description" dataType="STRING" maxlength="1500" required="false" label="${c:l('rules.description') }" multiline="true"/>
 						<codemirror value="" id="ru_script" linenumbers="true" visible="true" 
 							readonly="${! soffid:isUserInRole('rule:admin') }"
 						    bind="@bshExpression"

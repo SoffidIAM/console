@@ -1851,7 +1851,7 @@ public class ApplicationServiceImpl extends
     		}
     	}
 		RoleGrantHierarchy h = new RoleGrantHierarchy();
-		h.setRuleName(rule.getDescription());
+		h.setRuleName(rule.getName());
     	RolAccountDetail s = new RolAccountDetail(h, null);
     	s.rule = rule;
     	rad.add(s);

@@ -23,7 +23,7 @@
           icon: >-
             #{accountName != null ? "/img/account.svg": 
               groupName != null ? "/img/group.svg": 
-              ruleName != null ? "/img/rulesvg":
+              ruleName != null ? "/img/rule.svg":
               "/img/role.svg"}
           template: >-
              #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}

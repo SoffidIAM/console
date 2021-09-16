@@ -35,7 +35,7 @@
           - template: >-
                 #{accountName != null ? accountDescription: ""}
                 #{groupName != null ? groupDescription: ""}
-                #{ruleName != null ? "": ""}
+                #{ruleName != null ? ruleDescription: ""}
                 #{roleName != null ? roleDescription: ""}
         - path: /nested
           icon: >-

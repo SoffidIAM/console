@@ -49,7 +49,6 @@ public class GroupHandler extends FrameHandler {
 		SearchBox sb = (SearchBox) getFellow("searchBox");
 		if (name != null) {
 			sb.addAttribute("name").setSearchFilter(name);
-			sb.search();
 		}
 		sb.search();
 	}

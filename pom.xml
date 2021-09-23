@@ -370,11 +370,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkdb</artifactId>
-<<<<<<< HEAD
-        <version>2.1.8</version>
-=======
-        <version>2.1.8-SNAPSHOT</version>
->>>>>>> 0df8d4ce... ES-2920 Fix table columns
+        <version>2.1.9</version>
       </dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

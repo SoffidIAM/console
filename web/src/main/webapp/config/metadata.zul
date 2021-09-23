@@ -180,21 +180,18 @@
 				</div>
 				<customfield3 dataType="STRING" visible="false" id="admvisrow"
 						label="${c:l('dadesAddicionals.zul.AdminVisibility')}"
-						keysPath="/model:/visibility/value"
-						valuesPath="/model:/visibility/literal"
+						enumeration="com.soffid.iam.api.AttributeVisibilityEnum"
 						bind="@adminVisibility"
 						disabled="${!canModifyMetadata}" />
 				<customfield3 dataType="STRING" visible="false"  id="opevisrow"
 						label="${c:l('dadesAddicionals.zul.OperatorVisibility')}"
 						bind="@operatorVisibility"
-						keysPath="/model:/visibility/value"
-						valuesPath="/model:/visibility/literal"
+						enumeration="com.soffid.iam.api.AttributeVisibilityEnum"
 						disabled="${!canModifyMetadata}"></customfield3>
 				<customfield3 dataType="STRING" visible="false"  id="usevisrow"
 						label="${c:l('dadesAddicionals.zul.UserVisibility')}"
 						bind="@userVisibility"
-						keysPath="/model:/visibility/value"
-						valuesPath="/model:/visibility/literal"
+						enumeration="com.soffid.iam.api.AttributeVisibilityEnum"
 						disabled="${!canModifyMetadata}"></customfield3>
 				<customfield3 dataType="STRING" multiline="true" id="visibility4"
 					label="${c:l('dadesAddicionals.zul.VisibilityExpr')}"

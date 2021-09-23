@@ -27,7 +27,6 @@ import com.soffid.iam.service.GroupService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
-import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 
 import es.caib.seycon.ng.comu.Usuari;
@@ -227,7 +226,7 @@ public class Mail implements ActionHandler {
 				
 				User usuari = ServiceLocator.instance().getUserService().findUserByUserName(user);
 	
-				String lang = EJBLocator.getPreferencesService().findMyPreference("lang");
+				String lang = ServiceLocator.instance().getPreferencesService().findMyPreference("lang");
 				if (lang != null)
 					MessageFactory.setThreadLocale(new Locale (lang));
 				

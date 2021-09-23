@@ -25,7 +25,7 @@
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = '${(textQuery == null || queryText == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
+				if = '${(textQuery == null || textQuery == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
 				<parameter value=""/>
 				<parameter value="not parent.name pr"/>
 			</ejb-finder>

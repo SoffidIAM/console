@@ -944,6 +944,16 @@ public class ApplicationServiceImpl extends
            			if (first)
 						throw new NeedsAccountNameException(String.format("Please, specify account for user %s on system %s",
 								ra.getUserCode(), ra.getSystem()));
+           			else {
+           				RoleAccount raReturn = null;
+           				for (UserAccount account2: accounts) {
+       						RoleAccount ra2 = new RoleAccount(ra); 
+       						ra2.setAccountId(account2.getId());
+       						ra2.setAccountName(account2.getName());
+       						raReturn = performCreateRolAccount(inital, ra2, grantsToCreate, first);
+           				}
+           				return raReturn;
+           			}
            		}
            		else if (accounts.size() == 0)
            		{

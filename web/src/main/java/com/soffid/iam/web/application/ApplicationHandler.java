@@ -43,7 +43,6 @@ public class ApplicationHandler extends FrameHandler {
 		SearchBox sb = (SearchBox) getFellow("searchBox");
 		if (name != null) {
 			sb.addAttribute("name").setSearchFilter(name);
-			sb.search();
 		}
 		sb.search();
 	}

@@ -21,7 +21,7 @@ public abstract class RuleEntity {
 	@Column (name="RUL_DESCRI", length=150)
 	public java.lang.String name;
 
-	@Column (name="RUL_COMMEN", length=150)
+	@Column (name="RUL_COMMEN", length=1500)
 	@Nullable
 	public java.lang.String description;
 

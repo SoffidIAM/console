@@ -54,7 +54,7 @@ public class ConnectionFactory {
         for (Enumeration<String> e = ks.aliases(); e.hasMoreElements(); ) {
         	String key = e.nextElement();
         	if ( !key.equals(SeyconKeyStore.MY_KEY) && ks.isKeyEntry(key) )
-        		ks.deleteEntry("secretsKey");
+        		ks.deleteEntry(key);
         }
         SSLContext ctx;
         ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$

@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
@@ -50,8 +51,11 @@ public class ConnectionFactory {
         File file = SeyconKeyStore.getKeyStoreFile();
         KeyStore ks = SeyconKeyStore.loadKeyStore(file);
 
-        if (ks.getCertificate("secretsKey") != null)
-        	ks.deleteEntry("secretsKey");
+        for (Enumeration<String> e = ks.aliases(); e.hasMoreElements(); ) {
+        	String key = e.nextElement();
+        	if ( !key.equals(SeyconKeyStore.MY_KEY) && ks.isKeyEntry(key) )
+        		ks.deleteEntry("secretsKey");
+        }
         SSLContext ctx;
         ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 

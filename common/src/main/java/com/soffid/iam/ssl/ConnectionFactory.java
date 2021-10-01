@@ -53,7 +53,7 @@ public class ConnectionFactory {
 
         for (Enumeration<String> e = ks.aliases(); e.hasMoreElements(); ) {
         	String key = e.nextElement();
-        	if ( !key.equals(SeyconKeyStore.MY_KEY) && ks.isKeyEntry(key) )
+        	if ( !key.equalsIgnoreCase(SeyconKeyStore.MY_KEY) && ks.isKeyEntry(key) )
         		ks.deleteEntry(key);
         }
         SSLContext ctx;

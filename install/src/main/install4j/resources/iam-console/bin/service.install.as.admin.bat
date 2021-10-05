@@ -33,7 +33,7 @@ if "%OS%" == "Windows_NT" (
 
 pushd %DIRNAME%
 
-CACLS "%DIRNAME%\.." /T /E /G "NT Authority\Local Service:F" 
+CACLS "%DIRNAME%\.." /T /E /G "NT Authority\LocalService:F" 
 
 :checkUser
 if "x%1x" == "x/service-userx" goto serviceUser
@@ -62,5 +62,6 @@ call service install
 set PR_SERVICEUSER=%OLD_SERVICEUSER%
 set PR_SERVICEPASSWORD=%OLD_SERVICEPASSWORD%
 rd /q /s "%DIRNAME%\..\work\soffid"
+rd /q /s "%DIRNAME%\..\temp"
 net start soffid-iamconsole
 start http://localhost:8080

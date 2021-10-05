@@ -239,7 +239,7 @@ set PR_CLASSPATH=
 set PR_JVM=
 
 rem Set extra parameters
-if "%JAVA_MAJOR_VERSION%" lss 11 (
+if "%JAVA_MAJOR_VERSION%" equ 8 (
     "%EXECUTABLE%" //US//%SERVICE_NAME% ^
     	++JvmOptions "-javaagent:%CATALINA_HOME%\lib\openejb-javaagent.jar;-Dcatalina.base=%CATALINA_BASE%;-Dcatalina.home=%CATALINA_HOME%;-Djava.endorsed.dirs=%CATALINA_HOME%\endorsed"
 ) else (

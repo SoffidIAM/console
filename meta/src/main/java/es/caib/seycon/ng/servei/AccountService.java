@@ -263,7 +263,7 @@ public abstract class AccountService {
 	
 	/////////////
 	@Description("Generates the account name for a user and system")
-	@Operation ( grantees={roles.agent_update.class},
+	@Operation ( grantees={roles.agent_update.class, roles.user_query.class},
 			translated="guessAccountName")
 	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public java.lang.String gessAccountName(

@@ -401,7 +401,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		config.setMaximumResultSize(end);
 		h.setConfig(config);
 		h.setTenantFilter("type.tenant.id");
-		h.setOrder("o.name");
+//		h.setOrder("o.name");
 		h.setGenerator((entity) -> {
 			return dao.toCustomObject((CustomObjectEntity) entity);
 		}); 

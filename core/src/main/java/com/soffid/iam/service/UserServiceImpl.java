@@ -2994,8 +2994,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		else
 			qs = "("+qs+") and o.tenant.id = :tenantId";
 		
-		if (hql.getOrderByString().length() == 0)
-			qs = qs + " order by o.userName";
+		if (hql.getOrderByString().length() == 0) {
+			LinkedList<String> l = new LinkedList<>();
+			l.add("o.userName");
+			hql.setOrderBy(l);
+		}
 
 		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();

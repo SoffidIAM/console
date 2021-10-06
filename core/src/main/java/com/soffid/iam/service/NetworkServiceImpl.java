@@ -1683,7 +1683,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             maquina.setHostIP(ip);
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
-        } else if (serialNumber.equals(old.getSerialNumber())) {
+        } else if (serialNumber.equals(old.getSerialNumber()) || old.getSerialNumber() == null || old.getSerialNumber().trim().isEmpty()) {
             // Found host entry
             maquina = old;
         } else if (old.getDynamicIP().booleanValue()) {

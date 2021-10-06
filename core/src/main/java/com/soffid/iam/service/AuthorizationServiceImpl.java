@@ -17,6 +17,7 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AuthorizationRole;
+import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
@@ -293,6 +294,8 @@ public class AuthorizationServiceImpl extends
 	                   			compatibleDomain = false;
 	                   			for (String s: autoSEU.getTipusDomini().split("[, ]+"))
 	                   			{
+	                   				s = normalize(s);
+	                   				tipusDomini = normalize(tipusDomini);
 	                   				if (tipusDomini.startsWith(s))
 	                   				{
 	                   					compatibleDomain = true;
@@ -364,6 +367,18 @@ public class AuthorizationServiceImpl extends
         return autoritzacionsUsuari;
 
     }
+
+	protected String normalize(String s) {
+		if (DomainType.APLICACIONS.equals(s))
+			s = DomainType.APPLICATIONS;
+		if (DomainType.GRUPS.equals(s))
+			s = DomainType.GROUPS;
+		if (DomainType.GRUPS_USUARI.equals(s))
+			s = DomainType.GROUPS;
+		if (DomainType.DOMINI_APLICACIO.equals(s))
+			s = DomainType.CUSTOM;
+		return s;
+	}
 
 	private void addInheriedAuthorizations(List<AuthorizationRole> autoritzacionsUsuari, AuthorizationRole autoRolVO, SoffidAuthorization autoSEU) {
 		if (autoSEU != null

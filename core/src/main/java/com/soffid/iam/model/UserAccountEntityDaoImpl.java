@@ -12,6 +12,8 @@ import es.caib.seycon.ng.model.*;
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
+import org.hibernate.Hibernate;
+
 public class UserAccountEntityDaoImpl extends com.soffid.iam.model.UserAccountEntityDaoBase
 {
 
@@ -50,4 +52,17 @@ public class UserAccountEntityDaoImpl extends com.soffid.iam.model.UserAccountEn
     		getAccountEntityDao().propagateChanges(account.getAccount());
     	}
     }
+
+	@Override
+	public void remove(UserAccountEntity entity) {
+		super.remove(entity);
+		if (Hibernate.isInitialized(entity.getUser())) {
+			if (Hibernate.isInitialized(entity.getUser().getAccounts()))
+				entity.getUser().getAccounts().remove(entity);
+		}
+		if (Hibernate.isInitialized(entity.getAccount())) {
+			if (Hibernate.isInitialized(entity.getAccount().getUsers()))
+				entity.getAccount().getUsers().remove(entity);
+		}
+	}
 }

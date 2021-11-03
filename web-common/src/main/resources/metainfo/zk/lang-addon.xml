@@ -90,5 +90,29 @@
 		<component-class>com.soffid.iam.web.users.additionalData.CustomField</component-class>
 	</component>
 
+	<component>
+		<extends>listexporttoolbarbutton</extends>
+		<component-name>listexporttoolbarbutton</component-name>
+		<component-class>com.soffid.iam.ui.ListboxExportToolbarButton</component-class>
+	</component>
+	
+	<component>
+		<extends>listexportbutton</extends>
+		<component-name>listexportbutton</component-name>
+		<component-class>com.soffid.iam.ui.ListboxExportButton</component-class>
+	</component>
+	
+	<component>
+		<extends>gridexportbutton</extends>
+		<component-name>gridexportbutton</component-name>
+		<component-class>com.soffid.iam.ui.GridExportButton</component-class>
+	</component>			
+	
+	<component>
+		<extends>gridexporttoolbarbutton</extends>
+		<component-name>gridexporttoolbarbutton</component-name>
+		<component-class>com.soffid.iam.ui.GridExportToolbarbutton</component-class>
+	</component>			
+	
 </language-addon>
 

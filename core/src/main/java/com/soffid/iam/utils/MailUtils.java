@@ -77,6 +77,7 @@ public class MailUtils {
 		javax.mail.Authenticator authenticator = null;
 
 		String protocol = getConfigValue("mail.transport.protocol", "smtp");
+		String sslProtocols = getConfigValue("mail.smtp.ssl.protocols", "TLSv1.2");
 		props.put("mail.transport.protocol", protocol);
 		if ("smtps".equals(protocol))
 		{
@@ -84,12 +85,17 @@ public class MailUtils {
 		            "com.soffid.iam.utils.CustomSSLFactory");
 		    props.put("mail.smtp.socketFactory.fallback", "false");
 		    props.put("mail.smtp.starttls.enable", "true");
+		    props.put("mail.smtp.ssl.protocols", sslProtocols);
 		} 
 		
 		String startTls = ConfigurationCache.getProperty("mail.smtp.starttls.enable");
 		if (startTls != null) {
 			props.put("mail.smtp.starttls.enable", startTls); 
+		    props.put("mail.smtp.socketFactory.class",
+		            "com.soffid.iam.utils.CustomSSLFactory");
+		    props.put("mail.smtp.ssl.protocols", sslProtocols);
 		}
+		
 		String auth = getConfigValue("mail.auth", "false");
 		if ("true".equals(auth))
 		{

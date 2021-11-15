@@ -2211,6 +2211,17 @@ div.datatable table.thead td:last-child {
 div.datatable .thead td input {
 	width:100%;
 }
+
+div.datatable .tbody tr.next-page td,
+div.datatable .tbody tr.previous-page td {
+}
+
+div.datatable .tbody tr.next-page,
+div.datatable .tbody tr.previous-page {
+	text-align: center;
+	color: {SKY};
+}
+
 div.datatable div.tfoot {
 	margin-top: 5px;
 	background-color: white;
@@ -2222,6 +2233,25 @@ div.datatable div.tfoot {
 div.datatable div.tfoot a {
 	float: left;
 }
+
+div.datatable div.tfoot span.tablepager,
+div.datatree div.tfoot span.tablepager {
+	float:left;
+}
+
+div.datatable div.tfoot span.tablepager span,
+div.datatree div.tfoot span.tablepager span {
+	cursor: pointer;
+	margin-left: 8px;
+	margin-right: 8px;
+	color: {SKY};
+}
+
+div.datatable div.tfoot span.tablepager span:hover,
+div.datatree div.tfoot span.tablepager span:hover{
+	color: {SKYLIGHT};
+}
+
 div.datatable table.thead td.filter-cell {
 	padding-left:10px;
 	padding-right: 10px;
@@ -3012,6 +3042,16 @@ div.datatree div.tree-itemholder img.tree-icon {
 	vertical-align: top
 }
 
+div.datatree div.tree-itemholder.page-down, 
+div.datatree div.tree-itemholder.page-up  {
+	text-align: center;
+	color: {SKY};
+	cursor: pointer;
+	height: 32px;
+	padding-top: 6px; 
+	overflow: hidden;
+}
+
 div.datatree div.tree-label {
 	cursor: pointer;		
 	height: 32px;
@@ -3024,7 +3064,9 @@ div.datatree div.tree-label.dashed {
 	text-decoration: line-through;
 }
 
-div.datatree div.tree-label:hover {
+div.datatree div.tree-label:hover,
+div.datatree div.tree-itemholder.page-down:hover, 
+div.datatree div.tree-itemholder.page-up:hover  {
 	background-color: {BLUELIGHT};
 	color: {BLUETEXT};
 }

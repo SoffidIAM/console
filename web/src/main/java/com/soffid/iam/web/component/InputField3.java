@@ -399,7 +399,8 @@ public class InputField3 extends Databox
 		if (uiHandler != null && !uiHandler.isVisible(this)) {
 			super.setVisible(false);
 		} 
-		else if (dataType.getVisibilityExpression() != null &&
+		else if (dataType != null && 
+				dataType.getVisibilityExpression() != null &&
 				!dataType.getVisibilityExpression().trim().isEmpty())
 		{
 			SecureInterpreter interp = createInterpreter();

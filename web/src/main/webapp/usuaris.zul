@@ -88,6 +88,9 @@
 				import es.caib.zkib.datasource.XPathUtils;
 				canCreateUser = !readOnly && AutoritzacionsUsuari.hasCreateUser();
 				canDeleteUser = !readOnly && com.soffid.iam.utils.Security.isUserInRole("user:delete");
+				canActiveUser = !readOnly && 
+						(com.soffid.iam.utils.Security.isUserInRole("user:enable") ||
+						com.soffid.iam.utils.Security.isUserInRole("user:disable") );
 				canUpdateUser = !readOnly && AutoritzacionsUsuari.hasUpdateUser();
 				canUpdateCustomUser = !readOnly && AutoritzacionsUsuari.hasUpdateCustomUser();
 				canUpdateUserPassword = AutoritzacionsUsuari.hasUpdateUserPassword();
@@ -984,7 +987,7 @@
 															value="${c:l('usuaris.zul.Actiu-2')}" />
 														<div>
 															<checkbox id="actiu" bind="@actiu"
-																disabled="${!canModifyUser}" onCheck='setDisabledColor()' />
+																disabled="${!canActiveUser}" onCheck='setDisabledColor()' />
 															<label value="${c:l('accounts.Disabled')}" style="background-color: red; color:white; padding: 2px 6px 0px 6px;" visible="false" id="disabledRow"/>
 														</div>
 													</row>

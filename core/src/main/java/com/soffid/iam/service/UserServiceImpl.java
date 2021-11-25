@@ -177,6 +177,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
 
+		if ( ! "S".equals(usuariEntity.getActive())) {
+			if (!getAuthorizationService().hasPermission("user:disable", usuariEntity)) 
+				throw new SecurityException("Acces denied. Required roles: [user:disable]");
+			auditChange("e", usuariEntity.getUserName(), null);
+		}
 		/*
 		 * Se eliminan los roles de los usuarios
 		 */
@@ -1605,11 +1610,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		
 		if (previousUser.getActive().booleanValue() && !usuari.getActive().booleanValue())
 		{
+			if (!getAuthorizationService().hasPermission("user:disable", usu)) 
+				throw new SecurityException("Acces denied. Required roles: [user:disable]");
 			auditChange("e", previousUser.getUserName(), null);
 		}
 
 		if (! previousUser.getActive().booleanValue() && usuari.getActive().booleanValue())
 		{
+			if (!getAuthorizationService().hasPermission("user:enable", usu)) 
+				throw new SecurityException("Acces denied. Required roles: [user:enable]");
 			auditChange("E", previousUser.getUserName(), null);
 		}
 

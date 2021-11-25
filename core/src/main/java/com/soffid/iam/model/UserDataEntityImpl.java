@@ -123,10 +123,10 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 			else
 				try {
 					return DATE_FORMAT2.parse(getValue());
-				} catch (ParseException e) {
+				} catch (Exception e) {
 					try {
 						return DATE_FORMAT.parse(getValue());
-					} catch (ParseException e2) {
+					} catch (Exception e2) {
 						try {
 							return AccountAttributeEntityImpl.DATE_FORMAT3.parse(getValue());
 						} catch (Exception e3) {

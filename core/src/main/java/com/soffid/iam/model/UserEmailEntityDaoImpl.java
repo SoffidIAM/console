@@ -242,11 +242,13 @@ public class UserEmailEntityDaoImpl extends
 
     public void remove(Collection entities) {
         if (entities != null)
+        {
             for (Iterator it = entities.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj instanceof UserEmailEntity) {
-                UserEmailEntity entity = (UserEmailEntity) obj;
-                this.remove(entity);
+	            Object obj = it.next();
+	            if (obj instanceof UserEmailEntity) {
+	                UserEmailEntity entity = (UserEmailEntity) obj;
+	                this.remove(entity);
+	            }
             }
         }
     }

@@ -60,7 +60,12 @@
   sort: false
   className: small
   template: >-
-  	<button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)"><img src="${execution.contextPath }/img/password-r.svg"/>${c:l('self_account.setPassword')}</button> <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)"><img src="${execution.contextPath }/img/search2-r.svg"/>${c:l('self_account.queryPassword')}</button>
+    <span #{disabled?'style="display:none"': ''}>
+  	<button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)">
+    <img src="${execution.contextPath }/img/password-r.svg"/>${c:l('self_account.setPassword')}</button> 
+    <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)">
+    <img src="${execution.contextPath }/img/search2-r.svg"/>${c:l('self_account.queryPassword')}</button>
+    </span>
 			]]></attribute>
 			</datatable>
 		</div>

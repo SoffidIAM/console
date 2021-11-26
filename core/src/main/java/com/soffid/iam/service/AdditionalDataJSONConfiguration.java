@@ -20,7 +20,7 @@ import com.soffid.scimquery.conf.Configuration;
 
 public class AdditionalDataJSONConfiguration {
 
-	public static void registerVirtualAttribute(Class<?> additionalDataClass, String namePath, String valuePath)
+	public static void registerVirtualAttribute(Class<?> additionalDataClass, String namePath, String valuePath, String parentEntity)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException {
 		ClassConfig classConfig = Configuration.getClassConfig(additionalDataClass);
 		if (classConfig == null) {
@@ -29,6 +29,7 @@ public class AdditionalDataJSONConfiguration {
 			attributeConfig.setVirtualAttribute(true);
 			attributeConfig.setVirtualAttributeName(namePath);
 			attributeConfig.setVirtualAttributeValue(valuePath);
+			attributeConfig.setParentEntity(parentEntity);
 			classConfig.setDefaultVirtualAttribute(attributeConfig);
 			classConfig.setClazz(additionalDataClass.getName());
 			classConfig.setHibernateClass(additionalDataClass.getCanonicalName());
@@ -37,13 +38,13 @@ public class AdditionalDataJSONConfiguration {
 	}
 
 	public static void registerVirtualAttributes() throws UnsupportedEncodingException, ClassNotFoundException, JSONException {
-		registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value");
-		registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value");
-		registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value");
-		registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value");
-		registerVirtualAttribute(RoleAttributeEntity.class, "metadata.name", "value");
-		registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value");
-		registerVirtualAttribute(MailListAttributeEntity.class, "metadata.name", "value");
-		registerVirtualAttribute(UserGroupAttributeEntity.class, "metadata.name", "value");
+		registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value", "group");
+		registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value", "user");
+		registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value", "account");
+		registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value", "informationSystem");
+		registerVirtualAttribute(RoleAttributeEntity.class, "metadata.name", "value", "role");
+		registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value", "customObject");
+		registerVirtualAttribute(MailListAttributeEntity.class, "metadata.name", "value", "mailList");
+		registerVirtualAttribute(UserGroupAttributeEntity.class, "metadata.name", "value", "userGroup");
 	}
 }

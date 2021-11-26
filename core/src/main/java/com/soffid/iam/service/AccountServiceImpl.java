@@ -168,7 +168,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(acc.getAcl() == null || acc.getAcl().isEmpty()) &&
 				Security.isUserInRole(Security.AUTO_ACCOUNT_UPDATE) ||
 				
-				(acc.getType().equals (AccountType.IGNORED) || acc.getType().equals (AccountType.SHARED) ) &&
+				(acc.getType().equals (AccountType.IGNORED) || 
+						
+				acc.getType().equals (AccountType.SHARED) ) &&
 				acc.getAcl().size() == 1  &&  /* Account already belongs to the user and only to the user*/
 				acc.getAcl().iterator().next().getUser() == ue &&
 				acc.getAcl().iterator().next().getLevel()  == AccountAccessLevelEnum.ACCESS_OWNER  ||

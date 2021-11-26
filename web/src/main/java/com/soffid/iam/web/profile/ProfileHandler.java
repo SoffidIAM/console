@@ -24,7 +24,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
-import com.ibm.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;

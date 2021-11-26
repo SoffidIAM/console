@@ -24,7 +24,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
 
-import com.ibm.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.SyncAgentTaskLog;

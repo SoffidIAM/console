@@ -7,16 +7,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.LinkedList;
-import java.util.List;
 
-import org.hsqldb.types.Charset;
-import org.zkoss.util.media.AMedia;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Textbox;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
 

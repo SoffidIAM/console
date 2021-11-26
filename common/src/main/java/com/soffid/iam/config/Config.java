@@ -196,7 +196,7 @@ public class Config {
         File home = getHomeDir();
         File dir;
         if (File.separatorChar == '\\') {
-            dir = new File(home, "log"); //$NON-NLS-1$
+            dir = new File(home, "logs"); //$NON-NLS-1$
         } else {
             dir = new File("/var/log/soffid"); //$NON-NLS-1$
             dir.mkdirs();

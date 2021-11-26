@@ -416,13 +416,13 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>shell-plugin</artifactId>
-			<version>1.3.1</version>
+			<version>1.3.3</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>windows-plugin</artifactId>
-			<version>5.2.1</version>
+			<version>5.2.2</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>

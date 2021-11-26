@@ -1001,10 +1001,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		
 		VaultFolder folder = getVaultFolderEntityDao().toVaultFolder(entity);
 		
-		if (folder.getAccessLevel().equals (AccountAccessLevelEnum.ACCESS_NONE))
-			return null;
-		else
-			return folder;
+		return folder;
 	}
 
 	@Override

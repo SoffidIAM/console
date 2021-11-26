@@ -151,6 +151,7 @@ public class ParseTest extends TestCase {
 		config.setHibernateClass(AttributeValueEntity.class.getCanonicalName());
 		AttributeConfig attributeConfig = new AttributeConfig();
 		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setParentEntity("account");
 		attributeConfig.setVirtualAttributeValue("numericValue");
 		attributeConfig.setVirtualAttributeName("attribute.name");
 		attributeConfig.setAttributeName("employee");
@@ -158,6 +159,7 @@ public class ParseTest extends TestCase {
 
 		attributeConfig = new AttributeConfig();
 		attributeConfig.setVirtualAttribute(true);
+		attributeConfig.setParentEntity("account");
 		attributeConfig.setVirtualAttributeValue("value");
 		attributeConfig.setVirtualAttributeName("attribute.name");
 		config.setDefaultVirtualAttribute(attributeConfig);
@@ -170,6 +172,10 @@ public class ParseTest extends TestCase {
 				Account.class ,
 				false);
 
+		expressionTester2(
+				"not attributes.employee pr",
+				Account.class ,
+				false);
 	}
 
 	// Test corró d’avall

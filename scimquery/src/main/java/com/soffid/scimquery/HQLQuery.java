@@ -11,7 +11,7 @@ import com.soffid.scimquery.conf.ClassConfig;
 
 public class HQLQuery {
 	ClassConfig classConfig;
-	
+	boolean negativeExpression;
 	
 	public HQLQuery(ClassConfig classConfig) {
 		super();
@@ -174,5 +174,13 @@ public class HQLQuery {
 
 	public List<String> getOrderBy() {
 		return orderBy;
+	}
+
+	public boolean isNegativeExpression() {
+		return negativeExpression;
+	}
+
+	public void setNegativeExpression(boolean negativeExpression) {
+		this.negativeExpression = negativeExpression;
 	}
 }

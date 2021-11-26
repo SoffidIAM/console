@@ -116,16 +116,16 @@ public class AttributeParser {
 			else
 				try {
 					return DATETIME_FORMAT2.parse(value2);
-				} catch (ParseException e) {
+				} catch (Exception e) {
 					try {
 						return DATETIME_FORMAT.parse(value2);
-					} catch (ParseException e2) {
+					} catch (Exception e2) {
 						try {
 							return DATETIME_FORMAT3.parse(value2);
-						} catch (ParseException e3) { 
+						} catch (Exception e3) { 
 							try {
 								return DATETIME_FORMAT4.parse(value2);
-							} catch (ParseException e4) { 
+							} catch (Exception e4) { 
 								return null;
 							}
 						}

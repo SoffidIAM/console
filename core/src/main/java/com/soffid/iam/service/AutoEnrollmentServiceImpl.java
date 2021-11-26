@@ -280,7 +280,6 @@ public class AutoEnrollmentServiceImpl extends com.soffid.iam.service.AutoEnroll
         } catch (Throwable sex) {
             sex.printStackTrace();
             SeyconException ex = new SeyconException(Messages.getString("AutoEnrollmentServiceImpl.2")); //$NON-NLS-1$
-            ex.setStackTrace(sex.getStackTrace());
             throw ex;
         }
 
@@ -462,7 +461,6 @@ public class AutoEnrollmentServiceImpl extends com.soffid.iam.service.AutoEnroll
         } catch (Throwable sex) {
             sex.printStackTrace();
             SeyconException ex = new SeyconException(Messages.getString("AutoEnrollmentServiceImpl.2")); //$NON-NLS-1$
-            ex.setStackTrace(sex.getStackTrace());
             throw ex;
         }
 

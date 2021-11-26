@@ -18,6 +18,7 @@ import com.soffid.mda.annotation.*;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.AgentDescriptor;
 import es.caib.seycon.ng.comu.Dispatcher;
+import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.ServerEntity;
@@ -482,4 +483,7 @@ public abstract class ServerService {
 	@Description("Parses a kerberos token.")
     public Account parseKerberosToken (String domain, String serviceName, byte keytab[], byte token[] ) throws InternalErrorException {return null;}
 
+	@Description("Updates Soffid image of the reconciled account. Only triggers a UpdateUser for user accounts with new or removed roles.")
+	public void reconcileAccount(Account account, RolAccount grants[]) {};
+	
 }

@@ -88,10 +88,17 @@ public class PamUsedStorageGraph extends HttpServlet {
 			axe2.put("ticks", axe2ticks);
 			axe2ticks.put("callback", "locale");
 			
+			HashMap<Object, Object> plugins = new HashMap<>();
+			options.put("plugins", plugins);
+			
 			HashMap<Object, Object> title = new HashMap<>();
-			options.put("title", title);
+			plugins.put("title", title);
 			title.put("text", "Used storage by PAM storage server (MB)");
 			title.put("display", true);
+
+			HashMap<Object, Object> legend = new HashMap<>();
+			plugins.put("legend", legend);
+			legend.put("display", false);
 
 			return r;
 		} catch (InternalErrorException e) {

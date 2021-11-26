@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.ejb.EJB;
 import javax.servlet.ServletException;
@@ -16,12 +15,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.api.Stats;
 import com.soffid.iam.api.StatsSample;
 import com.soffid.iam.service.ejb.StatsService;
@@ -76,10 +68,19 @@ public class PamAccountsGraph extends HttpServlet {
 			r.put("data", data);
 			HashMap<Object, Object> options = new HashMap<>();
 			r.put("options", options);
+			
+			HashMap<Object, Object> plugins = new HashMap<>();
+			options.put("plugins", plugins);
+			
 			HashMap<Object, Object> title = new HashMap<>();
-			options.put("title", title);
+			plugins.put("title", title);
 			title.put("text", "Jump server enabled accounts");
 			title.put("display", true);
+
+			HashMap<Object, Object> legend = new HashMap<>();
+			plugins.put("legend", legend);
+			legend.put("display", true);
+
 			return r;
 		} catch (InternalErrorException e) {
 			log.warn("Error getting data", e);

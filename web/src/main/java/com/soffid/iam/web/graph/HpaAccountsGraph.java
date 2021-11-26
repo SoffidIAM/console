@@ -22,7 +22,6 @@ import org.apache.commons.logging.LogFactory;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.api.Stats;
 import com.soffid.iam.api.StatsSample;
 import com.soffid.iam.service.ejb.StatsService;
@@ -70,10 +69,18 @@ public class HpaAccountsGraph extends HttpServlet {
 			r.put("data", data);
 			HashMap<Object, Object> options = new HashMap<>();
 			r.put("options", options);
+
+			HashMap<Object, Object> plugins = new HashMap<>();
+			options.put("plugins", plugins);
+			
 			HashMap<Object, Object> title = new HashMap<>();
-			options.put("title", title);
+			plugins.put("title", title);
 			title.put("text", "High-privilege accounts");
 			title.put("display", true);
+
+			HashMap<Object, Object> legend = new HashMap<>();
+			plugins.put("legend", legend);
+			legend.put("display", true);
 			return r;
 		} catch (InternalErrorException e) {
 			log.warn("Error getting data", e);

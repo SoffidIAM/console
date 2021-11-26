@@ -239,7 +239,7 @@
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkdb</artifactId>
-			<version>2.1.9</version>
+			<version>${zkdb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomee</groupId>

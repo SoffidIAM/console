@@ -30,14 +30,19 @@ public class ApplicationHandler extends FrameHandler {
 		super();
 	}
 
+	public void onCreate() {
+		DataModel model = getModel();
+		Variables vars = model.getJXPathContext().getVariables();
+		vars.declareVariable("enableQuery", true);
+	}
+	
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
 
 		DataModel model = getModel();
 		Variables vars = model.getJXPathContext().getVariables();
-
-
+		
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 		String name = req.getParameter("name");
 		SearchBox sb = (SearchBox) getFellow("searchBox");

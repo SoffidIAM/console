@@ -720,10 +720,10 @@ img.imageclic.centre{
 td.dataTreeCelldestacada div {text-decoration: line-through; color:gray;}
 
 /* Estil per als combobox */
-.combobox, .comboboxinp {font-family: inherit;
+.combobox, .comboboxinp, .comboboxpp td, div.bandboxpp, div.comboboxpp {
+	font-family: inherit;
 	font-size: inherit;
 	color: black;}
-
 
 /* Estil per als menubar */
 

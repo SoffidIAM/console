@@ -240,7 +240,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 		List<String> groups = new LinkedList<>();
 		DataSource usersListbox = getUsersListbox();
 		String primaryGroup = (String) XPathUtils.getValue(usersListbox, "@primaryGroup");
-		String userName = (String) XPathUtils.getValue(usersListbox, "@primaryGroup");
+		String userName = (String) XPathUtils.getValue(usersListbox, "@userName");
 		
 		if (isHolderGroup(primaryGroup))
 		{
@@ -262,6 +262,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 			field.setValues(groups);
 			field.setVisible(true);
 		}
+		field.updateMetadata();
 		field.invalidate();
 	}
 

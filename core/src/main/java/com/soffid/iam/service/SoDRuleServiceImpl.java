@@ -15,13 +15,16 @@ import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleDependencyEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SoDRoleEntity;
 import com.soffid.iam.model.SoDRuleEntity;
 import com.soffid.iam.model.SoDRuleMatrixEntity;
+import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.Security;
@@ -32,6 +35,7 @@ import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
 
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.SoDRisk;
 import com.soffid.iam.api.SoDRole;
 import com.soffid.iam.api.SoDRule;
@@ -43,9 +47,11 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONException;
 
@@ -183,41 +189,51 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	@Override
     protected SoDRule handleIsAllowed(RoleAccount ra) throws Exception {
 		SoDRuleEntity affectingRule = null;
+		SoDRisk risk = null;
 		for (AppliedRule rule: doFindAffectingRulesByRolAccount(ra))
 		{
 			if (rule.cell != null) {
 				if (rule.cell.getRisk() == SoDRisk.SOD_FORBIDDEN)
 				{
 					affectingRule  = rule.rule;
+					risk = rule.cell.getRisk();
 					break;
 				}
 				else if (rule.cell.getRisk() == SoDRisk.SOD_HIGH)
 				{
+					risk = rule.cell.getRisk();
 					affectingRule  = rule.rule;
 				}
 				else if (rule.cell.getRisk() == SoDRisk.SOD_LOW && affectingRule == null)
 				{
+					risk = rule.cell.getRisk();
 					affectingRule  = rule.rule;
 				}
 			}
 			else if (rule.rule.getRisk() == SoDRisk.SOD_FORBIDDEN)
 			{
 				affectingRule  = rule.rule;
+				risk = rule.rule.getRisk();
 				break;
 			}
 			else if (rule.rule.getRisk() == SoDRisk.SOD_HIGH)
 			{
 				affectingRule  = rule.rule;
+				risk = rule.rule.getRisk();
 			}
 			else if (rule.rule.getRisk() == SoDRisk.SOD_LOW && affectingRule == null)
 			{
 				affectingRule  = rule.rule;
+				risk = rule.rule.getRisk();
 			}
 		}
 		if (affectingRule == null)
 			return null;
-		else
-			return getSoDRuleEntityDao().toSoDRule(affectingRule);
+		else {
+			final SoDRule soDRule = getSoDRuleEntityDao().toSoDRule(affectingRule);
+			soDRule.setRisk(risk);
+			return soDRule;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -238,7 +254,9 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                 for (AppliedRule rule : rules) {
                 	SoDRisk ruleRisk = rule.cell != null ? rule.cell.getRisk() : rule.rule.getRisk();
                 	if (ruleRisk != null && ruleRisk != SoDRisk.SOD_NA) {
-                		l.add(getSoDRuleEntityDao().toSoDRule(rule.rule));
+                		final SoDRule soDRule = getSoDRuleEntityDao().toSoDRule(rule.rule);
+                		soDRule.setRisk(ruleRisk);
+						l.add(soDRule);
                 		if (risk == null || isGreater(ruleRisk, risk)) 
                 			risk = ruleRisk;
                 	}
@@ -279,6 +297,9 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                 rolGrant.setUser(rolAccount2.getUserCode());
                 rolGrant.setOwnerAccountName(rolAccount2.getAccountName());
                 rolGrant.setOwnerSystem(rolAccount2.getAccountSystem());
+                RoleEntity role = getRoleEntityDao().findByNameAndSystem(rolAccount2.getRoleName(), rolAccount2.getSystem());
+                if (role != null)
+                	rolGrant.setRoleId(role.getId());
                 targetList.add(rolGrant);
             }
         }
@@ -458,6 +479,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(SoDRule.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -511,6 +533,76 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		getSoDRuleMatrixEntityDao().remove(role.getId());
 	}
 
+	@Override
+	protected List<RoleAccount> handleFindViolotions(String applicationName, SoDRisk riskLevel) throws Exception {
+		ViolationHandler h = new ViolationHandler();
+		for (InformationSystemEntity app: getInformationSystemEntityDao().loadAll()) {
+			if (applicationName == null || 
+					app.getName().equals(applicationName) ||
+					app.getName().startsWith(applicationName+"/")) {
+				h.analyze(applicationName, app, riskLevel);
+			}
+		}
+		return h.results;
+	}
+
+	class ViolationHandler {
+		List<RoleAccount> results = new LinkedList<>();
+		Set<Long> users = new HashSet<>();
+		Set<Long> accounts = new HashSet<>();
+		
+		void analyze(String applicationName, InformationSystemEntity app, SoDRisk level) throws InternalErrorException {
+			for (SoDRuleEntity rule: app.getSodRules()) {
+				boolean skip = true;
+				if (rule.getType() == SodRuleType.MATCH_MATRIX) {
+					for (SoDRuleMatrixEntity cell: rule.getMatrixCells()) {
+						if (cell.getRisk() == level) {
+							skip = false;
+							break;
+						}
+					}
+				}
+				else
+				{
+					skip = rule.getRisk() != level;
+				}
+				if (!skip) {
+					for (SoDRoleEntity sodRole: rule.getRoles()) {
+						for (RoleAccountEntity grant: sodRole.getRole().getAccounts()) {
+							if (grant.isEnabled() && !grant.getAccount().isDisabled()) {
+								if (grant.getAccount().getType() == AccountType.USER) {
+									for (UserAccountEntity ua: grant.getAccount().getUsers()) {
+										UserEntity user = ua.getUser();
+										if (!users.contains(user.getId())) {
+											users.add(user.getId());
+											Collection<RoleAccount> grants = getApplicationService().findUserRolesByUserName(user.getUserName());
+											filter (applicationName, grants, level);
+										}
+									}
+								} else {
+									if (!accounts.contains(grant.getAccount().getId())) {
+										Collection<RoleAccount> grants = getApplicationService().findRoleAccountByAccount(grant.getAccount().getId());
+										filter(applicationName, grants, level);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void filter(String applicationName, Collection<RoleAccount> grants, SoDRisk level) {
+			for (RoleAccount grant: grants) {
+				if (grant.getSodRisk() == level) {
+					if (applicationName == null ||
+							grant.getInformationSystemName().equals(applicationName) ||
+							grant.getInformationSystemName().startsWith(applicationName+"/"))
+						results.add(grant);
+				}
+			}
+		}
+	}
 }
 
 
@@ -523,3 +615,4 @@ class AppliedRule {
 		this.cell = cell;
 	}
 }
+

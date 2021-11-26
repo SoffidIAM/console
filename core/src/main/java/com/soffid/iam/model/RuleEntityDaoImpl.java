@@ -4,6 +4,9 @@
 //
 
 package com.soffid.iam.model;
+
+import com.soffid.iam.api.Rule;
+
 /**
  * DAO RuleEntity implementation
  */

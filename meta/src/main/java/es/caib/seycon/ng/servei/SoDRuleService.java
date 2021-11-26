@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
@@ -16,6 +18,8 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.RolAccount;
+import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.SoDRule;
 
 @Service ( translatedName="SoDRuleService",
@@ -203,5 +207,13 @@ public abstract class SoDRuleService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.sod_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public List<RolAccount> findViolotions(
+			@Nullable String applicationName,
+			SoDRisk riskLevel)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 
 }

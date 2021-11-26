@@ -45,6 +45,7 @@ import com.soffid.scimquery.parser.ParseException;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
+import es.caib.zkib.component.DataTextbox;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.events.SerializableEventListener;
@@ -451,7 +452,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		
 		if (advancedSearch != null)
 			advancedSearch.detach();
-		advancedSearch = new Textbox();
+		advancedSearch = new DataTextbox();
 		advancedSearch.setMultiline(true);
 		advancedSearch.setRows(2);
 		appendChild(advancedSearch);

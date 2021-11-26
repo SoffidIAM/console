@@ -10,9 +10,11 @@ import com.soffid.mda.annotation.ValueObject;
 @ValueObject
 public class NewPamSession {
 	String sessionId;
-	
+
+	@Nullable
 	String jumpServerGroup;
 	
+	@Nullable
 	URL url;
 	
 }

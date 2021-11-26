@@ -12,7 +12,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.ibm.icu.util.BytesTrie.Iterator;
 import com.soffid.iam.api.PamSecurityCheck;
 import com.soffid.iam.api.RequestedObligation;
 import com.soffid.iam.api.RequestedObligationEnum;
@@ -36,9 +35,6 @@ public class PamSecurityHandlerServiceImpl extends PamSecurityHandlerServiceBase
 
 	@Override
 	protected void handleCheckPermission(AccountEntity account, String action) throws Exception {
-		if (Security.isSyncServer())
-			return;
-		
 		PamSecurityCheck psc = handleGetObligations(account, action);
 		if ( ! psc.isAllowed())
 			throw new SecurityException("Action not authorized");

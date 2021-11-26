@@ -20,6 +20,7 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.Sessio;
+import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.MaquinaEntity;
@@ -29,6 +30,7 @@ import es.caib.seycon.ng.model.SessioEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.servei.AccountService;
 import es.caib.seycon.ng.servei.DispatcherService;
+import es.caib.seycon.ng.servei.XarxaService;
 import roles.Tothom;
 
 @Service
@@ -38,6 +40,7 @@ import roles.Tothom;
 	RegistreAccesEntity.class, SessioEntity.class, UsuariEntity.class,
 	MaquinaEntity.class,
 	DispatcherService.class,
+	XarxaService.class,
 	PamSecurityHandlerService.class})
 public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
@@ -63,6 +66,9 @@ public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor, String pamPolicy) {return null;}
+
+	@Description("Creates a jump server session and returns the session URL. Internal method for SSH and RDP proxies")
+	NewPamSession createCustomJumpServerSession (Account account, @Nullable String sourceIp, @Nullable TipusSessio type, @Nullable String info ) {return null;}
 
 	@Description("Checks a server session is up")
 	boolean checkJumpServerSession (Sessio sessio) {return false;}

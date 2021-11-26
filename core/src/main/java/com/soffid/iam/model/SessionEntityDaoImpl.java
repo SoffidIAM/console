@@ -71,7 +71,9 @@ public class SessionEntityDaoImpl extends
 			targetVO.setAccessLogId(sourceEntity.getLoginLogInfo().getId());
 		targetVO.setType(sourceEntity.getType());
 		
-		if (sourceEntity.getLoginLogInfo() != null && sourceEntity.getType() == TipusSessio.PAM) {
+		if (sourceEntity.getLoginLogInfo() != null && sourceEntity.getType() == TipusSessio.PAM ||
+				sourceEntity.getLoginLogInfo() != null && sourceEntity.getType() == TipusSessio.PAMRDP ||
+				sourceEntity.getLoginLogInfo() != null && sourceEntity.getType() == TipusSessio.PAMSSH) {
 			targetVO.setAccountName(sourceEntity.getLoginLogInfo().getAccountName());
 			targetVO.setSessionUrl(sourceEntity.getLoginLogInfo().getInformation());
 		}

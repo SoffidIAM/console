@@ -1,8 +1,13 @@
 package com.soffid.iam.common.security;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Obligation {
+public class Obligation implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	String  obligation;
 	Map<String,String> attributes;
 	long timeout;

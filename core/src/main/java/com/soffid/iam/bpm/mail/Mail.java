@@ -651,23 +651,26 @@ public class Mail implements ActionHandler {
 						SystemEntity defaultDispatcher = dao.findSoffidSystem();
     					dispatcher = defaultDispatcher.getName();
     				}
-    				i = roleName.lastIndexOf('/');
-    				if (i >= 0)
-    				{
-    					scope = roleName.substring(i+1);
-    					roleName = roleName.substring(0, i);
-    				}
-        			debug ("Resolving role "+roleName+"@"+dispatcher);
-    				ApplicationService aplicacioService = ServiceLocator.instance().getApplicationService();
-					for (Role role : aplicacioService.findRolesByFilter(roleName, "%", "%", dispatcher, "%", "%")) {
-                        debug("Resolving role grantees: " + role.getName() + "@" + role.getSystem());
-                        for (RoleGrant grant : aplicacioService.findEffectiveRoleGrantsByRoleId(role.getId())) {
-                            if (scope == null || scope.equals(grant.getDomainValue())) {
-                            	if (grant.getUser() != null)
-                            		result.add(grant.getUser());
-                            }
-                        }
-                    }
+    				i = -1;
+    				do {
+    					i = roleName.indexOf('/', i+1);
+	    				if (i >= 0)
+	    				{
+	    					scope = roleName.substring(i+1);
+	    					roleName = roleName.substring(0, i);
+	    				}
+	        			debug ("Resolving role "+roleName+"@"+dispatcher);
+	    				ApplicationService aplicacioService = ServiceLocator.instance().getApplicationService();
+						for (Role role : aplicacioService.findRolesByFilter(roleName, "%", "%", dispatcher, "%", "%")) {
+	                        debug("Resolving role grantees: " + role.getName() + "@" + role.getSystem());
+	                        for (RoleGrant grant : aplicacioService.findEffectiveRoleGrantsByRoleId(role.getId())) {
+	                            if (scope == null || scope.equals(grant.getDomainValue())) {
+	                            	if (grant.getUser() != null)
+	                            		result.add(grant.getUser());
+	                            }
+	                        }
+	                    }
+    				} while (i >= 0);
     				return result;
     			}
     		}

@@ -236,9 +236,6 @@ public class Password extends Object implements Serializable {
 		System.out.println("Coded  =" + p.toString()); //$NON-NLS-1$
 		System.out.println("Decoded=" + p.getPassword()); //$NON-NLS-1$
 		System.out.println("Base 64=" + Password.toBase64(s.getBytes("UTF-8"))); //$NON-NLS-1$ //$NON-NLS-2$
-		MessageDigest digest = MessageDigest.getInstance("SHA-1"); //$NON-NLS-1$
-		byte bytes[] = digest.digest(s.getBytes());
-		System.out.println("HASH = " + Password.toBase64(bytes)); //$NON-NLS-1$
 
 	}
 }

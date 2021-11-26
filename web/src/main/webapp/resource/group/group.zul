@@ -31,6 +31,7 @@
 				openLevels="1"
 				enablefilter="false"
 				maxheight="70vh"
+				use='com.soffid.iam.web.group.GroupDataTree2'
 				onAddGroup="ref:frame.addGroup"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">
@@ -39,16 +40,9 @@
 				  icon: /img/group.svg
 				  value: name
 				  leaf: false
-				  columns:
-				    - value: description
 				  ${soffid:isUserInRole('group:create') ? "tail":"no-tail"}: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddGroup')">${c:l('group.addNew')}</button>
 				  ]]>
   				</attribute>
-				<attribute name="columns"><![CDATA[
-				- name: ${c:l('com.soffid.iam.api.Group.description')}
-				  template: ${"$" }{description}
-				]]>
-				</attribute>
   			</datatree2>
 
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('group:create')}" >

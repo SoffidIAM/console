@@ -75,7 +75,7 @@ public class GroupHandler extends FrameHandler {
 	}
 
 	public void changeColumns(Event event) throws IOException {
-		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
+		SelectColumnsHandler.startWizard((DataTree2) getListbox());
 	}
 
 

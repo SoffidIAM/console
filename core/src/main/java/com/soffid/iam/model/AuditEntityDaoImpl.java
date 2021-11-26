@@ -76,7 +76,8 @@ public class AuditEntityDaoImpl extends
 					auditoria.setUser(ue.getUserName());
 			}
 			auditoria.setDate(new Date());
-			auditoria.setSourceIp(Security.getClientIp());
+			if (auditoria.getSourceIp() == null || ! Security.isSyncServer())
+				auditoria.setSourceIp(Security.getClientIp());
 			if (auditoria.getSourceIp() == null)
 			{
 				try 

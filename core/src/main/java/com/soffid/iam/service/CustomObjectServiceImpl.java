@@ -25,6 +25,7 @@ import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectEntityDao;
@@ -102,6 +103,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(CustomObject.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

@@ -28,6 +28,7 @@ import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.EmailDomainEntity;
 import com.soffid.iam.model.EmailDomainEntityDao;
 import com.soffid.iam.model.EmailListContainerEntity;
@@ -285,11 +286,11 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	protected void handleDelete(MailList llistaCorreu) throws Exception {
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		
-		getExternEmailEntityDao().remove(llistaCorreuEntity.getExternals());
-		getUserEmailEntityDao().remove(llistaCorreuEntity.getUserMailLists());
-		getEmailListContainerEntityDao().remove(llistaCorreuEntity.getMailListContent());
-		getMailListGroupMemberEntityDao().remove(llistaCorreuEntity.getGroups());
-		getMailListRoleMemberEntityDao().remove(llistaCorreuEntity.getRoles());
+		getExternEmailEntityDao().remove(new LinkedList<>(llistaCorreuEntity.getExternals()));
+		getUserEmailEntityDao().remove(  new LinkedList<>(llistaCorreuEntity.getUserMailLists()));
+		getEmailListContainerEntityDao().remove(new LinkedList<>(llistaCorreuEntity.getMailListContent()));
+		getMailListGroupMemberEntityDao().remove(new LinkedList<>(llistaCorreuEntity.getGroups()));
+		getMailListRoleMemberEntityDao().remove(new LinkedList<>(llistaCorreuEntity.getRoles()));
 		getEmailListEntityDao().remove(llistaCorreuEntity);
 	}
 
@@ -924,6 +925,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
+		expression.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expression.generateHSQLString(MailList.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

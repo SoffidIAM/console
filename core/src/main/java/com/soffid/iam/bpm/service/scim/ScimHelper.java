@@ -4,12 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.AdditionalDataService;
 import com.soffid.iam.utils.Security;
@@ -54,6 +56,7 @@ public class ScimHelper {
 		}
 		
 		AbstractExpression expr = ExpressionParser.parse(q2);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		hql = expr.generateHSQLString( objectClass );
 		qs = hql.getWhereString().toString();
 		if (tenantFilter != null) {
@@ -72,6 +75,9 @@ public class ScimHelper {
 		String q = hql.toString();
 		if (order != null && hql.getOrderByString().length() == 0)
 			q = q + " order by "+ order;
+		
+		LogFactory.getLog(getClass()).warn("//////////////////////////////////");
+		LogFactory.getLog(getClass()).warn(q);
 		org.hibernate.Query queryObject = session.createQuery( q );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
@@ -97,6 +103,7 @@ public class ScimHelper {
 			if (config.getFetchSize() != null)
 				queryObject.setFetchSize(config.getFetchSize());
 		}
+
 		
         java.util.List l = queryObject.list();
         count = null;
@@ -124,7 +131,7 @@ public class ScimHelper {
 	}
 
 	String generateQuickSearchQuery (String text) throws InternalErrorException {
-		if (text == null )
+		if (text == null || text.trim().isEmpty())
 			return  "";
 		String[] split = text.trim().split(" +");
 		
@@ -132,27 +139,29 @@ public class ScimHelper {
 		for (int i = 0; i < split.length; i++)
 		{
 			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (sb.length() > 0)
-				sb.append(" and ");
-			sb.append("(");
-			boolean first = true;
-			Collection<DataType> list = svc.findDataTypesByObjectTypeAndName2(objectClass.getName(), null);
-			for (DataType dt: list) {
-				if (Boolean.TRUE.equals( dt.getSearchCriteria())) {
-					if (first) first = false;
-					else sb.append(" or ");
-					sb.append(dt.getName() + " co \""+t+"\"");
+			if (t.trim().isEmpty()) {
+				if (sb.length() > 0)
+					sb.append(" and ");
+				sb.append("(");
+				boolean first = true;
+				Collection<DataType> list = svc.findDataTypesByObjectTypeAndName2(objectClass.getName(), null);
+				for (DataType dt: list) {
+					if (Boolean.TRUE.equals( dt.getSearchCriteria())) {
+						if (first) first = false;
+						else sb.append(" or ");
+						sb.append(dt.getName() + " co \""+t+"\"");
+					}
 				}
-			}
-			if (first) {
-				for (String primaryAttribute: primaryAttributes)
-				{
-					if (first) first = false;
-					else sb.append(" or ");
-					sb.append(primaryAttribute + " co \""+t+"\"");
+				if (first) {
+					for (String primaryAttribute: primaryAttributes)
+					{
+						if (first) first = false;
+						else sb.append(" or ");
+						sb.append(primaryAttribute + " co \""+t+"\"");
+					}
 				}
+				sb.append(")");
 			}
-			sb.append(")");
 		}
 		return sb.toString();
 	}

@@ -48,6 +48,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
@@ -508,6 +509,7 @@ public class AdditionalDataServiceImpl extends
 		ClassConfig config = Configuration.getClassConfig(CustomObjectType.class);
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(CustomObjectType.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

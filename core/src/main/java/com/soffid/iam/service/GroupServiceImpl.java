@@ -49,6 +49,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
@@ -820,6 +821,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
+		expression.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expression.generateHSQLString(Group.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

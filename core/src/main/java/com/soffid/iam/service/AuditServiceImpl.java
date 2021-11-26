@@ -20,6 +20,7 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.User;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
@@ -285,6 +286,7 @@ public class AuditServiceImpl extends
 			EvalException, InternalErrorException {
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(Audit.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

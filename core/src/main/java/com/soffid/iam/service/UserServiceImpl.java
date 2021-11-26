@@ -74,6 +74,7 @@ import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.HostEntity;
@@ -169,7 +170,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		// Cridat des de delete(usuari)
 
 		UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
-
+		if ( ! "S".equals(usuariEntity.getActive())) {
+			auditChange("e", usuariEntity.getUserName(), null);
+		}
 		/*
 		 * Se eliminan los roles de los usuarios
 		 */
@@ -180,16 +183,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		/*
 		 * Se eliminan las asociaciones a grupos
 		 */
-		Collection grups = usuariEntity.getSecondaryGroups();
+		Collection<UserGroupEntity> grups = usuariEntity.getSecondaryGroups();
 		getUserGroupEntityDao().remove(grups);
 
-		/*
-		 * Se elimina la asociación con el grupo primario y se le pone como
-		 * grupo primario "portal"
-		 */
-		GroupEntity grupEntity = getGroupEntityDao().findByName("World"); //$NON-NLS-1$
-		usuariEntity.setPrimaryGroup(grupEntity);
-
+		// Assign the root group
+		GroupEntity group = usuariEntity.getPrimaryGroup();
+		while (group.getParent() != null) {
+			group = group.getParent();
+		}
+		usuariEntity.setPrimaryGroup(group);
 		/*
 		 * Se eliminan las asociaciones d'impressora
 		 */
@@ -215,10 +217,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		/*
 		 * Se eliminan las asociaciones con servidores
 		 */
-		HostEntity maquinaNul = getHostEntityDao().findByName("nul"); //$NON-NLS-1$
-		usuariEntity.setHomeServer(maquinaNul);
-		usuariEntity.setMailServer(maquinaNul);
-		usuariEntity.setProfileServer(maquinaNul);
+		usuariEntity.setHomeServer(null);
+		usuariEntity.setMailServer(null);
+		usuariEntity.setProfileServer(null);
 
 		usuariEntity.setLastUserModification(Security.getCurrentAccount());
 		usuariEntity.setLastModificationDate(GregorianCalendar.getInstance()
@@ -1508,9 +1509,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		{
 			auditChange("e", previousUser.getUserName(), null);
 		}
-
 		if (! previousUser.getActive().booleanValue() && usuari.getActive().booleanValue())
 		{
+			if (!getAuthorizationService().hasPermission("user:enable", usu))
+				throw new SecurityException("Acces denied. Required roles: [user:enable]");
 			auditChange("E", previousUser.getUserName(), null);
 		}
 
@@ -2987,6 +2989,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(User.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

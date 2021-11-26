@@ -71,6 +71,7 @@ import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.AuthorizationEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectEntityDao;
 import com.soffid.iam.model.DomainValueEntity;
@@ -2846,6 +2847,7 @@ public class ApplicationServiceImpl extends
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(Role.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -2985,6 +2987,7 @@ public class ApplicationServiceImpl extends
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(Application.class);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
 			qs = "o.tenant.id = :tenantId";
@@ -3044,19 +3047,21 @@ public class ApplicationServiceImpl extends
 		for (int i = 0; i < split.length; i++)
 		{
 			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (sb.length() > 0)
-				sb.append(" and ");
-			sb.append("(");
-			sb.append("name co \""+t+"\"");
-			sb.append(" or description co \""+t+"\"");
-			for (MetaDataEntity att: atts)
-			{
-				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+			if (t.trim().isEmpty()) {
+				if (sb.length() > 0)
+					sb.append(" and ");
+				sb.append("(");
+				sb.append("name co \""+t+"\"");
+				sb.append(" or description co \""+t+"\"");
+				for (MetaDataEntity att: atts)
 				{
-					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+					if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+					{
+						sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+					}
 				}
+				sb.append(")");
 			}
-			sb.append(")");
 		}
 		return sb.toString();
 	}

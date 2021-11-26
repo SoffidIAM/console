@@ -26,6 +26,7 @@ import com.soffid.iam.api.System;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupTypeEntity;
 import com.soffid.iam.model.GroupTypeEntityDao;
 import com.soffid.iam.model.Parameter;
@@ -111,6 +112,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expr.generateHSQLString(OUType.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -216,6 +218,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
+		expression.setOracleWorkaround( new CustomDialect().isOracle());
 		HQLQuery hql = expression.generateHSQLString(OUType.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

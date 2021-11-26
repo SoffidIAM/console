@@ -63,10 +63,10 @@
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}"/>
 			</insert-method>
-			<update-method method="remove">
+			<update-method method="update">
 				<parameter value="${instance}"/>
 			</update-method>
-			<delete-method method="update">
+			<delete-method method="remove">
 				<parameter value="${instance}"/>
 			</delete-method>
 		</ejb-handler>

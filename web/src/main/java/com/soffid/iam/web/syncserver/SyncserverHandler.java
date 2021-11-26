@@ -385,27 +385,32 @@ public class SyncserverHandler extends FrameHandler {
         final String[] exceptions = task.getException();
         
         int col = Integer.parseInt( ((String[])event.getData())[0] );
-        if (! "DONE".equals(task.getEstatExecucioAgents()[col])) {
+        final String status = task.getEstatExecucioAgents()[col];
+		if (! "DONE".equals(status)) {
         	Window w = (Window) getFellow("taskWindow");
 
         	currentTask = EJBLocator.getSyncServerService().getAgentTasks(serverUrl, currentsAgents.get(col), id );
-        	w.setTitle(task.getTaskName());
-        	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
-        	((Databox) w.getFellow("message")).setValue(messages[col]);
-        	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
-        	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
-        	((Databox) w.getFellow("lastExecution")).setFormat(DateFormats.getDateTimeFormatString());
-        	((Databox) w.getFellow("lastExecution")).setValue(
-        			currentTask.getLastExecutionDate() == null ? null:
-        			currentTask.getLastExecutionDate().getTime());
-        	((Databox) w.getFellow("nextExecution")).setFormat(DateFormats.getDateTimeFormatString());
-        	((Databox) w.getFellow("nextExecution")).setValue(
-        		currentTask.getNextExecutionDate() == null ? null:
-        		currentTask.getNextExecutionDate().getTime());
-        	Textbox tb = (Textbox) w.getFellow("tb");
-        	tb.setValue(currentTask.getStackTrace());
-        	w.doHighlighted();
-        	
+        	if (currentTask != null) {
+	        	w.setTitle(task.getTaskName());
+	        	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
+	        	((Databox) w.getFellow("message")).setValue(messages == null || messages.length <= col ? "" : messages[col]);
+	        	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
+	        	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
+	        	((Databox) w.getFellow("lastExecution")).setFormat(DateFormats.getDateTimeFormatString());
+	        	((Databox) w.getFellow("lastExecution")).setValue(
+	        			currentTask.getLastExecutionDate() == null ? null:
+	        			currentTask.getLastExecutionDate().getTime());
+	        	((Databox) w.getFellow("nextExecution")).setFormat(DateFormats.getDateTimeFormatString());
+	        	((Databox) w.getFellow("nextExecution")).setValue(
+	        		currentTask.getNextExecutionDate() == null ? null:
+	        		currentTask.getNextExecutionDate().getTime());
+	        	Textbox tb = (Textbox) w.getFellow("tb");
+	        	tb.setValue(currentTask.getStackTrace());
+	        	w.doHighlighted();
+        	} else { // Task has been finished
+//        		currentTasks.remove(pos);
+        		dt.deleteSelectedItem();
+        	}
         }
 
 	}

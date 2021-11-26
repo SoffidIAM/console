@@ -25,8 +25,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.zul.Listitem;
 
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AgentStatusInfo;
 import com.soffid.iam.api.Server;
@@ -45,8 +45,9 @@ public class SyncServerTasksGraph extends HttpServlet {
 	{
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String template = "" 
-				+ "type: horizontalBar\n" 
+				+ "type: bar\n" 
 				+ "options:\n"
+				+ "  indexAxis: y\n"
 				+ "  scales:\n"
 				+ "    xAxes:\n"
 				+ "    - stacked: true\n"
@@ -56,13 +57,14 @@ public class SyncServerTasksGraph extends HttpServlet {
 				+ "    yAxes:\n"
 				+ "    - display: true\n"
 				+ "      stacked: true\n"
-				+ "  title:\n"
-				+ "    text: Active tasks\n"
-				+ "    display: true\n"
 				+ "  plugins:\n"
+				+ "    title:\n"
+				+ "      text: Active tasks\n"
+				+ "      display: true\n"
+				+ "    legend:\n"
+				+ "      display: false\n"
 				+ "    datalabels:\n"
 				+ "      display: false\n"
-				+ "  legend: false\n"
 				+ "refresh: 10000\n"
 				+ "data:\n"
 				+ "  datasets:\n"

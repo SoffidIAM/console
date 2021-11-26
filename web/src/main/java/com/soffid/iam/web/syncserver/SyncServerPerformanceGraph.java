@@ -1,6 +1,8 @@
 package com.soffid.iam.web.syncserver;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,8 +26,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.zul.Listitem;
 
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Server;
 import com.soffid.iam.api.SyncServerInfo;
@@ -41,7 +41,7 @@ public class SyncServerPerformanceGraph extends HttpServlet {
 	
 	protected JSONObject getStats(Long id) throws ServletException, IOException
 	{
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat df = new SimpleDateFormat("HH:mm:ss");
 		String template = "" 
 				+ "type: line\n" 
 				+ "options:\n"
@@ -53,10 +53,10 @@ public class SyncServerPerformanceGraph extends HttpServlet {
 				+ "    - time:\n"
 				+ "        unit: minute\n"
 				+ "      type: time\n" 
-				+ "  title:\n"
-				+ "    text: Syncserver performance (tasks per minute)\n"
-				+ "    display: true\n"
 				+ "  plugins:\n"
+				+ "    title:\n"
+				+ "      text: Syncserver performance (tasks per minute)\n"
+				+ "      display: true\n"
 				+ "    datalabels:\n"
 				+ "      display: false\n"
 				+ "refresh: 15000\n"
@@ -74,7 +74,8 @@ public class SyncServerPerformanceGraph extends HttpServlet {
 					int seconds = 1200;
 					Map<String, int[]> stats = EJBLocator.getSyncServerService().getStats(server.getUrl(), "tasks-success", seconds, step);
 					Map<String, int[]> statsError = EJBLocator.getSyncServerService().getStats(server.getUrl(), "tasks-error", seconds, step);
-					
+
+					LinkedList<String> labelsSet = new LinkedList<>();
 					Map<String, JSONArray> datasets = new HashMap<>();
 					
 					int min = 0;
@@ -89,7 +90,11 @@ public class SyncServerPerformanceGraph extends HttpServlet {
 						for ( int i = 0; i < data.length; i++) {
 							Date then = new Date ( now - 1000L * ( seconds - (long) i * (long)step ));
 							JSONObject item = new JSONObject();
-							item.put("x", df.format(then));
+							final String label = df.format(then);
+							if (!labelsSet.contains(label)) {
+								labelsSet.add(label);
+							}
+							item.put("x", label);
 							item.put("y", data[i]);
 							o.put(item);
 						}
@@ -105,13 +110,20 @@ public class SyncServerPerformanceGraph extends HttpServlet {
 						for ( int i = 0; i < data.length; i++) {
 							Date then = new Date ( now - 1000L * ( seconds - (long) i * (long)step ));
 							JSONObject item = new JSONObject();
-							item.put("x", df.format(then));
+							final String label = df.format(then);
+							if (!labelsSet.contains(label)) {
+								labelsSet.add(label);
+							}
+							item.put("x", label);
 							item.put("y", -data[i]);
 							if (- data[i] < min) min = -data[i];
 							o.put(item);
 						}
 					}
 
+					if (stats.keySet().size() + statsError.keySet().size() > 20)
+						base.getJSONObject("options").getJSONObject("plugins").put("legend", new JSONObject("{\"display\":false}"));
+					
 					JSONArray datasetArray = new JSONArray();
 					JSONArray labelsArray  = new JSONArray();
 					List<String> keys = new LinkedList<>( datasets.keySet() );
@@ -131,6 +143,11 @@ public class SyncServerPerformanceGraph extends HttpServlet {
 						num ++;
 					}
 					JSONObject data = base.getJSONObject("data");
+					Collections.sort(labelsSet);
+					JSONArray labels = new JSONArray();
+					for (String label: labelsSet) labels.put(label);
+					data.put("labels",  labels);
+
 					data.put ("datasets", datasetArray);
 					((JSONObject)base.query("/options/scales/yAxes/0/ticks")).put("min", min);
 					return base;

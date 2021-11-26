@@ -1,8 +1,13 @@
 package com.soffid.iam.web.syncserver;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
@@ -20,8 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.service.ejb.SyncServerService;
 import com.soffid.iam.web.menu.YamlParser;
@@ -33,7 +36,7 @@ public class SyncServerQueueGraph extends HttpServlet {
 	
 	protected JSONObject getStats() throws ServletException, IOException
 	{
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat df = new SimpleDateFormat("HH:mm");
 		String template = "" 
 				+ "type: line\n" 
 				+ "options:\n"
@@ -46,10 +49,10 @@ public class SyncServerQueueGraph extends HttpServlet {
 				+ "    - time:\n"
 				+ "        unit: minute\n"
 				+ "      type: time\n" 
-				+ "  title:\n"
-				+ "    text: Tasks by server\n"
-				+ "    display: true\n"
 				+ "  plugins:\n"
+				+ "    title:\n"
+				+ "      text: Tasks by server\n"
+				+ "      display: true\n"
 				+ "    datalabels:\n"
 				+ "      display: false\n"
 				+ "refresh: 60000\n"
@@ -65,16 +68,22 @@ public class SyncServerQueueGraph extends HttpServlet {
 			
 			JSONArray datasets = new JSONArray();
 			base.getJSONObject("data").put("datasets", datasets);
-			
+			base.put("refresh", 2000);
+
+			LinkedList<String> labelsSet = new LinkedList<>();
 			for ( String s: stats.keySet()) {
 				JSONArray dataArray = new JSONArray();
 				for (Object[] row: stats.get(s)) {
 					Date data = (Date) row[0];
 					Long n = (Long) row[1];
 					JSONObject o = new JSONObject();
-					o.put("x", df.format(data));
+					final String label = df.format(data);
+					o.put("x", label);
 					o.put("y", n);
 					dataArray.put(o);
+					if (!labelsSet.contains(label)) {
+						labelsSet.add(label);
+					}
 				}
 				JSONObject dataset = new JSONObject();
 				dataset.put("data", dataArray);
@@ -88,6 +97,10 @@ public class SyncServerQueueGraph extends HttpServlet {
 				
 				datasets.put(dataset);
 			}
+			Collections.sort(labelsSet);
+			JSONArray labels = new JSONArray();
+			for (String label: labelsSet) labels.put(label);
+			base.getJSONObject("data").put("labels",  labels);
 			return base;
 		} catch (Exception e) {
 			log.warn("Error getting data", e);

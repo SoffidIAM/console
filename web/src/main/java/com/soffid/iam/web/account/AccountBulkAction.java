@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -34,10 +35,18 @@ public class AccountBulkAction extends BulkAction {
 
 	@Override
 	public Collection<DataType> getMetadata() throws InternalErrorException, NamingException, CreateException {
-		Collection<DataType> l = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(Account.class.getName(), null);
+		Collection<DataType> l2 = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(Account.class.getName(), null) ;;
 
 		Set<String> names = new HashSet<String>();
 		
+		LinkedList<DataType> l = new LinkedList<DataType>();
+		l.addAll(l2);
+		DataType dt = new DataType();
+		dt.setName("$roles$");
+		dt.setLabel(Labels.getLabel("usuaris.zul.Rols"));
+		dt.setMultiValued(true);
+		dt.setType(TypeEnumeration.ROLE_TYPE);
+		l.addFirst(dt);
 		for (com.soffid.iam.api.System d: EJBLocator.getDispatcherService().findAllActiveDispatchers())
 		{
 			for (DataType att: EJBLocator.getAdditionalDataService().findSystemDataTypes(d.getName()))
@@ -48,12 +57,6 @@ public class AccountBulkAction extends BulkAction {
 				}
 			}
 		}
-		DataType dt = new DataType();
-		dt.setName("$roles$");
-		dt.setLabel(Labels.getLabel("usuaris.zul.Rols"));
-		dt.setMultiValued(true);
-		dt.setType(TypeEnumeration.ROLE_TYPE);
-		l.add(dt);
 		return l;
 	}
 	

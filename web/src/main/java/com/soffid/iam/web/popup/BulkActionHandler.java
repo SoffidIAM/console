@@ -171,6 +171,7 @@ public class BulkActionHandler extends Window implements AfterCompose {
 						throw new UiException(e);
 					}
 					cf.afterCompose();
+					cf.runOnLoadTrigger();
 				}
 			}
 		}

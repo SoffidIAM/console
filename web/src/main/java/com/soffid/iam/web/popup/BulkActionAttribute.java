@@ -7,7 +7,10 @@ public class BulkActionAttribute {
 
 	public BulkActionAttribute(String name, DataType dataType, BulkActionAttributeAction[] actions) {
 		super();
-		this.name = name;
+		if (Boolean.TRUE.equals(dataType.getBuiltin()))
+			this.name = name;
+		else
+			this.name = "ca$"+name;
 		this.dataType = dataType;
 		this.actions = actions;
 	}

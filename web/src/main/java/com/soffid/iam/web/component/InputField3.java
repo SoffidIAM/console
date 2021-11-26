@@ -11,6 +11,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -396,22 +397,25 @@ public class InputField3 extends Databox
 
 
 	private void calculateVisibility() throws Exception {
-		if (uiHandler != null && !uiHandler.isVisible(this)) {
-			super.setVisible(false);
-		} 
-		else if (dataType != null && 
-				dataType.getVisibilityExpression() != null &&
-				!dataType.getVisibilityExpression().trim().isEmpty())
+		if (XPathUtils.getComponentContext(this) != null)
 		{
-			SecureInterpreter interp = createInterpreter();
-			if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
+			if (uiHandler != null && !uiHandler.isVisible(this)) {
 				super.setVisible(false);
+			} 
+			else if (dataType != null && 
+					dataType.getVisibilityExpression() != null &&
+					!dataType.getVisibilityExpression().trim().isEmpty())
+			{
+				SecureInterpreter interp = createInterpreter();
+				if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
+					super.setVisible(false);
+				else
+					super.setVisible(visible);
+			}
 			else
+			{
 				super.setVisible(visible);
-		}
-		else
-		{
-			super.setVisible(visible);
+			}
 		}
 	}
 
@@ -498,10 +502,16 @@ public class InputField3 extends Databox
 			// Ignore parse error
 		}
 		InputFieldContainer grandpa = getObjectContainer();
-		Map attributes = grandpa != null ? ((InputFieldContainer) grandpa).getAttributesMap():
-			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
+		Map attributes = null;
+		try {
+			attributes = grandpa != null ? ((InputFieldContainer) grandpa).getAttributesMap():
+				(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
+		} catch (Exception e) {
+			attributes = new HashMap<>();
+		}
 		SecureInterpreter i = new SecureInterpreter();
 
+		i.set("inputFields", new HashMap()); //$NON-NLS-1$
 		// Identify attributes div
 		Component c = this;
 		do

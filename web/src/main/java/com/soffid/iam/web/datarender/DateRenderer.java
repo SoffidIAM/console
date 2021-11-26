@@ -9,7 +9,7 @@ import javax.naming.NamingException;
 
 import org.zkoss.util.Locales;
 
-import com.ibm.icu.util.TimeZone;
+import java.util.TimeZone;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.utils.ConfigurationCache;
 
@@ -20,13 +20,13 @@ public class DateRenderer {
 		try {
 			String tz = EJBLocator.getPreferencesService().findMyPreference("timezone");
 			if (tz != null)
-				return TimeZone.getFrozenTimeZone(tz);
+				return TimeZone.getTimeZone(tz);
 		} catch (Exception e) {
 		}
 		try {
 			String tz = ConfigurationCache.getProperty("soffid.timezone");
 			if (tz != null)
-				return TimeZone.getFrozenTimeZone(tz);
+				return TimeZone.getTimeZone(tz);
 		} catch (Exception e) {
 		}
 		return TimeZone.getDefault();

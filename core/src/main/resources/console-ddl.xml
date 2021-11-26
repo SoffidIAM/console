@@ -259,7 +259,7 @@
 
 	<table name='JBPM_DELEGATION'>
 		<column name='ID_' type='BIGINT'  notNull='true' primaryKey='true'/>
-		<column name='CLASSNAME_' type='VARCHAR' length='4000'/>
+		<column name='CLASSNAME_' type='VARCHAR' length='256'/>
 		<column name='CONFIGURATION_' type='VARCHAR' length='4000'/>
 		<column name='CONFIGTYPE_' type='VARCHAR' length='255'/>
 		<column name='PROCESSDEFINITION_' type='BIGINT'/>

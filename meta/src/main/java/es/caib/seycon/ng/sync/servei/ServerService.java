@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.sync.servei;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.soffid.iam.api.AttributeTranslation;
@@ -22,6 +23,7 @@ import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.ServerEntity;
+import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.UsuariService;
 import es.caib.seycon.ng.sync.intf.AuthoritativeChange;
@@ -64,6 +66,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.servei.DispatcherService.class,
 	es.caib.seycon.ng.servei.AccountService.class,
 	es.caib.seycon.ng.model.UserAccountEntity.class,
+	TasqueEntity.class,
 	UsuariService.class,
 	PasswordService.class,
 	CustomObjectService.class,
@@ -484,6 +487,6 @@ public abstract class ServerService {
     public Account parseKerberosToken (String domain, String serviceName, byte keytab[], byte token[] ) throws InternalErrorException {return null;}
 
 	@Description("Updates Soffid image of the reconciled account. Only triggers a UpdateUser for user accounts with new or removed roles.")
-	public void reconcileAccount(Account account, RolAccount grants[]) {};
+	public void reconcileAccount(Account account, @Nullable List<RolAccount> grants) {};
 	
 }

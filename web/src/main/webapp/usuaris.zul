@@ -55,7 +55,10 @@
 				boolean readOnly = false;
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
-			
+				canChangePassword = com.soffid.iam.utils.Security.isUserInRole("user:password:update") ||
+						com.soffid.iam.utils.Security.isUserInRole("user:password:set") ;
+				pageScope.put("canChangePassword", canChangePassword);
+				
 				String ghp = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.entitlement.group.holder");
 				if ("always".equals(ghp))
 					showHolderGroup = enforceHolderGroup = true;
@@ -1033,7 +1036,8 @@
 									</vbox>
 									<vbox align="center" width="100%"
 										style="border:1px solid #7F9196;padding:2px;background-color:#EEEEEE">
-										<imageclic id="imgPwd" src="~./img/pwd.gif" 
+										<imageclic id="imgPwd" src="~./img/pwd.gif"
+											if="${pageScope['canChangePassword'] }" 
 											title="${c:l('usuaris.zul.Canviacontrasenya')}">
 											<attribute name="onClick">
 												<![CDATA[
@@ -1575,7 +1579,8 @@
 												<treecell>
 <!-- 													<divVisible bind="@tipus" valorVisible="M">
  -->
-														<imageclic src="~./img/pwd.gif" tooltip="pwd">
+														<imageclic src="~./img/pwd.gif" tooltip="pwd" 
+															if="${pageScope['canChangePassword'] }">
 															<attribute name="onClick">
 																comprovaCanviaPassword(self.parent);
 															</attribute>

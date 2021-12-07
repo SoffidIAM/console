@@ -11,11 +11,14 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
 RUN locale-gen
 
 RUN echo "Adding soffid console ${pom.version} "
+RUN groupadd soffid --gid 10000
+RUN useradd soffid --gid 10000 --uid 10000
 ADD target/Soffid-iamconsole.tar.gz /opt/soffid/
 COPY src/main/docker/start.sh /opt/soffid/iam-console-3/start.sh
 COPY src/main/docker/server.xml /opt/soffid/iam-console-3/conf/server.xml
 
 RUN chmod a+rx /opt/soffid/iam-console-3/bin/*.sh
+RUN chown -R soffid /opt/soffid/iam-console-3/
 EXPOSE 8080
 
 ENV LANG en_US.UTF-8
@@ -26,3 +29,4 @@ VOLUME  /opt/soffid/iam-console-3/logs
 VOLUME  /opt/soffid/iam-console-3/docs
 VOLUME  /opt/soffid/iam-console-3/conf
 ENTRYPOINT /opt/soffid/iam-console-3/start.sh
+

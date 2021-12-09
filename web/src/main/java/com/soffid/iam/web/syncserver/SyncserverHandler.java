@@ -43,6 +43,7 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.component.Switch;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 
@@ -380,9 +381,6 @@ public class SyncserverHandler extends FrameHandler {
         if (task == null) return;
         
         final Long id  = task.getId();
-        final String taskName = task.getTaskName();
-        final String[] messages = task.getMessage();
-        final String[] exceptions = task.getException();
         
         int col = Integer.parseInt( ((String[])event.getData())[0] );
         final String status = task.getEstatExecucioAgents()[col];
@@ -391,9 +389,10 @@ public class SyncserverHandler extends FrameHandler {
 
         	currentTask = EJBLocator.getSyncServerService().getAgentTasks(serverUrl, currentsAgents.get(col), id );
         	if (currentTask != null) {
-	        	w.setTitle(task.getTaskName());
+        		String messages = currentTask.getMessage();
+	        	w.setTitle(currentTask.getTaskDescription());
 	        	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
-	        	((Databox) w.getFellow("message")).setValue(messages == null || messages.length <= col ? "" : messages[col]);
+	        	((Databox) w.getFellow("message")).setValue(messages == null ? "" : messages);
 	        	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
 	        	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
 	        	((Databox) w.getFellow("lastExecution")).setFormat(DateFormats.getDateTimeFormatString());
@@ -415,6 +414,34 @@ public class SyncserverHandler extends FrameHandler {
 
 	}
 	
+	public void refreshAgentTask(Event event) throws InternalErrorException, NamingException, CreateException {
+    	Window w = (Window) getFellow("taskWindow");
+
+    	currentTask = EJBLocator.getSyncServerService().getAgentTasks(serverUrl, currentTask.getAgentCode(), currentTask.getTaskId() );
+    	if (currentTask != null) {
+    		String messages = currentTask.getMessage();
+        	w.setTitle(currentTask.getTaskDescription());
+        	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
+        	((Databox) w.getFellow("message")).setValue(messages == null ? "" : messages);
+        	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
+        	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
+        	((Databox) w.getFellow("lastExecution")).setFormat(DateFormats.getDateTimeFormatString());
+        	((Databox) w.getFellow("lastExecution")).setValue(
+        			currentTask.getLastExecutionDate() == null ? null:
+        			currentTask.getLastExecutionDate().getTime());
+        	((Databox) w.getFellow("nextExecution")).setFormat(DateFormats.getDateTimeFormatString());
+        	((Databox) w.getFellow("nextExecution")).setValue(
+        		currentTask.getNextExecutionDate() == null ? null:
+        		currentTask.getNextExecutionDate().getTime());
+        	Textbox tb = (Textbox) w.getFellow("tb");
+        	tb.setValue(currentTask.getStackTrace());
+        	w.doHighlighted();
+    	} else {
+    		w.setVisible(false);
+    	}
+	}
+
+
 	public void getAgentTaskDetails (Event event) throws InternalErrorException, NamingException, CreateException {
 		Window w2 = (Window) getFellow("agentWindow");
         DataTable dt = (DataTable) w2.getFellow("table");
@@ -461,7 +488,32 @@ public class SyncserverHandler extends FrameHandler {
         if (pos < 0) return;
 
         currentAgent = agentStatus.get(pos);
-        currentAgentTasks = new LinkedList<> (EJBLocator.getSyncServerService().getAgentTasks(serverUrl, currentAgent.getAgentName()));
+        Window w = (Window) getFellow("agentWindow");
+        w.setTitle(currentAgent.getAgentName());
+        w.doHighlighted();
+        updateAgentTasks(w);
+        
+        ((Databox)w.getFellow("name")).setValue(currentAgent.getAgentName());
+        ((Databox)w.getFellow("url")).setValue(currentAgent.getUrl());
+        ((Databox)w.getFellow("version")).setValue(currentAgent.getVersion());
+        Databox stbox = (Databox)w.getFellow("stackTrace");
+        if (currentAgent.getStackTrace() != null) {
+        	stbox.setVisible(true);
+			stbox.setValue(currentAgent.getStackTrace());
+        } else {
+        	stbox.setVisible(false);
+        }
+        if ("local".equals(currentAgent.getUrl())) {
+        	w.getFellow("log_button").setVisible(false);
+        	w.getFellow("restart_button").setVisible(false);
+        } else {
+        	w.getFellow("log_button").setVisible(true);
+        	w.getFellow("restart_button").setVisible(true);
+        }
+	}
+
+	public void updateAgentTasks(Window w) throws InternalErrorException, NamingException, CreateException {
+		currentAgentTasks = new LinkedList<> (EJBLocator.getSyncServerService().getAgentTasks(serverUrl, currentAgent.getAgentName()));
         StringBuffer tasksArray = new StringBuffer();
         tasksArray.append("[");
         for (SyncAgentTaskLog task: currentAgentTasks) {
@@ -485,31 +537,17 @@ public class SyncserverHandler extends FrameHandler {
         }
         tasksArray.append("]");
         
-        Window w = (Window) getFellow("agentWindow");
         DataTable dt2 = (DataTable) w.getFellow("table");
-        w.setTitle(currentAgent.getAgentName());
         dt2.setData(tasksArray.toString());
-        w.doHighlighted();
-        
-        ((Databox)w.getFellow("name")).setValue(currentAgent.getAgentName());
-        ((Databox)w.getFellow("url")).setValue(currentAgent.getUrl());
-        ((Databox)w.getFellow("version")).setValue(currentAgent.getVersion());
-        Databox stbox = (Databox)w.getFellow("stackTrace");
-        if (currentAgent.getStackTrace() != null) {
-        	stbox.setVisible(true);
-			stbox.setValue(currentAgent.getStackTrace());
-        } else {
-        	stbox.setVisible(false);
-        }
-        if ("local".equals(currentAgent.getUrl())) {
-        	w.getFellow("log_button").setVisible(false);
-        	w.getFellow("restart_button").setVisible(false);
-        } else {
-        	w.getFellow("log_button").setVisible(true);
-        	w.getFellow("restart_button").setVisible(true);
-        }
 	}
 	
+	public void refreshAgentTasks(Event event) throws InternalErrorException, NamingException, CreateException {
+        Window w = (Window) getFellow("agentWindow");
+        w.setTitle(currentAgent.getAgentName());
+        w.doHighlighted();
+        updateAgentTasks(w);
+	}
+
 	public void closeAgentWindow(Event event) {
         Window w = (Window) getFellow("agentWindow");
 		w.setVisible(false);
@@ -664,6 +702,12 @@ public class SyncserverHandler extends FrameHandler {
         			});
         	
         }
+	}
+
+	@Override
+	public void hideDetails() throws CommitException {
+		super.hideDetails();
+		hideAllDivs();
 	}
 
 }

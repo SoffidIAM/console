@@ -86,6 +86,9 @@ public class Tasca {
 	public java.lang.String server;
 
 	@Nullable
+	public java.lang.String serverInstance;
+
+	@Nullable
 	@Attribute(translated = "userDomain" )
 	public java.lang.String dominiUsuaris;
 

@@ -130,8 +130,8 @@ public class TenantDataManager {
 					" WHERE RIS_TEN_ID=${tenantId}",
 				"SCV_RECGRO",
 					" WHERE RGR_TEN_ID=${tenantId}",
-//				"SC_SCTAHA",
-//					" WHERE 1=0",
+				"SC_SERINS",
+					" WHERE 0=1", // Do not export
 				"SC_USUPRO",
 					"WHERE UPR_IDPROC IN (SELECT JBPM_MODULEINSTANCE.PROCESSINSTANCE_ FROM  JBPM_MODULEINSTANCE "
 						+ "WHERE JBPM_MODULEINSTANCE.TENANT_=${tenantId})"

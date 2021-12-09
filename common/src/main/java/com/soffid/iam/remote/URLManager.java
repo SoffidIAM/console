@@ -53,24 +53,19 @@ public class URLManager {
             url2 = new URL("http:"+url);             //$NON-NLS-1$
         }
 
-        if (url.startsWith("https:")) //$NON-NLS-1$
+        if (url.startsWith("https:") || url.startsWith("http:")) //$NON-NLS-1$
         {
-    		if (url2.getPort() == -1)
-    			port = "";
-    		else
-    			port = ":"+Integer.toString(url2.getPort());
-            return new URL ("https://"+url2.getHost()+port+service); //$NON-NLS-1$ //$NON-NLS-2$
+  			return new URL (url2.getProtocol(),
+    					url2.getHost(), 
+    					url2.getPort() == -1 ?  Integer.parseInt(port): url2.getPort(),
+    					service); //$NON-NLS-1$ //$NON-NLS-2$
         }
         else
         {
-        	if (port == null)
-        	{
-        		if (url2.getPort() == -1)
-        			port = "";
-        		else
-        			port = ":"+Integer.toString(url2.getPort());
-        	}
-            return new URL ("https://"+url2.getHost()+port+service); //$NON-NLS-1$ //$NON-NLS-2$
+        	return new URL ("https",
+        			url2.getHost(),
+					url2.getPort() == -1 ?  Integer.parseInt(port): url2.getPort(),
+					service);
         }
     }
     

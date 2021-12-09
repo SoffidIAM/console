@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.Calendar;
@@ -60,6 +61,7 @@ import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
+import com.soffid.iam.model.ServerInstanceEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.SystemEntityDao;
 import com.soffid.iam.model.TaskEntity;
@@ -1466,31 +1468,50 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		Exception lastException = null;
 		for (ServerEntity se : dao.loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
-                try {
-                    RemoteServiceLocator rsl = new RemoteServiceLocator(se.getUrl());
-                    rsl.setAuthToken(se.getAuth());
-                    SyncStatusService sss = rsl.getSyncStatusService();
-                    Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
-                    if (p != null) {
-                        Audit audit = new Audit();
-                        audit.setAction("S");
-                        audit.setObject("SSO");
-                        audit.setAuthor(Security.getCurrentUser());
-                        audit.setCalendar(Calendar.getInstance());
-                        audit.setAccount(acc.getName());
-                        audit.setDatabase(acc.getSystem().getName());
-                        audit.setApplication("-");
-                        getAuditService().create(audit);
-                        return p;
-                    }
-                } catch (Exception e) {
-                    lastException = e;
-                }
+            	if (se.getInstances().isEmpty()) {
+	                try {
+	                    Password p = getPassword(level, usuari, acc, se.getUrl(), se.getAuth());
+	                    if (p != null)
+	                    	return p;
+	                } catch (Exception e) {
+	                    lastException = e;
+	                }
+            	} else {
+            		for (ServerInstanceEntity si: se.getInstances()) {
+            			try {
+		                    Password p = getPassword(level, usuari, acc, si.getUrl(), si.getAuth());
+		                    if (p != null)
+		                    	return p;
+		                } catch (Exception e) {
+		                    lastException = e;
+		                }
+            		}
+            	}
             }
         }
 		if (lastException != null)
 			throw lastException;
 		return null;
+	}
+
+	public Password getPassword(AccountAccessLevelEnum level, User usuari, AccountEntity acc, 
+			String url, String auth) throws IOException, InternalErrorException {
+        RemoteServiceLocator rsl = new RemoteServiceLocator(url);
+        rsl.setAuthToken(auth);
+		SyncStatusService sss = rsl.getSyncStatusService();
+		Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
+		if (p != null) {
+		    Audit audit = new Audit();
+		    audit.setAction("S");
+		    audit.setObject("SSO");
+		    audit.setAuthor(Security.getCurrentUser());
+		    audit.setCalendar(Calendar.getInstance());
+		    audit.setAccount(acc.getName());
+		    audit.setDatabase(acc.getSystem().getName());
+		    audit.setApplication("-");
+		    getAuditService().create(audit);
+		}
+		return p;
 	}
 
 	/* (non-Javadoc)
@@ -1609,31 +1630,44 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
-		Exception lastException = null;
 		log.info("Seting password for "+account.getSystem().getName());
 		if ( ! account.isDisabled() && account.getSystem().getUrl() != null)
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {
-	            	SyncStatusService sss = null;
-	                try {
-	                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getUrl());
-	                    rsl.setAuthToken(se.getAuth());
-	                    sss = rsl.getSyncStatusService();
-	                } catch (Exception e) {
-	                	lastException = e;
-	            		log.warn("Error sending password", e);
-	                }
-	                if (sss != null)
-	                {
-	                	sss.setAccountPassword(account.getName(), account.getSystem().getName(), password, temporary);
-	                	return;
-	                }
+	            	if (se.getInstances().isEmpty()) {
+	            		if (sendPasswordNow(account, password, temporary, se.getUrl(), se.getAuth())) 
+	            			return;
+	            	} else {
+	            		for (ServerInstanceEntity si: se.getInstances()) {
+		            		if (sendPasswordNow(account, password, temporary, si.getUrl(), si.getAuth())) 
+		            			return;
+	            			
+	            		}
+	            	}
 	            }
 	        }
 		}
 		log.info("Cannot send. Store locally");
 		getInternalPasswordService().storeAndForwardAccountPassword(account, password, temporary, null);
+	}
+
+	public boolean sendPasswordNow(AccountEntity account, Password password, boolean temporary, String url, String auth)
+			throws InternalErrorException {
+		SyncStatusService sss = null;
+		try {
+		    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
+		    rsl.setAuthToken(auth);
+		    sss = rsl.getSyncStatusService();
+		} catch (Exception e) {
+			log.warn("Error sending password", e);
+		}
+		if (sss != null)
+		{
+			sss.setAccountPassword(account.getName(), account.getSystem().getName(), password, temporary);
+			return true;
+		} else
+			return false;
 	}
 
 	/* (non-Javadoc)
@@ -2731,24 +2765,41 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		Exception lastException = null;
 		for (ServerEntity se : getServerEntityDao().loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
-                try {
-                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getUrl());
-                    rsl.setAuthToken(se.getAuth());
-                    SyncStatusService sss = rsl.getSyncStatusService();
-                    PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
-                    if (status != null) {
-                    	AccountEntity entity = getAccountEntityDao().load(account.getId());
-                    	getAccountEntityDao().removeFromCache( entity );
-                    	return status;
-                    }
-                } catch (Exception e) {
-                    lastException = e;
-                }
+            	if (se.getInstances().isEmpty()) {
+            		try {
+            			PasswordValidation status = getAccountSynchronizationStatus(account, se.getUrl(), se.getAuth());
+            			if (status != null) return status;
+            		} catch (Exception e) {
+            			lastException = e;
+            		}
+            	} else {
+            		for (ServerInstanceEntity si: se.getInstances()) {
+                		try {
+                			PasswordValidation status = getAccountSynchronizationStatus(account, si.getUrl(), si.getAuth());
+                			if (status != null) return status;
+                		} catch (Exception e) {
+                			lastException = e;
+                		}
+            			
+            		}
+            	}
             }
         }
 		if (lastException != null)
 			throw lastException;
 		return null;
+	}
+
+	public PasswordValidation getAccountSynchronizationStatus(Account account, String url, String auth) throws IOException, InternalErrorException {
+		RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
+		rsl.setAuthToken(auth);
+		SyncStatusService sss = rsl.getSyncStatusService();
+		PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
+		if (status != null) {
+			AccountEntity entity = getAccountEntityDao().load(account.getId());
+			getAccountEntityDao().removeFromCache( entity );
+		}
+		return status;
 	}
 
 	@Override

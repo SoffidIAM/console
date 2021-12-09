@@ -3,7 +3,9 @@ package com.soffid.iam.ssl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.rmi.RemoteException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -84,18 +86,20 @@ public class ConnectionFactory {
             
     }
 
-    public static HttpsURLConnection getConnection(URL url)
+    public static HttpURLConnection getConnection(URL url)
             throws RemoteException {
         try {
             if (sslFactory == null) {
                 init();
             }
 
-            HttpsURLConnection sslC = (HttpsURLConnection) url.openConnection();
-
-            sslC.setSSLSocketFactory(sslFactory);
-
-            return sslC;
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            if (conn instanceof HttpsURLConnection) {
+	            HttpsURLConnection sslC = (HttpsURLConnection) conn;
+	
+	            sslC.setSSLSocketFactory(sslFactory);
+            }
+	        return conn;
         } catch (Exception e) {
             throw new RemoteException(Messages.getString("ConnectionFactory.NotSSLInitialized"), e); //$NON-NLS-1$
         }

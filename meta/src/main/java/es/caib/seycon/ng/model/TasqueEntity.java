@@ -94,6 +94,10 @@ public abstract class TasqueEntity {
 	@Nullable
 	public java.lang.String server;
 
+	@Column(name = "TAS_SRVINS", length = 1024)
+	@Nullable
+	public java.lang.String serverInstance;
+
 	@Column(name = "TAS_PRIORI", translated = "priority")
 	@Nullable
 	public java.lang.Long prioritat;
@@ -149,6 +153,15 @@ public abstract class TasqueEntity {
 		return null;
 	}
 
+	@DaoFinder("select tasques from \n"
+			+ "com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server=:server and tasques.serverInstance=:serverInstance and tasques.tenant.id = :tenantId "
+			+ "order by tasques.date, tasques.id")
+	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findByServerAndServerInstance(
+			java.lang.String server, String serverInstance) {
+		return null;
+	}
+
 	@DaoFinder("select count(*) \n"
 			+ "from com.soffid.iam.model.TaskEntity tasques\n"
 			+ "where tasques.server is not null and tasques.tenant.id = :tenantId " )
@@ -186,6 +199,14 @@ public abstract class TasqueEntity {
 		return null;
 	}
 
+	@DaoFinder("select systemName, count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server = :server and tasques.serverInstance=:serverInstance and tasques.tenant.id = :tenantId \n"
+			+ "group by systemName" )
+	public Collection<Object[]> countTasksBySystem(String server, String serverInstance) {
+		return null;
+	}
+
 	@DaoFinder("select tasques from \n"
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
 			+ "where tasques.server=:server and "
@@ -194,6 +215,18 @@ public abstract class TasqueEntity {
 			+ "order by tasques.date, tasques.id")
 	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findByServerAndSystem(
 			java.lang.String server,
+			String system) {
+		return null;
+	}
+
+	@DaoFinder("select tasques from \n"
+			+ "com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server=:server and tasques.serverInstance=:serverInstance and "
+			+ "(tasques.systemName is null or tasques.systemName = :system) "
+			+ "and tasques.tenant.id = :tenantId "
+			+ "order by tasques.date, tasques.id")
+	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findByServerAndSystem(
+			java.lang.String server, String serverInstance,
 			String system) {
 		return null;
 	}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Proxy;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.rmi.RemoteException;
@@ -29,7 +30,7 @@ public class RemoteInvokerFactory {
     }
     
     public Object getInvoker(URL url, String tenantName, String authToken) throws IOException {
-        HttpsURLConnection c;
+        HttpURLConnection c;
         // Cambiar la factoria SSL
         try {
 

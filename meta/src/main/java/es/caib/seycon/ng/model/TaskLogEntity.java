@@ -70,6 +70,17 @@ public abstract class TaskLogEntity {
 		return null;
 	}
 
+	@DaoFinder("select tlog from com.soffid.iam.model.TaskLogEntity tlog \n"
+			+ "left join tlog.task tasca\n" 
+			+ "where  \n"
+			+ "  (:server is not null and tasca.server=:server) or (:server is null and tasca.server is null) and \n"
+			+ "  (:serverInstance is not null and tasca.serverInstance=:serverInstance) or (:serverInstance is null and tasca.serverInstance is null)\n"
+			+ "order by tlog.task.id, tlog.system.name")
+	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findAllHavingTasqueByServerAndServerInstance(
+			java.lang.String server, String serverInstance) {
+		return null;
+	}
+
 	@DaoFinder("select tlog from com.soffid.iam.model.TaskLogEntity tlog\n"
 			+ "left join tlog.system system\n" + "left join tlog.task task\n"
 			+ "where system.name=:system and \n"
@@ -86,14 +97,21 @@ public abstract class TaskLogEntity {
 	@DaoFinder("select tlog "
 			+ "from com.soffid.iam.model.TaskLogEntity tlog "
 			+ "where tlog.system.name=:system  " //$NON-NLS-1$
-			+ "and exists ( select 1 from com.soffid.iam.model.TaskEntity tasca "
-			+ "             where tasca.id = tlog.task.id and ( "
-			+ "              (:server is not null and tasca.server=:server) " //$NON-NLS-1$
-			+ "              or (:server is null and tasca.server is null) ) "
-			+ "            )"
+			+ "and (tlog.task.server=:server and :server is not null or tlog.task.server is null and :server is null) "
 			+ "order by tlog.task.id, tlog.system.name")
 	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByServerAndSystem(
 			java.lang.String server, java.lang.String system) {
+		return null;
+	}
+	
+	@DaoFinder("select tlog "
+			+ "from com.soffid.iam.model.TaskLogEntity tlog "
+			+ "where tlog.system.name=:system  " //$NON-NLS-1$
+			+ "and (tlog.task.server=:server and :server is not null or tlog.task.server is null and :server is null) and "
+			+ "    (tlog.task.serverInstance=:serverInstance and :serverInstance is not null or tlog.task.serverInstance is null and :serverInstance is null)"
+			+ "order by tlog.task.id, tlog.system.name")
+	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByServerAndSystem(
+			java.lang.String server, String serverInstance, java.lang.String system) {
 		return null;
 	}
 	
@@ -116,4 +134,13 @@ public abstract class TaskLogEntity {
 		return null;
 	}
 
+	@DaoFinder("select system.name, count(*) from \n"
+			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
+			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server and task.serverInstance=:serverInstance and \n"
+			+ "(task.systemName is null or task.systemName = system.name) "
+			+ "group by system.name \n"
+			+ "order by system.name")
+	public Collection<Object[]> countTasksByServerAndSystem(String server, String serverInstance) {
+		return null;
+	}
 }

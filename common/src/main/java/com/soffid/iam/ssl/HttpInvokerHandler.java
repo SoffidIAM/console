@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -39,7 +40,7 @@ public class HttpInvokerHandler implements InvocationHandler {
             throws Throwable {
 
         Object result = null;
-        HttpsURLConnection c;
+        HttpURLConnection c;
         try {
             
             // Cambiar la factoria SSL

@@ -11,6 +11,9 @@ import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.sync.service.SyncServerStatsService;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.ServerEntity;
+import es.caib.seycon.ng.model.ServerInstanceEntity;
+
 import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 		es.caib.seycon.ng.servei.AccountService.class, es.caib.seycon.ng.sync.servei.ServerService.class,
 		es.caib.seycon.ng.sync.servei.ChangePasswordNotificationQueue.class,
 		es.caib.seycon.ng.sync.servei.TaskQueue.class ,
+		ServerInstanceEntity.class, ServerEntity.class,
 		SyncServerStatsService.class})
 @Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
 public abstract class TaskQueue {

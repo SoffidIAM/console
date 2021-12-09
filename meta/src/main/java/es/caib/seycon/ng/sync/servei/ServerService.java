@@ -23,6 +23,7 @@ import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.ServerEntity;
+import es.caib.seycon.ng.model.ServerInstanceEntity;
 import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.servei.PasswordService;
 import es.caib.seycon.ng.servei.UsuariService;
@@ -71,7 +72,8 @@ import org.springframework.transaction.annotation.Transactional;
 	PasswordService.class,
 	CustomObjectService.class,
 	ServerEntity.class,
-	AttributeTranslationService.class, 
+	ServerInstanceEntity.class,
+	AttributeTranslationService.class,
 	AuthoritativeChangeService.class})
 public abstract class ServerService {
 
@@ -488,5 +490,7 @@ public abstract class ServerService {
 
 	@Description("Updates Soffid image of the reconciled account. Only triggers a UpdateUser for user accounts with new or removed roles.")
 	public void reconcileAccount(Account account, @Nullable List<RolAccount> grants) {};
-	
+
+	@Description("Registers a kubernetes sync server instance")
+	public void registerServerInstance(String name, String url) {};
 }

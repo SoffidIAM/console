@@ -75,7 +75,7 @@ public class SyncServerGraph extends HttpServlet {
 				+ "  - Connected\n"
 				+ "  - Disconnected\n";  
 		try {
-			for (Server server: syncServerService.getSyncServers()) {
+			for (Server server: syncServerService.getSyncServerInstances()) {
 				if (server.getId().equals(id)) {
 					JSONObject base = (JSONObject) new YamlParser().parse(template);
 					SyncServerInfo status = syncServerService.getSyncServerInfo(server.getUrl());

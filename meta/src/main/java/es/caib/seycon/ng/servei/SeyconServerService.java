@@ -26,10 +26,12 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.SeyconServerInfo;
 import es.caib.seycon.ng.model.ConfiguracioEntity;
+import es.caib.seycon.ng.model.ServerInstanceEntity;
 
 @Service(translatedName = "SyncServerService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.TasqueEntity.class, es.caib.seycon.ng.model.TaskLogEntity.class,
 		es.caib.seycon.ng.model.DispatcherEntity.class, es.caib.seycon.ng.model.ServerEntity.class, TenantEntity.class,
+		ServerInstanceEntity.class,
 		ConfiguracioService.class, ConfiguracioEntity.class ,
 		DispatcherService.class,
 		StatsService.class,
@@ -39,6 +41,13 @@ public abstract class SeyconServerService {
 	@Operation(grantees = { roles.monitor_server_list.class }, translated = "getSyncServers")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.util.Collection<es.caib.seycon.ng.comu.Server> getSyncServers()
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.monitor_server_list.class }, translated = "getSyncServerInstances")
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.Server> getSyncServerInstances()
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

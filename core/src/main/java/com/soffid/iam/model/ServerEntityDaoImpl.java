@@ -82,6 +82,7 @@ public class ServerEntityDaoImpl
 			n.setDiscoveryServer(null);
 			getNetworkEntityDao().update(n);
 		}
+		getServerInstanceEntityDao().remove(entity.getInstances());
 		super.remove(entity);
 	}
 

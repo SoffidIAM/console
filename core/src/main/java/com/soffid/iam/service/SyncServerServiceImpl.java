@@ -14,6 +14,7 @@ package com.soffid.iam.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -44,6 +45,7 @@ import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.ServerInstanceEntity;
 import com.soffid.iam.model.StatsEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
@@ -150,26 +152,54 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
     }
 
-    private RemoteServiceLocator createServerRemoteServiceLocator(String server) throws IOException, InternalErrorException {
-    	ServerEntity s = getServerEntityDao().findByName(server);
-    	if (s == null)
-    		throw new IOException ("Unknown server "+server);
-    	else
-    		return createRemoteServiceLocator(s.getUrl());
+    private RemoteServiceLocator createServerRemoteServiceLocator(String serverName, String serverInstance) throws IOException, InternalErrorException {
+    	ServerInstanceEntity si = serverInstance == null ? null:
+    		getServerInstanceEntityDao().findByServerNameAndInstanceName(serverName, serverInstance);
+		if (si != null) {
+			RemoteServiceLocator rsl = new RemoteServiceLocator(si.getUrl());
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+			rsl.setAuthToken(si.getAuth());        		
+			return rsl;
+		} else {
+			ServerEntity server = getServerEntityDao().findByName(serverName);
+			if (server == null) {
+				throw new InternalErrorException("Unknown server "+serverName);
+			}
+			else
+			{
+				RemoteServiceLocator rsl = new RemoteServiceLocator(server.getUrl());
+				rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+				rsl.setAuthToken(server.getAuth());
+				return rsl;
+			}
+			
+		}
     }
     
-    private RemoteServiceLocator createRemoteServiceLocator(String string) throws IOException, InternalErrorException {
-        RemoteServiceLocator rsl = new RemoteServiceLocator(string);
-        URLManager um = new URLManager(string);
-        ServerEntity server = getServerEntityDao().findByName(um.getServerURL().getHost());
-        if (server != null)
-        {
-        	rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
-            rsl.setAuthToken(server.getAuth());
-            return rsl;
-        }
-        else
-        	throw new InternalErrorException("Unknown server "+string);
+    private RemoteServiceLocator createRemoteServiceLocator(String serverName) throws IOException, InternalErrorException {
+        RemoteServiceLocator rsl = new RemoteServiceLocator(serverName);
+        URLManager um = new URLManager(serverName);
+        final String host = um.getServerURL().getHost();
+		ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(serverName);
+		if (si == null) 
+			si = getServerInstanceEntityDao().findByName(host);
+		if (si != null) {
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+			rsl.setAuthToken(si.getAuth());        		
+			return rsl;
+		} else {
+			ServerEntity server = getServerEntityDao().findByName(host);
+			if (server == null) {
+				throw new InternalErrorException("Unknown server "+serverName);
+			}
+			else
+			{
+				rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+				rsl.setAuthToken(server.getAuth());
+				return rsl;
+			}
+			
+		}
     }
 
     /**
@@ -198,8 +228,15 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 			
 			List<AgentStatusInfo> m = new LinkedList<>();
 
-			Collection<Object[]> tasks = getTaskEntityDao().countTasksBySystem(server);
-			Collection<Object[]> tl = getTaskLogEntityDao().countTasksByServerAndSystem(server);
+			ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
+			if (si == null) 
+				si = getServerInstanceEntityDao().findByName(server);
+			Collection<Object[]> tasks = si == null ?
+					getTaskEntityDao().countTasksBySystem(server) :
+					getTaskEntityDao().countTasksBySystem(si.getServer().getName(), si.getName());
+			Collection<Object[]> tl = si == null?
+					getTaskLogEntityDao().countTasksByServerAndSystem(server) :
+					getTaskLogEntityDao().countTasksByServerAndSystem(si.getServer().getName(), si.getName());
 
 			for ( AgentStatusInfo as: agentstatus) {
 				as.setPendingTasks(0);
@@ -251,7 +288,9 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             String host = m.getServerURL().getHost();
 
             if (host != null) {
-
+        		ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
+        		if (si == null)
+        			si = getServerInstanceEntityDao().findByName(host);
                 // Obtenim el llistat d'agents (capçalera)
                 Collection agentsActius = getSystemEntityDao().findActives();
                 HashMap<String, Integer> agentsPos = new HashMap(agentsActius.size());
@@ -268,14 +307,17 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
                 // Obtenim les tasques pendents D'AQUEST SERVER
                 // Ordenades per data i id
-                Collection tasques = getTaskEntityDao().
-                		findByServer(host);
+                Collection tasques = si == null?
+                		getTaskEntityDao().findByServer(host):
+                		getTaskEntityDao().findByServerAndServerInstance(si.getServer().getName(), si.getName());
 
                 if (tasques != null) {
                     // Si n'hi ha cap tasca pendent obtenim tots els TASKLOGs
                     // d'aquest server per optimitzar les consultes sql (encara
                     // que sobrecarreguem la sessió actual a nivell de memoria)
-                    Collection allTaskLog = getTaskLogEntityDao().findAllHavingTasqueByServer(host);
+                    Collection allTaskLog = si == null ?
+                    		getTaskLogEntityDao().findAllHavingTasqueByServer(host):
+                    		getTaskLogEntityDao().findAllHavingTasqueByServerAndServerInstance(si.getServer().getName(), si.getName());
                     HashMap<Long, String[][]> estatAllTasks = new HashMap<Long, String[][]>();
 
                     for (Iterator tit = allTaskLog.iterator(); tit.hasNext(); ) {
@@ -357,13 +399,12 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         // Ens quedem només amb el host
         String host = new URL(url).getHost();
 
-        // hem d'agafar TOTES les tasques del servidor
-
-        // Obtenim les tasques pendents (ordentades per id desc) D'AQUEST SERVER
-        // Tipus TasqueEntity: ordenats per prioritat, data e id
-        // Emprem un mètode existent canviant la select...
-        Collection<TaskEntity> tasques = getTaskEntityDao().
-        		findByServerAndSystem(host, agentCodi);
+		ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
+		if (si == null) 
+			si = getServerInstanceEntityDao().findByName(host);
+        Collection<TaskEntity> tasques = si == null ? 
+        		getTaskEntityDao().findByServerAndSystem(host, agentCodi):
+       			getTaskEntityDao().findByServerAndSystem(si.getServer().getName(), si.getName(), agentCodi);
         		
         // Construim el resultat
         LinkedList<SyncAgentTaskLog> tasquesAgent = new LinkedList();
@@ -376,8 +417,9 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             // Tipus TaskLogEntity
             // En principi no importa l'ordre.. (es fa amb l'ordre de les
             // tasques)
-            Collection allTaskLog = getTaskLogEntityDao()
-            		.findByServerAndSystem(host, agentCodi);
+            Collection allTaskLog = si == null ?
+            		getTaskLogEntityDao().findByServerAndSystem(host, agentCodi) :
+            		getTaskLogEntityDao().findByServerAndSystem(si.getServer().getName(), si.getName(), agentCodi);
             HashMap<Long, TaskLogEntity> allTaskLogs = new HashMap<Long, TaskLogEntity>();
 
             for (Iterator tit = allTaskLog.iterator(); tit.hasNext(); ) {
@@ -435,7 +477,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             URLManager m = new URLManager(urlServer);
             URL url = m.getServerLogFileURL();
 
-            HttpsURLConnection c = ConnectionFactory.getConnection(url);
+            HttpURLConnection c = ConnectionFactory.getConnection(url);
 
             c.setDoInput(true);
             c.setDoOutput(false);
@@ -479,8 +521,16 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
     	for (TenantServerEntity s: tenant.getServers())
     	{
-    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER)
-    			list.add(s.getTenantServer().getUrl());
+    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER) {
+    			Collection<ServerInstanceEntity> instances = s.getTenantServer().getInstances();
+    			if (instances.isEmpty())
+    				list.add(s.getTenantServer().getUrl());
+    			else {
+    				for (ServerInstanceEntity instance: instances) {
+    					list.add(instance.getUrl());
+    				}
+    			}
+    		}
     	}
 		return new java.util.LinkedList<String>(list);
     }
@@ -601,7 +651,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		{
 			throw new InternalErrorException(String.format("Task %d is not scheduled yet", taskId));
 		} else {
-	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server);
+	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server, task.getServerInstance());
 	        
 	        SyncStatusService status = rsl.getSyncStatusService();
 
@@ -621,7 +671,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		{
 			getTaskEntityDao().remove(task);
 		} else {
-	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server);
+	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server, task.getServerInstance());
 	        
 	        SyncStatusService status = rsl.getSyncStatusService();
 
@@ -754,15 +804,29 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     	for (TenantServerEntity s: tenant.getServers())
     	{
     		if (s.getTenantServer().getType() == ServerType.MASTERSERVER && !names.contains(s.getTenantServer().getUrl())) {
-    			
-    			Server server = getServerEntityDao().toServer(s.getTenantServer());
-    			server.setPk(null);
-    			server.setPublicKey(null);
-    			server.setUseMasterDatabase(false);
-    			server.setAuth(null);
-				list.add( server);
+				if (s.getTenantServer().getInstances().isEmpty()) {
+					Server server = getServerEntityDao().toServer(s.getTenantServer());
+					server.setPk(null);
+					server.setPublicKey(null);
+					server.setUseMasterDatabase(false);
+					server.setAuth(null);
+					list.add( server);
+					names.add(s.getTenantServer().getUrl());
+				} else {
+					for (ServerInstanceEntity si: s.getTenantServer().getInstances()) {
+						Server server = getServerEntityDao().toServer(s.getTenantServer());
+						server.setId(si.getId());
+						server.setUrl(si.getUrl());
+						server.setPk(null);
+						server.setPublicKey(null);
+						server.setUseMasterDatabase(false);
+						server.setAuth(null);
+						list.add( server);
+						names.add(s.getTenantServer().getUrl());
+					}
+					
+				}
 				
-				names.add(s.getTenantServer().getUrl());
     		}
     	}
     	return list;
@@ -911,6 +975,43 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 				return generateSeyconAgentTaskLog(agentName, te, tl);
 		}
 		return generateSeyconAgentTaskLog(agentName, te, null);		
+	}
+
+	@Override
+	protected Collection<Server> handleGetSyncServerInstances() throws Exception {
+        LinkedList<Server> list = new LinkedList<Server>();
+
+    	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
+    	HashSet<String> names = new HashSet<>();
+    	for (TenantServerEntity s: tenant.getServers())
+    	{
+    		final ServerEntity serverEntity = s.getTenantServer();
+			if (serverEntity.getType() == ServerType.MASTERSERVER && !names.contains(serverEntity.getUrl())) {
+    			
+    			Server server = getServerEntityDao().toServer(serverEntity);
+    			server.setPk(null);
+    			server.setPublicKey(null);
+    			server.setUseMasterDatabase(false);
+    			server.setAuth(null);
+    			
+    			if (serverEntity.getInstances().isEmpty())
+    				list.add( server);
+    			else {
+    				for (ServerInstanceEntity instance: serverEntity.getInstances()) {
+    	    			server.setPk(null);
+    	    			server.setPublicKey(null);
+    	    			server.setUseMasterDatabase(false);
+    	    			server.setAuth(null);
+    					Server i = new Server(server);
+    					i.setUrl(instance.getUrl());
+    					i.setId(instance.getId());
+    					list.add(i);
+    				}
+    			}
+				names.add(serverEntity.getUrl());
+    		}
+    	}
+    	return list;
 	}
 
 }

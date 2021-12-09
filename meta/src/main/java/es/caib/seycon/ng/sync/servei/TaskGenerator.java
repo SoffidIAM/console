@@ -10,6 +10,7 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.ConfiguracioEntity;
 import es.caib.seycon.ng.model.ServerEntity;
+import es.caib.seycon.ng.model.ServerInstanceEntity;
 import es.caib.seycon.ng.servei.ConfiguracioService;
 import es.caib.seycon.ng.servei.SeyconServerService;
 
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 	TenantEntity.class,
 	ConfiguracioService.class,
 	es.caib.seycon.ng.model.DispatcherEntity.class,
+	ServerInstanceEntity.class,
 	SeyconServerService.class})
 @Description("Generador de tareas. Recupera las tareas a realizar de la tabla SC_TASQUE y\nlas encola en TaskQueue. Adicionalmente coordina tareas de sincronización\nentre los dispatchers y otros threads relacionados con el SSO tales como el\nacceso a base de datos<BR>\nConsulta las siguientes propiedades del sistema:<BR>\n<li>server.getlogs: true permite la lectura de logs</li>\n<li>server.debuglevel: nivel de información de debug 0 = mínimo 10 = máximo</li>\n<li>server.dispatcher.enabled: true si el dispatcher debe recuperar las\ntareas de la tabla SC_TASQUE.</li>\n<li>server.dispatcher.delay: pausa (en ms.) que realizará el task dispatcher\ntras procesar la cola de tareas pendientes antes de volver a comenzar</li>\n<li>server.dispatcher.timeout: pausa (en ms.) que realizará el task\ndispatcher cuando se produzca en error de comunicaciones</li>\n<li>server.privatekey: archivo donde se encuentra la clave privada DSA que\nse utilizará para contactar con los agentes</li>\n<li>server.query.connections: Número maximo de conexiones a abrir contra la\nbase de datos (por defecto 5)</li>\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
 public abstract class TaskGenerator {
@@ -112,5 +114,8 @@ public abstract class TaskGenerator {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateClusterStatus() {
+	}
+	
+	public void purgeServerInstances() {
 	}
 }

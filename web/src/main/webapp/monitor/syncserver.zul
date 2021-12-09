@@ -127,6 +127,12 @@
 		position="center,top"
 		title=""
 		visible="false">
+		<div sclass="dummy navigation-bar">
+			<databutton image="/img/refresh.svg" label="${c:l('seyconserver.Refresca') }"
+				 onClick="ref:frame.refreshAgentTasks" 
+				 onlyIcon="true" id="refreshButton" 
+				 style="float:right"/>
+		</div>
 		<databox label="${c:l('agents.zul.Codi') }" type="STRING" readonly="true" id="name"/>
 		<databox label="${c:l('agents.zul.Url-2') }" type="STRING" readonly="true" id="url"/>
 		<databox label="${c:l('seyconserver.zul.Versia') }" type="STRING" readonly="true" id="version"/>
@@ -162,6 +168,12 @@
 		position="center,top"
 		title=""
 		visible="false">
+		<div sclass="dummy navigation-bar">
+			<databutton image="/img/refresh.svg" label="${c:l('seyconserver.Refresca') }"
+				 onClick="ref:frame.refreshAgentTask" 
+				 onlyIcon="true" id="refreshButton" 
+				 style="float:right"/>
+		</div>
 		<databox label="${c:l('seyconserver.zul.Tasca') }" type="STRING" readonly="true" id="task"/>
 		<databox label="${c:l('seyconserver.zul.Priority') }" type="STRING" readonly="true" id="priority"/>
 		<databox label="${c:l('seyconserver.zul.Executions') }" type="STRING" readonly="true" id="executions"/>

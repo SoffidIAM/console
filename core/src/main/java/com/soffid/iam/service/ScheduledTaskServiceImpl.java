@@ -38,6 +38,7 @@ import com.soffid.iam.model.ScheduledTaskEntity;
 import com.soffid.iam.model.ScheduledTaskHandlerEntity;
 import com.soffid.iam.model.ScheduledTaskLogEntity;
 import com.soffid.iam.model.ServerEntity;
+import com.soffid.iam.model.ServerInstanceEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.remote.URLManager;
@@ -390,10 +391,19 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
         	if ( (server.getType() == ServerType.MASTERSERVER && "*".equals(serverName) )
         			|| server.getName().equals(serverName))
         	{
-                RemoteServiceLocator rsl = new RemoteServiceLocator( server.getUrl() );
-            	rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
-                rsl.setAuthToken(server.getAuth());
-                return rsl;
+        		if (server.getInstances().isEmpty()) {
+        			RemoteServiceLocator rsl = new RemoteServiceLocator( server.getUrl() );
+        			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+        			rsl.setAuthToken(server.getAuth());
+        			return rsl;
+        		} else {
+        			for (ServerInstanceEntity instance: server.getInstances()) {
+            			RemoteServiceLocator rsl = new RemoteServiceLocator( instance.getUrl() );
+            			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+            			rsl.setAuthToken(instance.getAuth());
+            			return rsl;
+        			}
+        		}
         	}
         }
         return null;

@@ -3468,6 +3468,15 @@ public class ApplicationServiceImpl extends
 				Collection<RoleAccountEntity> grants = getRoleAccountEntityDao().findByRoleAndDomainValue(
 						role.getName(),
 						role.getSystem().getName(),
+						DomainType.APPLICATIONS,
+						null,
+						informationSystem,
+						null
+						);
+				ra.addAll(getRoleAccountEntityDao().toRoleAccountList(grants));
+				grants = getRoleAccountEntityDao().findByRoleAndDomainValue(
+						role.getName(),
+						role.getSystem().getName(),
 						DomainType.APLICACIONS,
 						null,
 						informationSystem,

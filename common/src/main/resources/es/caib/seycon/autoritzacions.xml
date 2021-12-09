@@ -31,7 +31,6 @@
 		<hereta>
 			user:update,
 			user:custom:update,
-			user:password:update,
 			user:query,
 			user:refresh,
 			user:role:query,
@@ -59,7 +58,6 @@
 		<ambit>Users</ambit>
 		<hereta>
 			user:custom:update,
-			user:password:update,
 			user:query,
 			user:refresh,
 			user:role:query,

@@ -145,7 +145,7 @@ public class ConfigurationServiceImpl
 		getConfigEntityDao().update(configuracioEntity);
 		configuracio = getConfigEntityDao().toConfiguration(configuracioEntity);
 		
-		if (configuracio.getNetworkCode() == null)
+		if (configuracio.getNetworkCode() == null && !configuracio.getName().equals("addon.report.server"))
 		{
 			ConfigurationCache.setProperty(configuracio.getCode(), configuracio.getValue());
 			if (Security.isMasterTenant())

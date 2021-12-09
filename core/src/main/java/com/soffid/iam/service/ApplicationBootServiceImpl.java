@@ -457,6 +457,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("106");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("106"))
+		{
+			createStandardAttributes();
+			cfg.setValue("107");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void fixAgentDescriptor() {

@@ -744,34 +744,38 @@ public class Security {
 	
 	static Collection<NetmaskMatch> matches = null;
 	protected static void parseTrustedIps(String s) throws UnknownHostException {
-		for (String part: s.split("\\s*,\\s*")) {
-			if (part.contains("*")) {
-				part = part.substring(0, part.indexOf("*"));
-				int dots = 0;
-				int pos = 0;
-				do {
-					int i = part.indexOf(".", pos);
-					if (i < 0) break;
-					dots ++;
-					pos = i+1;
-				} while(true);
-				if (dots == 0)
-					part = part + "0.0.0.0/0";
-				else if (dots == 1)
-					part = part + "0.0.0/8";
-				else if (dots == 2)
-					part = part + "0.0/16";
-				else
-					part = part + "0/24";
-			}
-			int slash = part.indexOf("/");
-			if (slash < 0) {
-				byte[] addr = InetAddress.getByName(part).getAddress();
-				matches.add(new NetmaskMatch(addr, addr.length * 8));
-			} else {
-				byte[] addr = InetAddress.getByName(part.substring(0, slash)).getAddress();
-				int bits = Integer.parseInt(part.substring(slash+1));
-				matches.add(new NetmaskMatch(addr, bits));
+		if (s != null) {
+			
+			matches = new LinkedList<>();
+			for (String part: s.split("\\s*,\\s*")) {
+				if (part.contains("*")) {
+					part = part.substring(0, part.indexOf("*"));
+					int dots = 0;
+					int pos = 0;
+					do {
+						int i = part.indexOf(".", pos);
+						if (i < 0) break;
+						dots ++;
+						pos = i+1;
+					} while(true);
+					if (dots == 0)
+						part = part + "0.0.0.0/0";
+					else if (dots == 1)
+						part = part + "0.0.0/8";
+					else if (dots == 2)
+						part = part + "0.0/16";
+					else
+						part = part + "0/24";
+				}
+				int slash = part.indexOf("/");
+				if (slash < 0) {
+					byte[] addr = InetAddress.getByName(part).getAddress();
+					matches.add(new NetmaskMatch(addr, addr.length * 8));
+				} else {
+					byte[] addr = InetAddress.getByName(part.substring(0, slash)).getAddress();
+					int bits = Integer.parseInt(part.substring(slash+1));
+					matches.add(new NetmaskMatch(addr, bits));
+				}
 			}
 		}
 	}

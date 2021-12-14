@@ -15,7 +15,7 @@ public class ServerNameHandler extends InputFieldUIHandler {
 			String system = (String) XPathUtils.getValue(field, "system");			
 			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
 			AccountType type = (AccountType) XPathUtils.getValue(field, "type");
-			return (ssoSystem == null || ssoSystem.equals(system) && type != AccountType.IGNORED && type != null);
+			return (ssoSystem == null || ssoSystem.equals(system) && type != null);
 		} catch (JXPathException e) {
 			return false;
 		}

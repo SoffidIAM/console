@@ -303,7 +303,8 @@ public class FrameHandler extends Frame {
 				((DataTree2)lb).setSelectedIndex(pos);
 			}
 		} catch (ComponentNotFoundException e) {
-			getModel().refresh();
+			if (getModel() != null)
+				getModel().refresh();
 			SearchBox sb = (SearchBox) getFellowIfAny("searchBox");
 			if (sb != null)
 				sb.updateProgress();

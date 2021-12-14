@@ -171,6 +171,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		UserEntity usuariEntity = getUserEntityDao().findByUserName(codiUsuari);
 		if ( ! "S".equals(usuariEntity.getActive())) {
+			if (!getAuthorizationService().hasPermission("user:disable", usuariEntity))
+				throw new SecurityException("Access denied. Required roles: [user:disable]");
 			auditChange("e", usuariEntity.getUserName(), null);
 		}
 		/*
@@ -424,6 +426,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		if ( usuari.getActive() != null && usuari.getActive().booleanValue())
 		{
+			if (!getAuthorizationService().hasPermission("user:enable", usuariEntity))
+				throw new SecurityException("Access denied. Required roles: [user:disable]");
 			auditChange("E", usuari.getUserName(), null);
 		}
 		getRuleEvaluatorService().applyRules(usuariEntity);
@@ -1507,12 +1511,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		
 		if (previousUser.getActive().booleanValue() && !usuari.getActive().booleanValue())
 		{
+			if (!getAuthorizationService().hasPermission("user:disable", usu))
+				throw new SecurityException("Access denied. Required roles: [user:disable]");
 			auditChange("e", previousUser.getUserName(), null);
 		}
 		if (! previousUser.getActive().booleanValue() && usuari.getActive().booleanValue())
 		{
 			if (!getAuthorizationService().hasPermission("user:enable", usu))
-				throw new SecurityException("Acces denied. Required roles: [user:enable]");
+				throw new SecurityException("Access denied. Required roles: [user:enable]");
 			auditChange("E", previousUser.getUserName(), null);
 		}
 

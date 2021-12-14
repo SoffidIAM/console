@@ -137,6 +137,28 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>user:enable</codi>
+		<descripcio>Enable disabled users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:disable</codi>
+		<descripcio>Disable enabled users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>user:role:query</codi>
 		<descripcio>Query the users roles</descripcio>
 		<tipusDomini>GRUPS, APLICACIONS</tipusDomini>

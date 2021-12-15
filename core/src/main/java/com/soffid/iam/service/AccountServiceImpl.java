@@ -1405,6 +1405,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 try {
                     RemoteServiceLocator rsl = new RemoteServiceLocator(se.getName());
                     rsl.setAuthToken(se.getAuth());
+		    rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
                     SyncStatusService sss = rsl.getSyncStatusService();
                     Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
                     if (p != null) {

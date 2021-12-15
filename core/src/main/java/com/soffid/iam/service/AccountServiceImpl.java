@@ -1620,6 +1620,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                try {
 	                    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getUrl());
 	                    rsl.setAuthToken(se.getAuth());
+			    rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
 	                    sss = rsl.getSyncStatusService();
 	                } catch (Exception e) {
 	                	lastException = e;
@@ -2735,6 +2736,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 try {
                     RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(se.getUrl());
                     rsl.setAuthToken(se.getAuth());
+		    rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
                     SyncStatusService sss = rsl.getSyncStatusService();
                     PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
                     if (status != null) {

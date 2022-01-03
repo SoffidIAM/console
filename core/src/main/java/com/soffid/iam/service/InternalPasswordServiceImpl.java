@@ -1223,8 +1223,6 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 						return PasswordValidation.PASSWORD_GOOD;
 					} else if (checkExpired) {
 						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
-					} else {
-						return PasswordValidation.PASSWORD_WRONG;
 					}
 				}
 			}

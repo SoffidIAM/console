@@ -99,7 +99,7 @@ public abstract class TaskQueue {
 
 	@Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public void cancelTask(long taskId) throws es.caib.seycon.ng.exception.InternalErrorException {
+	public void cancelTask(long taskId, String hash) throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
 	@Description("Cola de tareas pendientes de ejecución\n\n@author $Author: u07286 $\n@version $Revision: 1.1 $\n")
@@ -159,5 +159,13 @@ public abstract class TaskQueue {
 	public TaskHandler findTaskHandlerById(long taskId) throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+	
+
+	@Description("Registers a kubernetes sync server instance")
+	public void registerServerInstance(String name, String url) {};
+
+	public void updateServerInstanceTasks() { }
+	
+	public boolean isBestServer() {return false;}
 
 }

@@ -818,6 +818,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 						server.setId(si.getId());
 						server.setUrl(si.getUrl());
 						server.setPk(null);
+						server.setName(si.getName());
 						server.setPublicKey(null);
 						server.setUseMasterDatabase(false);
 						server.setAuth(null);
@@ -878,6 +879,11 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		Calendar then = Calendar.getInstance();
 		then.setTime(now.getTime());
 		then.add(Calendar.MINUTE, -29);
+		
+		HashSet<String> names = new HashSet<String>();
+		for (Server s: handleGetSyncServerInstances()) {
+			names.add(s.getName());
+		}
 
 		List<TaskEntity> unscheduled = getTaskEntityDao().findUnscheduled();
 		Vector<Object[]> data = null;
@@ -918,6 +924,10 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 					else
 						for (int i = lastposition + 1; i < position; i++)
 							data.get(i)[1] = data.get(lastposition)[1];
+				} else if (!names.contains(stat.getSerie())) {
+					data.get(position)[1] = stat.getValue();
+					for ( int i = position+1; i < 30; i++)
+						data.get(i)[1] = new Long(0);
 				} else {
 					for ( int i = position; i < 30; i++)
 						data.get(i)[1] = stat.getValue();
@@ -954,15 +964,35 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		stats.setSerie("Unscheduled");
 		stats.setValue(c);
 		getStatsEntityDao().create(stats);
-		for ( Server server: handleGetSyncServers()) {
-			c = getTaskEntityDao().countTasksByServer(server.getName());
-			stats = getStatsEntityDao().newStatsEntity();
-			stats.setDate(d);
-			stats.setName("pending-tasks");
-			stats.setSerie(server.getUrl());
-			stats.setValue(c);
-			getStatsEntityDao().create(stats);			
-		}
+    	TenantEntity tenant = getTenantEntityDao().findByName(Security.getCurrentTenantName());
+    	HashSet<String> names = new HashSet<>();
+    	for (TenantServerEntity s: tenant.getServers())
+    	{
+    		if (s.getTenantServer().getType() == ServerType.MASTERSERVER && !names.contains(s.getTenantServer().getUrl())) {
+    			ServerEntity server = s.getTenantServer();
+				if (server.getInstances().isEmpty()) {
+					c = getTaskEntityDao().countTasksByServer(server.getName());
+					stats = getStatsEntityDao().newStatsEntity();
+					stats.setDate(d);
+					stats.setName("pending-tasks");
+					stats.setSerie(server.getName());
+					stats.setValue(c);
+					getStatsEntityDao().create(stats);			
+				} else {
+					for (ServerInstanceEntity si: s.getTenantServer().getInstances()) {
+						c = getTaskEntityDao().countTasksByServerInstance(server.getName(), si.getName());
+						stats = getStatsEntityDao().newStatsEntity();
+						stats.setDate(d);
+						stats.setName("pending-tasks");
+						stats.setSerie(si.getName());
+						stats.setValue(c);
+						getStatsEntityDao().create(stats);			
+					}
+					
+				}
+				
+    		}
+    	}
 	}
 
 	@Override
@@ -1005,6 +1035,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
     					Server i = new Server(server);
     					i.setUrl(instance.getUrl());
     					i.setId(instance.getId());
+    					i.setName(instance.getName());
     					list.add(i);
     				}
     			}

@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.zkoss.zk.ui.Executions;
+
 import com.lowagie.text.pdf.codec.Base64.OutputStream;
 
 public class ErrorServlet extends HttpServlet {
@@ -98,7 +100,7 @@ public class ErrorServlet extends HttpServlet {
 				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/zkau/web/zkex/zul/css/layout.css.dsp\"/>"
 				+ "<body><p style=\"height:100px; \"/>"
 				+ "<div style=\"margin-left:auto; margin-right: auto; width:40em; text-align:center; margin-top:auto; margin-bottom:auto; min-height:10em; vertical-align:middle;\">"
-				+ "<p><img src=\"/anonymous/logo.png\" alt=\"Soffid logo\" /> </p>"
+				+ "<p><img src=\""+getServletContext().getContextPath()+"/anonymous/logo - iam-orig.svg\" alt=\"Soffid logo\" /> </p>"
 				+ "<p style=\"height:20px; \"/>"
 				+ "<p>Our apologies</p>"
 				+ "<p style=\"height:20px; \"/>"

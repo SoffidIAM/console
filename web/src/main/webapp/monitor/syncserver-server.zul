@@ -5,7 +5,7 @@
 <window style="width: 100%">
 	<custom-attributes serverId="${arg.id }" serverUrl="${arg.url }"/>
 	<div style="width: 100%">
-		<label value="${arg.url }" sclass="separator"/>
+		<label value='${arg.publicUrl }${arg.publicUrl != arg.url ? c:cat(" - ",arg.name): ""}' sclass="separator"/> 
 	</div>
 	<div style="width:100%">
          <iframe src="/graph/graph.html?data=syncserver_status/${arg.id }"> </iframe>

@@ -1,7 +1,6 @@
 package com.soffid.iam.filter;
 
 import java.io.IOException;
-import java.net.URL;
 import java.security.Principal;
 
 import javax.servlet.Filter;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.soffid.iam.juli.AsyncFileHandler;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 

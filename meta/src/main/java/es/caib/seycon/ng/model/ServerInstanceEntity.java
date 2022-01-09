@@ -39,6 +39,9 @@ public abstract class ServerInstanceEntity {
 	@Nullable @Column (name="SRE_TOKEN")
 	String auth;
 	
+	@Column(name="SRE_TASKS")
+	int tasks;
+	
 	ServerInstanceEntity findByName(String name) {return null;}
 	
 	ServerInstanceEntity findByUrl(String url) {return null;}
@@ -58,6 +61,13 @@ public abstract class ServerInstanceEntity {
 			+ "from com.soffid.iam.model.ServerInstanceEntityImpl as si "
 			+ "where si.lastSeen < :lastSeen")
 	List<ServerInstanceEntity> findExpired (Date lastSeen) {return null;}
+
+
+	@DaoFinder("select si "
+			+ "from com.soffid.iam.model.ServerInstanceEntityImpl as si "
+			+ "where si.server.name=:serverName "
+			+ "order by tasks, id desc")
+	List<ServerInstanceEntity> findBestServerInstances (String serverName) {return null;}
 }
 
 @Index( entity = ServerInstanceEntity.class, columns = {"SRE_NOM"}, name = "SC_SERINS_UK", unique = true )

@@ -38,5 +38,8 @@ public class Server {
 	public java.lang.String url;
 
 	@Nullable
+	public java.lang.String publicUrl;
+
+	@Nullable
 	public java.lang.String javaOptions;
 }

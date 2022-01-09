@@ -77,7 +77,9 @@ public class SyncserverHandler extends FrameHandler {
 			for ( Server server: EJBLocator.getSyncServerService().getSyncServers()) {
 				Map<String, Object> m = new HashMap<>();
 				m.put("url", server.getUrl());
+				m.put("name", server.getName());
 				m.put("id", server.getId());
+				m.put("publicUrl", server.getPublicUrl());
 				
 				Executions.getCurrent().createComponents("/monitor/syncserver-server.zul", div, m);
 			}

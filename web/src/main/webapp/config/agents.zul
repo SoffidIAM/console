@@ -723,11 +723,9 @@
 		<datatree2 id="log"
 			header="Test log" 
 			enablefilter="true"
-			sortDirection="500"
 			sortable="false"
 			maxheight="480px"
 			onAddPolicy="ref:frame.addPolicy"
-			style="height: 500px; min-height: 60vh"
 			onSelect="ref:frame.showDetails">
 			<attribute name="finders">
 			<![CDATA[

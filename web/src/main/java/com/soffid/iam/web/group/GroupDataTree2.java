@@ -11,7 +11,9 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.web.WebDataType;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.binder.tree.TreeModelProxyNode;
 import es.caib.zkib.component.DataTree2;
+import es.caib.zkib.datamodel.DataNode;
 
 
 public class GroupDataTree2 extends DataTree2 {
@@ -43,6 +45,15 @@ public class GroupDataTree2 extends DataTree2 {
 			setColumns(columns.toString());
 		} catch (Exception e) {}
 		super.afterCompose();
+	}
+
+	@Override
+	protected String getRowClass(TreeModelProxyNode node) {
+		DataNode dataNode = (DataNode) node.getValue();
+		if (Boolean.TRUE.equals(dataNode.get("obsolete")))
+			return "dashed";
+		else
+			return null;
 	}
 	
 	

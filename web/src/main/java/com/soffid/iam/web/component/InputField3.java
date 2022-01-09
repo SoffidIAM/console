@@ -416,6 +416,8 @@ public class InputField3 extends Databox
 			{
 				super.setVisible(visible);
 			}
+		} else {
+			super.setVisible(visible);
 		}
 	}
 

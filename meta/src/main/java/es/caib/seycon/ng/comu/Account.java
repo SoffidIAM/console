@@ -186,6 +186,8 @@ public class Account {
 	@Attribute(hidden=true, defaultValue = "new java.util.HashMap<String,Object>()")
 	Map<String, Object> attributes;
 	
+	@Description("True if there is an snapshot for delta changes")
+	boolean hasSnapshot;
 }
 
 

@@ -16,6 +16,7 @@ import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.HostServiceEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
@@ -73,7 +74,8 @@ import roles.account_query;
 	VaultFolderEntity.class,
 	JumpServerGroupEntity.class,
 	PamSecurityHandlerService.class,
-	HostServiceEntity.class})
+	HostServiceEntity.class,
+	AccountSnapshotEntity.class})
 public abstract class AccountService {
 
 	/// listUserAccounts
@@ -646,4 +648,6 @@ public abstract class AccountService {
 	@Operation(grantees= {roles.account_query.class} )
 	public Collection<HostService> findAccountServices(Account account) { return null; }
 
+	@Operation(grantees= {roles.account_update.class} )
+	public Account removeAccountSnapshot(Account account) { return null; }
 }

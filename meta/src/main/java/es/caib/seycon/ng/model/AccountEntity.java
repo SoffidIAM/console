@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.ACLService;
@@ -150,6 +151,10 @@ public abstract class AccountEntity {
 	@Column(name = "ACC_PWDSTA", length = 25)
 	@Nullable
 	public String passwordStatus;
+
+	@Column(name="ACC_ASN_ID", reverseAttribute = "accounts")
+	@Nullable
+	AccountSnapshotEntity snapshot;
 
 
 	@Operation(translated = "findByNameAndSystem")

@@ -42,6 +42,7 @@ public class ScimHelper {
 		this.objectClass = objectClass;
 	}
 	
+	
 	public void search (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
 		String qs = "";
 
@@ -56,7 +57,7 @@ public class ScimHelper {
 		}
 		
 		AbstractExpression expr = ExpressionParser.parse(q2);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( isOracle());
 		hql = expr.generateHSQLString( objectClass );
 		qs = hql.getWhereString().toString();
 		if (tenantFilter != null) {
@@ -76,8 +77,6 @@ public class ScimHelper {
 		if (order != null && hql.getOrderByString().length() == 0)
 			q = q + " order by "+ order;
 		
-		LogFactory.getLog(getClass()).warn("//////////////////////////////////");
-		LogFactory.getLog(getClass()).warn(q);
 		org.hibernate.Query queryObject = session.createQuery( q );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
@@ -128,6 +127,13 @@ public class ScimHelper {
 		
 		if (config.getMaximumResultSize() == null && config.getFetchSize() == null)
 			count = new Integer(result.size());
+	}
+
+	static Boolean oracle = null;
+	public boolean isOracle() {
+		if (oracle == null)
+			oracle = new CustomDialect().isOracle();
+		return oracle.booleanValue();
 	}
 
 	String generateQuickSearchQuery (String text) throws InternalErrorException {

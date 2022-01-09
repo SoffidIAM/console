@@ -85,8 +85,8 @@
 
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				<menu2>
-					<menu2item if="${soffid:isUserInRole('account:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
-					<menu2item if="${soffid:isUserInRole('account:update')}" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
+					<menu2item id="deleteAccountButton" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					<menu2item id="updatePasswordButton" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
 				</menu2>
 			</div>
 			<div id="dades">

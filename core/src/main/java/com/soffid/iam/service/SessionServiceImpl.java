@@ -36,6 +36,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -98,6 +99,13 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         return doCreateSession(codiUsuari, nomMaquina, nomMaquinaClient, TipusSessio.WSSO, url, null, null, authenticationMethod);
     }
 
+    static HashMap<TipusSessio, String[]> types = new HashMap<TipusSessio, String[]>() {{
+    	put(TipusSessio.ESSO, new String[] {"esso", "Soffid Enterprise SSO"});
+    	put(TipusSessio.WSSO, new String[] {"wsso", "Soffid Web SSO"});
+    	put(TipusSessio.PAM, new String[] {"PAM", "PAM Web Gateway"});
+    	put(TipusSessio.PAMRDP, new String[] {"PAMRDP", "PAM RDP Gateway"});
+    	put(TipusSessio.PAMSSH, new String[] {"PA_SSH", "PAM SSH Gateway"});
+    }};
     private com.soffid.iam.api.Session doCreateSession(java.lang.String codiUsuari, java.lang.String nomMaquina, java.lang.String nomMaquinaClient, TipusSessio tipus, 
     		java.lang.String url, java.lang.Long port, String key, String authenticationMethod) throws UnknownHostException, UnknownUserException {
         HostEntity me = findMaquina(nomMaquina);
@@ -157,11 +165,13 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         sessio.setWebHandler(url);
         
         ServiceEntityDao seDao = getServiceEntityDao(); 
-        ServiceEntity se = seDao.findByName("sso"); //$NON-NLS-1$
+        ServiceEntity se;
+        String typeText[] = types.get(tipus);
+        se = seDao.findByName(typeText[0]); //$NON-NLS-1$
         if (se == null) {
             se = getServiceEntityDao().newServiceEntity();
-            se.setName("sso"); //$NON-NLS-1$
-            se.setDescription("SEU Single Sign On"); //$NON-NLS-1$
+            se.setName(typeText[0]); //$NON-NLS-1$
+            se.setDescription(typeText[1]); //$NON-NLS-1$
             seDao.create(se);
         }
         
@@ -180,6 +190,8 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         ra.setHostAddress(sessio.getHostAddress());
         ra.setClientHostName(sessio.getClientHostName());
         ra.setClientAddress(sessio.getClientAddress());
+        if (sessio.getAuthenticationMethod() != null)
+        	ra.setInformation("Auth method: "+sessio.getAuthenticationMethod());
         raDao.create (ra);
         
 

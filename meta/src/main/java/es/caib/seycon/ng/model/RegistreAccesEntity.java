@@ -266,6 +266,19 @@ public abstract class RegistreAccesEntity {
 		return null;
 	}
 
+	@Operation(translated = "findAccessLogByAgentAndSessionIDAndEndDate2")
+	@DaoFinder("select rac\n"
+			+ "from com.soffid.iam.model.AccessLogEntity rac\n"
+			+ "where rac.sessionId=:sessioId and "
+			+ "rac.system = :system and (rac.endDate is null or rac.endDate=:date) and "
+			+ "rac.hostName=:hostName and "
+			+ "rac.tenant.id = :tenantId ")
+	public java.util.List<es.caib.seycon.ng.model.RegistreAccesEntity> findByAgentSessioIdEndDate2(
+			java.lang.String system, java.lang.String sessioId,
+			java.util.Date date, String hostName) {
+		return null;
+	}
+
 	@Operation(translated = "findAccessLogBySessionIDAndStartDate")
 	@DaoFinder("select rac\n"
 			+ "from com.soffid.iam.model.AccessLogEntity rac\n"
@@ -276,6 +289,19 @@ public abstract class RegistreAccesEntity {
 	public java.util.List<es.caib.seycon.ng.model.RegistreAccesEntity> findByAgentSessioIdStartDate(
 			java.lang.String system, java.lang.String sessioId,
 			java.util.Date date, es.caib.seycon.ng.model.MaquinaEntity server) {
+		return null;
+	}
+
+	@Operation(translated = "findAccessLogBySessionIDAndStartDate2")
+	@DaoFinder("select rac\n"
+			+ "from com.soffid.iam.model.AccessLogEntity rac\n"
+			+ "where rac.sessionId=:sessioId and "
+			+ "rac.system = :system and (rac.startDate=:date) and "
+			+ "rac.hostName=:hostName and "
+			+ "rac.tenant.id = :tenantId ")
+	public java.util.List<es.caib.seycon.ng.model.RegistreAccesEntity> findByAgentSessioIdStartDate2(
+			java.lang.String system, java.lang.String sessioId,
+			java.util.Date date, String hostName) {
 		return null;
 	}
 

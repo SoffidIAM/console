@@ -145,6 +145,14 @@
 							disabled="${!canModifyMetadata}"
 							onSelect='ref:frame.onChangeDataType(self)' />
 				</div>
+				<customfield3 label="${c:l('dadesAddicionals.zul.Hint')}" dataType="STRING"
+							maxlength="128"
+							bind="hint"
+							readonly="${!canModifyMetadata}" onChange="" />
+				<customfield3 label="${c:l('dadesAddicionals.zul.Description')}" dataType="STRING" multiline="true"
+							maxlength="512"
+							bind="description"
+							readonly="${!canModifyMetadata}" onChange="" />
 				<customfield3 label="${c:l('dadesAddicionals.zul.Required')}" dataType="BOOLEAN" 
 						bind="@required" disabled="${!canModifyMetadata}" />
 				<customfield3 label="${c:l('dadesAddicionals.zul.IncludeInSearch')}" dataType="BOOLEAN"

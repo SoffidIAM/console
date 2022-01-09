@@ -75,6 +75,11 @@ public class TipusDada {
 	@Description("Key of the localized label for this data type")
 	public String nlsLabel;
 	
+	@Description("Attribute description")
+	@Attribute (multiline = true)
+	@Nullable
+	public String description;
+
 	@Nullable
 	@Description("List of allowed values")
 	@Attribute(defaultValue="new java.util.LinkedList<String>()")

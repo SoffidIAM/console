@@ -371,6 +371,8 @@ public class InputField3 extends Databox
 						setPlaceholder(dataType.getLabel());
 				}
 			}
+			if (dataType.getHint() != null && ! dataType.getHint().isEmpty())
+				setPlaceholder(dataType.getHint());
 			if (dataType.getSize() != null)
 				setMaxlength(dataType.getSize());
 			setReadonly(this.readonly || dataType.isReadOnly());

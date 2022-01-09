@@ -126,6 +126,11 @@ public abstract class TipusDadaEntity {
 	@Nullable
 	public Boolean unique;
 	
+	@Description("Attribute description")
+	@Column (name="TDA_DESCRI", length=512)
+	@Nullable
+	public String description;
+	
 	
 	@Description("Object type acting as owner of the attribute")
 	@Column (name="TDA_COT_ID", reverseAttribute="attributes", composition=true)

@@ -796,14 +796,8 @@ public class Security {
 		{
 			if ( isTrusted (ip, trustedProxies) )
 			{
-				if (forwardedFor == null || forwardedFor.trim().isEmpty())
+				if (forwardedFor == null && !forwardedFor.trim().isEmpty())
 				{
-					try {
-						ip = InetAddress.getLocalHost().getHostAddress();
-					} catch (UnknownHostException e) {
-						ip = "127.0.0.1" ;
-					}
-				} else {
 					String[] ff = forwardedFor.split("[ ,]+");
 					for (int i = ff.length - 1; i >= 0; i--)
 					{

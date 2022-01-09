@@ -226,7 +226,10 @@ public class Config {
         if (isServer()) {
         	if ( lastServerLookup + 10000 < System.currentTimeMillis()) // 10 seconds cache
         	{
-        		serverListCache = serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
+        		String serverList = serverService.getConfig("seycon.server.list"); //$NON-NLS-1$
+        		if (!serverList.equals(serverListCache)) {
+        			serverListCache = serverList;
+        		}
         		lastServerLookup = System.currentTimeMillis();
         	}
         	return serverListCache;

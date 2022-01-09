@@ -5,7 +5,7 @@
 	<html><![CDATA[
   		<p style="height:100px; "/>
 	<div style="margin-left:auto; margin-right: auto; width:40em; text-align:center; margin-top:auto; margin-bottom:auto; min-height:10em; vertical-align:middle;">
-       	<p><img src="${execution.contextPath }/anonymous/logo.png" alt="Soffid logo" /> </p> 
+       	<p><img src="${execution.contextPath }/anonymous/logo - iam-orig.svg" alt="Soffid logo" /> </p> 
   			<p style="height:20px; "/>
        	<p>Our apologies</p>
   			<p style="height:20px; "/>

@@ -3,6 +3,7 @@ package com.soffid.iam.web.popup;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,22 +47,41 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 		if (c instanceof DynamicColumnsDatatable) {
 			DynamicColumnsDatatable src = (DynamicColumnsDatatable) c;
 			table = true;
-			cols = src.getAllColumns();
-			positions = new int[cols.length()];
-			for (int i = 0; i < positions.length; i++) positions[i] = i;
-	
-			for (int i = 0; i < cols.length(); i++) 
-			{
+			JSONArray srccols = src.getAllColumns();
+			cols = new JSONArray();
+			JSONArray cols2 = new JSONArray( src.getColumns() );
+			
+			HashSet<String> colNames = new HashSet();
+			for (int i = 0; i < cols2.length(); i++) {
 				JSONObject o = new JSONObject();
-				JSONObject colDef = cols.getJSONObject(i);
+				JSONObject colDef = cols2.getJSONObject(i);
 				if (colDef.optString("name", null) != null) {
 					o.put("name", colDef.getString("name"));
 					o.put("sort", false);
-					if (colDef.optBoolean("enabled"))
-						selected.add(new Integer(i));
+					selected.add(new Integer(data.length()));
 					data.put(o);
+					colNames.add(colDef.getString("name"));
+					cols.put(colDef);
+				}				
+			}
+	
+			
+			for (int i = 0; i < srccols.length(); i++) 
+			{
+				JSONObject o = new JSONObject();
+				JSONObject colDef = srccols.getJSONObject(i);
+				if (colDef.optString("name", null) != null &&
+						!colNames.contains(colDef.getString("name"))) {
+					o.put("name", colDef.getString("name"));
+					o.put("sort", false);
+					data.put(o);
+					cols.put(colDef);
 				}
 			}
+			
+			positions = new int[cols.length()];
+			for (int i = 0; i < positions.length; i++) positions[i] = i;
+			
 		} else {
 			table = false;
 			DataTree2 src = (DataTree2) c;

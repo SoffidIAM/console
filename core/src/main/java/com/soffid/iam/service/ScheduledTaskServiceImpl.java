@@ -206,7 +206,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 			Collections.sort(l, new Comparator<ScheduledTaskLogEntity>() {
 				@Override
 				public int compare(ScheduledTaskLogEntity o1, ScheduledTaskLogEntity o2) {
-					return o1.getTime().compareTo(o2.getTime());
+					return - o1.getTime().compareTo(o2.getTime());
 				}
 			});
 			while ( l.size() >= max) {

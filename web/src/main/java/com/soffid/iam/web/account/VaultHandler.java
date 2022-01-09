@@ -87,6 +87,8 @@ public class VaultHandler extends FrameHandler {
 				getFellow("folder_acl2").setVisible(owner && !instance.getFolder().isPersonal());
 				getFellow("folder_acl3").setVisible(owner && !instance.getFolder().isPersonal());
 				getFellow("folder_acl4").setVisible(owner && !instance.getFolder().isPersonal());
+				getFellow("deleteAccountButton").setVisible(false);
+				getFellow("updatePasswordButton").setVisible(false);
 			} else {
 				updateAccountIcons();
 			}
@@ -110,7 +112,11 @@ public class VaultHandler extends FrameHandler {
 			getFellow("set_password_button").setVisible(false);
 			getFellow("unlock_button").setVisible(true);
 			getFellow("view_password_button").setVisible(true);
+			getFellow("deleteAccountButton").setVisible(accessLevel == AccountAccessLevelEnum.ACCESS_OWNER);
+			getFellow("updatePasswordButton").setVisible(accessLevel == AccountAccessLevelEnum.ACCESS_OWNER || accessLevel == AccountAccessLevelEnum.ACCESS_MANAGER);
 		} else {
+			getFellow("deleteAccountButton").setVisible(accessLevel == AccountAccessLevelEnum.ACCESS_OWNER);
+			getFellow("updatePasswordButton").setVisible(accessLevel == AccountAccessLevelEnum.ACCESS_OWNER || accessLevel == AccountAccessLevelEnum.ACCESS_MANAGER);
 			getFellow("set_password_button").setVisible(accessLevel == AccountAccessLevelEnum.ACCESS_MANAGER || accessLevel == AccountAccessLevelEnum.ACCESS_OWNER);
 			getFellow("unlock_button").setVisible(false);
 			getFellow("view_password_button").setVisible(

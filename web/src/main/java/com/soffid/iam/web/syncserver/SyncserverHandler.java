@@ -307,7 +307,7 @@ public class SyncserverHandler extends FrameHandler {
 								EJBLocator.getSyncServerService().cancelTask(id);
 								getFellow("taskWindow").setVisible(false);
 								if (getFellow("agentWindow").isVisible()) {
-									DataTable dt = ((DataTable) getFellow("taskWindow").getFellow("table"));
+									DataTable dt = ((DataTable) getFellow("agentWindow").getFellow("table"));
 									currentAgentTasks.remove(dt.getSelectedIndex());
 									dt.delete();
 								}

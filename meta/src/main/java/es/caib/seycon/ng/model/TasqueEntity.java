@@ -178,6 +178,13 @@ public abstract class TasqueEntity {
 
 	@DaoFinder("select count(*) \n"
 			+ "from com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server = :server and tasques.serverInstance=:serverInstance and tasques.tenant.id = :tenantId " )
+	public Long countTasksByServerInstance(String server, String serverInstance) {
+		return null;
+	}
+
+	@DaoFinder("select count(*) \n"
+			+ "from com.soffid.iam.model.TaskEntity tasques\n"
 			+ "where tasques.server is null and tasques.tenant.id = :tenantId " )
 	public Long countUnscheduledTasks() {
 		return null;

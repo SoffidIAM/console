@@ -132,6 +132,12 @@ public class TenantDataManager {
 					" WHERE RGR_TEN_ID=${tenantId}",
 				"SC_SERINS",
 					" WHERE 0=1", // Do not export
+				"SC_TENSER",
+					" WHERE 0=1", // Do not export
+				"SC_SERVER",
+					" WHERE 0=1", // Do not export
+				"SC_SRVCER",
+					" WHERE 0=1", // Do not export
 				"SC_USUPRO",
 					"WHERE UPR_IDPROC IN (SELECT JBPM_MODULEINSTANCE.PROCESSINSTANCE_ FROM  JBPM_MODULEINSTANCE "
 						+ "WHERE JBPM_MODULEINSTANCE.TENANT_=${tenantId})"

@@ -50,9 +50,12 @@ import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.AccountAttributeEntityDaoImpl;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
+import com.soffid.iam.model.AccountEntityDaoImpl;
 import com.soffid.iam.model.AccountMetadataEntity;
+import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.Parameter;
@@ -455,28 +458,30 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		HashSet<String> keys = new HashSet<String>();
 		for (String key: app.getAttributes().keySet() )
 		{
-			Object v = app.getAttributes().get(key);
-			if (v == null)
-			{
-				// Do nothing
-			}
-			else
-			{
-				AccountMetadataEntity metadata = findMetadata (entity, key);
-				if (v instanceof Collection)
+			if (!key.equals(AccountEntityDaoImpl.PREVIOUS_STATUS_ATTRIBUTE)) {
+				Object v = app.getAttributes().get(key);
+				if (v == null)
 				{
-					Collection l = (Collection) v;
-					for (Object o: (Collection) v)
-					{
-						if (o != null)
-						{
-							updateAccountAttribute(entity, entities, key, metadata, o);
-						}
-					}
+					// Do nothing
 				}
 				else
 				{
-					updateAccountAttribute(entity, entities, key, metadata, v);
+					AccountMetadataEntity metadata = findMetadata (entity, key);
+					if (v instanceof Collection)
+					{
+						Collection l = (Collection) v;
+						for (Object o: (Collection) v)
+						{
+							if (o != null)
+							{
+								updateAccountAttribute(entity, entities, key, metadata, o);
+							}
+						}
+					}
+					else
+					{
+						updateAccountAttribute(entity, entities, key, metadata, v);
+					}
 				}
 			}
 		}
@@ -505,6 +510,29 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					}
 				}
 			}
+		}
+		
+		byte[] previousStatus = (byte[]) app.getAttributes().get(AccountEntityDaoImpl.PREVIOUS_STATUS_ATTRIBUTE);
+		if (previousStatus != null) {
+			if (entity.getSnapshot() == null) {
+				AccountSnapshotEntity s = getAccountSnapshotEntityDao().newAccountSnapshotEntity();
+				s.setData(previousStatus);
+				getAccountSnapshotEntityDao().create(s);
+				entity.setSnapshot(s);
+				getAccountEntityDao().update(entity);
+			} else {
+				entity.getSnapshot().setData(previousStatus);
+				getAccountSnapshotEntityDao().update(entity.getSnapshot());
+			}
+			app.setHasSnapshot(true);
+		}
+		else if (entity.getSnapshot() != null)
+		{
+			AccountSnapshotEntity s = entity.getSnapshot();
+			entity.setSnapshot(null);
+			getAccountEntityDao().update(entity);
+			getAccountSnapshotEntityDao().remove(s);
+			app.setHasSnapshot(false);
 		}
 	}
 
@@ -1498,6 +1526,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			String url, String auth) throws IOException, InternalErrorException {
         RemoteServiceLocator rsl = new RemoteServiceLocator(url);
         rsl.setAuthToken(auth);
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
 		SyncStatusService sss = rsl.getSyncStatusService();
 		Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
 		if (p != null) {
@@ -1658,6 +1687,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		try {
 		    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
 		    rsl.setAuthToken(auth);
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
 		    sss = rsl.getSyncStatusService();
 		} catch (Exception e) {
 			log.warn("Error sending password", e);
@@ -1830,6 +1860,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	private UserEntity getUserForAccount(AccountEntity acc) {
 		UserEntity ue = null;
 		if (acc.getType().equals(AccountType.USER))
+		{
+			for (UserAccountEntity uae: acc.getUsers())
+			{
+				ue = uae.getUser();
+			}
+		}
+		else
 		{
 			for (UserAccountEntity uae: acc.getUsers())
 			{
@@ -2793,6 +2830,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	public PasswordValidation getAccountSynchronizationStatus(Account account, String url, String auth) throws IOException, InternalErrorException {
 		RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
 		rsl.setAuthToken(auth);
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
 		SyncStatusService sss = rsl.getSyncStatusService();
 		PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
 		if (status != null) {
@@ -3028,5 +3066,21 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (entity == null)
 			return null;
 		return getHostServiceEntityDao().toHostServiceList(entity.getServices());
+	}
+
+	@Override
+	protected Account handleRemoveAccountSnapshot(Account account) throws Exception {
+		AccountEntity ae = getAccountEntityDao().load(account.getId());
+		if (ae.getSnapshot() != null) {
+			AccountSnapshotEntity s = ae.getSnapshot();
+			ae.setSnapshot(null);
+			getAccountEntityDao().update(ae);
+			getAccountSnapshotEntityDao().remove(s);
+		}
+		AccountAttributeEntity l = getAccountAttributeEntityDao().findByName(ae.getSystem().getName(), ae.getName(), AccountEntityDaoImpl.PREVIOUS_STATUS_ATTRIBUTE);
+		if (l != null)
+			getAccountAttributeEntityDao().remove(l);
+		account.setHasSnapshot(false);
+		return account;
 	}
 }

@@ -112,7 +112,7 @@ public class PluginHandler extends FrameHandler {
     			{
     				if (event.getName() == "onYes") //$NON-NLS-1$
     				{
-    					createFileToResetConsole();
+    					new Thread(createFileToResetConsole).start();;
     					showRefreshPopup();
     				}
     			}
@@ -124,27 +124,36 @@ public class PluginHandler extends FrameHandler {
      * to force the restart server process.
      * @throws IOException
      */
-	private void createFileToResetConsole() throws IOException
-	{
-		String fileName = "reset console.txt"; //$NON-NLS-1$
-		String fileContent = "File to check reset console"; //$NON-NLS-1$
-		File file = new File(fileName);
-		FileWriter wr = null;
-		String home = System.getProperty ("catalina.home"); //$NON-NLS-1$
-		File addonFolder = new File(new File(home, "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
-
-		try
-		{
-			addonFolder.mkdirs();
-			file = new File(addonFolder, fileName);
-			wr = new FileWriter(file, true);
-			wr.write(fileContent);
+	static final Runnable createFileToResetConsole = new Runnable() {
+		public void run() {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e1) {
+			}
+			String fileName = "reset console.txt"; //$NON-NLS-1$
+			String fileContent = "File to check reset console"; //$NON-NLS-1$
+			File file = new File(fileName);
+			FileWriter wr = null;
+			String home = System.getProperty ("catalina.home"); //$NON-NLS-1$
+			File addonFolder = new File(new File(home, "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			try {
+				try
+				{
+					addonFolder.mkdirs();
+					file = new File(addonFolder, fileName);
+					wr = new FileWriter(file, true);
+					wr.write(fileContent);
+				}
+				finally
+				{
+					if (wr != null) wr.close();
+				}
+			}
+			catch (Exception e) {
+			}
 		}
-		finally
-		{
-			if (wr != null) wr.close();
-		}
-    }
+	};
 	
 	private void showRefreshPopup() throws InterruptedException
 	{

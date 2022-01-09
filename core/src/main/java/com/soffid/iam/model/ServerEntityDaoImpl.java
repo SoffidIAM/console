@@ -45,6 +45,7 @@ public class ServerEntityDaoImpl
             }
         }
        	target.setBackupDatabase(null);
+       	target.setPublicUrl(source.getUrl());
     }
 
 
@@ -82,6 +83,7 @@ public class ServerEntityDaoImpl
 			n.setDiscoveryServer(null);
 			getNetworkEntityDao().update(n);
 		}
+		getServerCertificateEntityDao().remove(entity.getCertificates());
 		getServerInstanceEntityDao().remove(entity.getInstances());
 		super.remove(entity);
 	}

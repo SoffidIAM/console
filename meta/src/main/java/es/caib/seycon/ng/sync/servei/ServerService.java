@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.sync.servei;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.Server;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.AuditoriaEntity;
+import es.caib.seycon.ng.model.ServerCertificateEntity;
 import es.caib.seycon.ng.model.ServerEntity;
 import es.caib.seycon.ng.model.ServerInstanceEntity;
 import es.caib.seycon.ng.model.TasqueEntity;
@@ -71,9 +74,10 @@ import org.springframework.transaction.annotation.Transactional;
 	UsuariService.class,
 	PasswordService.class,
 	CustomObjectService.class,
-	ServerEntity.class,
+	ServerEntity.class, ServerCertificateEntity.class,
 	ServerInstanceEntity.class,
 	AttributeTranslationService.class,
+	AuditoriaEntity.class,
 	AuthoritativeChangeService.class})
 public abstract class ServerService {
 
@@ -323,7 +327,7 @@ public abstract class ServerService {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void cancelTask(
-		long taskid)
+		long taskid, String taskHash)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -490,7 +494,7 @@ public abstract class ServerService {
 
 	@Description("Updates Soffid image of the reconciled account. Only triggers a UpdateUser for user accounts with new or removed roles.")
 	public void reconcileAccount(Account account, @Nullable List<RolAccount> grants) {};
+	
+	public void addCertificate(X509Certificate cert) {};
 
-	@Description("Registers a kubernetes sync server instance")
-	public void registerServerInstance(String name, String url) {};
 }

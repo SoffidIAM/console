@@ -13,7 +13,10 @@
  */
 package com.soffid.iam.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -74,6 +77,7 @@ import com.soffid.iam.model.ObjectMappingTriggerEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.model.ReconcileTriggerEntityDao;
 import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.ServerCertificateEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
 import com.soffid.iam.model.SystemEntity;
@@ -1957,4 +1961,33 @@ public class DispatcherServiceImpl extends
 	protected String handleStartVirtualSourceTransaction(boolean readonly, String server) throws Exception {
 		return getTaskEntityDao().startVirtualSourceTransaction(readonly, server);
 	}
+
+	@Override
+	protected void handleAddCertificate(Server server, X509Certificate cert) throws Exception {
+		ServerEntity serverEntity = getServerEntityDao().load(server.getId());
+		
+		if (serverEntity != null) {
+			ServerCertificateEntity certEntity = getServerCertificateEntityDao().newServerCertificateEntity();
+			certEntity.setServer(serverEntity);
+			certEntity.setSince(cert.getNotBefore());
+			certEntity.setUntil(cert.getNotAfter());
+			certEntity.setCert(cert.getEncoded());
+			getServerCertificateEntityDao().create(certEntity);
+		}
+	}
+
+	@Override
+	protected List<X509Certificate> handleFindValidCertificates() throws Exception {
+		List<X509Certificate> certs = new LinkedList<>();
+		CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+		Date now = new Date();
+		for (ServerCertificateEntity entity: getServerCertificateEntityDao().loadAll()) {
+			if (now.after(entity.getSince()) && now.before(entity.getUntil())) {
+				X509Certificate cert = (X509Certificate)certFactory.generateCertificate(new ByteArrayInputStream(entity.getCert()));
+				certs.add(cert);
+			}
+		}
+		return certs;
+	}
+
 }

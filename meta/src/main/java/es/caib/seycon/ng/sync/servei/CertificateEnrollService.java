@@ -7,6 +7,9 @@
 package es.caib.seycon.ng.sync.servei;
 import com.soffid.mda.annotation.*;
 
+import java.security.cert.X509Certificate;
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service ( serverOnly=true,
@@ -27,6 +30,18 @@ public abstract class CertificateEnrollService {
 		@Nullable java.lang.String domain, 
 		java.lang.String hostName, 
 		java.security.PublicKey key)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return 0;
+	}
+	
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public long createRequest(
+		@Nullable java.lang.String tenant, 
+		java.lang.String user, 
+		java.lang.String password, 
+		@Nullable java.lang.String domain, 
+		java.lang.String hostName, 
+		X509Certificate cert)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return 0;
 	}
@@ -68,6 +83,11 @@ public abstract class CertificateEnrollService {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.security.cert.X509Certificate getRootCertificate()
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public List<java.security.cert.X509Certificate> getCertificates()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}

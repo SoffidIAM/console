@@ -99,4 +99,5 @@ public class SeyconKeyStore {
     public static final String ROOT_KEY = "rootKey"; //$NON-NLS-1$
     public static final String MY_KEY = "myKey"; //$NON-NLS-1$
     public static final String ROOT_CERT = "rootCert"; //$NON-NLS-1$
+	public static final String NEXT_CERT = "nextCert";
 }

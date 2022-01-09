@@ -2,6 +2,7 @@ package com.soffid.iam.ssl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,6 +16,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
@@ -30,7 +32,12 @@ import com.soffid.iam.api.Password;
 
 public class ConnectionFactory {
     private static SSLSocketFactory sslFactory = null;
-
+    private static TrustedCertificateLoader loader = null;
+    
+    public static void setTrustedCertificateLoader(TrustedCertificateLoader loader) {
+    	ConnectionFactory.loader = loader;
+    }
+    
     private static KeyManager[] getKeyManagers(KeyStore ks)
             throws KeyStoreException,
             NoSuchAlgorithmException, UnrecoverableKeyException, FileNotFoundException, IOException {
@@ -53,6 +60,26 @@ public class ConnectionFactory {
         File file = SeyconKeyStore.getKeyStoreFile();
         KeyStore ks = SeyconKeyStore.loadKeyStore(file);
 
+        if (loader != null) {
+        	List<X509Certificate> certs = loader.loadCerts(ks);
+        	if (certs != null) {
+    			for (Enumeration<String> e =  ks.aliases(); e.hasMoreElements();) {
+    				String alias = e.nextElement();
+    				if (alias.startsWith("trusted-")) {
+    					ks.deleteEntry(alias);
+    				}
+    			}
+    			int i = 0;
+    			for (X509Certificate trustedCert: certs) {
+    				ks.setCertificateEntry("trusted-"+i, trustedCert);
+    				i ++;
+    			}
+    			if (file != null) {
+    				Password password = SeyconKeyStore.getKeyStorePassword();
+    				ks.store( new FileOutputStream ( file ), password.getPassword().toCharArray());
+    			}
+        	}
+        }
         for (Enumeration<String> e = ks.aliases(); e.hasMoreElements(); ) {
         	String key = e.nextElement();
         	if ( !key.equalsIgnoreCase(SeyconKeyStore.MY_KEY) && ks.isKeyEntry(key) )
@@ -64,7 +91,6 @@ public class ConnectionFactory {
         ctx.init(getKeyManagers(ks), getTrustManagers(ks), null);
 
         sslFactory = ctx.getSocketFactory();
-
     }
 
     public static void reloadKeys () throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException

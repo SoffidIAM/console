@@ -49,7 +49,14 @@ public class RemoteInvokerFactory {
             Locale locale = MessageFactory.getLocale();
             if (locale != null)
             	c.addRequestProperty("Accept-Language", locale.toString());
-            c.connect();
+            try {
+            	c.connect();
+            } catch (IOException e) {
+            	try {
+            		ConnectionFactory.reloadKeys();
+            	} catch (Exception e2) {}
+            	throw e;
+            }
             
             // Consumir el stream
             InputStream in = c.getInputStream();

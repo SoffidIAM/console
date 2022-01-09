@@ -11,9 +11,15 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CRL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 /**
@@ -33,11 +39,18 @@ public class SeyconTrustManager implements X509TrustManager {
      * @see javax.net.ssl.X509TrustManager#getAcceptedIssuers()
      */
     public X509Certificate[] getAcceptedIssuers() {
-        if (trustedCert != null)
-            return new X509Certificate[] { trustedCert };
-        else
-            return new X509Certificate[0];
-
+    	try {
+			List<X509Certificate> certs = new LinkedList<>();
+			for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+				String alias = e.nextElement();
+				X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+				if (cert != null)
+					certs.add(cert);
+			}
+			return certs.toArray(new X509Certificate[certs.size()]);
+		} catch (KeyStoreException e) {
+			return new X509Certificate[0];
+		}
     }
 
     /*
@@ -46,23 +59,33 @@ public class SeyconTrustManager implements X509TrustManager {
      * @see javax.net.ssl.X509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[],
      *      java.lang.String)
      */
-    public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+    public void checkServerTrusted(X509Certificate[] certs, String arg1)
             throws CertificateException {
-        X509Certificate cert = arg0[0];
         try {
+    		for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+    			String alias = e.nextElement();
+    			X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+    			if (cert != null && cert.equals(certs[0]))
+    				return; // Knwon certificate
+    		}
             if (trustedCert != null)
-                cert.verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
+                certs[0].verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
         } catch (Exception e) {
             throw new CertificateException(e);
         }
     }
 
-    public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+    public void checkClientTrusted(X509Certificate[] certs, String arg1)
             throws CertificateException {
-        X509Certificate cert = arg0[0];
         try {
+    		for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+    			String alias = e.nextElement();
+    			X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+    			if (cert != null && cert.equals(certs[0]))
+    				return; // Knwon certificate
+    		}
             if (trustedCert != null)
-                cert.verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
+                certs[0].verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
         } catch (Exception e) {
             throw new CertificateException(e);
         }
@@ -75,6 +98,5 @@ public class SeyconTrustManager implements X509TrustManager {
         trustedCert = (X509Certificate) ks
                 .getCertificate("rootKey"); //$NON-NLS-1$
     }
-
 
 }

@@ -875,8 +875,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				+ "left join usuari.mailDomain as dominiCorreu " //$NON-NLS-1$
 				+ "left join usuari.userType as tipusUsuariDomini "; //$NON-NLS-1$
 		if (dni != null) {
-			query += "left join usuari.dadaUsuari as dadaUsuari " //$NON-NLS-1$
-					+ "left join dadaUsuari.tipusDada as tipusDada "; //$NON-NLS-1$
+			query += "left join usuari.userData as dadaUsuari " //$NON-NLS-1$
+					+ "left join dadaUsuari.dataType as tipusDada "; //$NON-NLS-1$
 		}
 		query += "where usuari.tenant.id=:tenantId and " //$NON-NLS-1$
 				+ "(:codi is null or usuari.userName like :codi) and (:nom is null or upper(usuari.userName) like upper(:nom)) and " //$NON-NLS-1$
@@ -894,7 +894,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				+ "(:codiGrupPrimari is null or grupPrimari.name like :codiGrupPrimari) and " //$NON-NLS-1$
 				+ "(:dominiCorreu is null or dominiCorreu.name like :dominiCorreu) "; //$NON-NLS-1$
 		if (dni != null) {
-			query += " and (dadaUsuari.valorDada like :dni and tipusDada.name = 'NIF') "; //$NON-NLS-1$
+			query += " and (dadaUsuari.value like :dni and tipusDada.name = 'NIF') "; //$NON-NLS-1$
 		}
 		if (grupSecundari != null) {
 			query += " and usuari.id in " //$NON-NLS-1$

@@ -288,14 +288,14 @@
 		</popup>
 		<div style="margin: 2em">
 			<div>
-				<label value="${c:l('com.soffid.iam.api.Account.loginName') } : " sclass="label" />
+				<label value="${c:l('com.soffid.iam.api.Account.loginName') } : " sclass="label" style="width: 250px"/>
 				<textbox bind="/listbox:/account/@loginName" disabled="true" readonly="true" />
 				<textbox bind="/listbox:/account/@loginName" id="loginName" readonly="true" style="display: none"/>
 				<imageclic src="/img/copy.svg" action="onClick: doCopy('${loginName.uuid}')"
 					title="${c:l('vault.account.copy')}"/>
 			</div>
 			<div>
-				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}" sclass="label"/>
+				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}" sclass="label"  style="width: 250px"/>
 				<textbox readonly="true" 
 					id="fakeqpassword" value="****************"/> 
 				<textbox readonly="true" style="display:none;" 

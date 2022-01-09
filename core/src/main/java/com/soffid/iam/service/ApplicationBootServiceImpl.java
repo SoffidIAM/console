@@ -58,7 +58,9 @@ import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
 import com.soffid.iam.model.AgentDescriptorEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.service.impl.ConsoleTrustedCertificateLoader;
 import com.soffid.iam.service.impl.DatabaseParser;
+import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
@@ -128,6 +130,8 @@ public class ApplicationBootServiceImpl extends
 		ConfigurationCache.setProperty("soffid.ui.wildcards", "auto"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		getCrudRegistryService().registerDefaultHandlers();
+		
+		configureCertificateLoader();
 
 		configureDatabase();
 
@@ -153,6 +157,10 @@ public class ApplicationBootServiceImpl extends
 	}
 
 	
+	private void configureCertificateLoader() {
+		ConnectionFactory.setTrustedCertificateLoader(new ConsoleTrustedCertificateLoader(dispatcherSvc));
+	}
+
 	private void loadServiceHandlers ()
 	{
 		bpmConfigSvc = getBpmConfigService();

@@ -28,6 +28,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class AccountEntityDaoImpl extends
 		com.soffid.iam.model.AccountEntityDaoBase {
+	public static final String PREVIOUS_STATUS_ATTRIBUTE = "$soffid$previous-status";
 	org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(getClass());
 	 
 	private void auditar(String accio, String account, String dispatcher) {
@@ -81,6 +82,10 @@ public class AccountEntityDaoImpl extends
 		entity.getRoles().clear();
         getNetworkDiscoveryAccountEntityDao().remove(entity.getNetworkDiscovery());
         entity.getNetworkDiscovery().clear();
+        if (entity.getSnapshot() != null) {
+        	getAccountSnapshotEntityDao().remove(entity.getSnapshot());
+        	entity.setSnapshot(null);
+        }
 		try {
 			getAuditEntityDao().unlinkAccounts(entity);
 		} catch (InternalErrorException e) {
@@ -117,6 +122,7 @@ public class AccountEntityDaoImpl extends
 			target.setPasswordStatus(source.getPasswordStatus() == null ? 
 				null:
 				PasswordValidation.valueOf(source.getPasswordStatus()));
+			target.setHasSnapshot(source.getSnapshot() != null);
 			Collection<String> grups = new LinkedList<String>();
 			Collection<String> roles = new LinkedList<String>();
 			Collection<String> usuaris = new LinkedList<String>();
@@ -208,6 +214,9 @@ public class AccountEntityDaoImpl extends
 				{
 					attributes.put(att.getMetadata().getName(),att.getObjectValue());
 				}
+			}
+			if (source.getSnapshot() != null && Security.isSyncServer()) {
+				attributes.put(PREVIOUS_STATUS_ATTRIBUTE, source.getSnapshot().getData());
 			}
 			for (Object o: attributes.values())
 			{
@@ -327,6 +336,7 @@ public class AccountEntityDaoImpl extends
 		target.setLoginUrl(entry.account.getLoginUrl());
 		target.setServerName(entry.account.getServerName());
 		target.setServerType(entry.account.getServerType());
+		target.setHasSnapshot(entry.account.isHasSnapshot());
 		String currentUser = Security.getCurrentAccount();
 		if (entry.ownerAcl.contains(currentUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);

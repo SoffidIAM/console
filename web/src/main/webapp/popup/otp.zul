@@ -12,7 +12,7 @@
 			</div>
 			<div align="center" height="4em" >
 				<label sclass="label" 
-						value="${arg.handler.challenge.cardNumber}">
+						value="${arg.handler.challenge.cardNumber} ${arg.handler.challenge.cell}:">
 				</label>
 				<textbox type="password" width="18em" id="password"
 						onOK="ref:w.onSetPassword();">

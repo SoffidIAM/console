@@ -485,36 +485,41 @@ public class RoleAccountEntityDaoImpl
 		if (tipusDomini.compareTo(TipusDomini.DOMINI_APLICACIO) == 0  ||
 				TipusDomini.CUSTOM.equals(tipusDomini)) {
 			DomainValueEntity valorDominiEntity = sourceEntity.getDomainValue();
-			DomainValue valorDomini = getDomainValueEntityDao().toDomainValue(
-					valorDominiEntity);
-			targetVO.setDomainValue(valorDomini);
+			if (valorDominiEntity != null) {
+				DomainValue valorDomini = getDomainValueEntityDao().toDomainValue(
+						valorDominiEntity);
+				targetVO.setDomainValue(valorDomini);
+			}
 		} else if (tipusDomini.compareTo(TipusDomini.GRUPS) == 0
 				|| tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0  ||
 						TipusDomini.GROUPS.equals(tipusDomini)  ||
 						TipusDomini.MEMBERSHIPS.equals(tipusDomini)) {
-			DomainValue valorDomini = new DomainValue();
-			valorDomini
-					.setDescription(sourceEntity.getGroup().getDescription());
-			if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0 ||
-					TipusDomini.MEMBERSHIPS.equals(tipusDomini) ) {
-				valorDomini.setExternalCodeDomain(usuariEntity == null ? null
-						: usuariEntity.getUserName());
-				valorDomini.setDomainName(TipusDomini.MEMBERSHIPS);
-			} else {
-				valorDomini.setExternalCodeDomain(null);
-				valorDomini.setDomainName(TipusDomini.GROUPS);
+			if (sourceEntity.getGroup() != null) {
+				DomainValue valorDomini = new DomainValue();
+				valorDomini.setDescription(sourceEntity.getGroup().getDescription());
+				if (tipusDomini.compareTo(TipusDomini.GRUPS_USUARI) == 0 ||
+						TipusDomini.MEMBERSHIPS.equals(tipusDomini) ) {
+					valorDomini.setExternalCodeDomain(usuariEntity == null ? null
+							: usuariEntity.getUserName());
+					valorDomini.setDomainName(TipusDomini.MEMBERSHIPS);
+				} else {
+					valorDomini.setExternalCodeDomain(null);
+					valorDomini.setDomainName(TipusDomini.GROUPS);
+				}
+				valorDomini.setValue(sourceEntity.getGroup().getName());
+				targetVO.setDomainValue(valorDomini);
 			}
-			valorDomini.setValue(sourceEntity.getGroup().getName());
-			targetVO.setDomainValue(valorDomini);
 		} else if (tipusDomini.compareTo(TipusDomini.APLICACIONS) == 0 ||
 				TipusDomini.APPLICATIONS.equals(tipusDomini) ) {
-			DomainValue valorDomini = new DomainValue();
-			valorDomini.setExternalCodeDomain(null);
-			valorDomini.setDescription(sourceEntity.getInformationSystem()
-					.getDescription());
-			valorDomini.setDomainName(TipusDomini.APPLICATIONS);
-			valorDomini.setValue(sourceEntity.getInformationSystem().getName());
-			targetVO.setDomainValue(valorDomini);
+			if (sourceEntity.getInformationSystem() != null) {
+				DomainValue valorDomini = new DomainValue();
+				valorDomini.setExternalCodeDomain(null);
+				valorDomini.setDescription(sourceEntity.getInformationSystem()
+						.getDescription());
+				valorDomini.setDomainName(TipusDomini.APPLICATIONS);
+				valorDomini.setValue(sourceEntity.getInformationSystem().getName());
+				targetVO.setDomainValue(valorDomini);
+			}
 		} else if (tipusDomini.compareTo(TipusDomini.SENSE_DOMINI) == 0) {
 			DomainValue valorDomini = new DomainValue();
 			valorDomini.setExternalCodeDomain(null);

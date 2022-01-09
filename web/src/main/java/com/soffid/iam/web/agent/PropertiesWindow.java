@@ -32,7 +32,7 @@ public class PropertiesWindow extends Window implements AfterCompose {
 		org.zkoss.zk.ui.Execution ex = Executions.getCurrent();
 		Map args = ex.getArg();
 		setVariable("objectType", args.get("objectType"), true);
-		setVariable("properties", args.get("properties"), true);
+		setVariable("propertiesFilter", args.get("propertiesFilter"), true);
 
 	}
 
@@ -45,9 +45,9 @@ public class PropertiesWindow extends Window implements AfterCompose {
 		
 		if (properties != null) {
 			HashMap<String,String> m = new HashMap<String,String>();
-			for (int i = 0; i+1 < properties.length; i++)
+			for (int i = 0; i+1 < properties.length; i+=2)
 				m.put(properties[i], properties[i+1]);
-			arg.put("properties", new HashSet<String>(m.keySet()));
+			arg.put("propertiesFilter", new HashSet<String>(m.keySet()));
 			
 			Component listbox = handler.getPage().getFellow("listbox");
 			DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(listbox, "/objectMapping");
@@ -73,7 +73,6 @@ public class PropertiesWindow extends Window implements AfterCompose {
 							mapping2.setProperty(np);
 							mapping2.setValue(m2.get(np));
 							coll2.add(mapping2);
-
 						}
 					}
 				}

@@ -512,7 +512,7 @@ public class AttributeMappingHandler extends DataGrid {
 		Row r = (Row) event.getData();
 		Set<String> filter = (Set<String>) getVariable("propertiesFilter", false);
 		if (filter != null) {
-			String name = (String) XPathUtils.getValue(r, "name");
+			String name = (String) XPathUtils.eval(r, "property");
 			if ( ! filter.contains(name))
 				r.setVisible(false);
 		}

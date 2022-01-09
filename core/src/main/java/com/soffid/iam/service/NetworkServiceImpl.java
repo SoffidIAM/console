@@ -1792,7 +1792,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         if (xarxa == null)
         {
         	String defaultNetwork = ConfigurationCache.getProperty("soffid.network.internet"); //$NON-NLS-1$
-        	if (defaultNetwork != null)
+        	if (defaultNetwork == null)
+        		defaultNetwork = "internet";
+        	if (! "disabled".equals(defaultNetwork))
         	{
         		xarxa = dao.findByName(defaultNetwork);
         		if (xarxa == null)

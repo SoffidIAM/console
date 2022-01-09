@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
+import es.caib.seycon.ng.model.ServerCertificateEntity;
 import roles.agent_create;
 import roles.agent_query;
 import roles.agent_queryObjects;
@@ -57,6 +59,7 @@ import roles.agent_update;
 		AccountMetadataEntity.class, AccountAttributeEntity.class, ScheduledTaskService.class,
 		ObjectMappingTriggerEntity.class, es.caib.seycon.ng.model.ObjectMappingPropertyEntity.class,
 		SeyconServerService.class, AutoritzacioService.class, TenantEntity.class, ReconcileTriggerEntity.class,
+		ServerCertificateEntity.class,
 		AsyncRunnerService.class,
 		HostSystemEntity.class})
 public abstract class DispatcherService {
@@ -293,6 +296,13 @@ public abstract class DispatcherService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	public void addCertificate(es.caib.seycon.ng.comu.Server server, X509Certificate cert)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+
+	public List<X509Certificate> findValidCertificates() {return null;}
 
 	@Operation(grantees = { roles.agent_update.class }, translated = "create")
 	@Transactional(rollbackFor = { java.lang.Exception.class })

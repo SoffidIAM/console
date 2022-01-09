@@ -32,6 +32,7 @@ import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Select;
@@ -325,6 +326,20 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 						dn.delete();
 					return;
 				}
+			}
+		}
+	}
+	
+	public void updateUserType(Event event) {
+		XPathUtils.setValue(getForm(), "@userTypeDescription", "");
+		String userType = (String) XPathUtils.eval(getForm(), "@userType");
+		DataNodeCollection coll = (DataNodeCollection) getModel().getJXPathContext().getValue( "/userTypeAndSelect");
+		for ( int i = 0; i < coll.size(); i++ ) {
+			DataNode dn = (DataNode) coll.getDataModel(i);
+			UserType ut = (UserType) dn.getInstance();
+			if (ut.getName() == null ? userType == null : ut.getName().equals(userType)) {
+				XPathUtils.setValue(getForm(), "@userTypeDescription", ut.getDescription());
+				
 			}
 		}
 	}

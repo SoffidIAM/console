@@ -3,6 +3,7 @@ package com.soffid.iam.web.main;
 import java.io.IOException;
 import java.util.List;
 
+import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
@@ -11,20 +12,36 @@ import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.common.TransactionalTask;
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
 
 public class SearchMenuHandler extends SearchHandler<MenuOption> {
-
 	public void startSearch(String term) throws Exception {
 		super.startSearch(term);
-		List<MenuOption> options = (List<MenuOption>) Sessions.getCurrent().getAttribute("current_menu");
-		if (options == null) {
-			MenuParser menuParser = new MenuParser();
-			options = menuParser.parse("console.yaml");
-			Sessions.getCurrent().setAttribute("current_menu", options);
-		}
-		findMenu (options, term.split(" ,+"));
+		final AsyncList<MenuOption> l = new AsyncList<>();
+		list = l;
+		EJBLocator.getAsyncRunnerService().runTransaction( new TransactionalTask() {
+			@Override
+			public Object run() throws Exception {
+				try {
+					List<MenuOption> options = (List<MenuOption>) Sessions.getCurrent().getAttribute("current_menu");
+					if (options == null) {
+						MenuParser menuParser = new MenuParser();
+						options = menuParser.parse("console.yaml");
+						Sessions.getCurrent().setAttribute("current_menu", options);
+					}
+					findMenu (options, term.split(" ,+"), l);
+				} catch (Exception e) {
+					l.cancel(e);
+				} finally {
+					l.done();
+				}
+				return null;
+			}
+		});
 	}
 	
 		
@@ -60,15 +77,17 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 	}
 
 	
-	public void findMenu(List<MenuOption> options, String terms[]) {
+	public void findMenu(List<MenuOption> options, String terms[], AsyncList<MenuOption> l) {
 		if (options == null || terms == null || terms.length == 0)
 			return;
 		for ( MenuOption option: options)
 		{
+			if (l.isCancelled())
+				return;
 			String s = option.getLiteral() == null ? Labels.getLabel(option.getLabel()) : option.getLiteral();
 			if (matches(terms, s)) 
 			{
-				addElement (option);
+				l.add(option);
 			}
 			if ( loaded >= max) return;
 			List<MenuOption> options2 = option.getOptions();
@@ -76,7 +95,7 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 				options2 = option.getHandler().getOptions(option);
 			}
 			if ( loaded >= max) return;
-			findMenu (options2, terms);
+			findMenu (options2, terms, l);
 		}
 	}
 
@@ -90,12 +109,11 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 		return true;
 	}
 
-
 	@Override
 	protected void addMore() {
-		// TODO Auto-generated method stub
-		
+		Div d = new Div();
+		d.setSclass("search-more");
+		d.appendChild(new Label("..."));
+		parentDiv.appendChild(d);
 	}
-
-
 }

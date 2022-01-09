@@ -21,7 +21,7 @@ public abstract class SearchHandler<E> {
 		AsyncList<E> list = this.list;
 		if (list != null)
 		{
-			if ( loaded < list.size() && loaded <= max ) {
+			if ( loaded < list.size() && loaded < max ) {
 				Iterator<E> iterator = list.iterator();
 				for (int i = 0; i < loaded; i++)
 					iterator.next();

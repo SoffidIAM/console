@@ -36,13 +36,15 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 	}
 
 	public void onChanging(InputEvent inputEvent) throws Exception {
-		for (SearchHandler handler: handlers) {
-			handler.cancelSarch();
-			handler.startSearch(inputEvent.getValue());
+		if (inputEvent.getValue().length() > 2) {
+			for (SearchHandler handler: handlers) {
+				handler.cancelSarch();
+				handler.startSearch(inputEvent.getValue());
+			}
+			timer.start();
+			onTimer(inputEvent);
+			open (inputEvent.getTarget());
 		}
-		timer.start();
-		onTimer(inputEvent);
-		open (inputEvent.getTarget());
 	}
 	
 	public void onTimer (Event event) throws Exception {

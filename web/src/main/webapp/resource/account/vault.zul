@@ -48,24 +48,31 @@
 				maxheight="70vh"
 				onAddFolder="ref:frame.addFolder"
 				onAddAccount="ref:frame.addAccount"
+				onViewPassword="ref:frame.viewPassword2"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">
-				<![CDATA[
-				- path: /vault
-				  icon: #{type=='account'? "/img/account-green.svg": "/img/container-green.svg"}
-				  template: >-
-				    #{type=='account'? (account.loginName == null ? account.name: account.loginName) : folder.name}
-				    #{type=='account' && account.lockedBy != null? c:cat3("<span class='lock'>Locked by ",account.lockedBy,'</span>'): ""}
-				  tail: >-
-				    #{type == 'account' ? '': '
-				    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, &quot;onAddFolder&quot;)">${c:l('vault.createFolder')}</button>
-				    <button class="small-button"onclick="zkDatatree2.sendClientAction(this, &quot;onAddAccount&quot;)">${c:l('vault.createAccount')}</button>
-				    '}
-				  leaf: #{type == 'account'}
-				  columns:
-				  - template: #{type=='account'? account.description: folder.description}
-				  ]]>
-  				</attribute>
+<![CDATA[
+- path: /vault
+  icon: #{type=='account'? "/img/account-green.svg": "/img/container-green.svg"}
+  template: >-
+    #{type=='account'? (account.loginName == null ? account.name: account.loginName) : folder.name}
+    #{type=='account' && account.lockedBy != null? c:cat3("<span class='lock'>Locked by ",account.lockedBy,'</span>'): ""}
+    #{type=='account' && (account.accessLevel == 'O' || account.accessLevel=='M') ?
+    "<div class='tree-icon-button' style='float: right' onclick='zkDatatree2.sendClientAction(this,&quot;onViewPassword&quot;)'>
+    <img class='tree-icon-button button-0' style='padding: 0px' src='${execution.contextPath }/img/search2.svg'/>
+    <img class='tree-icon-button button-1' style='padding: 0px' src='${execution.contextPath }/img/search.svg'/>
+    </div>": "" }
+  tail: >-
+    #{type == 'account' ? '': '
+    <button class="small-button" onclick="zkDatatree2.sendClientAction(this, &quot;onAddFolder&quot;)">${c:l('vault.createFolder')}</button>
+    <button class="small-button"onclick="zkDatatree2.sendClientAction(this, &quot;onAddAccount&quot;)">${c:l('vault.createAccount')}</button>
+    '}
+  leaf: #{type == 'account'}
+  columns:
+  - template: >-
+        #{type=='account'? account.description: folder.description}
+]]>
+		</attribute>
 				<attribute name="columns"><![CDATA[
 				- name: ${c:l('com.soffid.iam.api.Account.description')}
 				]]>

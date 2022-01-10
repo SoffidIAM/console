@@ -516,6 +516,11 @@ public class VaultHandler extends FrameHandler {
 
 	}
 	
+	public void viewPassword2() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
+		getCard().setSclass ( "card" );
+		viewPassword();
+	}
+	
 	public void viewPassword() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
 		Window showPassword = (Window) getFellow("showPassword");
 		((Textbox)showPassword.getFellow("qpassword")).setValue("");

@@ -3032,14 +3032,44 @@ div.datatree div.tree-itemholder {
 }
 	
 div.datatree div.tree-itemholder img.tree-icon,
+div.datatree div.tree-itemholder div.tree-icon-button,
 img.small-icon {
 	width: 1em;
 	height: 1em;
+	display: inline-block;
 	margin-right: 4px;			
 }
 
-div.datatree div.tree-itemholder img.tree-icon {
+div.datatree div.tree-itemholder img.tree-icon, 
+div.datatree div.tree-itemholder div.tree-icon-button {
 	vertical-align: top
+}
+
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button {
+	visibility: visible;
+}
+
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button img.button-0,
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button:hover img.button-1
+{
+	display: none;
+}
+
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button:hover img.button-0,
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button img.button-1
+{
+	display: inline-block;
+}
+
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button img.button-0 {
+	display: none;
+}
+div.datatree div.tree-itemholder div.tree-cell:hover div.tree-icon-button {
+	visibility: visible;
+}
+
+div.datatree div.tree-itemholder div.tree-icon-button {
+	visibility: hidden;
 }
 
 div.datatree div.tree-itemholder.page-down, 

@@ -15,7 +15,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-import org.apache.axis.utils.ByteArrayOutputStream;
 
 public class PluginMerger {
     ServerPluginEntityDao pluginDao;

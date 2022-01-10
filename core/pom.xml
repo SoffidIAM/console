@@ -358,24 +358,9 @@
 			<version>4.5.1</version>
 		</dependency>
 		<dependency>
-			<groupId>axis</groupId>
-			<artifactId>axis</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>commons-discovery</groupId>
 			<artifactId>commons-discovery</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis</groupId>
-			<artifactId>axis-jaxrpc</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.axis</groupId>
-			<artifactId>axis-saaj</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>es.caib.signatura.valcert</groupId>
@@ -385,9 +370,9 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>dom4j</groupId>
+			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
+			<version>2.1.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>xml-apis</groupId>
@@ -614,7 +599,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.10.1</version>
+			<version>3.17</version>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>
@@ -641,12 +626,12 @@
 		<dependency>
     		<groupId>org.bouncycastle</groupId>
     		<artifactId>bcprov-jdk15on</artifactId>
-    		<version>1.51</version>
+    		<version>1.66</version>
 		</dependency>
 		<dependency>
     		<groupId>org.apache.santuario</groupId>
     		<artifactId>xmlsec</artifactId>
-    		<version>2.0.6</version>
+    		<version>2.1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.console</groupId>

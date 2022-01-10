@@ -385,11 +385,6 @@
 			<type>ear</type>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.ddlutils</groupId>
-			<artifactId>ddlutils</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.soffid.iam.bpm</groupId>
 			<artifactId>add-agent-wf</artifactId>
 			<version>1.0.4</version>

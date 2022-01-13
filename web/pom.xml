@@ -152,12 +152,14 @@
 			<version>b9</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+<!-- 
+ 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkiblaf</artifactId>
 			<version>${zkiblaf.version}</version>
 			<type>war</type>
 		</dependency>
+ -->
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>
 			<artifactId>zkiblaf</artifactId>

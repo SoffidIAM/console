@@ -783,15 +783,10 @@ public class Security {
 	{
 		String ip = req.getRemoteAddr();
 		String trustedProxies;
-		try {
-			if ( Config.getConfig().isAgent()) 
-				trustedProxies = System.getProperty("soffid.proxy.trustedIps");
-			else
-				trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
-		} catch (IOException e1) {
-			log.warn("Error getting trusted proxies: ", e1);
-			trustedProxies = null;
-		}
+		if (isSyncProxy()) 
+			trustedProxies = System.getProperty("soffid.proxy.trustedIps");
+		else
+			trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
 		String forwardedFor = req.getHeader("x-forwarded-for");
 //		log.info("trusted proxies = "+trustedProxies);
 		if (trustedProxies != null)

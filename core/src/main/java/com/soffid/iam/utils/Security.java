@@ -789,14 +789,16 @@ public class Security {
 			else
 				trustedProxies = ConfigurationCache.getMasterProperty("soffid.proxy.trustedIps");
 		} catch (IOException e1) {
+			log.warn("Error getting trusted proxies: ", e1);
 			trustedProxies = null;
 		}
 		String forwardedFor = req.getHeader("x-forwarded-for");
+//		log.info("trusted proxies = "+trustedProxies);
 		if (trustedProxies != null)
 		{
 			if ( isTrusted (ip, trustedProxies) )
 			{
-				if (forwardedFor == null && !forwardedFor.trim().isEmpty())
+				if (forwardedFor != null && !forwardedFor.trim().isEmpty())
 				{
 					String[] ff = forwardedFor.split("[ ,]+");
 					for (int i = ff.length - 1; i >= 0; i--)
@@ -815,6 +817,7 @@ public class Security {
 		if (matches == null) parseTrustedIps(trustedProxies);
 		byte[] addrBytes = InetAddress.getByName(ip).getAddress();
 		for (NetmaskMatch m: matches) {
+//			log.info("Checking "+ip+" against "+m.address[0]+"."+m.address[1]+"."+m.address[2]+"."+m.address[3]+"/"+m.bits);
 			if (m.match(addrBytes))
 				return true;
 		}

@@ -175,10 +175,9 @@ public class UploadService {
 			uploadComponentCurrent("jasperreports","jasperreports", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("spring", "1.2.7", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cxf-rt-rs-client", "3.1.10", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("hibernate", "3.2.6.ga", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("commons-collections", "3.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("commons-beanutils", "1.7.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("axis", "1.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("hibernate", "3.2.7.ga", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("commons-collections", "3.2.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("commons-beanutils", "1.9.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("ehcache", "1.2.3", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("cglib", "2.1_3", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("asm", "1.5.3", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -208,12 +207,12 @@ public class UploadService {
 			uploadComponentVersion("opensaml-soap-impl", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("java-support", "7.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("guava", "19.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("joda-time", "2.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("joda-time", "2.9", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("metrics-core", "3.1.2", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("xmlsec", "2.0.6", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("cryptacular", "1.1.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("commons-codec", "1.9", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("bcprov-jdk15on", "1.51", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("xmlsec", "2.1.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("cryptacular", "1.2.4", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("commons-codec", "1.14", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("bcprov-jdk15on", "1.64", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("bcpkix-jdk15on", "1.51", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			uploadComponentForResource("javamail", "javax/mail/Message.class"); //$NON-NLS-1$ //$NON-NLS-2$

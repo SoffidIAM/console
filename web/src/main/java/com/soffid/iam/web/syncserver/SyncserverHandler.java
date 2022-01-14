@@ -68,6 +68,9 @@ public class SyncserverHandler extends FrameHandler {
 		super.afterCompose();
 		
 		refreshPage();
+		
+		Timer t = (Timer) getFellow("timer");
+		t.start();
 	}
 	
 	public void refreshPage() {
@@ -81,7 +84,8 @@ public class SyncserverHandler extends FrameHandler {
 				m.put("id", server.getId());
 				m.put("publicUrl", server.getPublicUrl());
 				
-				Executions.getCurrent().createComponents("/monitor/syncserver-server.zul", div, m);
+				Component c = Executions.getCurrent().createComponents("/monitor/syncserver-server.zul", div, m);
+				c.setAttribute("serverId", server.getId());
 			}
 		} catch (InternalErrorException | NamingException | CreateException e) {
 			throw new UiException (e);
@@ -712,4 +716,42 @@ public class SyncserverHandler extends FrameHandler {
 		hideAllDivs();
 	}
 
+	public void updateServerList(Event event) {
+		Div div = (Div) getFellow("servers");
+		try {
+			final Collection<Server> syncServers = EJBLocator.getSyncServerService().getSyncServers();
+			List<Component> children = new LinkedList<>((List<Component>)div.getChildren());
+			for ( Server server: syncServers) {
+				boolean found = false;
+				for (Component c: children) {
+					if (server.getId().equals(c.getAttribute("serverId"))) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					Map<String, Object> m = new HashMap<>();
+					m.put("url", server.getUrl());
+					m.put("name", server.getName());
+					m.put("id", server.getId());
+					m.put("publicUrl", server.getPublicUrl());
+					Component c = Executions.getCurrent().createComponents("/monitor/syncserver-server.zul", div, m);
+					c.setAttribute("serverId", server.getId());
+				}
+			}
+			for (Component c: children) {
+				boolean found = false;
+				for (Server server: syncServers) {
+					if (server.getId().equals(c.getAttribute("serverId"))) {
+						found = true;
+					}
+				}
+				if (!found)
+					c.detach();
+			}
+		} catch (InternalErrorException | NamingException | CreateException e) {
+			throw new UiException (e);
+		}
+		
+	}
 }

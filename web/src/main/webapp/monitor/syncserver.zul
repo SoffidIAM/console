@@ -15,10 +15,9 @@
 			vertical-align: top;
 		}
 	</style>
-	
+	<timer id="timer" delay="10000" onTimer="ref:frame.updateServerList" repeats="true" />	
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
-	
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 			</div>
 			<div id="servers"/>

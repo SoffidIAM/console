@@ -56,6 +56,7 @@ public class AsyncFileHandler extends java.util.logging.Handler {
 				afh = new org.apache.juli.AsyncFileHandler(directory, prefix, suffix, maxDays );
 			else
 				afh = new org.apache.juli.AsyncFileHandler(directory, prefix+tenant+".", suffix, maxDays );
+			handlers.put(tenant, afh);
 		}
 		return afh;
 	}

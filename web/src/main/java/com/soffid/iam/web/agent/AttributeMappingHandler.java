@@ -226,7 +226,7 @@ public class AttributeMappingHandler extends DataGrid {
 		{
 			String t = (String) XPathUtils.getValue(c, "@soffidCustomObject");
 			((Label)c.getFellow("testRowLabel1")).setValue("Object type: ");
-			((Label)c.getFellow("testRowTextbox1")).setValue (t); 
+			((Textbox)c.getFellow("testRowTextbox1")).setValue (t); 
 			c.getFellow("testRowLabel2").setVisible(true);						
 			c.getFellow("testRowTextbox2").setVisible(true);						
 			((Label)c.getFellow("testRowLabel2")).setValue("Object name: ");						

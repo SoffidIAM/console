@@ -23,7 +23,7 @@
 		maxActive = 50
 		maxIdle = 20
 		maxOpenPreparedStatements = 0
-		maxWaitTime = 30 seconds
+		MaxWaitTime = 5000 millisecond
 		minEvictableIdleTime = 30 minutes
 		minIdle = 0
 		numTestsPerEvictionRun = 3

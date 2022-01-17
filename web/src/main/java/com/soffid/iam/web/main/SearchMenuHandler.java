@@ -15,6 +15,8 @@ import org.zkoss.zul.Label;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.common.TransactionalTask;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
 
@@ -23,10 +25,11 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 		super.startSearch(term);
 		final AsyncList<MenuOption> l = new AsyncList<>();
 		list = l;
-		EJBLocator.getAsyncRunnerService().runTransaction( new TransactionalTask() {
-			@Override
-			public Object run() throws Exception {
+		final SoffidPrincipal principal = Security.getSoffidPrincipal();
+		new Thread (  ) {
+			public void run () {
 				try {
+					Security.nestedLogin(principal);
 					List<MenuOption> options = (List<MenuOption>) Sessions.getCurrent().getAttribute("current_menu");
 					if (options == null) {
 						MenuParser menuParser = new MenuParser();
@@ -34,14 +37,14 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 						Sessions.getCurrent().setAttribute("current_menu", options);
 					}
 					findMenu (options, term.split(" ,+"), l);
-				} catch (Exception e) {
+				} catch (Throwable e) {
 					l.cancel(e);
 				} finally {
+					Security.nestedLogoff();
 					l.done();
 				}
-				return null;
 			}
-		});
+		}.start();
 	}
 	
 		

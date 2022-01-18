@@ -134,6 +134,8 @@ public class MenuParser {
 			if (obj.has("url"))
 			{
 				o.url = obj.getString("url");
+				if (o.url != null && !o.url.trim().isEmpty() && !o.url.startsWith("/"))
+					o.url = "/"+o.url;
 				try {
 					PageDefinition def = Executions.getCurrent().getPageDefinition(o.url);
 					if (def != null)

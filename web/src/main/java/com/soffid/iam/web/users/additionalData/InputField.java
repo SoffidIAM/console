@@ -399,7 +399,7 @@ public class InputField extends Div implements XPathSubscriber
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
 							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
-							sb.append("<imageclic src='/zkau/web/img/grup.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectGroup(event)' onActualitza='self.parent.parent.onActualitzaGroup(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+							sb.append("<imageclic src='/img/group.svg' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectGroup(event)' onActualitza='self.parent.parent.onActualitzaGroup(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openGroup()'/>");
 							sb.append(required+"</div>");
 							result = sb.toString();
@@ -426,7 +426,7 @@ public class InputField extends Div implements XPathSubscriber
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
 							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
-							sb.append("<imageclic src='/zkau/web/img/servidorHome.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectApplication(event)' onActualitza='self.parent.parent.onActualitzaApplication(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+							sb.append("<imageclic src='/img/host.svg' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectApplication(event)' onActualitza='self.parent.parent.onActualitzaApplication(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openApplication()'/>");
 							sb.append(required+"</div>");
 							result = sb.toString();
@@ -453,7 +453,7 @@ public class InputField extends Div implements XPathSubscriber
 							StringBuffer sb = new StringBuffer();
 							sb.append("<div style='display:inline' visible='"+!dualEdit+"'>");
 							sb.append("<textbox sclass='textbox' maxlength='"+size+"' bind='@" + (v2 ? "value": "valorDada") + "' onChange='' onOK='' readonly='"+readonlyExpr+"'/>");
-							sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectCustomObject(event)' onActualitza='self.parent.parent.onActualitzaCustomObject(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
+							sb.append("<imageclic src='/img/search2.svg' visible='"+!dualEdit+"' onClick='self.parent.parent.onSelectCustomObject(event)' onActualitza='self.parent.parent.onActualitzaCustomObject(event)' style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' />");
 							sb.append("<label style='text-decoration:underline; cursor:pointer' onClick='self.parent.parent.openCustomObject()'/>");
 							sb.append(required+"</div>");
 							result = sb.toString();

@@ -235,7 +235,7 @@
 								</row>
 								<row id="groups_row">
 									<input_etiqueta value="${c:l('agents.zul.Grups')}"/>
-									<inputfield
+									<customfield3
 										noLabel="true"
 										dataType="group"
 										bind="@groupsList" 

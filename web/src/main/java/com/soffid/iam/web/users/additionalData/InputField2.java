@@ -1548,7 +1548,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChanging='self.parent.parent.onChanging(event)' " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/img/group.gif' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/group.svg' onClick='self.parent.parent.onSelectGroup(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaGroup(event)' " //$NON-NLS-1$
 							+ "style='margin-left:2px; margin-right:2px; vertical-align:-4px; width:16px' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly  && Security.isUserInRole("group:query"))+"\" />"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1723,7 +1723,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChanging='self.parent.parent.onChanging(event)'  " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/host.svg' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ "onClick='self.parent.parent.onSelectCustomObject(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.onActualitzaCustomObject(event)' " //$NON-NLS-1$
@@ -1737,7 +1737,7 @@ public class InputField2 extends Div implements XPathSubscriber
 							+ "onChanging='self.parent.parent.parent.parent.onChanging(event)'  " //$NON-NLS-1$
 							+ "id=\""+id+"\" "+ph //$NON-NLS-1$ //$NON-NLS-2$
 							+ "readonly='"+readonlyExpr+"'/>"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append("<imageclic src='/zkau/web/img/servidorPerfils.gif' " //$NON-NLS-1$
+					sb.append("<imageclic src='/img/host.svg' " //$NON-NLS-1$
 							+ " visible=\""+(!readonly  && Security.isUserInRole("customObject:query"))+"\" " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ "onClick='self.parent.parent.parent.parent.onSelectCustomObject(event)' " //$NON-NLS-1$
 							+ "onActualitza='self.parent.parent.parent.parent.onActualitzaCustomObject(event)' " //$NON-NLS-1$

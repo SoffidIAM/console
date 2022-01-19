@@ -87,7 +87,7 @@ public class VaultHandler extends FrameHandler {
 				getFellow("folder_acl2").setVisible(owner && !instance.getFolder().isPersonal());
 				getFellow("folder_acl3").setVisible(owner && !instance.getFolder().isPersonal());
 				getFellow("folder_acl4").setVisible(owner && !instance.getFolder().isPersonal());
-				getFellow("deleteAccountButton").setVisible(false);
+				getFellow("deleteAccountButton").setVisible(true);
 				getFellow("updatePasswordButton").setVisible(false);
 			} else {
 				updateAccountIcons();

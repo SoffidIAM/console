@@ -4,20 +4,10 @@
 <frame id="frame" saveContent="false" title="${c:l('seu.pamDashboard')}" width="99%" use="com.soffid.iam.web.component.FrameHandler">
 	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 	</div>
-	<style >
-		iframe { 
-			border:none;
-			width: 400px;
-			height: 400px;
-		}
-	</style>
-		<html>
-		<![CDATA[
-         <iframe src="../graph/graph.html?data=pam_accounts"> </iframe>
-         <iframe src="../graph/graph.html?data=hpa_accounts"> </iframe>
-         <iframe src="../graph/graph.html?data=pam_sessions"> </iframe>
-         <iframe src="../graph/graph.html?data=pam_storage_used"> </iframe>
-         <iframe src="../graph/graph.html?data=pam_storage_free"> </iframe>
-         <iframe src="../graph/graph.html?data=pam_users"> </iframe>
-		]]></html>
+	<graphjs use="com.soffid.iam.web.graph.PamAccountsGraphjs" refresh="60000"/>
+	<graphjs use="com.soffid.iam.web.graph.HpaAccountsGraphjs" refresh="60000"/>
+	<graphjs use="com.soffid.iam.web.graph.PamSessionsGraphjs" refresh="10000"/>
+	<graphjs use="com.soffid.iam.web.graph.PamUsedStorageGraphjs" refresh="300000"/>
+	<graphjs use="com.soffid.iam.web.graph.PamFreeStorageGraphjs" refresh="300000"/>
+	<graphjs use="com.soffid.iam.web.graph.PamUsersGraphjs" refresh="60000"/>
 </frame>

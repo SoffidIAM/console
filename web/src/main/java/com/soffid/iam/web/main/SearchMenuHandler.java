@@ -26,15 +26,15 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 		final AsyncList<MenuOption> l = new AsyncList<>();
 		list = l;
 		final SoffidPrincipal principal = Security.getSoffidPrincipal();
+		List<MenuOption> currentOptions = (List<MenuOption>) Sessions.getCurrent().getAttribute("current_menu");
 		new Thread (  ) {
 			public void run () {
 				try {
 					Security.nestedLogin(principal);
-					List<MenuOption> options = (List<MenuOption>) Sessions.getCurrent().getAttribute("current_menu");
+					List<MenuOption> options = currentOptions;
 					if (options == null) {
 						MenuParser menuParser = new MenuParser();
 						options = menuParser.parse("console.yaml");
-						Sessions.getCurrent().setAttribute("current_menu", options);
 					}
 					findMenu (options, term.split(" ,+"), l);
 				} catch (Throwable e) {

@@ -24,8 +24,8 @@
 			<div style="width: 100%">
 				<label value="${c:l('seyconserver.zul.Tasques')}" sclass="separator"/>
 			</div>
-	         <iframe src="/graph/graph.html?data=tasks" style="width: 400px; height: 400px"> </iframe>
-	         <iframe src="/graph/graph.html?data=syncserver_queue" style="width: 400px; height: 400px"> </iframe>
+	         <graphjs refresh="10000" use="com.soffid.iam.web.syncserver.SyncServerTasksGraphjs" />
+	         <graphjs refresh="10000" use="com.soffid.iam.web.syncserver.SyncServerQueueGraphjs" />
 			<div sclass="options options-small" style="display: inline-block; text-align: left">
 				<div sclass="menuoption" onClick="ref:frame.viewUnscheduledTasks">
 					<image src="/img/grid.svg"/>
@@ -60,7 +60,7 @@
 <!-- ============================ Performance graph ======================== -->				
 
 				<div id="tab_stats" style="width:100%; height: 70vh">
-					<iframe style="width:100%; height: 100%" id="statsGraph" />
+			         <graphjs id="performanceGraph" style="width:100%; height: 100%" refresh="10000" use="com.soffid.iam.web.syncserver.SyncServerPerformanceGraphjs" visible="false"/>
 				</div>
 				
 <!-- ============================ Tasks grid ======================== -->				

@@ -13,7 +13,20 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import org.json.JSONException;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.ExternalName;
@@ -24,7 +37,6 @@ import com.soffid.iam.api.MailListRelated;
 import com.soffid.iam.api.MailListRoleMember;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.PagedResult;
-import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
@@ -35,8 +47,6 @@ import com.soffid.iam.model.EmailListContainerEntity;
 import com.soffid.iam.model.EmailListEntity;
 import com.soffid.iam.model.EmailListEntityDao;
 import com.soffid.iam.model.ExternEmailEntity;
-import com.soffid.iam.model.GroupAttributeEntity;
-import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.MailListGroupMemberEntity;
 import com.soffid.iam.model.MailListRoleMemberEntity;
@@ -60,24 +70,9 @@ import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownApplicationException;
+import es.caib.seycon.ng.exception.UnknownGroupException;
 import es.caib.seycon.ng.exception.UnknownMailListException;
 import es.caib.seycon.ng.exception.UnknownRoleException;
-
-import java.io.UnsupportedEncodingException;
-import java.rmi.activation.UnknownGroupException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import org.json.JSONException;
 
 /**
  * @see es.caib.seycon.ng.servei.LlistesDeCorreuService

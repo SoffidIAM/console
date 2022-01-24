@@ -36,6 +36,7 @@ import com.soffid.iam.ui.SeyconTask;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.Graphjs;
 
 import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -217,9 +218,11 @@ public class SyncserverHandler extends FrameHandler {
 		hideAllDivs();
 		((Label)getFellow("form-label")).setValue(getUrl(event));
 		getFellow("tab_stats").setVisible(true);
-		Iframe iframe = (Iframe) getFellow("statsGraph");
-		iframe.setSrc("/graph/graph.html?data=syncserver_performance/"+serverId);
-		iframe.invalidate();
+		SyncServerPerformanceGraphjs g = (SyncServerPerformanceGraphjs) getFellow("performanceGraph");
+		g.setServerId(serverId);
+		g.setVisible(true);
+		g.invalidate();
+		g.updateData();
 		showDetails();
 	}
 

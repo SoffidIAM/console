@@ -3714,3 +3714,9 @@ a.bookmark:hover {
 	text-decoration: underline;
 }
 
+div.graphjs {
+	width: 400px;
+	height: 400px;
+	display: inline-block;
+	vertical-align: bottom;
+}

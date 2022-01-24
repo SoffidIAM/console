@@ -8,9 +8,10 @@
 		<label value='${arg.publicUrl }${arg.publicUrl != arg.url ? c:cat(" - ",arg.name): ""}' sclass="separator"/> 
 	</div>
 	<div style="width:100%">
-         <iframe src="/graph/graph.html?data=syncserver_status/${arg.id }"> </iframe>
-		
-		<div sclass="options options-tiny" style="display: inline-block; width: calc(100% - 210px); text-align: left">
+		<graphjs use="com.soffid.iam.web.syncserver.SyncServerGraphjs" serverId="${arg.id }"
+			refresh="500" 
+			style="width: 200px; height: 200px; vertical-align: top"/>
+		<div sclass="options options-tiny" style="display: inline-block; width: calc(100% - 210px); text-align: left; vertical-align:bottom">
 			<div sclass="menuoption" onClick="ref:frame.viewAgents">
 				<image src="/img/engine.svg"/>
 				<label sclass='menuoption-title' value="${c:l('seyconserver.zul.VeureAgents')}" />

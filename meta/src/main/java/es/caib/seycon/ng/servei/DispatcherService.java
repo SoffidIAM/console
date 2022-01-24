@@ -61,6 +61,7 @@ import roles.agent_update;
 		SeyconServerService.class, AutoritzacioService.class, TenantEntity.class, ReconcileTriggerEntity.class,
 		ServerCertificateEntity.class,
 		AsyncRunnerService.class,
+		AuditoriaService.class,
 		HostSystemEntity.class})
 public abstract class DispatcherService {
 
@@ -430,6 +431,13 @@ public abstract class DispatcherService {
 	@Description("Tests and applies an object mapping")
 	public DebugTaskResults testPropagateObject(String dispatcher, SoffidObjectType type, String object1,
 			@Nullable String object2) throws InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { agent_create.class, agent_update.class })
+	@Description("Invokes a custom method")
+	public Collection<Map<String,Object>> invoke(String dispatcher, String verb,
+			@Nullable String object, @Nullable Map<String,Object> attributes) throws InternalErrorException {
 		return null;
 	}
 

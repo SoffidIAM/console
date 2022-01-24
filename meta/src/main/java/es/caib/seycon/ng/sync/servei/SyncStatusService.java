@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.sync.servei;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.soffid.iam.api.ScheduledTask;
@@ -18,6 +20,8 @@ import es.caib.seycon.ng.comu.PasswordValidation;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.servei.DispatcherService;
+import roles.agent_create;
+import roles.agent_update;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,6 +124,12 @@ public abstract class SyncStatusService {
 	public DebugTaskResults testPropagateObject(String dispatcher, 
 			SoffidObjectType type, String object1, @Nullable String object2) throws InternalErrorException 
 	{
+		return null;
+	}
+
+	@Description("Invokes a custom method")
+	public Collection<Map<String,Object>> invoke(String dispatcher, String verb,
+			@Nullable String object, @Nullable Map<String,Object> attributes) throws InternalErrorException {
 		return null;
 	}
 

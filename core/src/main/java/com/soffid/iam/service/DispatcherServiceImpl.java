@@ -44,6 +44,7 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 import com.soffid.iam.api.AccessControl;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AttributeMapping;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.ObjectMapping;
@@ -1988,6 +1989,24 @@ public class DispatcherServiceImpl extends
 			}
 		}
 		return certs;
+	}
+
+	@Override
+	protected Collection<Map<String, Object>> handleInvoke(String dispatcher, String verb, String object,
+			Map<String, Object> attributes) throws Exception {
+		Audit audit = new Audit();
+		audit.setObject("SC_DISPAT");
+		audit.setAction("I");
+		audit.setCalendar(Calendar.getInstance());
+		audit.setCustomObjectType(verb);
+		audit.setCustomObjectName(object);
+		audit.setDatabase(dispatcher);
+		getAuditService().create(audit);
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		
+		if (svc == null)
+			throw new InternalErrorException ("No sync server available");
+		return svc.invoke(dispatcher, verb, object, attributes);
 	}
 
 }

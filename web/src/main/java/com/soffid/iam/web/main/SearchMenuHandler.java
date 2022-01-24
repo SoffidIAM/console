@@ -36,7 +36,8 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 						MenuParser menuParser = new MenuParser();
 						options = menuParser.parse("console.yaml");
 					}
-					findMenu (options, term.split(" ,+"), l);
+					findMenu (options, term.split(" ,+"), l, false);
+					findMenu (options, term.split(" ,+"), l, true);
 				} catch (Throwable e) {
 					l.cancel(e);
 				} finally {
@@ -80,7 +81,7 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 	}
 
 	
-	public void findMenu(List<MenuOption> options, String terms[], AsyncList<MenuOption> l) {
+	public void findMenu(List<MenuOption> options, String terms[], AsyncList<MenuOption> l, Boolean dynamic) {
 		if (options == null || terms == null || terms.length == 0)
 			return;
 		for ( MenuOption option: options)
@@ -93,12 +94,25 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 				l.add(option);
 			}
 			if ( loaded >= max) return;
-			List<MenuOption> options2 = option.getOptions();
-			if (option.getHandler() != null) {
-				options2 = option.getHandler().getOptions(option);
+			List<MenuOption> options2 = null;
+			if (dynamic == null) {
+				options2 = option.getOptions();
+				if (option.getHandler() != null) {
+					options2 = option.getHandler().getOptions(option);
+				}
+				findMenu (options2, terms, l, null);				
+			}
+			else if (dynamic) {
+				if (option.getHandler() != null) {
+					options2 = option.getHandler().getOptions(option);
+					findMenu (options2, terms, l, null);
+				}
+			}
+			else {
+				options2 = option.getOptions();
+				findMenu (options2, terms, l, dynamic);
 			}
 			if ( loaded >= max) return;
-			findMenu (options2, terms, l);
 		}
 	}
 

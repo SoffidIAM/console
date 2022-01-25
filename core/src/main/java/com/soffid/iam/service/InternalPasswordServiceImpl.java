@@ -1258,7 +1258,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 					return validatePasswordOnServer(account, password);
 				}
 			} catch (NoSuchBeanDefinitionException e) {
-
+				if (checkTrusted && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
+					return validatePasswordOnServer(account, password);
+				}
 			}
 
 			return PasswordValidation.PASSWORD_WRONG;

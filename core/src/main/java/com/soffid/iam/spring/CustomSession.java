@@ -44,7 +44,13 @@ import com.soffid.iam.utils.Security;
 public class CustomSession implements Session
 {
 	Runtime runtime = Runtime.getRuntime();
-	
+	static int threshold2 = 15;
+	static {
+		try {
+			threshold2 =  Integer.parseInt(System.getProperty("soffid.memory.limit2"));
+		} catch (Exception e) {}
+	}
+
 	protected void checkMemoryUsage() {
 		if (! Security.isSyncServer()) {
 			long max = runtime.maxMemory();
@@ -53,7 +59,7 @@ public class CustomSession implements Session
 			long pct = free * 100L / max;
 			if (pct < 15) {
 				runtime.gc();
-				throw new OutOfMemoryError("System is running out of memory");
+				throw new RuntimeException(new OutOfMemoryError("System is running out of memory"));
 			}
 		}
 	}

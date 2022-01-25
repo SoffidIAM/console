@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 import org.jbpm.JbpmContext;
 import org.jbpm.logging.exe.LoggingInstance;
 import org.springframework.beans.BeansException;
@@ -696,12 +697,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			if (ae.getType().equals(AccountType.USER))
 			{
 				account.setOwnerUsers(new LinkedList<User>());
-				for (UserAccountEntity ua : ae.getUsers()) {
+				for (UserAccountEntity ua : new LinkedList<UserAccountEntity>(ae.getUsers())) {
                     User u = getUserService().getUserInfo(ua.getUser().getUserName());
                     getUserAccountEntityDao().remove(ua);
+                    if (Hibernate.isInitialized(ua.getUser().getAccounts()))
+                    	ua.getUser().getAccounts().remove(ua);
                     account.getOwnerUsers().add(u);
                 }
-				
+				ae.getUsers().clear();
 			}
 			if (account.getType().equals(AccountType.USER))
 			{
@@ -723,6 +726,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				uae.setAccount(ae);
 				uae.setUser(ue);
 				getUserAccountEntityDao().create(uae);
+				if (Hibernate.isInitialized(ue.getAccounts()))
+					ue.getAccounts().add(uae);
+				if (Hibernate.isInitialized(ae.getUsers()))
+					ae.getUsers().add(uae);
 				
 				account.setDescription(owner.getFullName());
 				
@@ -991,6 +998,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                             getAccountEntityDao().update(acc);
                         }
                     }
+                }
+            } else if ( "N".equals(ue.getActive())) { // Disable accounts in offline systems
+                LinkedList<AccountEntity> accs = new LinkedList<AccountEntity>();
+                for (AccountEntity account: accounts) {
+                	if (account.getSystem() == disEntity && 
+                			(account.getStatus() == AccountStatus.FORCED_ACTIVE || account.getStatus() == AccountStatus.ACTIVE ))
+                	{
+                        account.setDisabled(true);
+						account.setStatus(AccountStatus.DISABLED);
+                        getAccountEntityDao().update(account);
+                        audit("e", account);
+               		}
                 }
             }
         }
@@ -1386,6 +1405,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 try {
                     RemoteServiceLocator rsl = new RemoteServiceLocator(se.getName());
                     rsl.setAuthToken(se.getAuth());
+		    rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
                     SyncStatusService sss = rsl.getSyncStatusService();
                     Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
                     if (p != null) {
@@ -2319,7 +2339,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			Account u = getAccountEntityDao().toAccount(ue);
 			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
 				if (getAuthorizationService().hasPermission(
-						Security.AUTO_USER_QUERY, ue)) {
+						Security.AUTO_ACCOUNT_QUERY, ue) ||
+						u.getAccessLevel() == AccountAccessLevelEnum.ACCESS_MANAGER ||
+						u.getAccessLevel() == AccountAccessLevelEnum.ACCESS_OWNER) {
 					totalResults ++;
 					result.add(u);
 				}

@@ -95,7 +95,8 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 	}
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
-	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
+	public static final SimpleDateFormat DATE_FORMAT3 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
 
 	@Override
 	public void setObjectValue(Object value) {
@@ -140,8 +141,12 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 					try {
 						return DATE_FORMAT.parse(getValue());
 					} catch (Exception e2) {
-						org.apache.commons.logging.LogFactory.getLog(getClass()).info("Error parsing date "+getValue()+" for attribute value "+getId());
-						return null;
+						try {
+							return DATE_FORMAT3.parse(getValue());
+						} catch (Exception e3) {
+							org.apache.commons.logging.LogFactory.getLog(getClass()).info("Error parsing date "+getValue()+" for attribute value "+getId());
+							return null;
+						}
 					}
 				}
 		}

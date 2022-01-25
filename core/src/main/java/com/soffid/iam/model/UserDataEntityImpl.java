@@ -12,13 +12,9 @@ import java.util.Date;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.model.security.SecurityScopeEntity;
-import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.TypeEnumeration;
-import es.caib.seycon.ng.exception.InternalErrorException;
 
 /**
  * Entity DadaUsuariEntity implementation
@@ -81,7 +77,7 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 	}
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd HH.mm.ss"); //$NON-NLS-1$
-	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATE_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
 	@Override
 	public void setObjectValue(Object value) {
 		if (value == null || value.equals(""))
@@ -127,11 +123,16 @@ public class UserDataEntityImpl extends com.soffid.iam.model.UserDataEntity
 			else
 				try {
 					return DATE_FORMAT2.parse(getValue());
-				} catch (ParseException e) {
+				} catch (Exception e) {
 					try {
 						return DATE_FORMAT.parse(getValue());
-					} catch (ParseException e2) {
-						return null;
+					} catch (Exception e2) {
+						try {
+							return AccountAttributeEntityImpl.DATE_FORMAT3.parse(getValue());
+						} catch (Exception e3) {
+							org.apache.commons.logging.LogFactory.getLog(getClass()).info("Error parsing date "+getValue()+" for attribute value "+getId());
+							return null;
+						}
 					}
 				}
 		}

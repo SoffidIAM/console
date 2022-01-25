@@ -31,7 +31,6 @@
 		<hereta>
 			user:update,
 			user:custom:update,
-			user:password:update,
 			user:query,
 			user:refresh,
 			user:role:query,
@@ -59,7 +58,6 @@
 		<ambit>Users</ambit>
 		<hereta>
 			user:custom:update,
-			user:password:update,
 			user:query,
 			user:refresh,
 			user:role:query,
@@ -130,6 +128,28 @@
 	<autoritzacio>
 		<codi>user:refresh</codi>
 		<descripcio>Propagate users and view users tasks</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:enable</codi>
+		<descripcio>Enable disabled users</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>user:disable</codi>
+		<descripcio>Disable enabled users</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>
 		<scope>children</scope>
 		<ambit>Users</ambit>
@@ -1124,6 +1144,12 @@
 		<codi>usersDomain:query</codi>
 		<descripcio>Query user domains</descripcio>
 		<ambit>User domains</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:data:export</codi>
+		<descripcio>Export files from user interface</descripcio>
+		<ambit>Soffid</ambit>
 	</autoritzacio>
 
 	<autoritzacio>

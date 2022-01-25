@@ -55,7 +55,10 @@
 				boolean readOnly = false;
 				boolean showHolderGroup = false;
 				boolean enforceHolderGroup = false;
-			
+				canChangePassword = com.soffid.iam.utils.Security.isUserInRole("user:password:update") ||
+						com.soffid.iam.utils.Security.isUserInRole("user:password:set") ;
+				pageScope.put("canChangePassword", canChangePassword);
+				
 				String ghp = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.entitlement.group.holder");
 				if ("always".equals(ghp))
 					showHolderGroup = enforceHolderGroup = true;
@@ -88,6 +91,9 @@
 				import es.caib.zkib.datasource.XPathUtils;
 				canCreateUser = !readOnly && AutoritzacionsUsuari.hasCreateUser();
 				canDeleteUser = !readOnly && com.soffid.iam.utils.Security.isUserInRole("user:delete");
+				canActiveUser = !readOnly && 
+						(com.soffid.iam.utils.Security.isUserInRole("user:enable") ||
+						com.soffid.iam.utils.Security.isUserInRole("user:disable") );
 				canUpdateUser = !readOnly && AutoritzacionsUsuari.hasUpdateUser();
 				canUpdateCustomUser = !readOnly && AutoritzacionsUsuari.hasUpdateCustomUser();
 				canUpdateUserPassword = AutoritzacionsUsuari.hasUpdateUserPassword();
@@ -720,7 +726,7 @@
 							<tab label="${c:l('usuaris.zul.RolsHeretats')}" />
 							<tab label="${c:l('usuaris.zul.Impressora')}" />
 							<tab label="${c:l('usuaris.zul.Sessions')}" />
-							<tab
+							<tab id="procstab"
 								label="${c:l('usuaris.zul.Processosdusuari')}" />
 						</tabs>
 
@@ -984,7 +990,7 @@
 															value="${c:l('usuaris.zul.Actiu-2')}" />
 														<div>
 															<checkbox id="actiu" bind="@actiu"
-																disabled="${!canModifyUser}" onCheck='setDisabledColor()' />
+																disabled="${!canActiveUser}" onCheck='setDisabledColor()' />
 															<label value="${c:l('accounts.Disabled')}" style="background-color: red; color:white; padding: 2px 6px 0px 6px;" visible="false" id="disabledRow"/>
 														</div>
 													</row>
@@ -1030,7 +1036,8 @@
 									</vbox>
 									<vbox align="center" width="100%"
 										style="border:1px solid #7F9196;padding:2px;background-color:#EEEEEE">
-										<imageclic id="imgPwd" src="~./img/pwd.gif" 
+										<imageclic id="imgPwd" src="~./img/pwd.gif"
+											if="${pageScope['canChangePassword'] }" 
 											title="${c:l('usuaris.zul.Canviacontrasenya')}">
 											<attribute name="onClick">
 												<![CDATA[
@@ -1572,7 +1579,8 @@
 												<treecell>
 <!-- 													<divVisible bind="@tipus" valorVisible="M">
  -->
-														<imageclic src="~./img/pwd.gif" tooltip="pwd">
+														<imageclic src="~./img/pwd.gif" tooltip="pwd" 
+															if="${pageScope['canChangePassword'] }">
 															<attribute name="onClick">
 																comprovaCanviaPassword(self.parent);
 															</attribute>
@@ -2587,7 +2595,7 @@ String nomRolsBorrar = "";
 								</vbox>
 							</tabpanel>
 
-							<tabpanel id="processos">
+							<tabpanel id="processos" fulfill="procstab.onSelect">
 								<vbox width="100%">
 									<listbox
 										dataPath="/esquema/lista/listbox:/processosUsuari"

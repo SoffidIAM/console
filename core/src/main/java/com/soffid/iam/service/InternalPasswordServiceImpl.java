@@ -832,22 +832,26 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				else
 				{
 					currentValidationRequests.add(hash);
-					log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Creating task");
-					taskQueue = true;
-					final long timeToWait = 60000; // 1 minute
-					TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(),
-							password, false, true);
-	
-					th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
-					synchronized (th) {
-						if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
-							th.wait(timeToWait);
+					try {
+						
+						log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Creating task");
+						taskQueue = true;
+						final long timeToWait = 60000; // 1 minute
+						TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(),
+								password, false, true);
+						
+						th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
+						synchronized (th) {
+							if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
+								th.wait(timeToWait);
+							}
 						}
+						if (th.isValidated())
+							updateAccountLastLogin(user, passwordDomain);
+						return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+					} finally {
+						currentValidationRequests.remove(hash);
 					}
-					if (th.isValidated())
-						updateAccountLastLogin(user, passwordDomain);
-					currentValidationRequests.remove(hash);
-					return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
 				}
 			}
 		} catch (NoSuchBeanDefinitionException e) {
@@ -1241,18 +1245,22 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 					else
 					{
 						currentAccountValidationRequests.add(hash);
-						log.info("Received password validation for "+account.getName()+"/"+account.getSystem().getName()+". Forwarding task to trusted dispatchers");
-						final long timeToWait = 60000; // 1 minute
-						TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(),
-								account.getSystem().getName(), password, false, null);
-	
-						th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
-						synchronized (th) {
-							if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
-								th.wait(timeToWait);
+						try {
+							log.info("Received password validation for "+account.getName()+"/"+account.getSystem().getName()+". Forwarding task to trusted dispatchers");
+							final long timeToWait = 60000; // 1 minute
+							TaskHandler th = createAccountTask(TaskHandler.VALIDATE_ACCOUNT_PASSWORD, account.getName(),
+									account.getSystem().getName(), password, false, null);
+		
+							th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
+							synchronized (th) {
+								if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
+									th.wait(timeToWait);
+								}
 							}
+							return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+						} finally {
+							currentAccountValidationRequests.remove(hash);
 						}
-						return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
 					}
 				} else if (checkTrusted && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
 					return validatePasswordOnServer(account, password);

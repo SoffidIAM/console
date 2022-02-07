@@ -219,7 +219,7 @@ public class VaultFolderAsyncList extends AsyncList<VaultFolder> {
 		String path = getPath(vault);
 		cache.put(vault.getId(), path);
 		for (String t: text)
-			if (!path.contains(t))
+			if (!path.toLowerCase().contains(t.toLowerCase()))
 				return false;
 		return true;
 	}

@@ -140,8 +140,9 @@ public class GroupEntityDaoImpl extends
 			auditarGrup("D", codiGrup); //$NON-NLS-1$
 
 			getUserGroupEntityDao().remove( grup.getSecondaryGroupUsers());
-			getRoleGroupEntityDao().remove(grup.getGrantedRoles());
-			getGroupAttributeEntityDao().remove(grup.getAttributes());
+			getRoleGroupEntityDao().remove( grup.getGrantedRoles());
+			getGroupAttributeEntityDao().remove(new LinkedList<>(grup.getAttributes()));
+			grup.getAttributes().clear();
 			getMailListGroupMemberEntityDao().remove(grup.getMailLists());
 			getMailListRoleMemberEntityDao().remove(grup.getRoleScopeMailLists());
 			getRoleAccountEntityDao().remove(grup.getUsersRoles());

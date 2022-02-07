@@ -27,6 +27,8 @@
 
 			<datatree2 id="listbox"
 				width="100%" dataPath="/model:/"
+				reorder="true"
+				onReorder="ref:frame.reorderGroup"
 				header="${c:l('com.soffid.iam.api.Group.name') }" 
 				openLevels="1"
 				enablefilter="false"

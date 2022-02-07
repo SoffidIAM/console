@@ -135,12 +135,14 @@ public class WorkflowInterceptor implements Filter {
 						org.zkoss.util.Locales.setThreadLocal(locale);
 						MessageFactory.setThreadLocale(locale);
 					} else {
-						String lang = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA);			
+						String lang = (String) sesion.getAttribute(ConfigureUserSettings.SESSIO_IDIOMA);
 						if (lang != null)
 						{
 							Locale locale = new Locale (lang);
 							org.zkoss.util.Locales.setThreadLocal( locale );
 							MessageFactory.setThreadLocale(locale);
+						} else {
+							MessageFactory.setThreadLocale( (Locale) sesion.getAttribute(Attributes.PREFERRED_LOCALE) );
 						}
 					}
 					TimeZone timezone = (TimeZone) sesion.getAttribute(ConfigureUserSettings.SESSIO_TIMEZONE);

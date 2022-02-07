@@ -26,7 +26,7 @@ public class GroupAttributeEntity {
 	@Nullable
 	public java.lang.String value;
 
-	@Column(name = "GAT_GRU_ID", reverseAttribute = "attributes", composition = true)
+	@Column(name = "GAT_GRU_ID", reverseAttribute = "attributes")
 	public GrupEntity group;
 
 	@Column(name = "GAT_TDA_ID")

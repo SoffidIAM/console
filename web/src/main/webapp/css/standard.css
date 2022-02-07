@@ -3094,6 +3094,11 @@ div.datatree div.tree-label.dashed {
 	text-decoration: line-through;
 }
 
+div.datatree div.tree-label.drag-highlight {
+	background-color: {BLUELIGHT};
+	color: {BLUETEXT};
+}
+
 div.datatree div.tree-label:hover,
 div.datatree div.tree-itemholder.page-down:hover, 
 div.datatree div.tree-itemholder.page-up:hover  {

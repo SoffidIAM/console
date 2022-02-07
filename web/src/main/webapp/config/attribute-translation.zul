@@ -40,8 +40,10 @@
 					input.value = value[col.value];
 					input.setAttribute("style", "width: 100%; border: none");
 					zk.listen(input, 'change',
-							() => {zkDatatable.sendClientAction(input,"onEditValue", [col.value, input.value])});
-					td.appendChild(input);
+							() => {
+								td.parentElement.data.value[col.value]=input.value;
+								zkDatatable.sendClientAction(input,"onEditValue", [col.value, input.value]);
+							});
 					var ds = document.getElementById("${model.uuid}");
 					zkDatasource.registerInput(ds, input);
 				}

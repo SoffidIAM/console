@@ -6,6 +6,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
@@ -21,11 +22,13 @@ import com.soffid.iam.web.user.UserImporter;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree2;
+import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.Variables;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 
 public class GroupHandler extends FrameHandler {
@@ -87,5 +90,27 @@ public class GroupHandler extends FrameHandler {
 	
 	public void importCsv () throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
 		new GroupImporter().importCsv(this);
+	}
+	
+	public void reorderGroup(Event event) {
+		int[][] data = (int[][]) event.getData();
+		int[] srcPos = data[0];
+		int[] targetPos = data[1];
+		DataTree2 tree = (DataTree2) getListbox();
+		
+		DataNode src = (DataNode) tree.getElementAt(srcPos);
+		DataNode target = (DataNode) tree.getElementAt(targetPos);
+		if (src != null) {
+			Missatgebox.confirmaOK_CANCEL(
+				String.format(Labels.getLabel("grups.zul.confirmMove"), target.get("name"), src.get("name") ),
+				(ev) -> {
+					if (ev.getName().equals("onOK")) {
+						tree.setSelectedIndex(srcPos);
+						XPathUtils.setValue(tree, "/parentGroup", target.get("name"));
+						tree.setSelectedIndex(targetPos);
+						getModel().commit();
+					}
+				});
+		}
 	}
 }

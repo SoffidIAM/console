@@ -65,6 +65,16 @@ public class MenuParser {
 						found = true;
 						break;
 					}
+					if (p.contains("@")) {
+						for (String role: Security.getSoffidPrincipal().getSoffidRoles()) {
+							if (role.equals(p))
+							{
+								found = true;
+								break;
+							}
+						}
+						if (found) break;
+					}
 				}
 				if (!found)
 					continue;

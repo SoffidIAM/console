@@ -45,9 +45,23 @@ public class Frame extends Div implements AfterCompose, Frameable {
 		if (permissions != null && permissions.length > 0)
 		{
 			boolean valid = false;
-			for (String s: permissions) if (Security.isUserInRole(s)) valid = true;
-			if ( ! valid )
+			for (String s: permissions) {
+				if (Security.isUserInRole(s)) valid = true;
+				if (s.contains("@") && Security.getSoffidPrincipal() != null)
+				{
+					for (String sr: Security.getSoffidPrincipal().getSoffidRoles()) {
+						if (sr.equals(s))
+						{
+							valid = true;
+							break;
+						}
+					}
+				}
+			}
+			if ( ! valid ) {
 				setVisible(false);
+				detach();
+			}
 		}
 		if (new OtpPageHandler().needsOtp(this))
 			setVisible(false);

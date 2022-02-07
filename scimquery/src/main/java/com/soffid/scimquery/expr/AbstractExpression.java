@@ -257,7 +257,7 @@ public abstract class AbstractExpression implements Serializable {
 						int i = query.getNextParameter();
 						String obj2 = obj+"aux";
 						String s[] = attConfig.getVirtualAttributeName().split("\\.");
-						ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
+						ctx.objectCondition = ""; //obj2+"."+s[1]+" is not null and ";
 						ctx.closeCondition = ")";
 						ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 					}

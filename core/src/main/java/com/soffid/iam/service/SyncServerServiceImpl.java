@@ -839,7 +839,6 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
 		Collection<Object[]> tasks = getTaskEntityDao().countTasksBySystem();
 		Collection<Object[]> tl = getTaskLogEntityDao().countTasksBySystem();
-		Long total = getTaskEntityDao().countTasks();
 		for (SystemEntity agent: getSystemEntityDao().findActives()) {
 			AgentStatusInfo s = new AgentStatusInfo();
 			s.setAgentName(agent.getName());

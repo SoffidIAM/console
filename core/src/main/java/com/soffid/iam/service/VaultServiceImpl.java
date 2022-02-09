@@ -1121,10 +1121,16 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected VaultElement handleUpdate(VaultElement folder) throws Exception {
 		if ("account".equals(folder.getType())) {
+			Account acc = getAccountService().findAccountById(folder.getAccount().getId());
+			if (acc == null || acc.getAccessLevel() != AccountAccessLevelEnum.ACCESS_OWNER)
+				throw new SecurityException("Not authorized to modify this account");
 			folder.setAccount( getAccountService().updateAccount2(folder.getAccount()) );
 			folder.setParentId(folder.getAccount().getVaultFolderId());
 		}
 		if ("folder".equals(folder.getType())) {
+			VaultFolder f = handleFindFolder(folder.getFolder().getId());
+			if (f == null || f.getAccessLevel() != AccountAccessLevelEnum.ACCESS_OWNER)
+				throw new SecurityException("Not authorized to modify this vault folder");
 			folder.setFolder( handleUpdate(folder.getFolder()) );
 			folder.setParentId(folder.getFolder().getParentId());
 		}

@@ -30,6 +30,8 @@
 
 			<datatree2 id="listbox"
 				width="100%" dataPath="/model:/"
+				reorder="true"
+				onReorder="ref:frame.reorder"
 				header="${c:l('com.soffid.iam.api.Application.relativeName') }" 
 				openLevels="1"
 				enablefilter="false"

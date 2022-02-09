@@ -10,6 +10,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -40,6 +41,8 @@ import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.InputField3;
+import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.vault.LaunchHelper;
 
@@ -91,6 +94,15 @@ public class VaultHandler extends FrameHandler {
 				getFellow("updatePasswordButton").setVisible(false);
 			} else {
 				updateAccountIcons();
+				ObjectAttributesDiv att = (ObjectAttributesDiv) getFellow("userAttributes");
+				
+				AccountAccessLevelEnum level = instance.getAccount().getAccessLevel();
+				boolean owner = (level == AccountAccessLevelEnum.ACCESS_OWNER) || instance.getAccount().getId() == null;
+				if (att.isReadonly() == owner ) {
+					att.setReadonly(!owner);
+					att.refresh();
+				}
+				getFellow("accountBasics").setVisible(owner);
 			}
 			try {
 				DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "../services");
@@ -598,5 +610,37 @@ public class VaultHandler extends FrameHandler {
 		}
 		return b;
 	}
-	
+
+	public void reorder(Event event) {
+		int[][] data = (int[][]) event.getData();
+		int[] srcPos = data[0];
+		int[] targetPos = data[1];
+		DataTree2 tree = (DataTree2) getListbox();
+		
+		DataNode src = (DataNode) tree.getElementAt(srcPos);
+		DataNode target = (DataNode) tree.getElementAt(targetPos);
+		VaultElement ob = (VaultElement) target.getInstance();
+		if (ob.getAccount() != null)
+			target = (DataNode) target.getParent();
+		final DataNode target2 = target;
+		if (src != null) {
+			VaultElement ob2 = (VaultElement) src.getInstance();
+			Missatgebox.confirmaOK_CANCEL(
+				String.format(Labels.getLabel("application.zul.confirmMove"), ob.getFolder().getName(), ob2.getAccount().getLoginName() ),
+				(ev) -> {
+					if (ev.getName().equals("onOK")) {
+						tree.setSelectedIndex(srcPos);
+						XPathUtils.setValue(tree, "parentId", target2.get("id"));
+						if (ob2.getAccount() != null) {
+							XPathUtils.setValue(tree, "/account/vaultFolderId", target2.get("id"));
+						} else {
+							XPathUtils.setValue(tree, "/folder/parentId", target2.get("id"));
+						}
+						tree.setSelectedIndex(targetPos);
+						getModel().commit();
+					}
+				});
+		}
+	}
+
 }

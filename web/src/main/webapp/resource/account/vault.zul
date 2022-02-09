@@ -42,6 +42,8 @@
 
 			<datatree2 id="listbox"
 				width="100%" dataPath="/model:/"
+				reorder="true"
+				onReorder="ref:frame.reorder"
 				header="${c:l('com.soffid.iam.api.Account.name') }" 
 				openLevels="1"
 				enablefilter="false"
@@ -132,7 +134,7 @@
 									</div>
 								</tabpanel>
 								<tabpanel>
-									<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+									<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
 										objectType="com.soffid.iam.api.Account"
 										dataPath="/." id="userAttributes"/>
 									<div sclass="section" id="servicesSection" if="${soffid:isUserInRole('account:query') }">

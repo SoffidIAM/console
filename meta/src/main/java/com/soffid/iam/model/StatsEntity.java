@@ -13,6 +13,7 @@ import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.ForeignKey;
 import com.soffid.mda.annotation.Identifier;
+import com.soffid.mda.annotation.Index;
 import com.soffid.mda.annotation.Nullable;
 
 import es.caib.seycon.ng.model.GrupEntity;
@@ -52,3 +53,6 @@ public class StatsEntity {
 	public Collection<StatsEntity> findByName(String name, String since, String until)
 	{return null;}
 }
+
+@Index(entity = StatsEntity.class, name="SC_STATS_NAME_NDX", columns = {"STA_NAME", "STA_DATE"})
+class StatsEntityNameIndex {}

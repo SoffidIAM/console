@@ -875,7 +875,7 @@ public class InputField3 extends Databox
 			} else if (currentList.size() > currentPosition) {
 				int i = 0;
 				result = new LinkedList();
-				while (it.hasNext())
+				while (it.hasNext() && currentPosition < 100)
 				{
 				    Object o = it.next();
 					if (i++ >= currentPosition)
@@ -885,7 +885,11 @@ public class InputField3 extends Databox
 						currentPosition ++;
 					}
 				}
-			} 
+				if (currentPosition >= 100) 
+					currentList.cancel();
+			} else {
+				result = new LinkedList<>();
+			}
 		}
 		return result;
 	}

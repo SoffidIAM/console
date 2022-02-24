@@ -598,6 +598,9 @@ public class AdditionalDataServiceImpl extends
 		
 		String fileName = objectType.replace(".", "/") + ".ui.json";
 		List<DataType> d = getDescriptorMetadata(fileName);
+		if (d == null) {
+			return new LinkedList<DataType>();
+		}
 		for (Iterator<DataType> it = d.iterator(); it.hasNext(); ) {
 			DataType dt = it.next();
 			if (attribute != null && ! attribute.equals(dt.getName()))

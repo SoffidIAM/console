@@ -1676,17 +1676,20 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         HostEntity old = getHostEntityDao().findByName(nomMaquina);
         if (old == null) {
             // Nothing to do
-        } else if (old.getSerialNumber() == null && old.getDynamicIP().booleanValue()) {
+        } else if (old.getSerialNumber() == null || old.getSerialNumber().trim().isEmpty()) {
             // Replace unused host
             maquina = old;
             maquina.setSerialNumber(serialNumber);
-            maquina.setHostIP(ip);
+            if (old.getDynamicIP().booleanValue())
+            	maquina.setHostIP(ip);
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
-        } else if (serialNumber.equals(old.getSerialNumber()) || old.getSerialNumber() == null || old.getSerialNumber().trim().isEmpty()) {
+        } else if (serialNumber.equals(old.getSerialNumber())) {
             // Found host entry
             maquina = old;
-        } else if (old.getDynamicIP().booleanValue()) {
+            maquina.setLastSeen(new Date());
+            getHostEntityDao().update(maquina);
+        } else if (old.getDynamicIP().booleanValue() ) { // Serial number has changed => Register a new host
             // Autodelete
             old.setDeleted(true);
             getHostEntityDao().update(old);

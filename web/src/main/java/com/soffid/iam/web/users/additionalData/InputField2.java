@@ -70,6 +70,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
@@ -2052,7 +2053,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		return id;
 	}
 
-	private void calculateVisibility() throws EvalError, MalformedURLException {
+	private void calculateVisibility() throws InternalErrorException, IOException, Exception {
 		if (dataType.getVisibilityExpression() != null && 
 				!dataType.getVisibilityExpression().trim().isEmpty())
 		{
@@ -2062,8 +2063,10 @@ public class InputField2 extends Div implements XPathSubscriber
 			if (i > 0)
 			{
 				path = path.substring(0, i);
-				SecureInterpreter interp = createInterpreter();
-				if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
+				Object obj = Evaluator.instance().evaluate(dataType.getVisibilityExpression(), 
+						createVars(), 
+						"Visibility expression for "+dataType.getName());
+				if ( Boolean.FALSE.equals(obj))
 					this.setVisible(false);
 				else
 					this.setVisible(true);
@@ -2327,10 +2330,11 @@ public class InputField2 extends Div implements XPathSubscriber
 				dataType.getValidationExpression().isEmpty())
 			return true;		
 		try {
-			SecureInterpreter i = createInterpreter();
-			i.set("value", currentValue);
-			
-			Object o = i.eval(dataType.getValidationExpression());
+			final Map<String, Object> vars = createVars();
+			vars.put("value", currentValue);
+			Object o = Evaluator.instance().evaluate(dataType.getValidationExpression(), 
+					vars, 
+					"Visibility expression for "+dataType.getName());
 			if (o == null)
 				throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
 			if (o != null && ! Boolean.TRUE.equals(o))
@@ -2338,15 +2342,8 @@ public class InputField2 extends Div implements XPathSubscriber
 				if  (!((Boolean) o).booleanValue())
 					throw new WrongValueException(input, o instanceof String ? (String) o: "Wrong value"); //$NON-NLS-1$
 			}
-		} catch ( TargetError e) {
-			if (e.getTarget() instanceof UiException)
-				throw new UiException(e);
-			else
-				throw new RuntimeException(e.getTarget());
-		} catch ( EvalError e) {
-			throw new UiException(e.toString());
-		} catch (MalformedURLException e) {
-			throw new UiException (e.toString());
+		} catch ( Exception e) {
+			throw new UiException(e);
 		}
 		return true;
 	}
@@ -2358,26 +2355,23 @@ public class InputField2 extends Div implements XPathSubscriber
 			return true;
 		
 		try {
-			SecureInterpreter i = createInterpreter();
-			Object o = i.eval(dataType.getVisibilityExpression());
+			Object o = Evaluator.instance().evaluate(dataType.getVisibilityExpression(), 
+					createVars(), 
+					"Visibility expression for "+dataType.getName());
 			if (o == null)
 				throw new UiException(String.format("Visibility expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
 			if (o != null && o instanceof Boolean)
 				return ((Boolean) o).booleanValue();
 			else
 				throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode())); //$NON-NLS-1$
-		} catch ( TargetError e) {
-			throw new UiException(e.getTarget());
-		} catch ( EvalError e) {
-			throw new UiException(e.toString(), e);
-		} catch (MalformedURLException e) {
-			throw new UiException (e.toString());
 		} catch (JXPathException e) {
 			return false;
+		} catch ( Exception e) {
+			throw new UiException(e);
 		}
 	}
 
-	private SecureInterpreter createInterpreter() throws EvalError {
+	private Map<String,Object> createVars() {
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = null;
 		value = XPathUtils.getValue(ctx, bind);
@@ -2385,7 +2379,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		Map attributes = grandpa instanceof ObjectAttributesDiv ? 
 			((ObjectAttributesDiv) grandpa).getAttributesMap():
 			(Map) XPathUtils.getValue(ctx, "/."); //$NON-NLS-1$
-		SecureInterpreter i = new SecureInterpreter();
+		Map<String,Object> vars = new HashMap<String,Object>();
 
 		// Identify attributes div
 		Component c = this;
@@ -2393,66 +2387,66 @@ public class InputField2 extends Div implements XPathSubscriber
 		{
 			if (c instanceof AttributesDiv)
 			{
-				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
+				vars.put("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else if (c instanceof ObjectAttributesDiv)
 			{
 				((ObjectAttributesDiv) c).adjustVisibility();
-				i.set("inputFields", ((ObjectAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
+				vars.put("inputFields", ((ObjectAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else
 				c = c.getParent();
 		} while (c != null);
 
-		i.set("value", value); //$NON-NLS-1$
-		i.set("attributes", attributes); //$NON-NLS-1$
-		i.set("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
-		i.set("inputField", this); //$NON-NLS-1$
+		vars.put("value", value); //$NON-NLS-1$
+		vars.put("attributes", attributes); //$NON-NLS-1$
+		vars.put("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
+		vars.put("inputField", this); //$NON-NLS-1$
 		if (ownerObject != null)
 		{
-			i.set("object", ownerObject); //$NON-NLS-1$
+			vars.put("object", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof User)
-				i.set("user", ownerObject); //$NON-NLS-1$
+				vars.put("user", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Usuari)
 			{
-				i.set("user", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
-				i.set("object", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
+				vars.put("user", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
+				vars.put("object", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Group)
-				i.set("group", ownerObject); //$NON-NLS-1$
+				vars.put("group", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Grup)
 			{
-				i.set("group", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
-				i.set("object", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
+				vars.put("group", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
+				vars.put("object", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Role)
-				i.set("role", ownerObject); //$NON-NLS-1$
+				vars.put("role", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Rol)
 			{
-				i.set("role", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
-				i.set("object", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
+				vars.put("role", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
+				vars.put("object", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Application)
-				i.set("application", ownerObject); //$NON-NLS-1$
+				vars.put("application", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Aplicacio)
 			{
-				i.set("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
-				i.set("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
+				vars.put("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
+				vars.put("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Task)
 			{
-				i.set("task",  ownerObject); //$NON-NLS-1$
+				vars.put("task",  ownerObject); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof ProcessInstance)
 			{
-				i.set("process", ownerObject); //$NON-NLS-1$
+				vars.put("process", ownerObject); //$NON-NLS-1$
 			}
 		}
-		i.set("context", ownerContext); //$NON-NLS-1$
-		i.set("requestContext", ownerContext); //$NON-NLS-1$
-		return i;
+		vars.put("context", ownerContext); //$NON-NLS-1$
+		vars.put("requestContext", ownerContext); //$NON-NLS-1$
+		return vars;
 	}
 
 	public void setOwnerContext(String ownerContext) {
@@ -2493,19 +2487,12 @@ public class InputField2 extends Div implements XPathSubscriber
 		if (dataType != null && dataType.getOnChangeTrigger() != null && ! dataType.getOnChangeTrigger().trim().isEmpty())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				i.eval(dataType.getOnChangeTrigger());
-			} catch ( TargetError e) {
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
+				Evaluator.instance().evaluate(dataType.getOnChangeTrigger(), 
+						createVars(), 
+						"On-change trigger for "+dataType.getName());
+			} catch ( Exception e) {
+				throw new UiException (e);
 			}
-
 		}
 	}
 
@@ -2565,19 +2552,12 @@ public class InputField2 extends Div implements XPathSubscriber
 				binder.isValid())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				i.eval(dataType.getOnLoadTrigger());
-			} catch ( TargetError e) {
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
+				Evaluator.instance().evaluate(dataType.getOnLoadTrigger(), 
+						createVars(), 
+						"On-load trigger for "+dataType.getName());
+			} catch ( Exception e) {
+				throw new UiException (e);
 			}
-
 		}
 	}
 
@@ -2591,19 +2571,12 @@ public class InputField2 extends Div implements XPathSubscriber
 		if (dataType != null && dataType.getOnFocusTrigger() != null && ! dataType.getOnFocusTrigger().trim().isEmpty())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				i.eval(dataType.getOnFocusTrigger());
-			} catch ( TargetError e) {
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
+				Evaluator.instance().evaluate(dataType.getOnFocusTrigger(), 
+						createVars(), 
+						"On-focus trigger for "+dataType.getName());
+			} catch ( Exception e) {
+				throw new UiException (e);
 			}
-
 		}
 	}
 }

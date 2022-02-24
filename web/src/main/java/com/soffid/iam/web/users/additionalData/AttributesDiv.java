@@ -31,6 +31,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.User;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.InputField3;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.TipusDada;
@@ -202,7 +203,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		}
 		if (attributes != null)
 		{
-			List<InputField2> inputFields  = new LinkedList<InputField2>();
+			List<InputField3> inputFields  = new LinkedList<InputField3>();
 			for (TipusDada att: dataTypes)
 			{
 				AttributeVisibilityEnum v = getVisibility (att);
@@ -211,18 +212,13 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					Div d = new Div();
 					appendChild(d);
 					d.setSclass(getSclass()+"_row");
-					Label l = new Label (att.getLabel());
-					if ( att.getType() == TypeEnumeration.SEPARATOR)
-						l.setSclass(getSclass()+"_label separator_label");
-					else
-						l.setSclass(getSclass()+"_label");
-					d.appendChild(l);
-					InputField2 input = new InputField2();
+					InputField3 input = new InputField3();
 					if (! attributes.containsKey(att.getCodi()))
 						attributes.put(att.getCodi(), null);
+					input.setLabel(att.getLabel());
 					input.setBind("[@name='"+att.getCodi()+"']");
 					input.setDataType( DataType.toDataType(att));
-					input.setSclass(getSclass()+"_input");
+					input.setSclass(getSclass()+"_input databox");
 					input.setReadonly(readonly || v == AttributeVisibilityEnum.READONLY);
 					input.setOwnerObject(ownerObject);
 					input.setOwnerContext(ownerContext);
@@ -242,7 +238,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					d.setVisible(input.attributeVisible());
 				}
 			}
-			for ( InputField2 input: inputFields)
+			for ( InputField3 input: inputFields)
 				input.runOnLoadTrigger();
 		}
 	}
@@ -288,7 +284,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 	public void adjustVisibility() {
 		for (Div d : (Collection<Div>)getChildren())
 		{
-			InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
+			InputField3 input = (InputField3) d.getFirstChild();
 			input.setOwnerObject(ownerObject);
 			input.setOwnerContext(ownerContext);
 			boolean v = input.attributeVisible();
@@ -347,7 +343,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		{
 			if (d.isVisible())
 			{
-				InputField2 input = (InputField2) d.getFirstChild().getNextSibling();
+				InputField3 input = (InputField3) d.getFirstChild();
 				input.setOwnerObject(ownerObject);
 				input.setOwnerContext(ownerContext);
 				if (!input.attributeValidateAll())
@@ -413,18 +409,18 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		
 	}
 
-	public Map<String,InputField2> getInputFieldsMap() {
-		Map<String, InputField2> r = new HashMap<String, InputField2>();
+	public Map<String,InputField3> getInputFieldsMap() {
+		Map<String, InputField3> r = new HashMap<String, InputField3>();
 		for (Component c : (Collection<Component>)getChildren())
 		{
 			if (c instanceof Div)
 			{
 				Component cc = c.getFirstChild().getNextSibling();
-				if (cc instanceof InputField2) {
-					InputField2 inputField2 = (InputField2) cc;
-					DataType dt = inputField2.getDataType();
+				if (cc instanceof InputField3) {
+					InputField3 InputField3 = (InputField3) cc;
+					DataType dt = InputField3.getDataType();
 					if (dt != null && dt.getCode() != null)
-						r.put(dt.getCode(), inputField2);
+						r.put(dt.getCode(), InputField3);
 				}
 			}
 		}

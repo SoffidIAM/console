@@ -48,6 +48,7 @@ import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.model.AuthenticationLog;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountAttributeEntityDaoImpl;
@@ -1168,7 +1169,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private String guessAccountName(String dispatcherName, UserDomainEntity du, UserEntity ue)
-			throws EvalError, MalformedURLException, InternalErrorException {
+			throws Exception {
 		if (ue == null)
 			return null;
 
@@ -1178,7 +1179,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return userName;
 		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
 		{
-			Object o = evalExpression(du, ue, dispatcherName, du.getBshExpr());
+			Object o = evalExpression(du, ue, dispatcherName, du.getBshExpr(), "User domain "+du.getName());
 			if (o != null && ! (o instanceof String))
 				throw new InternalErrorException(
 						String.format("Create expression for domain %s returned a non String object: %s",
@@ -1216,9 +1217,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 
 	private Object evalExpression(UserDomainEntity du, UserEntity ue, String dispatcherName,
-			String expression) throws EvalError, MalformedURLException {
+			String expression, String label) throws Exception {
 		User userVO = getUserEntityDao().toUser(ue);
-		SecureInterpreter interpreter = new SecureInterpreter();
 		SystemEntity de = dispatcherName == null ? null : getSystemEntityDao().findByName(dispatcherName);
 		
 		HashMap<String, String> attributes;
@@ -1234,21 +1234,22 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (UserGroupEntity grup : ue.getSecondaryGroups()) 
 			if (! Boolean.TRUE.equals(grup.getDisabled()))
 				addGroups(groups, grup.getGroup());
-			
-		interpreter.set("attributes", attributes); //$NON-NLS-1$
-		interpreter.set("groups", groups); //$NON-NLS-1$
-		interpreter.set("groupsList", groups.keySet()); //$NON-NLS-1$
-		interpreter.set("applicationContext", applicationContext); //$NON-NLS-1$
-		interpreter.set("serviceLocator", com.soffid.iam.ServiceLocator.instance()); //$NON-NLS-1$
-		interpreter.set("usuariEntity", ue); //$NON-NLS-1$
-		interpreter.set("user", userVO); //$NON-NLS-1$
-		interpreter.set("dominiEntity", du); //$NON-NLS-1$
-		interpreter.set("userDomain", getUserDomainEntityDao().toUserDomain(du)); //$NON-NLS-1$
-		interpreter.set("dispatcherEntity", de); //$NON-NLS-1$
-		interpreter.set("system", de == null ? null : getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
-		interpreter.set("dao", getAccountEntityDao()); //$NON-NLS-1$
-				
-		return interpreter.eval(expression);
+
+		Map<String,Object> vars = new HashMap();
+		vars.put("attributes", attributes); //$NON-NLS-1$
+		vars.put("groups", groups); //$NON-NLS-1$
+		vars.put("groupsList", groups.keySet()); //$NON-NLS-1$
+		vars.put("user", userVO); //$NON-NLS-1$
+		vars.put("userDomain", getUserDomainEntityDao().toUserDomain(du)); //$NON-NLS-1$
+		vars.put("system", de == null ? null : getSystemEntityDao().toSystem(de)); //$NON-NLS-1$
+		if (! Evaluator.instance().isSecure()) {
+			vars.put("dominiEntity", du); //$NON-NLS-1$
+			vars.put("dispatcherEntity", de); //$NON-NLS-1$
+			vars.put("usuariEntity", ue); //$NON-NLS-1$
+			vars.put("applicationContext", applicationContext); //$NON-NLS-1$
+			vars.put("dao", getAccountEntityDao()); //$NON-NLS-1$
+		}				
+		return Evaluator.instance().evaluate(expression, vars, label);
 	}
 
 	@Override
@@ -2620,7 +2621,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private boolean needsAccount(String dispatcher, UserDomainEntity du, UserEntity ue)
-			throws EvalError, MalformedURLException, InternalErrorException {
+			throws Exception {
 		boolean needs = false;
 		if (ue == null)
 			needs = false;
@@ -2633,7 +2634,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				needs = true;
 			else
 			{
-				Object o = evalExpression(du, ue, dispatcher, du.getBshExprCreate());
+				Object o = evalExpression(du, ue, dispatcher, du.getBshExprCreate(), "Create expression for user domain "+du.getName());
 				if (o == null || ! (o instanceof Boolean))
 					throw new InternalErrorException(
 							String.format("Create expression for domain %s returned a non boolean object: %s",

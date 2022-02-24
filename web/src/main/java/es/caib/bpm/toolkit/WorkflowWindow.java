@@ -205,6 +205,8 @@ public class WorkflowWindow extends Window implements WorkflowWindowInterface {
     public void refresh ()
     {
         DataModel dm = (DataModel) getParent().getFellowIfAny("BPMdata"); //$NON-NLS-1$
+        if (dm == null)
+        	dm = (DataModel) getParent().getFellowIfAny("model"); //$NON-NLS-1$
         if (dm != null)
             dm.refresh();
     }

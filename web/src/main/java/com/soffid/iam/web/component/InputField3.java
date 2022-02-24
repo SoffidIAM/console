@@ -46,6 +46,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.inputField.AccountDataHandler;
@@ -408,8 +409,10 @@ public class InputField3 extends Databox
 					dataType.getVisibilityExpression() != null &&
 					!dataType.getVisibilityExpression().trim().isEmpty())
 			{
-				SecureInterpreter interp = createInterpreter();
-				if ( Boolean.FALSE.equals(interp.eval(dataType.getVisibilityExpression())))
+				Object obj = Evaluator.instance().evaluate(dataType.getVisibilityExpression(), 
+						createVars(), 
+						"Visibility expression for "+dataType.getName());
+				if ( Boolean.FALSE.equals( obj ))
 					super.setVisible(false);
 				else
 					super.setVisible(visible);
@@ -474,22 +477,19 @@ public class InputField3 extends Databox
 		if (dataType.getVisibilityExpression() != null &&
 				! dataType.getVisibilityExpression().trim().isEmpty()) {
 			try {
-				SecureInterpreter i = createInterpreter();
-				Object o = i.eval(dataType.getVisibilityExpression());
+				Object o = Evaluator.instance().evaluate(dataType.getVisibilityExpression(), 
+						createVars(), 
+						"Visibility expression for "+dataType.getName());
 				if (o == null)
 					throw new UiException(String.format("Visibility expression for attribute %s has returned a null value: %s", dataType.getCode(), dataType.getVisibilityExpression())); //$NON-NLS-1$
 				if (o != null && o instanceof Boolean)
 					return ((Boolean) o).booleanValue();
 				else
 					throw new UiException(String.format("Visibility expression for attribute %s has not returned a boolean value", dataType.getCode())); //$NON-NLS-1$
-			} catch ( TargetError e) {
-				throw new UiException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString(), e);
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
 			} catch (JXPathException e) {
 				return false;
+			} catch ( Exception e) {
+				throw new UiException("Error evaluating visibility expression for attribute "+dataType.getName(), e);
 			}
 		}
 
@@ -497,7 +497,7 @@ public class InputField3 extends Databox
 		return true;
 	}
 
-	private SecureInterpreter createInterpreter() throws EvalError {
+	private Map<String,Object> createVars() throws EvalError {
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = null;
 		try {
@@ -513,74 +513,79 @@ public class InputField3 extends Databox
 		} catch (Exception e) {
 			attributes = new HashMap<>();
 		}
-		SecureInterpreter i = new SecureInterpreter();
+		Map<String,Object> vars = new HashMap<>();
 
-		i.set("inputFields", new HashMap()); //$NON-NLS-1$
+		vars.put("inputFields", new HashMap()); //$NON-NLS-1$
 		// Identify attributes div
 		Component c = this;
 		do
 		{
 			if (c instanceof AttributesDiv)
 			{
-				i.set("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
+				vars.put("inputFields", ((AttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
+				break;
+			}
+			else if (c instanceof ObjectAttributesDiv)
+			{
+				vars.put("inputFields", ((ObjectAttributesDiv) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else if (c instanceof InputFieldContainer)
 			{
-				i.set("inputFields", ((InputFieldContainer) c).getInputFieldsMap()); //$NON-NLS-1$
+				vars.put("inputFields", ((InputFieldContainer) c).getInputFieldsMap()); //$NON-NLS-1$
 				break;
 			}
 			else
 				c = c.getParent();
 		} while (c != null);
 
-		i.set("value", value); //$NON-NLS-1$
-		i.set("attributes", attributes); //$NON-NLS-1$
-		i.set("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
-		i.set("inputField", this); //$NON-NLS-1$
+		vars.put("value", value); //$NON-NLS-1$
+		vars.put("attributes", attributes); //$NON-NLS-1$
+		vars.put("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
+		vars.put("inputField", this); //$NON-NLS-1$
 		if (ownerObject != null)
 		{
-			i.set("object", ownerObject); //$NON-NLS-1$
+			vars.put("object", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof User)
-				i.set("user", ownerObject); //$NON-NLS-1$
+				vars.put("user", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Usuari)
 			{
-				i.set("user", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
-				i.set("object", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
+				vars.put("user", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
+				vars.put("object", User.toUser((Usuari) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Group)
-				i.set("group", ownerObject); //$NON-NLS-1$
+				vars.put("group", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Grup)
 			{
-				i.set("group", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
-				i.set("object", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
+				vars.put("group", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
+				vars.put("object", Group.toGroup((Grup) ownerObject) ); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Role)
-				i.set("role", ownerObject); //$NON-NLS-1$
+				vars.put("role", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Rol)
 			{
-				i.set("role", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
-				i.set("object", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
+				vars.put("role", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
+				vars.put("object", Role.toRole((Rol) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Application)
-				i.set("application", ownerObject); //$NON-NLS-1$
+				vars.put("application", ownerObject); //$NON-NLS-1$
 			if (ownerObject instanceof Aplicacio)
 			{
-				i.set("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
-				i.set("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
+				vars.put("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
+				vars.put("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof Task)
 			{
-				i.set("task",  ownerObject); //$NON-NLS-1$
+				vars.put("task",  ownerObject); //$NON-NLS-1$
 			}
 			if (ownerObject instanceof ProcessInstance)
 			{
-				i.set("process", ownerObject); //$NON-NLS-1$
+				vars.put("process", ownerObject); //$NON-NLS-1$
 			}
 		}
-		i.set("context", ownerContext); //$NON-NLS-1$
-		i.set("requestContext", ownerContext); //$NON-NLS-1$
-		return i;
+		vars.put("context", ownerContext); //$NON-NLS-1$
+		vars.put("requestContext", ownerContext); //$NON-NLS-1$
+		return vars;
 	}
 
 	public void setOwnerContext(String ownerContext) {
@@ -680,8 +685,9 @@ public class InputField3 extends Databox
 				! dataType.getValidationExpression().isEmpty())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				Object o = i.eval(dataType.getValidationExpression());
+				Object o = Evaluator.instance().evaluate(dataType.getValidationExpression(), 
+						createVars(), 
+						"Validation expression for "+dataType.getName());
 				if (o == null)
 					throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$
 
@@ -690,18 +696,9 @@ public class InputField3 extends Databox
 					setWarning(position, o instanceof String ? o.toString(): "Wrong value"); //$NON-NLS-1$
 					return false;
 				}
-			} catch ( TargetError e) {
+			} catch ( Exception e) {
 				setWarning(position, "Internal error" );
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				setWarning(position, "Internal error" );
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				setWarning(position, "Internal error" );
-				throw new UiException (e.toString());
+				throw new UiException(e);
 			}
 		}
 		
@@ -723,17 +720,11 @@ public class InputField3 extends Databox
 		if (dataType != null && dataType.getOnChangeTrigger() != null && ! dataType.getOnChangeTrigger().trim().isEmpty())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				i.eval(dataType.getOnChangeTrigger());
-			} catch ( TargetError e) {
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
+				Evaluator.instance().evaluate(dataType.getOnChangeTrigger(), 
+						createVars(), 
+						"On-change trigger for "+dataType.getName());
+			} catch ( Exception e) {
+				throw new UiException("Error evaluating on-change trigger for attribute "+dataType.getName(), e);
 			}
 
 		}
@@ -772,17 +763,11 @@ public class InputField3 extends Databox
 				binder.isValid())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				i.eval(dataType.getOnLoadTrigger());
-			} catch ( TargetError e) {
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
+				Evaluator.instance().evaluate(dataType.getOnLoadTrigger(), 
+						createVars(), 
+						"On-load trigger for "+dataType.getName());
+			} catch ( Exception e) {
+				throw new UiException("Error evaluating on-load trigger for attribute "+dataType.getName(), e);
 			}
 
 		}
@@ -804,17 +789,11 @@ public class InputField3 extends Databox
 		if (dataType != null && dataType.getOnFocusTrigger() != null && ! dataType.getOnFocusTrigger().trim().isEmpty())
 		{
 			try {
-				SecureInterpreter i = createInterpreter();
-				i.eval(dataType.getOnFocusTrigger());
-			} catch ( TargetError e) {
-				if (e.getTarget() instanceof UiException)
-					throw new UiException(e);
-				else
-					throw new RuntimeException(e.getTarget());
-			} catch ( EvalError e) {
-				throw new UiException(e.toString());
-			} catch (MalformedURLException e) {
-				throw new UiException (e.toString());
+				Evaluator.instance().evaluate(dataType.getOnFocusTrigger(), 
+						createVars(), 
+						"On-focus trigger for "+dataType.getName());
+			} catch ( Exception e) {
+				throw new UiException("Error evaluating on-focus trigger for attribute "+dataType.getName(), e);
 			}
 
 		}

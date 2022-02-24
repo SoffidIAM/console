@@ -1393,6 +1393,7 @@ div.databox div.datahtml {
 	background: transparent;
 	width: 100%;
 	margin-top: 6px;
+	cursor: pointer;
 } 
 div.databox div.container, div.databox div.container span {
 	white-space: pre; 

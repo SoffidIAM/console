@@ -24,7 +24,9 @@ public class NotExpression extends AbstractExpression {
 		if (subExpression != null)
 		{
 			query.getWhereString().append("( not ");
+			query.setNegativeExpression(! query.isNegativeExpression());
 			subExpression.generateHSQLString(query);
+			query.setNegativeExpression(! query.isNegativeExpression());
 			query.getWhereString().append(')');
 		}
 	}

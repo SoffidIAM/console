@@ -17,8 +17,8 @@ import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 
 public abstract class AbstractExpression implements Serializable {
-	private static final String ROOT_OBJECT_NAME = "o";
-	private static final String ROOT_OBJECT_NAME2 = "p";
+	protected static final String ROOT_OBJECT_NAME = "o";
+	protected static final String ROOT_OBJECT_NAME2 = "p";
 	private boolean oracleWorkaround = false;
 	
 	/**
@@ -147,6 +147,19 @@ public abstract class AbstractExpression implements Serializable {
 		return ctx;
 	}
 
+	public EvaluationContext generateHQLNotPrStringReference(HQLQuery query, String attributeReference) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, EvalException {
+		EvaluationContext ctx = new EvaluationContext();
+		ctx.currentBean = query.getClassConfig();
+		ctx.objectName = query.getRootObject();
+		ctx.hibernatePath.append( query.getRootObject() );
+		ctx.beanPath.append(".");
+		ctx.beanPath.append(attributeReference);
+		ctx.notPr   = true;
+		generateHQLStringReference(query, attributeReference, ctx);
+		
+		return ctx;
+	}
+
 	/**
 	 * Inner method to translate HSQL sentence on a specific context
 	 * 
@@ -199,31 +212,55 @@ public abstract class AbstractExpression implements Serializable {
 				AttributeConfig attConfig = entityConfig.getAttribute(part);
 				if (attConfig.isVirtualAttribute())
 				{
-					String path = ctx.partialPath+"."+part;
-					String obj = query.getObjects().get(path);
-					if (obj == null)
-					{
+					if (ctx.notPr) {
+						String path = ctx.partialPath+"."+part;
+						String pp = ctx.partialPath.substring(0, ctx.partialPath.lastIndexOf("."));
+						String obj = query.getObjects().get(path);
+						String s[] = attConfig.getVirtualAttributeName().split("\\.");
+
 						int number = query.getNextObject();
 						obj = ROOT_OBJECT_NAME +number;
-						query.getObjects().put(path, obj);
-						query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
-						String obj2 = obj+"aux";
-						String s[] = attConfig.getVirtualAttributeName().split("\\.");
 
 						int i = query.getNextParameter();
 						String param  = "p"+i;
 						query.getParameters().put(param, part);
 
-						query.getJoinString().append("\nleft join "+obj+"."+s[0]+
-								" as "+obj2+" with "+
-								obj2+"."+s[1]+"=:"+param);
+						ctx.objectCondition = "exists ( select 1 from "+
+								entityConfig.getHibernateClass()+" as "+ctx.objectName+
+								" left join "+ctx.objectName+"."+s[0]+" as "+ctx.objectName+"aux"+
+								" where "+ctx.objectName+"."+
+								attConfig.getParentEntity() + "=" + pp+" and "+
+								ctx.objectName+"aux."+s[1]+"=:"+param+" and ";
+						ctx.partialPath = null;
+						ctx.objectName = ctx.objectName+"."+attConfig.getVirtualAttributeValue();
+					} else {
+						String path = ctx.partialPath+"."+part;
+						String obj = query.getObjects().get(path);
+						if (obj == null)
+						{
+							int number = query.getNextObject();
+							obj = ROOT_OBJECT_NAME +number;
+							query.getObjects().put(path, obj);
+							query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
+							String obj2 = obj+"aux";
+							String s[] = attConfig.getVirtualAttributeName().split("\\.");
+							
+							int i = query.getNextParameter();
+							String param  = "p"+i;
+							query.getParameters().put(param, part);
+							
+							query.getJoinString().append("\nleft join "+obj+"."+s[0]+
+									" as "+obj2+" with "+
+									obj2+"."+s[1]+"=:"+param);
+						}
+						ctx.partialPath = null;
+						int i = query.getNextParameter();
+						String obj2 = obj+"aux";
+						String s[] = attConfig.getVirtualAttributeName().split("\\.");
+						ctx.objectCondition = ""; //obj2+"."+s[1]+" is not null and ";
+						ctx.closeCondition = ")";
+						ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 					}
-					ctx.partialPath = null;
-					int i = query.getNextParameter();
-					String obj2 = obj+"aux";
-					String s[] = attConfig.getVirtualAttributeName().split("\\.");
-					ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
-					ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 				} else {
 					flushParts(query, ctx);
 					ctx.objectName = ctx.objectName+"."+part;					
@@ -470,6 +507,8 @@ public abstract class AbstractExpression implements Serializable {
 
 
 class EvaluationContext {
+	public String closeCondition;
+	public boolean notPr  = false;
 	public String objectCondition;
 	boolean nonHQLAttributeUsed = false;
 	ClassConfig currentBean;

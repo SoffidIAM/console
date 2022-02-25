@@ -1573,7 +1573,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
             LogFactory.getLog(getClass()).warn("Error updating role: ", e);
-			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e));  //$NON-NLS-1$
+			throw new RuntimeException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e), e);  //$NON-NLS-1$
         }
 	}
 

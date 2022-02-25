@@ -11,6 +11,7 @@ import com.soffid.scimquery.conf.AttributeConfig;
 import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.test.entity.AccountEntity;
 import com.soffid.scimquery.test.entity.AttributeEntity;
 import com.soffid.scimquery.test.entity.AttributeValueEntity;
 import com.soffid.scimquery.test.vo.Account;
@@ -104,22 +105,22 @@ public class ParseTest extends TestCase {
 	public void testAttribute() throws ParseException, EvalException, UnsupportedEncodingException,
 			ClassNotFoundException, TokenMgrError, JSONException {
 		ClassConfig config = new ClassConfig();
+		config.setClazz(AccountEntity.class.getCanonicalName());
+		config.setHibernateClass(AccountEntity.class.getCanonicalName());
+
+		Configuration.registerClass(config);
+
+		config = new ClassConfig();
 		config.setClazz(AttributeValueEntity.class.getCanonicalName());
 		config.setHibernateClass(AttributeValueEntity.class.getCanonicalName());
-		AttributeConfig attributeConfig = new AttributeConfig();
-		attributeConfig.setVirtualAttribute(true);
-		attributeConfig.setVirtualAttributeValue("numericValue");
-		attributeConfig.setVirtualAttributeName("attribute.name");
-		attributeConfig.setAttributeName("employee");
-		config.getAttributes().put("employee", attributeConfig);
 
-		attributeConfig = new AttributeConfig();
+		AttributeConfig attributeConfig = new AttributeConfig();
 		attributeConfig.setVirtualAttribute(true);
 		attributeConfig.setVirtualAttributeValue("value");
 		attributeConfig.setVirtualAttributeName("attribute.name");
 		config.setDefaultVirtualAttribute(attributeConfig);
-
 		Configuration.registerClass(config);
+
 
 		expressionTester("attributes.employee eq \"value\"", Account.class);
 		

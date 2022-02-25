@@ -10,7 +10,7 @@ public class AttributeConfig {
 	boolean virtualAttribute = false;
 	String virtualAttributeName;
 	String virtualAttributeValue;
-
+	String parentEntity;
 	
 	public boolean isVirtualAttribute() {
 		return virtualAttribute;
@@ -58,6 +58,14 @@ public class AttributeConfig {
 
 	public void setScimType(Class<?> scimType) {
 		this.scimType = scimType;
+	}
+
+	public String getParentEntity() {
+		return parentEntity;
+	}
+
+	public void setParentEntity(String parentEntity) {
+		this.parentEntity = parentEntity;
 	}
 
 }

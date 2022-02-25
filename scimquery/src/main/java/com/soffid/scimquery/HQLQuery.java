@@ -3,6 +3,7 @@ package com.soffid.scimquery;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,7 +11,7 @@ import com.soffid.scimquery.conf.ClassConfig;
 
 public class HQLQuery {
 	ClassConfig classConfig;
-	
+	boolean negativeExpression;
 	
 	public HQLQuery(ClassConfig classConfig) {
 		super();
@@ -30,6 +31,8 @@ public class HQLQuery {
 	StringBuffer countQueryString = new StringBuffer();
 	
 	StringBuffer joinString = new StringBuffer();
+	
+	StringBuffer joinString2 = new StringBuffer();
 	
 	StringBuffer whereString = new StringBuffer();
 	
@@ -80,6 +83,10 @@ public class HQLQuery {
 		this.joinString = joinString;
 	}
 
+	public void setJoinString2(StringBuffer joinString) {
+		this.joinString2 = joinString;
+	}
+
 	public void setWhereString(StringBuffer whereString) {
 		this.whereString = whereString;
 	}
@@ -88,16 +95,31 @@ public class HQLQuery {
 		return joinString;
 	}
 
+	public StringBuffer getJoinString2() {
+		return joinString2;
+	}
+
 	public StringBuffer getWhereString() {
 		return whereString;
 	}
 	
+	public StringBuffer getOrderByString() {
+		StringBuffer sb = new StringBuffer();
+		
+		if (orderBy == null || orderBy.isEmpty()) return sb;
+		for (String s: orderBy) {
+			if (sb.length() > 0 ) sb.append(", ");
+			sb.append(s);
+		}
+		return sb;
+	}
 
 	public String toCountString ()
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append (getCountQueryString())
-			.append(getJoinString());
+			.append(getJoinString())
+			.append(getJoinString2());
 		if (getWhereString().length() > 0)
 			sb.append("\nwhere ")
 			  .append(getWhereString());
@@ -108,10 +130,14 @@ public class HQLQuery {
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append (getQueryString())
-			.append(getJoinString());
+			.append(getJoinString())
+			.append(getJoinString2());
 		if (getWhereString().length() > 0)
 			sb.append("\nwhere ")
 			  .append(getWhereString());
+		if (getOrderByString().length() > 0)
+			sb.append("\norder by ")
+				.append(getOrderByString());
 		return sb.toString();
 	}
 
@@ -136,6 +162,8 @@ public class HQLQuery {
 	}
 
 	String rootObject = null;
+
+	private List<String> orderBy;
 	public String getRootObject() {
 		return rootObject;
 	}
@@ -150,5 +178,21 @@ public class HQLQuery {
 
 	public void setCountQueryString(StringBuffer countQueryString) {
 		this.countQueryString = countQueryString;
+	}
+
+	public void setOrderBy(List<String> orderBy) {
+		this.orderBy = orderBy;
+	}
+
+	public List<String> getOrderBy() {
+		return orderBy;
+	}
+
+	public boolean isNegativeExpression() {
+		return negativeExpression;
+	}
+
+	public void setNegativeExpression(boolean negativeExpression) {
+		this.negativeExpression = negativeExpression;
 	}
 }

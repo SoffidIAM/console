@@ -34,6 +34,7 @@ import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 import roles.agent_create;
+import roles.agent_query;
 import roles.agent_queryObjects;
 import roles.agent_update;
 
@@ -462,4 +463,10 @@ public abstract class DispatcherService {
 	String createRemoteServer (String name, String tenant) {
 		return null;
 	}
+	
+	@Operation(grantees = {agent_query.class})
+	protected String startVirtualSourceTransaction(boolean readonly, @Nullable String server) { return null; }
+
+	@Operation(grantees = {agent_query.class})
+	protected void finishVirtualSourceTransaction(String transactionId) { }
 }

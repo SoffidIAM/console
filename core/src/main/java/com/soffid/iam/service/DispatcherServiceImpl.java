@@ -1841,4 +1841,13 @@ public class DispatcherServiceImpl extends
 		
 		return o;
 	}
+	
+	public void handleFinishVirtualSourceTransaction(String transactionId) throws InternalErrorException, InternalErrorException {
+		getTaskEntityDao().finishVirtualSourceTransaction(transactionId);
+	}
+
+	@Override
+	protected String handleStartVirtualSourceTransaction(boolean readonly, String server) throws Exception {
+		return getTaskEntityDao().startVirtualSourceTransaction(readonly, server);
+	}
 }

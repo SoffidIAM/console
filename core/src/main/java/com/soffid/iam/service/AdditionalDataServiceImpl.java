@@ -93,7 +93,7 @@ public class AdditionalDataServiceImpl extends
 	 */
 	protected java.util.Collection<DataType> handleGetDataTypes() throws java.lang.Exception {
 		CustomObjectTypeEntity user = getCustomObjectTypeEntityDao().findByName(User.class.getName());
-		Collection<MetaDataEntity> col = user.getAttributes();
+		Collection<MetaDataEntity> col = new LinkedList<>(user.getAttributes());
 		for ( Iterator<MetaDataEntity> iterator = col.iterator(); iterator.hasNext(); )
 		{
 			MetaDataEntity md = iterator.next();

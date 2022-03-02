@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.api.AsyncList;
@@ -23,7 +24,7 @@ public abstract class InputFieldDataHandler<E> {
 	public abstract E getObject(String name, String filter) throws Exception;
 	public abstract String getDescription(String name, String filter) throws Exception;
 	public abstract AsyncList<E> search(String text, String filter) throws Exception; 
-	public abstract void openFinder(String filter, boolean multiple, Databox databox, EventListener listener) throws Exception;
+	public abstract void openFinder(String filter, boolean multiple, Component databox, EventListener listener) throws Exception;
 	public abstract String followLink(String value) throws UnsupportedEncodingException;
 	
 	String buildJsonFilter (String attribute, String value, String filter) {

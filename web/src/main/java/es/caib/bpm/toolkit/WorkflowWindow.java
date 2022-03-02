@@ -63,6 +63,7 @@ public class WorkflowWindow extends Window implements WorkflowWindowInterface {
 
     public WorkflowWindow() 
     {
+    	setStyle("position: relative");
     	Execution exe = Executions.getCurrent();
     	if (exe == null)
     		throw new UiException("Cannot get current execution");

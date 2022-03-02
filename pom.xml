@@ -10,7 +10,7 @@
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>3.3.1-SNAPSHOT</version>
+  <version>3.3.4-SNAPSHOT</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>

@@ -62,6 +62,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserTypeDispatcher;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccessControlEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
@@ -1026,6 +1027,8 @@ public class DispatcherServiceImpl extends
 	@Override
 	protected void handleSetDefaultMappingsByDispatcher(Long dispatcherId)
 			throws Exception {
+		Evaluator ev = Evaluator.instance();
+	
 		SystemEntity de = getSystemEntityDao().load(dispatcherId);
 
 		for (ObjectMappingEntity ome : de.getObjectMappings()) {
@@ -1068,8 +1071,8 @@ public class DispatcherServiceImpl extends
 							.newAttributeMappingEntity();
 					am.setObject(ome);
 					am.setDirection(dam.getDirection());
-					am.setSoffidAttribute(dam.getSoffidAttribute());
-					am.setSystemAttribute(dam.getSystemAttribute());
+					am.setSoffidAttribute(ev.translateFromBsh( dam.getSoffidAttribute()) );
+					am.setSystemAttribute(ev.translateFromBsh( dam.getSystemAttribute()) );
 					getAttributeMappingEntityDao().create(am);
 					ome.getAttributeMappings().add(am);
 				}

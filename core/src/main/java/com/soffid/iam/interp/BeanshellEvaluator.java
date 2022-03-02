@@ -17,6 +17,8 @@ public class BeanshellEvaluator extends Evaluator {
 
 	@Override
 	public Object evaluate(String script, Map<String, Object> vars, String label) throws Exception {
+		if (!vars.containsKey("out"))
+			vars.put("out", System.out);
 		SecureInterpreter interpreter = interpreters.get();
 		if ( interpreter == null)
 		{
@@ -56,6 +58,11 @@ public class BeanshellEvaluator extends Evaluator {
 	@Override
 	public boolean isSecure() {
 		return false;
+	}
+
+	@Override
+	public String translateFromBsh(String bshScript) {
+		return bshScript;
 	}
 
 }

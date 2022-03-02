@@ -39,15 +39,15 @@ public class SecureServiceLocator extends AbstractJSObject {
 
 	private Object findService(String name) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		if (name.equalsIgnoreCase("context"))
-			return false;
+			return null;
 		if (name.toLowerCase().endsWith("dao"))
 			return null;
 		Object service = null;
 		if (localServiceLocator != null) {
 			String methodName = "get"+name.substring(0, 1).toUpperCase()+name.substring(1);
 			try {
-				Method m = remoteServiceLocator.getClass().getMethod(methodName);
-				service = m.invoke(remoteServiceLocator);
+				Method m = localServiceLocator.getClass().getMethod(methodName);
+				service = m.invoke(localServiceLocator);
 			} catch (NoSuchMethodException e) {
 				
 			}

@@ -31,14 +31,15 @@ public class JavascriptEvaluator extends Evaluator {
 	static ClassFilter classFilter = new SoffidClassFilter();
 	@Override
 	public Object evaluate(String script, Map<String, Object> vars, String label) throws Exception {
+		if (!vars.containsKey("out"))
+			vars.put("out", System.out);
 		NashornScriptEngineFactory factory = new NashornScriptEngineFactory ();
 		Account acc = new Account();
 		ScriptEngine engine = factory.getScriptEngine(classFilter);
 		Bindings bindings = new DynamicBindings(vars);
-		acc.getAttributes().put("att", "xxx");
 		engine.setBindings(bindings , ScriptContext.ENGINE_SCOPE);
 		try {
-			return engine.eval(script);
+			return secureRun(engine, script);
         } catch (ScriptException se) {
             // get the original cause
             Throwable cause = se.getCause();
@@ -109,5 +110,12 @@ public class JavascriptEvaluator extends Evaluator {
 			else 
 				throw (RuntimeException) result[1];
 		}
+	}
+	@Override
+	public String translateFromBsh(String bshScript) {
+		return bshScript.replaceAll("\\{\\s*(\"[^\"]*\")\\s*\\}", "[$1]")
+				.replaceAll("\\.\\s*size\\s*\\(\\s*\\)", ".length")
+				.replaceAll("\\.\\s*equals", " == ")
+				.replaceAll("(\\W)void(\\W)", "$1undefined$2");
 	}
 }

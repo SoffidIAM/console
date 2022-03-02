@@ -30,6 +30,7 @@
 				<listbox mold="select" id="language" onSelect="ref:frame.enableButtons">
 					<listitem value="beanshell" label="Beanshell (default)"></listitem>
 					<listitem value="javascript" label="Javascript"></listitem>
+					<listitem value="autodetect" label="Autodetect"></listitem>
 				</listbox>
 			</row>
 			<row>

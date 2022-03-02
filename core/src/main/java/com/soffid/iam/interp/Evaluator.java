@@ -32,6 +32,8 @@ public abstract class Evaluator {
 		Evaluator evaluator;
 		if ("javascript".equalsIgnoreCase(lang))
 			evaluator = new JavascriptEvaluator();
+		else if ("autodetect".equalsIgnoreCase(lang))
+			evaluator = new AutodetectEvaluator();
 		else
 			evaluator = new BeanshellEvaluator();
 		return evaluator;
@@ -39,4 +41,5 @@ public abstract class Evaluator {
 	
 	public abstract Object evaluate (String script, Map<String, Object> vars, String label) throws Exception;
 	public abstract boolean isSecure();
+	public abstract String translateFromBsh(String bshScript);
 }

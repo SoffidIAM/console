@@ -1,5 +1,7 @@
 package com.soffid.iam.web.agent;
 
+import java.io.IOException;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
@@ -36,7 +38,7 @@ public class TriggerHandler extends Tabpanel {
 	}
 	
 	
-	public void editTrigger (final Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
+	public void editTrigger (final Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
 		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
 					    new com.soffid.iam.web.agent.ScriptEnviroment().getLoadTriggerVars(event.getTarget()));
 	}

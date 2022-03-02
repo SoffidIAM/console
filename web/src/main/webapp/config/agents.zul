@@ -445,7 +445,7 @@
 															height="32px" onFocus="ref:objectsGrid.focusTextarea">
 														</textbox>
 														<imageclic src="/img/pencil.svg" 
-															onClick="ref:objectsGrid.editAttribute">
+															onClick="ref:objectsGrid.editSoffidAttribute">
 														</imageclic>
 														<div>
 															<label multiline="true"/>

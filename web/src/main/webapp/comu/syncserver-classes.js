@@ -132,6 +132,7 @@ CodeMirrorJavaTypes['list<accountObject>'] = {
 };
 CodeMirrorJavaTypes['es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject'] = {
 		'search':'java.util.Map',
+		'invoke':'java.util.List',
 		'soffidToSystem':'java.util.Map',
 		'systemToSoffid':'java.util.Map'
 };

@@ -111,12 +111,12 @@ public class UserDomainHandler extends FrameHandler implements AfterCompose {
 		try {
 			com.soffid.codemirror.Codemirror cm = (Codemirror) getFellow("du_script1");
 			cm.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getDomainVars());
-		} catch (InternalErrorException | NamingException | CreateException e) {
+		} catch (InternalErrorException | NamingException | CreateException | IOException e) {
 		}
 		try {
 			com.soffid.codemirror.Codemirror cm = (Codemirror) getFellow("du_script2");
 			cm.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getDomainVars());
-		} catch (InternalErrorException | NamingException | CreateException e) {
+		} catch (InternalErrorException | NamingException | CreateException | IOException e) {
 		}
 	}
 	

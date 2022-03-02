@@ -1,5 +1,6 @@
 package com.soffid.iam.web.agent;
 
+import java.io.IOException;
 import java.util.Comparator;
 
 import javax.ejb.CreateException;
@@ -100,7 +101,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 		metadataWindow.setVisible(false);
 	}
 	
-	public void editScript(Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
+	public void editScript(Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
 		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
 				new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
 	}
@@ -174,7 +175,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 		super.onPageAttached(newpage, oldpage);
 		try {
 			newpage.setVariable("js_template", new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
-		} catch (InternalErrorException | NamingException | CreateException e) {
+		} catch (InternalErrorException | NamingException | CreateException | IOException e) {
 			throw new UiException("Error generating javascript template", e);
 		}
 	}

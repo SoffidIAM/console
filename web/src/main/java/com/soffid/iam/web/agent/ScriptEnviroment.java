@@ -1,5 +1,6 @@
 package com.soffid.iam.web.agent;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.ejb.CreateException;
@@ -19,6 +20,8 @@ import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.SoffidObjectType;
+import com.soffid.iam.interp.Evaluator;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.TypeEnumeration;
@@ -39,8 +42,9 @@ public class ScriptEnviroment {
 	 * @throws CreateException 
 	 * @throws NamingException 
 	 * @throws InternalErrorException 
+	 * @throws IOException 
 	 */
-	public String getLoadTriggerVars (Component c) throws InternalErrorException, NamingException, CreateException
+	public String getLoadTriggerVars (Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		Object o = XPathUtils.getValue(c, "@objectType");
 		SoffidObjectType type = SoffidObjectType.fromString( o.toString() );
@@ -74,8 +78,9 @@ public class ScriptEnviroment {
 	 * @throws CreateException 
 	 * @throws NamingException 
 	 * @throws InternalErrorException 
+	 * @throws IOException 
 	 */
-	public String getTriggerVars (Component c) throws InternalErrorException, NamingException, CreateException
+	public String getTriggerVars (Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		while ( ! (c instanceof Grid ))
 			c = c.getParent();
@@ -131,8 +136,9 @@ public class ScriptEnviroment {
 	 * @throws CreateException 
 	 * @throws NamingException 
 	 * @throws InternalErrorException 
+	 * @throws IOException 
 	 */
-	public String getSystemVars (Component c) throws InternalErrorException, NamingException, CreateException
+	public String getSystemVars (Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		while ( ! (c instanceof Grid ))
 			c = c.getParent();
@@ -159,8 +165,9 @@ public class ScriptEnviroment {
 	 * @throws CreateException 
 	 * @throws NamingException 
 	 * @throws InternalErrorException 
+	 * @throws IOException 
 	 */
-	public String getSoffidVars (Component c) throws InternalErrorException, NamingException, CreateException
+	public String getSoffidVars (Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		while ( ! (c instanceof Grid ))
 			c = c.getParent();
@@ -168,7 +175,7 @@ public class ScriptEnviroment {
 		return getSoffidVars2(c);
 	}
 	
-	public String getSoffidVars2 (Component c) throws InternalErrorException, NamingException, CreateException
+	public String getSoffidVars2 (Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		SoffidObjectType type = (SoffidObjectType) XPathUtils.getValue(c, "@soffidObject");
 
@@ -316,7 +323,21 @@ public class ScriptEnviroment {
 		return sb.toString();
 	}
 
-	private void defineAccountAttributes(Component c)
+	private String openAttribute() throws InternalErrorException, IOException {
+		if (Evaluator.instance().isSecure())
+			return "'";
+		else
+			return "'{\"";
+	}
+
+	private String closeAttribute() throws InternalErrorException, IOException {
+		if (Evaluator.instance().isSecure())
+			return "'";
+		else
+			return "\"}'";
+	}
+
+	private void defineAccountAttributes(Component c) throws InternalErrorException, IOException
 	{
 		StringBuffer sb = new StringBuffer();
 				
@@ -329,7 +350,7 @@ public class ScriptEnviroment {
 			TypeEnumeration t = (TypeEnumeration) ctx.getValue(p.asPath()+"/@type");
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(name).append("\"}':\"");
+			sb.append(openAttribute()).append(name).append(closeAttribute()).append(":\"");
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
 			else if (t == TypeEnumeration.DATE_TYPE)
@@ -343,7 +364,7 @@ public class ScriptEnviroment {
 		
 	}
 
-	private void defineUserAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	private void defineUserAttributes(Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		StringBuffer sb = new StringBuffer();
 		
@@ -351,7 +372,7 @@ public class ScriptEnviroment {
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
+			sb.append(openAttribute()).append(td.getCode()).append(closeAttribute()).append(":\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -366,7 +387,7 @@ public class ScriptEnviroment {
 		
 	}
 
-	private void defineRoleAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	private void defineRoleAttributes(Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		StringBuffer sb = new StringBuffer();
 		
@@ -374,7 +395,7 @@ public class ScriptEnviroment {
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
+			sb.append(openAttribute()).append(td.getCode()).append(closeAttribute()).append(":\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -389,7 +410,7 @@ public class ScriptEnviroment {
 		
 	}
 
-	private void defineApplicationAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	private void defineApplicationAttributes(Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		StringBuffer sb = new StringBuffer();
 		
@@ -397,7 +418,7 @@ public class ScriptEnviroment {
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
+			sb.append(openAttribute()).append(td.getCode()).append(closeAttribute()).append(":\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -412,7 +433,7 @@ public class ScriptEnviroment {
 		
 	}
 
-	private void defineCustomObjectAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	private void defineCustomObjectAttributes(Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		StringBuffer sb = new StringBuffer();
 		
@@ -427,7 +448,7 @@ public class ScriptEnviroment {
 				if ( !first )
 					sb.append(",");
 				first = false;
-				sb.append("'{\"").append(td.getCode()).append("\"}':\"");
+				sb.append(openAttribute()).append(td.getCode()).append(closeAttribute()).append(":\"");
 				TypeEnumeration t = td.getType();
 				if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 					sb.append("byte");
@@ -445,7 +466,7 @@ public class ScriptEnviroment {
 		
 	}
 
-	private void defineGroupAttributes(Component c) throws InternalErrorException, NamingException, CreateException
+	private void defineGroupAttributes(Component c) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		StringBuffer sb = new StringBuffer();
 		
@@ -453,7 +474,7 @@ public class ScriptEnviroment {
 		{
 			if ( sb.length() > 0)
 				sb.append(",");
-			sb.append("'{\"").append(td.getCode()).append("\"}':\"");
+			sb.append(openAttribute()).append(td.getCode()).append(closeAttribute()).append(":\"");
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
@@ -476,8 +497,9 @@ public class ScriptEnviroment {
 	 * @throws CreateException 
 	 * @throws NamingException 
 	 * @throws InternalErrorException 
+	 * @throws IOException 
 	 */
-	public String getRuleVars () throws InternalErrorException, NamingException, CreateException
+	public String getRuleVars () throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		defineUserAttributes(null);
 		
@@ -514,8 +536,9 @@ public class ScriptEnviroment {
 	 * @throws CreateException 
 	 * @throws NamingException 
 	 * @throws InternalErrorException 
+	 * @throws IOException 
 	 */
-	public String getDomainVars () throws InternalErrorException, NamingException, CreateException
+	public String getDomainVars () throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		defineUserAttributes(null);
 		
@@ -548,7 +571,7 @@ public class ScriptEnviroment {
 	}
 
 
-	public String getUserAttributeValidationVars (CustomObjectType t) throws InternalErrorException, NamingException, CreateException
+	public String getUserAttributeValidationVars (CustomObjectType t) throws InternalErrorException, NamingException, CreateException, IOException
 	{
 		String partial = "";
 		if (t == null)

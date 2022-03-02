@@ -506,7 +506,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 					});
 	}
 	
-	public void editScript(Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
+	public void editScript(Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
 		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
 				new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
 	}

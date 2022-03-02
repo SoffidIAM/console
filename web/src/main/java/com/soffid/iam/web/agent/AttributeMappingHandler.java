@@ -1,5 +1,6 @@
 package com.soffid.iam.web.agent;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
@@ -146,11 +147,16 @@ public class AttributeMappingHandler extends DataGrid {
 		XPathUtils.removePath (bindCtx.getDataSource(), bindCtx.getXPath());
 	}
 	
-	public void editAttribute (final Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
+	public void editAttribute (final Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
 		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
 					    new com.soffid.iam.web.agent.ScriptEnviroment().getSystemVars(event.getTarget()));
 	}
 	
+	public void editSoffidAttribute (final Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
+		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
+					    new com.soffid.iam.web.agent.ScriptEnviroment().getSoffidVars(event.getTarget()));
+	}
+
 	public void displayTestRow (Event event)
 	{
 		Component c = event.getTarget();
@@ -482,7 +488,7 @@ public class AttributeMappingHandler extends DataGrid {
 		testWindow.doHighlighted();
 	}
 	
-	public void editTrigger(Event event ) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException {
+	public void editTrigger(Event event ) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
 		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
 					    new com.soffid.iam.web.agent.ScriptEnviroment().getTriggerVars(event.getTarget()));
 

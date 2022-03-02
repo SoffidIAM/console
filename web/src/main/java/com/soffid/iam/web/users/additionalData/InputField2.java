@@ -77,6 +77,9 @@ import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.Identity;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
+import com.soffid.iam.web.component.SearchDictionaryBuilder;
+import com.soffid.iam.web.component.inputField.RoleDataHandler;
+import com.soffid.iam.web.popup.FinderHandler;
 
 import bsh.EvalError;
 import bsh.TargetError;
@@ -167,125 +170,137 @@ public class InputField2 extends Div implements XPathSubscriber
 	private boolean updateCustomObject;
 	private boolean readonly;
 	private String ownerContext;
+	FinderListener listener = null;
+	InputElement currentTextbox = null;
 	
-	public void onSelectUser (Event event) {
+	class FinderListener implements EventListener {
+		@Override
+		public void onEvent(Event event) throws Exception {
+			if (dataType.isMultiValued())
+			{
+				List<String> data = (List<String>) event.getData();
+				for (String s: data)
+				{
+					currentTextbox.setRawValue(s);
+					onChildChange( new Event (event.getName(), currentTextbox ) );
+					List l = (List) binder.getValue();
+					int currentSize = l.size();
+					currentTextbox = (InputElement) getFellow( getIdForPosition(currentSize));
+				}			
+			}
+			else
+			{
+				String data = (String) event.getData();
+				String userName = data;
+				currentTextbox.setRawValue(userName);
+				onChildChange( new Event (event.getName(), currentTextbox ) );
+			}
+		}
+	}
+
+	public void onSelect (Event event, String title, Class cl) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("usuarisLlista"); //$NON-NLS-1$
-			Boolean multiValued = dataType.isMultiValued();
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {   //$NON-NLS-1$ //$NON-NLS-2$
-					filter, 
-					multiValued, 
-					dataType.getFilterExpression(),
-					hideUserName });
+			try {
+				if (listener == null)
+					listener = new FinderListener();
+				currentTextbox = (InputElement) event.getTarget().getPreviousSibling();
+				FinderHandler.startWizard(title, cl.getName(),
+						this, dataType.isMultiValued(), 
+						dataType.getFilterExpression(),
+						listener);
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
 		}
+	}
+
+	public void onSelectUser (Event event) {
+		onSelect(event,"Select user", User.class);
 	}
 
 	public void onSelectRole (Event event) {
-		if (!readonly)
-		{
-			Page p = getDesktop().getPage("rolsLlista2"); //$NON-NLS-1$
-			Boolean multiValued = dataType.isMultiValued();
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {   //$NON-NLS-1$ //$NON-NLS-2$
-					filter, 
-					multiValued, 
-					dataType.getFilterExpression(),
-					hideUserName });
-		}
+		onSelect(event,"Select role", Role.class);
 	}
 
 	public void onSelectGroup(Event event) {
-		if (!readonly)
-		{
-			Page p = getDesktop().getPage("grupsLlista"); //$NON-NLS-1$
-			p.setAttribute("tipus", ""); //$NON-NLS-1$ //$NON-NLS-2$
-			p.setAttribute("llistaObsolets", false); //$NON-NLS-1$
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() }); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+		onSelect(event,"Select group", Group.class);
 	}
 
 	public void onSelectApplication(Event event) {
-		if (!readonly)
-		{
-			Page p = getDesktop().getPage("aplicacionsLlista"); //$NON-NLS-1$
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, dataType.isMultiValued(), dataType.getFilterExpression() }); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+		onSelect(event,"Select application", Application.class);
+	}
+
+	protected String quote(String name) {
+		return name
+				.replaceAll("\\\\", "\\\\\\\\")
+				.replaceAll("\"", "\\\\\"");
 	}
 
 	public void onSelectCustomObject(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPage("customObjectsLlista"); //$NON-NLS-1$
-			p.setAttribute("type", dataType.getDataObjectType()); //$NON-NLS-1$
-			Boolean multiValued = dataType.isMultiValued();
-			Events.postEvent("onInicia", p.getFellow("esquemaLlista"), new Object[] {event.getTarget(), multiValued}); //$NON-NLS-1$ //$NON-NLS-2$
-			Events.postEvent("onConfigure", p.getFellow("esquemaLlista"), new Object [] {  filter, multiValued, dataType.getFilterExpression() }); //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				if (listener == null)
+					listener = new FinderListener();
+				currentTextbox = (InputElement) event.getTarget().getPreviousSibling();
+				String q = "type.name eq\""+quote(dataType.getDataObjectType())+"\"";
+				if (dataType.getFilterExpression() != null && ! dataType.getFilterExpression().trim().isEmpty())
+					q = "("+dataType.getFilterExpression()+") and ("+q+")";
+				FinderHandler.startWizard("Select object", User.class.getName(),
+						this, dataType.isMultiValued(), 
+						q,
+						listener);
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
 		}
 	}
 
 	public void onSelectHost(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPageIfAny("maquinesLlista"); //$NON-NLS-1$
-			if ( p == null)
-			{
-				Component hostsWindow = getPage().getFellowIfAny("hostsWindow"); //$NON-NLS-1$
-				if (hostsWindow == null)
-				{
-					hostsWindow = new Window();
-					hostsWindow.setId("hostsWindow"); //$NON-NLS-1$
-					hostsWindow.setPage(getPage());
-					Executions.getCurrent().createComponents("/maquinesllista.zul", hostsWindow, new HashMap()); //$NON-NLS-1$
-				}
-				Events.postEvent("onInicia", hostsWindow.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				if (listener == null)
+					listener = new FinderListener();
+				FinderHandler.startWizard("Select host", Host.class.getName(),
+						this, dataType.isMultiValued(), 
+						dataType.getFilterExpression(),
+						listener);
+			} catch (Exception e) {
+				throw new UiException(e);
 			}
-			else
-				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 	public void onSelectNetwork (Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPageIfAny("xarxesLlista"); //$NON-NLS-1$
-			if ( p == null)
-			{
-				Component networksWindow = getPage().getFellowIfAny("networksWindow"); //$NON-NLS-1$
-				if (networksWindow == null)
-				{
-					networksWindow = new Window();
-					networksWindow.setId("networksWindow"); //$NON-NLS-1$
-					networksWindow.setPage(getPage());
-					Executions.getCurrent().createComponents("/xarxesllista.zul", networksWindow, new HashMap()); //$NON-NLS-1$
-				}
-				Events.postEvent("onInicia", networksWindow.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				if (listener == null)
+					listener = new FinderListener();
+				FinderHandler.startWizard("Select netwokr", Network.class.getName(),
+						this, dataType.isMultiValued(), 
+						dataType.getFilterExpression(),
+						listener);
+			} catch (Exception e) {
+				throw new UiException(e);
 			}
-			else
-				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
 	public void onSelectMailDomain(Event event) {
 		if (!readonly)
 		{
-			Page p = getDesktop().getPageIfAny("dominisCorreuLlista"); //$NON-NLS-1$
-			if ( p == null)
-			{
-				Component mailDomainWindow = getPage().getFellowIfAny("mailDomainWindow"); //$NON-NLS-1$
-				if (mailDomainWindow == null)
-				{
-					mailDomainWindow = new Window();
-					mailDomainWindow.setId("mailDomainWindow"); //$NON-NLS-1$
-					mailDomainWindow.setPage(getPage());
-					Executions.getCurrent().createComponents("/dominisCorreullista.zul", mailDomainWindow, new HashMap()); //$NON-NLS-1$
-				}
-				Events.postEvent("onInicia", mailDomainWindow.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
+			try {
+				if (listener == null)
+					listener = new FinderListener();
+				FinderHandler.startWizard("Select mail domain", MailDomain.class.getName(),
+						this, dataType.isMultiValued(), 
+						dataType.getFilterExpression(),
+						listener);
+			} catch (Exception e) {
+				throw new UiException(e);
 			}
-			else
-				Events.postEvent("onInicia", p.getFellow("esquemaLlista"), event.getTarget()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

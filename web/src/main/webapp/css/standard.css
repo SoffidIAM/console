@@ -1988,7 +1988,7 @@ div.attributeSearchPopup {
     border: solid 2px #AAB;
     z-index: 10;
     float: {TEXT_ALIGN_LEFT};
-    margin-top: 20px;
+    margin-top: 28px;
     position: absolute;
     min-width: 150px;
     min-height: 80px;
@@ -2014,8 +2014,16 @@ div.inputField_input {
 	padding-bottom: 2px;
 }
 
-div.inputField_input .widetextbox {
-	width: 350px;	
+div.inputField_input {
+	position: relative;
+	display: table-cell;
+	vertical-align: top;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+div.inputField_input img.imageclic {
+	width: 24px;	
 }			
 
 span.inputField_tail {

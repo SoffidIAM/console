@@ -415,7 +415,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 		{
 			if (c instanceof Div)
 			{
-				Component cc = c.getFirstChild().getNextSibling();
+				Component cc = c.getFirstChild();
 				if (cc instanceof InputField3) {
 					InputField3 InputField3 = (InputField3) cc;
 					DataType dt = InputField3.getDataType();

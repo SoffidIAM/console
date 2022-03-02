@@ -30,9 +30,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.Configuration;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.Group;
@@ -1430,18 +1432,18 @@ public class ApplicationBootServiceImpl extends
 	}
 
 	private void createStandardAttributes() throws Exception {
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Group.ui.json", MetadataScope.GROUP, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/GroupUser.ui.json", MetadataScope.GROUP_MEMBERSHIP, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Host.ui.json", null, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", MetadataScope.APPLICATION, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Role.ui.json", MetadataScope.ROLE, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, false);
-		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/MailList.ui.json", MetadataScope.MAIL_LIST, false);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Group.ui.json", MetadataScope.GROUP, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/GroupUser.ui.json", MetadataScope.GROUP_MEMBERSHIP, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Host.ui.json", null, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", MetadataScope.APPLICATION, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Role.ui.json", MetadataScope.ROLE, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/MailList.ui.json", MetadataScope.MAIL_LIST, true);
 
 		for (CustomObjectTypeEntity entity: getCustomObjectTypeEntityDao().loadAll()) {
 			if (! entity.isBuiltin()) {
-				if ( getMetaDataEntityDao().findByObjectTypeAndName(entity.getName(), "name") == null) {
+				if ( getMetaDataEntityDao().findByObjectTypeAndName(entity.getName(), "name").isEmpty()) {
 					MetaDataEntity name = getMetaDataEntityDao().newMetaDataEntity();
 					name.setBuiltin(true);
 					name.setObjectType(entity);
@@ -1454,7 +1456,7 @@ public class ApplicationBootServiceImpl extends
 					getMetaDataEntityDao().create(name);
 				}
 				
-				if ( getMetaDataEntityDao().findByObjectTypeAndName(entity.getName(), "description") == null) {
+				if ( getMetaDataEntityDao().findByObjectTypeAndName(entity.getName(), "description").isEmpty()) {
 					MetaDataEntity description = getMetaDataEntityDao().newMetaDataEntity();
 					description.setBuiltin(true);
 					description.setObjectType(entity);

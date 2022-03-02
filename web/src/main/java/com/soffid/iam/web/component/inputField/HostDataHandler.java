@@ -7,6 +7,7 @@ import java.util.List;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
@@ -48,7 +49,7 @@ public class HostDataHandler extends InputFieldDataHandler<Host> {
 	}
 
 	@Override
-	public void openFinder(String filter, boolean multiple, Databox databox, EventListener listener) throws Exception {
+	public void openFinder(String filter, boolean multiple, Component databox, EventListener listener) throws Exception {
 		FinderHandler.startWizard("Select host", Host.class.getName(),
 				databox, multiple, 
 				filter,

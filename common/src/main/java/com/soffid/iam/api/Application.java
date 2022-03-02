@@ -28,7 +28,7 @@ public class Application extends AbstractApplication {
 	public void setRelativeName(String relativeName) {
 		if (relativeName == null ?  getRelativeName() != null: ! relativeName.equals(getRelativeName())) {
 			super.setRelativeName(relativeName);
-			super.setName(getParent() == null? getRelativeName(): getParent()+"/"+getRelativeName());
+			super.setName(getParent() == null || getParent().trim().isEmpty()? getRelativeName(): getParent()+"/"+getRelativeName());
 		}
 	}
 

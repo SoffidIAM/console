@@ -164,7 +164,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
-        <version>1.2.7</version>
+        <version>1.2.7-soffid-1-SNAPSHOT</version>
         <optional>true</optional>
         <exclusions>
           <exclusion>
@@ -405,6 +405,11 @@
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>2.1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam</groupId>
+			<artifactId>nashorn-core</artifactId>
+			<version>15.3-SNAPSHOT</version>
 		</dependency>
     </dependencies>
   </dependencyManagement>

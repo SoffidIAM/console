@@ -33,30 +33,30 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 			</plugin>
-	<plugin>
-		<artifactId>maven-dependency-plugin</artifactId>
-		<executions>
-			<execution>
-				<goals>
-					<goal>unpack</goal>
-				</goals>
-				<phase>generate-sources</phase>
-			</execution>
-		</executions>
-		<configuration>
-			<artifactItems>
-				<artifactItem>
-					<groupId>${project.groupId}</groupId>
-					<artifactId>iam-meta</artifactId>
-					<version>${project.version}</version>
-					<classifier>common</classifier>
-					<type>zip</type>
-					<overWrite>true</overWrite>
-					<outputDirectory>${project.build.directory}/src</outputDirectory>
-				</artifactItem>
-			</artifactItems>
-		</configuration>
-	</plugin>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<phase>generate-sources</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>iam-meta</artifactId>
+							<version>${project.version}</version>
+							<classifier>common</classifier>
+							<type>zip</type>
+							<overWrite>true</overWrite>
+							<outputDirectory>${project.build.directory}/src</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -267,6 +267,10 @@
 			<groupId>org.beanshell</groupId>
 			<artifactId>bsh</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam</groupId>
+			<artifactId>nashorn-core</artifactId>
 		</dependency>
 	</dependencies>
   <reporting>

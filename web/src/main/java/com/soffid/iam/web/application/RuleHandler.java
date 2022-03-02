@@ -128,7 +128,7 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 		try {
 			cm.setGlobalVars(new com.soffid.iam.web.agent.ScriptEnviroment().getRuleVars());
 			cm.invalidate();
-		} catch (InternalErrorException | NamingException | CreateException e) {
+		} catch (InternalErrorException | NamingException | CreateException | IOException e) {
 			throw new UiException(e);
 		}
 	}

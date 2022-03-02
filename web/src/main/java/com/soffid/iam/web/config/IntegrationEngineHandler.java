@@ -17,6 +17,7 @@ import org.zkoss.zul.Listitem;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.service.ejb.ConfigurationService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -33,12 +34,14 @@ public class IntegrationEngineHandler extends FrameHandler {
 	ConfigurationService configurationService = EJBLocator.getConfigurationService();
 	private Listbox taskMode;
 	private Intbox taskLimit;
+	private Listbox lang;
 
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
 		taskLimit = (Intbox) getFellow("taskLimit");
 		taskMode = (Listbox) getFellow("taskMode");
+		lang = (Listbox) getFellow("language");
 		refreshTaskEngine();
 	}
 
@@ -50,8 +53,17 @@ public class IntegrationEngineHandler extends FrameHandler {
 		for (Listitem item : items)
 			if (item.getValue().equals(mode))
 				taskMode.setSelectedItem(item);
+		
+		
+		String interpreter = ConfigurationCache.getProperty("soffid.interpreter");
+		if ("javascript".equals(interpreter))
+			lang.setSelectedIndex(1);
+		else
+			lang.setSelectedIndex(0);
+
 		String max = com.soffid.iam.utils.ConfigurationCache.getProperty("soffid.task.limit");
 		taskLimit.setText(max);
+		
 		
 		Button b = (Button) getFellow("undoButton");
 		b.setDisabled(true);
@@ -82,6 +94,7 @@ public class IntegrationEngineHandler extends FrameHandler {
 
 		updateAttribute("soffid.task.mode", (String) taskMode.getSelectedItem().getValue(), "Task operation mode");
 		updateAttribute("soffid.task.limit", taskLimit.getText(), "Maximum number of tasks per transaction");
+		updateAttribute("soffid.interpreter", (String) lang.getSelectedItem().getValue(), "Script language");
 		
 		closeFrame();
 	}

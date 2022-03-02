@@ -3,8 +3,6 @@ package es.caib.seycon.ng.test;
 import java.io.File;
 import java.util.Collection;
 
-import javax.sql.rowset.spi.XmlReader;
-
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.model.TenantEntityDao;

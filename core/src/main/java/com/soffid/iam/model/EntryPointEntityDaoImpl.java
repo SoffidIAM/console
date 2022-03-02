@@ -32,8 +32,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
 /**
  * @see es.caib.seycon.ng.model.PuntEntradaEntity
  */

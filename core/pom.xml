@@ -693,6 +693,10 @@
 			<artifactId>lucene-queryparser</artifactId>
 			<version>4.5.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam</groupId>
+			<artifactId>nashorn-core</artifactId>
+		</dependency>
 	</dependencies>
 </project>
 

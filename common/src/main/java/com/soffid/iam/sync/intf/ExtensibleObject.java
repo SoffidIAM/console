@@ -27,6 +27,7 @@ public class ExtensibleObject implements Serializable, Map<String, Object>
 
 	public boolean containsKey(Object key)
 	{
+		get(key);
 		return attributes.containsKey(key);
 	}
 

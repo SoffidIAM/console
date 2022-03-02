@@ -26,6 +26,14 @@
 				</div>
 			</row>
 			<row>
+				<label value="${c:l('parametres.zul.scriptLanguage')}"/>
+				<listbox mold="select" id="language" onSelect="ref:frame.enableButtons">
+					<listitem value="beanshell" label="Beanshell (default)"></listitem>
+					<listitem value="javascript" label="Javascript"></listitem>
+					<listitem value="autodetect" label="Autodetect"></listitem>
+				</listbox>
+			</row>
+			<row>
 				<label/>
 				<div style="margin-top: 2em">
 					<button image="/img/undo-r.svg" label="${c:l('common.undo') }" onClick="ref:frame.refreshTaskEngine" id="undoButton"

@@ -26,6 +26,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -97,7 +98,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			RoleAccountEntityDao raDao = getRoleAccountEntityDao();
 			Object result = null;
 			if ("S".equals(user.getActive())) //$NON-NLS-1$
-				result = evaluate (rule.getBshExpression(), env);
+				result = evaluate (rule.getBshExpression(), rule.getName(), env);
 			if (result != null && ! (result instanceof Boolean))
 			{
 				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
@@ -126,7 +127,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                         if (rar.getDomainValue() != null && rar.getDomainValue().length() > 0) {
                             stringValue = rar.getDomainValue();
                         } else if (rar.getBshDomainValueExpression() != null && rar.getBshDomainValueExpression().length() > 0) {
-                            Object obj = evaluate(rar.getBshDomainValueExpression(), env);
+                            Object obj = evaluate(rar.getBshDomainValueExpression(), rule.getName(), env);
                             if (obj != null) stringValue = obj.toString();
                         }
                     }
@@ -135,7 +136,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				
 				if ( rule.getBshRoles() != null)
 				{
-					Object o = evaluate(rule.getBshRoles(), env);
+					Object o = evaluate(rule.getBshRoles(), rule.getName(), env);
 					if (o != null) {
 						if (! (o instanceof Collection))
 							throw new InternalErrorException(
@@ -355,25 +356,9 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		}
 	}
 
-	private Object evaluate (String expression, InterpreterEnvironment env) throws EvalError, InternalErrorException
+	private Object evaluate (String expression, String ruleName, InterpreterEnvironment env) throws Exception
 	{
-		try {
-			Interpreter interpreter = env.getInterpeter();
-			return interpreter.eval(expression);
-		} catch (ParseException e) {
-			throw new InternalErrorException("Error parsing custom script "+cut(expression)+": "+e.getMessage());
-		} catch (TargetError e) {
-			throw new InternalErrorException ("Error executing custom script "+cut(expression)+" at "+e.getScriptStackTrace(),
-					e.getTarget());
-		} catch (EvalError e) {
-			String msg;
-			try {
-				msg = e.getMessage() + "[ "+ e.getErrorText()+"] ";
-			} catch (Exception e2) {
-				msg = e.getMessage();
-			}
-			throw new InternalErrorException ("Error parsing custom script "+cut (expression)+": "+msg);
-		}
+		return Evaluator.instance().evaluate(expression, env.getVars(), ruleName);
 	}
 
 	private String cut(String expression) {
@@ -407,7 +392,6 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		
 	}
 	
-	static ThreadLocal<Interpreter> interpreters = new ThreadLocal<Interpreter>();
 	class InterpreterEnvironment {
 		
 		private User userVO;
@@ -432,22 +416,15 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			
 		}
 		
-		public Interpreter getInterpeter() throws EvalError
-		{
-			Interpreter interpreter = interpreters.get();
-			if ( interpreter == null)
-			{
-				interpreter = new Interpreter();
-				interpreters.set(interpreter);
-			}
-			interpreter.set("user", userVO); //$NON-NLS-1$
-			interpreter.set("attributes", attributes); //$NON-NLS-1$
-			interpreter.set("groups", groups); //$NON-NLS-1$
-			interpreter.set("groupsList", groups.keySet()); //$NON-NLS-1$
-			interpreter.set("applicationContext", ctx); //$NON-NLS-1$
-			interpreter.set("serviceLocator", ServiceLocator.instance()); //$NON-NLS-1$
+		public Map<String,Object> getVars() {
+			Map<String,Object> vars = new HashMap<>();
+			vars.put("user", userVO); //$NON-NLS-1$
+			vars.put("attributes", attributes); //$NON-NLS-1$
+			vars.put("groups", groups); //$NON-NLS-1$
+			vars.put("groupsList", groups.keySet()); //$NON-NLS-1$
+			vars.put("serviceLocator", ServiceLocator.instance()); //$NON-NLS-1$
 			
-			return interpreter;
+			return vars;
 		}
 		
 	}

@@ -901,7 +901,6 @@ public class DispatcherServiceImpl extends
 
 		if (canAccess (entity))
 		{
-			getServerCertificateEntityDao().remove(entity.getCertificates());
 			getServerEntityDao().remove(entity);
 			updateSeyconServerList();
 		}

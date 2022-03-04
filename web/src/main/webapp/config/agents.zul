@@ -290,7 +290,7 @@
 							<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 						</div>
 					</tabpanel>
-						<tabpanel width="100%">
+						<tabpanel width="100%" fulfill="r_workflow.onSelect" >
 							<div style="margin-bottom: 10px;">
 								<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 							</div>
@@ -303,7 +303,7 @@
   ]]> </attribute>
   							</datatable>
 						</tabpanel>
-					<tabpanel id="tabAttributeMapping">
+					<tabpanel id="tabAttributeMapping" fulfill="r_attributeMapping.onSelect" >
 						<div style="margin-bottom: 10px;">
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 						</div>
@@ -592,7 +592,8 @@
 						</grid>
 					</tabpanel>
 			
-					<tabpanel if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}">
+					<tabpanel if="${canPropagateAgentUsers or canPropagateAgentRoles or canPropagateAgentGroups}"
+						fulfill="r_tasksTab.onSelect" >
 						<div style="margin-bottom: 10px;">
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 						</div>
@@ -642,48 +643,76 @@
 						</div>
 					</tabpanel>
 
-					<tabpanel id="tabControlAcces" use="com.soffid.iam.web.agent.AccessControlHandler">
-						<div style="margin-bottom: 10px;">
-							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+					<tabpanel id="tabControlAcces"  fulfill="r_controlAcces.onSelect" >
+						<div use="com.soffid.iam.web.agent.AccessControlHandler" id="accessControl">
+							<div style="margin-bottom: 10px;">
+								<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
+								<menu2>
+									<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:accessControl.importCsv"/>
+									<menu2item image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:accessControl.exportCsv"/>
+								</menu2>
+							</div>
+							<style>
+								div.datatable.actable table.thead td:last-child { width:120px; }
+	 							div.datatable.actable table.tbody td:last-child { width:120px; }
+							</style>
+							<switch bind="@accessControl" disabled="${!canSetAccessControl}" id="c_controlAcces" onCheck=""/> 
+							<label value="${c:l('agents.zul.Activarcontroldacca')}" />
+							<datatable dataPath="listbox:/controlAcces" sclass="actable datatable"
+								onSelect="ref:accessControl.editRule"
+								multiselect="true"
+								onMultiSelect="ref:accessControl.multiSelect"
+								maxheight="300px" id="gridControlAccess" width="100%">
+								<attribute name="columns"><![CDATA[
+	- name: ${c:l('agents.zul.Usuari')}
+	  value: genericUser
+	- name: ${c:l('agents.zul.Rol')}
+	  value: roleDescription
+	- name: ${c:l('agents.zul.Maquina/IP')}
+	  value: hostName
+	- name: ${c:l('agents.zul.Programa')}
+	  value: program
+	  ]]> </attribute>
+		  					</datatable>
+							<div width="100%" style="text-align: right"
+								if="${canCreateAgent}">
+								<div class="deleteButton" onClick="ref:accessControl.deleteSelected" visible="false">-</div>
+								<div class="addButton" onClick="ref:accessControl.addNew">
+									+
+								</div>
+							</div>
+							<window closable="false" width="70%" id="accessControlWindow"
+								position="center,top"
+								title="${c:l('controlAcces.zul.addRule') }"
+								visible="false">
+								<div style="width: 100%">
+									<label value="${c:l('controlAcces.zul.type')}"/>
+									<radiogroup id="type" style="margin-left: 60px; width: calc (100% - 60px); display: block">
+										<div sclass="radiooption">
+											<radio id="r_user" label="${c:l('controlAcces.zul.Usuari')}" onCheck="ref:accessControl.activaRadio())"/>	
+											<div  style="width: calc(100% - 230px); display: inline-block">
+												<customfield3 dataType="USER" noLabel="true" id="user" required="true"/>			
+											</div>
+										</div>
+										<div sclass="radiooption">
+											<radio id="r_role"  label="${c:l('controlAcces.zul.Rol')}" onCheck="ref:accessControl.activaRadio()"/>
+											<div  style="width: calc(100% - 230px); display: inline-block">
+												<customfield3 dataType="ROLE" noLabel="true" id="role" required="true"/>			
+											</div>	
+										</div>
+									</radiogroup>
+									<customfield3 dataType="STRING" label="${c:l('controlAcces.zul.Maquines')}" id="host" required="true"/>
+									<customfield3 dataType="STRING" label="${c:l('controlAcces.zul.Programa')}" id="app" required="true"/>
+								</div>
+								<div style="text-align: right; margin: 2em">
+									<button image="/img/undo.svg" label="${c:l('common.undo')}" onClick="ref:accessControl.undoAdd">
+									</button> 
+									<button image="/img/save.svg" label="${c:l('common.apply') }" onClick="ref:accessControl.applyAdd"/>
+								</div>
+							</window>
 						</div>
-						<style>
-							div.datatable.actable table.thead td:last-child { width:120px; }
- 							div.datatable.actable table.tbody td:last-child { width:120px; }
-						</style>
-						<switch bind="@accessControl" disabled="${!canSetAccessControl}" id="c_controlAcces" onCheck=""/> 
-						<label value="${c:l('agents.zul.Activarcontroldacca')}" />
-						<datatable dataPath="listbox:/controlAcces" sclass="actable datatable"
-							onEdit="ref:tabControlAcces.editRule"
-							onRemove="ref:tabControlAcces.onRemove"
-							onClone="ref:tabControlAcces.onClone"
-							multiselect="true"
-							onMultiSelect="ref:frame.multiSelect"
-							maxheight="300px" id="gridControlAccess" width="100%">
-							<attribute name="columns"><![CDATA[
-- name: ${c:l('agents.zul.Usuari')}
-  value: genericUser
-- name: ${c:l('agents.zul.Rol')}
-  value: roleDescription
-- name: ${c:l('agents.zul.Maquina/IP')}
-  value: hostName
-- name: ${c:l('agents.zul.Programa')}
-  value: program
-- name: ""
-  template: <button class="grid-icon-button" title="${c:l('agents.zul.editRule') }" onClick='zkDatatable.sendClientAction(this,"onEdit")'><img src="/img/pencil.svg"/></button><button class="grid-icon-button" title="${c:l('plugins.zul.Delete') }" onClick='zkDatatable.sendClientAction(this,"onRemove")'><img src="/img/remove.svg"/></button><button class="grid-icon-button" title="${c:l('agents.zul.Clonaregla') }" onClick='zkDatatable.sendClientAction(this,"onClone")'><img src="/img/copy.svg"/></button>
-  filter: false
-  sort: false
-  ]]> </attribute>
-  					</datatable>
-					<div align="right"><listexportbutton acces="${canQueryAgent}" listbox="gridControlAccess"/></div>
-					<div width="100%" style="text-align: right"
-						if="${canCreateAgent}">
-						<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
-						<div class="addButton" onClick="ref:tabControlAcces.addNew">
-							+
-						</div>
-					</div>
 					</tabpanel>
-					<tabpanel id="tabMetadata">
+					<tabpanel id="tabMetadata" fulfill="r_metadata.onSelect" >
 						<div style="margin-bottom: 10px;">
 							<label bind="@name" sclass="label"/> - <label bind="@description" sclass="label"/>
 						</div>

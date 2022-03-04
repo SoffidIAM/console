@@ -5,8 +5,8 @@
     use="com.soffid.iam.web.popup.AccountSelectorWindow"
 	position="top center" sizable="true"
 	title="${c:l('selfService.SelectAccount')}" visible="false"
-	width="400px"
-	<datatable id="accountsListbox" sortable="true" filter="false">
+	width="400px">
+	<datatable id="accountsListbox" sortColumn="0" enablefilter="false">
 	<attribute name="columns"><![CDATA[
 - name: ${c:l('accounts.name') }
   value: name

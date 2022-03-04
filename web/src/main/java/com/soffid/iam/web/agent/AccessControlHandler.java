@@ -1,25 +1,60 @@
 package com.soffid.iam.web.agent;
 
+import java.awt.event.WindowFocusListener;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
+
+import org.zkoss.util.resource.Labels;
+import org.zkoss.xel.fn.CommonFns;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.HtmlBasedComponent;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.ListModel;
+import org.zkoss.zul.Radio;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Tabpanel;
+import org.zkoss.zul.Window;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AccessControl;
+import com.soffid.iam.api.Network;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.service.ejb.ApplicationService;
+import com.soffid.iam.service.ejb.DispatcherService;
+import com.soffid.iam.service.ejb.NetworkService;
+import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.CustomField3;
+import com.soffid.iam.web.popup.CsvParser;
+import com.soffid.iam.web.popup.ImportCsvHandler;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.list.ModelProxy;
 import es.caib.zkib.component.DataGrid;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
+import es.caib.zkib.component.Div;
+import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.JXPathContext;
 import es.caib.zkib.jxpath.Pointer;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class AccessControlHandler extends Tabpanel implements AfterCompose {
+public class AccessControlHandler extends Div implements AfterCompose {
 	private DataModel model;
 	private DataTable gridControlAccess;
+	private AccessControl currentAccessControl;
 
 	public void afterCompose() {
 		model = (DataModel) getFellow("model");
@@ -33,178 +68,253 @@ public class AccessControlHandler extends Tabpanel implements AfterCompose {
 	}
 
 	public void addNew() {
-//		desktop.getPage("controlAcces").setAttribute("idCAC", idRandom);
-		
-		getDesktop().getPage("controlAcces").setAttribute("rol_bbdd",model.getVariables().getVariable("codiAgent"));
-		Events.postEvent ("onInicia",getDesktop().getPage("controlAcces").getFellow("esquemaLlista"), this);
-	}
+		DataTable gridControlAccess = (DataTable) getFellow("gridControlAccess");
+		final DataSource dataSource = gridControlAccess.getDataSource();
+		String agent = (String) XPathUtils.eval(dataSource, "name");
 
-	public void onClone(Event event) {
-		if ( Boolean.TRUE.equals( getVariable("canModifyAccessControl", false))) {
-			DataSource ds = gridControlAccess;
-			es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();																												
-			
-			// Guardem el id per poder moficiar la fila que correspon
-			getDesktop().getPage("controlAcces").setAttribute("idCAC", ctx.getValue("/@id"));
-			getDesktop().getPage("controlAcces").setAttribute("usuariGeneric", ctx.getValue("/@genericUser"));
-			getDesktop().getPage("controlAcces").setAttribute("idRol", ctx.getValue("/@roleId"));
-			getDesktop().getPage("controlAcces").setAttribute("descripcioRol", ctx.getValue("/@roleDescription"));
-			getDesktop().getPage("controlAcces").setAttribute("nomMaquina", ctx.getValue("/@hostName"));
-			getDesktop().getPage("controlAcces").setAttribute("idMaquina", ctx.getValue("/@hostId"));
-			getDesktop().getPage("controlAcces").setAttribute("maquinaGeneric", ctx.getValue("/@genericHost"));
-			getDesktop().getPage("controlAcces").setAttribute("programa", ctx.getValue("/@program"));
-			getDesktop().getPage("controlAcces").setAttribute("rol_bbdd", XPathUtils.getValue(this, "name"));
-
-			Events.postEvent ("onIniciaClon",getDesktop().getPage("controlAcces").getFellow("esquemaLlista"), this);
-		}
+		Window w = (Window) getFellow("accessControlWindow");
+		((Radiogroup)w.getFellow("type")).setSelectedIndex(0);
+		((CustomField3)w.getFellow("user")).setText("");
+		((CustomField3)w.getFellow("role")).setText("");
+		((CustomField3)w.getFellow("role")).setFilterExpression("system eq \""+agent.replace("\\", "\\\\").replace("\"", "\\\"")+"\"");
+		((CustomField3)w.getFellow("host")).setText("%");
+		((CustomField3)w.getFellow("user")).setVisible(true);
+		((CustomField3)w.getFellow("role")).setVisible(false);
+		((CustomField3)w.getFellow("app")).setText("%");
 		
+		currentAccessControl = null;
+		
+		w.doHighlighted();
 	}
 	
-	public void onRemove(Event event) {
-		if ( Boolean.TRUE.equals( getVariable("canDeleteAccessControlAgent", false))) {
-			JXPathContext context = gridControlAccess.getJXPathContext();
-			String c_usuari = (String) context.getValue("/@genericUser");
-			String c_rol = (String) context.getValue("/@roleDescription");
-			String c_program = (String) context.getValue("/@program");
-			String dada = c_usuari==null?c_rol:c_usuari;
-			Missatgebox.confirmaOK_CANCEL(
-				String.format(org.zkoss.util.resource.Labels.getLabel("agents.SegurEsborra"), new Object [] {dada,c_program}),
-				org.zkoss.util.resource.Labels.getLabel("agents.Esborra"),
-				(evt) -> {
-						if ("onOK".equals(evt.getName())) {
-							gridControlAccess.delete();
-						}														
-				}
-   			);								
-		}
+	public void activaRadio(Event ev) {
+		Radio r = (Radio) ev.getTarget();
+		final Radiogroup radiogroup = r.getRadiogroup();
+		int selected = radiogroup.getSelectedIndex();
+		((CustomField3)radiogroup.getFellow("user")).setVisible(selected == 0);
+		((CustomField3)radiogroup.getFellow("role")).setVisible(selected == 1);
+	}
 
+	public void undoAdd(Event ev) {
+		Window w = (Window) getFellow("accessControlWindow");
+		w.setVisible(false);
 	}
 	
-
-	
-	public void onActualitza(Event event) throws Exception {
-		// NOVA FILERA DE CONTROL D'ACCÉS
-		Object[] dada = (Object[]) event.getData();
-		// Datos: usuari, idUsuari, usuari_generic, rol, idRol, maquina, idMaquina, maquines_generic, programa, idFicticia
-		//Missatgebox.info ("rebudes #"+dada.length+ " dades "+dada)
-		ModelProxy modelProxy = (es.caib.zkib.binder.list.ModelProxy) gridControlAccess.getModel();
-		DataSource ds = gridControlAccess.getDataSource(); 
-		es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext();
-		// codi dispatcher actual
-		String v_codi = (String) XPathUtils.getValue(this, "name");
-		// user: pot ésser usuari(idUsuari), usuari_generic o rol
-		String v_usuari = (String) dada[0];
-		Long v_idUsuari = (Long) dada[1];
-		String v_usuari_generic = (String) dada[2];
-		String v_rol = (String) dada[3];
-		Long v_idRol = (Long) dada[4];
-		// maquina: pot ésser maquina (idMaquina) o maquines_generic
-		String v_maquina = (String) dada[5];
-		Long v_idMaquina = (Long) dada[6];
-		String v_maquines_generic = (String) dada[7];
-		// programa
-		String v_programa = (String) dada[8];
+	public void applyAdd(Event ev) throws Exception {
+		Window w = (Window) getFellow("accessControlWindow");
+		int selected = ((Radiogroup)w.getFellow("type")).getSelectedIndex();
+		com.soffid.iam.api.AccessControl acc;
+		if (currentAccessControl == null)
+			acc = new com.soffid.iam.api.AccessControl();
+		else
+			acc = currentAccessControl;
 		
-		String condicio = "[@agentName = '"+v_codi+"'"; //no tanquem ]
-		if (v_idRol != null) {
-			condicio += " and @roleId ='"+v_idRol+"' ";
-		} else  {
-			condicio += " and (@genericUser = '"+v_usuari_generic+"') ";
+		CustomField3 f;
+		if (selected == 0) {
+			f = ((CustomField3)w.getFellow("user"));
+			if (! f.attributeValidateAll()) return;	
+			acc.setGenericUser((String) f.getValue());
 		}
-		// maquina: pot ésser maquina (idMaquina) o maquines_generic
-		if (v_idMaquina!=null) {
-			condicio += " and @hostId = '"+v_idMaquina+"' ";
-		} else { // genèric (comparem amb el nom de la màquina)
-			condicio += "and @hostName = '"+v_maquines_generic+"' ";
-			//" and @maquinaGeneric = '"+v_maquines_generic+"' ";
+		if (selected == 1) {
+			f = ((CustomField3)w.getFellow("role"));
+			if (! f.attributeValidateAll()) return;
+			Role roleName = (Role) f.getValueObject();
+			acc.setRoleId(roleName.getId());
+			acc.setRoleDescription(roleName.getDescription());
 		}
+		f = ((CustomField3)w.getFellow("host"));
+		if (! f.attributeValidateAll()) return;	
+		acc.setGenericHost((String) f.getValue());
+		acc.setHostName((String)f.getValue());
 		
-		// programa
-		condicio +=" and @program='"+v_programa+"']"; //tanquem ]
+		f = ((CustomField3)w.getFellow("app"));
+		if (! f.attributeValidateAll()) return;	
+		acc.setProgram((String) f.getValue());
 		
-		//Missatgebox.info ("condicio =" +condicio);              			
-		
-		String xpath = gridControlAccess.getXPath() + condicio;
-		boolean jaExisteix = true;
-		try {
-				Object valor = ctx.getValue(xpath);
-		} catch(Exception e) {
-				jaExisteix = false;
-		}
-		if (jaExisteix) {
-			Missatgebox.error (org.zkoss.util.resource.Labels.getLabel("agents.JaExisteix"));
-			return;
-		} else { // Creem un de nou
-  			int position = modelProxy.newInstance();
-  			ds = gridControlAccess.getDataSource(); 
-  			ctx =  ds.getJXPathContext(); 
-  			xpath = gridControlAccess.getXPath() + modelProxy.getBind(position); 
-  			Pointer pointer = ctx.createPath (xpath);
- 			es.caib.zkib.jxpath.JXPathContext ctx2 = ctx.getRelativeContext(pointer);
- 			ctx2.setValue("@agentName", v_codi);
-			if (v_idRol != null) {
-				ctx2.setValue("@roleDescription", v_rol);
-				ctx2.setValue("@rolId", v_idRol);
-			} else  {
-				ctx2.setValue("@genericUser", v_usuari_generic);
+		DataTable gridControlAccess = (DataTable) getFellow("gridControlAccess");
+		final DataSource dataSource = gridControlAccess.getDataSource();
+		Long id = (Long) XPathUtils.eval(dataSource, "id");
+		acc.setAgentId(id);
+		acc.setAgentName((String) XPathUtils.eval(dataSource, "name"));
+		if (currentAccessControl == null) {
+			String path = XPathUtils.createPath(dataSource, "controlAcces", acc);
+			try {
+				gridControlAccess.commit();
+			} catch (Exception e) {
+				XPathUtils.removePath(dataSource, path);
+				throw e;
 			}
-			ctx2.setValue("@genericHost", v_maquines_generic);
-			ctx2.setValue("@hostName", v_maquina); // no té id serà genèric
-			ctx2.setValue("@program", v_programa);  
+		} else {
+			DataNode dn = (DataNode) gridControlAccess.getJXPathContext().getValue("/");
+			dn.update();
+			gridControlAccess.commit();
 		}
-
+		w.setVisible(false);
 	}
-	
-	public void editRule(Event event) {
-		if ( Boolean.TRUE.equals( getVariable("canModifyAccessControl", false))) {
+
+	public void editRule(Event event) throws InternalErrorException, NamingException, CreateException {
+		if ( Security.isUserInRole(Security.AUTO_AGENT_ACCESSCONTROL_UPDATE)) {
 			DataSource ds = gridControlAccess;
-			es.caib.zkib.jxpath.JXPathContext ctx = ds.getJXPathContext();																												
 			
-			// Guardem el id per poder moficiar la fila que correspon
-			getDesktop().getPage("controlAcces").setAttribute("idCAC", ctx.getValue("/@id"));
-			getDesktop().getPage("controlAcces").setAttribute("usuariGeneric", ctx.getValue("/@genericUser"));
-			getDesktop().getPage("controlAcces").setAttribute("idRol", ctx.getValue("/@roleId"));
-			getDesktop().getPage("controlAcces").setAttribute("descripcioRol", ctx.getValue("/@roleDescription"));
-			getDesktop().getPage("controlAcces").setAttribute("nomMaquina", ctx.getValue("/@hostName"));
-			getDesktop().getPage("controlAcces").setAttribute("idMaquina", ctx.getValue("/@hostId"));
-			getDesktop().getPage("controlAcces").setAttribute("maquinaGeneric", ctx.getValue("/@genericHost"));
-			getDesktop().getPage("controlAcces").setAttribute("programa", ctx.getValue("/@program"));
-			getDesktop().getPage("controlAcces").setAttribute("rol_bbdd", XPathUtils.getValue(this, "name"));
-			Events.postEvent ("onIniciaUpdate",getDesktop().getPage("controlAcces").getFellow("esquemaLlista"), this);
+			currentAccessControl = (AccessControl) ds.getJXPathContext().getValue("instance");
+			
+			String agent = (String) XPathUtils.eval(gridControlAccess.getDataSource(), "name");
+
+			Window w = (Window) getFellow("accessControlWindow");
+			((Radiogroup)w.getFellow("type")).setSelectedIndex( currentAccessControl.getRoleId() == null ? 0: 1 );
+			((CustomField3)w.getFellow("user")).setText(currentAccessControl.getGenericUser());
+			((CustomField3)w.getFellow("role")).setFilterExpression("system eq \""+agent.replace("\\", "\\\\").replace("\"", "\\\"")+"\"");
+			if (currentAccessControl.getRoleId() == null) {
+				((CustomField3)w.getFellow("role")).setText("");
+			} else {
+				Role role = EJBLocator.getApplicationService().findRoleById(currentAccessControl.getRoleId());
+				((CustomField3)w.getFellow("role")).setText(role.getName()+"@"+role.getSystem());
+			}
+			((CustomField3)w.getFellow("host")).setText(currentAccessControl.getGenericHost());
+			((CustomField3)w.getFellow("user")).setVisible(currentAccessControl.getRoleId() == null);
+			((CustomField3)w.getFellow("role")).setVisible(currentAccessControl.getRoleId() != null);
+			((CustomField3)w.getFellow("app")).setText(currentAccessControl.getProgram());
+			w.doHighlighted();
 		}
 		
 		
 	}
 	
-	public void onUpdate (Event event) {
-		Object []dada = (Object[]) event.getData();
-		// Datos: usuari, idUsuari, usuari_generic, rol, idRol, maquina, idMaquina, maquines_generic, programa, id (real o ficticia)
-		ListModel modelProxy = gridControlAccess.getModel();
-		DataSource ds = gridControlAccess; 
-		es.caib.zkib.jxpath.JXPathContext ctx =  ds.getJXPathContext();
-		String v_codi = (String) XPathUtils.getValue(this, "name");
-		// user: pot ésser usuari(idUsuari), usuari_generic o rol
-		String v_usuari = (String) dada[0];
-		Long v_idUsuari = (Long) dada[1];
-		String v_usuari_generic = (String) dada[2];
-		String v_rol = (String) dada[3];
-		Long v_idRol = (Long) dada[4];
-		// maquina: pot ésser maquina (idMaquina) o maquines_generic
-		String v_maquina = (String) dada[5];
-		Long v_idMaquina = (Long) dada[6];
-		String v_maquines_generic = (String) dada[7];
-		// programa
-		String v_programa = (String) dada[8];
-
-		ctx.setValue("@agentName", v_codi);
-		if (v_idRol != null) {
-			ctx.setValue("@roleDescription", v_rol);
-			ctx.setValue("@rolId", v_idRol);
-		} else  {
-			ctx.setValue("@genericUser", v_usuari_generic);
+	
+	public void displayRemoveButton(Component lb, boolean display) {
+		HtmlBasedComponent d = (HtmlBasedComponent) lb.getNextSibling();
+		if (d != null && d instanceof Div) {
+			d =  (HtmlBasedComponent) d.getFirstChild();
+			if (d != null && "deleteButton".equals(d.getSclass())) {
+				d.setVisible(display);
+			}
 		}
-		ctx.setValue("@genericHost", v_maquines_generic);
-		ctx.setValue("@hostName", v_maquina); // no té id serà genèric
-		ctx.setValue("@program", v_programa);  
 	}
+	
+	public void multiSelect(Event event) {
+		DataTable lb = (DataTable) event.getTarget();
+		displayRemoveButton( lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+	}
+
+	public void deleteSelected(Event event0) {
+		Component b = event0.getTarget();
+		final Component lb = b.getParent().getPreviousSibling();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							displayRemoveButton(lb, false);
+						}
+					});
+		}
+	}
+	
+	public void exportCsv(Event event) {
+		gridControlAccess.download();
+	}
+	
+	
+	public void importCsv () throws IOException, CommitException {
+		gridControlAccess.commit();
+		
+		String[][] data = { 
+				{"host", Labels.getLabel("agents.zul.Maquina/IP")},
+				{"user", Labels.getLabel("agents.zul.Usuari")},
+				{"role", Labels.getLabel("agents.zul.Rol")},
+				{"app", Labels.getLabel("agents.zul.Programa")},
+		};
+		
+		String title = Labels.getLabel("tenant.zul.import");
+		ImportCsvHandler.startWizard(title, data, this, 
+				parser -> importCsv(parser));
+	}
+
+	private void importCsv(CsvParser parser) {
+		Map<String,String> m = null;
+		int updates = 0;
+		int inserts = 0;
+		int unchanged = 0;
+		int removed = 0;
+		String yes = CommonFns.getLabel("mesg:org.zkoss.zul.mesg.MZul:YES");
+		try {
+			String agent = (String) XPathUtils.eval(gridControlAccess.getDataSource(), "name");
+
+			DispatcherService svc = EJBLocator.getDispatcherService();
+			ApplicationService appSvc = EJBLocator.getApplicationService();
+			LinkedList<AccessControl> current = new LinkedList<AccessControl>();
+			for (AccessControl ut: svc.findAccessControlByDispatcherName(agent))
+				current.add(ut);
+			
+			for ( Iterator<Map<String, String>> iterator = parser.iterator(); iterator.hasNext(); )
+			{
+				m = iterator.next();
+				String app = m.get("app");
+				String role = m.get("role");
+				String user = m.get("user");
+				String host = m.get("host");
+
+				if (app != null && !app.trim().isEmpty())
+				{
+					AccessControl ac = new AccessControl();
+					ac.setProgram(app);
+					ac.setAgentName(agent);
+					ac.setGenericHost(host);
+					if (role != null && !role.trim().isEmpty()) {
+						Role r = appSvc.findRoleByNameAndSystem(role, agent);
+						if (r == null)
+							throw new Exception(String.format("Cannot find role %s", role));
+						ac.setRoleDescription(r.getName());
+						ac.setRoleId(r.getId());
+					}
+					if (user != null && !user.trim().isEmpty()) {
+						ac.setGenericUser(user);
+					}
+					boolean found = false;
+					for (AccessControl ac2: current)
+					{
+						if (nullCmp (ac.getRoleDescription(), ac2.getRoleDescription()) &&
+							nullCmp (ac.getGenericUser(), ac2.getGenericUser()) &&
+							nullCmp (ac.getRoleId(), ac2.getRoleId()) &&
+							nullCmp (ac.getGenericHost(), ac2.getGenericHost()) ) {
+							unchanged ++;
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						svc.create(ac);
+						current.add(ac);
+						inserts ++;
+					}
+				}
+			}
+		} catch (UiException e) {
+			throw e;
+		} catch (Exception e) {
+			if (m == null)
+				throw new UiException(e);
+			else
+				throw new UiException("Error loading parameter "+m.get("name"), e);
+		}
+		
+		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
+		DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(gridControlAccess.getDataSource(), "controlAcces");
+		try {
+			coll.refresh();
+		} catch (Exception e) {
+			throw new UiException(e);
+		}
+	}
+
+	private boolean nullCmp(Object object1, Object object2) {
+		return object1 == null ? object2 == null : object1.equals(object2);
+	}
+	
 }

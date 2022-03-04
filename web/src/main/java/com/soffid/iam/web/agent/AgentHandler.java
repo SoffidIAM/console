@@ -102,7 +102,6 @@ public class AgentHandler extends FrameHandler {
 	private Tab basicTab;
 	private Tab attributeMappingTab;
 	private Tab metadataTab;
-	private DataTable gridControlAccess;
 	private DataTable listbox;
 	private DataTable userTypeTable;
 	private Component form;
@@ -209,6 +208,7 @@ public class AgentHandler extends FrameHandler {
 
 	public void carregaControlAcces() throws Exception {
 		((DataNodeCollection) getModel().getValue("/agent/controlAcces")).refresh();
+		DataTable gridControlAccess = (DataTable) getFellow("gridControlAccess");
 		gridControlAccess.setDataPath("listbox:/controlAcces");
 	}
 
@@ -304,7 +304,6 @@ public class AgentHandler extends FrameHandler {
 		basicTab = (Tab) getFellow("r_basica");
 		attributeMappingTab = (Tab) getFellow("r_attributeMapping");
 		metadataTab = (Tab) getFellow("r_metadata");
-		gridControlAccess = (DataTable) getFellow("gridControlAccess");
 		listbox = (DataTable) getFellow("listbox");
 		userTypeTable = (DataTable) getFellow("lbTipusUsuari");
 		form = getFellow("form");

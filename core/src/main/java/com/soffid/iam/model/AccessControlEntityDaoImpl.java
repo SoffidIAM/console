@@ -122,22 +122,11 @@ public class AccessControlEntityDaoImpl
 		target.setId(source.getId());
 		target.setAgentId(source.getAgent().getId());
 		target.setAgentName(source.getAgent().getName()); 
-/*		if(source.getUsuari()!=null) {
-			target.setCodiUsuari(source.getUsuari().getCodi());
-			target.setIdUsuari(source.getUsuari().getId());
-		} else { // Posem l'usuari genèric com a usuari
-			if (source.getUsuariGeneric()!=null)
-				target.setCodiUsuari(source.getUsuariGeneric());
-		}*/
 		if (source.getRole() != null) {
 			target.setRoleDescription(source.getRole().getName());
 			target.setRoleId(source.getRole().getId());
 		}
-		/*if (source.getMaquina() !=null) {
-			target.setNomMaquina(source.getMaquina().getNom()+ " ["+source.getMaquina().getAdreca()+"]");
-			target.setIdMaquina(source.getMaquina().getId());
-		} else*/ 
-		if (source.getGenericHost() != null) {
+ue l		if (source.getGenericHost() != null) {
 			HostEntity maquinaEntity = getHostEntityDao().findByName(source.getGenericHost());
 			if (maquinaEntity != null) {
 				target.setHostName(maquinaEntity.getName());//+ " ["+maquinaEntity.getAdreca()+"]");

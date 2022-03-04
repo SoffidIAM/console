@@ -205,7 +205,7 @@ public class LaunchHelper {
 			openPamEntryPoint (exe, r.get(0));
 		} else {
 			Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
-			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellow("accountSelectorWindow");
+			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellowIfAny("accountSelectorWindow");
 			if (accountSelectorWindow == null) {
 				accountSelectorWindow = (AccountSelectorWindow) Executions.getCurrent().createComponents("/popup/select-account.zul", new HashMap()) [0];
 			}
@@ -290,7 +290,7 @@ public class LaunchHelper {
 			openWssoEntryPoint(exe, r.get(0));
 		} else {
 			Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
-			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellow("accountSelectorWindow");
+			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellowIfAny("accountSelectorWindow");
 			if (accountSelectorWindow == null) {
 				accountSelectorWindow = (AccountSelectorWindow) Executions.getCurrent().createComponents("/popup/select-account.zul", new HashMap()) [0];
 			}

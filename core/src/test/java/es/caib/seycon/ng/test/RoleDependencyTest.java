@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.soffid.iam.api.Account;
-import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
@@ -496,6 +495,96 @@ public class RoleDependencyTest extends AbstractTest
 				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
 			}
 			assertEquals(true, rols.size() >= 2);
+
+		} finally {
+			Security.nestedLogoff();
+		}
+	}
+
+	public void testTranistiveInverse () throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException
+	{
+		Security.nestedLogin("Test", Security.ALL_PERMISSIONS);
+		try {
+			DominiContrasenya dc = dominiSvc.findDominiContrasenyaByCodi("DEFAULT");
+			
+			Dispatcher dis5 = new Dispatcher ();
+			dis5.setBasRol(new Boolean(false));
+			dis5.setCodi("dis5"); //$NON-NLS-1$
+			dis5.setControlAccess(new Boolean(false));
+			dis5.setDominiContrasenyes(dc.getCodi());
+			dis5.setDominiUsuaris("DEFAULT");
+			dis5.setIdDominiContrasenyes(dc.getId());
+			dis5.setNomCla("- no class -"); //$NON-NLS-1$
+			dis5.setRelacioLaboral("I"); //$NON-NLS-1$
+			dis5 = dispatcherSvc.create(dis5);
+
+			Dispatcher dis6 = new Dispatcher ();
+			dis6.setBasRol(new Boolean(false));
+			dis6.setCodi("dis6"); //$NON-NLS-1$
+			dis6.setControlAccess(new Boolean(false));
+			dis6.setDominiContrasenyes(dc.getCodi());
+			dis6.setDominiUsuaris("DEFAULT");
+			dis6.setIdDominiContrasenyes(dc.getId());
+			dis6.setNomCla("- no class -"); //$NON-NLS-1$
+			dis6.setRelacioLaboral("I"); //$NON-NLS-1$
+			dis6 = dispatcherSvc.create(dis6);
+
+			Usuari u = new Usuari ();
+			u.setCodi("user4");
+			u.setNom("user4");
+			u.setPrimerLlinatge("user4");
+			u.setServidorCorreu("null");
+			u.setServidorHome("null");
+			u.setServidorPerfil("null");
+			u.setCodiGrupPrimari("world");
+			u.setActiu(true);
+			u.setTipusUsuari("I");
+			u = usuariSvc.create(u);
+			
+			accountSvc.createAccount(u, dis5, "user4@dis5");
+			accountSvc.createAccount(u, dis6, "user4@dis6");
+
+
+			Aplicacio app = appSvc.findAplicacioByCodiAplicacio("SOFFID"); //$NON-NLS-1$
+
+			Rol rol1 = createRol(dis5, app, "ROLE_1");
+			Rol rol2 = createRol(dis6, app, "ROLE_2");
+			
+			
+			// role1 => role2 => user u
+			RolGrant rg = new RolGrant();
+			rg.setOwnerRol(rol1.getId());
+			rg.setOwnerRolName(rol1.getNom());
+			rg.setOwnerDispatcher(rol1.getBaseDeDades());
+			rg.setIdRol(rol2.getId());
+			rg.setDispatcher(rol2.getBaseDeDades());
+			rg.setRolName(rol2.getNom());
+			rg.setDomainValue(null);
+			rg.setHasDomain(false);
+			rol2.getOwnerRoles().add(rg);
+			appSvc.update(rol2);
+
+			RolAccount ra = new RolAccount();
+			ra.setCodiUsuari(u.getCodi());
+			ra.setAccountName("user@dis5");
+			ra.setNomRol(rol1.getNom());
+			ra.setBaseDeDades(rol1.getBaseDeDades());
+			appSvc.create(ra);
+			System.out.println ("User with granted role 2");
+			Collection<RolGrant> rols = appSvc.findEffectiveRolGrantsByRolId(rol2.getId());
+			for (RolGrant ru : rols)
+			{
+				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
+			}
+			assertEquals(1, rols.size());
+			System.out.println ("Roles granted to user user3");
+			rols = appSvc.findEffectiveRolGrantsByRolId(rol2.getId());
+			for (RolGrant ru : rols)
+			{
+				System.out.println ("ROL Assigned: "+ru.getRolName()+ " on " + ru.getDispatcher() + " account (" + ru.getOwnerAccountName()+")");
+				assertEquals("user4@dis6", ru.getOwnerAccountName());
+			}
+			assertEquals(true, rols.size() == 1);
 
 		} finally {
 			Security.nestedLogoff();

@@ -2342,17 +2342,38 @@ public class ApplicationServiceImpl extends
 		for (RoleAccountEntity rac : rol.getAccounts()) {
             if (rac.isEnabled() && shouldBeEnabled(rac)) {
                 RolAccountDetail rad;
-                if (originalGrant == null) 
+                if (originalGrant == null) {
                 	rad = new RolAccountDetail(rac, rac.getAccount(), null); 
-                else {
+	                if (!radSet.contains(rad)) {
+	                	if (originalGrant == null || matchesGranteeDomainValue(rad, originalGrant)) {
+	                		radSet.add(rad);
+	                	}
+	                }
+                }
+                else if (originalGrant.getContained().getSystem() == rac.getAccount().getSystem()){
                     RolAccountDetail previousRad = new RolAccountDetail(rac, rac.getAccount(), null);
                     rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, rac.getAccount(), previousRad);
                     rad.granteeRol = rol;
-                }
-                if (!radSet.contains(rad)) {
-                    if (originalGrant == null || matchesGranteeDomainValue(rad, originalGrant)) {
-                        radSet.add(rad);
+                    if (!radSet.contains(rad)) {
+                    	if (originalGrant == null || matchesGranteeDomainValue(rad, originalGrant)) {
+                    		radSet.add(rad);
+                    	}
                     }
+                } else if (rac.getAccount().getType() == AccountType.USER) {
+                	for (UserAccountEntity user: rac.getAccount().getUsers()) {
+                		for (AccountEntity accountEntity: getAccountEntityDao().findByUserAndSystem(
+                				user.getUser().getUserName(), 
+                				originalGrant.getContained().getSystem().getName())) {
+                			RolAccountDetail previousRad = new RolAccountDetail(rac, accountEntity, null);
+                			rad = new RolAccountDetail((RoleDependencyEntity) originalGrant, accountEntity, previousRad);
+                			rad.granteeRol = rol;
+                            if (!radSet.contains(rad)) {
+                            	if (originalGrant == null || matchesGranteeDomainValue(rad, originalGrant)) {
+                            		radSet.add(rad);
+                            	}
+                            }
+                		}
+                	}
                 }
             }
         }

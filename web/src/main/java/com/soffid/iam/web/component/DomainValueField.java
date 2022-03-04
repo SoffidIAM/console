@@ -214,7 +214,11 @@ public class DomainValueField extends Databox
 		@Override
 		public void onEvent(Event event) throws Exception {
 			if (isMultiValue()) {
-				
+				List values = (List) event.getData();
+				for (Object value: values) {
+					onItemChange(value, collectionValue.size());
+				}
+				refreshValue();
 			} else {
 				onItemChange(event.getData(), 0);
 				refreshValue();

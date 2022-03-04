@@ -2951,7 +2951,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				if (!validation.isValid())
 					throw new BadPasswordException(validation.getReason());
 				getInternalPasswordService().storeAndForwardPassword(usuari,
-						dominiContrasenyes, newPassword, false);
+						dominiContrasenyes, newPassword, mustChange);
 				auditaCanviPassword(codiUsuari, dominiContrasenyes.getName());
 			} else {
 				throw new SecurityException(

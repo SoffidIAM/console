@@ -376,13 +376,16 @@ public class AgentHandler extends FrameHandler {
 				seleccionaTipusUsuari(relacioLaboral);
 				
 				String url = (String) ((Select) getFellow("url")).getSelectedValue();
-				if(url == null || url.trim().length() == 0)
-				{
-					getFellow("imgPropaga").setVisible(false);
-				}
-				else
-				{
-					getFellow("imgPropaga").setVisible(true);
+				final Component prop = getFellowIfAny("imgPropaga");
+				if (prop != null) {
+					if(url == null || url.trim().length() == 0)
+					{
+						prop.setVisible(false);
+					}
+					else
+					{
+						prop.setVisible(true);
+					}
 				}
 			} 
 			((Intbox) getFellow("agentThreadsBox")).setDisabled(Boolean.TRUE.equals ( system.getSharedDispatcher() ) );
@@ -431,18 +434,21 @@ public class AgentHandler extends FrameHandler {
 			java.util.Calendar last1 = null;
 			java.util.Calendar last2 = null;
 			
+			final Component div = form.getFellowIfAny(type+"Div");
+			if (div == null) return;
+			
 			try {
-				active = (Boolean) XPathUtils.getValue(form, "tasks[1]/"+type+"Task/active");
-				error =  (Boolean) XPathUtils.getValue(form, "tasks[1]/"+type+"Task/error");
-				last1 = (Calendar) XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastExecution");
-				last2 = (Calendar) XPathUtils.getValue(form, "tasks[1]/"+type+"Task/lastEnd");
-				form.getFellow (type+"Div"). setVisible(true);
+				active = (Boolean) XPathUtils.eval(form, "tasks[1]/"+type+"Task/active");
+				error =  (Boolean) XPathUtils.eval(form, "tasks[1]/"+type+"Task/error");
+				last1 = (Calendar) XPathUtils.eval(form, "tasks[1]/"+type+"Task/lastExecution");
+				last2 = (Calendar) XPathUtils.eval(form, "tasks[1]/"+type+"Task/lastEnd");
+				div. setVisible(true);
 			} catch (Exception e) {
-				form.getFellow (type+"Div"). setVisible(false);
+				div. setVisible(false);
 				// Ignore
 			}
 			Image statusComponent = (Image) form.getFellow (type+"Status");
-			DataDatebox lastComponent = (DataDatebox) form.getFellow (type+"Last");
+			DataDatebox lastComponent = (DataDatebox) form.getFellow(type+"Last");
 			Label labelComponent = (Label) form.getFellow (type+"Label");
 			DataDatebox lastEndComponent = (DataDatebox) form.getFellow (type+"LastEnd");
 			Label separator = (Label) form.getFellow (type+"Separator");
@@ -492,7 +498,7 @@ public class AgentHandler extends FrameHandler {
 	
 	public void refreshTasks () {
 		try {
-			es.caib.zkib.datamodel.DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(form, "tasks");
+			es.caib.zkib.datamodel.DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(form, "tasks");
 			if (coll != null)
 			{
 				coll .refresh();
@@ -868,6 +874,19 @@ public class AgentHandler extends FrameHandler {
      	}
      	else
      		refreshTasksTimer.stop();
+		// Agent existent:
+		String url = (String) ((Select) getFellow("url")).getSelectedValue();
+		final Component prop = getFellowIfAny("imgPropaga");
+		if (prop != null) {
+			if(url == null || url.trim().length() == 0)
+			{
+				prop.setVisible(false);
+			}
+			else
+			{
+				prop.setVisible(true);
+			}
+		}
 	}
 	
 	public void showMessage() {

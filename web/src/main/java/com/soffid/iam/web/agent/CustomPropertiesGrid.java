@@ -51,6 +51,7 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 	public void setDataPath(String path)
 	{
 		binder.setDataPath(path);
+		generateGrid();
 	}
 	
 	public Object clone() {
@@ -153,7 +154,8 @@ public class CustomPropertiesGrid extends Grid implements AfterCompose {
 	protected HashMap<String, HashMap<String,String>> methods;
 	protected String[][] methodDescriptor;
 	public void generateGrid() {
-		if (getPage() == null)
+		if (getPage() == null || binder.getDataPath() == null ||
+				binder.getDataSource() == null)
 			return;
 		// Initialize variable
 		methods = new HashMap<String, HashMap<String,String>>();

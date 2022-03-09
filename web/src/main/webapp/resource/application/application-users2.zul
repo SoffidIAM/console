@@ -11,7 +11,7 @@
 	</div>
 
 					<datatable id="listbox" autocommit="false" 
-						dataPath="${arg.listbox }:/user" maxheight="60vh" sortColumn="0"
+						dataPath="${arg.listbox }:/effectiveuser" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
 					<attribute name="columns"><![CDATA[
 - name: ${c:l('aplicacions.zul.Codi-2')}

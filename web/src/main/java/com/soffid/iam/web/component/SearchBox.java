@@ -3,6 +3,7 @@ package com.soffid.iam.web.component;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -647,37 +648,41 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	private void selectAttributeToAdd() {
 		menu.getChildren().clear();
 		LinkedList<Menuitem> items = new LinkedList<Menuitem>();
+		HashSet<String> atts = new HashSet();
 		for (final SearchAttributeDefinition def: dictionary.getAttributes())
 		{
-			boolean found = false;
-			for ( Component component: (List<Component>)getChildren())
-			{
-				if (component instanceof AttributeSearchBox)
+			if (! atts.contains(def.getName())) {
+				atts.add(def.getName());
+				boolean found = false;
+				for ( Component component: (List<Component>)getChildren())
 				{
-					AttributeSearchBox asb = (AttributeSearchBox) component;
-					if (asb.attributeDef == def)
+					if (component instanceof AttributeSearchBox)
 					{
-						found = true;
-						break;
+						AttributeSearchBox asb = (AttributeSearchBox) component;
+						if (asb.attributeDef == def)
+						{
+							found = true;
+							break;
+						}
 					}
 				}
-			}
-			if (! found)
-			{
-				Menuitem item = new Menuitem(def.getLocalizedName() != null ?
-						def.getLocalizedName() :
-						Labels.getLabel(def.getLabelName()));
-				item.setValue(def.getName());
-				item.setAutocheck(true);
-				item.addEventListener("onClick", new SerializableEventListener() {
-					@Override
-					public void onEvent(Event event) throws Exception {
-						AttributeSearchBox att = addAttribute(def.getName());
-						if (att != null)
-							att.onClick();
-					}
-				});
-				items.add(item);
+				if (! found)
+				{
+					Menuitem item = new Menuitem(def.getLocalizedName() != null ?
+							def.getLocalizedName() :
+							Labels.getLabel(def.getLabelName())+" ("+def.getName()+")");
+					item.setValue(def.getName());
+					item.setAutocheck(true);
+					item.addEventListener("onClick", new SerializableEventListener() {
+						@Override
+						public void onEvent(Event event) throws Exception {
+							AttributeSearchBox att = addAttribute(def.getName());
+							if (att != null)
+								att.onClick();
+						}
+					});
+					items.add(item);
+				}
 			}
 		}
 		Collections.sort( items, new Comparator<Menuitem>()

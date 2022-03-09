@@ -27,7 +27,9 @@ public class WebDataType extends DataType {
 		String p = super.getLabel();
 		if ( p == null || p.trim().isEmpty()) {
 			if (getNlsLabel() != null)
-				return Labels.getLabel(getNlsLabel());
+				p = Labels.getLabel(getNlsLabel());
+			if (p == null || p.trim().isEmpty())
+				return getName();
 		}
 		return p;
 	}

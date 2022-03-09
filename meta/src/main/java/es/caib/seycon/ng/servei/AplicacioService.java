@@ -676,6 +676,13 @@ public abstract class AplicacioService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.application_query.class,roles.user_query.class })
+	public java.util.Collection<es.caib.seycon.ng.comu.RolAccount> findEffectiveUserRolesByInformationSystem(
+			java.lang.String informationSystem)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Operation
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void revokeRolesHoldedOnGroup(long userId, long groupId) {

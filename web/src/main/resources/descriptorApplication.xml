@@ -74,6 +74,11 @@
 				<parameter value="${instance.name}" />
 			</ejb-finder>
 		</finder>
+		<finder name="effectiveuser" type="userRole">
+			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findEffectiveUserRolesByInformationSystem">
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+		</finder>
 		<ejb-handler jndi="java:/module/ApplicationService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />

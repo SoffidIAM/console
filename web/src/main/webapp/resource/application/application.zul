@@ -6,6 +6,7 @@
 <?component name="application_domains" macro-uri="application-domains.zul"?>
 <?component name="application_roles" macro-uri="application-roles.zul"?>
 <?component name="application_users" macro-uri="application-users.zul"?>
+<?component name="application_users2" macro-uri="application-users2.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.application.ApplicationHandler" id="frame">
@@ -78,6 +79,7 @@
 					<tab label="${c:l('aplicacions.zul.Dominis')}" id="domainTab" />
 					<tab label="${c:l('aplicacions.zul.Rols')}" id="roleTab" />
 					<tab id="usersTab" label="${c:l('aplicacions.zul.Usuaris')}"/>
+					<tab id="usersTab2" label="${c:l('aplicacions.zul.EffectiveUsers')}"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
@@ -109,6 +111,9 @@
 					</tabpanel>
 					<tabpanel fulfill="usersTab.onSelect">
 						<application_users listbox="//application/listbox"/>
+					</tabpanel>
+					<tabpanel fulfill="usersTab2.onSelect">
+						<application_users2 listbox="//application/listbox"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

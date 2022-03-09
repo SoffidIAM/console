@@ -4101,6 +4101,63 @@ public class ApplicationServiceImpl extends
 		pr.setResources(result);
 		return pr;
 	}
+	@Override
+	protected Collection<RoleAccount> handleFindEffectiveUserRolesByInformationSystem(String informationSystem)
+			throws Exception {
+		HashSet<RolAccountDetail> radSet = new HashSet<RolAccountDetail>();
+		
+		for (RoleEntity role: getRoleEntityDao().findByInformationSystem(informationSystem)) {
+			populateParentGrantsForRol(radSet, role, null, null);
+		}
+		LinkedList<RoleAccount> rg = new LinkedList<>();
+		for (RolAccountDetail rad : radSet) {
+            RoleAccount grant = new RoleAccount();
+            if (rad.rolAccount != null) 
+            	grant = getRoleAccountEntityDao().toRoleAccount(rad.rolAccount); 
+            else if (rad.rolRol != null) 
+            {
+            	grant.setRoleName(rad.rolRol.getContained().getName());
+            	grant.setRoleDescription(rad.rolRol.getContained().getDescription());
+            	grant.setRoleCategory(rad.rolRol.getContained().getCategory());
+            	grant.setSystem(rad.rolRol.getContained().getSystem().getName());
+                if (rad.qualifier != null) 
+                	grant.setDomainValue( getDomainValueEntityDao().toDomainValue(rad.qualifier));
+                else if (rad.qualifierAplicacio != null) { 
+                	grant.setDomainValue( new DomainValue());
+                	grant.getDomainValue().setValue(rad.qualifierAplicacio.getName());
+                	grant.getDomainValue().setDescription(rad.qualifierAplicacio.getDescription());
+                	grant.getDomainValue().setDomainName(TipusDomini.APPLICATIONS);
+                }
+                else if (rad.qualifierGroup != null) {
+                	grant.setDomainValue( new DomainValue());
+                	grant.getDomainValue().setValue(rad.qualifierGroup.getName());
+                	grant.getDomainValue().setDescription(rad.qualifierGroup.getDescription());
+                	grant.getDomainValue().setDomainName(TipusDomini.GROUPS);
+                	
+                }
+            } else {
+            	grant.setRoleName(rad.rolGrup.getGrantedRole().getName());
+            	grant.setRoleDescription(rad.rolGrup.getGrantedRole().getDescription());
+            	grant.setRoleCategory(rad.rolGrup.getGrantedRole().getCategory());
+            	grant.setSystem(rad.rolGrup.getGrantedRole().getSystem().getName());            	
+            }
+            if (rad.account != null && rad.account.getId() != null) {
+                grant.setAccountName(rad.account.getName());
+                grant.setSystem(rad.account.getSystem().getName());
+                grant.setUserFullName(rad.account.getDescription());
+                if (rad.account.getType().equals(AccountType.USER)) {
+                    for (UserAccountEntity ua : rad.account.getUsers()) {
+                        grant.setUserCode(ua.getUser().getUserName());
+                        grant.setUserFullName(ua.getUser().getFullName());
+                        grant.setUserGroupCode(ua.getUser().getPrimaryGroup().getName());
+                        grant.setGroupDescription(ua.getUser().getPrimaryGroup().getDescription());
+                    }
+                }
+            }
+            rg.add(grant);
+        }
+		return rg;
+	}
 
 
 }

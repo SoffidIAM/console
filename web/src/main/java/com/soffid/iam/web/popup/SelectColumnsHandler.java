@@ -49,7 +49,15 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			table = true;
 			JSONArray srccols = src.getAllColumns();
 			cols = new JSONArray();
-			JSONArray cols2 = new JSONArray( src.getColumns() );
+			String colsString = src.getColumns();
+			if (colsString == null) {
+				JSONArray ar = new JSONArray();
+				for (int i = 0; i < srccols.length() && i < 6; i++)
+					ar.put(srccols.get(i));
+				colsString = ar.toString();
+			}
+				
+			JSONArray cols2 = new JSONArray( colsString );
 			
 			HashSet<String> colNames = new HashSet();
 			for (int i = 0; i < cols2.length(); i++) {

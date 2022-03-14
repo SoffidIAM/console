@@ -118,7 +118,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
 	 		// Remove account snapshots
-			getSession().createQuery("delete from com.soffid.iam.model.AccountSnapshatEntity uac "
+			getSession().createQuery("delete from com.soffid.iam.model.AccountSnapshotEntity uac "
 				+ "where uac.account.id in (select id from com.soffid.iam.model.AccountEntity where system.id=:system)")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();

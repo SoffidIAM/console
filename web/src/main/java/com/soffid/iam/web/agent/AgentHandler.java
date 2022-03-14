@@ -590,16 +590,19 @@ public class AgentHandler extends FrameHandler {
 	}
 	
 	private void fillWorkflowsTable(DataModelCollection coll) {
-		JSONArray data = new JSONArray();
-		for ( int i = 0; i < coll.getSize(); i++) {
-			DataNode node = (DataNode) coll.getDataModel(i);
-			String name = (String) node.get("name");
-			JSONObject o = new JSONObject();
-			o.put("name", name);
-			data.put(o);
+		DataTable workflows = (DataTable) getFellowIfAny("workflowsGrid");
+		if (workflows != null) {
+			JSONArray data = new JSONArray();
+			for ( int i = 0; i < coll.getSize(); i++) {
+				DataNode node = (DataNode) coll.getDataModel(i);
+				String name = (String) node.get("name");
+				JSONObject o = new JSONObject();
+				o.put("name", name);
+				data.put(o);
+			}
+			
+			workflows.setData(data);
 		}
-		DataTable workflows = (DataTable) getFellow("workflowsGrid");
-		workflows.setData(data);
 	}
 
 	private void setVisibleWorkflows(boolean visible) {
@@ -886,6 +889,18 @@ public class AgentHandler extends FrameHandler {
 			{
 				prop.setVisible(true);
 			}
+		}
+		// Workflows
+		Select cb = (Select) getFellow("cbClassDescription");
+		String value = (String) cb.getSelectedValue();
+		es.caib.zkib.jxpath.JXPathContext ctx = getModel().getJXPathContext ();
+		DataNode dn = (DataNode) ctx.getValue("/plugin[className='"+value+"']");
+		DataModelCollection coll = dn.getListModel("pluginWorkflow");
+		if (coll == null || coll.getSize() == 0) {
+			setVisibleWorkflows(false);
+		} else {
+			setVisibleWorkflows(true);
+			fillWorkflowsTable (coll);
 		}
 	}
 	

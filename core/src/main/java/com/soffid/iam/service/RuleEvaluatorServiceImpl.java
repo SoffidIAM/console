@@ -168,7 +168,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		for (Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext(); ) {
             RoleAccountEntity ra = it.next();
             boolean match = false;
-            if (ra.getRole().getId().equals(role.getId())) {
+            if (ra.getRole().getId().equals(role.getId()) && ra.getRule() != null) {
                 if (ra.getDomainValue() != null) {
                     if (ra.getDomainValue().getValue().equals(stringValue)) match = true;
                 } else if (ra.getGroup() != null) {

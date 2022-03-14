@@ -932,8 +932,13 @@ public class ApplicationServiceImpl extends
 			   			else if (rg.getDomainValue() != null && 
 			   					! rg.getDomainValue().getValue().equals( ra.getDomainValue().getValue()))
 			   				continue ;
-			   			else if (rg.isEnabled() && (rg.getEndDate() == null || rg.getEndDate().after(new Date())))
+			   			else if (rg.isEnabled() && (rg.getEndDate() == null || rg.getEndDate().after(new Date()))) {
+			   				if (rg.getRule() == null && ra.getRuleId() != null) {
+			   					rg.setRule(getRuleEntityDao().load(ra.getRuleId()));
+			   					getRoleAccountEntityDao().update(rg);
+			   				}
 			   				return getRoleAccountEntityDao().toRoleAccount(rg);
+			   			}
 			   			else
 			   			{
 			   				deleteRoleAccountEntity(rg, null, true);

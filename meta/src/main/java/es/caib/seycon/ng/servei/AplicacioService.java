@@ -14,6 +14,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
+import com.soffid.iam.model.RuleEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.EntitlementDelegationService;
 import com.soffid.iam.service.impl.AttributeValidationService;
@@ -48,6 +49,7 @@ import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 		es.caib.seycon.ng.model.AutoritzacioRolEntity.class,
 		es.caib.seycon.ng.model.AplicacioEntity.class,
 		es.caib.seycon.ng.model.RolEntity.class,
+		RuleEntity.class,
 		UserAccountEntity.class,
 		ValorDominiAplicacioEntity.class,
 		// Services

@@ -1848,6 +1848,6 @@ public class DispatcherServiceImpl extends
 
 	@Override
 	protected String handleStartVirtualSourceTransaction(boolean readonly, String server) throws Exception {
-		return getTaskEntityDao().startVirtualSourceTransaction(readonly, server);
+		return getTaskEntityDao().startVirtualSourceTransaction(readonly);
 	}
 }

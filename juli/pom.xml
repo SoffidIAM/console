@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.3.11-SNAPSHOT</version>
+		<version>3.3.10-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>iam-juli</artifactId>

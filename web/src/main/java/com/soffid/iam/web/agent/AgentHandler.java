@@ -208,8 +208,9 @@ public class AgentHandler extends FrameHandler {
 
 	public void carregaControlAcces() throws Exception {
 		((DataNodeCollection) getModel().getValue("/agent/controlAcces")).refresh();
-		DataTable gridControlAccess = (DataTable) getFellow("gridControlAccess");
-		gridControlAccess.setDataPath("listbox:/controlAcces");
+		DataTable gridControlAccess = (DataTable) getFellowIfAny("gridControlAccess");
+		if (gridControlAccess != null)
+			gridControlAccess.setDataPath("listbox:/controlAcces");
 	}
 
 	public void propagaCanvisAgent_Usuaris() {
@@ -585,6 +586,7 @@ public class AgentHandler extends FrameHandler {
 				setVisibleWorkflows(false);
 			}
 			setVisibleMetadata (true);
+			this.verificaControlAcces();
 			
 		}
 	}

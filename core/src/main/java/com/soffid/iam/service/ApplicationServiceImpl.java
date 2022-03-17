@@ -1870,65 +1870,64 @@ public class ApplicationServiceImpl extends
     	return s;
     }
     
-    private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user, GroupEntity holderGroup, boolean hierarchy) {
-    	if (type == NONE)
-    		return;
+	private void populateRoles(Set<RolAccountDetail> rad, int type, UserEntity user, GroupEntity holderGroup,
+			boolean hierarchy) {
+		if (type == NONE)
+			return;
 
-      Map<Long,RolAccountDetail> accounts = new HashMap<>();
-      List<AccountEntity> userAccounts = getAccountEntityDao().findByUser(user.getId());
-      if (hierarchy) {
-      for (AccountEntity account: userAccounts)
-        {
-          RolAccountDetail parent = null;
-          if (!account.isDisabled()) {
-            RoleGrantHierarchy h = new RoleGrantHierarchy();
-            h.setAccountName(account.getName());
-            h.setSystem(account.getSystem().getName());
-            h.setAccountDescription(account.getDescription());
-            RolAccountDetail r = new RolAccountDetail(h, null);
-            rad.add(r);
-            accounts.put(account.getId(), r);
-          }
-        }
-      }
-      
-      for (RoleAccountEntity ra: getRoleAccountEntityDao().findByUserName(user.getUserName())) {
-        if (!ra.getAccount().isDisabled()) {
-          if (hierarchy) 
-            populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, accounts.get(ra.getAccount().getId()), ra);
-          else
-            populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
-        }
-        
-    	}
-    	
-    	if (type == INDIRECT || type == ALL)
-    	{
-    		if (holderGroup == null || holderGroup  == user.getPrimaryGroup()) {
-    			if (hierarchy) 
-    			{
+		Map<Long, RolAccountDetail> accounts = new HashMap<>();
+		List<AccountEntity> userAccounts = getAccountEntityDao().findByUser(user.getId());
+		if (hierarchy) {
+			for (AccountEntity account : userAccounts) {
+				RolAccountDetail parent = null;
+				if (!account.isDisabled()) {
+					RoleGrantHierarchy h = new RoleGrantHierarchy();
+					h.setAccountName(account.getName());
+					h.setSystem(account.getSystem().getName());
+					h.setAccountDescription(account.getDescription());
+					RolAccountDetail r = new RolAccountDetail(h, null);
+					rad.add(r);
+					accounts.put(account.getId(), r);
+				}
+			}
+		}
+
+		for (RoleAccountEntity ra : getRoleAccountEntityDao().findByUserName(user.getUserName())) {
+			if (hierarchy) {
+				if (!ra.getAccount().isDisabled())
+					populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy,
+							accounts.get(ra.getAccount().getId()), ra);
+			} else {
+				if (!ra.getAccount().isDisabled() || ra.getAccount().getSystem().getRoleBased().equals("S")) 
+					populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
+			}
+
+		}
+
+		if (type == INDIRECT || type == ALL) {
+			if (holderGroup == null || holderGroup == user.getPrimaryGroup()) {
+				if (hierarchy) {
 					RoleGrantHierarchy h = new RoleGrantHierarchy();
 					h.setGroupName(user.getPrimaryGroup().getName());
 					h.setGroupDescription(user.getPrimaryGroup().getDescription());
 					RolAccountDetail r = new RolAccountDetail(h, null);
 					populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user, hierarchy, r);
-    			} else {
+				} else {
 					populateGroupRoles(rad, ALL, user.getPrimaryGroup(), user, hierarchy, null);
-    			}
-    		}
-    		for (UserGroupEntity ug : user.getSecondaryGroups()) {
-        		if (! Boolean.TRUE.equals(ug.getDisabled()) &&
-        				(holderGroup == null || holderGroup  == ug.getGroup())) {
-    				RoleGrantHierarchy h = new RoleGrantHierarchy();
-    				h.setGroupName(ug.getGroup().getName());
-    				h.setGroupDescription(ug.getGroup().getDescription());
-    				RolAccountDetail r = new RolAccountDetail(h, null);
-    				populateGroupRoles(rad, ALL, ug.getGroup(), user, hierarchy, r);
-        		}
-            }
-    	}
-    	
-    }
+				}
+			}
+			for (UserGroupEntity ug : user.getSecondaryGroups()) {
+				if (!Boolean.TRUE.equals(ug.getDisabled()) && (holderGroup == null || holderGroup == ug.getGroup())) {
+					RoleGrantHierarchy h = new RoleGrantHierarchy();
+					h.setGroupName(ug.getGroup().getName());
+					h.setGroupDescription(ug.getGroup().getDescription());
+					RolAccountDetail r = new RolAccountDetail(h, null);
+					populateGroupRoles(rad, ALL, ug.getGroup(), user, hierarchy, r);
+				}
+			}
+		}
+
+	}
     
 	private void populateGroupRoles(Set<RolAccountDetail> rad, int type, GroupEntity grup, UserEntity originUser, boolean hierarchy, RolAccountDetail parent) {
 		if (type == NONE)

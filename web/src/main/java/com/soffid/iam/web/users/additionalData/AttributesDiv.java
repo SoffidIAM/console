@@ -229,6 +229,7 @@ public class AttributesDiv extends Div implements XPathSubscriber, BindContext {
 					} catch (Exception e) {
 						throw new UiException(e);
 					};
+					input.afterCompose();
 					input.addEventListener("onChange", new EventListener() {
 						public void onEvent(Event event) throws Exception {
 							adjustVisibility();

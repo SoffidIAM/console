@@ -54,6 +54,8 @@ public class AccountAttributeTest extends AbstractTest
 			
 			ServiceLocator.instance().getAccountService().removeAccountAttribute(attribute );
 			
+			ServiceLocator.instance().getDispatcherService().delete(s);
+			
 		} finally {
 			Security.nestedLogoff();
 		}

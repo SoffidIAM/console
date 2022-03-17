@@ -117,13 +117,27 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 					+ "where uac.account.id in (select id from com.soffid.iam.model.AccountEntity where system.id=:system)")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
-	 		// Remove account snapshots
-			getSession().createQuery("delete from com.soffid.iam.model.AccountSnapshotEntity uac "
-				+ "where uac.account.id in (select id from com.soffid.iam.model.AccountEntity where system.id=:system)")
+			// Remove grants
+			getSession().createQuery("delete from com.soffid.iam.model.RoleAccountEntity as ra "+
+					"where ra.account.id in (select id from com.soffid.iam.model.AccountEntity where system.id=:system)")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
 	 		// Remove accounts
 			getSession().createQuery("delete from com.soffid.iam.model.AccountEntity where system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			// Remove account snapshots
+			getSession().createQuery("delete from com.soffid.iam.model.AccountSnapshotEntity uac "
+					+ "where uac.id not in (select a.snapshot.id from com.soffid.iam.model.AccountEntity as a)")
+				.executeUpdate();
+			// Remove role dependencies
+			getSession().createQuery("delete from com.soffid.iam.model.RoleDependencyEntity as rd "+
+					"where rd.contained.id in (select id from com.soffid.iam.model.RoleEntity where system.id=:system)")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			// Remove role dependencies
+			getSession().createQuery("delete from com.soffid.iam.model.RoleDependencyEntity as rd "+
+					"where rd.container.id in (select id from com.soffid.iam.model.RoleEntity where system.id=:system)")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
 			// Remove roles

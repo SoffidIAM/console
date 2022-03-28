@@ -18,6 +18,7 @@ import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.Host;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.service.ejb.NetworkService;
 import com.soffid.iam.web.component.CustomField3;
@@ -200,5 +201,22 @@ public class HostHandler extends FrameHandler {
 			Missatgebox.info(Labels.getLabel("hosts.passwordNotAvailable"));
 		}
 		
+	}
+	
+	public void assignIpAddress(Event event) throws NamingException, CreateException, InternalErrorException {
+		Long id = (Long) XPathUtils.eval((DataSource)getListbox(), "id");
+		NetworkService svc = EJBLocator.getNetworkService();
+		if (id != null) {
+			Host host = svc.findHostById(id);
+			if (host != null && host.getIp() != null && !host.getIp().trim().isEmpty()) {
+				XPathUtils.setValue((DataSource)getListbox(), "ip", host.getIp());
+				return;
+			}
+		}
+		String network = (String) XPathUtils.eval((DataSource)getListbox(), "networkCode");
+		if (network != null && ! network.trim().isEmpty()) {
+			String empty = svc.getFirstAvailableIP(network);
+			XPathUtils.setValue((DataSource)getListbox(), "ip", empty);
+		}
 	}
 }

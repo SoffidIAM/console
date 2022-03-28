@@ -3466,9 +3466,9 @@ div.databox[multivalue='true'] div.container input.description {
 	width: calc( 100% - 2em - 8px );
 }
 
-div.databox div.databox-popup {
+div.databox-popup {
    position: fixed;
-   margin-top: 24px;
+   margin-top: 2px;
    background-color: white;
    padding: 8px;
    border: solid 1px {BLUEDARK};
@@ -3482,7 +3482,7 @@ div.databox div.databox-popup {
    overflow-y: auto;
 }
 
-div.databox div.databox-popup div {
+div.databox-popup div {
     width: 100%;
     cursor: pointer;
     overflow: hidden;
@@ -3490,23 +3490,23 @@ div.databox div.databox-popup div {
     height: 20px;
 }
 
-div.databox div.databox-popup div span.name span {
+div.databox-popup div span.name span {
 	font-weight: bold;
 }
 
-div.databox div.databox-popup div span.search-match{
+div.databox-popup div span.search-match{
 	color: {SKY};
 }
 
-div.databox div.databox-popup div:hover,
-div.databox div.databox-popup div:hover span ,
-div.databox div.databox-popup div:hover span.search-match {
+div.databox-popup div:hover,
+div.databox-popup div:hover span ,
+div.databox-popup div:hover span.search-match {
 	background-color: {BLUELIGHT};
 	color: {BLUETEXT};
 }
 
-div.databox div.databox-popup div.no-results,
-div.databox div.databox-popup div.no-results:hover {
+div.databox-popup div.no-results,
+div.databox-popup div.no-results:hover {
 	background-color: white;
 	color: #606060;
 }
@@ -3529,7 +3529,7 @@ div.databox div.warning span {
     font-weight: bold;
 }
 
-div.databox div.databox-popup img {
+div.databox-popup img {
    width: 24px;
 }
 

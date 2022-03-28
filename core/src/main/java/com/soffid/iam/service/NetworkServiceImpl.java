@@ -79,6 +79,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +97,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
-import org.bouncycastle.util.Arrays;
 import org.json.JSONException;
 
 /**
@@ -2019,7 +2019,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         Collection<RoleGrant> grants = null;
         Collection<Group> groups  = null;
         for (NetworkAuthorizationEntity auth: host.getNetwork().getAuthorizations()) {
-        	if (Arrays.contains(autoritzacions, auth.getLevel().intValue()) &&
+        	if (arrayContains(autoritzacions, auth.getLevel().intValue()) &&
         			teAcces(host.getName(), auth.getHostsName())) {
         		if (auth.getUser() == userEntity )
         			return true;
@@ -2042,7 +2042,14 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return false; // Not found
     }
 
-    @Override
+    private boolean arrayContains(int[] autoritzacions, int intValue) {
+    	for (int a: autoritzacions)
+    		if (a == intValue)
+    			return true;
+    	return false;
+	}
+
+	@Override
 	protected boolean handleCanLogin(String user, String host) throws Exception {
         HostEntity maquinaEntity = getHostEntityDao().findByName(host);
         if (maquinaEntity == null)  {

@@ -501,7 +501,25 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+        <dependency>
+           <groupId>com.lowagie</groupId>
+           <artifactId>itext</artifactId>
+           <exclusions>
+           	<exclusion>
+           		<groupId>org.bouncycastle</groupId>
+           		<artifactId>bctsp-jdk14</artifactId>
+           	</exclusion>
+           	<exclusion>
+           		<groupId>bouncycastle</groupId>
+           		<artifactId>bcmail-jdk14</artifactId>
+           	</exclusion>
+           	<exclusion>
+           		<groupId>bouncycastle</groupId>
+           		<artifactId>bcprov-jdk14</artifactId>
+           	</exclusion>
+           </exclusions>
+        </dependency>
+ 		<dependency>
 			<groupId>it.sauronsoftware.cron4j</groupId>
 			<artifactId>cron4j</artifactId>
 			<version>2.2.5</version>
@@ -599,7 +617,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.17</version>
+			<version>3.10.1</version>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>

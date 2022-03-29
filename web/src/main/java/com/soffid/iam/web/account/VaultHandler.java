@@ -63,6 +63,7 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class VaultHandler extends FrameHandler {
 	private Account account;
+	private boolean unselectAfterPassword;
 
 	public VaultHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
@@ -530,6 +531,7 @@ public class VaultHandler extends FrameHandler {
 	
 	public void viewPassword2() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
 		getCard().setSclass ( "card" );
+		unselectAfterPassword = true;
 		viewPassword();
 	}
 	
@@ -583,6 +585,11 @@ public class VaultHandler extends FrameHandler {
 	public void closeShowPassword() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
 		Window showPassword = (Window) getFellow("showPassword");
 		showPassword.setVisible(false);
+		if (unselectAfterPassword) {
+			unselectAfterPassword = true;
+			DataTree2 dt = (DataTree2) getListbox();
+			dt.setSelectedIndex(new int[0]);
+		}
 	}
 	
 	public void launch() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException, UnsupportedEncodingException {

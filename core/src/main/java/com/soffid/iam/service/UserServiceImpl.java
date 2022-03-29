@@ -1671,7 +1671,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			MetaDataEntity tipusDada = tipusDadesIterator.next();
 			if (tipusDada.getName().compareTo(NIF) != 0
 					&& tipusDada.getName().compareTo(TELEFON) != 0 &&
-					(tipusDada.getScope() == null || tipusDada.getScope() == MetadataScope.USER)) {
+					(tipusDada.getScope() == null || tipusDada.getScope() == MetadataScope.USER) &&
+					! Boolean.TRUE.equals( tipusDada.getBuiltin())) {
 				Iterator<UserDataEntity> dadesIterator = dades.iterator();
 				boolean teTipusDada = false;
 				while (dadesIterator.hasNext()) {

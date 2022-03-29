@@ -292,8 +292,10 @@ public class AgentHandler extends FrameHandler {
 						Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.DeleteAgentRoles"),
 								org.zkoss.util.resource.Labels.getLabel("process.warning"),
 								(evt2) -> {
-									if ("onOK".equals(evt2.getName())) 
+									if ("onOK".equals(evt2.getName())) { 
 										listbox.delete();
+										hideDetails();
+									}
 								});
 					}
 				});

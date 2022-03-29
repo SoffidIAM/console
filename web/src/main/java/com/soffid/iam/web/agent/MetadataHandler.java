@@ -180,6 +180,15 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 		}
 	}
 	
+	public void undo(Event event) {
+		metadataWindow.setVisible(false);
+		try {
+			metadataGrid.refresh();
+		} catch (Exception e) {
+			throw new UiException(e);
+		}
+	}
+	
 }
 
 class OrderComparator implements Comparator<DataType>

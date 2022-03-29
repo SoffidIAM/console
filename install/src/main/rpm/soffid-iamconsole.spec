@@ -47,6 +47,6 @@ systemctl disable 'soffid-iamconsole.service' || true
 (Converted from a deb package by alien version 8.95.)
 
 %files
-%config "/opt/soffid/iam-console-3/bin/env.sh"
-%config "/opt/soffid/iam-console-3/conf/server.xml"
-%config "/opt/soffid/iam-console-3/conf/tomee.xml"
+%config(noreplace) "/opt/soffid/iam-console-3/bin/env.sh"
+%config(noreplace) "/opt/soffid/iam-console-3/conf/server.xml"
+%config(noreplace) "/opt/soffid/iam-console-3/conf/tomee.xml"

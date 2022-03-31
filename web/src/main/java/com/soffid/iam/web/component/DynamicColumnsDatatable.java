@@ -62,7 +62,6 @@ public class DynamicColumnsDatatable extends DataTable {
 	private void setDefaultColumns() throws Exception {
 		String pref = EJBLocator.getPreferencesService().findMyPreference("cols-"+preference);
 		if (pref != null && ! pref.trim().isEmpty()) {
-			Set<String> cols = new java.util.HashSet<String>();
 			JSONArray a = new JSONArray();
 			
 			String customColumns = getCustomColumns();
@@ -70,8 +69,11 @@ public class DynamicColumnsDatatable extends DataTable {
 				a = (JSONArray) new YamlParser().parse(customColumns);
 			
 			String[] mandatory = getMandatoryColumns();
-			List<String> enabledColumns = new LinkedList<>( 
-					new HashSet<String>(Arrays.asList(pref.split(" "))));
+			List<String> enabledColumns = new LinkedList<>();
+			for (String columnName:  pref.split(" ")) {
+				if (!columnName.trim().isEmpty() && ! enabledColumns.contains(columnName))
+					enabledColumns.add(columnName);
+			}
 			if (mandatory != null) {
 				for (String m: mandatory) {
 					if (! enabledColumns.contains(m))

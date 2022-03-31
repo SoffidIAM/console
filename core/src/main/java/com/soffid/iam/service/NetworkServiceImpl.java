@@ -51,10 +51,12 @@ import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
+import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
@@ -77,6 +79,7 @@ import es.caib.seycon.util.TimedProcess;
 
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -253,6 +256,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			getAccessLogEntityDao().remove(
         					getAccessLogEntityDao().findByHostId(maq.getId()));
         			getHostEntityDao().remove(maq);
+        			createHostTask(maq.getName());
         		}
         		else
             		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
@@ -325,6 +329,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		getHostEntityDao().hostToEntity(maquina, old, true);
                 old.setDeleted(new Boolean(false));
                 getHostEntityDao().update(old);
+    			createHostTask(maquina.getName());
                 updateHostAlias(old, maquina.getHostAlias());
 	            return getHostEntityDao().toHost(old);                
         	} else {
@@ -333,6 +338,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	            getHostEntityDao().create(entity);
 	            maquina.setId(entity.getId());
 	            updateHostAlias(entity, maquina.getHostAlias());
+    			createHostTask(maquina.getName());
 	            return getHostEntityDao().toHost(entity);
         	}
         }
@@ -344,8 +350,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      */
     protected void handleUpdate(com.soffid.iam.api.Host maquina) throws java.lang.Exception {
         if (teAccesEscripturaMaquina(maquina)) {
-            HostEntity hostEntity = getHostEntityDao().hostToEntity(maquina);
+            HostEntity hostEntity = getHostEntityDao().load(maquina.getId());
+            if (!hostEntity.getName().equals(maquina.getName()))
+    			createHostTask(hostEntity.getName());
+            getHostEntityDao().hostToEntity(maquina, hostEntity, true);
 			getHostEntityDao().update(hostEntity);
+			createHostTask(maquina.getName());
             updateHostAlias(hostEntity, maquina.getHostAlias());
         } else {
             // Comprovem permís per actualitzar el SO de la màquina
@@ -372,6 +382,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 // I les comparem
                 if (maquinesIguals(maquinaTrobada, maquina)) {
                     getHostEntityDao().update(getHostEntityDao().hostToEntity(maquinaTrobada));
+        			createHostTask(maquina.getName());
                 } else {
                     throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.OnlyChangeSOMachine"), maquina.getName()));
                 }
@@ -440,6 +451,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			}
         			entity.getSystems().clear();
         			getHostEntityDao().remove(entity);
+        			createHostTask(maquina.getName());
         		}
         		else
         		{
@@ -452,6 +464,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		HostEntity entity = getHostEntityDao().hostToEntity(maquina);
         		entity.setDeleted(true);
         		getHostEntityDao().update(entity);
+    			createHostTask(maquina.getName());
         	}
         }
     	else
@@ -1666,6 +1679,14 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             return getHostEntityDao().toHost(maquina);
     }
 
+    protected void createHostTask(String host) {
+        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
+        tasque.setTransaction(TaskHandler.UPDATE_HOST);
+        tasque.setHost(host);
+        getTaskEntityDao().create(tasque);
+    }
+    
     @Override
     protected Host handleRegisterDynamicIP(String nomMaquina, String ip, String serialNumber) throws es.caib.seycon.ng.exception.UnknownHostException, UnknownNetworkException, InternalErrorException {
         boolean anyChange = false;
@@ -1684,15 +1705,18 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             	maquina.setHostIP(ip);
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
+			createHostTask(maquina.getName());
         } else if (serialNumber.equals(old.getSerialNumber())) {
             // Found host entry
             maquina = old;
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
+			createHostTask(maquina.getName());
         } else if (old.getDynamicIP().booleanValue() ) { // Serial number has changed => Register a new host
             // Autodelete
             old.setDeleted(true);
             getHostEntityDao().update(old);
+			createHostTask(old.getName());
         } else {
             log.warn(String.format(
                     Messages.getString("NetworkServiceImpl.HostsCollisionMessage"), //$NON-NLS-1$
@@ -1732,6 +1756,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 maquina.setOperatingSystem(getOsTypeEntityDao().findOSTypeByName("ALT")); //$NON-NLS-1$
                 maquina.setNetwork(x);
                 getHostEntityDao().create(maquina);
+    			createHostTask(maquina.getName());
         	} catch (java.net.UnknownHostException e) {
             	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, "??"); //$NON-NLS-1$ //$NON-NLS-2$ 
             	log.warn(msg);
@@ -1769,6 +1794,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         {
         	maquina.setLastSeen(new Date());
         	getHostEntityDao().update(maquina);
+			createHostTask(maquina.getName());
         }
 
         return getHostEntityDao().toHost(maquina);

@@ -22,6 +22,7 @@ import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.PuntEntradaEntity;
+import es.caib.seycon.ng.model.TasqueEntity;
 import roles.Tothom;
 
 @Service (translatedName="NetworkService",
@@ -48,6 +49,7 @@ import roles.Tothom;
 	DispatcherService.class,
 	PuntEntradaEntity.class,
 	DispatcherEntity.class,
+	TasqueEntity.class,
 	AsyncRunnerService.class})
 public abstract class XarxaService {
 

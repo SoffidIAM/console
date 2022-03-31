@@ -254,12 +254,6 @@ public class HostEntityDaoImpl extends
             getHostServiceEntityDao().remove(maquinaEntity.getServices());
             getHostSystemEntityDao().remove(maquinaEntity.getSystems());
             super.remove(maquinaEntity);
-            TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_HOST);
-            tasque.setHost(maquinaEntity.getName());
-            getTaskEntityDao().create(tasque);
-            getSession(false).flush();
             auditarMaquina("D", nomMaquina); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
@@ -270,11 +264,6 @@ public class HostEntityDaoImpl extends
     public void create(com.soffid.iam.model.HostEntity maquina) throws RuntimeException {
         try {
             super.create(maquina);
-            TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_HOST);
-            tasque.setHost(maquina.getName());
-            getTaskEntityDao().create(tasque);
             getSession(false).flush();
             auditarMaquina("C", maquina.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
@@ -293,26 +282,7 @@ public class HostEntityDaoImpl extends
     }
     public void update(com.soffid.iam.model.HostEntity maquina) throws RuntimeException {
         try {
-            HostEntity oldMaquina = load(maquina.getId());
             super.update(maquina);
-            if (areDifferent(oldMaquina.getHostIP(), maquina.getHostIP()) || areDifferent(oldMaquina.getMail(), maquina.getMail()) || areDifferent(oldMaquina.getDescription(), maquina.getDescription()) || areDifferent(oldMaquina.getFolders(), maquina.getFolders()) || areDifferent(oldMaquina.getMac(), maquina.getMac()) || areDifferent(oldMaquina.getDhcp(), maquina.getDhcp()) || areDifferent(oldMaquina.getSerialNumber(), maquina.getSerialNumber()) || areDifferent(oldMaquina.getPrintersServer(), maquina.getPrintersServer()) || areDifferent(oldMaquina.getOperatingSystem(), maquina.getOperatingSystem()) || areDifferent(oldMaquina.getDeleted(), maquina.getDeleted()) || areDifferent(oldMaquina.getDynamicIP(), maquina.getDynamicIP()) || areDifferent(oldMaquina.getName(), maquina.getName())) 
-            {
-                TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-                tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransaction(TaskHandler.UPDATE_HOST);
-            	tasque.setHost(oldMaquina.getName());
-            	getTaskEntityDao().create(tasque);
-                auditarMaquina("U", maquina.getName()); //$NON-NLS-1$
-            }
-            if (!oldMaquina.getName().equals(maquina.getName())) 
-            {
-                TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-                tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransaction(TaskHandler.UPDATE_HOST);
-                tasque.setHost(maquina.getName());
-                getTaskEntityDao().create(tasque);
-            }
-            getSession().flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.4"), maquina.getName(), message)); //$NON-NLS-1$

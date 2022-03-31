@@ -3477,7 +3477,7 @@ div.databox-popup {
    min-width: 200px;
    max-width: 800px;
    max-height: 800px;
-   z-index: 1;
+   z-index: 99999;
    box-shadow: 4px 4px #a0a0a0;
    overflow-y: auto;
 }

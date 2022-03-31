@@ -223,7 +223,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		case WIZARD_GRANTED:
 			switch (wizard.getSelected()) {
 			case 0:
-				wizard.setVisible(false);
+				wizard.getParent().setVisible(false);
 				break;
 			case 1:
 				String currentDomain = (String) getListbox().getJXPathContext().getValue("/@domain");
@@ -261,7 +261,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 				wizard.previous();
 				break;
 			case 0:
-				wizard.setVisible(false);
+				wizard.getParent().setVisible(false);
 				break;
 			}
 			break;
@@ -277,7 +277,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 				wizard.previous();
 				break;
 			case 0:
-				wizard.setVisible(false);
+				wizard.getParent().setVisible(false);
 				break;
 			}
 			break;

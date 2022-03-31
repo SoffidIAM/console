@@ -79,7 +79,7 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 						{
 							List<ATTRIBUTEENTITY> p = findAttributeEntityByNameAndValue(m, v);
 							if (p.size() > 1)
-								throw new InternalErrorException(String.format("Already exists a user with %s %s",
+								throw new InternalErrorException(String.format("Already exists an object with %s %s",
 										m.getLabel(), v));
 						}
 					}

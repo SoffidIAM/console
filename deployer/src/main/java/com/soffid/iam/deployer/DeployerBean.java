@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -384,12 +385,7 @@ public class DeployerBean implements DeployerService {
 						log.info("Appending messages to " + f.getPath());
 						FileOutputStream out = new FileOutputStream(f, true);
 						out.write('\n');
-						byte b[] = new byte[4096];
-						int read;
-						while ((read = zin.read(b)) > 0) {
-							out.write(b, 0, read);
-						}
-						out.close();
+						copyStream(zin, out);
 					} else if (f.canRead()) {
 						log.warn("Module " + name + ". Ignoring file "
 								+ f.getPath());
@@ -405,12 +401,16 @@ public class DeployerBean implements DeployerService {
 	private void extractFile(ZipInputStream zin, File f)
 			throws FileNotFoundException, IOException {
 		FileOutputStream out = new FileOutputStream(f);
+		copyStream(zin, out);
+		out.close();
+	}
+
+	public void copyStream(InputStream zin, OutputStream out) throws IOException {
 		byte b[] = new byte[4096];
 		int read;
 		while ((read = zin.read(b)) > 0) {
 			out.write(b, 0, read);
 		}
-		out.close();
 	}
 
 	private boolean isXslPath(File warFile, ZipEntry entry) {
@@ -486,6 +486,7 @@ public class DeployerBean implements DeployerService {
 			throws Exception {
 		File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
 		log.info("Generating web service file " + coreFile);
+
 		FileOutputStream out = new FileOutputStream(coreFile);
 		boolean ejb = false;
 		byte b[] = new byte[4096];
@@ -495,50 +496,34 @@ public class DeployerBean implements DeployerService {
 		}
 		out.close();
 
-		// Search for services.xml file
-		boolean axisService = false;
+		final File warDir = new File (removeExtension(webserviceWarFile.getPath()));
+		File libDir = new File(warDir, "WEB-INF/lib"); //$NON-NLS-1$ //$NON-NLS-2$
+		libDir.mkdirs();
+		File libFile = new File(libDir, "plugin-"+name+".jar");
+		ZipOutputStream resources = new ZipOutputStream(new FileOutputStream(libFile));
+		
+		File classesDir = new File(warDir,
+					"WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
+		log.info("Extracting to " + classesDir);
 		ZipInputStream zin = new ZipInputStream( new FileInputStream(coreFile));
 		ZipEntry entry;
 		while ((entry = zin.getNextEntry()) != null) {
-			if (entry.getName().equals("META-INF/services.xml") ||
-					entry.getName().equals("META-INF\\services.xml") )
-				axisService = true;
-		}
-		zin.close();
-		
-		if ( axisService)
-		{
-			File wsFile = new File(new File (removeExtension(webserviceWarFile.getPath())),
-					"WEB-INF/services/plugin-" + name + ".aar"); //$NON-NLS-1$ //$NON-NLS-2$
-	
-			log.info("Moving to " + wsFile);
-			FileOutputStream out2 = new FileOutputStream(wsFile);
-			FileInputStream in2 = new FileInputStream (coreFile);
-			while ((read = in2.read(b)) > 0) {
-				out2.write(b, 0, read);
-			}
-			out2.close();
-			in2.close();
-			
-			coreFile.delete();
-		}
-		else
-		{
-			File classesDir = new File(new File (removeExtension(webserviceWarFile.getPath())),
-					"WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
-			log.info("Extracting to " + classesDir);
-			zin = new ZipInputStream( new FileInputStream(coreFile));
-			while ((entry = zin.getNextEntry()) != null) {
+			if (entry.isDirectory()) {
+				resources.putNextEntry(new ZipEntry(entry.getName()));
+				resources.closeEntry();
+			} else if (entry.getName().endsWith(".class")) {
 				File f = new File(classesDir, entry.getName());
-				if (entry.isDirectory()) {
-					f.mkdirs();
-				} else {
-					f.getParentFile().mkdirs();
-					extractFile(zin, f);
-				}
+				f.getParentFile().mkdirs();
+				extractFile(zin, f);
+			} else {
+				resources.putNextEntry(new ZipEntry(entry.getName()));
+				copyStream(zin, resources);
+				resources.closeEntry();
 			}
-			coreFile.delete();			
 		}
+		resources.close();
+		zin.close();
+		coreFile.delete();
 	}
 
 	private void uncompressEar() throws Exception {

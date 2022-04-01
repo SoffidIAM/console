@@ -66,6 +66,10 @@ public class Password extends Object implements Serializable {
         return password;
     }
 
+    
+    static public Password fromString(String s) {
+    	return new Password(s);
+    }
     /**
      * Des-serializar
      * 

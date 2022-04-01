@@ -9,12 +9,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -30,6 +32,7 @@ import org.json.JSONObject;
 import org.zkoss.image.AImage;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -61,6 +64,7 @@ import com.soffid.iam.web.bpm.BPMDataNode;
 import com.soffid.iam.web.bpm.ListitemCreator;
 import com.soffid.iam.web.bpm.WorkflowWindowInterface;
 import com.soffid.iam.web.bpm.attachment.ProcessAttachmentManager;
+import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.bpm.exception.BPMException;
@@ -71,7 +75,9 @@ import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.DateFormats;
+import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
+import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.SerializableEventListener;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -93,6 +99,7 @@ public class ProcessUI extends FrameHandler {
     ProcessInstance currentProcess;
     ProcessDefinition currentDefinition;
 	private Job currentJob;
+	Map<Long,Job> jobs = new HashMap<>();
 	private Window currentJobWindow;
 
 	private DataModel model;
@@ -471,7 +478,9 @@ public class ProcessUI extends FrameHandler {
 		if ("task".equals(type)) {
 			openTask(current);
 		}
-		
+		if ("job".equals(type)) {
+			openJob(current.getLong("jobId"));
+		}
 	}
 
 	public void openTask (JSONObject o) throws InternalErrorException, BPMException, NamingException, CreateException {
@@ -582,6 +591,7 @@ public class ProcessUI extends FrameHandler {
     
 	private void cargarTablaTareas(ProcessInstance proc, DataTree2 tablaTareas) throws CreateException, NamingException, BPMException, InternalErrorException {
 		BpmEngine engine = getEngine();
+		jobs.clear();
 		
 		Set <Long> roots = new HashSet<Long>();
 		Set <Long> children = new HashSet<Long>();
@@ -693,6 +703,8 @@ public class ProcessUI extends FrameHandler {
 			for (Iterator<Job> it = tasks.iterator(); it.hasNext(); )
 			{
 				Job job = it.next();
+				
+				jobs.put(job.getId(), job);
 	
 				JSONObject o = new JSONObject();
 				o.put("type", "job");
@@ -872,4 +884,77 @@ public class ProcessUI extends FrameHandler {
 	public void setParentFrame(FrameHandler parentFrame) {
 		this.parentFrame = parentFrame;
 	}
+	
+	public void openJob(Long id) {
+		currentJob = jobs.get(id);
+
+		Component w = getFellow("job");
+
+		((CustomField3)w.getFellow("id")).setValue(currentJob.getId());
+		((CustomField3)w.getFellow("name")).setValue(currentJob.getName());
+		((CustomField3)w.getFellow("dueDate")).setValue(currentJob.getDueDate());
+		((CustomField3)w.getFellow("failures")).setValue(currentJob.getFailures());
+		((CustomField3)w.getFellow("errorLog")).setValue(currentJob.getErrorMessage());
+		
+		String errorMessage = currentJob.getErrorMessage();
+		w.getFellow("errorLog").setVisible(errorMessage != null && ! errorMessage.trim().isEmpty());
+		Button pauseButton = (Button) w.getFellow("pausebutton"); //$NON-NLS-1$
+		Button resumeButton = (Button) w.getFellow("resumebutton"); //$NON-NLS-1$
+		Button retryButton = (Button) w.getFellow("retrybutton"); //$NON-NLS-1$
+		Button closeButton = (Button) w.getFellow("closebutton"); //$NON-NLS-1$
+		
+		CustomField3 statusLabel = (CustomField3) w.getFellow("status");
+		if (currentJob.isPaused())
+		{
+			statusLabel.setValue(Labels.getLabel("job.status.pause")); //$NON-NLS-1$
+			resumeButton.setVisible(true);
+			pauseButton.setVisible(false);
+			retryButton.setVisible(false);
+		}
+		else if (currentJob.isError())
+		{
+			statusLabel.setValue(Labels.getLabel("job.status.error")); //$NON-NLS-1$
+			retryButton.setVisible(true);
+			pauseButton.setVisible(false);
+			resumeButton.setVisible(false);
+		}
+		else 
+		{
+			Integer failures = currentJob.getFailures();
+			if (failures != null && failures.intValue() > 0 && errorMessage != null && ! errorMessage.trim().isEmpty())
+				statusLabel.setValue(Labels.getLabel("job.status.warning")); //$NON-NLS-1$
+			else
+				statusLabel.setValue(Labels.getLabel("job.status.pending")); //$NON-NLS-1$
+			retryButton.setVisible(false);
+			resumeButton.setVisible(false);
+			pauseButton.setVisible(true);
+		}
+
+		((Window)getFellow("job")).doHighlighted();
+	}
+	
+	public void pause (Event event) throws InternalErrorException, BPMException, CreateException, NamingException, CommitException, RemoteException, InterruptedException {
+		BPMApplication.getEngine().pauseJob(currentJob);
+		hideJob();
+		cargarTablaTareas (currentProcess, tablaTareas);
+	}
+
+	public void resume (Event event) throws InternalErrorException, BPMException, CreateException, NamingException, CommitException, RemoteException, InterruptedException {
+		BPMApplication.getEngine().resumeJob(currentJob);
+		hideJob();
+		cargarTablaTareas (currentProcess, tablaTareas);
+	}
+	
+	public void retry (Event event) throws InternalErrorException, BPMException, CreateException, NamingException, CommitException, RemoteException, InterruptedException {
+		BPMApplication.getEngine().retryJob(currentJob);
+		hideJob();
+        cargarTablaTareas (currentProcess, tablaTareas);
+	}
+
+	public void hideJob() {
+		getFellow("job").setVisible(false);
+		DataTree2 dt = (DataTree2) getFellow("listadoTareas");
+		dt.setSelectedIndex(new int[0]);
+	}
+
 }

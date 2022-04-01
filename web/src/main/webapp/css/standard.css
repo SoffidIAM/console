@@ -2182,7 +2182,7 @@ div.databox.bold select {
 }
 div.datatable table.tbody tr.red td,
 div.databox.red select {
-	color: {SKY};
+	color: red;
 }
 div.datatable table.tbody tr.approval-pending td {
 	color: #808080;

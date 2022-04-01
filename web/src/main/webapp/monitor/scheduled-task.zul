@@ -25,6 +25,8 @@
 				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 				dataPath="/model:/task"
 				preference="task"
+				sortColumn="9"
+				sortDirection="-1"
 				maxheight="70vh" 
 				onSelect="ref:frame.showDetails" enablefilter="true">
 				<attribute name="allColumns"><![CDATA[

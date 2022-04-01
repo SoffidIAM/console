@@ -9,36 +9,36 @@
 	xmlns:zk="http://www.zkoss.org/2005/zk" 
 	id="frame" use="com.soffid.iam.web.bpm.process.ProcessUI" 
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
-		<datamodel class="com.soffid.iam.web.bpm.BPMDataNode" id="model"/>
-		<div width="100%">
-			<label sclass="label" value="${c:l('process.lblProceso')}"/>
-			<label id="txtIdProceso"/>
-			<label id="txtProceso" style="margin-left: 2em"/>
-			<databutton image="/img/restart.svg" onClick="ref:frame.refresh" onlyIcon="true" label="${c:l('seyconserver.Refresca') }" id="pendingTasksButton" style="float:right"/>
-		</div>
-		<tabbox id="tabbox" style="width: 100%; height: 70vh">
-			<tabs>
-				<tab label="${c:l('inbox.lblProceso')}"/>
-				<tab label="${c:l('process.lblTareas')}"/>
-				<tab label=" ${c:l('inbox.lblMapaProceso')} "/>
-				<tab id="tabAnexos" label="${c:l('inbox.lblAnexos')}"/>
-				<tab label="${c:l('task.comentari')}"/>
-			</tabs>
-			<tabpanels width="100%">
-				<tabpanel id="proceso" style="min-height:30em;overflow:auto" width="100%">
-					<form2 dataPath="model:/processInstance/variables"  style="width:100%; height: calc( 100vh - 340px )">
-						 
-						<div id="datosElementoWorkflow" width="100%">
-					
-						</div>
-					</form2>
-				</tabpanel>
-				<tabpanel id="tareas" style="overflow:auto"> 
-					<datatree2 id="listadoTareas" width="100%" style="min-height: 0"
-						header="${c:l('process.lblIdentificador')}"
-						onSelect="ref:frame.openTree">
-					<attribute name="finders">
-					<![CDATA[
+	<datamodel class="com.soffid.iam.web.bpm.BPMDataNode" id="model"/>
+	<div width="100%">
+		<label sclass="label" value="${c:l('process.lblProceso')}"/>
+		<label id="txtIdProceso"/>
+		<label id="txtProceso" style="margin-left: 2em"/>
+		<databutton image="/img/restart.svg" onClick="ref:frame.refresh" onlyIcon="true" label="${c:l('seyconserver.Refresca') }" id="pendingTasksButton" style="float:right"/>
+	</div>
+	<tabbox id="tabbox" style="width: 100%; height: 70vh">
+		<tabs>
+			<tab label="${c:l('inbox.lblProceso')}"/>
+			<tab label="${c:l('process.lblTareas')}"/>
+			<tab label=" ${c:l('inbox.lblMapaProceso')} "/>
+			<tab id="tabAnexos" label="${c:l('inbox.lblAnexos')}"/>
+			<tab label="${c:l('task.comentari')}"/>
+		</tabs>
+		<tabpanels width="100%">
+			<tabpanel id="proceso" style="min-height:30em;overflow:auto" width="100%">
+				<form2 dataPath="model:/processInstance/variables"  style="width:100%; height: calc( 100vh - 340px )">
+					 
+					<div id="datosElementoWorkflow" width="100%">
+				
+					</div>
+				</form2>
+			</tabpanel>
+			<tabpanel id="tareas" style="overflow:auto"> 
+				<datatree2 id="listadoTareas" width="100%" style="min-height: 0"
+					header="${c:l('process.lblIdentificador')}"
+					onSelect="ref:frame.openTree">
+				<attribute name="finders">
+				<![CDATA[
 - path: process
   icon: /img/agent-green.svg
   value: id
@@ -66,39 +66,57 @@
     - value: startDate
     - value: status
     - value: ""
-				  		]]></attribute>
-						<attribute name="columns"><![CDATA[
+			  		]]></attribute>
+					<attribute name="columns"><![CDATA[
 - name: ${c:l('llistesCorreu.zul.Descripcia-2')}
 - name: ${c:l('inbox.lblFecha')}
 - name: ${c:l('process.lblEstado')}
 - name: ${c:l('inbox.lblActoresAsignados')}
-						]]></attribute>
-					</datatree2>
-				</tabpanel>
-				<tabpanel style="overflow:auto;min-height:30em;" width="100%">
-					<processInfo/>
-				</tabpanel>
-				<tabpanel style="overflow:auto;min-height:30em;" width="100%">
-				<!-- 
-					 -->
-					<attachments/>
-				</tabpanel>
-				<tabpanel style="overflow:auto" width="100%">
-				<!-- 
-					 -->
-					<comments/>
-				</tabpanel>
-			</tabpanels>
-		</tabbox>
-		
-	    <hbox width="98%">
-			<hbox style="float:left;">
-				<button id="btnCerrar" label="${c:l('task.btnCerrar')}" onClick="ref:frame.cerrar()"/>
-			</hbox>
-
-			<hbox style="float:right;">
-				<button id="btnCancel" label="${c:l('process.btnCancel')}" onClick="ref:frame.cancel()"/>
-				<button id="btnUpgrade" label="${c:l('process.btnUpgrade')}" onClick="ref:frame.upgrade()"/>
-			</hbox>
+					]]></attribute>
+				</datatree2>
+			</tabpanel>
+			<tabpanel style="overflow:auto;min-height:30em;" width="100%">
+				<processInfo/>
+			</tabpanel>
+			<tabpanel style="overflow:auto;min-height:30em;" width="100%">
+			<!-- 
+				 -->
+				<attachments/>
+			</tabpanel>
+			<tabpanel style="overflow:auto" width="100%">
+			<!-- 
+				 -->
+				<comments/>
+			</tabpanel>
+		</tabpanels>
+	</tabbox>
+	
+    <hbox width="98%">
+		<hbox style="float:left;">
+			<button id="btnCerrar" label="${c:l('task.btnCerrar')}" onClick="ref:frame.cerrar()"/>
 		</hbox>
+
+		<hbox style="float:right;">
+			<button id="btnCancel" label="${c:l('process.btnCancel')}" onClick="ref:frame.cancel()"/>
+			<button id="btnUpgrade" label="${c:l('process.btnUpgrade')}" onClick="ref:frame.upgrade()"/>
+		</hbox>
+	</hbox>
+	
+	<window id="job" visible="false"
+		position="center, center" sizable="false"
+		title="${c:l('job.title')}" 
+		style="width: 80%; max-width: 800px" closable="false">
+		<customfield3 label="${c:l('process.lblIdentificador')}" readonly="true" id="id" dataType="STRING" maxlength="12"/>
+		<customfield3 label="${c:l('job.name')}" readonly="true" id="name" dataType="STRING"/>
+		<customfield3 label="${c:l('job.dueDate')}" readonly="true" id="dueDate" dataType="DATE_TIME"/>
+		<customfield3 label="${c:l('job.failures')}" readonly="true" id="failures" dataType="NUMBER"/>
+		<customfield3 label="${c:l('job.status')}" readonly="true" dataType="STRING" id="status"/>
+		<customfield3 label="${c:l('job.error')}" readonly="true" dataType="STRING" id="errorLog" multiline="true"/>
+		<div style="text-align: right; width: 100%">
+		    <button id="closebutton" label="${c:l('job.button.close')}" onClick="ref:frame.hideJob"/>
+		    <button id="pausebutton" label="${c:l('job.button.pause')}" onClick="ref:frame.pause"/>
+		    <button id="resumebutton" label="${c:l('job.button.resume')}" onClick="ref:frame.resume"/>
+		    <button id="retrybutton" label="${c:l('job.button.retry')}" onClick="ref:frame.retry"/>
+		</div>
+	</window>
 </frame>

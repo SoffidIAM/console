@@ -205,19 +205,20 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 
 	public void reorder (ReorderEvent event) {
 		int pos = event.getSrcPosition();
-		Integer target = event.getInsertBeforePosition();
-		if (target == null) target = cols.length() -1 ;
-		int[] positions = new int[cols.length()];
+		Integer before = event.getInsertBeforePosition();
+		int[] positions = new int[this.positions.length];
 		
 		JSONObject srcObject = cols.getJSONObject(pos);
 		JSONArray cols2 = new JSONArray();
-		for (int i = 0, j = 0; i <= cols.length(); i++) {
-			if ( i == target )
-				positions[j++] = this.positions[pos];
-				cols2.put(srcObject);
-			if ( i != pos && i < cols.length())
+		int j = 0;
+		for (int i = 0; i < cols.length(); i++) {
+			if ( before != null && before.intValue() == this.positions[i])
+				positions[j++] = pos;
+			if ( this.positions[i] != pos )
 				positions[j++] = this.positions[i];
 		}
+		if (before == null)
+			positions[j++] = pos;
 		this.positions = positions;
 	}
 

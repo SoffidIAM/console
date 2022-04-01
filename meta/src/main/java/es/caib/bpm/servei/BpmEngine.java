@@ -270,6 +270,13 @@ public abstract class BpmEngine {
 	 return null;
 	}
 
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.List<ProcessDefinition> findAllProcessDefinitions(
+		boolean onlyEnabled)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Description("Searches for process definition of a predefined type")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<ProcessDefinition> findProcessDefinitions(

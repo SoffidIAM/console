@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+	<datanode name="root">
+		<finder name="definition" type="definition">
+			<ejb-finder jndi="java:/module/BpmEngine-v2" method="findAllProcessDefinitions">
+				<parameter value="${all}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="definition" transient="true"/>
+
+</zkib-model>

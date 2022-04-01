@@ -28,7 +28,7 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 			HashSet<String> keys = new HashSet<String>();
 			for (String key: attributes.keySet() )
 			{
-				for (MetaDataEntity metadata: getMetaDataEntityDao().findDataTypesByScopeAndName(getMetadataScope(), key))
+				for (MetaDataEntity metadata: getMetaDataEntityDao().findByObjectTypeAndName(getMetadataScope(), key))
 				{
 					Object v = attributes.get(key);
 					if (v == null)
@@ -58,11 +58,12 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 			if (!entities.isEmpty())
 			{
 				getEntityAttributes(entity).removeAll(entities);
+				removeAttributes(entities);
 				anyChange = true;
 			}
 			updateEntity(entity);
 
-			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(getMetadataScope());
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByObjectTypeAndName(getMetadataScope(), null);
 			
 			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
@@ -108,7 +109,8 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 	
 	protected abstract List<ATTRIBUTEENTITY> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) ;
 	protected abstract void updateEntity(ENTITY entity);
-	protected abstract MetadataScope getMetadataScope() ;
+	protected abstract void removeAttributes(Collection<ATTRIBUTEENTITY> entities);	
+	protected abstract String getMetadataScope() ;
 	protected abstract Collection<ATTRIBUTEENTITY> getEntityAttributes(ENTITY entity) ;
 	protected abstract ATTRIBUTEENTITY createNewAttribute(ENTITY entity, MetaDataEntity metadata, Object value) ;
 	protected abstract ATTRIBUTEENTITY findAttributeEntity(LinkedList<ATTRIBUTEENTITY> entities, String key,

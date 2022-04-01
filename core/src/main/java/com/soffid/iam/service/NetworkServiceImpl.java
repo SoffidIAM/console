@@ -23,6 +23,7 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.HostAlias;
 import com.soffid.iam.api.Identity;
+import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.api.OsType;
@@ -35,13 +36,17 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EntryPointEntity;
+import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostAdminEntity;
 import com.soffid.iam.model.HostAliasEntity;
+import com.soffid.iam.model.HostAttributeEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.HostEntityDao;
 import com.soffid.iam.model.HostEntryPointEntity;
 import com.soffid.iam.model.HostSystemEntity;
+import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.NetworkEntityDao;
@@ -56,6 +61,9 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.reconcile.model.ReconcileAccountEntityDao;
 import com.soffid.iam.reconcile.model.ReconcileAssignmentEntityDao;
+import com.soffid.iam.service.GroupServiceImpl.GroupAttributePersister;
+import com.soffid.iam.service.attribute.AttributePersister;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -223,7 +231,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             Collection maquines = findHostByFilter(null, null, null, null, null, null, null, null, null, xarxa.getCode(), null, new Boolean(false));
             for (Iterator iterator = maquines.iterator(); iterator.hasNext(); ) {
                 Host maquina = (Host) (iterator.next());
-                if (!maquinaCompatibleAmbXarxa(maquina.getIp(), xarxa.getIp(), xarxa.getMask())) {
+                if (maquina.getIp() != null && !maquinaCompatibleAmbXarxa(maquina.getIp(), xarxa.getIp(), xarxa.getMask())) {
                     throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.IncompatibleIPMessage"), xarxa.getIp(), xarxa.getMask(), maquina.getIp()));
                 }
             }
@@ -329,6 +337,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		getHostEntityDao().hostToEntity(maquina, old, true);
                 old.setDeleted(new Boolean(false));
                 getHostEntityDao().update(old);
+                updateHostAttributes(maquina, old);
     			createHostTask(maquina.getName());
                 updateHostAlias(old, maquina.getHostAlias());
 	            return getHostEntityDao().toHost(old);                
@@ -337,6 +346,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	            entity.setDeleted(new Boolean(false));
 	            getHostEntityDao().create(entity);
 	            maquina.setId(entity.getId());
+	            updateHostAttributes(maquina, entity);
 	            updateHostAlias(entity, maquina.getHostAlias());
     			createHostTask(maquina.getName());
 	            return getHostEntityDao().toHost(entity);
@@ -355,6 +365,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     			createHostTask(hostEntity.getName());
             getHostEntityDao().hostToEntity(maquina, hostEntity, true);
 			getHostEntityDao().update(hostEntity);
+            updateHostAttributes(maquina, hostEntity);
 			createHostTask(maquina.getName());
             updateHostAlias(hostEntity, maquina.getHostAlias());
         } else {
@@ -2098,5 +2109,72 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         	return false;
 
         return hasNetworkAuthorizations(userEntity, maquinaEntity, new int[] { LOGIN, SUPORT });
+	}
+	
+	private void updateHostAttributes (Host app, HostEntity entity) throws InternalErrorException
+	{
+		new HostAttributePersister().updateAttributes(app.getAttributes(), entity);
+	}
+
+	class HostAttributePersister extends AttributePersister<HostEntity,HostAttributeEntity> {
+		@Override
+		protected List<HostAttributeEntity> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) {
+			return getHostAttributeEntityDao().findByNameAndValue(m.getName(), v);
+		}
+
+		@Override
+		protected void updateEntity(HostEntity entity) {
+			getHostEntityDao().update(entity);
+		}
+
+		@Override
+		protected String getMetadataScope() {
+			return Host.class.getName();
+		}
+
+		@Override
+		protected Collection<HostAttributeEntity> getEntityAttributes(HostEntity entity) {
+			return entity.getAttributes();
+		}
+
+		@Override
+		protected HostAttributeEntity createNewAttribute(HostEntity entity, MetaDataEntity metadata, Object value) {
+			HostAttributeEntity aae = getHostAttributeEntityDao().newHostAttributeEntity();
+			aae.setHost(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getHostAttributeEntityDao().create(aae);
+			return aae;
+		}
+
+		@Override
+		protected HostAttributeEntity findAttributeEntity(LinkedList<HostAttributeEntity> entities, String key,
+				Object o) {
+			for (HostAttributeEntity aae: entities)
+			{
+				if (aae.getMetadata().getName().equals(key))
+				{
+					if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+						return aae;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected MetaDataEntityDao getMetaDataEntityDao() {
+			return NetworkServiceImpl.this.getMetaDataEntityDao();
+		}
+
+		@Override
+		protected AttributeValidationService getAttributeValidationService() {
+			return NetworkServiceImpl.this.getAttributeValidationService();
+		}
+
+		@Override
+		protected void removeAttributes(Collection<HostAttributeEntity> entities) {
+			getHostAttributeEntityDao().remove(entities);
+		}
+		
 	}
 }

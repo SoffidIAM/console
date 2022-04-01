@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.comu;
 import java.util.List;
+import java.util.Map;
 
 import com.soffid.mda.annotation.*;
 
@@ -72,4 +73,9 @@ public class Maquina {
 	@Attribute(readonly = true)
 	public java.util.Calendar lastSeen;
 
+	@Description ("Host custom attributes")
+	@Nullable
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()", hidden = true)
+	public Map<String,Object> attributes; 
 }

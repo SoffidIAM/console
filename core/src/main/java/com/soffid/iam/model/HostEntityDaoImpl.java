@@ -13,31 +13,23 @@
  */
 package com.soffid.iam.model;
 
-import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.Host;
-import com.soffid.iam.api.Network;
-import com.soffid.iam.model.AuditEntity;
-import com.soffid.iam.model.HostAliasEntity;
-import com.soffid.iam.model.HostEntity;
-import com.soffid.iam.model.NetworkEntity;
-import com.soffid.iam.model.TaskEntity;
-import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.utils.ExceptionTranslator;
-import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.*;
-
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Network;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.exception.SeyconException;
 
 /**
  * @see es.caib.seycon.ng.model.MaquinaEntity
@@ -253,6 +245,7 @@ public class HostEntityDaoImpl extends
             getHostPortEntityDao().remove(maquinaEntity.getPorts());
             getHostServiceEntityDao().remove(maquinaEntity.getServices());
             getHostSystemEntityDao().remove(maquinaEntity.getSystems());
+            getHostAttributeEntityDao().remove(maquinaEntity.getAttributes());
             super.remove(maquinaEntity);
             auditarMaquina("D", nomMaquina); //$NON-NLS-1$
         } catch (Throwable e) {

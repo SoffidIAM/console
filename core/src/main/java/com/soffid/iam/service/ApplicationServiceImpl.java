@@ -3617,8 +3617,8 @@ public class ApplicationServiceImpl extends
 		}
 
 		@Override
-		protected MetadataScope getMetadataScope() {
-			return MetadataScope.GROUP;
+		protected String getMetadataScope() {
+			return Role.class.getName();
 		}
 
 		@Override
@@ -3659,6 +3659,11 @@ public class ApplicationServiceImpl extends
 		protected AttributeValidationService getAttributeValidationService() {
 			return ApplicationServiceImpl.this.getAttributeValidationService();
 		}
+
+		@Override
+		protected void removeAttributes(Collection<RoleAttributeEntity> entities) {
+			getRoleAttributeEntityDao().remove(entities);
+		}
 		
 	}
 
@@ -3674,8 +3679,8 @@ public class ApplicationServiceImpl extends
 		}
 
 		@Override
-		protected MetadataScope getMetadataScope() {
-			return MetadataScope.GROUP;
+		protected String getMetadataScope() {
+			return Application.class.getName();
 		}
 
 		@Override
@@ -3715,6 +3720,11 @@ public class ApplicationServiceImpl extends
 		@Override
 		protected AttributeValidationService getAttributeValidationService() {
 			return ApplicationServiceImpl.this.getAttributeValidationService();
+		}
+
+		@Override
+		protected void removeAttributes(Collection<ApplicationAttributeEntity> entities) {
+			getApplicationAttributeEntityDao().remove(entities);
 		}
 		
 	}

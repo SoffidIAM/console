@@ -942,8 +942,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 
 		@Override
-		protected MetadataScope getMetadataScope() {
-			return MetadataScope.GROUP;
+		protected String getMetadataScope() {
+			return Group.class.getName();
 		}
 
 		@Override
@@ -984,6 +984,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		protected AttributeValidationService getAttributeValidationService() {
 			return GroupServiceImpl.this.getAttributeValidationService();
 		}
+
+		@Override
+		protected void removeAttributes(Collection<GroupAttributeEntity> entities) {
+			getGroupAttributeEntityDao().remove(entities);
+		}
 		
 	}
 
@@ -999,8 +1004,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 
 		@Override
-		protected MetadataScope getMetadataScope() {
-			return MetadataScope.GROUP_MEMBERSHIP;
+		protected String getMetadataScope() {
+			return GroupUser.class.getName();
 		}
 
 		@Override
@@ -1040,6 +1045,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		@Override
 		protected AttributeValidationService getAttributeValidationService() {
 			return GroupServiceImpl.this.getAttributeValidationService();
+		}
+
+		@Override
+		protected void removeAttributes(Collection<UserGroupAttributeEntity> entities) {
+			getUserGroupAttributeEntityDao().remove(entities);
 		}
 		
 	}

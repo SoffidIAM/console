@@ -146,7 +146,7 @@
 								<row>
 									<label value="${c:l('agents.zul.Codi')}"/>
 									<div>
-										<textbox bind="@name" id="agentName" maxlength="50" constraint="no empty"/>
+										<textbox bind="@name" id="agentName" maxlength="50" style="width:100%; max-width: 50em" constraint="no empty"/>
 										<div id="missatge" visible="false">
 											<label value="${c:l('agents.zul.AlertSpreadUsers')}" style="color:red;"/>
 											<button label="${c:l('rules.preview')}" onClick="ref:frame.preview">

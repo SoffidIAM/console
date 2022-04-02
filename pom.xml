@@ -269,13 +269,6 @@
         <optional>true</optional>
       </dependency>
       <dependency>
-        <groupId>itext</groupId>
-        <artifactId>itext</artifactId>
-        <version>0.99</version>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
         <version>1.1.2</version>
@@ -401,11 +394,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.lowagie</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
-		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam</groupId>
 			<artifactId>nashorn-core</artifactId>

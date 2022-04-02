@@ -32,7 +32,12 @@ function dumpFiles {
 		   echo "   <ComponentRef Id='$3_cmp'/>" >>$base/target/wix/feature.wxs
 		   echo "$2<Component Id='$3_cmp' Guid='*'>"
          fi
-         echo "$2  <File Name='$f' DiskId='1' Id='$3.$f' DefaultVersion='$5' Source='$4/$f'/>"
+         if [ "$f" = "tomee.xml" -o "$f" = "server.xml" ]
+         then
+	         echo "$2  <File Name='$f.template' DiskId='1' Id='$3.$f' Source='$4/$f'/>"
+         else 
+	         echo "$2  <File Name='$f' DiskId='1' Id='$3.$f' DefaultVersion='$5' Source='$4/$f'/>"
+	     fi
      fi
    done
    if [ "$found" = 1 ]

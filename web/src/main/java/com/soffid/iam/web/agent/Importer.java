@@ -100,7 +100,6 @@ public class Importer {
 			Element n = (Element) nodes.item(i);
 			DataType dt = new DataType();
 			
-			Element e = doc.createElement("metadata");
 			dt.setName(n.getAttribute("name"));
 			dt.setCustomObjectType( n.getAttribute("customObjectType") );
 			dt.setDataObjectType( n.getAttribute("dataObjectType") );
@@ -140,7 +139,7 @@ public class Importer {
 			}
 			dt.setValues(l);
 
-			XPathUtils.createPath(ds, "/metadada", dt);
+			XPathUtils.createPath(ds, "/metadata", dt);
 			
 		}
 	}

@@ -500,8 +500,16 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 				org.zkoss.util.resource.Labels.getLabel("process.warning"),
 					(evt) -> {
 						if ("onOK".equals(evt.getName())) {
-							metadataGrid.delete();
-							metadataWindow.setVisible(false);
+							String msg = org.zkoss.util.resource.Labels.getLabel("dadesAddicionals.zul.confirmDelete");
+							String att = (String) XPathUtils.eval(metadataGrid, "code");
+							String object = (String) XPathUtils.eval(metadataGrid, "objectType");
+							msg = String.format(msg, att, object);
+							Missatgebox.confirmaYES_NO(msg, (evt2) -> {
+								if ("onYes".equals(evt2.getName())) {
+									metadataGrid.delete();
+									metadataWindow.setVisible(false);
+								}
+							});
 						}
 					});
 	}

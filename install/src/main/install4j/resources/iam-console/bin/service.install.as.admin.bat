@@ -35,6 +35,10 @@ pushd %DIRNAME%
 
 CACLS "%DIRNAME%\.." /T /E /G "NT Authority\LocalService:F" 
 
+IF NOT EXIST "%DIRNAME%\..\conf\tomee.xml" COPY "%DIRNAME%\..\conf\tomee.xml.template" "%DIRNAME%\..\conf\tomee.xml" 
+IF NOT EXIST "%DIRNAME%\..\conf\server.xml" COPY "%DIRNAME%\..\conf\tomee.xml.template" "%DIRNAME%\..\conf\server.xml" 
+IF NOT EXIST "%DIRNAME%\..\conf\system.properties" COPY "%DIRNAME%\..\conf\system.properties.template" "%DIRNAME%\..\conf\system.properties" 
+
 :checkUser
 if "x%1x" == "x/service-userx" goto serviceUser
 if "x%1x" == "x--service-userx" goto serviceUser

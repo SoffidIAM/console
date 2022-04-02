@@ -24,19 +24,24 @@
 				dataPath="/model:/printer" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 				dataPath="/model:/printer" maxheight="70vh" sortColumn="0"
 				multiselect="true"
+				preference="printer"
 				onMultiSelect="ref:frame.multiSelect"
 				onSelect="ref:frame.showDetails" enablefilter="false">
-			<attribute name="columns"><![CDATA[
+			<attribute name="allColumns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.Printer.name') }
   value: name
+  default: true
 - name: ${c:l('impressores.zul.Description')}
   value: description
+  default: true
 - name: ${c:l('com.soffid.iam.api.Printer.model')}
   value: model
 - name: ${c:l('impressores.zul.ServImpressia-2')}
   value: hostName
+  default: true
 - name: ${c:l('impressores.zul.Usuaris') }
   value: users
 - name: ${c:l('com.soffid.iam.api.System.groups') }

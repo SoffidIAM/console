@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Domain;
@@ -17,11 +20,13 @@ import es.caib.zkib.datasource.XPathUtils;
 
 
 public class RoleDomainFieldHandler extends InputFieldUIHandler {
-	@Override
+	String lastInformationSystem = null;
+
 	public void afterCreate(InputField3 field) throws Exception {
 		field.setValues( getValues(field));
 		field.setType(Type.LIST);
 	}
+	
 
 	@Override
 	public boolean validate(InputField3 field) {
@@ -30,7 +35,14 @@ public class RoleDomainFieldHandler extends InputFieldUIHandler {
 
 	@Override
 	public boolean isVisible(InputField3 field) {
-		field.setValues( getValues(field));
+		try {
+			String app = (String) XPathUtils.eval(field, "informationSystemName");
+			if (app == null ? lastInformationSystem != null: !app.equals(lastInformationSystem)) {
+				field.setValues( getValues(field));
+			}
+		} catch (Exception e) {
+			
+		}
 		return true;
 	}
 
@@ -46,6 +58,8 @@ public class RoleDomainFieldHandler extends InputFieldUIHandler {
 					l.add( URLEncoder.encode( d.getName(), "UTF-8")+": "+d.getName()+" - "+d.getDescription());
 				}
 			}
+			lastInformationSystem = app;
+			field.invalidate();
 		} catch (Exception e) {
 			
 		}

@@ -162,12 +162,6 @@ public class ConfigurationServiceImpl
 	protected Collection<Configuration> handleFindConfigurationByFilter(String codi, String valor, String descripcio, String codiXarxa) throws Exception {
 		int limitResults = 0;	// Limit of rows to obtain
 		
-		// Check limit defined
-		if (ConfigurationCache.getProperty("soffid.ui.maxrows") != null) //$NON-NLS-1$
-		{
-			limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
-		}
-		
 		if(codi != null && (codi.trim().compareTo("") == 0 || codi.trim().compareTo("%") == 0 )){ //$NON-NLS-1$ //$NON-NLS-2$
 			codi = null;
 		}
@@ -184,11 +178,6 @@ public class ConfigurationServiceImpl
 		Collection<ConfigEntity> configuracions = localFindConfiguracioByFiltre(codi, valor, descripcio, codiXarxa);
 		if (configuracions != null)
 		{
-			if ((limitResults != 0) && (configuracions.size() > limitResults))
-			{
-				return getConfigEntityDao().toConfigurationList(configuracions).subList(0, limitResults);
-			}
-			
 			return getConfigEntityDao().toConfigurationList(configuracions);
 		}
 		

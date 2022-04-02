@@ -104,7 +104,7 @@
 					</datatable>
 					<div width="100%" style="text-align: right"
 						if="${canModifyMetadata}">
-					<div class="deleteButton" onClick="ref:frame.deleteSelectedAttribute" visible="false">-</div>
+						<div class="deleteButton" onClick="ref:frame.deleteSelectedAttribute" visible="false">-</div>
 						<div class="addButton" onClick="ref:frame.addNewAttribute">
 							+
 						</div>

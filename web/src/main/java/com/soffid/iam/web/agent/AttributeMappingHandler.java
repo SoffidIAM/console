@@ -480,12 +480,16 @@ public class AttributeMappingHandler extends DataGrid {
 				(String) XPathUtils.getValue(g, "../@name"),
 				(SoffidObjectType) XPathUtils.getValue(g, "@soffidObject"),
 				o1, o2);
-		Window testWindow = (Window) getFellow("testWindow");
-		testWindow.setAttribute("logText", r.getLog());
-		((Label)testWindow.getFellow("status")).setValue(r.getStatus());
-		DataTree2 tree = (DataTree2)testWindow.getFellow("log");
-		new LogParser().parseLog(r.getLog(), tree);
-		testWindow.doHighlighted();
+		if (r == null) {
+			Missatgebox.avis("Cannot connect to target system");
+		} else {
+			Window testWindow = (Window) getFellow("testWindow");
+			testWindow.setAttribute("logText", r.getLog());
+			((Label)testWindow.getFellow("status")).setValue(r.getStatus());
+			DataTree2 tree = (DataTree2)testWindow.getFellow("log");
+			new LogParser().parseLog(r.getLog(), tree);
+			testWindow.doHighlighted();
+		}
 	}
 	
 	public void editTrigger(Event event ) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {

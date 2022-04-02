@@ -75,7 +75,7 @@
 				<customfield3 dataType="USER" id="user"
 					label="${c:l('user-groups.selectUser') }"
 					required="true"
-					filterExpression='active eq "S"'>
+					filterExpression='active eq "true"'>
 				</customfield3>		
 			
 				<div style="text-align: right; width: 100%">

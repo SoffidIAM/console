@@ -2182,7 +2182,7 @@ div.databox.bold select {
 }
 div.datatable table.tbody tr.red td,
 div.databox.red select {
-	color: {SKY};
+	color: red;
 }
 div.datatable table.tbody tr.approval-pending td {
 	color: #808080;
@@ -3466,9 +3466,9 @@ div.databox[multivalue='true'] div.container input.description {
 	width: calc( 100% - 2em - 8px );
 }
 
-div.databox div.databox-popup {
+div.databox-popup {
    position: fixed;
-   margin-top: 24px;
+   margin-top: 2px;
    background-color: white;
    padding: 8px;
    border: solid 1px {BLUEDARK};
@@ -3477,12 +3477,12 @@ div.databox div.databox-popup {
    min-width: 200px;
    max-width: 800px;
    max-height: 800px;
-   z-index: 1;
+   z-index: 99999;
    box-shadow: 4px 4px #a0a0a0;
    overflow-y: auto;
 }
 
-div.databox div.databox-popup div {
+div.databox-popup div {
     width: 100%;
     cursor: pointer;
     overflow: hidden;
@@ -3490,23 +3490,23 @@ div.databox div.databox-popup div {
     height: 20px;
 }
 
-div.databox div.databox-popup div span.name span {
+div.databox-popup div span.name span {
 	font-weight: bold;
 }
 
-div.databox div.databox-popup div span.search-match{
+div.databox-popup div span.search-match{
 	color: {SKY};
 }
 
-div.databox div.databox-popup div:hover,
-div.databox div.databox-popup div:hover span ,
-div.databox div.databox-popup div:hover span.search-match {
+div.databox-popup div:hover,
+div.databox-popup div:hover span ,
+div.databox-popup div:hover span.search-match {
 	background-color: {BLUELIGHT};
 	color: {BLUETEXT};
 }
 
-div.databox div.databox-popup div.no-results,
-div.databox div.databox-popup div.no-results:hover {
+div.databox-popup div.no-results,
+div.databox-popup div.no-results:hover {
 	background-color: white;
 	color: #606060;
 }
@@ -3529,7 +3529,7 @@ div.databox div.warning span {
     font-weight: bold;
 }
 
-div.databox div.databox-popup img {
+div.databox-popup img {
    width: 24px;
 }
 
@@ -3538,6 +3538,12 @@ div.section {
 	width: 50% ;
 	padding-right: 24px;
 	vertical-align: top;
+}
+
+div.highlighted div.section {
+	display: block;
+	width: 100%;
+	padding-right: 0px;
 }
 
 @media only screen and (max-width: 1023px) {

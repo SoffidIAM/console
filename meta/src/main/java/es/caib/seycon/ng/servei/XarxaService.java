@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.PagedResult;
+import com.soffid.iam.model.HostAttributeEntity;
 import com.soffid.iam.model.HostEntryPointEntity;
 import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
@@ -22,6 +24,8 @@ import es.caib.seycon.ng.comu.Maquina;
 import es.caib.seycon.ng.comu.Xarxa;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.PuntEntradaEntity;
+import es.caib.seycon.ng.model.TasqueEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import roles.Tothom;
 
 @Service (translatedName="NetworkService",
@@ -48,7 +52,11 @@ import roles.Tothom;
 	DispatcherService.class,
 	PuntEntradaEntity.class,
 	DispatcherEntity.class,
-	AsyncRunnerService.class})
+	TasqueEntity.class,
+	AsyncRunnerService.class,
+	HostAttributeEntity.class,
+	TipusDadaEntity.class,
+	AttributeValidationService.class})
 public abstract class XarxaService {
 
 	@Operation ( grantees={roles.host_all_query.class},

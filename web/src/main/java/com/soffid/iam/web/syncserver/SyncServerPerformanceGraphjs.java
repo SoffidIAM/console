@@ -147,7 +147,6 @@ public class SyncServerPerformanceGraphjs extends Graphjs {
 						return ;
 					}
 				}
-				throw new ServletException("Wrong server "+id);
 			} catch (Exception e) {
 				log.warn("Error getting data", e);
 				JSONObject r = new JSONObject();

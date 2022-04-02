@@ -269,13 +269,6 @@
         <optional>true</optional>
       </dependency>
       <dependency>
-        <groupId>itext</groupId>
-        <artifactId>itext</artifactId>
-        <version>0.99</version>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>jstl</artifactId>
         <version>1.1.2</version>
@@ -402,11 +395,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.lowagie</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<dependency>
 			<groupId>com.soffid.iam</groupId>
 			<artifactId>nashorn-core</artifactId>
 			<version>15.3-2</version>
@@ -419,7 +407,7 @@
     <mda.model>Soffid-IAM-Profile</mda.model>
     <mda.version>557</mda.version>
     <zkiblaf.version>2.0</zkiblaf.version>
-    <zkdb.version>2.1.14</zkdb.version>
+    <zkdb.version>2.1.14-SNAPSHOT</zkdb.version>
 		<maven.compile.source>1.8</maven.compile.source>
     <maven.compile.target>1.8</maven.compile.target>
   </properties>

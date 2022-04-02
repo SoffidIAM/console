@@ -34,4 +34,8 @@ public class SoffidObjectType {
 
 	public java.lang.String OBJECT_CUSTOM="custom";
 
+	public java.lang.String OBJECT_HOST="host";
+
+	public java.lang.String OBJECT_NETWORK="network";
+
 }

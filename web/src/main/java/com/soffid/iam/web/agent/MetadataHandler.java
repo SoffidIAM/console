@@ -146,7 +146,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 	
 	public void reorder (ReorderEvent event) {
 		DataNodeCollection collection = (DataNodeCollection) XPathUtils.getValue(this, "/metadata");
-		
+
+		DataTable dt = (DataTable) getFellow("metadataGrid"); 
 		DataNode src = (DataNode) event.getSrcObject();
 		DataType srcDatatype = (DataType) src.getInstance();
 		long order = 1;
@@ -157,17 +158,19 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 				if (target == event.getInsertBeforeObject()) {
 					srcDatatype.setOrder(order++);
 					src.update();
+					dt.updateClientRow((int)order-2);
 				}
 				datatype.setOrder(order++);
 				target.update();
+				dt.updateClientRow((int)order-2);
 			}
 		}
 		if (event.getInsertBeforeObject() == null) {
 			srcDatatype.setOrder(order++);
 			src.update();
+			dt.updateClientRow((int)order-2);
 		}
 		collection.sort(new OrderComparator());
-		
 	}
 
 	@Override
@@ -177,6 +180,15 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 			newpage.setVariable("js_template", new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));
 		} catch (InternalErrorException | NamingException | CreateException | IOException e) {
 			throw new UiException("Error generating javascript template", e);
+		}
+	}
+	
+	public void undo(Event event) {
+		metadataWindow.setVisible(false);
+		try {
+			metadataGrid.refresh();
+		} catch (Exception e) {
+			throw new UiException(e);
 		}
 	}
 	

@@ -7,33 +7,44 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:zk="http://www.zkoss.org/2005/zk"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
-	id="ui"
+	id="frame"
 	use="es.caib.bpm.ui.admin.DespliegueUI">
 	
+	<datamodel id="model" rootNode="root" src="descriptorProcessDefinition.xml" use="es.caib.bpm.ui.admin.DeploymentModel"/>
+
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 	
 			<div use="com.soffid.iam.web.component.NavigationBar"
-				frame="ui"> index
+				frame="frame"> index
 			</div>
 			<div style="margin-bottom: 16px">
 				<label sclass="label" value="${c:l('deploy.btnReloadTodos')}:"/>
 				<switch id="todos"
 						visible="true" checked="false" 
-						onCheck="ref:ui.onCheck"/>
+						onCheck="ref:frame.onCheck"/>
 			</div>
-			<listbox id="listbox" fixedLayout="true" mold="paging"
-				pageSize="15" width="100%">
-				<listhead>
-					<listheader label="${c:l('deploy.lblProceso')}" sort="auto"  />
-					<listheader label="${c:l('deploy.lblVersion')}" sort="auto" width="150px" />
-					<listheader label="${c:l('deploy.DeployedBy')}" sort="auto" width="150px"/>
-					<listheader label="${c:l('deploy.Date')}" sort="auto" width="150px"/>
-					<listheader label="${c:l('deploy.CanviarEstat')}" sort="auto" width="150px"/>
-				</listhead>
-			</listbox>
+			<datatable id="listbox" dataPath="model:/definition" onDisable="ref:frame.onDisable"
+				use="es.caib.bpm.ui.admin.ProcessDefinitionTable"
+				sortColumn="0"
+				height="calc( 50vh )">
+			<attribute name="columns"><![CDATA[
+- name: ${c:l('deploy.lblProceso') }
+  value: name
+- name: ${c:l('deploy.lblVersion')}
+  value: version
+- name: ${c:l('deploy.DeployedBy')}
+  value: author
+- name: ${c:l('deploy.Date')}
+  value: deployed
+  template: #{deployed_datetime}
+- name: ${c:l('deploy.CanviarEstat')}
+  template: <input type="button" value="#{enabled? '${c:l('deploy.btnDisable') }': '${c:l('deploy.btnEnable') }' }" onclick="zkDatatable.sendClientAction(this, 'onDisable')"  >
+	]]>
+			</attribute>
+			</datatable>
 			<div width="100%" style="text-align: right">
-				<div class="addButton" onClick="ref:ui.upload" title="${c:l('deploy.btnDeploy')}">+</div>
+				<div class="addButton" onClick="ref:frame.upload" title="${c:l('deploy.btnDeploy')}">+</div>
 			</div>
 			<label sclass="label" style="width: 100%"
 				value="${c:l('deploy.lblResultadoDespliegue')}" />

@@ -3778,4 +3778,9 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 
+	@Override
+	protected List<ProcessDefinition> handleFindAllProcessDefinitions(boolean onlyEnabled) throws Exception {
+		return findProcessDefinitions(null, onlyEnabled);
+	}
+
 }

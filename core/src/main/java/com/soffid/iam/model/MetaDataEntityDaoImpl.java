@@ -41,6 +41,20 @@ public class MetaDataEntityDaoImpl extends
 
 	public void remove(com.soffid.iam.model.MetaDataEntity tipusDada) throws RuntimeException {
 		try {
+			getSession().createQuery("delete from com.soffid.iam.model.ApplicationAttributeEntity as app where app.metadata.id=:id")
+					.setLong("id", tipusDada.getId()).executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.GroupAttributeEntity as app where app.metadata.id=:id")
+					.setLong("id", tipusDada.getId()).executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.RoleAttributeEntity as app where app.metadata.id=:id")
+					.setLong("id", tipusDada.getId()).executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.HostAttributeEntity as app where app.metadata.id=:id")
+					.setLong("id", tipusDada.getId()).executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.CustomObjectAttributeEntity as app where app.metadata.id=:id")
+				.setLong("id", tipusDada.getId()).executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.MailListAttributeEntity as app where app.metadata.id=:id")
+				.setLong("id", tipusDada.getId()).executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.UserDataEntity as app where app.dataType.id=:id")
+				.setLong("id", tipusDada.getId()).executeUpdate();
 			super.remove(tipusDada);
 			getSession(false).flush();
 		} catch (Throwable e) {

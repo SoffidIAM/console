@@ -551,7 +551,7 @@ public class Mail implements ActionHandler {
 			else if (taskInstance.getPooledActors() != null)
 				return getNameUsers(taskInstance.getPooledActors());
 		}
-		return null;
+		return new HashSet<String>();
 	}
 
 	private Set<String> getSwimlaneUsers (SwimlaneInstance swimlane) throws InternalErrorException, UnsupportedEncodingException

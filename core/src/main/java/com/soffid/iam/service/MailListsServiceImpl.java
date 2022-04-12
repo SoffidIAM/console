@@ -162,8 +162,12 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 
 	protected void handleDelete(MailList llistaCorreu) throws Exception {
 		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
-		if(!llistaCorreuEntity.getExternals().isEmpty() || !llistaCorreuEntity.getUserMailLists().isEmpty() || !llistaCorreuEntity.getMailListContent().isEmpty())
-			throw new SeyconException(String.format(Messages.getString("LlistaCorreuEntityDaoImpl.IntegrityException"), llistaCorreu.getName()));
+		getExternEmailEntityDao().remove(new LinkedList(llistaCorreuEntity.getExternals()));
+		getUserEmailEntityDao().remove(new LinkedList(llistaCorreuEntity.getUserMailLists()));
+		getMailListGroupMemberEntityDao().remove(new LinkedList(llistaCorreuEntity.getGroups()));
+		getMailListRoleMemberEntityDao().remove(new LinkedList(llistaCorreuEntity.getRoles()));
+		getEmailListContainerEntityDao().remove(new LinkedList(llistaCorreuEntity.getMailListContent()));
+		getEmailListContainerEntityDao().remove(new LinkedList(llistaCorreuEntity.getMailListPertain()));
 //		getMailListAttributeEntityDao().remove(llistaCorreuEntity.getAttributes());
 		getEmailListEntityDao().remove(llistaCorreuEntity);
 	}
@@ -509,7 +513,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 			EmailListEntity llistaEsborrar = getEmailListEntityDao().findByNameAndDomain(nomLlistaCorreu, codiDomini);
 			if (llistaEsborrar != null)
 			{
-				for (UserEmailEntity ul: llistaEsborrar.getUserMailLists())
+				for (UserEmailEntity ul: new LinkedList <UserEmailEntity>( llistaEsborrar.getUserMailLists() ))
 				{
 					getUserEmailEntityDao().remove(ul);
 				}

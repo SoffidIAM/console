@@ -2036,7 +2036,9 @@ public class ApplicationServiceImpl extends
             if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
             if (rad.rolRol != null) {
                 rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
-                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
+                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); 
+                else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); 
+                else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
             }
             if (rad.rolGrup != null) rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
             if (rg != null) {

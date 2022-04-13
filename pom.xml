@@ -441,6 +441,7 @@
     <site>
       <id>soffid-open-site</id>
       <name>Soffid Maven site repository</name>
+      <url>${soffid.deploy.site.url}</url>
     </site>
   </distributionManagement>
   <profiles>

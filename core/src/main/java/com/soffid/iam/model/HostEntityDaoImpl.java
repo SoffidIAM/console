@@ -19,9 +19,11 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Host;
@@ -70,6 +72,28 @@ public class HostEntityDaoImpl extends
         targetVO.setDynamicIp(sourceEntity.getDynamicIP());
         
         targetVO.setOs(sourceEntity.getOperatingSystem() == null ? null : sourceEntity.getOperatingSystem().getName());
+		targetVO.setAttributes(new HashMap<String, Object>());
+		Map<String, Object> attributes = targetVO.getAttributes();
+		for (HostAttributeEntity att : sourceEntity.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
+		}
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
+		}
     }
     
 

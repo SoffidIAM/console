@@ -118,8 +118,6 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	protected Collection<MailList> handleFindMailListsByData(String nom, String domini, String descripcio, String membres) throws Exception {
-		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
-		
 		if (nom != null && (nom.trim().compareTo("") == 0)) { //$NON-NLS-1$
 			nom = null;
 		}
@@ -137,16 +135,9 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		}
 		
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
-		config.setMaximumResultSize(limitResults + 1);
 		Collection<EmailListEntity> llistesCorreu = getEmailListEntityDao().findByData(config, nom, domini, descripcio);
 		if (llistesCorreu != null)
 		{
-			// Check maximum number of results
-			if (llistesCorreu.size() > limitResults)
-			{
-				return getEmailListEntityDao().toMailListList(llistesCorreu).subList(0, limitResults);
-			}
-			
 			return getEmailListEntityDao().toMailListList(llistesCorreu);
 		}
 		
@@ -518,8 +509,6 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	protected Collection<MailDomain> handleFindMailDomainsByFilter(String codi, String descripcio, String obsolet) throws Exception {
-		int limitResults = Integer.parseInt(ConfigurationCache.getProperty("soffid.ui.maxrows")); //$NON-NLS-1$
-		
 		if (codi != null && ((codi.trim().compareTo("") == 0) || (codi.trim().compareTo("%") == 0))) { //$NON-NLS-1$ //$NON-NLS-2$
 			codi = null;
 		}
@@ -535,12 +524,6 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		Collection<EmailDomainEntity> dominisDeCorreu = getEmailDomainEntityDao().findByCriteria(codi, descripcio, obsolet);
 		if (dominisDeCorreu != null)
 		{
-			// Check maximum number of results
-			if (dominisDeCorreu.size() > limitResults)
-			{
-				return getEmailDomainEntityDao().toMailDomainList(dominisDeCorreu).subList(0, limitResults);
-			}
-			
 			return getEmailDomainEntityDao().toMailDomainList(dominisDeCorreu);
 		}
 		

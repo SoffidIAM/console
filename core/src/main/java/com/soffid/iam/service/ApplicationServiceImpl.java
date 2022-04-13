@@ -732,11 +732,13 @@ public class ApplicationServiceImpl extends
 				Security.getCurrentAccount(), nomRol));
 
         List<RoleAccount> toReturn = new LinkedList<RoleAccount>();
-        for (RoleAccountEntity ra : rolEntity.getAccounts()) {
-        	if (ra.isEnabled())
-        		toReturn.add(getRoleAccountEntityDao().toRoleAccount(ra));
+        if (rolEntity != null) {
+	        for (RoleAccountEntity ra : rolEntity.getAccounts()) {
+	        	if (ra.isEnabled())
+	        		toReturn.add(getRoleAccountEntityDao().toRoleAccount(ra));
+	        }
+	 		getSoDRuleService().qualifyRolAccountList(toReturn);
         }
- 		getSoDRuleService().qualifyRolAccountList(toReturn);
         return toReturn;
     }
 

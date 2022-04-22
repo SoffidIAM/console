@@ -105,7 +105,7 @@ public class Indexer {
 			for (ProcessInstance process: p)
 			{
 				try {
-					log.debug("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
+					log.info("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
 					d = generateDocument(process, skipArray);
 					log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 					// Delete pre-existing document

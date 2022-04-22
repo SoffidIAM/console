@@ -594,7 +594,7 @@ public class VaultHandler extends FrameHandler {
 	
 	public void launch() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException, UnsupportedEncodingException {
 		Account account = (Account) XPathUtils.getValue(getForm(), "/.");
-		new LaunchHelper().launchAccount(account);
+		new LaunchHelper().launchAccount(account, false);
 	}
 
 	@Override

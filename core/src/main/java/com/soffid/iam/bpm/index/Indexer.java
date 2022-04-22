@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -28,6 +29,10 @@ import org.hibernate.criterion.Restrictions;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
+import org.jbpm.context.exe.TokenVariableMap;
+import org.jbpm.context.exe.VariableContainer;
+import org.jbpm.context.exe.VariableInstance;
+import org.jbpm.context.exe.variableinstance.ByteArrayInstance;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.Comment;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -37,6 +42,7 @@ import org.jbpm.job.Timer;
 import com.soffid.iam.bpm.config.Configuration;
 import com.soffid.iam.bpm.model.DBProperty;
 import com.soffid.iam.bpm.model.TenantModule;
+import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.utils.Security;
 
@@ -48,6 +54,12 @@ public class Indexer {
 		try {
 			maxFieldLength = Integer.parseInt(System.getProperty("soffid.indexer.max-field-size"));
 		} catch (Exception e) {}
+		String mfs = ConfigurationCache.getProperty("soffid.indexer.max-field-ize");
+		if (mfs != null) {
+			try {
+				maxFieldLength = Integer.parseInt(System.getProperty(mfs));
+			} catch (Exception e) {}
+		}
 	}
 	public static Indexer getIndexer () {
 		if (theIndexer == null)
@@ -68,6 +80,10 @@ public class Indexer {
 	}
 
 	public void flush(Session session, long then, long now) throws IOException {
+		String skip = ConfigurationCache.getProperty("soffid.indexer.skip-attribute");
+		String skipArray[] = skip == null ? new String[0]: skip.split(" ");
+		Arrays.sort(skipArray);
+		
 		if (DirectoryFactory.isEmpty(session)) {
 			log.info("Index is empty. Regenerating");
 			then = 0;
@@ -90,7 +106,7 @@ public class Indexer {
 			{
 				try {
 					log.debug("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
-					d = generateDocument(process);
+					d = generateDocument(process, skipArray);
 					log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
 					// Delete pre-existing document
 					w.deleteDocuments(new Term ("$id", d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
@@ -107,7 +123,7 @@ public class Indexer {
 		}
 	}
 	
-	public Document generateDocument (ProcessInstance pi) throws IOException {
+	public Document generateDocument (ProcessInstance pi, String[] skipArray) throws IOException {
 		String id = Long.toString(pi.getId()); 
 		Document d;
 		// Create new document
@@ -118,10 +134,11 @@ public class Indexer {
 		d.add(new Field ("$definition",  //$NON-NLS-1$
 				pi.getProcessDefinition().getName(),
 				Field.Store.NO, Field.Index.ANALYZED));
-		ContextInstance ci = pi.getContextInstance();
 		StringBuffer contents = new StringBuffer();
 		contents.append(pi.getProcessDefinition().getName());
-		addTokenInfo (d, ci, pi.getRootToken(), contents);
+		ContextInstance ci = pi.getContextInstance();
+		addTokenInfo (d, ci, pi.getRootToken(), contents, skipArray);
+
 		d.add(new Field ("$contents",  //$NON-NLS-1$
 				contents.toString(),
 				Field.Store.NO, Field.Index.ANALYZED));
@@ -150,32 +167,10 @@ public class Indexer {
 	public void index(ProcessInstance pi) throws IOException {
 	}
 
-	private StringBuffer addTokenInfo(Document d, ContextInstance ci, Token token, StringBuffer contents) {
-		String prefix = token.isRoot()? "": token.getFullName()+"/"; //$NON-NLS-1$ //$NON-NLS-2$
-
+	private StringBuffer addTokenInfo(Document d, ContextInstance ci, Token token, StringBuffer contents, String[] skipArray) {
 		try {
-			Map m = ci.getVariables(token);
-			for (Iterator it = m.keySet().iterator(); it.hasNext(); )
-			{
-				String key = (String) it.next();
-				try {
-					Object value = m.get(key);
-					if (value != null) {
-						String s = toString(value);
-						if (s.length() < maxFieldLength) {
-							d.add(new Field (prefix+key, 
-									s,
-									Field.Store.NO, Field.Index.ANALYZED));
-							if (contents.length() < maxFieldLength) {
-								contents.append(" "); //$NON-NLS-1$
-								contents.append(s);
-							}
-						}
-					}
-				} catch (Throwable t) {
-					// Error deserializing data
-				}
-			}
+			TokenVariableMap tvm = ci.getTokenVariableMap(token);
+			addTokenInfo (d, tvm, token, contents, skipArray);
 		} catch (Throwable e) {
 			// Error deserializing data
 		}
@@ -192,6 +187,7 @@ public class Indexer {
 				}
 			}
 		}
+		String prefix = token.isRoot()? "": token.getFullName()+"/"; //$NON-NLS-1$ //$NON-NLS-2$
 		d.add(new Field (prefix+"comments",  //$NON-NLS-1$
 				comments.toString(),
 				Field.Store.NO, Field.Index.ANALYZED));
@@ -202,12 +198,45 @@ public class Indexer {
 			for (Iterator it = children.keySet().iterator(); it.hasNext();)
 			{
 				Token childToken = token.getChild((String) it.next());
-				addTokenInfo (d, ci, childToken, contents);
+				addTokenInfo (d, ci, childToken, contents, skipArray);
 			}
 		}
 		return contents;
 	}
 	
+	private void addTokenInfo(Document d, TokenVariableMap tvm, Token token, StringBuffer contents, String skip[]) {
+		String prefix = token.isRoot()? "": token.getFullName()+"/"; //$NON-NLS-1$ //$NON-NLS-2$
+		Map m = tvm.getVariableInstances();
+		for (Iterator it = m.keySet().iterator(); it.hasNext(); )
+		{
+			String key = (String) it.next();
+			if (Arrays.binarySearch(skip, key) < 0) {
+				try {
+					VariableInstance vi = (VariableInstance) m.get(key);
+					if ( vi instanceof ByteArrayInstance && Arrays.binarySearch(skip, "binary") >= 0) {
+						// Skip
+					} else {
+						Object value = vi.getValue();
+						if (value != null) {
+							String s = toString(value);
+							if (s.length() < maxFieldLength) {
+								d.add(new Field (prefix+key, 
+										s,
+										Field.Store.NO, Field.Index.ANALYZED));
+								if (contents.length() < maxFieldLength) {
+									contents.append(" "); //$NON-NLS-1$
+									contents.append(s);
+								}
+							}
+						}
+					}
+				} catch (Throwable t) {
+					// Error deserializing data
+				}
+			}
+		}
+	}
+
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH24:mm");
 	
 	private String toString(Object value) {

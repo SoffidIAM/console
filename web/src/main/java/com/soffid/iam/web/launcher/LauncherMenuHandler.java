@@ -73,7 +73,10 @@ public class LauncherMenuHandler implements DynamicMenuHandler {
 			}
 			o.setMenuId(child.getId().toString());
 			o.setAccessTree(child);
-			o.setLabel("appmenu_"+child.getId());
+			if (child.getCode() != null && !child.getCode().trim().isEmpty())
+				o.setLabel("appmenu_"+child.getCode());
+			else
+				o.setLabel("appmenu_"+child.getId());
 			list.add(o);
 		}
 	}

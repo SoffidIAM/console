@@ -102,6 +102,8 @@ public class AttributeParser {
 		}
 		else if (type.equals( TypeEnumeration.HTML) )
 		{
+			if (blobDataValue == null)
+				return value2;
 			try {
 				return new String(blobDataValue, "UTF-8");
 			} catch (UnsupportedEncodingException e) {

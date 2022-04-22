@@ -124,6 +124,7 @@ public class Indexer {
 			{
 				if (number > max) return last;
 				last = process.getId();
+				number ++;
 				try {
 					log.info("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
 					d = generateDocument(process, skipArray);

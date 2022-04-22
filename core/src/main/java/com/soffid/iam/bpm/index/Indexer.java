@@ -24,6 +24,7 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jbpm.JbpmConfiguration;
@@ -50,6 +51,8 @@ public class Indexer {
 	private Log log = LogFactory.getLog(Indexer.class);
 	private static Indexer theIndexer = null;
 	int maxFieldLength = 4000;
+	boolean fullIndex = false;
+	
 	private Indexer () {
 		try {
 			maxFieldLength = Integer.parseInt(System.getProperty("soffid.indexer.max-field-size"));
@@ -67,19 +70,31 @@ public class Indexer {
 		return theIndexer;
 	}
 	
-	private Collection<ProcessInstance> getProcesses(Session session, long then, long now) {
-		return session
-				.createQuery("select distinct pi "
-					+ "from org.jbpm.logging.log.ProcessLog as pl "
-					+ "join pl.token as token "
-					+ "join token.processInstance as pi "
-					+ "where pl.date > :then "
-					+ "order by pi.id desc")
-				.setTimestamp ("then", new Date(then))
-				.list();
+	private Collection<ProcessInstance> getProcesses(Session session, long then, long now, Long nextProcessId) {
+		if (nextProcessId == null)
+			return session
+					.createQuery("select distinct pi "
+						+ "from org.jbpm.logging.log.ProcessLog as pl "
+						+ "join pl.token as token "
+						+ "join token.processInstance as pi "
+						+ "where pl.date > :then "
+						+ "order by pi.id desc")
+					.setTimestamp ("then", new Date(then))
+					.list();
+		else
+			return session
+					.createQuery("select distinct pi "
+						+ "from org.jbpm.logging.log.ProcessLog as pl "
+						+ "join pl.token as token "
+						+ "join token.processInstance as pi "
+						+ "where pl.date > :then and pi.id < :nextProcessId "
+						+ "order by pi.id desc")
+					.setTimestamp ("then", new Date(then))
+					.setLong("nextProcessId", nextProcessId)
+					.list();
 	}
 
-	public void flush(Session session, long then, long now) throws IOException {
+	public Long flush(Session session, long then, long now, Long nextProcessId, long max) throws IOException {
 		String skip = ConfigurationCache.getProperty("soffid.indexer.skip-attribute");
 		String skipArray[] = skip == null ? new String[0]: skip.split(" ");
 		Arrays.sort(skipArray);
@@ -87,9 +102,10 @@ public class Indexer {
 		if (DirectoryFactory.isEmpty(session)) {
 			log.info("Index is empty. Regenerating");
 			then = 0;
+			nextProcessId = null;
 		}
 		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
-		Collection<ProcessInstance> p = getProcesses (session, then, now);
+		Collection<ProcessInstance> p = getProcesses (session, then, now, nextProcessId);
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, DirectoryFactory.getAnalyzer());
@@ -102,8 +118,12 @@ public class Indexer {
 		}
 		Document d;
 		try { 
+			long last = 0;
+			int number = 0;
 			for (ProcessInstance process: p)
 			{
+				if (number > max) return last;
+				last = process.getId();
 				try {
 					log.info("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
 					d = generateDocument(process, skipArray);
@@ -121,6 +141,7 @@ public class Indexer {
 		} finally {
 			w.close();
 		}
+		return null;
 	}
 	
 	public Document generateDocument (ProcessInstance pi, String[] skipArray) throws IOException {
@@ -281,12 +302,16 @@ public class Indexer {
 	}
 	
 	public void reindexAll ( ) throws IOException {
-		JbpmContext ctx = Configuration.getConfig().createJbpmContext();
-		try {
-			flush (ctx.getSession(), 0, System.currentTimeMillis());
-		} finally {
-			ctx.close();
-		}
+		Long next = null;
+		Long now = System.currentTimeMillis();
+		do {
+			JbpmContext ctx = Configuration.getConfig().createJbpmContext();
+			try {
+				next = flush (ctx.getSession(), 0, now, next, 1000);
+			} finally {
+				ctx.close();
+			}
+		} while (next != null);
 	}
 	
 }

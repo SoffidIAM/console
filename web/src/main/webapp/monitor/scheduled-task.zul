@@ -25,7 +25,7 @@
 				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 				dataPath="/model:/task"
 				preference="task"
-				sortColumn="9"
+				sortColumn="5"
 				sortDirection="-1"
 				maxheight="70vh" 
 				onSelect="ref:frame.showDetails" enablefilter="true">
@@ -39,28 +39,30 @@
   default: true
 - name: ${c:l('jobadmin.month')}
   value: monthsPattern
-  default: true
+  default: false
 - name: ${c:l('jobadmin.day')}
   value: dayPattern
-  default: true
+  default: false
 - name: ${c:l('jobadmin.hour')}
   value: hoursPattern
-  default: true
+  default: false
 - name: ${c:l('jobadmin.minute')}
   value: minutesPattern
-  default: true
+  default: false
 - name: ${c:l('jobadmin.dayOfWeek')}
   value: dayOfWeekPattern
-  default: true
+  default: false
 - name: ${c:l('jobadmin.server') }
   value: serverName
   default: true
 - name: ${c:l('llistaRegistreAccesUsuari.zul.Datainici') }
   value: lastExecution
   template: #{lastExecution_datetime}
+  default: true
 - name: ${c:l('llistaRegistreAccesUsuari.zul.Datafi') }
   value: lastEnd
   template: #{lastEnd_datetime}
+  default: true
 - name: ${c:l('jobadmin.status') }
   template: <img class="small-icon" src="${execution.contextPath }#{!lastExecution? '/img/pixel.png': active?'/anonymous/wait.gif': error? '/img/warning.svg': '/img/ok.svg'}">
   value: error

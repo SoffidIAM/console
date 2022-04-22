@@ -45,7 +45,7 @@ import es.caib.zkib.component.DataTable;
 public class LaunchHelper {
 	Log log = LogFactory.getLog(getClass());
 	
-	public void launchAccount( Account account ) throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException
+	public void launchAccount( Account account, boolean directLink ) throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException
 	{
 		String url = account.getLoginUrl();
 		
@@ -54,15 +54,15 @@ public class LaunchHelper {
 		if (url != null)
 		{
 			if ( account.getLaunchType() == LaunchType.LAUNCH_TYPE_PAM)
-				launchPamAccount(account, url);
+				launchPamAccount(account, url, directLink);
 			else if (account.getLaunchType() == LaunchType.LAUNCH_TYPE_WEBSSO)
-				launchWssoAccount(account, url);
+				launchWssoAccount(account, url, directLink);
 			else
-				launchStandardAccount(account, url);
+				launchStandardAccount(account, url, directLink);
 		}
 	}
 
-	private void launchPamAccount(Account account, String url) throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException {
+	private void launchPamAccount(Account account, String url, boolean directLink) throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException {
 		NewPamSession s = EJBLocator.getPamSessionService().createJumpServerSession(account);
 		if (s == null)
 			throw new InternalErrorException("Unable to start session");
@@ -73,7 +73,9 @@ public class LaunchHelper {
 			String targetUrl = u.getProtocol()+"://"+u.getHost()+ ( u.getPort() > 0 ? ":"+u.getPort(): "" ) + u.getPath();
 			
 			sb.append("var f=document.getElementById(\"pamLauncherForm\");");
-			sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
+			if (directLink)
+				sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
+			sb.append("f.target = \"\";");
 			for (String part: (u.getQuery() != null && !u.getQuery().trim().isEmpty()? u.getQuery().split("&"): new String[0]))
 			{
 				int i = part.indexOf("=");
@@ -87,7 +89,7 @@ public class LaunchHelper {
 		}
 	}
 
-	private void launchWssoAccount(Account account, String url) throws InternalErrorException, NamingException, CreateException {
+	private void launchWssoAccount(Account account, String url, boolean directLink) throws InternalErrorException, NamingException, CreateException {
 		String name = account.getLoginName() == null ? account.getName() : account.getLoginName();
 		com.soffid.iam.api.Password password = com.soffid.iam.EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
 		org.json.JSONObject j = new org.json.JSONObject();
@@ -112,21 +114,27 @@ public class LaunchHelper {
 			j.put("url", url);
 			j.put("account", name);
 			j.put("password", password.getPassword());
-			Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
+			Clients.evalJavaScript("launchSsoUrl("+j.toString()+","+directLink+");");
 		} catch (Exception e) {
-			Clients.evalJavaScript("window.open('"+encodeJS(url)+"', '_blank');");
+			if (directLink) 
+				Clients.evalJavaScript("window.location.href='"+encodeJS(url)+"';");
+			else
+				Clients.evalJavaScript("window.open('"+encodeJS(url)+"', '_blank');");
 		}
 	}
 
-	private void launchStandardAccount(Account account, String url) {
-		Clients.evalJavaScript("window.open('"+encodeJS(url)+"', '_blank');");
+	private void launchStandardAccount(Account account, String url, boolean directLink) {
+		if (directLink) 
+			Clients.evalJavaScript("window.location.href='"+encodeJS(url)+"';");
+		else
+			Clients.evalJavaScript("window.open('"+encodeJS(url)+"', '_blank');");
 	}
 
 	public String encodeJS(String url) {
 		return url.replaceAll("\\\\","\\\\\\\\").replaceAll("'", "\\'");
 	}
 	
-	public void launchAccessTree(AccessTree item, AccessTreeExecution exec) throws Exception {
+	public void launchAccessTree(AccessTree item, AccessTreeExecution exec, boolean directLink) throws Exception {
 		String system = item.getSystem();
 		String type = exec.getExecutionTypeCode();
 		List<com.soffid.iam.api.Account> accounts = fetchAccounts(item);
@@ -136,16 +144,18 @@ public class LaunchHelper {
 			ApplicationLauncher l = (ApplicationLauncher) executor.newInstance();
 			l.open(item,
 					exec,
-					accounts);
+					accounts, directLink);
 		}
 		else if ( exec.getExecutionTypeCode().equals("PAM") )
 		{
-			openPamEntryPoint (item, exec, accounts);
+			openPamEntryPoint (item, exec, accounts, directLink);
 		}
 		else if ( exec.getExecutionTypeCode().equals("WSSO") )
 		{
-			openWssoEntryPoint(item, exec, accounts);
+			openWssoEntryPoint(item, exec, accounts, directLink);
 		}
+		else if (directLink)
+			Clients.evalJavaScript("window.location.href='"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"';");
 		else
 			Clients.evalJavaScript("window.open('"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"', '_blank');");
 
@@ -184,7 +194,7 @@ public class LaunchHelper {
 		return accounts;
 	}
 
-	private void openPamEntryPoint(final AccessTree instance, final AccessTreeExecution exe, List<com.soffid.iam.api.Account> accounts) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
+	private void openPamEntryPoint(final AccessTree instance, final AccessTreeExecution exe, List<com.soffid.iam.api.Account> accounts, boolean directLink) throws NamingException, CreateException, InternalErrorException, UnsupportedEncodingException {
 		Long name = instance.getId();
 		// Get passwords
 		final List<Account> r = new LinkedList<Account>();
@@ -202,7 +212,7 @@ public class LaunchHelper {
 		}
 		else if (r.size() == 1)
 		{
-			openPamEntryPoint (exe, r.get(0));
+			openPamEntryPoint (exe, r.get(0), directLink);
 		} else {
 			Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
 			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellowIfAny("accountSelectorWindow");
@@ -229,7 +239,7 @@ public class LaunchHelper {
 			accountSelectorWindow.setListener((event)->{
 				int i = w.getSelectedAccount();
 				if (i >= 0 && i < r.size()) {
-					openPamEntryPoint(exe, r.get(i));
+					openPamEntryPoint(exe, r.get(i), directLink);
 				}
 			});
 			
@@ -237,7 +247,7 @@ public class LaunchHelper {
 		}
 	}
 	
-	private void openPamEntryPoint(AccessTreeExecution exe, com.soffid.iam.api.Account account) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+	private void openPamEntryPoint(AccessTreeExecution exe, com.soffid.iam.api.Account account, boolean directLink) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		NewPamSession s;
 		if (exe == null || exe.getContent() == null || exe.getContent().trim().isEmpty()) {
 			s= EJBLocator.getPamSessionService()
@@ -255,6 +265,8 @@ public class LaunchHelper {
 			String targetUrl = u.getProtocol()+"://"+u.getHost()+ ( u.getPort() > 0 ? ":"+u.getPort(): "" ) + u.getPath();
 			
 			sb.append("var f=document.getElementById(\"pamLauncherForm\");");
+			if (directLink)
+				sb.append("f.target = '';");
 			sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
 			for (String part: (u.getQuery() != null && !u.getQuery().trim().isEmpty()? u.getQuery().split("&"): new String[0]))
 			{
@@ -270,7 +282,7 @@ public class LaunchHelper {
 	}
 
 	
-	public void openWssoEntryPoint(AccessTree instance, final AccessTreeExecution exe, List<com.soffid.iam.api.Account> accounts)
+	public void openWssoEntryPoint(AccessTree instance, final AccessTreeExecution exe, List<com.soffid.iam.api.Account> accounts, boolean directLink)
 			throws InternalErrorException, NamingException, CreateException {
 		// Get passwords
 		List<Account> r = new LinkedList<Account>();
@@ -287,7 +299,7 @@ public class LaunchHelper {
 		}
 		else if (r.size() == 1)
 		{
-			openWssoEntryPoint(exe, r.get(0));
+			openWssoEntryPoint(exe, r.get(0), directLink);
 		} else {
 			Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
 			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellowIfAny("accountSelectorWindow");
@@ -314,7 +326,7 @@ public class LaunchHelper {
 			accountSelectorWindow.setListener((event)->{
 				int i = w.getSelectedAccount();
 				if (i >= 0 && i < r.size()) {
-					openWssoEntryPoint(exe, r.get(i));
+					openWssoEntryPoint(exe, r.get(i), directLink);
 				}
 			});
 			
@@ -322,7 +334,7 @@ public class LaunchHelper {
 		}
 	}
 
-	private void openWssoEntryPoint(AccessTreeExecution exe, Account account) throws InternalErrorException, NamingException, CreateException {
+	private void openWssoEntryPoint(AccessTreeExecution exe, Account account, boolean directLink) throws InternalErrorException, NamingException, CreateException {
 		try {
 			com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
 			if (password == null)
@@ -334,9 +346,12 @@ public class LaunchHelper {
 			j.put("url", exe.getContent());
 			j.put("account", account.getLoginName());
 			j.put("password", password.getPassword());
-			Clients.evalJavaScript("launchSsoUrl("+j.toString()+");");
-		} catch (JSONException e) {
-			Clients.evalJavaScript("window.open('"+exe.getContent()+"', '_blank');");
+			Clients.evalJavaScript("launchSsoUrl("+j.toString()+","+directLink+");");
+		} catch (Exception e) {
+			if (directLink) 
+				Clients.evalJavaScript("window.location.href='"+encodeJS(exe.getContent())+"';");
+			else
+				Clients.evalJavaScript("window.open('"+encodeJS(exe.getContent())+"', '_blank');");
 		}
 	}
 

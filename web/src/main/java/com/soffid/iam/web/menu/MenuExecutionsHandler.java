@@ -77,6 +77,6 @@ public class MenuExecutionsHandler extends Div implements AfterCompose {
 		AccessTree at = (AccessTree) ((DataNode)XPathUtils.getValue( tree, "/.")).getInstance();
 		WebAccessTreeExecution exec = (WebAccessTreeExecution) ((DataNode)XPathUtils.getValue( event.getTarget(), "/.")).getInstance();
 		
-		new LaunchHelper().launchAccessTree(at, exec.getExec());
+		new LaunchHelper().launchAccessTree(at, exec.getExec(), false);
 	}
 }

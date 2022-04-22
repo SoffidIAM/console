@@ -67,7 +67,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 				currentOptions = stack.getLast().getOptions();
 			if (prev.getExecHandler() != null) {
 				try {
-					prev.getExecHandler().launch(prev);
+					prev.getExecHandler().launch(prev, false);
 				} catch (Exception e) {
 					throw new UiException(e);
 				}
@@ -99,23 +99,43 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 	}
 
 	
-	private boolean searchOption(List<MenuOption> options, String optionName) {
+	private boolean searchOption(List<MenuOption> options, String optionName) throws Exception {
+		if (searchOption(options, optionName, false))
+			return true;
+		else
+			return searchOption(options, optionName, true);
+	}
+	
+	private boolean searchOption(List<MenuOption> options, String optionName, boolean dynamic) throws Exception {
+		if (options == null)
+			return false;
 		for (MenuOption option: options)
 		{
 			if (option.getLabel() != null && option.getLabel().equals(optionName))
 			{
 				stack.add(option);
-				currentOptions = option.getOptions();
-				if ( option.getHandler() != null)
-					currentOptions = option.getHandler().getOptions(option);
-				small = option.isSmall();
-				setUrl("/main/menu.zul?option="+optionName);
+				if (option.getExecHandler() != null) {
+					option.getExecHandler().launch(option, true);
+				} else {
+					if ( option.getHandler() != null)
+						currentOptions = option.getHandler().getOptions(option);
+					else 
+						currentOptions = option.getOptions();
+					small = option.isSmall();
+					setUrl("/main/menu.zul?option="+optionName);
+				}
 				return true;
 			}
 			else if (option.getOptions() != null && ! option.getOptions().isEmpty())
 			{
 				stack.add(option);
 				if ( searchOption(option.getOptions(), optionName))
+					return true;
+				stack.removeLast();
+			}
+			else if (dynamic && option.getHandler() != null) {
+				stack.add(option);
+				if (searchOption (option.getHandler().getOptions(option), optionName, dynamic))
 					return true;
 				stack.removeLast();
 			}
@@ -265,7 +285,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			else
 				Application.call(option.getUrl());
 		} else if ((option.getOptions() == null || option.getOptions().isEmpty()) && option.getExecHandler() != null) {
-			option.getExecHandler().launch(option);
+			option.getExecHandler().launch(option, false);
 		} else {
 			stack.add(option);
 			small = option.isSmall();

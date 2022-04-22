@@ -17,7 +17,7 @@ import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
 public class MenuEntryLauncher implements DynamicLauncher {
 
 	@Override
-	public void launch(MenuOption option) throws Exception {
+	public void launch(MenuOption option, boolean directLink) throws Exception {
 		AccessTree accessTree = option.getAccessTree();
 		
 		String scope = com.soffid.iam.ServiceLocator.instance()
@@ -32,7 +32,7 @@ public class MenuEntryLauncher implements DynamicLauncher {
 			selected = findExecution (accessTree.getExecutions(), "I");
 
 		if (selected != null)
-			new LaunchHelper().launchAccessTree(accessTree, selected);
+			new LaunchHelper().launchAccessTree(accessTree, selected, directLink);
 	}
 
 	private AccessTreeExecution findExecution(Collection<AccessTreeExecution> executions, String scope) {

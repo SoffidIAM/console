@@ -1,9 +1,9 @@
-function launchSsoUrl (secrets) {
+function launchSsoUrl (secrets, direct) {
 	var d = document.getElementById("soffidAraleExtensionDetector");
 	if ( d && d.getAttribute("soffidAraleExtensionPresent") == "true")
 	{
 		var ev = new CustomEvent("soffidMessage", {detail: 
-			{type:"soffid",action:"prepare",url:secrets.url,secrets:secrets}});
+			{type:"soffid",action:"prepare",url:secrets.url,secrets:secrets,direct:direct}});
 		d.dispatchEvent(ev);
 	} else if (d) {
 		var isChromium = window.chrome;
@@ -26,7 +26,6 @@ function launchSsoUrl (secrets) {
 				location.href="https://chrome.google.com/webstore/detail/phjdhfhnbedpkmplaegoejildnieofcf";
 				return;
 			}
-				window.setTimeout(function(){window.open(secrets.url, "_blank")}, 100);
 		}
 		window.setTimeout(function(){window.open(secrets.url, "_blank")}, 100);
 	}

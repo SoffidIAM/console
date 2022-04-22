@@ -14,8 +14,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 public class AccountLauncher implements DynamicLauncher {
 
 	@Override
-	public void launch(MenuOption option) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
-		new LaunchHelper().launchAccount(option.getAccount());
+	public void launch(MenuOption option, boolean directLink) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		new LaunchHelper().launchAccount(option.getAccount(), directLink);
 	}
 
 }

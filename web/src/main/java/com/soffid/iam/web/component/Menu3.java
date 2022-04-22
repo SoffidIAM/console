@@ -110,7 +110,7 @@ public class Menu3 extends Div implements AfterCompose {
 			if (o != null)	
 			{
 				if ( o.getExecHandler() != null)
-					o.getExecHandler().launch(o);
+					o.getExecHandler().launch(o, false);
 				else if ("true".equals(data[1]))
 					Executions.getCurrent().sendRedirect(o.getUrl(), "_blank");
 				else if (o.getUrl() == null)

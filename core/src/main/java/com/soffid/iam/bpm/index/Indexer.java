@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -70,10 +71,10 @@ public class Indexer {
 		return theIndexer;
 	}
 	
-	private Collection<ProcessInstance> getProcesses(Session session, long then, long now, Long nextProcessId) {
+	private Collection<Long> getProcesses(Session session, long then, long now, Long nextProcessId) {
 		if (nextProcessId == null)
 			return session
-					.createQuery("select distinct pi "
+					.createQuery("select distinct pi.id "
 						+ "from org.jbpm.logging.log.ProcessLog as pl "
 						+ "join pl.token as token "
 						+ "join token.processInstance as pi "
@@ -83,7 +84,7 @@ public class Indexer {
 					.list();
 		else
 			return session
-					.createQuery("select distinct pi "
+					.createQuery("select distinct pi.id "
 						+ "from org.jbpm.logging.log.ProcessLog as pl "
 						+ "join pl.token as token "
 						+ "join token.processInstance as pi "
@@ -94,36 +95,34 @@ public class Indexer {
 					.list();
 	}
 
+	public boolean isIndexEmpty(Session session) {
+		return DirectoryFactory.isEmpty(session);
+	}
+	
 	public Long flush(Session session, long then, long now, Long nextProcessId, long max) throws IOException {
 		String skip = ConfigurationCache.getProperty("soffid.indexer.skip-attribute");
 		String skipArray[] = skip == null ? new String[0]: skip.split(" ");
 		Arrays.sort(skipArray);
 		
-		if (DirectoryFactory.isEmpty(session)) {
-			log.info("Index is empty. Regenerating");
-			then = 0;
-			nextProcessId = null;
-		}
 		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
-		Collection<ProcessInstance> p = getProcesses (session, then, now, nextProcessId);
+		Collection<Long> p = new LinkedList<Long>(getProcesses (session, then, now, nextProcessId));
 		Directory dir = DirectoryFactory.getDirectory(session);
 		IndexWriter w;
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, DirectoryFactory.getAnalyzer());
-		iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-		try {
-			w = new IndexWriter (dir, iwc);
-		} catch (FileNotFoundException e) {
-			iwc.setOpenMode(OpenMode.CREATE);
-			w = new IndexWriter (dir, iwc);
-		}
+		final Analyzer analyzer = DirectoryFactory.getAnalyzer();
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
+		iwc.setOpenMode(then == 0 ? OpenMode.CREATE : OpenMode.CREATE_OR_APPEND);
+		w = new IndexWriter (dir, iwc);
 		Document d;
 		try { 
-			long last = 0;
 			int number = 0;
-			for (ProcessInstance process: p)
+			for (Long processId: p)
 			{
-				if (number > max) return last;
-				last = process.getId();
+				if (number >= max) {
+					number = 0;
+					w.commit();
+					session.clear();
+				}
+				ProcessInstance process = (ProcessInstance) session.get(ProcessInstance.class, processId);
 				number ++;
 				try {
 					log.info("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
@@ -138,6 +137,7 @@ public class Indexer {
 				} catch (Throwable th) {
 					log.info("Error indexing process "+process.getId(), th);
 				}
+//				session.evict(process);
 			}
 		} finally {
 			w.close();
@@ -308,7 +308,7 @@ public class Indexer {
 		do {
 			JbpmContext ctx = Configuration.getConfig().createJbpmContext();
 			try {
-				next = flush (ctx.getSession(), 0, now, next, 1000);
+				next = flush (ctx.getSession(), 0, now, next, 10_000);
 			} finally {
 				ctx.close();
 			}

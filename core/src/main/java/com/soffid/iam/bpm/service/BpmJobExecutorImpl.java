@@ -203,9 +203,18 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 		Indexer i = Indexer.getIndexer ();
 		JbpmContext ctx = getContext();
 		Long nextProcess = null;
+		try {
+			if (i.isIndexEmpty(ctx.getSession())) {
+				log.info("Index is empty. Regenerating");
+				last = 0;
+			}
+		} finally {
+			ctx.close();
+		}
 		do {
+			ctx = getContext();
 			try {
-				nextProcess = i.flush(ctx.getSession(), last, newExecution, nextProcess, 1000);
+				nextProcess = i.flush(ctx.getSession(), last, newExecution, nextProcess, 100);
 				if (nextProcess == null)
 					last = newExecution;
 			} catch (Exception e) {

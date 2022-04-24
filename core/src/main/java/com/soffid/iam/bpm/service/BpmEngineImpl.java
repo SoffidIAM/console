@@ -769,6 +769,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 	@Override
 	protected ProcessInstance handleGetProcess(long id) throws Exception {
+		return getProcessInstance2(id, false);
+	}
+
+	public ProcessInstance getProcessInstance2(long id, boolean lightweight)
+			throws InternalErrorException, BPMException, UnknownUserException, Exception {
 		JbpmContext jbpmContext = null;
 
 		try {
@@ -801,17 +806,17 @@ public class BpmEngineImpl extends BpmEngineBase {
 						org.jbpm.taskmgmt.exe.TaskInstance ti = (org.jbpm.taskmgmt.exe.TaskInstance) it
 								.next();
 						if (business.canAccess(getUserGroups(), ti)) {
-							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
+							return VOFactory.newProcessInstance2(jbpmContext, getProcessHierarchyEntityDao(),process, lightweight);
 						}
 					}
 					for (ProcessHierarchyEntity parentProcess: getProcessHierarchyEntityDao().findByChildren(id))
 					{
-						if (handleGetProcess(parentProcess.getParentProcess()) != null)
-							return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
+						if (getProcessInstance2(parentProcess.getParentProcess(), true) != null)
+							return VOFactory.newProcessInstance2(jbpmContext, getProcessHierarchyEntityDao(), process, lightweight);
 					}
 					return null;
 				} else {
-					return VOFactory.newProcessInstance(jbpmContext, getProcessHierarchyEntityDao(),process);
+					return VOFactory.newProcessInstance2(jbpmContext, getProcessHierarchyEntityDao(), process, lightweight);
 				}
 			}
 			else
@@ -821,6 +826,11 @@ public class BpmEngineImpl extends BpmEngineBase {
 		} finally {
 			flushContext(jbpmContext);
 		}
+	}
+
+	@Override
+	protected ProcessInstance handleGetProcessLightweight(long id) throws Exception {
+		return getProcessInstance2(id, true);
 	}
 
 	private void recursiveFillTokens(org.jbpm.graph.exe.Token rootToken,
@@ -3172,7 +3182,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			if (f != null) {
 				long processId = Long.parseLong(f.stringValue());
 				try {
-					ProcessInstance proc = handleGetProcess(processId);
+					ProcessInstance proc = handleGetProcessLightweight(processId);
 					if (proc != null) {
 						result.add(proc);
 					}

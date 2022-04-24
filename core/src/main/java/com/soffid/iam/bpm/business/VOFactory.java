@@ -21,6 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.bytes.ByteArray;
+import org.jbpm.context.exe.TokenVariableMap;
+import org.jbpm.context.exe.VariableInstance;
+import org.jbpm.context.exe.variableinstance.ByteArrayInstance;
 import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Node;
 import org.jbpm.graph.def.ProcessDefinition;
@@ -140,6 +143,8 @@ public class VOFactory {
 						throw new RuntimeException(e);
 					}
 				}
+				else if (obj instanceof VariableInstance)
+					obj = ((VariableInstance) obj).getValue();
 				variables.put(key, obj);
 			}
 			vo.setVariables(variables);
@@ -167,82 +172,7 @@ public class VOFactory {
 			JbpmContext context,
 			ProcessHierarchyEntityDao hDao,
 			org.jbpm.graph.exe.ProcessInstance instance) throws InternalErrorException {
-		try {
-			com.soffid.iam.bpm.api.ProcessInstance process = new com.soffid.iam.bpm.api.ProcessInstance();
-			process.setEnd(instance.getEnd());
-			process.setId(instance.getId());
-			process.setStart(instance.getStart());
-			process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
-	
-			ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
-			Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
-			try {
-				process.setVariables(instance.getContextInstance().getVariables());
-				if (process.getVariables() == null)
-					process.setVariables(new HashMap<String, Object>());
-			} catch (Throwable th) {
-				log.warn("Error deserializing process",th);
-				process.setVariables(new HashMap<String, Object>());
-			} finally {
-				Thread.currentThread().setContextClassLoader(oldcl);
-			}
-			Vector<Comment> comments = new Vector<Comment>();
-			populateTokenComments(context, hDao, instance, comments);
-			Collections.sort(comments, new Comparator<Comment>() {
-				public int compare(Comment o1, Comment o2) {
-					return o1.getTime().compareTo(o2.getTime());
-				}
-			});
-			process.setComments(comments);
-			Token t = instance.getRootToken();
-			if (t != null) {
-				Node n = t.getNode();
-				if (n instanceof TaskNode)
-				{
-					StringBuffer tasks = new StringBuffer();
-					for( Iterator it = instance.getTaskMgmtInstance().getUnfinishedTasks(t).iterator();
-						it.hasNext();) {
-						TaskInstance ti = (TaskInstance) it.next();
-						tasks.append(ti.getName());
-						tasks.append(" "); //$NON-NLS-1$
-					}
-					process.setCurrentTask(tasks.toString());
-				}
-				else if (n != null)
-				{
-					process.setCurrentTask(n.getName());
-				}
-			}
-			
-			if (process.getVariables().containsKey("$title"))
-				process.setDescription((String) process.getVariables().get("$title"));
-			else
-			{
-				String def = instance.getProcessDefinition().getDescription();
-				if (def != null && !def.trim().isEmpty()) {
-					VariableResolver variableResolver = JbpmExpressionEvaluator
-							.getUsedVariableResolver();
-					try {
-						process.setDescription( (String) JbpmExpressionEvaluator.evaluate(def,
-								new ExecutionContext( instance.getRootToken()),
-								variableResolver,
-								JbpmExpressionEvaluator.getUsedFunctionMapper()) );
-					} catch (Throwable th) {
-						process.setDescription(instance.getProcessDefinition().getName());
-					}
-				}
-				else
-					process.setDescription(instance.getProcessDefinition().getName());
-			}
-	
-	        process.setProcessDefinition(instance.getProcessDefinition().getId());
-	        process.setDummyProcess(false);
-
-	        return process;
-		} catch (Throwable th) {
-			log.info("Error generating ProcessInstance", th);
-			throw new InternalErrorException("Error generating process instance", th);
-		}
+		return newProcessInstance2(context, hDao, instance, false);
 	}
 
 	private static void populateTokenComments(JbpmContext context, ProcessHierarchyEntityDao hDao,
@@ -459,6 +389,98 @@ public class VOFactory {
 	static public UIClassLoader getClassLoader(ProcessDefinition def) throws InternalErrorException
 	{
 		return (UIClassLoader) JbpmConfiguration.getProcessClassLoader(def);
+	}
+
+	public static com.soffid.iam.bpm.api.ProcessInstance newProcessInstanceLightweight(JbpmContext context,
+			ProcessHierarchyEntityDao hDao, ProcessInstance instance) throws InternalErrorException {
+		return newProcessInstance2(context, hDao, instance, true);
+	}
+
+	public static com.soffid.iam.bpm.api.ProcessInstance newProcessInstance2(JbpmContext context,
+			ProcessHierarchyEntityDao hDao, ProcessInstance instance, boolean lightweight) throws InternalErrorException {
+		try {
+			com.soffid.iam.bpm.api.ProcessInstance process = new com.soffid.iam.bpm.api.ProcessInstance();
+			process.setEnd(instance.getEnd());
+			process.setId(instance.getId());
+			process.setStart(instance.getStart());
+			process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
+	
+			ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
+			try {
+				process.setVariables(new HashMap<>());
+				TokenVariableMap tvm = instance.getContextInstance().getTokenVariableMap(instance.getRootToken());
+				for (Map.Entry<String,VariableInstance> entry: (Set<Map.Entry<String, VariableInstance>>) tvm.getVariableInstances().entrySet()) {
+					String name = entry.getKey();
+					if ( entry.getValue() instanceof ByteArrayInstance && lightweight) {
+						// Omit
+					} else {
+						process.getVariables().put(name, entry.getValue().getValue());
+					}
+				}
+			} catch (Throwable th) {
+				log.warn("Error deserializing process",th);
+				process.setVariables(new HashMap<String, Object>());
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldcl);
+			}
+			Vector<Comment> comments = new Vector<Comment>();
+			populateTokenComments(context, hDao, instance, comments);
+			Collections.sort(comments, new Comparator<Comment>() {
+				public int compare(Comment o1, Comment o2) {
+					return o1.getTime().compareTo(o2.getTime());
+				}
+			});
+			process.setComments(comments);
+			Token t = instance.getRootToken();
+			if (t != null) {
+				Node n = t.getNode();
+				if (n instanceof TaskNode)
+				{
+					StringBuffer tasks = new StringBuffer();
+					for( Iterator it = instance.getTaskMgmtInstance().getUnfinishedTasks(t).iterator();
+						it.hasNext();) {
+						TaskInstance ti = (TaskInstance) it.next();
+						tasks.append(ti.getName());
+						tasks.append(" "); //$NON-NLS-1$
+					}
+					process.setCurrentTask(tasks.toString());
+				}
+				else if (n != null)
+				{
+					process.setCurrentTask(n.getName());
+				}
+			}
+			
+			if (process.getVariables().containsKey("$title"))
+				process.setDescription((String) process.getVariables().get("$title"));
+			else
+			{
+				String def = instance.getProcessDefinition().getDescription();
+				if (def != null && !def.trim().isEmpty()) {
+					VariableResolver variableResolver = JbpmExpressionEvaluator
+							.getUsedVariableResolver();
+					try {
+						process.setDescription( (String) JbpmExpressionEvaluator.evaluate(def,
+								new ExecutionContext( instance.getRootToken()),
+								variableResolver,
+								JbpmExpressionEvaluator.getUsedFunctionMapper()) );
+					} catch (Throwable th) {
+						process.setDescription(instance.getProcessDefinition().getName());
+					}
+				}
+				else
+					process.setDescription(instance.getProcessDefinition().getName());
+			}
+	
+	        process.setProcessDefinition(instance.getProcessDefinition().getId());
+	        process.setDummyProcess(false);
+
+	        return process;
+		} catch (Throwable th) {
+			log.info("Error generating ProcessInstance", th);
+			throw new InternalErrorException("Error generating process instance", th);
+		}
 	}
 
 }

@@ -105,6 +105,13 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
 	 return null;
 	}
+
+	public es.caib.bpm.vo.ProcessInstance getProcessLightweight(
+			long id)
+			throws es.caib.seycon.ng.exception.InternalErrorException, es.caib.bpm.exception.BPMException {
+		 return null;
+		}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.bpm.vo.Token[] getTokens(
 		long id)

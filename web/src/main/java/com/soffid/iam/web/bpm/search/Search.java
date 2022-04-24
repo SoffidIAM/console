@@ -39,6 +39,7 @@ import com.soffid.iam.bpm.service.ejb.BpmEngine;
 import com.soffid.iam.web.bpm.BPMApplication;
 import com.soffid.iam.web.bpm.process.ProcessUI;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.bpm.api.ProcessDefinition;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -210,6 +211,7 @@ public class Search extends FrameHandler
 
         getFellow("query-box").setVisible(false);
         showDetails();
+        process = EJBLocator.getBpmEngine().getProcess(process.getId()); // Load full process variables
         processUi.openProcessInstance(process, false);
         processUi.setParentFrame(this);
 //        getFellow("query-box").setVisible(true);

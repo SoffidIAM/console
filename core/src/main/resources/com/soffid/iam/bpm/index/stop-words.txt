@@ -35,3 +35,16 @@ les
 al
 del
 pel
+the
+of
+since
+until
+von
+before
+after
+from
+with
+without
+therefore
+somehow
+however

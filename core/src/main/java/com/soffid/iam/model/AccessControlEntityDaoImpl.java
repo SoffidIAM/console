@@ -135,8 +135,6 @@ public class AccessControlEntityDaoImpl
 				target.setHostName(source.getGenericHost());
 			}
 		}
-		
-		//}
 	}	
 
 	public void controlAccesToEntityCustom(com.soffid.iam.api.AccessControl source, com.soffid.iam.model.AccessControlEntity target) {

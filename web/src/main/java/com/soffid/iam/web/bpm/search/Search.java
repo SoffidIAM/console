@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.out.AuSendRedirect;
 import org.zkoss.zk.ui.Session;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Checkbox;
@@ -36,6 +37,7 @@ import es.caib.bpm.exception.BPMException;
 import es.caib.bpm.ui.inbox.Messages;
 
 import com.soffid.iam.bpm.service.ejb.BpmEngine;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.bpm.BPMApplication;
 import com.soffid.iam.web.bpm.process.ProcessUI;
 import com.soffid.iam.web.component.FrameHandler;
@@ -211,7 +213,14 @@ public class Search extends FrameHandler
 
         getFellow("query-box").setVisible(false);
         showDetails();
-        process = EJBLocator.getBpmEngine().getProcess(process.getId()); // Load full process variables
+        Security.nestedLogin(new String[] {"BPM_INTERNAL"});
+        try {
+        	process = EJBLocator.getBpmEngine().getProcess(process.getId()); // Load full process variables
+        	if (process == null)
+        		throw new UiException("Access denied");
+        } finally {
+        	Security.nestedLogoff();
+        }
         processUi.openProcessInstance(process, false);
         processUi.setParentFrame(this);
 //        getFellow("query-box").setVisible(true);

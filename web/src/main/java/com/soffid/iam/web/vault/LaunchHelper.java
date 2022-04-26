@@ -73,9 +73,9 @@ public class LaunchHelper {
 			String targetUrl = u.getProtocol()+"://"+u.getHost()+ ( u.getPort() > 0 ? ":"+u.getPort(): "" ) + u.getPath();
 			
 			sb.append("var f=document.getElementById(\"pamLauncherForm\");");
+			sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
 			if (directLink)
-				sb.append("f.action = \""+encodeJS(targetUrl)+"\";");
-			sb.append("f.target = \"\";");
+				sb.append("f.target = \"\";");
 			for (String part: (u.getQuery() != null && !u.getQuery().trim().isEmpty()? u.getQuery().split("&"): new String[0]))
 			{
 				int i = part.indexOf("=");

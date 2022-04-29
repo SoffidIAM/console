@@ -44,6 +44,10 @@ public abstract class PoliticaContrasenyaEntity {
 	@Nullable
 	public java.lang.Long duradaMaximaCaducada;
 
+	@Nullable
+	@Column(translated = "minimumPeriod" , name="PCD_MINAGE")
+	public java.lang.Long minimumPeriod;
+
 	@Column (name="PCD_MINLEN", translated="minLength")
 	@Nullable
 	public java.lang.Long minLongitud;

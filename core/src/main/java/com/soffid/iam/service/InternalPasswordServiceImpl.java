@@ -99,7 +99,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	 */
 	@SuppressWarnings(value = "rawtypes")
 	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
-			com.soffid.iam.model.PasswordPolicyEntity politica, com.soffid.iam.api.Password password)
+			com.soffid.iam.model.PasswordPolicyEntity politica, com.soffid.iam.api.Password password, 
+			boolean ignoreMinimumPeriod)
 			throws InternalErrorException {
 		PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, getUserAccounts(user, politica));
 
@@ -109,9 +110,28 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		if (user != null && isOldPassword(user, politica.getPasswordDomain(), password))
 			return PolicyCheckResult.OLD_PASSWORD;
 
-		return PolicyCheckResult.VALID;
+		if (ignoreMinimumPeriod)
+			return PolicyCheckResult.VALID;
+
+		if (politica.getMinimumPeriod() == null || politica.getMinimumPeriod() == 0)
+			return PolicyCheckResult.VALID;
+		for (PasswordEntity pe : getPasswordEntityDao().findLastByUserDomain(user, politica.getPasswordDomain())) {
+			if (pe==null || pe.getDate()==null )
+				return PolicyCheckResult.NOT_YET;
+			if (pe.getExpirationDate() != null && pe.getExpirationDate().getTime() <= System.currentTimeMillis())
+				return PolicyCheckResult.VALID;
+			if (System.currentTimeMillis() - pe.getDate().getTime() < politica.getMinimumPeriod().longValue() * 1000 * 60 * 60 * 24 )
+				return PolicyCheckResult.NOT_YET; 
+		}
+		return PolicyCheckResult.VALID; // No previous password
 	}
 
+	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
+			com.soffid.iam.model.PasswordPolicyEntity politica, com.soffid.iam.api.Password password)
+			throws InternalErrorException {
+		return handleCheckPolicy(user, politica, password, false);
+	}
+	
 	/**
 	 * Gets the list of accounts that belong to a user and a selected password
 	 * polciy apply.
@@ -142,14 +162,22 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	 */
 	@SuppressWarnings(value = "rawtypes")
 	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
-			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password)
+			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password,
+			boolean ignoreMinimumPeriod)
 			throws InternalErrorException {
 		PasswordPolicyEntity politica = getUserPolicy(user, passwordDomain);
 		if (politica == null)
 			throw new InternalError ("No password policy available for user "+user.getUserName()+" and password domain "+passwordDomain.getName());
-		return handleCheckPolicy(user, politica, password);
+		return handleCheckPolicy(user, politica, password, ignoreMinimumPeriod);
 	}
 
+	@SuppressWarnings(value = "rawtypes")
+	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
+			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password)
+			throws InternalErrorException {
+		return handleCheckPolicy(user, passwordDomain, password, false);
+	}
+	
 	private PolicyCheckResult internalCheckBasicPolicy(com.soffid.iam.model.PasswordPolicyEntity politica,
 			com.soffid.iam.api.Password password, Collection<AccountEntity> accounts) {
 		String uncrypted = password.getPassword();
@@ -649,7 +677,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 								pc.getUserType().getName()));
 			password = generatePasswordCandidate(pc, minLength, maxLength, r);
 
-		} while (!handleCheckPolicy(usuariEntity, pc, password).isValid());
+		} while (!handleCheckPolicy(usuariEntity, pc, password, true).isValid());
 		return password;
 	}
 
@@ -1755,4 +1783,5 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 		return null;
 	}
+
 }

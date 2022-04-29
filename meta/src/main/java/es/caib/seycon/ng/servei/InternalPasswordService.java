@@ -9,10 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.DominiContrasenyaEntity;
+import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
 
 @Service ( internal=true,
@@ -35,6 +39,17 @@ import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
 
 public abstract class InternalPasswordService {
 
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Description("Checks password policy, ignoring the minimum password period option")
+	public es.caib.seycon.ng.comu.PolicyCheckResult checkPolicy(
+		es.caib.seycon.ng.model.UsuariEntity user, 
+		es.caib.seycon.ng.model.PoliticaContrasenyaEntity politica, 
+		es.caib.seycon.ng.comu.Password password,
+		boolean ignoreMinimumPeriod)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
 	@Operation(translated="checkPolicy")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PolicyCheckResult checkPolicy(
@@ -44,6 +59,7 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
 	@Operation(translated="checkAccountPolicy")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PolicyCheckResult checkAccountPolicy(
@@ -52,6 +68,7 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation(translated="storePassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void storePassword(
@@ -270,6 +287,18 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation(translated="checkPolicy")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.PolicyCheckResult checkPolicy(
+		es.caib.seycon.ng.model.UsuariEntity user, 
+		es.caib.seycon.ng.model.DominiContrasenyaEntity passwordDomain, 
+		es.caib.seycon.ng.comu.Password password,
+		boolean ignoreMinimumPeriod)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation(translated="checkPolicy")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.PolicyCheckResult checkPolicy(
@@ -279,6 +308,7 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
 	@Operation(translated="getPolicyDescription")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.lang.String getPolicyDescription(

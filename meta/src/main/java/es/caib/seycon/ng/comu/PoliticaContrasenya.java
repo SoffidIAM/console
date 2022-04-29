@@ -35,6 +35,10 @@ public class PoliticaContrasenya {
 	public java.lang.Long duradaMaximaCaducada;
 
 	@Nullable
+	@Attribute(translated = "minimumPeriod" )
+	public java.lang.Long minimumPeriod;
+
+	@Nullable
 	@Attribute(translated = "minimumLength" )
 	public java.lang.Long minLongitud;
 

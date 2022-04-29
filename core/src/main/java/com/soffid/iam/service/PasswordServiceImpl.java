@@ -16,6 +16,7 @@ package com.soffid.iam.service;
 import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Messages;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;

@@ -2948,7 +2948,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				PasswordDomainEntity dominiContrasenyes = getPasswordDomainEntityDao()
 						.findByName(codiDominiContrasenyes);
 				PolicyCheckResult validation = getInternalPasswordService()
-						.checkPolicy(usuari, dominiContrasenyes, newPassword);
+						.checkPolicy(usuari, dominiContrasenyes, newPassword, true);
 				if (!validation.isValid())
 					throw new BadPasswordException(validation.getReason());
 				getInternalPasswordService().storeAndForwardPassword(usuari,

@@ -180,10 +180,12 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 			if ("A".equals(pp.getType())) {
 				getFellow("rtempsRenovacio").setVisible(true);
 				getFellow("rduradaMaxima").setVisible(false);
+				getFellow("rduradaMinima").setVisible(false);
 				getFellow("rduradaMaximaCaducada").setVisible(false);
 			} else {
 				getFellow("rtempsRenovacio").setVisible(false);
 				getFellow("rduradaMaxima").setVisible(true);
+				getFellow("rduradaMinima").setVisible(false);
 				getFellow("rduradaMaximaCaducada").setVisible(true);
 			}
 		}

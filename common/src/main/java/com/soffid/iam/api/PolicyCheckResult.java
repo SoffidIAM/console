@@ -9,7 +9,7 @@ import com.soffid.iam.lang.MessageFactory;
 
 public class PolicyCheckResult implements Serializable {
     
-    public static int NUM_ERRORS = 19; 
+    public static int NUM_ERRORS = 20; 
 
     public static PolicyCheckResult VALID = new PolicyCheckResult (0);
     public static PolicyCheckResult TOO_LONG = new PolicyCheckResult (1);
@@ -30,6 +30,7 @@ public class PolicyCheckResult implements Serializable {
     public static PolicyCheckResult CONTAINS_ACCOUNTNAME = new PolicyCheckResult (16);
     public static PolicyCheckResult CONTAINS_NAME = new PolicyCheckResult (17);
     public static PolicyCheckResult MORE_TYPES_OF_CHARS = new PolicyCheckResult (18);
+    public static PolicyCheckResult NOT_YET = new PolicyCheckResult (19);
 
     public int reasonCode;
     public String extraInfo;

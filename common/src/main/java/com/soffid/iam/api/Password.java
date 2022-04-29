@@ -181,25 +181,21 @@ public class Password extends Object implements Serializable {
     }
 
     private String crypt(String source) {
-        char contents[] = source.toCharArray();
+        byte contents[];
+		try {
+			contents = source.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
         byte result[] = new byte[contents.length + 2];
         int b1 = (int) java.lang.Math.floor(256.0 * java.lang.Math.random());
         int b2 = (int) java.lang.Math.floor(256.0 * java.lang.Math.random());
         result[0] = (byte) b1;
         result[1] = (byte) b2;
         int i;
-        // System.out.println ("crypt");
         for (i = 0; i < contents.length; i++) {
             int c = contents[i];
-            // System.out.print ("b1 = ");
-            // System.out.print (b1);
-            // System.out.print (" b2 = ");
-            // System.out.print (b2);
-            // System.out.print (" c = ");
-            // System.out.print (c);
             c = ((c ^ b1) + b2);
-            // System.out.print ("->");
-            // System.out.println (c);
             result[i + 2] = (byte) c;
             b1 = (b1 + b2) % 256;
             b2 = b2 ^ c;
@@ -210,7 +206,7 @@ public class Password extends Object implements Serializable {
     private String uncrypt(String source) {
         // System.out.println ("uncrypt");
         char contents[] = fromBase64(source);
-        char result[] = new char[contents.length - 2];
+        byte result[] = new byte[contents.length - 2];
         int b1 = contents[0];
         int b2 = contents[1];
         int i;
@@ -228,11 +224,15 @@ public class Password extends Object implements Serializable {
             c = (c ^ b1);
             // System.out.print ("->");
             // System.out.println (c);
-            result[i] = (char) c;
+            result[i] = (byte) c;
             b1 = (b1 + b2) % 256;
             b2 = (b2 ^ (int) contents[i + 2]);
         }
-        return new String(result);
+        try {
+			return new String(result, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
     }
 
     public static void main(String args[]) throws NoSuchAlgorithmException,

@@ -1,6 +1,6 @@
 build-job:
   stage: build
-  image: mane:3-jdk-11
+  image: maven:3-jdk-11
   script:
     - mvn clean install
 

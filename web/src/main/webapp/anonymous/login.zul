@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><?page id="login" title="SOFFID IAM login page" ?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
+<?meta http-equiv="X-UA-Compatible" content="IE=Edge" ?>
+<?meta name="viewport" content="width=device-width, initial-scale=1"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
 		<script>
 		function loadTenant() 
@@ -51,7 +53,7 @@
         		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 
 			<div class="loginbox" id="loginbox"> 
 				<p>${c:l('configure.header')}</p>
-				<form method="post" action="j_security_check" id='loginForm' accept-charset="UTF-8" onsubmit="preparesubmit(event)">
+				<form method="post" action="j_security_check" id='loginForm' accept-charset="utf-8" onsubmit="preparesubmit(event)" >
 				<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
 				<input name="j_username" id="j_username" type="hidden" value="${user }">
 				<p style="${tenantStyle }">

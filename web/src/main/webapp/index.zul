@@ -2,6 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page id="index" title="Soffid Identity and Access Manager" ?>
 <?meta http-equiv="X-UA-Compatible" content="IE=Edge" ?>
+<?meta name="viewport" content="width=device-width, initial-scale=1"?>
 <?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
 
 <div xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 

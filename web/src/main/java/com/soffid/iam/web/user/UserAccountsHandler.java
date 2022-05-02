@@ -4,8 +4,6 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Page;
-import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
@@ -25,7 +23,6 @@ import com.soffid.iam.service.ejb.UserService;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;

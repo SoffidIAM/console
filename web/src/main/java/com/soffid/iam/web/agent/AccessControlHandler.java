@@ -281,6 +281,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 					{
 						if (nullCmp (ac.getRoleDescription(), ac2.getRoleDescription()) &&
 							nullCmp (ac.getGenericUser(), ac2.getGenericUser()) &&
+							nullCmp (ac.getProgram(), ac2.getProgram()) &&
 							nullCmp (ac.getRoleId(), ac2.getRoleId()) &&
 							nullCmp (ac.getGenericHost(), ac2.getGenericHost()) ) {
 							unchanged ++;

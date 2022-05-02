@@ -111,8 +111,8 @@
 						  value: system
 						- name: ${c:l('rules.description')}
 						  value: description
-						- name: ${c:l('rules.roleContext')}
-						  value: domain
+						- name: ${c:l('aplicacions.zul.ValordeDomini')}
+						  value: domainValue
 						</attribute>
 						</datatable>
 						<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >

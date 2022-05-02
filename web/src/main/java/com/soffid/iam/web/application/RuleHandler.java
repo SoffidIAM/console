@@ -198,16 +198,17 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 
 		DomainValueField input = (DomainValueField) getWindowAdd().getFellow("domainValues");
 		List<String> domains = (List<String>) input.getValue();
-		DataTable lb = (DataTable) getListbox();
+		Component usersListbox = getListbox();
+		DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(usersListbox, "/ruleAssignedRole");
 		if ( currentRole.getDomain() !=  null && domains != null && ! domains.isEmpty()) {
-			lb.delete();
+			coll.remove(coll.getSize()-1);
 			Long ruleId = (Long) XPathUtils.getValue(getListbox(), "@id");
 			for (String domain: domains) {
 				currentRoleAccount = new RuleAssignedRole();
 				currentRoleAccount.setRoleId(currentRole.getId());
 				currentRoleAccount.setRuleId(ruleId);
 				currentRoleAccount.setDomainValue(domain);
-				DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(getListbox(), "/ruleAssignedRole");				
+				coll.add(currentRoleAccount);
 			}
 		}
 		groupsDataSource.commit();

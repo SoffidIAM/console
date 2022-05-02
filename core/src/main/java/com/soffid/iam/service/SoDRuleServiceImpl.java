@@ -47,6 +47,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -259,6 +260,11 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 						l.add(soDRule);
                 		if (risk == null || isGreater(ruleRisk, risk)) 
                 			risk = ruleRisk;
+                		if (rule.cell != null) {
+                			soDRule.setName(soDRule.getName()+ " "+ 
+                				rule.cell.getRow().getRole().getName()+ " / "+
+                				rule.cell.getColumn().getRole().getName());
+                		}
                 	}
                 }
                 rolAccount.setSodRisk(risk);
@@ -358,6 +364,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                 
                 if (rule.getType() == SodRuleType.MATCH_MATRIX) {
 	                for (SoDRuleMatrixEntity cell : rule.getMatrixCells()) {
+	                	boolean found = false;
 	                    if (cell.getRow().getId().equals(sourceSodRole.getId())) {
 	                        for (RoleGrant rolGrant : rols) {
 	                        	if (rolGrant.getRoleId() != null ?
@@ -367,17 +374,20 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	                        			rolGrant.getSystem().equals(cell.getColumn().getRole().getSystem().getName()):
 	                        			false) 
 								{
+                        			found = true;
 	                            	rules.add(new AppliedRule(rule, cell));
+	                            	break;
 	                            }
 	                        }	                    	
 	                    }
-	                    if (cell.getColumn().getId().equals(sourceSodRole.getId())) {
+	                    if (!found && cell.getColumn().getId().equals(sourceSodRole.getId())) {
 	                        for (RoleGrant rolGrant : rols) {
 	                            if (rolGrant.getRoleId() != null ?
 	                            		rolGrant.getRoleId().equals(cell.getRow().getRole().getId()) :
 	                            			rolGrant.getRoleName().equals(cell.getRow().getRole().getName()) &&
 		                        			rolGrant.getSystem().equals(cell.getRow().getRole().getSystem().getName())) {
 	                            	rules.add(new AppliedRule(rule, cell));
+	                            	break;
 	                            }
 	                        }	                    	
 	                    }
@@ -538,6 +548,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		ViolationHandler h = new ViolationHandler();
 		for (InformationSystemEntity app: getInformationSystemEntityDao().loadAll()) {
 			if (applicationName == null || 
+					applicationName.isEmpty() ||
 					app.getName().equals(applicationName) ||
 					app.getName().startsWith(applicationName+"/")) {
 				h.analyze(applicationName, app, riskLevel);
@@ -548,8 +559,9 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 
 	class ViolationHandler {
 		List<RoleAccount> results = new LinkedList<>();
-		Set<Long> users = new HashSet<>();
-		Set<Long> accounts = new HashSet<>();
+		Map<Long,Collection<RoleAccount>> users = new HashMap<>();
+		Map<Long,Collection<RoleAccount>> accounts = new HashMap<>();
+		HashSet<String> grantids = new HashSet<>();
 		
 		void analyze(String applicationName, InformationSystemEntity app, SoDRisk level) throws InternalErrorException {
 			for (SoDRuleEntity rule: app.getSodRules()) {
@@ -573,17 +585,20 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 								if (grant.getAccount().getType() == AccountType.USER) {
 									for (UserAccountEntity ua: grant.getAccount().getUsers()) {
 										UserEntity user = ua.getUser();
-										if (!users.contains(user.getId())) {
-											users.add(user.getId());
-											Collection<RoleAccount> grants = getApplicationService().findUserRolesByUserName(user.getUserName());
-											filter (applicationName, grants, level);
+										Collection<RoleAccount> grants = users.get(user.getId());
+										if (grants == null) {
+											grants = getApplicationService().findUserRolesByUserName(user.getUserName());
+											users.put(user.getId(), grants);
 										}
+										filter (rule, grants, level );
 									}
 								} else {
-									if (!accounts.contains(grant.getAccount().getId())) {
-										Collection<RoleAccount> grants = getApplicationService().findRoleAccountByAccount(grant.getAccount().getId());
-										filter(applicationName, grants, level);
+									Collection<RoleAccount> grants = accounts.get(grant.getAccount().getId());
+									if (grants == null) {
+										grants = getApplicationService().findRoleAccountByAccount(grant.getAccount().getId());
+										accounts.put(grant.getAccount().getId(), grants);
 									}
+									filter(rule, grants, level);
 								}
 							}
 						}
@@ -592,13 +607,16 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 			}
 		}
 
-		private void filter(String applicationName, Collection<RoleAccount> grants, SoDRisk level) {
+		private void filter(SoDRuleEntity rule, Collection<RoleAccount> grants, SoDRisk level) {
 			for (RoleAccount grant: grants) {
-				if (grant.getSodRisk() == level) {
-					if (applicationName == null ||
-							grant.getInformationSystemName().equals(applicationName) ||
-							grant.getInformationSystemName().startsWith(applicationName+"/"))
-						results.add(grant);
+				String prefix = grant.getUserCode() == null ? "Acc "+grant.getAccountName(): "User "+grant.getUserCode();
+				for (SoDRule rule2: grant.getSodRules()) {
+					if (rule2.getId().equals(rule.getId()) && rule2.getRisk() == level) {
+						if (! grantids.contains(prefix + rule.getName())) {
+							results.add(grant);
+							grantids.add(prefix + rule.getName());
+						}
+					}
 				}
 			}
 		}

@@ -13,37 +13,9 @@
  */
 package com.soffid.iam.model;
 
-import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.MailList;
-import com.soffid.iam.api.MailListRoleMember;
-import com.soffid.iam.api.RoleGrant;
-import com.soffid.iam.model.AuditEntity;
-import com.soffid.iam.model.EmailDomainEntity;
-import com.soffid.iam.model.EmailListContainerEntity;
-import com.soffid.iam.model.EmailListEntity;
-import com.soffid.iam.model.ExternEmailEntity;
-import com.soffid.iam.model.MailListGroupMemberEntity;
-import com.soffid.iam.model.MailListRoleMemberEntity;
-import com.soffid.iam.model.TaskEntity;
-import com.soffid.iam.model.UserEmailEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.model.UserGroupEntity;
-import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.utils.ExceptionTranslator;
-import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.PrincipalStore;
-import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
-import es.caib.seycon.ng.model.*;
-
-import java.security.Principal;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,6 +23,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.MailList;
+import com.soffid.iam.api.MailListRoleMember;
+import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ExceptionTranslator;
+import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconException;
 
 /**
  * @see es.caib.seycon.ng.model.LlistaCorreuEntity
@@ -156,7 +139,12 @@ public class EmailListEntityDaoImpl extends
 
 		String nomLlista = sourceEntity.getName();
 		String codiDomini = sourceEntity.getDomain() == null ? null : sourceEntity.getDomain().getName();
-		targetVO.setLists(findLlistaCompactaLlistesByNomLlistaCorreuAndCodiDomini(nomLlista, codiDomini));
+
+		LinkedList<String> lists = new LinkedList<String>();
+		for (EmailListContainerEntity ue : sourceEntity.getMailListContent()) {
+			lists.add(ue.getContains().getName()+"@"+ue.getContains().getDomain().getName());
+        }
+		targetVO.setLists(lists);
 		
 		targetVO.setExternalList(findLlistaCompactaExternsByNomLlistaCorreuAndCodiDomini(nomLlista, codiDomini));
 

@@ -7,14 +7,18 @@
 package es.caib.seycon.ng.comu;
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.UsuariImpressoraEntity;
+
+@JsonObject(hibernateClass = UsuariImpressoraEntity.class)
 @ValueObject ( translatedName="PrinterUser",
 	 translatedPackage="com.soffid.iam.api")
 public class UsuariImpressora {
-
 	@Attribute(translated = "printer" )
+	@JsonAttribute(hibernateAttribute = "printer.name")
 	public java.lang.String codiImpressora;
 
 	@Attribute(translated = "user" )
+	@JsonAttribute(hibernateAttribute = "user.userName")
 	public java.lang.String codiUsuari;
 
 	@Nullable
@@ -30,6 +34,7 @@ public class UsuariImpressora {
 
 	@Nullable
 	@Attribute(translated = "printerServerName" )
+	@JsonAttribute(hibernateAttribute = "printer.server.name")
 	public java.lang.String nomServidorImpressora;
 
 }

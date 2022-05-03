@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.user.UserPrintersHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<div class="navigation-bar dummy">
+		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+		<menu2>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
+		</menu2>
+	</div>
+	
+	<datatable id="listbox" autocommit="true" 
+		multiselect="true"
+		onMultiSelect="ref:handler.multiSelect"
+		dataPath="${arg.listbox }:/printer" maxheight="70vh" sortColumn="0"
+		onSelect="ref:handler.showDetails" enablefilter="true">
+	<attribute name="columns"><![CDATA[
+- name: ${c:l('usuaris.zul.Impressora') }
+  value: printer
+- name: ${c:l('com.soffid.iam.api.Printer.hostName') }
+  value: printerServerName
+- name: ${c:l('com.soffid.iam.api.Role.enableByDefault') }
+  value: enabledByDefault
+  template: #{enabledByDefault ? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES')}" : "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO')}" }
+	]]></attribute>
+	</datatable>
+
+	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:printer:create')}" >
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false" if="${soffid:isUserInRole('user:printer:delete')}">-</div>
+		<div class="addButton" onClick="ref:handler.addNew">+</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="modify-window"
+		position="center, center" sizable="true"
+		title="${c:l('usuaris.zul.printerDetails')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
+
+		<form id="form" width="100%" dataPath="../listbox:/">
+			<customfield3 label="${c:l('usuaris.zul.Impressora') }" dataType="PRINTER_TYPE" bind="printer" 
+				onChange="ref:handler.changePrinter" required="true" id="printer"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.Role.enableByDefault') }" dataType="BOOLEAN" bind="enabledByDefault"/>
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:handler.closeDetails">
+			</button>
+			<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" 
+				datamodel="${arg.listbox}" 
+				onClick="ref:handler.apply"/>
+		</div>
+	</window>
+	
+	<div style="text-align: right; width: 100%">
+		<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
+			onClick="ref:handler.closePrinters">
+		</button>
+	</div>
+</div>

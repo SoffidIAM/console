@@ -16,24 +16,35 @@ package com.soffid.iam.service;
 import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.api.NetworkAuthorization;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Printer;
 import com.soffid.iam.api.PrinterGroup;
 import com.soffid.iam.api.PrinterUser;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.NetworkEntity;
+import com.soffid.iam.model.NetworkEntityDao;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.PrinterEntityDao;
 import com.soffid.iam.model.PrinterGroupEntity;
+import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserPrinterEntity;
+import com.soffid.iam.model.UserPrinterEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.NetworkServiceImpl;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -45,6 +56,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -304,6 +316,7 @@ public class PrinterServiceImpl extends
             usuariEntity.setLastUserModification(getPrincipal().getName());
             getUserEntityDao().update(usuariEntity); // guardem els canvis
 
+            
             return usuariImpressora;
         } else {
             throw new SeyconAccessLocalException(
@@ -498,5 +511,60 @@ public class PrinterServiceImpl extends
 		return result;
 	}
 
+
+
+	@Override
+	protected AsyncList<PrinterUser> handleFindPrinterUserByTextAndJsonQueryAsync(final String text, final String jsonQuery)
+			throws Exception {
+		final AsyncList<PrinterUser> result = new AsyncList<PrinterUser>();
+		getAsyncRunnerService().run(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					doFindPrinterUserByTextAndJsonQuery(text, jsonQuery, null, null, result);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
+		}, result);
+
+		return result;
+	}
+
+	private PagedResult<PrinterUser> doFindPrinterUserByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize,
+			List<PrinterUser> result) throws Exception {
+		final UserPrinterEntityDao dao = getUserPrinterEntityDao();
+		ScimHelper h = new ScimHelper(PrinterUser.class);
+		h.setPrimaryAttributes(new String[] { "printer", "user"});
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("user.tenant.id");
+
+		h.setGenerator((entity) -> {
+			UserPrinterEntity ne = (UserPrinterEntity) entity;
+			if (ne.isAllowed("user:query"))
+				return dao.toPrinterUser(ne);
+			else 
+				return null;
+		}); 
+		h.search(text, jsonQuery, (Collection) result); 
+		PagedResult<PrinterUser> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
+	}
+	
+
+	@Override
+	protected PagedResult<PrinterUser> handleFindPrinterUserByTextAndJsonQuery(String text, String jsonQuery,
+			Integer start, Integer pageSize) throws Exception {
+		final LinkedList<PrinterUser> result = new LinkedList<PrinterUser>();
+		return doFindPrinterUserByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
+	}
 
 }

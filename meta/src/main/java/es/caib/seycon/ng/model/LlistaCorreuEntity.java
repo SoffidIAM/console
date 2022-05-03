@@ -48,10 +48,10 @@ public abstract class LlistaCorreuEntity {
 	@ForeignKey (foreignColumn="ULC_IDLCO", translated="userMailLists")
 	public java.util.Collection<es.caib.seycon.ng.model.LlistaCorreuUsuariEntity> llistaDeCorreuUsuari;
 
-	@ForeignKey (foreignColumn="LLC_IDLCO1", translated="mailListContent")
+	@ForeignKey (foreignColumn="LLC_IDLCO1", translated="mailListPertain")
 	public java.util.Collection<es.caib.seycon.ng.model.RelacioLlistaCorreuEntity> relacioLlistaCorreuFromConte;
 
-	@ForeignKey (foreignColumn="LLC_IDLCO2", translated="mailListPertain")
+	@ForeignKey (foreignColumn="LLC_IDLCO2", translated="mailListContent")
 	public java.util.Collection<es.caib.seycon.ng.model.RelacioLlistaCorreuEntity> relacioLlistaCorreuFromPertany;
 
 	@Operation(translated="findByName")

@@ -262,4 +262,9 @@ public class UserHandler extends FrameHandler {
 		EJBLocator.getUserService().refreshChanges(user);
 		
 	}
+	
+	public void userPrinters(Event ev) {
+		Window w = (Window) getFellow("printersWindow");
+		w.doHighlighted();
+	}
 }

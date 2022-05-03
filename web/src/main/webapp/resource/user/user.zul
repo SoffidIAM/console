@@ -9,6 +9,7 @@
 <?component name="user_effective_roles" macro-uri="user-effective-roles.zul"?>
 <?component name="user_process" macro-uri="user-process.zul"?>
 <?component name="user_session" macro-uri="user-session.zul"?>
+<?component name="user_printers" macro-uri="user-printers.zul"?>
 
 <?page id="user"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
@@ -72,6 +73,7 @@
 						<div class="navigation-bar">
 							<menu2>
 								<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+								<menu2item image="/img/printer.svg" label="${c:l('seu.impressores') }" id="printersMenu" onClick="ref:frame.userPrinters"/>
 								<menu2item image="/img/menu/audit.svg" label="${c:l('seu.auditoria') }" onClick="ref:frame.audit" if="${soffid:isUserInRole('seu:auditoria:show') }"/>
 								<menu2item image="/img/menu/access-record.svg" label="${c:l('seu.registresaccess') }" onClick="ref:frame.accessLog" if="${soffid:isUserInRole('seu:registreAcces:show') }"/>
 								<menu2item image="/img/refresh.svg" label="${c:l('usuaris.PropagarCanvi') }" onClick="ref:frame.refresh" />
@@ -143,4 +145,7 @@
 		</div>
 	</window>
 
+	<window id="printersWindow" visible="false" title="${c:l('grups.zul.Impressores') }" width="90%" position="top, center" fulfill="../printersMenu.onClick">
+		<user_printers listbox="//user/listbox" id="user_printer"/>
+	</window>
 </frame>

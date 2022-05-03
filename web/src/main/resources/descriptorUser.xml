@@ -96,6 +96,14 @@
 					<parameter value="${instance.userName}"/>
 			</ejb-finder>
 		</finder>
+		<finder name="printer" type="impressora" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findUserPrintersByUserName" >
+				<parameter value="${instance.userName}"/>
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.PrinterUser"> 
+			</new-instance-bean>
+		</finder>
 		<ejb-handler jndi="java:/module/UserService-v2">
 			<insert-method method="create" returnBean="true" >  <!-- user:create -->
 				<parameter value="${instance}"/>
@@ -181,7 +189,7 @@
 	</datanode>
 	
 	<datanode name="impressora">
-		<ejb-handler jndi="java:/java:/module/PrinterService-v2">
+		<ejb-handler jndi="java:/module/PrinterService-v2">
 			<insert-method method="create"  returnBean="true"> <!-- user:printer:create -->
 				<parameter value="${instance}" />
 			</insert-method>

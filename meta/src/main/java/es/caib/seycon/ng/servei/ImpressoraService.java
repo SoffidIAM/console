@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -15,6 +16,7 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Impressora;
+import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.model.GrupEntity;
 
 @Service (translatedName="PrinterService",
@@ -195,4 +197,18 @@ public abstract class ImpressoraService {
 		return null;
 	}
 
+	@Operation(grantees = { roles.printer_query.class })
+	public PagedResult<UsuariImpressora> findPrinterUserByTextAndJsonQuery(
+			@Nullable String text,
+			@Nullable String jsonQuery,
+			@Nullable Integer start, @Nullable Integer pageSize) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.printer_query.class })
+	public AsyncList<UsuariImpressora> findPrinterUserByTextAndJsonQueryAsync(
+			@Nullable String text,
+			@Nullable String jsonQuery) {
+		return null;
+	}
 }

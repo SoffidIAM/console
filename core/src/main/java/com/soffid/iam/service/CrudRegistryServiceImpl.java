@@ -15,6 +15,8 @@ import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.OUType;
+import com.soffid.iam.api.Printer;
+import com.soffid.iam.api.PrinterUser;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.System;
@@ -32,6 +34,8 @@ import com.soffid.iam.service.crud.CrudMailDomainHandler;
 import com.soffid.iam.service.crud.CrudMailListHandler;
 import com.soffid.iam.service.crud.CrudNetworkHandler;
 import com.soffid.iam.service.crud.CrudOUTypeHandler;
+import com.soffid.iam.service.crud.CrudPrinterHandler;
+import com.soffid.iam.service.crud.CrudPrinterUserHandler;
 import com.soffid.iam.service.crud.CrudRoleAccountHandler;
 import com.soffid.iam.service.crud.CrudRoleHandler;
 import com.soffid.iam.service.crud.CrudSystemHandler;
@@ -66,6 +70,8 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(CustomObject.class.getName(), new CrudCustomObjectHandler());
 		registry.put(GroupUser.class.getName(), new CrudGroupUserHandler());
 		registry.put(RoleAccount.class.getName(), new CrudRoleAccountHandler());
+		registry.put(Printer.class.getName(), new CrudPrinterHandler());
+		registry.put(PrinterUser.class.getName(), new CrudPrinterUserHandler());
 	}
 
 	@Override

@@ -30,4 +30,5 @@ public class TypeEnumeration {
 	public String separator = "-";
 	public String dateTimeType = "DT";
 	public String osType = "1T";
+	public String printerType = "PR";
 }

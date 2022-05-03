@@ -59,6 +59,7 @@ import com.soffid.iam.web.component.inputField.MailDomainDataHandler;
 import com.soffid.iam.web.component.inputField.MailListDataHandler;
 import com.soffid.iam.web.component.inputField.NetworkDataHandler;
 import com.soffid.iam.web.component.inputField.OUTypeDataHandler;
+import com.soffid.iam.web.component.inputField.PrinterDataHandler;
 import com.soffid.iam.web.component.inputField.RoleDataHandler;
 import com.soffid.iam.web.component.inputField.UserDataHandler;
 import com.soffid.iam.web.popup.Editor;
@@ -206,7 +207,8 @@ public class InputField3 extends Databox
 								dataType.getType().equals(TypeEnumeration.HOST_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.MAIL_LIST_TYPE) ||
-								dataType.getType().equals(TypeEnumeration.OS_TYPE) )
+								dataType.getType().equals(TypeEnumeration.OS_TYPE) ||
+								dataType.getType().equals(TypeEnumeration.PRINTER_TYPE)  )
 				
 			{
 				if (hideUserName)
@@ -218,6 +220,12 @@ public class InputField3 extends Databox
 				{
 					dataHandler = new UserDataHandler(dataType);
 					setSelectIcon("/img/user.svg");
+					setHyperlink(true);
+				}
+				else if ( dataType.getType().equals(TypeEnumeration.PRINTER_TYPE))
+				{
+					dataHandler = new PrinterDataHandler(dataType);
+					setSelectIcon("/img/printer.svg");
 					setHyperlink(true);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE))

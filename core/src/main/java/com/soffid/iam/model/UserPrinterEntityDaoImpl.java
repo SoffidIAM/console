@@ -221,7 +221,7 @@ public class UserPrinterEntityDaoImpl extends
         if (impressora != null) {
             targetEntity.setPrinter(impressora);
         } else {
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.5") + sourceVO.getPrinter()));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.5"), sourceVO.getPrinter()));
         }
         if (sourceVO.getEnabledByDefault() != null && sourceVO.getEnabledByDefault().booleanValue()) {
             // La que és per defecte te uimOrdre=1 les altres a 2
@@ -230,7 +230,10 @@ public class UserPrinterEntityDaoImpl extends
             Iterator iterator = impressores.iterator();
             while (iterator.hasNext()) {
                 UserPrinterEntity usuariImpressoraEntity = (UserPrinterEntity) iterator.next();
-                usuariImpressoraEntity.setOrder(new Long(2));
+                if (usuariImpressoraEntity.getOrder().longValue() < 2) { 
+	                usuariImpressoraEntity.setOrder(new Long(2));
+	                update(usuariImpressoraEntity);
+                }
             }
             targetEntity.setOrder(new Long(1));
         } else {

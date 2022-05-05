@@ -2566,17 +2566,25 @@ div.addButton, div.deleteButton {
 	height: 40px;
 	width: 40px;
 	background-color: {SKY};
+	background-size: 20px;
 	color: {SKYTEXT};
 	border-radius: 20px;
 	opacity: 0.5;
 	text-align: center;
 	line-height: 40px;
 	cursor: pointer;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+div.addButton {
+	background-image: url(/soffid/img/add-w.svg);
 }
 
 div.deleteButton {
 	float: left;
 	background-color: {SKYDARK};
+	background-image: url(/soffid/img/remove-r.svg);
 }
 
 div.addButton:hover, div.deleteButton:hover {
@@ -2597,7 +2605,7 @@ div.deleteButton:hover {
 
 div.addButton span, div.deleteButton span {
 	vertical-align: middle;
-	display: inline-block;
+	display: none;
 	color: white;
 	font-size: 35px;
 	padding-top: 2px;

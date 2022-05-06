@@ -1,0 +1,10 @@
+build-job:
+  stage: build
+  image: maven:3-jdk-11
+  script:
+    - mvn clean install
+
+deploy-prod:
+  stage: deploy
+  script:
+    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."

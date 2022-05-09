@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
 import java.util.List;
 
 import com.soffid.mda.annotation.*;
@@ -152,4 +153,5 @@ public class Dispatcher {
 	@Nullable
 	@Description("Owner tenant")
 	public String tenant;
+
 }

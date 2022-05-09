@@ -281,6 +281,7 @@ public class DispatcherServiceImpl extends
 		String t = getTaskEntityDao().startVirtualSourceTransaction();
 		try
 		{
+			dispatcher.setTimeStamp(Calendar.getInstance());
 			if (dispatcher.getName().contains("@"))
 				throw new IllegalArgumentException("A target system name should not contain the at (@) sign");
 	    	soffidDispatcher = null;
@@ -526,6 +527,13 @@ public class DispatcherServiceImpl extends
 			getAccessControlEntityDao().create(entity);
 			controlAcces.setId(entity.getId());
 			controlAcces = getAccessControlEntityDao().toAccessControl(entity);
+			Task updateAccessControl = new Task();
+			updateAccessControl.setTransaction("UpdateAccessControl");// Actualització //$NON-NLS-1$
+			updateAccessControl.setTaskDate(Calendar.getInstance());
+			updateAccessControl.setSystemName(controlAcces.getAgentName()); // Només
+			updateAccessControl.setStatus("P");// Posem com a pendent //$NON-NLS-1$
+			TaskEntity tasca = getTaskEntityDao().taskToEntity(updateAccessControl);
+			getTaskEntityDao().create(tasca);
 			updateServers();
 			return controlAcces;
 		}
@@ -548,21 +556,10 @@ public class DispatcherServiceImpl extends
 			// Ací hem de crear la tasca de UpdateAccessControl
 			Task updateAccessControl = new Task();
 			updateAccessControl.setTransaction("UpdateAccessControl");// Actualització //$NON-NLS-1$
-			// de l'usuari
-			// a l'agent
 			updateAccessControl.setTaskDate(Calendar.getInstance());
-			// nomAgent = getAgent().getCodi()
 			updateAccessControl.setSystemName(controlAcces.getAgentName()); // Només
-			// es
-			// genera
-			// la
-			// tasca
-			// al
-			// dispatcher
-			// actual
 			updateAccessControl.setStatus("P");// Posem com a pendent //$NON-NLS-1$
-			TaskEntity tasca = getTaskEntityDao().taskToEntity(
-					updateAccessControl);
+			TaskEntity tasca = getTaskEntityDao().taskToEntity(updateAccessControl);
 			getTaskEntityDao().create(tasca);
 
 			updateServers();

@@ -672,6 +672,8 @@
 	  value: hostName
 	- name: ${c:l('agents.zul.Programa')}
 	  value: program
+	- name: ${c:l('com.soffid.iam.api.User.comments')}
+	  value: comments
 	  ]]> </attribute>
 		  					</datatable>
 							<div width="100%" style="text-align: right"
@@ -703,6 +705,7 @@
 									</radiogroup>
 									<customfield3 dataType="STRING" label="${c:l('controlAcces.zul.Maquines')}" id="host" required="true"/>
 									<customfield3 dataType="STRING" label="${c:l('controlAcces.zul.Programa')}" id="app" required="true"/>
+									<customfield3 dataType="STRING" label="${c:l('com.soffid.iam.api.User.comments')}" id="comments" multiline="true" maxLength="250" required="true"/>
 								</div>
 								<div style="text-align: right; margin: 2em">
 									<button image="/img/undo.svg" label="${c:l('common.undo')}" onClick="ref:accessControl.undoAdd">

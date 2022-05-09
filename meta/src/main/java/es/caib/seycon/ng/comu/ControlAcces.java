@@ -53,4 +53,6 @@ public class ControlAcces {
 	@Attribute(translated = "remoteIp" )
 	public java.lang.String ipsPropagades;
 
+	@Nullable
+	public java.lang.String comments;
 }

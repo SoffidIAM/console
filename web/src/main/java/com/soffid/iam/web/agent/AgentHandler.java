@@ -152,12 +152,12 @@ public class AgentHandler extends FrameHandler {
 	}
 
 	public void verificaControlAcces() {
-		// l'amaguem per defecte
-		setVisibleControlAcces(false);
 
 		// si no pot veure el control d'accés sortim
-		if (!canQueryAccessControlAgent)
+		if (!canQueryAccessControlAgent) {
+			setVisibleControlAcces(false);
 			return;
+		}
 
 		// Ací obtenim el nom de l'agent per veure la seua classe
 		Object elem = XPathUtils.getValue(getListbox(), ".");

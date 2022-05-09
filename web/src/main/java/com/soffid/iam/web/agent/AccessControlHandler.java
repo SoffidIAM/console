@@ -1,8 +1,7 @@
 package com.soffid.iam.web.agent;
 
-import java.awt.event.WindowFocusListener;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -16,29 +15,22 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.ext.AfterCompose;
-import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
-import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessControl;
-import com.soffid.iam.api.Network;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.DispatcherService;
-import com.soffid.iam.service.ejb.NetworkService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.binder.list.ModelProxy;
-import es.caib.zkib.component.DataGrid;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Div;
@@ -47,8 +39,6 @@ import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
-import es.caib.zkib.jxpath.JXPathContext;
-import es.caib.zkib.jxpath.Pointer;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class AccessControlHandler extends Div implements AfterCompose {
@@ -81,6 +71,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 		((CustomField3)w.getFellow("user")).setVisible(true);
 		((CustomField3)w.getFellow("role")).setVisible(false);
 		((CustomField3)w.getFellow("app")).setText("%");
+		((CustomField3)w.getFellow("comments")).setText("");
 		
 		currentAccessControl = null;
 		
@@ -131,11 +122,15 @@ public class AccessControlHandler extends Div implements AfterCompose {
 		if (! f.attributeValidateAll()) return;	
 		acc.setProgram((String) f.getValue());
 		
+		f = ((CustomField3)w.getFellow("comments"));
+		acc.setComments((String) f.getValue());
+
 		DataTable gridControlAccess = (DataTable) getFellow("gridControlAccess");
 		final DataSource dataSource = gridControlAccess.getDataSource();
 		Long id = (Long) XPathUtils.eval(dataSource, "id");
 		acc.setAgentId(id);
 		acc.setAgentName((String) XPathUtils.eval(dataSource, "name"));
+		updateAgentTimestamp();
 		if (currentAccessControl == null) {
 			String path = XPathUtils.createPath(dataSource, "controlAcces", acc);
 			try {
@@ -174,6 +169,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 			((CustomField3)w.getFellow("user")).setVisible(currentAccessControl.getRoleId() == null);
 			((CustomField3)w.getFellow("role")).setVisible(currentAccessControl.getRoleId() != null);
 			((CustomField3)w.getFellow("app")).setText(currentAccessControl.getProgram());
+			((CustomField3)w.getFellow("comments")).setText(currentAccessControl.getComments());
 			w.doHighlighted();
 		}
 		
@@ -229,11 +225,18 @@ public class AccessControlHandler extends Div implements AfterCompose {
 				{"user", Labels.getLabel("agents.zul.Usuari")},
 				{"role", Labels.getLabel("agents.zul.Rol")},
 				{"app", Labels.getLabel("agents.zul.Programa")},
+				{"comments", Labels.getLabel("com.soffid.iam.api.User.comments")},
 		};
 		
 		String title = Labels.getLabel("tenant.zul.import");
 		ImportCsvHandler.startWizard(title, data, this, 
 				parser -> importCsv(parser));
+	}
+	
+	protected void updateAgentTimestamp() {
+		DataTable gridControlAccess = (DataTable) getFellow("gridControlAccess");
+		final DataSource dataSource = gridControlAccess.getDataSource();
+		XPathUtils.setValue(dataSource, "timeStamp", Calendar.getInstance());
 	}
 
 	private void importCsv(CsvParser parser) {
@@ -259,6 +262,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 				String role = m.get("role");
 				String user = m.get("user");
 				String host = m.get("host");
+				String comments = m.get("comments");
 
 				if (app != null && !app.trim().isEmpty())
 				{
@@ -266,6 +270,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 					ac.setProgram(app);
 					ac.setAgentName(agent);
 					ac.setGenericHost(host);
+					ac.setComments(comments);
 					if (role != null && !role.trim().isEmpty()) {
 						Role r = appSvc.findRoleByNameAndSystem(role, agent);
 						if (r == null)
@@ -304,9 +309,11 @@ public class AccessControlHandler extends Div implements AfterCompose {
 			else
 				throw new UiException("Error loading parameter "+m.get("name"), e);
 		}
-		
+
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
 		DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(gridControlAccess.getDataSource(), "controlAcces");
+		updateAgentTimestamp();
+		coll.commit();
 		try {
 			coll.refresh();
 		} catch (Exception e) {

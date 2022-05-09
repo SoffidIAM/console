@@ -44,6 +44,10 @@ public abstract class ControlAccessEntity {
 	@Nullable
 	public java.lang.String ipsPropagades;
 
+	@Column(name="CAC_COMMEN", length = 250)
+	@Nullable
+	public java.lang.String comments;
+
 	@Operation(translated="findByAgentCode")
 	@DaoFinder("select cac from com.soffid.iam.model.AccessControlEntity cac where cac.agent.name=:systemName and cac.agent.tenant.id = :tenantId")
 	public java.util.Collection<es.caib.seycon.ng.model.ControlAccessEntity> findByCodiAgent(

@@ -24,7 +24,7 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 {
 
 	private ApplicationContext applicationContext;
-	private List<CertificateValidationModule> modules = null;
+	private List<CertificateValidationService> modules = null;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
@@ -36,14 +36,15 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 	}
 
 
-	public List<CertificateValidationModule> getModules()
+	public List<CertificateValidationService> getModules()
 	{
 		if (modules == null)
 		{
-			LinkedList<CertificateValidationModule> m = new LinkedList<CertificateValidationModule>();
-			for (String name: applicationContext.getBeanNamesForType(CertificateValidationModule.class))
+			LinkedList<CertificateValidationService> m = new LinkedList<CertificateValidationService>();
+			for (String name: applicationContext.getBeanNamesForType(CertificateValidationService.class))
 			{
-				m.add ((CertificateValidationModule) applicationContext.getBean(name));
+				if (!name.equals("certificateValidationService-v2"))
+					m.add ((CertificateValidationService) applicationContext.getBean(name));
 			}
 			modules = m;
 		}
@@ -64,7 +65,7 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 					throws Exception
 	{
 		LinkedList<X509Certificate> roots = new LinkedList<X509Certificate>();
-		for (CertificateValidationModule module: getModules())
+		for (CertificateValidationService module: getModules())
 		{
 			roots.addAll(module.getRootCertificateList());
 		}
@@ -78,7 +79,7 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 	protected boolean handleValidateCertificate (List<X509Certificate> certs)
 					throws Exception
 	{
-		for (CertificateValidationModule module: getModules())
+		for (CertificateValidationService module: getModules())
 		{
 			if (module.validateCertificate(certs))
 				return true;
@@ -91,12 +92,12 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 	 */
 	@Override
     protected User handleGetCertificateUser(List<X509Certificate> certs) throws Exception {
-		for (CertificateValidationModule module: getModules())
+		for (CertificateValidationService module: getModules())
 		{
 			if (module.validateCertificate(certs))
 				return module.getCertificateUser(certs);
 		}
-		for (CertificateValidationModule module : getModules()) {
+		for (CertificateValidationService module : getModules()) {
             User user = module.getCertificateUser(certs);
             if (user != null) return user;
         }
@@ -110,12 +111,12 @@ public class CertificateValidationServiceImpl extends CertificateValidationServi
 	protected Account handleGetCertificateAccount (List<X509Certificate> certs)
 					throws Exception
 	{
-		for (CertificateValidationModule module: getModules())
+		for (CertificateValidationService module: getModules())
 		{
 			if (module.validateCertificate(certs))
 				return module.getCertificateAccount(certs);
 		}
-		for (CertificateValidationModule module: getModules())
+		for (CertificateValidationService module: getModules())
 		{
 			Account account = module.getCertificateAccount(certs);
 			if (account != null)

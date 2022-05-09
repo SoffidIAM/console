@@ -42,6 +42,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.jxpath.JXPathException;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class UserHandler extends FrameHandler {
@@ -76,6 +77,21 @@ public class UserHandler extends FrameHandler {
 
 	public void onChangeDades() {
 		updateStatus();
+		try {
+			ObjectAttributesDiv oa = (ObjectAttributesDiv) getFellow("userAttributes");
+			boolean ro = oa.isReadonly();
+			boolean ro2;
+			Long id = (Long) XPathUtils.eval(getForm(), "id");
+			String group = (String) XPathUtils.eval(getForm(), "primaryGroup");
+			if (id == null)
+				ro2 = ! Security.isUserInRole(Security.AUTO_USER_CREATE);
+			else 
+				ro2 = ! Security.isUserInRole(Security.AUTO_USER_UPDATE+"/"+group);
+			if (ro != ro2) {
+				oa.setReadonly(ro2);
+				oa.updateMetadata();
+			}
+		} catch (JXPathException e) {}
 	}
 	
 	public void importCsv () throws IOException, CommitException, InternalErrorException, NamingException, CreateException {

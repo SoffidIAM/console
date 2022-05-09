@@ -620,7 +620,7 @@ public abstract class XarxaService {
 	}
 
 
-	@Operation(grantees = { roles.network_all_query.class })
+	@Operation(grantees = { roles.network_all_query.class,roles.Tothom.class })
 	public PagedResult<Xarxa> findNetworkByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
@@ -628,7 +628,7 @@ public abstract class XarxaService {
 		return null;
 	}
 
-	@Operation(grantees = { roles.network_all_query.class })
+	@Operation(grantees = { roles.network_all_query.class,roles.Tothom.class })
 	public AsyncList<Xarxa> findNetworkByTextAndJsonQueryAsync(
 			@Nullable String text,
 			@Nullable String jsonQuery) {

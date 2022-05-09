@@ -52,6 +52,8 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	boolean hidebuiltin;
 	private static final long serialVersionUID = 1L;
 	List<InputField3> fields = new LinkedList<>();
+	String requiredPermissions ;
+	boolean noPermissions;
 	
 	private SingletonBinder binder = new SingletonBinder(this);
 
@@ -180,7 +182,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 							inputField.setBind(att.getName());
 						else
 							inputField.setBind("/attributes[@name='"+att.getName()+"']");
-						inputField.setReadonly(readonly);
+						inputField.setReadonly(readonly || noPermissions);
 						inputField.setOwnerObject(ownerObject);
 						if ( att.getType() == TypeEnumeration.SEPARATOR) {
 							if (section != null && emptySection)
@@ -373,5 +375,28 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	
 	public void setHidebuiltin(boolean hidebuiltin) {
 		this.hidebuiltin = hidebuiltin;
+	}
+
+	
+	public String getRequiredPermissions() {
+		return requiredPermissions;
+	}
+
+	
+	public void setRequiredPermissions(String requiredPermissions) {
+		this.requiredPermissions = requiredPermissions;
+		if (requiredPermissions == null)
+			noPermissions = false;
+		else {
+			noPermissions = true;
+			for (String p: requiredPermissions.split("[, ]+"))
+			{
+				if (Security.isUserInRole(p))
+				{
+					noPermissions = false;
+					break;
+				}
+			}
+		}
 	}
 }

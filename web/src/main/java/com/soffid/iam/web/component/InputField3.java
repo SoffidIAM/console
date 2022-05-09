@@ -112,6 +112,8 @@ public class InputField3 extends Databox
 	private int currentPosition;
 
 	private EventListener listener;
+
+	private boolean noPermissions;
 	
 	public DataType getDataType() {
 		return dataType;
@@ -221,53 +223,65 @@ public class InputField3 extends Databox
 					dataHandler = new UserDataHandler(dataType);
 					setSelectIcon("/img/user.svg");
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_USER_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.PRINTER_TYPE))
 				{
 					dataHandler = new PrinterDataHandler(dataType);
 					setSelectIcon("/img/printer.svg");
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE))
 				{
 					dataHandler = new ApplicationDataHandler(dataType);
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_APPLICATION_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE)) {
 					dataHandler = new CustomObjectDataHandler(dataType);
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole("customObject:query");
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new OUTypeDataHandler(dataType);
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole("organizationalUnit:query");
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new GroupDataHandler(dataType);
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_GROUP_QUERY);
 				} else if ( dataType.getType().equals(TypeEnumeration.HOST_TYPE)) {
 					setSelectIcon("/img/host.svg");
 					dataHandler = new HostDataHandler(dataType);
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_HOST_ALL_QUERY) &&
+							! Security.isUserInRole(Security.AUTO_HOST_ALL_SUPPORT_VNC);
 				} else if ( dataType.getType().equals(TypeEnumeration.ROLE_TYPE)) {
 					dataHandler = new RoleDataHandler(dataType);
 					setSelectIcon("/img/role.svg");
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_ROLE_QUERY);
 				} else if ( dataType.getType().equals(TypeEnumeration.ACCOUNT_TYPE)) {
 					dataHandler = new AccountDataHandler(dataType);
 					setSelectIcon("/img/account.svg");
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_ACCOUNT_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE))
 				{
 					dataHandler = new MailDomainDataHandler(dataType);
 					setSelectIcon("/img/maildomain.svg");
 					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_MAIL_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.MAIL_LIST_TYPE))
 				{
 					dataHandler = new MailListDataHandler(dataType);
 					setHyperlink(true);
 					setSelectIcon("/img/maillist.svg");
+					noPermissions = ! Security.isUserInRole(Security.AUTO_MAIL_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.NETWORK_TYPE))
 				{
@@ -812,14 +826,32 @@ public class InputField3 extends Databox
 		if (dataHandler == null || name == null || name.toString().trim().isEmpty())
 			return null;
 		else {
-			String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
-			String link = dataHandler.followLink(name.toString());
-			if (link != null) {
-				d = "<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>";
-			} else {
-				d = XMLs.encodeAttribute(d);
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
+			try {
+				String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+				String link = dataHandler.followLink(name.toString());
+				if (link != null) {
+					d = "<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>";
+				} else if (d == null) {
+					return "";
+				} else {
+					d = XMLs.encodeAttribute(d);
+				}
+				return d;
+			} catch (Exception e) {
+				noPermissions = true;
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
+				try {
+					String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+					return  d == null ? "" : XMLs.encodeAttribute(d);
+				} finally {
+					Security.nestedLogoff();
+				}
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
 			}
-			return d;
 		}
 	}
 
@@ -827,7 +859,7 @@ public class InputField3 extends Databox
 	public List<String[]> findObjects(String text) throws Throwable {
 		if (currentList != null)
 			currentList.cancel();
-		if ( dataHandler != null) {
+		if ( dataHandler != null && ! noPermissions) {
 			try {
 				currentList = dataHandler.search(text, dataType.getFilterExpression());
 			} catch (Exception e) {
@@ -883,6 +915,8 @@ public class InputField3 extends Databox
 	
 	
 	public void openSelectWindow(Integer position) throws UiException {
+		if (noPermissions)
+			return;
 		if (dataHandler != null)
 		{
 			try {
@@ -1076,7 +1110,7 @@ public class InputField3 extends Databox
 
 	
 	public boolean isReadonly() {
-		return readonly;
+		return readonly || noPermissions;
 	}
 
 	
@@ -1142,5 +1176,14 @@ public class InputField3 extends Databox
 	
 	public void setJavascript(String javascript) {
 		this.javascript = javascript;
+	}
+	
+	protected void refreshValue () {
+		raisePrivileges = true;
+		try {
+			super.refreshValue();
+		} finally {
+			raisePrivileges = false;
+		}
 	}
 }

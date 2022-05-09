@@ -79,7 +79,12 @@ public class MenuParser {
 				if (!found)
 					continue;
 			}
-			r.add(option);
+			// Skip menus with no options
+			if (option.getOptions()  != null && !option.getOptions().isEmpty() ||
+					option.getUrl() != null ||
+					option.getHandler() != null ||
+					option.getExecHandler() != null)
+				r.add(option);
 		}
 		return r;
 	}

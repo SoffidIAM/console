@@ -15,6 +15,7 @@ import org.zkoss.zk.ui.event.Event;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
 import com.soffid.iam.web.user.UserImporter;
@@ -27,6 +28,7 @@ import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.jxpath.JXPathException;
 import es.caib.zkib.jxpath.Variables;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -113,4 +115,5 @@ public class GroupHandler extends FrameHandler {
 				});
 		}
 	}
+	
 }

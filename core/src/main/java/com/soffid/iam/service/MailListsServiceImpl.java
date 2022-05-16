@@ -159,7 +159,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 
 	private void updateUsers(EmailListEntity llistaCorreuEntity, List<String> usersList) throws InternalErrorException {
 		LinkedList<String> l = new LinkedList<String>(fixNull(usersList));
-		for (UserEmailEntity m: llistaCorreuEntity.getUserMailLists()) {
+		for (UserEmailEntity m: new LinkedList<UserEmailEntity>( llistaCorreuEntity.getUserMailLists())) {
 			if (Boolean.TRUE.equals(m.getDisabled())) {
 				// Ignore
 			}

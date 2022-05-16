@@ -230,7 +230,8 @@ public class UserPrinterEntityDaoImpl extends
             Iterator iterator = impressores.iterator();
             while (iterator.hasNext()) {
                 UserPrinterEntity usuariImpressoraEntity = (UserPrinterEntity) iterator.next();
-                if (usuariImpressoraEntity.getOrder().longValue() < 2) { 
+                if (usuariImpressoraEntity.getOrder() == null || 
+                		usuariImpressoraEntity.getOrder().longValue() < 2) { 
 	                usuariImpressoraEntity.setOrder(new Long(2));
 	                update(usuariImpressoraEntity);
                 }

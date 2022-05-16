@@ -11,7 +11,7 @@
 				<label class="etiqueta" id="missatge" multiline="true"
 					value="" style="font-size:120%; color:#cd6155;" />
 			</div>
-			<div style="margin-left:-2px;margin-top:10px;">
+			<div style="margin-left:-2px;margin-top:10px;" id = "techDataDiv">
 				<div sclass="collapser" onClick="ref:errorWindow.showStack" id="collapser" style="vertical-align: bottom">
 					<image src="/img/foldBar.svg" />
 				</div>
@@ -28,11 +28,10 @@
 	<hbox style="margin-left:auto; margin-right:auto; padding:7px;">
 		<button label="${c:l('error.zul.Tancar')}" id="closeButton"
 			onClick="ref:errorWindow.detach" />
-		<button label="${c:l('error.zul.Reinicia')}" id="resetButton"
-			onClick="ref:errorWindow.reset">
-		</button>
-		<button label="${c:l('error.zul.Reinicia')}" id="resetButton2"
-			visible="false" onClick="ref:errorWindow.resetSession">
+		<button label="${c:l('error.notifyAdmin')}" id="notify"
+			onClick="ref:errorWindow.notify" visible="false">
 		</button>
 	</hbox>
+	<textbox visible="false" id="pageimage"/>
+	<textbox visible="false" id="pageurl"/>
 </window>

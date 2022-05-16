@@ -15,6 +15,7 @@
 	<!--  Chrome bug. script tags created on the fly are not loaded -->
 	<script src='~./js/codemirror/java-classes.js' />
 	<script src='/comu/syncserver-classes.js' />
+	<script src="/js/html2canvas.min.js" />
 	
 	<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits"
 	    template="main/application.zul" 

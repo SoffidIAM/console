@@ -9,7 +9,7 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true $MAVEN_CERT_OPTS"
 
 # This template uses jdk8 for verifying and deploying images
-image: maven:3.8.5-openjdk-11
+image: maven:3.6.3-openjdk-11
 stages:
   - verify
   - compile

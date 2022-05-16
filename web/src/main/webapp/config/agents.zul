@@ -678,8 +678,8 @@
 		  					</datatable>
 							<div width="100%" style="text-align: right"
 								if="${canCreateAgent}">
-								<div class="deleteButton" onClick="ref:accessControl.deleteSelected" visible="false">-</div>
-								<div class="addButton" onClick="ref:accessControl.addNew">
+								<div class="deleteButton" onClick="ref:accessControl.deleteSelected" visible="false" if="${soffid:isUserInRole('agent:accessControl:remove') }">-</div>
+								<div class="addButton" onClick="ref:accessControl.addNew"  if="${soffid:isUserInRole('agent:accessControl:create') }">>
 									+
 								</div>
 							</div>

@@ -34,7 +34,7 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 					List<MenuOption> options = currentOptions;
 					if (options == null) {
 						MenuParser menuParser = new MenuParser();
-						options = menuParser.parse("console.yaml");
+						options = menuParser.getMenus("console.yaml");
 					}
 					findMenu (options, term.split(" ,+"), l, false);
 					findMenu (options, term.split(" ,+"), l, true);

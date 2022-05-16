@@ -186,7 +186,6 @@ public class HostHandler extends FrameHandler {
 		}
 	}
 
-	
 	public void getAdminPassword(Event event) throws InternalErrorException, NamingException, CreateException {
 		NetworkService svc = EJBLocator.getNetworkService();
 		

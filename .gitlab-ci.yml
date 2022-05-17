@@ -45,6 +45,8 @@ maven_install:
     - mkdir -p ~/.ssh
     - 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
+    - mkdir "$HOME/.docker"
+    - cp $DOCKER_CONFIG "$HOME/.docker/config.json""
     - mvn install $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
   only:
     variables:
@@ -61,12 +63,14 @@ maven_deploy:
     - mkdir -p ~/.ssh
     - 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
+    - mkdir "$HOME/.docker"
+    - cp $DOCKER_CONFIG "$HOME/.docker/config.json""
     - mvn deploy $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
   rules:
     - when: manual
 
 maven_release:
-  stage: release
+  stage: deploy
   script:
     - 'eval $(ssh-agent -s)'
     - chmod 600 "$GITLAB_SSH_KEY"  "$GITHUB_SSH_KEY"
@@ -86,6 +90,8 @@ maven_release:
     - git remote -v
     - git push gitlab "$CI_COMMIT_BRANCH"
     - git push gitlab --tags
+    - mkdir "$HOME/.docker"
+    - cp $DOCKER_CONFIG "$HOME/.docker/config.json""
     - mvn release:perform $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS -Dgoals=install -DskipTests=true -Darguments="$MAVEN_CERT_OPTS"
   rules:
     - if: $CI_COMMIT_BRANCH == "version-3"

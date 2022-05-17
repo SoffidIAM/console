@@ -45,7 +45,6 @@ maven_install:
     - mkdir -p ~/.ssh
     - 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
-    - dockerd >/var/log/docker.log &
     - mvn install $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
   only:
     variables:

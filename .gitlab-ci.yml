@@ -13,6 +13,7 @@ image: maven:3.6.3-openjdk-11
 stages:
   - verify
   - compile
+  - deploy
   - release
 # Cache downloaded dependencies and plugins between builds.
 # To keep cache across branches add 'key: "$CI_JOB_NAME"'
@@ -33,7 +34,7 @@ verify:
       - $CI_COMMIT_BRANCH == "version-3"
 
 
-mvn_package:
+maven_install:
   stage: compile
   script:
     - 'which ssh-agent'
@@ -48,6 +49,21 @@ mvn_package:
   only:
     variables:
       - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+maven_deploy:
+  stage: deploy
+  script:
+    - 'which ssh-agent'
+    - 'eval $(ssh-agent -s)'
+    - chmod 600 "$GITLAB_SSH_KEY"  "$GITHUB_SSH_KEY"
+    - 'ssh-add "$GITLAB_SSH_KEY"'
+    - 'ssh-add "$GITHUB_SSH_KEY"'
+    - mkdir -p ~/.ssh
+    - 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
+    - mvn deploy $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
+  rules:
+    - when: manual
 
 maven_release:
   stage: release

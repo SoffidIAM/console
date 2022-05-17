@@ -22,70 +22,10 @@
 		</resources>
 		<plugins>
 			<plugin>
-				<groupId>org.codehaus.mojo.jspc</groupId>
-				<artifactId>jspc-maven-plugin</artifactId>
-				<version>2.0-alpha-3</version>
-				<executions>
-					<execution>
-						<id>precompileJsp</id>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<directory>${basedir}/src/main/webapp</directory>
-								<includes>
-									<include>**/*.jsp</include>
-								</includes>
-							</sources>
-							<source />
-							<target>1.8</target>
-						</configuration>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.codehaus.mojo.jspc</groupId>
-						<artifactId>jspc-compiler-tomcat5</artifactId>
-						<version>2.0-alpha-3</version>
-					</dependency>
-					<dependency>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j12</artifactId>
-						<version>1.5.6</version>
-					</dependency>
-					<dependency>
-						<groupId>org.slf4j</groupId>
-						<artifactId>jcl-over-slf4j</artifactId>
-						<version>1.5.6</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>add-sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>target/jsp-source</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
-					<webXml>target/jspweb.xml</webXml>
 					<filteringDeploymentDescriptors>
 						false
 					</filteringDeploymentDescriptors>

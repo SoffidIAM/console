@@ -68,6 +68,9 @@ maven_deploy:
     - mvn deploy $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
   rules:
     - when: manual
+  except:
+    variables: 
+    - $CI_COMMIT_TAG                  # Run this job when a tag is created manually
 
 maven_release:
   stage: deploy
@@ -86,7 +89,7 @@ maven_release:
     - git pull gitlab "$CI_COMMIT_PATH" --no-edit
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
-    - mvn release:prepare $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS --batch-mode
+    - mvn release:prepare $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS --batch-mode --tagNameFormat 'version-${project.version}'
     - git remote -v
     - git push gitlab "$CI_COMMIT_BRANCH"
     - git push gitlab --tags

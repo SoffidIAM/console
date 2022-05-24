@@ -50,6 +50,10 @@ public class DefaultRenderer extends DataTypeRenderer {
 			o.put("value", "parseInt ("+prefix+dt.getName()+")");
 			o.put("className", "statusColumn");
 		}
+		else if (dt.getType() == TypeEnumeration.PASSWORD_TYPE) {
+			o.put("template", "*******");
+			o.put("className", "statusColumn");
+		}
 		else if (dt.getType() == TypeEnumeration.PHOTO_TYPE) {
 			o.put("template", "<img class='small-picture' style='display:${"+prefix+dt.getName()+"?'inline-block':'none'}' "
 					+ "src='data:${"+prefix+dt.getName()+"_contentType};base64,${"+

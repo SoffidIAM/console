@@ -31,7 +31,7 @@ verify:
     - 'mvn $MAVEN_CLI_OPTS verify'
   except:
     variables:
-      - $CI_COMMIT_BRANCH == "version-3"
+      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 
 maven_install:
@@ -57,21 +57,14 @@ maven_deploy:
   script:
     - 'which ssh-agent'
     - 'eval $(ssh-agent -s)'
-    - chmod 600 "$GITLAB_SSH_KEY"  "$GITHUB_SSH_KEY"
-    - 'ssh-add "$GITLAB_SSH_KEY"'
-    - 'ssh-add "$GITHUB_SSH_KEY"'
-    - mkdir -p ~/.ssh
-    - 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
     - mkdir "$HOME/.docker"
     - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
-    - mvn deploy $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
+    - mvn deploy $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS  -Darguments="$MAVEN_CERT_OPTS"
   rules:
-    - when: manual
-  except:
-    variables: 
-    - $CI_COMMIT_TAG                  # Run this job when a tag is created manually
-
+    - if: $CI_COMMIT_TAG == null
+      when: manual
+      
 maven_release:
   stage: deploy
   script:
@@ -89,35 +82,36 @@ maven_release:
     - git pull gitlab "$CI_COMMIT_PATH" --no-edit
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
-    - mvn release:prepare $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS --batch-mode --tagNameFormat 'version-${project.version}'
+    - mvn release:prepare $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS --batch-mode -DtagNameFormat='version-@{project.version}' -DpreparationGoals='install'
     - git remote -v
     - git push gitlab "$CI_COMMIT_BRANCH"
     - git push gitlab --tags
     - mkdir "$HOME/.docker"
     - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
-    - mvn release:perform $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS -Dgoals=install -DskipTests=true -Darguments="$MAVEN_CERT_OPTS"
+    - mvn release:perform $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS -Dgoals=install -DskipTests=true -Darguments="$MAVEN_CERT_OPTS -Dmaven.javadoc.skip=true -Dmaven.test.skip=true"
   rules:
-    - if: $CI_COMMIT_BRANCH == "version-3"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
 
 release:
   stage: release
-  script: 
-    - links=$(
+  script:
+    - mkdir -p target
+    - > 
+      (
+      echo '{"tag_name": "'$CI_COMMIT_TAG'", ' ;
+      echo '"name": "Release '$CI_COMMIT_TAG'", ' ;
+      echo '"assets":{"links": [';
       first="true" ;
       mvn -q -Dexec.executable='echo' -Dexec.args='${project.groupId} ${project.version} ${project.artifactId} ${project.packaging}' exec:exec | 
       while read a b c d ;
-      do
-        if [[ "$first" == "false" ]] ;
-        then 
-          echo ,  ;
-        fi ;
-        first=false ;
-        echo '{"name":"'$c'","url":"https://download.soffid.com/maven/'$(echo $a|sed 's/\./\//g' )/$c/$b/$c-$b.$d'","link_type":"other"}'; 
-      done)
-    - echo $links
-    - "echo wget --header \"JOB-TOKEN: $CI_JOB_TOKEN\" --content-on-error https://gitlab.internal.soffid.com/api/v4/projects/$CI_PROJECT_ID/releases --post-data '{\"tag_name\": \"'$CI_COMMIT_TAG'\", \"name\": \"Release '$CI_COMMIT_TAG'\", \"assets\":{\"links\": ['$links']}, \"description\": \"Automatically created '$EXTRA_DESCRIPTION'\"}' " 
-    - "wget -O - --header \"JOB-TOKEN: $CI_JOB_TOKEN\" --header \"Content-Type: application/json\" --content-on-error https://gitlab.internal.soffid.com/api/v4/projects/$CI_PROJECT_ID/releases --method POST --body-data '{\"tag_name\": \"'$CI_COMMIT_TAG'\", \"name\": \"Release '$CI_COMMIT_TAG'\", \"assets\":{\"links\": ['$links']}, \"description\": \"Automatically created '$EXTRA_DESCRIPTION'\"}' " 
+      do if [[ "$first" == "false" ]] ; then  echo ,  ;  fi ;  first=false ;
+      echo '{"name":"'$c'","url":"https://download.soffid.com/maven/'$(echo $a|sed 's/\./\//g' )/$c/$b/$c-$b.$d'","link_type":"other"}'; 
+      done ;
+      echo ']}, "description": "Automatically created '$EXTRA_DESCRIPTION'"}'
+      ) > target/release.json
+    - cat target/release.json
+    - "wget -O - --header \"JOB-TOKEN: $CI_JOB_TOKEN\" --header \"Content-Type: application/json\" --content-on-error https://gitlab.internal.soffid.com/api/v4/projects/$CI_PROJECT_ID/releases --method POST --body-file=target/release.json" 
   rules: 
      - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
 

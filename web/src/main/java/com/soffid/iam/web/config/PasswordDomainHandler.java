@@ -185,7 +185,7 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 			} else {
 				getFellow("rtempsRenovacio").setVisible(false);
 				getFellow("rduradaMaxima").setVisible(true);
-				getFellow("rduradaMinima").setVisible(false);
+				getFellow("rduradaMinima").setVisible(true);
 				getFellow("rduradaMaximaCaducada").setVisible(true);
 			}
 		}

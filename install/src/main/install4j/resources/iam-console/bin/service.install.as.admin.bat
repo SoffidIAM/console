@@ -33,11 +33,15 @@ if "%OS%" == "Windows_NT" (
 
 pushd %DIRNAME%
 
-CACLS "%DIRNAME%\.." /T /E /G "NT Authority\LocalService:F" 
+MKDIR "%DIRNAME%\..\work" 
+MKDIR "%DIRNAME%\..\temp" 
+
 
 IF NOT EXIST "%DIRNAME%\..\conf\tomee.xml" COPY "%DIRNAME%\..\conf\tomee.xml.template" "%DIRNAME%\..\conf\tomee.xml" 
 IF NOT EXIST "%DIRNAME%\..\conf\server.xml" COPY "%DIRNAME%\..\conf\server.xml.template" "%DIRNAME%\..\conf\server.xml" 
 IF NOT EXIST "%DIRNAME%\..\conf\system.properties" COPY "%DIRNAME%\..\conf\system.properties.template" "%DIRNAME%\..\conf\system.properties" 
+
+CACLS "%DIRNAME%\.." /T /E /C /G "NT Authority\LocalService:F" >NUL: 
 
 :checkUser
 if "x%1x" == "x/service-userx" goto serviceUser

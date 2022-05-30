@@ -176,6 +176,8 @@ public class AgentHandler extends FrameHandler {
 					if (cacActiu != null && cacActiu) { // es boolea
 						setVisibleControlAcces(true);
 						carregaControlAcces();
+					} else {
+						setVisibleControlAcces(false);
 					}
 				}
 

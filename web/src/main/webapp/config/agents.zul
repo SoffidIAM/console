@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?page id="agents" title="Gestió dels Agents"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <?init class="es.caib.seycon.ng.web.CheckPermisos" arg0="agents" ?>
 <?component name="input_dada" macro-uri="/comu/input_dada.zul"?>
 <?component name="input_etiqueta" macro-uri="/comu/input_etiqueta.zul"?>
 <?component name="input_password" macro-uri="/comu/input_password.zul"?>
 <?component name="accountMetadata" macro-uri="/config/agent/account_metadata.zul"?>
-<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml"
 	style="position: relative" use="com.soffid.iam.web.agent.AgentHandler"
@@ -764,7 +764,7 @@
 			- path: header
 			  value: header 
 			- path: log
-			  template: <pre ${"${"}style${"}"}>${"${"}log${"}"}</pre>
+			  template: <pre #{style}>#{log}</pre>
 			  leaf: true
 			  ]]>
 			</attribute>

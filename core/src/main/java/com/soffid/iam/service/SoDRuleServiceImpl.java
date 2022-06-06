@@ -281,7 +281,9 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		targetList = new LinkedList<RoleGrant>();
 		if (rolAccount.getUserCode() == null)
 		{
-			targetList.addAll(getApplicationService().findEffectiveRoleGrantByAccount(rolAccount.getAccountId()));
+			if (rolAccount.getAccountId() != null) {
+				targetList.addAll(getApplicationService().findEffectiveRoleGrantByAccount(rolAccount.getAccountId()));
+			}
 		}
 		else
 		{

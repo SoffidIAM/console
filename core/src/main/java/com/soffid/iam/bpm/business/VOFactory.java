@@ -410,12 +410,14 @@ public class VOFactory {
 			try {
 				process.setVariables(new HashMap<>());
 				TokenVariableMap tvm = instance.getContextInstance().getTokenVariableMap(instance.getRootToken());
-				for (Map.Entry<String,VariableInstance> entry: (Set<Map.Entry<String, VariableInstance>>) tvm.getVariableInstances().entrySet()) {
-					String name = entry.getKey();
-					if ( entry.getValue() instanceof ByteArrayInstance && lightweight) {
-						// Omit
-					} else {
-						process.getVariables().put(name, entry.getValue().getValue());
+				if (tvm != null && tvm.getVariables() != null) {
+					for (Map.Entry<String,VariableInstance> entry: (Set<Map.Entry<String, VariableInstance>>) tvm.getVariableInstances().entrySet()) {
+						String name = entry.getKey();
+						if ( entry.getValue() instanceof ByteArrayInstance && lightweight) {
+							// Omit
+						} else {
+							process.getVariables().put(name, entry.getValue().getValue());
+						}
 					}
 				}
 			} catch (Throwable th) {

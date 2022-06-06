@@ -73,6 +73,7 @@
 				</tabpanel>
 				<tabpanel>
 					<datatable id="ownedRoles" autocommit="false" 
+						use="com.soffid.iam.web.application.GrantDatatable" 
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGranted"
 						multiselect="true"
@@ -106,11 +107,6 @@
   sort: false
   className: selector
   template: <input type="checkbox" title="${c:l('aplica_rolsllista.zul.Mandatory') }" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  className: selector
-  sort: false
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 48px">
@@ -120,6 +116,7 @@
 				</tabpanel>
 				<tabpanel>
 					<datatable id="ownerRoles" autocommit="false" 
+						use="com.soffid.iam.web.application.GrantDatatable" 
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGrantee"
 						multiselect="true"
@@ -153,11 +150,6 @@
   filter: false
   sort: false
   template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  sort: false
-  className: selector
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 48px">
@@ -196,11 +188,6 @@
   sort: false
   filter: false
   template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  sort: false
-  className: selector
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 48px">
@@ -209,7 +196,7 @@
 					</div>
 				</tabpanel>
 				<tabpanel fulfill="roleusersTabe.onSelect">
-					<role_users listbox="../../listbox" />
+					<role_users listbox="../../listbox" readonly="${false }"/>
 				</tabpanel>
 			</tabpanels>
 		</tabbox>

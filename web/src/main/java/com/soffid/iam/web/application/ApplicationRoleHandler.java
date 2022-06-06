@@ -89,6 +89,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	
 	public void showDetails(Event event) {
 		DataNode dn = (DataNode) getListbox().getJXPathContext().getValue("/");
+		currentRole = (Role) dn.getInstance();
 		getWindowModify().doHighlighted();
 		displayRemoveButton(false);
 	}
@@ -360,7 +361,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 				{
 					wizard.next();
 					String currentDomain = (String) getListbox().getJXPathContext().getValue("/@domain");
-					DomainValueField dvf = (DomainValueField) wizardWindow.getFellow("sourceDomainValues");
+					DomainValueField dvf = (DomainValueField) wizardWindow.getFellow("domainValues");
 					if (currentDomain == null)
 					{
 						dvf.setVisible(false);

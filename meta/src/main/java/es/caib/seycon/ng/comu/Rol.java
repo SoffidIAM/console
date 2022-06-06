@@ -54,7 +54,7 @@ public abstract class Rol {
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute="containerRoles.container")
-	@Attribute(hidden = true)
+	@Attribute(hidden = true, defaultValue="new java.util.LinkedList()")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> ownerRoles;
 
 	@Nullable
@@ -63,12 +63,12 @@ public abstract class Rol {
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> ownerGroups;
 
 	@Nullable
-	@Attribute(hidden = true)
+	@Attribute(hidden = true, defaultValue = "new java.util.LinkedList()")
 	@JsonAttribute(hibernateJoin="", hibernateAttribute="containerGroups.group.name")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> granteeGroups;
 
 	@Nullable
-	@Attribute(hidden = true)
+	@Attribute(hidden = true, defaultValue="new java.util.LinkedList()")
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> ownedRoles;
 
 	@Nullable

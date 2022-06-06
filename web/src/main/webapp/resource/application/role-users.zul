@@ -63,7 +63,7 @@
 		</attribute>
 	</datatable>
 
-	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:role:create')}" >
+	<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('user:role:create')}" visible="${!arg.readonly }">
 		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false">-</div>
 		<div class="addButton" onClick="ref:handler.addNew">+</div>
 	</div>

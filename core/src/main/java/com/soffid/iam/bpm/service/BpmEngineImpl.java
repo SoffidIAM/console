@@ -188,6 +188,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 		p = Security.getCurrentUser();
 		if (p == null)
 			return "nobody"; //$NON-NLS-1$
+		else if (p.startsWith("*"))
+			return p.substring(1);
 		else
 			return p;
 	}
@@ -751,7 +753,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				throw new BPMException(
 						Messages.getString("BpmEngineImpl.StartedProcessError"), -1); //$NON-NLS-1$
 			}
-			if (!isInternalService()
+			if (isInternalService()
 					|| business.isUserAuthorized(INITIATOR_ROLE,
 							getUserGroups(), pi.getProcessDefinition())) {
 				startAuthenticationLog(pi.getRootToken());

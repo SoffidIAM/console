@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -21,6 +22,9 @@ public class NavigationBar extends Div implements AfterCompose {
 	String menu = "console.yaml";
 	String lastAction = null;
 	String pageArgs = null;
+	private String path;
+	List<MenuOption> options;
+	private Component firstChild;
 
 	public NavigationBar () {
 		setSclass("navigation-bar");
@@ -29,35 +33,41 @@ public class NavigationBar extends Div implements AfterCompose {
 	@Override
 	public void afterCompose() {
 		Page p = getPage();
-		String path = p.getRequestPath();
+		path = p.getRequestPath();
 		if (pageArgs != null)
 			path = path + "?" + pageArgs;
 		
-		List<MenuOption> options;
 		try {
 			options = new MenuParser().parse(menu);
-			if (fillMenu ( options, path, false ) || fillMenu(options, path, true))
-			{
-				String name = Labels.getLabel("menu.title");				
-				insertBefore(new Label(" > "), getFirstChild());
-				Label label = new Label(name);
-				
-				label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
-				label.setAttribute("target", "");
-				label.setSclass("link");
-				insertBefore(label, getFirstChild());
-			}
-			else 
-			{
-				String name = Labels.getLabel("menu.title");				
-				Label label = new Label(name);
-				label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
-				label.setAttribute("target", "");
-				label.setSclass("link");
-				insertBefore(label, getFirstChild());				
-			}
+			firstChild = getFirstChild();
+			refresh();
 		} catch (IOException | InstantiationException | IllegalAccessException | ClassNotFoundException | JSONException e) {
 			throw new UiException(e);
+		}
+	}
+
+	public void refresh() {
+		while (getFirstChild() != firstChild && getFirstChild() != null)
+			getFirstChild().detach();
+		if (fillMenu ( options, path, false ) || fillMenu(options, path, true))
+		{
+			String name = Labels.getLabel("menu.title");				
+			insertBefore(new Label(" > "), getFirstChild());
+			Label label = new Label(name);
+			
+			label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
+			label.setAttribute("target", "");
+			label.setSclass("link");
+			insertBefore(label, getFirstChild());
+		}
+		else 
+		{
+			String name = Labels.getLabel("menu.title");				
+			Label label = new Label(name);
+			label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
+			label.setAttribute("target", "");
+			label.setSclass("link");
+			insertBefore(label, getFirstChild());				
 		}
 	}
 

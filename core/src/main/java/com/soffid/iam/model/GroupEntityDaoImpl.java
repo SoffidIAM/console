@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -198,21 +199,21 @@ public class GroupEntityDaoImpl extends
 				
 				
 			}
-                        TaskEntity tasque;
-                        tasque = getTaskEntityDao().newTaskEntity();
-                        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-                        tasque.setGroup(grup.getName());
-                        getTaskEntityDao().create(tasque);
-                        if (grup.getDriveServer() != null ? old.getDriveServer() == null || !old.getDriveServer().getId().equals(grup.getDriveServer().getId()) : old.getDriveServer() != null) {
-                            tasque = getTaskEntityDao().newTaskEntity();
-                            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                            tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                            tasque.setFolder(grup.getName());
-                            tasque.setFolderType("G"); //$NON-NLS-1$
-                            getTaskEntityDao().create(tasque);
-                        }
-			auditarGrup("U", grup.getName()); //$NON-NLS-1$
+            TaskEntity tasque;
+            tasque = getTaskEntityDao().newTaskEntity();
+            tasque.setDate(new Timestamp(System.currentTimeMillis()));
+            tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+            tasque.setGroup(grup.getName());
+            getTaskEntityDao().create(tasque);
+            if (grup.getDriveServer() != null ? old.getDriveServer() == null || !old.getDriveServer().getId().equals(grup.getDriveServer().getId()) : old.getDriveServer() != null) {
+                tasque = getTaskEntityDao().newTaskEntity();
+                tasque.setDate(new Timestamp(System.currentTimeMillis()));
+                tasque.setTransaction(TaskHandler.CREATE_FOLDER);
+                tasque.setFolder(grup.getName());
+                tasque.setFolderType("G"); //$NON-NLS-1$
+                getTaskEntityDao().create(tasque);
+            }
+			auditarGrup("S".equals(grup.getObsolete()) ? "D": "U", grup.getName()); //$NON-NLS-1$
 			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
@@ -337,6 +338,10 @@ public class GroupEntityDaoImpl extends
 		String codiPare = sourceVO.getParentGroup();
 		if (codiPare != null && codiPare.trim().compareTo("") != 0) { //$NON-NLS-1$
 			GroupEntity grupPare = findByName(sourceVO.getParentGroup());
+			if (grupPare == null && Boolean.TRUE.equals(sourceVO.getObsolete()) && sourceVO.getEndDate() != null) 
+				grupPare = findByNameAndDate(codiPare, new Date (sourceVO.getEndDate().getTime()-1000));
+			if (grupPare == null && Boolean.TRUE.equals(sourceVO.getObsolete()) && sourceVO.getStartDate() != null) 
+				grupPare = findByNameAndDate(codiPare, sourceVO.getStartDate());
 			if (grupPare == null) {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.3"), codiPare)); //$NON-NLS-1$
 			} else {

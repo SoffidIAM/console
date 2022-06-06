@@ -85,6 +85,19 @@ public abstract class UsuariGrupEntity {
 	 return null;
 	}
 
+	@Operation(translated="findByGroupName")
+	@DaoFinder("select usuariGrup "
+			+ "from com.soffid.iam.model.UserGroupEntity usuariGrup "
+			+ "where usuariGrup.group.name = :groupName and "
+			+ "(usuariGrup.start <= :date or usuariGrup.start = null) and "
+			+ "(usuariGrup.end > :date or usuariGrup.end = null) and "
+			+ "usuariGrup.group.tenant.id = :tenantId "
+			+ "order by usuariGrup.user.userName, usuariGrup.group.name")
+	public java.util.List<es.caib.seycon.ng.model.UsuariGrupEntity> findByCodiGrup(
+		java.lang.String groupName, @Nullable Date date) {
+	 return null;
+	}
+
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 

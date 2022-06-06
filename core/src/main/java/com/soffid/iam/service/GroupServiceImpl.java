@@ -16,6 +16,7 @@ package com.soffid.iam.service;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -132,6 +133,26 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		return Collections.emptyList();
 	}
 
+	protected Collection<Group> handleFindSubgroupsByGroupNameAndDate(String codiGrup, Date d) throws InternalErrorException {
+		if (d == null)
+			return handleFindSubgroupsByGroupName(codiGrup);
+		// Si és administrador d'usuaris els pot llistar tots
+		Collection<GroupEntity> groups = getGroupEntityDao().findByParent(codiGrup, d);
+		if (groups != null) {
+			List<Group> groupsList = filterGroups(groups);
+			Collections.sort(groupsList, new Comparator<Group>() {
+				@Override
+				public int compare(Group o1, Group o2) {
+					return o1.getDescription().compareTo(o2.getDescription());
+				}
+				
+			});
+			return groupsList;
+		}
+
+		return Collections.emptyList();
+	}
+
 	private List<Group> filterGroups(Collection<GroupEntity> groups) throws InternalErrorException {
 		List<Group> groupsList = new LinkedList<Group>();
 		for (GroupEntity groupEntity : groups) {
@@ -202,6 +223,17 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		return null;
 	}
 
+	protected Group handleFindGroupByGroupNameAndDate(java.lang.String codi, Date d) throws java.lang.Exception {
+		if (d == null)
+			return handleFindGroupByGroupName(codi);
+		GroupEntity grupEntity = getGroupEntityDao().findByNameAndDate(codi, d);
+		if (grupEntity != null) {
+			Group grup = getGroupEntityDao().toGroup(grupEntity);
+			return grup;
+		}
+		return null;
+	}
+
 	protected void handleSetSuperGroup(String codiSubGrup, String codiSuperGrup) throws java.lang.Exception {
 		GroupEntity groupEntity  = getGroupEntityDao().findByName(codiSubGrup);
 		if (groupEntity != null && getAuthorizationService().hasPermission(Security.AUTO_GROUP_UPDATE, groupEntity)) {
@@ -226,6 +258,13 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		
 		GroupEntity grupEntity = getGroupEntityDao().groupToEntity(grup);
 		if (grupEntity != null) {
+			if (ConfigurationCache.isHistoryEnabled()) {
+				if (! "S".equals(grupEntity.getObsolete())) {
+					if (grupEntity.getStartDate() == null)
+						grupEntity.setStartDate(new Date());
+					grupEntity.setEndDate(null);
+				}
+			}
 			getGroupEntityDao().create(grupEntity);
 			updateGroupAttributes(grup, grupEntity);
 			return getGroupEntityDao().toGroup(grupEntity);
@@ -238,31 +277,35 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (grupEntity == null) {
 			throw new SeyconException("Group not found: " + grup.getName());
 		}
-//		if (grupEntity.getParent() == null)
-//		{
-//			throw new SeyconException("Cannot remove root (world) group");
-//		}
-
 		for (UserEntity u: grupEntity.getPrimaryGroupUsers())
 		{
 			u.setPrimaryGroup(grupEntity.getParent());
 			getUserEntityDao().update(u);
 		}
-			
+		
 		for (RoleAccountEntity ra: grupEntity.getHoldedRoleAssignments())
 		{
 			ra.setHolderGroup(grupEntity.getParent());
 			getRoleAccountEntityDao().update(ra);
 		}
-
+		
 		for (GroupEntity ch: grupEntity.getChildren())
 		{
 			ch.setParent(grupEntity.getParent());
 			getGroupEntityDao().update(ch);
 		}
-		getGroupEntityDao().remove(grupEntity);
-		
-		
+		if (ConfigurationCache.isHistoryEnabled()) {
+			grupEntity.setObsolete("S");
+			if (grup.getEndDate() != null)
+				grupEntity.setEndDate(grupEntity.getEndDate());
+			else
+				grupEntity.setEndDate(new Date());
+			getGroupEntityDao().update(grupEntity);
+		}
+		else {
+			getGroupEntityDao().remove(grupEntity);
+			
+		}
 	}
 
 	protected Collection<Group> handleFindGroupsByFilter(String codi, String pare, String unitatOfimatica, String descripcio, String tipus, String obsolet) throws Exception {
@@ -352,6 +395,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	protected Group handleUpdate(Group grup) throws Exception {
+		if (ConfigurationCache.isHistoryEnabled()) {
+			GroupEntity old = getGroupEntityDao().load(grup.getId());
+			makeACopy(old, grup);
+		}
 		GroupEntity entity = getGroupEntityDao().groupToEntity(grup);
 		// Check for loops
 		for (GroupEntity e = entity.getParent(); e != null; e = e.getParent()) {
@@ -362,6 +409,43 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		getGroupEntityDao().update(entity);
 		updateGroupAttributes(grup, entity);
 		return getGroupEntityDao().toGroup(entity);
+	}
+
+	protected Group handleCreateHistoric(Group grup) throws Exception {
+		if (ConfigurationCache.isHistoryEnabled() && Boolean.TRUE.equals(grup.getObsolete())) {
+			GroupEntity entity = getGroupEntityDao().groupToEntity(grup);
+			for (GroupEntity e = entity.getParent(); e != null; e = e.getParent()) {
+				if (e == entity) {
+					throw new InternalErrorException("The new parent for group "+grup.getName()+" cannot be "+grup.getParentGroup()+", as it would create a loop");
+				}
+			}
+			getGroupEntityDao().create(entity);
+			updateGroupAttributes(grup, entity);
+			return getGroupEntityDao().toGroup(entity);
+		} else {
+			return handleUpdate(grup);
+		}
+	}
+
+	private void makeACopy(GroupEntity old, Group grup) throws InternalErrorException {
+		if (Boolean.TRUE.equals(grup.getObsolete())) {
+			if (grup.getEndDate() != null)
+				grup.setEndDate(new Date());
+		} else {
+			Group copyObject = getGroupEntityDao().toGroup(old);
+			copyObject.setId(null);
+			if (grup.getStartDate() != null) {
+				copyObject.setEndDate(grup.getStartDate());
+			} else {
+				copyObject.setEndDate(new Date());
+				grup.setStartDate(copyObject.getEndDate());
+			}
+			GroupEntity copy = getGroupEntityDao().groupToEntity(copyObject);
+			copy.setObsolete("S");
+			copy.setEndDate(new Date());
+			getGroupEntityDao().create(copy);
+			updateGroupAttributes(copyObject, copy);
+		}
 	}
 
 	protected void handleAddGroupToUser(String codiUsuari, String codiGrup) throws Exception {
@@ -639,6 +723,31 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		return result.get();
 	}
 
+	protected Collection<GroupUser> handleFindUsersBelongtoGroupByGroupName(String codiGrup, Date date) throws Exception {
+		if (date == null)
+			return handleFindUsersBelongtoGroupByGroupName(codiGrup);
+		AsyncList<GroupUser> result = new AsyncList<GroupUser>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		Collection<UserGroupEntity> usuaris = getUserGroupEntityDao().findByGroupName(codiGrup, date);
+		// Los añadimos al listado anterior
+		for (UserGroupEntity uge : usuaris) {
+			if (result.isCancelled())
+				TimeOutUtils.generateException();
+            if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, uge)) {
+                GroupUser ug = getUserGroupEntityDao().toGroupUser(uge);
+                if (Boolean.TRUE.equals(ug.getPrimaryGroup()))
+                    ug.setInfo(Messages.getString("GroupServiceImpl.PrimaryGroupText"));
+                else
+                	ug.setInfo(Messages.getString("GroupServiceImpl.SecondaryGroupText"));
+                result.add(ug);
+            }
+        }
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
+	}
+
 	private void findGroupUsers(String codiGrup, AsyncList<GroupUser> result) throws InternalErrorException {
 		// Mirem les autoritzacions a nivell de grup per group:user:query
 		Collection usuari = getUserEntityDao().findByPrimaryGroup(codiGrup);
@@ -768,20 +877,55 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected AsyncList<Group> handleFindGroupByTextAndFilterAsync(String text, String filter) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+") and ( not endDate pr )";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+")  and ( not endDate pr )";
+		else if (!q.isEmpty())
+			q = "("+q+")  and ( not endDate pr )";
+		else
+			q = "not endDate pr";
+		return handleFindGroupByJsonQueryAsync(q);
+			
+	}
+
+	@Override
+	protected AsyncList<Group> handleFindGroupHistoryByTextAndFilterAsync(String text, String filter, Date date) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
 		else if ( filter != null && ! filter.trim().isEmpty())
 			q = filter;
-		return handleFindGroupByJsonQueryAsync(q);
-			
+		if (date == null)
+			return handleFindGroupByJsonQueryAsync(q);
+		else {
+			String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
+			final AsyncList<Group> result = new AsyncList<Group>();
+			final String q2 = "("+q+") and (not startDate pr or startDate le \""+s+"\") and"
+					+ "(not endDate pr or endDate ge \""+s+"\")";
+			getAsyncRunnerService().run(new Runnable() {
+				public void run() {
+					try {
+						findByJsonQuery(result, q2, new CriteriaSearchConfiguration());
+					} catch (Exception e) {
+						result.cancel(e);
+					}
+				}
+			}, result);
+			return result;
+		}
 	}
 
 	@Override
 	protected List<Group> handleFindGroupByTextAndFilter(String text, String filter) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
+			q = "("+q+") and ("+filter+") and ( not endDate pr )";
 		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
+			q = "("+filter+")  and ( not endDate pr )";
+		else if (! q.isEmpty())
+			q = "("+q+")  and ( not endDate pr )";
+		else
+			q = "not endDate pr";
 		return handleFindGroupByJsonQuery(q);
 	}
 
@@ -789,7 +933,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected PagedResult<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
+			q = "("+q+") and ("+filter+") and ( not endDate pr )";
 		else if ( filter != null && ! filter.trim().isEmpty())
 			q = filter;
 		return handleFindGroupByJsonQuery(q, first, pageSize);
@@ -798,12 +942,20 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	@Override
 	protected List<Group> handleFindGroupByText(String text) throws Exception {
 		String q = generateQuickSearchQuery(text);
+		if (! q.isEmpty())
+			q = "("+q+")  and ( not endDate pr )";
+		else
+			q = "not endDate pr";
 		return handleFindGroupByJsonQuery(q);
 	}
 	
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAsync(final String text) throws Exception {
 		String q = generateQuickSearchQuery(text);
+		if (! q.isEmpty())
+			q = "("+q+")  and ( not endDate pr )";
+		else
+			q = "not endDate pr";
 		return handleFindGroupByJsonQueryAsync(q);
 	}
 
@@ -876,6 +1028,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected List<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		if (! query.isEmpty())
+			query = "("+query+")  and ( not endDate pr )";
+		else
+			query = "not endDate pr";
 		findByJsonQuery(result, query, new CriteriaSearchConfiguration());
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
@@ -887,6 +1043,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected PagedResult<Group> handleFindGroupByJsonQuery(String query, Integer first, Integer pageSize) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		if (! query.isEmpty())
+			query = "("+query+")  and ( not endDate pr )";
+		else
+			query = "not endDate pr";
 		PagedResult<Group> pr = findByJsonQuery(result, query, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
@@ -901,7 +1061,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					findByJsonQuery(result, query, new CriteriaSearchConfiguration());
+					String q = query;
+					if (! q.isEmpty())
+						q = "("+q+")  and ( not endDate pr )";
+					else
+						q = "not endDate pr";
+					findByJsonQuery(result, q, new CriteriaSearchConfiguration());
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -1092,4 +1257,5 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		pr.setResources(result);
 		return pr;
 	}
+
 }

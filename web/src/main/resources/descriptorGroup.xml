@@ -3,31 +3,27 @@
 <zkib-model>
 
 	<datanode name="groups">
-
 		<finder name="group" type="group" >
 			<ejb-finder jndi="java:/module/GroupService-v2" 
-				method="findGroupByJsonQueryAsync"
+				method="findGroupHistoryByTextAndFilterAsync"
 				if = "${query != null &amp;&amp; query != '' &amp;&amp; synchro == null}">
-				<parameter value="${query}"/>
-			</ejb-finder>
-			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByJsonQuery" 
-				if = "${query != null  &amp;&amp; synchro != null}">
-				<parameter value="${query}"/>
-			</ejb-finder>
-			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = "${textQuery != null  &amp;&amp; textQuery != '' &amp;&amp; synchro == null}">
 				<parameter value="${textQuery}"/>
 				<parameter value="${query}"/>
+				<parameter value="${date}"/>
 			</ejb-finder>
-			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = "${textQuery != null &amp;&amp; synchro != null}">
+			<ejb-finder jndi="java:/module/GroupService-v2" 
+				method="findGroupHistoryByTextAndFilterAsync" 
+				if = "${textQuery != null  &amp;&amp; textQuery != ''}">
 				<parameter value="${textQuery}"/>
 				<parameter value="${query}"/>
+				<parameter value="${date}"/>
 			</ejb-finder>
-			<ejb-finder jndi="java:/module/GroupService-v2" method="findGroupByTextAndFilterAsync" 
-				if = '${(textQuery == null || textQuery == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
+			<ejb-finder jndi="java:/module/GroupService-v2" 
+				method="findGroupHistoryByTextAndFilterAsync" 
+				if = '${(textQuery == null || textQuery == "") &amp;&amp; (query == null || query == "")}'>
 				<parameter value=""/>
 				<parameter value="not parent.name pr"/>
+				<parameter value="${date}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Group"></new-instance-bean>
 		</finder>
@@ -40,9 +36,10 @@
 			<parameter value="${instance.parentGroup}"/>
 		</ejb-parent-loader>
 		<finder name="group" type="group">
-			<ejb-finder jndi="java:/module/GroupService-v2" method="findSubgroupsByGroupName"
+			<ejb-finder jndi="java:/module/GroupService-v2" method="findSubgroupsByGroupNameAndDate"
 				if="canQueryGroup">  <!-- group:query -->
 				<parameter value="${instance.name}" />
+				<parameter value="${date}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Group">
 			</new-instance-bean>

@@ -8,6 +8,7 @@ import org.zkoss.xel.fn.CommonFns;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Host;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -24,6 +25,10 @@ public class ZulFns {
 	 */
 	public static final boolean isUserInRole(String role) {
 		return Security.isUserInRole(role);
+	}
+
+	public static final boolean isHistoryEnabled() {
+		return ConfigurationCache.isHistoryEnabled();
 	}
 
 	public static final boolean isUpdatePending(Account account) {

@@ -11,9 +11,11 @@
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 	
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" id="navigator1">
+				<label id="dateNavigator1" visible="false"/>
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
+					<menu2item image="/img/calendar.svg" label="${c:l('group.changeDate') }" if="${soffid:isHistoryEnabled()}"  onClick="ref:frame.changeDate"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('group:create')}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('group:create') &amp;&amp; soffid:isUserInRole('group:update') &amp;&amp; soffid:isUserInRole('group:delete')}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
@@ -53,7 +55,9 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails" id="navigator2">
+				<label id="dateNavigator2b" value=" &gt; " visible="false"/>
+				<label id="dateNavigator2" sclass="link" onClick="ref:frame.hideDetails" visible="false"/>
 				<pager datatree2="listbox"/>
 				
 				<menu2>
@@ -104,4 +108,20 @@
 			</tabbox>
 		</div>
 	</div>
+	
+	<window id="changeDate" visible="false" title="${c:l('group.changeDate') }" position="top, center" closable="false" 
+		style="width: 60%; min-width: 600px">
+		<label value="${c:l('group.dateExplanation') }" style="display: block; width: 100%; word-break: break-word"/>
+		<div style="padding:48px">
+			<customfield3 dataType="DATE_TIME" id="date" label="${c:l('group.newDate') }" />
+		</div>
+		<div style="width:100%; text-align: right">
+				<button image="/img/calendar-r.svg" label="${c:l('group.today')}" style="float:left" onClick="ref:frame.dateToday"/>
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:frame.closeDate">
+			</button>
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:frame.applyDate"/>
+		</div>
+	</window>
 </frame>

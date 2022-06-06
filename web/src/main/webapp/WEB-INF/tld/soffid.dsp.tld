@@ -23,6 +23,16 @@
 	</function>
 
 	<function>
+		<name>isHistoryEnabled</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>boolean isHistoryEnabled()</function-signature>
+		<description>
+		Checks for history parameter.
+		</description>
+	</function>
+
+
+	<function>
 		<name>isUpdatePending</name>
 		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
 		<function-signature>boolean isUpdatePending(com.soffid.iam.api.Account account)</function-signature>

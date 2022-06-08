@@ -639,7 +639,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		Group g = change.getGroup();
 		Group oldGroup = null;
 		if ( ConfigurationCache.isHistoryEnabled() &&  
-				g.getObsolete().booleanValue() && 
+				(g.getObsolete() != null && g.getObsolete().booleanValue()) && 
 				g.getEndDate() != null && 
 				g.getStartDate() != null) {
 			oldGroup = getGroupService().findGroupByGroupNameAndDate(g.getName(), new Date(g.getEndDate().getTime() - 10));

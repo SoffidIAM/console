@@ -7,6 +7,7 @@ import java.util.List;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.zhtml.S;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.ComponentNotFoundException;
 import org.zkoss.zk.ui.Executions;
@@ -26,7 +27,11 @@ import com.soffid.iam.api.HostPort;
 import com.soffid.iam.api.JumpServerGroup;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordDomain;
+import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.api.Server;
 import com.soffid.iam.api.System;
+import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.service.ejb.AccountService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.component.CustomField3;
@@ -43,6 +48,7 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Wizard;
+import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
@@ -141,7 +147,7 @@ public class DiscoveryHandler extends FrameHandler {
 			if (hasService("389/tcp") && hasService("88/tcp"))
 				values.add("AD: Active directory");
 			else {
-				if (hasService("135/tcp"))
+				if (hasService("137/tcp"))
 					values.add("Windows: Windows local accounts");
 				if (hasService("389/tcp") || hasService("636/tcp"))
 					values.add("LDAP: LDAP Server");
@@ -149,7 +155,7 @@ public class DiscoveryHandler extends FrameHandler {
 		}
 		else if ("LIN".equals( host.getOs()))  {
 			if (hasService("22/tcp"))
-				values.add("Linux local accounts");
+				values.add("Linux: Linux local accounts");
 			if (hasService("389/tcp") || hasService("636/tcp"))
 				values.add("LDAP: LDAP Server");
 		}
@@ -300,7 +306,8 @@ public class DiscoveryHandler extends FrameHandler {
 		Window w = (Window) getFellow("add_system");
 		CustomField3 cf = (CustomField3) w.getFellow("type");
 		Wizard wizard = (Wizard) w.getFellow("wizard");
-		if (cf.getValue().equals("Other")) {
+		final String type = (String) cf.getValue();
+		if (type.equals("Other")) {
 			DataModel model = (DataModel) w.getFellow("model");
 			model.getVariables().declareVariable("className", System.class.getName());
 			wizard.enableStep(1);
@@ -308,6 +315,39 @@ public class DiscoveryHandler extends FrameHandler {
 			wizard.enableStep(2);
 		}
 		wizard.next();
+		CustomField3 instance = (CustomField3) w.getFellow("instance");
+		CustomField3 instanceUrl = (CustomField3) w.getFellow("instanceUrl");
+		if ("Oracle".equalsIgnoreCase(type)) {
+			DataNode dn = (DataNode) XPathUtils.eval(getForm(), "/");;
+			DataNode parentNode = (DataNode) dn.getParent();
+			Host h = (Host) parentNode.getInstance();
+
+			instance.setVisible(false);
+			instanceUrl.setVisible(true);
+			instanceUrl.setValue("jdbc:oracle:thin:@"+ h.getName()+":1521:SID" );
+			
+			final DataModelCollection ports = parentNode.getListModel("port");
+			for (int i = 0; i < ports.getSize(); i++) {
+				DataNode portNode = (DataNode) ports.getDataModel(i);
+				if (portNode != null && !portNode.isDeleted()) {
+					String desc = (String) portNode.get("description");
+					if (desc.toLowerCase().contains("oracle")) {
+						String portNumber = (String) portNode.get("port");
+						if (portNumber.contains("/"))
+							portNumber = portNumber.substring(0, portNumber.indexOf("/"));
+						instanceUrl.setValue("jdbc:oracle:thin:@"+ h.getName()+":"+portNumber+":SID" );
+					}
+				}
+			}
+		}
+		else if ("Postgresql".equalsIgnoreCase(type) ||
+				"SqlServer".equalsIgnoreCase(type)) {
+			instance.setVisible(true);
+			instanceUrl.setVisible(false);			
+		} else {
+			instance.setVisible(false);
+			instanceUrl.setVisible(false);
+		}
 	}
 	
 	public void back(Event event) {
@@ -319,6 +359,7 @@ public class DiscoveryHandler extends FrameHandler {
 			wizard.disableStep(2);
 		}
 	}
+
 	public void linkSystem(Event event) throws Exception {
 		Window w = (Window) getFellow("add_system");
 		Wizard wizard = (Wizard) w.getFellow("wizard");
@@ -334,6 +375,52 @@ public class DiscoveryHandler extends FrameHandler {
 		w.setVisible(false);
 		dn.getListModel("system").refresh();
 		parentNode.getListModel("dispatcherHolder").refresh();
+	}
+	
+	public void applyAddSystem(Event event) throws Exception {
+		Window w = (Window) getFellow("add_system");
+		Wizard wizard = (Wizard) w.getFellow("wizard");
+		
+		CustomField3 cfUser = (CustomField3) w.getFellow("loginName");
+		final String userName = (String) cfUser.getValue();
+		CustomField3 cfPassword = (CustomField3) w.getFellow("password");
+		Password password = (Password) cfPassword.getValue();
+		if (!cfUser.attributeValidateAll() || !cfPassword.attributeValidateAll())
+			return;
+		
+		CustomField3 cf = (CustomField3) w.getFellow("type");
+		CustomField3 instance = (CustomField3) w.getFellow("instance");
+		CustomField3 instanceUrl = (CustomField3) w.getFellow("instanceUrl");
+
+		String type = (String) cf.getValue();
+		String instanceName = null;
+		if (instance.isVisible()) instanceName = (String) instance.getValue();
+		if (instanceUrl.isVisible()) instanceName = (String) instanceUrl.getValue();
+		
+		DataNode dn = (DataNode) XPathUtils.eval(getForm(), "/");;
+		DataNode parentNode = (DataNode) dn.getParent();
+		Host h = (Host) parentNode.getInstance();
+
+		System system = EJBLocator.getNetworkDiscoveryService().createSystemCandidate(h, type, userName, password, instanceName);
+		
+		Thread.sleep(100);
+		
+		try {
+			EJBLocator.getDispatcherService().checkConnectivity( system.getName() );
+		} catch (Exception e) {
+			EJBLocator.getDispatcherService().delete(system);
+			throw e;
+		}
+		w.setVisible(false);
+		dn.getListModel("system").refresh();
+		parentNode.getListModel("dispatcherHolder").refresh();
+		
+		for (ScheduledTask task: EJBLocator.getScheduledTaskService().listTasks()) {
+			if (task.getHandlerName().equals("com.soffid.iam.sync.engine.cron.ReconcileAgentTask") &&
+					task.getParams().equals(system.getId().toString())) {
+				EJBLocator.getScheduledTaskService().startNow(task);
+			}
+		}
 	}
 	
 	public void addEntryPoint(Event event) throws Exception {

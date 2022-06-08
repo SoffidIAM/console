@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Host;
@@ -16,6 +17,7 @@ import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordDomain;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
+import com.soffid.iam.api.Server;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.model.AccountEntity;
@@ -26,6 +28,7 @@ import com.soffid.iam.model.HostServiceEntity;
 import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.NetworkDiscoveryAccountEntity;
 import com.soffid.iam.model.NetworkEntity;
+import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.SystemEntity;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -283,25 +286,99 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 
 
 	@Override
-	protected System handleCreateSystemCandidate(Host host, String type, String userName, Password password)
+	protected System handleCreateSystemCandidate(Host host, String agentType, String userName, Password password, String instance)
 			throws Exception {
+		
+		HostEntity hostEntity = getHostEntityDao().load(host.getId());
+		String url = "local";
+		NetworkEntity network = hostEntity.getNetwork();
+		
+		ServerEntity server = network.getDiscoveryServer();
+		if (server != null)
+			url = server.getUrl();
 		System s = new System();
+		s.setUrl(url);
+		s.setAccessControl(false);
+		s.setAuthoritative(false);
+		s.setDescription( host.getDescription()  );
+		s.setFullReconciliation(false);
+		s.setGenerateTasksOnLoad(false);
 		s.setManualAccountCreation(true);
-		s.setReadOnly(false);
-		s.setDescription(host.getDescription());
-		s.setName(host.getName());
-		s.setFullReconciliation(true);
+		s.setName(agentType+" "+host.getName());
+		if (instance != null && !instance.trim().isEmpty())
+			s.setName(s.getName()+"/"+instance);
+		PasswordDomain pd = EJBLocator.getUserDomainService().findPasswordDomainByName("DEFAULT");
+		if (pd == null) {
+			pd = EJBLocator.getUserDomainService().findAllPasswordDomain().iterator().next();
+		}
+		s.setPasswordsDomain(pd.getName());
+		s.setPasswordsDomainId(pd.getId());
+		UserDomain ud = EJBLocator.getUserDomainService().findUserDomainByName("DEFAULT");
+		if (ud == null) {
+			ud = EJBLocator.getUserDomainService().findAllUserDomain().iterator().next();
+		}
+		s.setUsersDomain(ud.getName());
+		s.setReadOnly(true);
+		s.setRolebased(false);
 		s.setSharedDispatcher(true);
 		s.setTrusted(false);
-		UserDomain ud = getUserDomainService().findUserDomainByName("DEFAULT");
-		if (ud == null)
-			ud  = getUserDomainService().findAllUserDomain().iterator().next();
-		s.setUsersDomain(ud.getName());
-		PasswordDomain pd = getUserDomainService().findPasswordDomainByName("DEFAULT");
-		if (pd == null)
-			pd = getUserDomainService().findAllPasswordDomain().iterator().next();
-		s.setPasswordsDomain(pd.getName());
-		if (type.equalsIgnoreCase("linux")) {
+		if ("AD".equalsIgnoreCase(agentType)) {
+			s.setClassName("com.soffid.iam.sync.agent2.CustomizableActiveDirectoryAgent_v2");
+			s.setSharedDispatcher(false);
+			s.setParam0(host.getName());
+			s.setParam1(host.getName());
+			
+			for (HostPortEntity hp: hostEntity.getPorts()) {
+				if (hp.getPort().equals("tcp/389")) {
+					int t = hp.getDescription().indexOf("Domain: ");
+					if (t > 0) {
+						String dn = hp.getDescription().substring(t+8);
+						if (dn.contains(","))
+							dn = dn.substring(0, dn.indexOf(","));
+						StringBuffer sb = new StringBuffer();
+						for (String part: dn.split("\\.")) {
+							if (sb.length() > 0) sb.append(",");
+							sb.append("dc=");
+							sb.append(part);
+						}
+						s.setParam0(sb.toString());
+					}
+				}
+			}
+			s.setParam2(userName);
+			s.setParam3(password.toString());
+			s.setParam4("false");
+			s.setParam5("false");
+			s.setParam6("");
+			s.setParam7("false");
+			s.setParam8("true");
+			s.setParam9("false");
+		} 
+		else if ("Windows".equalsIgnoreCase(agentType)) {
+			s.setClassName("com.soffid.iam.sync.agent.SimpleWindowsAgent");
+			s.setParam0(userName);
+			s.setParam2(password.toString());
+			s.setParam3(host.getIp());
+			s.setParam4("true"); // only passwords
+			s.setParam7("false"); // debug
+		} 
+		else if ("LDAP".equals(agentType)) {
+			s.setClassName("com.soffid.iam.sync.agent2.CustomizableLDAPAgent");
+			s.setSharedDispatcher(false);
+			s.setParam0(userName);
+			s.setParam1(password.toString());
+			s.setParam2(host.getName());
+			s.setParam8("false"); //debug
+			s.setParam9("false"); //ssl
+			for (HostPortEntity hp: hostEntity.getPorts()) {
+				if (hp.getPort().equals("tcp/636")) {
+					s.setParam9("true");
+				}
+			}
+
+			s.setParam7(instance);
+		} 
+		else if ("Linux".equalsIgnoreCase(agentType)) {
 			s.setClassName("com.soffid.iam.sync.agent.SimpleSSHAgent");
 			s.setParam0(userName);
 			s.setParam2(password.toString());
@@ -309,10 +386,50 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			s.setParam4("true"); // only passwords
 			s.setParam6("UTF-8");
 			s.setParam7("false"); // debug
-			return s;
-		} else {
-			throw new InternalErrorException("Unknown system type ",type);
+		} 
+		else if ("MariaDB".equals(agentType)) {
+			s.setClassName("com.soffid.iam.agent.mariadb.MariadbAgent");
+			s.setParam0(userName);
+			s.setParam1(password.toString());
+			s.setParam2("jdbc:mariadb://"+host.getName()+"/"+instance);
+			s.setParam4("false"); // debug
+		} 
+		else if ("PostgreSQL".equals(agentType)) {
+			s.setClassName("com.soffid.iam.agent.postgresql.PostgresqlAgent");
+			s.setParam0(userName);
+			s.setParam1(password.toString());
+			s.setParam2("jdbc:postgresql://"+host.getName()+"/"+instance);
+			s.setParam4("false"); // debug
+		} 
+		else if ("SQLServer".equals(agentType)) {
+			s.setClassName("com.soffid.iam.agent.sqlserver.SqlServerAgent");
+			s.setParam0(userName);
+			s.setParam1(password.toString());
+			s.setParam2("jdbc:sqlserver://"+host.getName()+";databaseName="+instance);
+			s.setParam3("false"); // multi-instance
+			s.setParam4("false"); // debug
+		} 
+		else if ("Oracle".equals(agentType)) {
+			String n = instance.replace("@", "");
+			int i = n.indexOf("thin:");
+			if (i > 0) n = n.substring(i+5);
+			s.setName("Oracle "+n);
+			s.setClassName("com.soffid.iam.agent.oracle.OracleAgent");
+			s.setParam0(userName);
+			s.setParam1(password.toString());
+			s.setParam2(instance);
+			s.setParam3("true"); // multi-instance
+			s.setParam4("false"); // debug
 		}
+		else {
+			throw new InternalErrorException("Unknown system type "+agentType);
+		}
+		
+		s = getDispatcherService().create(s);
+		
+		handleRegisterHostSystem(host, s);
+		
+		return s;
 	}
 
 

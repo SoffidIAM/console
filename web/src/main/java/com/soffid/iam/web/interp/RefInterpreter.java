@@ -34,28 +34,33 @@ public class RefInterpreter extends GenericInterpreter implements
 		if (script.startsWith("import java.util.*;"))
 			return; // Ignore bsh expression
 		String[] s = script.split("\\.");
-		if ( s.length != 2 ) {
+		if ( s.length > 2 ) {
 			log.warn("Error evaluating expression for component " + getVariable("self") );
 			throw new UiException("Wrong reference script "+script);
 		}
 		Method m;
 		Event event = (Event) getFromNamespace("event");
 		try {
-			Object o = getFromNamespace(s[0]) ;
-			if ( o == null || o == UNDEFINED) {
-				o = null;
-				Component c = event.getTarget();
-				do {
-					c = c.getNamespace().getOwner();
-					if (c == null) break;
-					c = c.getParent();
-					if (c == null) break;
-					o = c.getFellowIfAny(s[0]);
-				} while (o == null);
+			Object o;
+			if (s.length == 1)
+				o = event.getTarget().getSpaceOwner();
+			else {
+				o = getFromNamespace(s[0]) ;
+				if ( o == null || o == UNDEFINED) {
+					o = null;
+					Component c = event.getTarget();
+					do {
+						c = c.getNamespace().getOwner();
+						if (c == null) break;
+						c = c.getParent();
+						if (c == null) break;
+						o = c.getFellowIfAny(s[0]);
+					} while (o == null);
+				}
 			}
 			if (o == null)
 				throw new UiException("Cannot find component "+s[0]);
-			String method = s[1];
+			String method = s[s.length - 1];
 			if (method.contains("("))
 				method = method.substring(0, method.indexOf('('));
 			try {

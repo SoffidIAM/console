@@ -200,7 +200,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						List<String> l = o instanceof List? (List) o: Collections.singletonList(o);
+						Collection<String> l = (Collection<String>) (o instanceof Collection? (Collection) o: Collections.singletonList(o));
 						for (String v: l)
 						{
 							List<CustomObjectAttributeEntity> p = getCustomObjectAttributeEntityDao().findByTypeNameAndValue(entity.getType().getName(), m.getName(), v);

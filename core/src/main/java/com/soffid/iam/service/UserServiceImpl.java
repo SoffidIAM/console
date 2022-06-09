@@ -3389,7 +3389,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
+						Collection<String> l = (Collection<String>) (o instanceof Collection? (Collection) o: Collections.singletonList(o));
 						for (String v: l)
 						{
 							List<UserDataEntity> p = getUserDataEntityDao().findByTypeAndValue(m.getName(), v);

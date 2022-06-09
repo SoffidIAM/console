@@ -732,7 +732,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
+						Collection<String> l = (Collection<String>) (o instanceof Collection? (Collection) o: Collections.singletonList(o));
 						for (String v: l)
 						{
 							List<MailListAttributeEntity> p = getMailListAttributeEntityDao().findByNameAndValue(m.getName(), v);

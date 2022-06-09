@@ -90,6 +90,9 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			Object result = null;
 			if ("S".equals(user.getActive())) //$NON-NLS-1$
 				result = evaluate (rule.getBshExpression(), env);
+			
+			log.info("Rule "+rule.getDescription()+" User "+user.getUserName()+" => "+result);
+			
 			if (result != null && ! (result instanceof Boolean))
 			{
 				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
@@ -108,6 +111,17 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				
 				roles.addAll( raDao.findDelegatedRolAccounts(user.getUserName()));
 			}
+			HashSet<Long> rolesToRemove = new HashSet<Long>();
+			for (RoleAccountEntity role: roles) {
+                if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
+                	if (role.isEnabled() && ( 
+                			role.getEndDate() == null ||
+                			role.getEndDate().after(new Date())))
+                	{
+                		rolesToRemove.add(role.getId());
+                	}
+                }
+			}
 			// Add role if needed
 			if (result != null && ((Boolean) result).booleanValue())
 			{
@@ -125,15 +139,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                     assignRole(rule, roles, user, rar.getRole(), stringValue, method);
                 }
 			}
-			// Now remove unneded roles
+			// Now remove unneeded roles
 			for (RoleAccountEntity role : roles) {
-                if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
-                	if (role.isEnabled() || 
-                			role.getEndDate() == null ||
-                			role.getEndDate().after(new Date()))
-                	{
-                		method.revoke(user, role);
-                	}
+				if (rolesToRemove.contains(role.getId())) {
+               		method.revoke(user, role);
                 }
             }
 		} catch (Exception e) {
@@ -164,6 +173,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 */
 	private void assignRole(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user, 
 			RoleEntity role, String stringValue, RuleEvaluatorGrantRevokeMethod method) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+		log.info(">> Rule "+rule.getDescription()+" User "+user.getUserName()+" >> Granting "+role.getName());
 		// First. Test if role is already assigned
 		for (Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext(); ) {
             RoleAccountEntity ra = it.next();
@@ -180,6 +190,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                 }
             }
             if (match) {
+    			log.info(">> Rule "+rule.getDescription()+" User "+user.getUserName()+" >> Ignoring as it is already granted");
                 it.remove();
                 return;
             }
@@ -246,12 +257,20 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 */
 	@Override
     protected void handleApplyRules(UserEntity user) throws Exception {
+		try {
+			throw new Exception("Applying roles for user "+user.getUserName());
+		} catch (Exception e) {
+			log.warn(e);
+		}
+
+		
 		List<RuleEntity> rules = getRuleEntityDao().loadAll();
 		if (! rules.isEmpty())
 		{
     		InterpreterEnvironment env = new InterpreterEnvironment(user);
     		for (RuleEntity rule: rules)
     		{
+    			log.info("Evaluting rule "+rule.getDescription());
     			doApply (rule, user, env, new ActualUpdateMethod());
     		}
 		}
@@ -259,8 +278,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		for (String name : ctx.getBeanNamesForType(SoffidEventListener.class))
 		{
 			SoffidEventListener bean = (SoffidEventListener) ctx.getBean(name);
-			if (bean != null)
+			if (bean != null) {
+				log.info("Notifying to bean "+name);
 				bean.onUserChange(user);
+			}
 		}
 	}
 

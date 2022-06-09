@@ -885,6 +885,7 @@ public class ApplicationServiceImpl extends
         	ra.setAccountName(account.getName());
         }
         	
+		log.info(">> Granting "+ra.getRoleName()+" to "+ra.getAccountName());
         // Check group holder
         checkGroupHolder (ra);
         // Check for Sod Rules
@@ -894,8 +895,10 @@ public class ApplicationServiceImpl extends
         	if (first)
         		throw new InternalErrorException (String.format(Messages.getString("ApplicationServiceImpl.SoDRuleNotAllowRole") //$NON-NLS-1$
            					, rule.getName()));
-        	else
+        	else {
+        		log.warn(">> SOD Violation "+rule.getName()+" >> Ignoring");
         		skip = true;
+        	}
         }
         if (!skip)
         {
@@ -933,6 +936,7 @@ public class ApplicationServiceImpl extends
 			   					! rg.getDomainValue().getValue().equals( ra.getDomainValue().getValue()))
 			   				continue ;
 			   			else if (rg.isEnabled() && (rg.getEndDate() == null || rg.getEndDate().after(new Date()))) {
+			   				log.info(">> Already granted. Bonding role-account "+ra.getId());
 			   				if (rg.getRule() == null && ra.getRuleId() != null) {
 			   					rg.setRule(getRuleEntityDao().load(ra.getRuleId()));
 			   					getRoleAccountEntityDao().update(rg);
@@ -941,6 +945,7 @@ public class ApplicationServiceImpl extends
 			   			}
 			   			else
 			   			{
+			   				log.info(">> Removing old grant "+ra.getId());
 			   				deleteRoleAccountEntity(rg, null, true);
 			   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
 			   			}
@@ -948,12 +953,14 @@ public class ApplicationServiceImpl extends
 			   		else if (rolsUsuarisEntity.getRole().getInformationSystem() == rg.getRole().getInformationSystem() &&
 			   			Boolean.TRUE.equals(rolsUsuarisEntity.getRole().getInformationSystem().getSingleRole()))
 			   		{
+		   				log.info(">> Application is single-role. Removing old grant "+ra.getRoleName());
 		   				deleteRoleAccountEntity(rg, null, true);
 		   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
 			   		}
 		   		}
 		   	}
 		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);
+			log.info(">> Created role-account "+rolsUsuarisEntity.getId()+" for "+ra);
 		    AccountEntity account = rolsUsuarisEntity.getAccount();
 		    account.getRoles().add(rolsUsuarisEntity);
 		    
@@ -2517,7 +2524,7 @@ public class ApplicationServiceImpl extends
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
+						Collection<String> l = (Collection<String>) (o instanceof Collection? (Collection) o: Collections.singletonList(o));
 						for (String v: l)
 						{
 							List<ApplicationAttributeEntity> p = getApplicationAttributeEntityDao().findByNameAndValue(m.getName(), v);
@@ -2613,7 +2620,7 @@ public class ApplicationServiceImpl extends
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
-						Collection<String> l = o instanceof Collection? (Collection) o: Collections.singletonList(o);
+						Collection<String> l = (Collection<String>) (o instanceof Collection? (Collection) o: Collections.singletonList(o));
 						for (String v: l)
 						{
 							List<RoleAttributeEntity> p = getRoleAttributeEntityDao().findByNameAndValue(m.getName(), v);
@@ -3281,12 +3288,15 @@ public class ApplicationServiceImpl extends
 
 	@Override
 	protected void handleDeleteByRuleEvaluation(RoleAccount rolsUsuaris) throws Exception {
+		log.info("Removing "+rolsUsuaris.getRoleName()+" from "+rolsUsuaris.getAccountName());
         String codiAplicacio = rolsUsuaris.getInformationSystemName();
         // if (esAdministracioPersonal(rolsUsuaris) || esAdministradorUsuaris())
         // {
         RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao().load(rolsUsuaris.getId());
-    	if (rolsUsuarisEntity == null)
+    	if (rolsUsuarisEntity == null) {
+    		log.info(">> Not found => Ignoring");
     		return;
+    	}
     	
         if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_DELETE, rolsUsuarisEntity)) {
 
@@ -3302,6 +3312,7 @@ public class ApplicationServiceImpl extends
                 user = ua.getUser();
             }
             
+    		log.info(">> Removing "+rolsUsuarisEntity.getId());
             deleteRoleAccountEntity(rolsUsuarisEntity, user, false);
             return;
         } 

@@ -1,5 +1,6 @@
 package es.caib.seycon.ng.comu;
 
+import java.util.Date;
 import java.util.Map;
 
 import com.soffid.iam.api.Application;
@@ -18,9 +19,10 @@ public class Grup extends AbstractGrup {
 
 	public Grup(String codi, String descripcio, String quota, String unitatOfimatica, String codiPare, String tipus,
 			String nomServidorOfimatic, Long id, Boolean obsolet, Boolean organitzatiu, String seccioPressupostaria,
+			Date beginDate, Date endDate,
 			Map<String, Object> attributes) {
 		super(codi, descripcio, quota, unitatOfimatica, codiPare, tipus, nomServidorOfimatic, id, obsolet, organitzatiu,
-				seccioPressupostaria, attributes);
+				seccioPressupostaria, beginDate, endDate, attributes);
 	}
 
 	public Grup(String codi, String descripcio) {

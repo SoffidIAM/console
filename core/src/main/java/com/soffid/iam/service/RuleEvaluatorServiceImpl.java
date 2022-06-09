@@ -117,6 +117,17 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				
 				roles.addAll( raDao.findDelegatedRolAccounts(user.getUserName()));
 			}
+			HashSet<Long> rolesToRemove = new HashSet<Long>();
+			for (RoleAccountEntity role: roles) {
+                if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
+                	if (role.isEnabled() && ( 
+                			role.getEndDate() == null ||
+                			role.getEndDate().after(new Date())))
+                	{
+                		rolesToRemove.add(role.getId());
+                	}
+                }
+			}
 			// Add role if needed
 			if (result != null && ((Boolean) result).booleanValue())
 			{
@@ -185,15 +196,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 					}
 				}
 			}
-			// Now remove unneded roles
+			// Now remove unneeded roles
 			for (RoleAccountEntity role : roles) {
-                if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
-                	if (role.isEnabled() || 
-                			role.getEndDate() == null ||
-                			role.getEndDate().after(new Date()))
-                	{
-                		method.revoke(user, role);
-                	}
+				if (rolesToRemove.contains(role.getId())) {
+               		method.revoke(user, role);
                 }
             }
 		} catch (Exception e) {

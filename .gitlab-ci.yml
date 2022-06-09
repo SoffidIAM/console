@@ -48,9 +48,6 @@ maven_install:
     - mkdir "$HOME/.docker"
     - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
     - mvn install $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
-  only:
-    variables:
-      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 maven_deploy:
   stage: deploy

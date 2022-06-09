@@ -9,8 +9,8 @@
 	<artifactId>web-common</artifactId>
 	<name>Web Common classes</name>
 	<properties>
-		<maven.compile.source>1.6</maven.compile.source>
-		<maven.compile.target>1.6</maven.compile.target>
+		<maven.compile.source>1.7</maven.compile.source>
+		<maven.compile.target>1.7</maven.compile.target>
 	</properties>
 
 	<build>

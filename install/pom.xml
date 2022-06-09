@@ -10,8 +10,8 @@
 	<packaging>jar</packaging>
 	<name>install</name>
 	<properties>
-		<maven.compile.source>1.5</maven.compile.source>
-		<maven.compile.target>1.5</maven.compile.target>
+		<maven.compile.source>1.7</maven.compile.source>
+		<maven.compile.target>1.7</maven.compile.target>
 	</properties>
 	<build>
 		<resources>

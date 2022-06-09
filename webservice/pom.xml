@@ -39,7 +39,7 @@
 								</includes>
 							</sources>
 							<source />
-							<target>1.5</target>
+							<target>1.7</target>
 						</configuration>
 					</execution>
 				</executions>

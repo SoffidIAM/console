@@ -29,6 +29,14 @@
   <build>
     <defaultGoal>install</defaultGoal>
     <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>1.7</source>
+            <target>1.7</target>
+          </configuration>
+        </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -147,7 +155,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring</artifactId>
-        <version>1.2.7-soffid-2</version>
+        <version>1.2.7-soffid-3</version>
         <optional>true</optional>
         <exclusions>
           <exclusion>
@@ -480,7 +488,6 @@
     		<module>tomee</module>
     		<module>core</module>
    			<module>web-common</module>
-    		<module>bpm-sar</module>
     		<module>weblogout</module>
     		<module>web</module>
     		<module>selfservice</module>

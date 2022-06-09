@@ -10,7 +10,7 @@
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>3.3.31</version>
+  <version>3.3.32-SNAPSHOT</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>
@@ -24,7 +24,7 @@
   <url>http://www.soffid.com/doc/console/${project.version}</url>
   <scm>
         <connection>scm:git:ssh://git@github.com/SoffidIAM/console.git</connection>
-        <tag>version-3.3.31</tag>
+        <tag>HEAD</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>

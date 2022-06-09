@@ -135,7 +135,6 @@ public class RolAccount {
 	public Long parentGrant;
 
 	@Description("Delegation status")
-	@Column(name="RLU_DELSTA")
 	@Nullable
 	public com.soffid.iam.api.DelegationStatus delegationStatus;
 

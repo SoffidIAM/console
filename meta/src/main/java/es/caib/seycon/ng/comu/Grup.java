@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.Date;
 import java.util.Map;
 
 import com.soffid.mda.annotation.Attribute;
@@ -66,6 +67,14 @@ public abstract class Grup {
 	@Nullable
 	@Attribute(translated = "section", hidden=true )
 	public java.lang.String seccioPressupostaria;
+
+	@Nullable
+	@Attribute(readonly = true)
+	public Date startDate;
+
+	@Nullable
+	@Attribute(readonly = true)
+	public Date endDate;
 
 	@Description ("Group custom attributes")
 	@Nullable

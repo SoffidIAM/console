@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.servei;
 import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +60,11 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	public es.caib.seycon.ng.comu.Grup createHistoric(
+			es.caib.seycon.ng.comu.Grup grup)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		 return null;
+		}
 	@Operation (translated="getGroups")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Grup> getGrups()
@@ -73,6 +79,14 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.group_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Grup findGroupByGroupNameAndDate(
+		java.lang.String codi, @Nullable Date date)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
 	@Operation ( grantees={roles.group_query.class,roles.lopd_query.class},
 			translated="findSubgroupsByGroupName")
 	@Transactional(rollbackFor={java.lang.Exception.class})
@@ -81,6 +95,17 @@ public abstract class GrupService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.group_query.class,roles.lopd_query.class},
+			translated="findSubgroupsByGroupNameAndDate")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.Grup> findSubGrupsByCodiGrupAndDate(
+		java.lang.String codi,
+		@Nullable Date date)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation (translated="removeGroupFormUser", grantees={roles.user_group_delete.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void removeGrupFromUsuari(
@@ -271,6 +296,16 @@ public abstract class GrupService {
 	}
 
 	@Operation ( grantees={roles.group_user_query.class},
+			translated="findUsersBelongtoGroupByGroupName")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<es.caib.seycon.ng.comu.UsuariGrup> findUsuarisPertanyenAlGrupByCodiGrup(
+		java.lang.String codiGrup, @Nullable Date date)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+
+	@Operation ( grantees={roles.group_user_query.class},
 			translated="findUsersBelongtoGroupByGroupNameAsync")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public AsyncList<es.caib.seycon.ng.comu.UsuariGrup> findUsuarisPertanyenAlGrupByCodiGrupAsync(
@@ -361,6 +396,15 @@ public abstract class GrupService {
 	public AsyncList<es.caib.seycon.ng.comu.Grup> findGroupByTextAndFilterAsync(
 			@Nullable String text,
 			@Nullable String filter) {
+		return null;
+	}
+
+	@Operation(grantees = { roles.group_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public AsyncList<es.caib.seycon.ng.comu.Grup> findGroupHistoryByTextAndFilterAsync(
+			@Nullable String text,
+			@Nullable String filter,
+			@Nullable Date date) {
 		return null;
 	}
 

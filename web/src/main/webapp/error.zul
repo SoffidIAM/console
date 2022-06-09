@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <window xmlns:h="http://www.w3.org/1999/xhtml" border="normal"
-	closable="true" id="errorWindow" mode="highlighted"
+	closable="true" mode="highlighted"
 	position="center,center"
 	title="${c:l('error.Titol')} (${c:l('error.Codi')} ${requestScope['javax.servlet.error.status_code']})"
 	width="720px" use="com.soffid.iam.web.error.ErrorHandler">
@@ -12,11 +12,11 @@
 					value="" style="font-size:120%; color:#cd6155;" />
 			</div>
 			<div style="margin-left:-2px;margin-top:10px;" id = "techDataDiv">
-				<div sclass="collapser" onClick="ref:errorWindow.showStack" id="collapser" style="vertical-align: bottom">
+				<div sclass="collapser" onClick="ref:showStack" id="collapser" style="vertical-align: bottom">
 					<image src="/img/foldBar.svg" />
 				</div>
 				<label sclass="etiqueta"
-					value="${c:l('error.zul.Causatper')}" onClick="ref:errorWindow.showStack();" />
+					value="${c:l('error.zul.Causatper')}" onClick="ref:showStack();" />
 			</div>
 			<textbox id="exception" visible="false" readonly="true"
 				rows="10" width="675px" />
@@ -27,9 +27,9 @@
 	<separator bar="true" spacing="10px" />
 	<hbox style="margin-left:auto; margin-right:auto; padding:7px;">
 		<button label="${c:l('error.zul.Tancar')}" id="closeButton"
-			onClick="ref:errorWindow.detach" />
+			onClick="ref:detach" />
 		<button label="${c:l('error.notifyAdmin')}" id="notify"
-			onClick="ref:errorWindow.notify" visible="false">
+			onClick="ref:notify" visible="false">
 		</button>
 	</hbox>
 	<textbox visible="false" id="pageimage"/>

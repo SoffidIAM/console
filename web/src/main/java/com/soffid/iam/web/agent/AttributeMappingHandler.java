@@ -1,6 +1,7 @@
 package com.soffid.iam.web.agent;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
@@ -358,6 +359,9 @@ public class AttributeMappingHandler extends DataGrid {
 				r = r + stringify(k, indent+" ") + ": "+stringify (((Map)obj).get(k), indent+"  ");
 			}
 			return r + "}";
+		}
+		if (obj instanceof byte[]) {
+			return Base64.getEncoder().encodeToString((byte[]) obj);
 		}
 		if (obj.getClass().isArray())
 		{

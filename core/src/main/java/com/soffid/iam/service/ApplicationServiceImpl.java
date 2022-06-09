@@ -1127,8 +1127,11 @@ public class ApplicationServiceImpl extends
 					ProcessInstance pi = ctx.newProcessInstance(app.getApprovalProcess());
 					RoleAccount ra = getRoleAccountEntityDao().toRoleAccount(RoleAccountEntity);
 		            SoDRule rule = getSoDRuleService().isAllowed(ra);
-		            if (rule != null)
+		            if (rule != null) {
 		            	ra.setSodRisk(rule.getRisk());
+		            	ra.setSodRules(new LinkedList<>());
+		            	ra.getSodRules().add(rule);
+		            }
 
 					pi.getContextInstance().createVariable("request", ra);
 					pi.getContextInstance().createVariable("requesterAccount", Security.getCurrentAccount());

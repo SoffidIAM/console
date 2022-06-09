@@ -230,6 +230,16 @@
 					required="true">
 				</customfield3>		
 
+				<customfield3 dataType="STRING" id="instance"
+					label="${c:l('discovery.instance') }"
+					required="true">
+				</customfield3>		
+
+				<customfield3 dataType="STRING" id="instanceUrl"
+					label="${c:l('discovery.instance_url') }"
+					required="true">
+				</customfield3>		
+
 				<div style="text-align: right; width: 100%">
 					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
 						onClick="ref:frame.back" />

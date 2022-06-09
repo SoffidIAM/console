@@ -2000,6 +2000,8 @@ public class DispatcherServiceImpl extends
 		audit.setCalendar(Calendar.getInstance());
 		audit.setCustomObjectType(verb);
 		audit.setCustomObjectName(object);
+		if (object.length() > 100)
+			audit.setCustomObjectName(object.substring(0, 99));
 		audit.setDatabase(dispatcher);
 		getAuditService().create(audit);
 		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);

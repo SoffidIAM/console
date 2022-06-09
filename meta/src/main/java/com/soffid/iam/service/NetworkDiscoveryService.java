@@ -13,6 +13,7 @@ import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.NetworkDiscoveryAccountEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
+import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
@@ -127,5 +128,5 @@ public class NetworkDiscoveryService {
 
 	@Description("Generates a candidate system definiton")
 	@Operation (grantees= {networkDiscovery_schedule.class})
-	Dispatcher createSystemCandidate(Maquina host, String type, String userName, Password password) { return null; }
+	Dispatcher createSystemCandidate(Maquina host, String type, String userName, Password password, @Nullable String instance) { return null; }
 }

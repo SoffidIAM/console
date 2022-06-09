@@ -85,6 +85,7 @@ public class RolGrant {
 	public String holderGroup;
 	
 	@Nullable
+	@Attribute(defaultValue = "com.soffid.iam.api.RoleDependencyStatus.STATUS_TOAPPROVE")
 	public RoleDependencyStatus status;
 	
 	@Description("True if the role is always granted. False if role grant is optional, and thus can be removed from user entitlements form")

@@ -210,7 +210,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	{
 		java.util.Date now = new java.util.Date();
 		String approvalProcess = role.getInformationSystem().getRoleDefinitionProcess();
-		if (approvalProcess == null || approvalProcess.trim().isEmpty())
+		if (Security.isUserInRole("internal:recertification-process")) {
+			return true; 
+		}
+		else if (approvalProcess == null || approvalProcess.trim().isEmpty())
 		{
 			if (role.getApprovalStart() == null ||
 					now.getTime() - role.getApprovalStart().getTime() > 2000) // Updated more than 2 secons ago
@@ -299,8 +302,8 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
 		{
-			deleteRolDependency(grantEntity);
-			entity.getContainerRoles().remove (grantEntity);
+			if (deleteRolDependency(grantEntity))
+				entity.getContainerRoles().remove (grantEntity);
 		}
 	}
 	 
@@ -368,9 +371,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		}
 		for ( RoleDependencyEntity grantEntity: currentGrants)
 		{
-			deleteRolDependency(grantEntity);
 			anyChange = true;
-			entity.getContainedRoles().remove (grantEntity);
+			if (deleteRolDependency(grantEntity)) 
+				entity.getContainedRoles().remove (grantEntity);
 		}
 		return anyChange;
 	}
@@ -460,7 +463,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 		getRoleGroupEntityDao().remove(entity);
 	}
 	
-	private void deleteRolDependency(RoleDependencyEntity entity) throws InternalErrorException, BPMException {
+	private boolean deleteRolDependency(RoleDependencyEntity entity) throws InternalErrorException, BPMException {
         RoleEntity ownerRole = entity.getContainer();
         
         // Delete a not approved yet role or no approval is needed
@@ -472,9 +475,11 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         	if (Hibernate.isInitialized(entity.getContainer().getContainedRoles()))
         		entity.getContainer().getContainerRoles().remove(entity);
         	getRoleDependencyEntityDao().remove(entity);
+        	return true;
         } else {
         	entity.setStatus(RoleDependencyStatus.STATUS_TOREMOVE);
         	getRoleDependencyEntityDao().update(entity);
+        	return false;
         }
 	}
 

@@ -11,7 +11,7 @@
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 	
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" visible="${!embed}">
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('role:create')}"  onClick="ref:frame.addNew"/>
@@ -37,7 +37,7 @@
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 
-			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('application:create')}" >
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('application:create')}" visible="${!readonly }">
 				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>
@@ -45,7 +45,7 @@
 		
 		<div sclass="card__face card__face--back" use="com.soffid.iam.web.application.ApplicationRoleHandler"
 			id="handler">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"  lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"  lastAction="ref:frame.hideDetails" visible="${!embed }">
 				<pager datatable="listbox"/>
 				<databutton image="/img/trash.svg" onlyIcon="true"
 						 if="${soffid:isUserInRole('user:group:delete')}" 
@@ -70,11 +70,13 @@
 						<form id="form" width="100%" dataPath="listbox:/">
 							<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
 								id="attributes"
-								objectType="com.soffid.iam.api.Role" dataPath="/." />
+								objectType="com.soffid.iam.api.Role" dataPath="/." 
+								readonly="${readonly }"/>
 						</form>
 					</tabpanel>
 					<tabpanel>
-						<datatable id="ownedRoles" autocommit="false" 
+						<datatable id="ownedRoles" autocommit="false"
+							use="com.soffid.iam.web.application.GrantDatatable" 
 						    sclass="datatable roleGrant"
 						    onSetMandatory="ref:handler.setMandatoryGranted"
 							multiselect="true"
@@ -107,20 +109,16 @@
   sort: false
   className: selector
   template: <input type="checkbox" title="${c:l('aplica_rolsllista.zul.Mandatory') }" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  className: selector
-  sort: false
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 						]]></attribute>
 						</datatable>
-						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px" visible="${! readonly }">
 							<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 							<div style="float: right"  class="addButton" onClick="ref:handler.addNewGranted">+</div>
 						</div>
 					</tabpanel>
 					<tabpanel>
 						<datatable id="ownerRoles" autocommit="false" 
+							use="com.soffid.iam.web.application.GrantDatatable" 
 						    sclass="datatable roleGrant"
 						    onSetMandatory="ref:handler.setMandatoryGrantee"
 						    onRemove="ref:handler.removeGrantee"
@@ -154,14 +152,9 @@
   filter: false
   sort: false
   template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  sort: false 
-  className: selector
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 						]]></attribute>
 						</datatable>
-						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px" visible="${!readonly }">
 							<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 							<div style="float: right"  class="addButton" onClick="ref:handler.addNewGrantee">+</div>
 						</div>
@@ -197,24 +190,19 @@
   sort: false
   filter: false
   template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  sort: false
-  className: selector
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 						</datatable>
-						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
+						<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px" visible="${!readonly }">
 							<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>
 							<div style="float: right"  class="addButton" onClick="ref:handler.addNewGroup">+</div>
 						</div>
 					</tabpanel>
 					<tabpanel fulfill="roleusersTabe.onSelect">
-						<role_users listbox="../listbox" />
+						<role_users listbox="../listbox" readonly="${readonly }"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>
-			<div style="width: 100%">
+			<div style="width: 100%" visible="${!readonly }">
 				<button label="${c:l('rules.preview')}" onClick="ref:handler.preview">
 				</button>
 				<div style="text-align: right; width: 100%">
@@ -265,6 +253,7 @@
 				</tabpanel>
 				<tabpanel>
 					<datatable id="ownedRoles" autocommit="false" 
+						use="com.soffid.iam.web.application.GrantDatatable" 
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGranted"
 					    onRemove="ref:handler.removeGranted"
@@ -295,9 +284,6 @@
   value: mandatory
   filter: false
   template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
@@ -307,6 +293,7 @@
 				</tabpanel>
 				<tabpanel>
 					<datatable id="ownerRoles" autocommit="false" 
+						use="com.soffid.iam.web.application.GrantDatatable" 
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGrantee"
 					    onRemove="ref:handler.removeGrantee"
@@ -337,9 +324,6 @@
   value: mandatory
   filter: false
   template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">
@@ -375,9 +359,6 @@
   value: mandatory
   filter: false
   template: <input type="checkbox" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-- name: ""
-  filter: false
-  template: <button type="button" class="icon-button" onClick="zkDatatable.sendClientAction(this, 'onRemove')"> <img src="${execution.contextPath }/img/trash.svg"> </button>
 					]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 40px">

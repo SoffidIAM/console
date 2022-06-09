@@ -89,8 +89,7 @@ public class UserDomainHandler extends FrameHandler implements AfterCompose {
 	}
 
 	public void onChangeType(Event event) {
-		DataNode registre = (DataNode) XPathUtils.getValue(getForm(), "/");
-		UserDomain ud = (UserDomain) registre.getInstance();
+		UserDomain ud = (UserDomain) XPathUtils.eval(getForm(), "/instance");
 
 		Select select = (Select) event.getTarget(); 
 		TipusDominiUsuariEnumeration type = (TipusDominiUsuariEnumeration) select.getSelectedValue();
@@ -121,7 +120,8 @@ public class UserDomainHandler extends FrameHandler implements AfterCompose {
 	}
 	
 	public void scriptHelp() {
-		Executions.getCurrent().sendRedirect("https://confluence.soffid.com/display/SOF/Account+naming+rules+script", "_blank");
+		Executions.getCurrent().sendRedirect("https://confluence.soffid.com/display/SOF/Account+naming+rules+script", 
+				"_blank");
 	}
 	
 	public void export () throws IOException, InternalErrorException, NamingException, CreateException {

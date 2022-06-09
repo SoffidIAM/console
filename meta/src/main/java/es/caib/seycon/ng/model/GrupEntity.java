@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.model;
 import java.util.Collection;
+import java.util.Date;
 
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
@@ -83,6 +84,14 @@ public abstract class GrupEntity {
 	@Nullable
 	public java.lang.String organitzatiu;
 
+	@Column (name="GRU_STADAT")
+	@Nullable
+	public Date startDate;
+
+	@Column (name="GRU_ENDDAT")
+	@Nullable
+	public Date endDate;
+
 	@Column (name="GRU_TEN_ID")
 	TenantEntity tenant;
 	
@@ -110,16 +119,27 @@ public abstract class GrupEntity {
 	
 	
 	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.parent.name = :parent "
-			+ "and grup.tenant.id = :tenantId "
+			+ "and grup.tenant.id = :tenantId and grup.obsolete = 'N' "
 			+ "order by grup.name")
 	@Operation(translated="findByParent")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findSubGrupsByCodi(
 		java.lang.String parent) {
 	 return null;
 	}
+
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.parent.name = :parent "
+			+ "and grup.tenant.id = :tenantId and "
+			+ "(grup.startDate <= :d or grup.startDate = null) and (grup.endDate = null or grup.endDate > :d) "
+			+ "order by grup.name")
+	@Operation(translated="findByParent")
+	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findByParentAndDate(
+		java.lang.String parent, @Nullable Date d) {
+	 return null;
+	}
+
 	@Operation(translated="findByType")
 	@DaoFinder("from com.soffid.iam.model.GroupEntity grup where grup.unitType.name = :unitType and "
-			+ "grup.unitType.tenant.id = :tenantId "
+			+ "grup.unitType.tenant.id = :tenantId and grup.obsolete='N' "
 			+ "order by grup.name")
 	public java.util.List<es.caib.seycon.ng.model.GrupEntity> findGrupsByTipus(
 		java.lang.String unitType) {
@@ -136,12 +156,23 @@ public abstract class GrupEntity {
 	@Operation(translated="findByName")
 	@DaoFinder("from com.soffid.iam.model.GroupEntity grup "
 			+ "where grup.name = :name and "
-			+ "grup.tenant.id = :tenantId "
+			+ "grup.tenant.id = :tenantId and grup.obsolete='N' "
 			+ "order by grup.name")
 	public es.caib.seycon.ng.model.GrupEntity findByCodi(
 		java.lang.String name) {
 	 return null;
 	}
+
+	@DaoFinder("from com.soffid.iam.model.GroupEntity grup "
+			+ "where grup.name = :name and "
+			+ "grup.tenant.id = :tenantId and grup.obsolete='N' and "
+			+ "(grup.startDate <= :d or grup.startDate = null) and (grup.endDate = null or grup.endDate > :d) "
+			+ "order by grup.name")
+	public es.caib.seycon.ng.model.GrupEntity findByNameAndDate(
+		java.lang.String name, @Nullable Date d) {
+	 return null;
+	}
+
 	@Operation(translated="findByCriteria")
 	@DaoFinder("select grup "
 			+ "from com.soffid.iam.model.GroupEntity grup "
@@ -197,7 +228,7 @@ public abstract class GrupEntity {
 	}
 
 	@DaoFinder("select grup.parent from com.soffid.iam.model.GroupEntity grup "
-			+ "where grup.name = :groupName and grup.tenant.id = :tenantId")
+			+ "where grup.name = :groupName and grup.obsolete = 'N' and grup.tenant.id = :tenantId")
 	@Operation(translated="findByChild")
 	public es.caib.seycon.ng.model.GrupEntity getSuperGrup(
 		java.lang.String groupName) {
@@ -252,9 +283,7 @@ public abstract class GrupEntity {
 }
 
 
-@Index (name="GRU_UK_CODI",	unique=true,
-entity=es.caib.seycon.ng.model.GrupEntity.class,
-columns={"GRU_TEN_ID", "GRU_CODI"})
+@Index (name="GRU_UK_CODI",	unique=false, entity=es.caib.seycon.ng.model.GrupEntity.class, columns={"GRU_TEN_ID", "GRU_CODI"})
 abstract class GrupIndex {
 }
 

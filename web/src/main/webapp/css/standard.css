@@ -743,6 +743,12 @@ div.menubar td {
 	border: none;
 }
 
+tr.nocheck td.menu1,
+tr.nocheck td.menu1ck {
+	background-image: none;
+	
+}
+
 td.menu1ck {
 	padding-right: 6px;
 	background-image: url('../zkau/web/img/checked.gif');
@@ -1321,7 +1327,8 @@ button:hover:disabled, input[type="button"]:hover:disabled, input[type="submit"]
 	border-color: white
 }
 
-button img {
+button img,
+div.menupopup tr td img {
 	height: 20px;
 	vertical-align: bottom;
 }
@@ -2145,6 +2152,7 @@ div.datatable.fixedlayout table {
 
 div.datatable table.tbody tr td.minicolumn {
 	width: 25px;
+	min-width: 25px;
 	text-align: center;
 	padding-left: 0px;
 	padding-right: 0px;

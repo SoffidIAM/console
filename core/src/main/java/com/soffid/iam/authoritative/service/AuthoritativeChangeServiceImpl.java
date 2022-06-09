@@ -24,6 +24,7 @@ import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.sync.intf.AuthoritativeChange;
 import com.soffid.iam.sync.intf.AuthoritativeChangeIdentifier;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
@@ -636,10 +637,27 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	private Group applyGroupChange(ProcessTracker tracker) throws InternalErrorException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		AuthoritativeChange change = tracker.change;
 		Group g = change.getGroup();
-		Group oldGroup = getGroupService().findGroupByGroupName(g.getName()); 
+		Group oldGroup = null;
+		if ( ConfigurationCache.isHistoryEnabled() &&  
+				(g.getObsolete() != null && g.getObsolete().booleanValue()) && 
+				g.getEndDate() != null && 
+				g.getStartDate() != null) {
+			oldGroup = getGroupService().findGroupByGroupNameAndDate(g.getName(), new Date(g.getEndDate().getTime() - 10));
+			if (oldGroup != null && oldGroup.getObsolete().booleanValue())
+				return oldGroup; // Already loaded
+
+			auditAuthoritativeChange(tracker);
+			if (g.getParentGroup() == null) g.setParentGroup("world");
+			if (g.getDescription() == null) g.setDescription("?");
+			oldGroup = getGroupService().createHistoric(g);
+			return oldGroup;
+		} else {
+			oldGroup = getGroupService().findGroupByGroupName(g.getName());
+		}
 		if (oldGroup == null)
 		{
-			if (g.getParentGroup() == null) g.setParentGroup("World");
+			auditAuthoritativeChange(tracker);
+			if (g.getParentGroup() == null) g.setParentGroup("world");
 			if (g.getDescription() == null) g.setDescription("?");
 			if (g.getObsolete() == null) g.setObsolete(false);
 			oldGroup = getGroupService().create(g);
@@ -676,7 +694,7 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	private boolean compareGroups(Group g, Group oldGroup) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		boolean anyChange = false;
 		for (String att : new String[]{"Description", "DriveLetter", "DriveServerName", "Name", "Obsolete", 
-				"Organizational", "ParentGroup", "Quota", "Section", "Type"}) {
+				"Organizational", "ParentGroup", "Quota", "Section", "Type", "StartDate", "EndDate"}) {
             Method getter = Group.class.getMethod("get" + att);
             Method setter = Group.class.getMethod("set" + att, getter.getReturnType());
             Object value = getter.invoke(g);

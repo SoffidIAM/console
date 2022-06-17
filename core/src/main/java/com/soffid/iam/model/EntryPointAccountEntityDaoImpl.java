@@ -97,7 +97,7 @@ public class EntryPointAccountEntityDaoImpl
 				TipusAutoritzacioPuntEntrada.NIVELL_ALTRES_DESCRIPCIO);
 		
 		//Punt d'entrada
-		target.setId(source.getEntryPoint().getId());
+		target.setAccessTreeId(source.getEntryPoint().getId());
 		// Informació relacionada amb l'entitat autoritzada
 		target.setAuthorizationEntityType(TipusAutoritzacioPuntEntrada.ACCOUNT);
 		target.setAuthorizationEntityId(source.getAccount().getId());

@@ -37,20 +37,7 @@ verify:
 maven_install:
   stage: compile
   script:
-    - 'which ssh-agent'
-    - 'eval $(ssh-agent -s)'
-    - chmod 600 "$GITLAB_SSH_KEY"  "$GITHUB_SSH_KEY"
-    - 'ssh-add "$GITLAB_SSH_KEY"'
-    - 'ssh-add "$GITHUB_SSH_KEY"'
-    - mkdir -p ~/.ssh
-    - 'echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
-    - mkdir "$HOME/.docker"
-    - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
     - mvn install $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
-  only:
-    variables:
-      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 maven_deploy:
   stage: deploy

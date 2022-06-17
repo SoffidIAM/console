@@ -482,26 +482,35 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             c.setDoInput(true);
             c.setDoOutput(false);
             c.setAllowUserInteraction(false);
-            ServerEntity server = getServerEntityDao().findByName(url.getHost());
-            if (server == null || server.getAuth() == null)
-                throw new InternalErrorException(
-                        Messages.getString("SeyconServerServiceImpl.AuthenticationNoObtained") //$NON-NLS-1$
-                                + url.getHost());
+            
+            String seu = "-seu-" +
+            		Security.getCurrentTenantName()+
+            		"\\"+
+            		Security.getCurrentAccount()+
+            		":" ;
+    		ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(urlServer);
+    		if (si == null) 
+    			si = getServerInstanceEntityDao().findByName(url.getHost());
+    		if (si != null) {
+                seu = seu + si.getAuth(); //$NON-NLS-1$
+    		} else {
+    			ServerEntity server = getServerEntityDao().findByName(url.getHost());
+    			if (server == null) {
+    				throw new InternalErrorException("Unknown server "+urlServer);
+    			}
+    			else
+    			{
+    				seu += server.getAuth();
+    			}
+    			
+    		}
+            
+            byte bytes[] = seu.getBytes("UTF-8"); //$NON-NLS-1$
+            String tag = "Basic " //$NON-NLS-1$
+                    + Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES);
+            c.addRequestProperty("Authorization", tag); //$NON-NLS-1$
+            c.addRequestProperty("Accept-Language", MessageFactory.getLocale().getLanguage());
 
-            if (server.getAuth() != null) {
-                String seu = "-seu-" +
-                		Security.getCurrentTenantName()+
-                		"\\"+
-                		Security.getCurrentAccount()+
-                		":" + 
-                		server.getAuth(); //$NON-NLS-1$
-                byte bytes[] = seu.getBytes("UTF-8"); //$NON-NLS-1$
-                String tag = "Basic " //$NON-NLS-1$
-                        + Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES);
-                c.addRequestProperty("Authorization", tag); //$NON-NLS-1$
-                c.addRequestProperty("Accept-Language", MessageFactory.getLocale().getLanguage());
-
-            }
             c.connect();
 
             // Consumir el stream

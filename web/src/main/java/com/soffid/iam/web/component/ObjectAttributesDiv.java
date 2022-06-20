@@ -196,9 +196,9 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 							appendChild(inputField);
 						else
 							section.appendChild(inputField);
-						inputField.afterCompose();
 						try {
 							inputField.createField();
+							inputField.afterCompose();
 							inputFields.add(inputField);
 						} catch (Exception e) {
 							throw new UiException(e);

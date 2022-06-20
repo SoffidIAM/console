@@ -51,7 +51,9 @@ import es.caib.seycon.util.Base64;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collection;
@@ -827,20 +829,37 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		
 		log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName());
 		
-		if (user.getActive().equals("N")) //$NON-NLS-1$
+		if (user.getActive().equals("N")) { //$NON-NLS-1$
+			if (debugPasswords())
+				log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : WRONG (User disabled)");
 			return PasswordValidation.PASSWORD_WRONG;
+		}
+		
 		for (PasswordEntity contra : getPasswordEntityDao().findLastByUserDomain(user, passwordDomain)) {
 			if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") //$NON-NLS-1$
 					|| contra.getActive().equals("E"))) {
 				if ( isRightPassword(password, contra) ) {
+					if (debugPasswords()) {
+		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password matches");
+		            }				
 					if (new Date().before(contra.getExpirationDate())) {
+						if (debugPasswords()) 
+			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD");
 						updateAccountLastLogin(user, passwordDomain);
 						return PasswordValidation.PASSWORD_GOOD;
 					} else if (checkExpired) {
+						if (debugPasswords()) 
+			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : EXPIRED");
 						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
 					} else {
+						if (debugPasswords()) 
+			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName()+ " : WRONG (Expired)");
 						return PasswordValidation.PASSWORD_WRONG;
 					}
+				} else {
+					if (debugPasswords()) {
+		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password does not match "+hash(password.getPassword()));
+		            }				
 				}
 			}
 		}
@@ -872,6 +891,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
 								th.wait(timeToWait);
 							}
+						}
+						if (debugPasswords()) {
+							if (th.isValidated())
+								log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : WRONG Password not accepted by any system: "+hash(password.getPassword()));
+							else
+								log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD Password accepted by  system: "+hash(password.getPassword()));
 						}
 						if (th.isValidated()) {
 							updateAccountLastLogin(user, passwordDomain);
@@ -999,8 +1024,11 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			throws java.lang.Exception {
 		for (Iterator it = getPasswordEntityDao().findByUserDomain(user, passwordDomain).iterator(); it.hasNext();) {
 			PasswordEntity contra = (PasswordEntity) it.next();
-			if (isRightPassword(password, contra) ) 
+			if (isRightPassword(password, contra) ) {
+				if (debugPasswords())
+					log.info("IsOldPassword "+user.getUserName()+"/"+passwordDomain.getName()+": Detected at position "+contra.getOrder());
 				return true;
+			}
 		}
 		return false;
 	}
@@ -1235,14 +1263,28 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 	}
 
+    public String hash(String s) {
+    	MessageDigest d;
+		try {
+			d = MessageDigest.getInstance("SHA-256");
+			return Base64.encodeBytes(d.digest(s.getBytes( StandardCharsets.UTF_8 ) ), Base64.DONT_BREAK_LINES);
+		} catch (NoSuchAlgorithmException e) {
+			return s;
+		}
+    }
+    
 	Set<String> currentAccountValidationRequests = new HashSet<String>();
 	@Override
 	protected PasswordValidation handleCheckAccountPassword(AccountEntity account, Password password,
 			boolean checkTrusted, boolean checkExpired) throws Exception {
 
-		if (account.isDisabled())
+		if (account.isDisabled()) {
+			if (debugPasswords()) {
+            	log.info("CheckAccountPassword " +account.getName() +  " @ " + account.getSystem() + " : FALSE (Account disabled)");
+            }
 			return PasswordValidation.PASSWORD_WRONG;
-
+		}
+		
 		if (account.getType().equals(AccountType.USER)) {
 			UserEntity user = getUsuari(account);
 			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
@@ -1254,14 +1296,31 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							.getActive().equals("E"))) { //$NON-NLS-1$
 				if (isRightPassword(password, contra)) 
 				{
+					if (debugPasswords()) {
+		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : Current password matches");
+		            }				
 					if (new Date().before(contra.getExpirationDate())) {
+						if (debugPasswords()) 
+			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD");
 						return PasswordValidation.PASSWORD_GOOD;
 					} else if (checkExpired) {
+						if (debugPasswords()) 
+			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : EXPIRED");
 						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
 					} else {
+						if (debugPasswords()) 
+			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG (Expired)");
 						return PasswordValidation.PASSWORD_WRONG;
 					}
+				} else {
+					if (debugPasswords()) {
+		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : Current password does not match "+hash(password.getPassword()));
+		            }				
 				}
+			} else {
+				if (debugPasswords()) {
+	            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : No current password found");
+	            }				
 			}
 
 			try {
@@ -1290,12 +1349,20 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 									th.wait(timeToWait);
 								}
 							}
+							if (debugPasswords()) {
+								if (th.isValidated())
+									log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG Password not accepted by any system: "+hash(password.getPassword()));
+								else
+									log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD Password accepted by  system: "+hash(password.getPassword()));
+							}
 							return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
 						} finally {
 							currentAccountValidationRequests.remove(hash);
 						}
 					}
 				} else if (checkTrusted && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
+					if (debugPasswords())
+						log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : Sending request to server");
 					return validatePasswordOnServer(account, password);
 				}
 			} catch (NoSuchBeanDefinitionException e) {
@@ -1306,6 +1373,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 	}
 
+	public boolean debugPasswords() {
+		return "true".equals(ConfigurationCache.getProperty("soffid.server.trace-passwords"));
+	}
+
 	private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password)
 			throws InternalErrorException, IOException {
 
@@ -1314,11 +1385,25 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				log.info("Checking account in sync server: "+account.getName()+" at "+account.getSystem().getName());
 				ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService()
 						.getServerService(ConsoleLogonService.REMOTE_PATH);
-				if (ls != null)
-					return ls.validatePassword(account.getName(), account.getSystem().getName(),
+				if (ls != null) {
+					PasswordValidation r = ls.validatePassword(account.getName(), account.getSystem().getName(),
 							password.getPassword());
+					if (debugPasswords()) {
+						if (r == PasswordValidation.PASSWORD_GOOD)
+							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD Password accepted by syncserver");
+						if (r == PasswordValidation.PASSWORD_GOOD_EXPIRED)
+							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD_EXPIRED Password accepted by syncserver");
+						if (r == PasswordValidation.PASSWORD_WRONG)
+							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG Password accepted by syncserver "+hash(password.getPassword()));
+					}
+					return r;
+				}
 			} catch (Exception e) {
 				log.warn("Logon failed in sync server: "+account.getName()+" at "+account.getSystem().getName(), e);
+			}
+		} else {
+			if (debugPasswords()) {
+				log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG (System not trusted or offline)");
 			}
 		}
 
@@ -1375,8 +1460,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			return handleIsOldPassword(user, passwordDomain, password);
 		} else {
 			for (AccountPasswordEntity contra : account.getPasswords()) {
-				if (isRightPassword(password, contra)) 
-					return true;
+				if (isRightPassword(password, contra))  {
+					if (debugPasswords()) {
+						log.info("IsOldPassword "+account.getName()+"/"+account.getSystem().getName()+": Detected at position "+contra.getOrder());
+						return true;
+					}
+				}
 			}
 			return false;
 		}

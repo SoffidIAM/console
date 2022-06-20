@@ -286,7 +286,6 @@ public class LaunchHelper {
 			throws InternalErrorException, NamingException, CreateException {
 		// Get passwords
 		List<Account> r = new LinkedList<Account>();
-		SelfService sss = EJBLocator.getSelfService();
 		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
 		for (com.soffid.iam.api.Account account: accounts)
 		{

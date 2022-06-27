@@ -33,12 +33,15 @@ import com.soffid.iam.api.AccessTreeExecutionType;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.LaunchType;
 import com.soffid.iam.api.NewPamSession;
+import com.soffid.iam.api.Password;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 import com.soffid.iam.web.launcher.ApplicationLauncher;
 import com.soffid.iam.web.popup.AccountSelectorWindow;
+import com.soffid.iam.web.popup.PasswordSelectorWindow;
 
+import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 
@@ -289,7 +292,8 @@ public class LaunchHelper {
 		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
 		for (com.soffid.iam.api.Account account: accounts)
 		{
-			if (accountService.isAccountPasswordAvailable(account.getId()))
+			if ( account.getType() == AccountType.USER ||
+				accountService.isAccountPasswordAvailable(account.getId()))
 				r.add(account);
 		}
 		if (r.size() == 0)
@@ -336,22 +340,45 @@ public class LaunchHelper {
 	private void openWssoEntryPoint(AccessTreeExecution exe, Account account, boolean directLink) throws InternalErrorException, NamingException, CreateException {
 		try {
 			com.soffid.iam.api.Password password = EJBLocator.getSelfService().queryAccountPasswordBypassPolicy(account);
-			if (password == null)
-				throw new InternalErrorException(
-						String.format("Unable to fetch password for account %s at %s",
-								account.getName(),
-								account.getSystem()));
-			JSONObject j = new JSONObject();
-			j.put("url", exe.getContent());
-			j.put("account", account.getLoginName());
-			j.put("password", password.getPassword());
-			Clients.evalJavaScript("launchSsoUrl("+j.toString()+","+directLink+");");
+			if (password == null) {
+				if ( account.getType() == AccountType.USER) {
+					wssoAskForAccountPassword(exe, account, directLink);
+				} else {
+					throw new InternalErrorException(
+							String.format("Unable to fetch password for account %s at %s",
+									account.getName(),
+									account.getSystem()));
+				}
+			} else {
+				JSONObject j = new JSONObject();
+				j.put("url", exe.getContent());
+				j.put("account", account.getLoginName());
+				j.put("password", password.getPassword());
+				Clients.evalJavaScript("launchSsoUrl("+j.toString()+","+directLink+");");
+			}
 		} catch (Exception e) {
 			if (directLink) 
 				Clients.evalJavaScript("window.location.href='"+encodeJS(exe.getContent())+"';");
 			else
 				Clients.evalJavaScript("window.open('"+encodeJS(exe.getContent())+"', '_blank');");
 		}
+	}
+
+	private void wssoAskForAccountPassword(AccessTreeExecution exe, final Account account, boolean directLink) {
+		Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
+		PasswordSelectorWindow passwordSelectorWindow = (PasswordSelectorWindow) page.getFellowIfAny("passwordSelectorWindow");
+		if (passwordSelectorWindow == null) {
+			passwordSelectorWindow = (PasswordSelectorWindow) Executions.getCurrent().createComponents("/popup/select-password.zul", new HashMap()) [0];
+		}
+
+		final PasswordSelectorWindow w = passwordSelectorWindow;
+		passwordSelectorWindow.setListener((event)->{
+			Password pass = w.getPassword();
+			EJBLocator.getSelfService().setAccountPassword(account, pass);
+			openWssoEntryPoint(exe, account, directLink);
+		});
+		
+		w.doHighlighted();
 	}
 
 	private Class findExecutionType(AccessTreeExecution exe) throws InternalErrorException, NamingException, CreateException {

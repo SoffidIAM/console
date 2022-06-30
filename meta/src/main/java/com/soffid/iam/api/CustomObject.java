@@ -22,6 +22,7 @@ public class CustomObject {
 	
 	public String description;
 
+	@JsonAttribute(hibernateAttribute = "type.name")
 	public String type;
 
 	@Description ("Object custom attributes")

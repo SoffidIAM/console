@@ -220,4 +220,9 @@ public class GroupUsersHandler extends Div implements AfterCompose {
 					});
 		}
 	}
+	
+	public void downloadCsv(Event ev) {
+		DataTable dt = (DataTable) getFellow("listbox");
+		dt.download();
+	}
 }

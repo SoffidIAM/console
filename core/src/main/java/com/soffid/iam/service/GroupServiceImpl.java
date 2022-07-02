@@ -757,7 +757,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
             UserEntity user = (UserEntity) it.next();
             if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, user)) {
                 String nomComplet = user.getFullName();
-                GroupUser usugru = new GroupUser(user.getUserName(), user.getPrimaryGroup().getName(), nomComplet);
+                GroupUser usugru = new GroupUser();
+                usugru.setUser(user.getUserName());
+                usugru.setGroup(user.getPrimaryGroup().getName());
+                usugru.setFullName(nomComplet);
+                usugru.setGroupDescription(user.getPrimaryGroup().getDescription());
                 usugru.setInfo(Messages.getString("GroupServiceImpl.PrimaryGroupText"));
                 usugru.setPrimaryGroup(true);
                 result.add(usugru);

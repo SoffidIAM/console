@@ -35,6 +35,7 @@ public class UsuariGrup {
 	public java.lang.Long id;
 
 	@Attribute(translated = "fullName", hidden = true )
+	@Nullable
 	public java.lang.String nomComplet;
 
 	@Nullable

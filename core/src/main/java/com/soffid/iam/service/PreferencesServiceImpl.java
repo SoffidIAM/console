@@ -73,6 +73,9 @@ public class PreferencesServiceImpl extends PreferencesServiceBase {
 		if (userEntity == null)
 			return ;
 		
+		if (value.length() > 500)
+			value = null;
+		
 		Collection<UserPreferenceEntity> entities = getUserPreferenceEntityDao().findByNameAndUserName(preference, user);
 		for (UserPreferenceEntity entity: entities) {
 			if ( value == null || value.trim().isEmpty()) {

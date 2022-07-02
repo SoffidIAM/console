@@ -59,13 +59,20 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 				
 			JSONArray cols2 = new JSONArray( colsString );
 			
+			String[] mandatory = null; 
+			try {
+				mandatory = ((DynamicColumnsDatatable) c).getMandatoryColumns();
+			} catch (Exception e) {
+			}
 			HashSet<String> colNames = new HashSet();
 			for (int i = 0; i < cols2.length(); i++) {
 				JSONObject o = new JSONObject();
 				JSONObject colDef = cols2.getJSONObject(i);
+				String value = colDef.optString("value", "");
 				if (colDef.optString("name", null) != null) {
 					o.put("name", colDef.getString("name"));
 					o.put("sort", false);
+					o.put("mandatory", isMandatory(mandatory, value));
 					selected.add(new Integer(data.length()));
 					data.put(o);
 					colNames.add(colDef.getString("name"));
@@ -78,10 +85,12 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			{
 				JSONObject o = new JSONObject();
 				JSONObject colDef = srccols.getJSONObject(i);
+				String value = colDef.optString("value", "");
 				if (colDef.optString("name", null) != null &&
 						!colNames.contains(colDef.getString("name"))) {
 					o.put("name", colDef.getString("name"));
 					o.put("sort", false);
+					o.put("mandatory", isMandatory(mandatory, value));
 					data.put(o);
 					cols.put(colDef);
 				}
@@ -120,6 +129,14 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 		doHighlighted();
 	}
 	
+	private boolean isMandatory(String[] mandatory, String value) {
+		if (mandatory == null)
+			return false;
+		for (String m: mandatory)
+			if (m.equals(value)) return true;
+		return false;
+	}
+
 	@Override
 	public void setPage(Page page) {
 		super.setPage(page);
@@ -166,11 +183,21 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			Arrays.sort(selected);
 			JSONArray allCols = new JSONArray();
 			JSONArray cols = new JSONArray();
+			String[] mandatory = null; 
+			try {
+				if (c instanceof DynamicColumnsDatatable)
+					mandatory = ((DynamicColumnsDatatable) c).getMandatoryColumns();
+			} catch (Exception e) {
+			}
 			for (int i = 0; i < positions.length; i++) 
 			{
 				JSONObject colDef = this.cols.getJSONObject( positions[i] );
+				String value = colDef.optString("value", "");
 				allCols.put(colDef);
-				if (selected.length == 0) {
+				if (isMandatory(mandatory, value)) {
+					colDef.put("enabled", true);
+					cols.put(colDef);
+				} else if (selected.length == 0) {
 					colDef.put("enabled", colDef.optBoolean("default"));
 					cols.put(colDef);
 				} else if (Arrays.binarySearch(selected, positions[i]) >= 0) {

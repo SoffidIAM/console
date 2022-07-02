@@ -189,10 +189,11 @@ AbstractExpression Expression () :
     AbstractExpression e1;
     List e2;
 	OrderByExpression e = new OrderByExpression();
+	e.setExpression ( new OrExpression()); 
 }
 {
-	e1 = Or () {e.setExpression(e1);}
-	(e2=OrderBy() { e.setOrderBy(e2);}  )? 
+	( e1 = Or () {e.setExpression(e1);} ) ?
+	(e2=OrderBy() { e.setOrderBy(e2);}  ) ? 
 	{
 		return e;	
 	}

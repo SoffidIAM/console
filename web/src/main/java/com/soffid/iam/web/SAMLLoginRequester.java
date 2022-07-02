@@ -131,7 +131,7 @@ public class SAMLLoginRequester extends HttpServlet {
 		else
 		{
 			req.getSession().setAttribute("samlLoginToken", token);
-			resp.sendRedirect( context );
+			req.getServletContext().getRequestDispatcher("/anonymous/login.zul").forward(req, resp);
 		}
 	}
 

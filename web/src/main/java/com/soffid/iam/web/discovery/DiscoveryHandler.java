@@ -147,7 +147,7 @@ public class DiscoveryHandler extends FrameHandler {
 			if (hasService("389/tcp") && hasService("88/tcp"))
 				values.add("AD: Active directory");
 			else {
-				if (hasService("137/tcp"))
+				if (hasService("445/tcp"))
 					values.add("Windows: Windows local accounts");
 				if (hasService("389/tcp") || hasService("636/tcp"))
 					values.add("LDAP: LDAP Server");
@@ -161,7 +161,7 @@ public class DiscoveryHandler extends FrameHandler {
 		}
 		else 
 		{
-			if (hasService("135/tcp"))
+			if (hasService("445/tcp"))
 				values.add("Windows: Windows local accounts");
 			if (hasService("389/tcp") || hasService("636/tcp"))
 				values.add("LDAP: LDAP Server");

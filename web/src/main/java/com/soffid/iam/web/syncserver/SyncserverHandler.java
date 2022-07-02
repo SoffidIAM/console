@@ -1,10 +1,13 @@
 package com.soffid.iam.web.syncserver;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,8 +38,10 @@ import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.ui.SeyconTask;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
+import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.Graphjs;
+import com.soffid.iam.web.popup.SelectColumnsHandler;
 
 import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -148,6 +153,7 @@ public class SyncserverHandler extends FrameHandler {
 		getFellow("tab_unscheduledtasks").setVisible(false);
 		getFellow("tab_agents").setVisible(false);
 		getFellow("refreshButton").setVisible(false);
+		getFellow("backmenu").setVisible(false);
 	}
 	
 	public void restart(Event event) {
@@ -227,8 +233,9 @@ public class SyncserverHandler extends FrameHandler {
 	}
 
 
-	public void viewTasks(Event event) throws InternalErrorException, NamingException, CreateException {
+	public void viewTasks(Event event) throws Exception {
 		hideAllDivs();
+		getFellow("backmenu").setVisible(true);
 		serverId = getServerId(event);
 		serverUrl = getUrl(event);
 		((Label)getFellow("form-label")).setValue(serverUrl);
@@ -239,18 +246,24 @@ public class SyncserverHandler extends FrameHandler {
 		updateTasksGrid();
 	}
 
-	public void updateTasksGrid() throws InternalErrorException, NamingException, CreateException {
+	public void changeGridColumns(Event event) throws IOException {
+        DynamicColumnsDatatable dt = (DynamicColumnsDatatable) getFellow("tasks_table");
+		SelectColumnsHandler.startWizard(dt);
+	}
+	
+	public void updateTasksGrid() throws Exception {
 		Iterator<Object> it = EJBLocator.getSyncServerService().getServerTasks(serverUrl).iterator();
         currentsAgents = new LinkedList<String> ( (Collection<String>) it.next());
         currentTasks = (List<SeyconTask>) it.next();
         
-        DataTable dt = (DataTable) getFellow("tasks_table");
+        DynamicColumnsDatatable dt = (DynamicColumnsDatatable) getFellow("tasks_table");
         
         // Create columns
         JSONArray columns = new JSONArray();
         JSONObject h = new JSONObject();
         h.put("name", Labels.getLabel("seyconserver.zul.Tasca"));
         h.put("value", "task");
+        h.put("default", true);
         columns.put(h);
         int i = 0;
         for ( String s: currentsAgents) {
@@ -259,10 +272,12 @@ public class SyncserverHandler extends FrameHandler {
             h.put("className", "#{col_"+i+"=='DONE'?'green':col_"+i+"=='ERROR'?'red': 'yellow'}");
             h.put("template", "<span onclick=\"zkDatatable.sendClientAction(this, 'onTaskDetails', ["+i+"])\">#{col_"+i+"}</span>");
             h.put("value", "col_"+i);
+            h.put("default", true);
             columns.put(h);
-            i++;
+        	i++;
         }
-        dt.setColumns(columns.toString());
+//        dt.setColumns(columns.toString());
+        dt.setAllColumns(columns);
         // Set value
         StringBuffer values = new StringBuffer();
         values.append("[");
@@ -345,7 +360,7 @@ public class SyncserverHandler extends FrameHandler {
 						});
 	}
 
-	public void refreshTasks (Event event) throws InternalErrorException, NamingException, CreateException {
+	public void refreshTasks (Event event) throws Exception {
 		if (getFellow("tab_tasks").isVisible())
 			updateTasksGrid();
 		if (getFellow("tab_unscheduledtasks").isVisible())

@@ -394,6 +394,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		// this.getUsuariEntityDao().findByCodi(codiUsuariCreacio);
 
 		usuariEntity.setCreationUser(codiUsuariCreacio);
+		usuariEntity.setLastUserModification(codiUsuariCreacio);
+		usuariEntity.setLastModificationDate(now);
 		// Comprobamos autorización del usuario
 		if (!getAuthorizationService().hasPermission(Security.AUTO_USER_CREATE, usuariEntity)) {
 			throw new SeyconAccessLocalException("UsuariService", //$NON-NLS-1$

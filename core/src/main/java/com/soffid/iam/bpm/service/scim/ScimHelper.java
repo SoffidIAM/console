@@ -131,8 +131,10 @@ public class ScimHelper {
 
 	static Boolean oracle = null;
 	public boolean isOracle() {
-		if (oracle == null)
-			oracle = new CustomDialect().isOracle();
+		if (oracle == null) {
+			CustomDialect cd = new CustomDialect();
+			oracle = cd.isOracle() || cd.isSqlServer();
+		}
 		return oracle.booleanValue();
 	}
 

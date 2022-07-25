@@ -56,6 +56,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
+import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.ReorderEvent;
 import es.caib.zkib.datamodel.DataModelCollection;
@@ -366,6 +367,14 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 	public void addValue(Event event) throws Exception {
 		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(event.getTarget());
 		XPathUtils.createPath(ctx.getDataSource(), ctx.getXPath(), new String());
+	}
+
+	public void removeValue(Event event) throws Exception {
+		es.caib.zkib.binder.BindContext ctx = XPathUtils.getComponentContext(event.getTarget());
+		XPathUtils.removePath(ctx.getDataSource(), ctx.getXPath());
+		Component lb = getFellow("metadataGrid");
+    	DataNode dm = (DataNode) XPathUtils.eval(lb, ".");
+    	dm.update();
 	}
 
 	public void applyAttribute(Event event) throws CommitException {

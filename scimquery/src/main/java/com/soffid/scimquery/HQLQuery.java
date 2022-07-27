@@ -152,6 +152,7 @@ public class HQLQuery {
 	String rootObject = null;
 
 	private List<String> orderBy;
+	private StringBuffer outerJoinString = new StringBuffer();
 	public String getRootObject() {
 		return rootObject;
 	}
@@ -182,5 +183,13 @@ public class HQLQuery {
 
 	public void setNegativeExpression(boolean negativeExpression) {
 		this.negativeExpression = negativeExpression;
+	}
+
+	public void setOuterJoinString(StringBuffer joinString2) {
+		outerJoinString = joinString2;
+	}
+
+	public StringBuffer getOuterJoinString() {
+		return outerJoinString;
 	}
 }

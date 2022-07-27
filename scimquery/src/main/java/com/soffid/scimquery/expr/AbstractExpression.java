@@ -488,7 +488,7 @@ public abstract class AbstractExpression implements Serializable {
 			query.getWhereString().insert(0, where2);
 			query.getWhereString().append(")");
 			
-			query.getJoinString().setLength(0);
+			query.setJoinString(query.getOuterJoinString());
 			
 		}
 		return query;

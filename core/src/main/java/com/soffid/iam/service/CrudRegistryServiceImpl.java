@@ -75,6 +75,7 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(VaultFolder.class.getName(), new CrudVaultFolderHandler());
 		registry.put(Account.class.getName(), new CrudAccountHandler());
 		registry.put(MailList.class.getName(), new CrudMailListHandler());
+		registry.put(CustomObject.class.getName(), new CrudCustomObjectHandler(null));
 		registry.put(GroupUser.class.getName(), new CrudGroupUserHandler());
 		registry.put(RoleAccount.class.getName(), new CrudRoleAccountHandler());
 		registry.put(Printer.class.getName(), new CrudPrinterHandler());

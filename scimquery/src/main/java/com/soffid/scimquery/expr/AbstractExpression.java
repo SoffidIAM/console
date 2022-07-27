@@ -173,17 +173,18 @@ public abstract class AbstractExpression implements Serializable {
 	 */
 	public void generateHQLStringReference (HQLQuery query, String attributeReference, EvaluationContext ctx) throws EvalException, UnsupportedEncodingException, ClassNotFoundException, JSONException
 	{
-		for (String part: attributeReference.split("\\.+"))
+		final String[] parts = attributeReference.split("\\.+");
+		for (int i = 0; i < parts.length; i++)
 		{
-			part = part.trim();
+			String part = parts[i].trim();
 			
 			if (ctx.currentBean != null)
 			{
-				generateBeanPart(query, ctx, part);
+				generateBeanPart(query, ctx, part, i == parts.length - 1);
 			}
 			else
 			{
-				generateHibernatePart(query, ctx, part);
+				generateHibernatePart(query, ctx, part, i == parts.length - 1);
 			}
 			if (ctx.nonHQLAttributeUsed)
 				break;
@@ -199,7 +200,7 @@ public abstract class AbstractExpression implements Serializable {
 	 * @throws EvalException
 	 */
 	private void generateHibernatePart(HQLQuery query, EvaluationContext ctx,
-			String part) throws EvalException {
+			String part, boolean last) throws EvalException {
 		String entityClass = ctx.hibernateClass;
 		
 		try {
@@ -212,90 +213,14 @@ public abstract class AbstractExpression implements Serializable {
 				AttributeConfig attConfig = entityConfig.getAttribute(part);
 				if (attConfig.isVirtualAttribute())
 				{
-					if (ctx.notPr) {
-						String path = ctx.partialPath+"."+part;
-						String pp = ctx.partialPath.substring(0, ctx.partialPath.lastIndexOf("."));
-						String obj = query.getObjects().get(path);
-						String s[] = attConfig.getVirtualAttributeName().split("\\.");
-
-						int number = query.getNextObject();
-						obj = ROOT_OBJECT_NAME +number;
-
-						int i = query.getNextParameter();
-						String param  = "p"+i;
-						query.getParameters().put(param, part);
-
-						ctx.objectCondition = "exists ( select 1 from "+
-								entityConfig.getHibernateClass()+" as "+ctx.objectName+
-								" left join "+ctx.objectName+"."+s[0]+" as "+ctx.objectName+"aux"+
-								" where "+ctx.objectName+"."+
-								attConfig.getParentEntity() + "=" + pp+" and "+
-								ctx.objectName+"aux."+s[1]+"=:"+param+" and ";
-						ctx.partialPath = null;
-						ctx.objectName = ctx.objectName+"."+attConfig.getVirtualAttributeValue();
-					} else {
-						String path = ctx.partialPath+"."+part;
-						String obj = query.getObjects().get(path);
-						if (obj == null)
-						{
-							int number = query.getNextObject();
-							obj = ROOT_OBJECT_NAME +number;
-							query.getObjects().put(path, obj);
-							query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
-							String obj2 = obj+"aux";
-							String s[] = attConfig.getVirtualAttributeName().split("\\.");
-							
-							int i = query.getNextParameter();
-							String param  = "p"+i;
-							query.getParameters().put(param, part);
-							
-							query.getJoinString().append("\nleft join "+obj+"."+s[0]+
-									" as "+obj2+" with "+
-									obj2+"."+s[1]+"=:"+param);
-						}
-						ctx.partialPath = null;
-						int i = query.getNextParameter();
-						String obj2 = obj+"aux";
-						String s[] = attConfig.getVirtualAttributeName().split("\\.");
-						ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
-						ctx.closeCondition = ")";
-						ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
-					}
+					processVirtualAttribute(query, ctx, entityConfig, part, attConfig);
+				} else if (!last && existAttribute(entityClass, part)) {
+					processEntityAttribute(query, ctx, entityClass, part);
 				} else {
-					flushParts(query, ctx);
-					ctx.objectName = ctx.objectName+"."+part;					
-					ctx.hibernateClass = attConfig.getScimType().getCanonicalName();
+					processStandardAttribute(query, ctx, part, attConfig);
 				}
 			} else {
-				flushParts(query, ctx);
-				Field f = Class.forName(entityClass).getDeclaredField(part);
-				if ( isPrimitive (f))
-				{
-					ctx.objectName = ctx.objectName+"."+part;
-				}
-				else 
-				{
-					ctx.hibernatePath.append(".").append(part);
-					String obj = query.getObjects().get(ctx.hibernatePath.toString());
-					if (obj == null)
-					{
-						int number = query.getNextObject();
-						obj = ROOT_OBJECT_NAME +number;
-						ctx.partialPath = ctx.hibernatePath.toString();
-						ctx.partialObjectToUse = obj;
-						ctx.partialJoinToAdd = "\nleft join "+ctx.objectName+"."+part+" as "+obj;
-					}
-					ctx.objectName = obj;
-				}
-				Class type = f.getType();
-				ctx.hibernateClass = type.getCanonicalName();
-				if (type.isAssignableFrom(Collection.class) && 
-						f.getGenericType() instanceof ParameterizedType)
-				{
-					ParameterizedType pt = (ParameterizedType) f.getGenericType();
-					Class pt0 = (Class) pt.getActualTypeArguments()[0];
-					ctx.hibernateClass = pt0.getCanonicalName();
-				}
+				processEntityAttribute(query, ctx, entityClass, part);
 			}
 		} catch (NoSuchFieldException e) {
 			throw new EvalException("Missing column "+part+" on object "+
@@ -323,6 +248,108 @@ public abstract class AbstractExpression implements Serializable {
 		}
 	}
 
+	private boolean existAttribute(String entityClass, String part) {
+		try {
+			Class.forName(entityClass).getDeclaredField(part);
+			return true;
+		} catch (Throwable e) {
+			return false;
+		}
+	}
+
+	private void processStandardAttribute(HQLQuery query, EvaluationContext ctx, String part,
+			AttributeConfig attConfig) {
+		flushParts(query, ctx);
+		ctx.objectName = ctx.objectName+"."+part;					
+		ctx.hibernateClass = attConfig.getScimType().getCanonicalName();
+	}
+
+	private void processVirtualAttribute(HQLQuery query, EvaluationContext ctx, ClassConfig entityConfig, String part,
+			AttributeConfig attConfig) {
+		if (ctx.notPr) {
+			String path = ctx.partialPath+"."+part;
+			String pp = ctx.partialPath.substring(0, ctx.partialPath.lastIndexOf("."));
+			String obj = query.getObjects().get(path);
+			String s[] = attConfig.getVirtualAttributeName().split("\\.");
+
+			int number = query.getNextObject();
+			obj = ROOT_OBJECT_NAME +number;
+
+			int i = query.getNextParameter();
+			String param  = "p"+i;
+			query.getParameters().put(param, part);
+
+			ctx.objectCondition = "exists ( select 1 from "+
+					entityConfig.getHibernateClass()+" as "+ctx.objectName+
+					" left join "+ctx.objectName+"."+s[0]+" as "+ctx.objectName+"aux"+
+					" where "+ctx.objectName+"."+
+					attConfig.getParentEntity() + "=" + pp+" and "+
+					ctx.objectName+"aux."+s[1]+"=:"+param+" and ";
+			ctx.partialPath = null;
+			ctx.objectName = ctx.objectName+"."+attConfig.getVirtualAttributeValue();
+		} else {
+			String path = ctx.partialPath+"."+part;
+			String obj = query.getObjects().get(path);
+			if (obj == null)
+			{
+				int number = query.getNextObject();
+				obj = ROOT_OBJECT_NAME +number;
+				query.getObjects().put(path, obj);
+				query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
+				String obj2 = obj+"aux";
+				String s[] = attConfig.getVirtualAttributeName().split("\\.");
+				
+				int i = query.getNextParameter();
+				String param  = "p"+i;
+				query.getParameters().put(param, part);
+				
+				query.getJoinString().append("\nleft join "+obj+"."+s[0]+
+						" as "+obj2+" with "+
+						obj2+"."+s[1]+"=:"+param);
+			}
+			ctx.partialPath = null;
+			int i = query.getNextParameter();
+			String obj2 = obj+"aux";
+			String s[] = attConfig.getVirtualAttributeName().split("\\.");
+			ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
+			ctx.closeCondition = ")";
+			ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
+		}
+	}
+
+	private void processEntityAttribute(HQLQuery query, EvaluationContext ctx, String entityClass, String part)
+			throws NoSuchFieldException, ClassNotFoundException {
+		flushParts(query, ctx);
+		Field f = Class.forName(entityClass).getDeclaredField(part);
+		if ( isPrimitive (f))
+		{
+			ctx.objectName = ctx.objectName+"."+part;
+		}
+		else 
+		{
+			ctx.hibernatePath.append(".").append(part);
+			String obj = query.getObjects().get(ctx.hibernatePath.toString());
+			if (obj == null)
+			{
+				int number = query.getNextObject();
+				obj = ROOT_OBJECT_NAME +number;
+				ctx.partialPath = ctx.hibernatePath.toString();
+				ctx.partialObjectToUse = obj;
+				ctx.partialJoinToAdd = "\nleft join "+ctx.objectName+"."+part+" as "+obj;
+			}
+			ctx.objectName = obj;
+		}
+		Class type = f.getType();
+		ctx.hibernateClass = type.getCanonicalName();
+		if (type.isAssignableFrom(Collection.class) && 
+				f.getGenericType() instanceof ParameterizedType)
+		{
+			ParameterizedType pt = (ParameterizedType) f.getGenericType();
+			Class pt0 = (Class) pt.getActualTypeArguments()[0];
+			ctx.hibernateClass = pt0.getCanonicalName();
+		}
+	}
+
 	private void flushParts(HQLQuery query, EvaluationContext ctx) {
 		if (ctx.partialPath != null)
 		{
@@ -339,14 +366,20 @@ public abstract class AbstractExpression implements Serializable {
 	 * @param query Current query
 	 * @param ctx Evaluation context
 	 * @param part member to evaluate
+	 * @param last 
 	 * @throws EvalException
 	 */
 	private void generateBeanPart(HQLQuery query, EvaluationContext ctx,
-			String part) throws EvalException, UnsupportedEncodingException,
+			String part, boolean last) throws EvalException, UnsupportedEncodingException,
 			ClassNotFoundException, JSONException {
 		flushParts(query, ctx);
 		AttributeConfig attribute = ctx.currentBean.getAttribute(part);
-		if (attribute == null)
+		if (!last && ctx.currentBean.getHibernateClass() != null && existAttribute(ctx.currentBean.getHibernateClass(), part)) {
+			ctx.hibernateClass = ctx.currentBean.getHibernateClass();
+			ctx.currentBean = null;
+			generateHibernatePart(query, ctx, part, true);
+		}
+		else if (attribute == null)
 		{
 			ctx.hibernateClass = ctx.currentBean.getHibernateClass();
 			if (ctx.hibernateClass == null)
@@ -355,7 +388,7 @@ public abstract class AbstractExpression implements Serializable {
 						, null);
 			}
 			ctx.currentBean = null;
-			generateHibernatePart(query, ctx, part);
+			generateHibernatePart(query, ctx, part, true);
 		}
 		else
 		{

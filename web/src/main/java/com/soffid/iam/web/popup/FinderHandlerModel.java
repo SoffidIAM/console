@@ -31,21 +31,17 @@ public class FinderHandlerModel implements FinderHandler {
 		if (className == null)
 			return null;
 		
+		CrudHandler crud;
 		Class clazz;
 		if (className.startsWith(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT)) {
 			clazz = CustomObject.class;
 			String objectName = className.substring(SearchDictionaryBuilder.COM_SOFFID_IAM_API_CUSTOM_OBJECT.length());
-			String q2 = "type.name eq \""+  objectName.replaceAll ("\"", "\\\\\"")+"\"";
-			if (query == null || query.trim().isEmpty()) {
-				query = q2;
-			} else {
-				query = q2 +" and ("+query+")";
-			}
+			crud = EJBLocator.getCrudRegistryService().getHandler(objectName);
 		} else {
 			clazz = Class.forName(className);
+			crud = EJBLocator.getCrudRegistryService().getHandler(clazz);
 		}
 
-		CrudHandler crud = EJBLocator.getCrudRegistryService().getHandler(clazz);
 		
 		if (crud == null)
 			throw new InternalErrorException("Unable to find "+clazz.getCanonicalName()+" finder");

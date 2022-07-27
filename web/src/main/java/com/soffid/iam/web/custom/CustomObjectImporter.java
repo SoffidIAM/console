@@ -18,13 +18,12 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 public class CustomObjectImporter extends CsvImporter< CustomObject > {
 	private String type;
 	private CustomObjectService svc;
-	private CrudCustomObjectHandler handler;
+	private CrudHandler<CustomObject> handler;
 
 	public CustomObjectImporter(String type) throws NamingException, CreateException, InternalErrorException {
 		this.type = type;
 		svc = EJBLocator.getCustomObjectService();
-		handler = (CrudCustomObjectHandler) EJBLocator.getCrudRegistryService().getHandler(CustomObject.class);
-		handler.setType(type);
+		handler = EJBLocator.getCrudRegistryService().getHandler(type);
 	}
 	
 	@Override

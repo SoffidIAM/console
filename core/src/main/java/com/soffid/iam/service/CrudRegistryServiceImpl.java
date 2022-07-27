@@ -52,6 +52,14 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 	}
 
 	@Override
+	protected <E> CrudHandler<E> handleGetHandler(String cl) throws Exception {
+		CrudHandler<E> h = (CrudHandler<E>) registry.get(cl);
+		if (h == null) {
+			h = (CrudHandler<E>) new CrudCustomObjectHandler(cl);
+		}
+		return h;
+	}
+	@Override
 	protected void handleRegisterDefaultHandlers() throws Exception {
 		registry.put(User.class.getName(), new CrudUserHandler());
 		registry.put(Host.class.getName(), new CrudHostHandler());
@@ -67,7 +75,6 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(VaultFolder.class.getName(), new CrudVaultFolderHandler());
 		registry.put(Account.class.getName(), new CrudAccountHandler());
 		registry.put(MailList.class.getName(), new CrudMailListHandler());
-		registry.put(CustomObject.class.getName(), new CrudCustomObjectHandler());
 		registry.put(GroupUser.class.getName(), new CrudGroupUserHandler());
 		registry.put(RoleAccount.class.getName(), new CrudRoleAccountHandler());
 		registry.put(Printer.class.getName(), new CrudPrinterHandler());

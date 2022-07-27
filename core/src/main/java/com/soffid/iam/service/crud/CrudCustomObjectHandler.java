@@ -18,6 +18,10 @@ public class CrudCustomObjectHandler implements CrudHandler<CustomObject> {
 	private CustomObjectService ejb;
 	String objectType;
 
+	public CrudCustomObjectHandler(String objectType) {
+		this.objectType = objectType;
+	}
+	
 	public CustomObjectService getService() throws NamingException, CreateException {
 		if (ejb == null)
 			ejb = EJBLocator.getCustomObjectService();
@@ -66,10 +70,6 @@ public class CrudCustomObjectHandler implements CrudHandler<CustomObject> {
 
 	public String getType() {
 		return objectType;
-	}
-
-	public void setType(String type) {
-		this.objectType = type;
 	}
 
 }

@@ -14,4 +14,7 @@ public class CrudRegistryService {
 
 	@Operation(grantees = {Tothom.class})
 	public<E> CrudHandler<E> getHandler(Class<E> cl) {return null;}
+
+	@Operation(grantees = {Tothom.class})
+	public<E> CrudHandler<E> getHandler(String className) {return null;}
 }

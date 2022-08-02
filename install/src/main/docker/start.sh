@@ -147,6 +147,27 @@ then
      >opt/soffid/iam-console-3/conf/server.xml
 fi
 
+if [[ "$DBPOOL_MIN_IDLE" != "" ]]
+then
+  sed -i -e "s/.*minIdle.*/minIdle = $DBPOOL_MIN_IDLE/" /opt/soffid/iam-console-3/conf/tomee.xml
+fi
+
+if [[ "$DBPOOL_MAX_IDLE" != "" ]]
+then
+  sed -i -e "s/.*maxIdle.*/maxIdle = $DBPOOL_MAX_IDLE/" /opt/soffid/iam-console-3/conf/tomee.xml
+fi
+
+if [[ "$DBPOOL_MAX" != "" ]]
+then
+  sed -i -e "s/.*maxActive.*/maxActive = $DBPOOL_MAX/" /opt/soffid/iam-console-3/conf/tomee.xml
+fi
+
+if [[ "$DBPOOL_INITIAL" != "" ]]
+then
+  sed -i -e "s/.*initialSize.*/initialSize = $DBPOOL_INITIAL/" /opt/soffid/iam-console-3/conf/tomee.xml
+fi
+
+
 if [[ "$SECURE" != "true" ]]
 then
     echo "Starting SECURE Soffid IAM Console"

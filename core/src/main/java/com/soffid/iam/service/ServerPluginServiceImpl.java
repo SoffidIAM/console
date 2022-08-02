@@ -127,6 +127,7 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     			plugin.setAuthor(p.getUserName());
     		else
     			plugin.setAuthor(null);
+    		plugin.setEnabled(true);
     		plugin.setDeployed(new Date());
     		getServerPluginEntityDao().update(plugin);
     		audit(plugin, "U");

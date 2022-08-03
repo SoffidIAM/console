@@ -281,7 +281,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			UserAccountEntity ua = list.iterator().next();
 			
 			createAccountTask(acc);
-			for (RoleAccountEntity ra: acc.getRoles())
+			for (RoleAccountEntity ra: new LinkedList<RoleAccountEntity> (acc.getRoles()))
 			{
 				getRoleAccountEntityDao().remove(ra);
 			}

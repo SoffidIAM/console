@@ -18,6 +18,7 @@ import es.caib.seycon.ng.model.DominiContrasenyaEntity;
 import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
+import es.caib.seycon.ng.sync.servei.TaskGenerator;
 
 @Service ( internal=true,
 		translatedName="InternalPasswordService",
@@ -25,6 +26,7 @@ import es.caib.seycon.ng.sync.servei.ConsoleLogonService;
 @Depends ({es.caib.seycon.ng.model.ContrasenyaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.sync.servei.TaskQueue.class,
+	TaskGenerator.class,
 	ConsoleLogonService.class,
 	es.caib.seycon.ng.model.PoliticaContrasenyaEntity.class,
 	es.caib.seycon.ng.model.DominiContrasenyaEntity.class,

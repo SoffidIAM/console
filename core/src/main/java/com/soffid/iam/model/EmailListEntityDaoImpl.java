@@ -159,7 +159,7 @@ public class EmailListEntityDaoImpl extends
 		String llistesPertany = ""; //$NON-NLS-1$
 		if (col_llistesPertany != null) for (Iterator it = col_llistesPertany.iterator(); it.hasNext(); ) {
             EmailListContainerEntity rel = (EmailListContainerEntity) it.next();
-            EmailListEntity pertanyA = rel.getContains();
+            EmailListEntity pertanyA = rel.getPertains();
             String codiDominiCurrent = pertanyA.getDomain() == null ? null : pertanyA.getDomain().getName();
             llistesPertany += pertanyA.getName() + "@" + codiDominiCurrent + ", ";
         }

@@ -32,7 +32,9 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.sync.engine.DispatcherHandler;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.intf.UserMgr;
 import com.soffid.iam.sync.service.ConsoleLogonService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -882,28 +884,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 					try {
 						log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Creating task");
 						taskQueue = true;
-						final long timeToWait = 60000; // 1 minute
-						TaskHandler th = createTask(TaskHandler.VALIDATE_PASSWORD, passwordDomain.getName(), user.getUserName(),
-								password, false, true);
-		
-						th.setTimeout(new Date(System.currentTimeMillis() + timeToWait));
-						synchronized (th) {
-							if (th.getTask().getStatus().equals("P")) { //$NON-NLS-1$
-								th.wait(timeToWait);
-							}
-						}
-						if (debugPasswords()) {
-							if (th.isValidated())
-								log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : WRONG Password not accepted by any system: "+hash(password.getPassword()));
-							else
-								log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD Password accepted by  system: "+hash(password.getPassword()));
-						}
-						if (th.isValidated()) {
+						if (validateOnDispatchers(user, passwordDomain, password)) {
 							updateAccountLastLogin(user, passwordDomain);
 							log.info("Storing password validate on trusted system");
 							handleStoreAndForwardPassword(user, passwordDomain, password, false);
+							return PasswordValidation.PASSWORD_GOOD;
 						}
-						return th.isValidated() ? PasswordValidation.PASSWORD_GOOD : PasswordValidation.PASSWORD_WRONG;
+						else
+							return PasswordValidation.PASSWORD_WRONG;
 					} finally {
 						currentValidationRequests.remove(hash);
 					}
@@ -927,6 +915,78 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 
 		return PasswordValidation.PASSWORD_WRONG;
+	}
+
+	class ThreadInfo {
+		boolean success;
+		int pending;
+	}
+	private boolean validateOnDispatchers(UserEntity user, PasswordDomainEntity passwordDomain, Password password) throws InternalErrorException {
+		final ThreadInfo t = new ThreadInfo();
+		t.success = false;
+		t.pending = 0;
+		final long timeOut = System.currentTimeMillis() + 60000; // 1 minute
+		for (UserAccountEntity acc: user.getAccounts()) {
+			if (! acc.getAccount().isDisabled() && acc.getAccount().getSystem().getPasswordDomain() == passwordDomain) {
+				final String accountName = acc.getAccount().getName();
+				final DispatcherHandler h = getTaskGenerator().getDispatcher(acc.getAccount().getSystem().getName());
+				if (h != null && h.isConnected() && Boolean.TRUE.equals( h.getSystem().getTrusted()) ) {
+					synchronized (t) {
+						t.pending ++ ;
+					}
+					new Thread() {
+						public void run() {
+							try {
+								Object agent = h.connect(false, false);
+								if ( agent instanceof es.caib.seycon.ng.sync.intf.UserMgr &&
+									((es.caib.seycon.ng.sync.intf.UserMgr) agent).validateUserPassword(accountName, es.caib.seycon.ng.comu.Password.toPassword(password))) {
+									if (debugPasswords())
+										log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Password accepted by any system: "+h.getSystem().getName()+": "+hash(password.getPassword()));
+									t.success = true;
+								}
+								else if ( agent instanceof UserMgr && 
+									((UserMgr) agent).validateUserPassword(accountName, password)) {
+									if (debugPasswords())
+										log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Password accepted by any system: "+h.getSystem().getName()+": "+hash(password.getPassword()));
+									t.success = true;
+								}
+								else {
+									log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : WRONG Password not accepted by system "+h.getSystem().getName()+": "+hash(password.getPassword()));
+								}
+							} catch (Exception e) {
+								log.info("Cannot validate account "+accountName+" on "+h.getSystem().getName(), e);
+							} finally {
+								synchronized(t) {
+									t.pending --;
+									if (t.pending == 0 || t.success)
+									{
+										t.notify();
+									}
+								}	
+							}
+						}
+					}.start();
+				}
+			}
+		}
+
+		try {
+			synchronized (t) {
+				long delay = timeOut - System.currentTimeMillis();
+				if (t.success || t.pending == 0 || delay <= 0)
+					return t.success;
+				t.wait(delay);
+				if (debugPasswords()) {
+					if (t.success)
+						log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : WRONG Password not accepted by any system: "+hash(password.getPassword()));
+					else
+						log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD Password accepted by  system: "+hash(password.getPassword()));
+				}
+				return t.success;
+			}
+		} catch (InterruptedException e) {
+			return t.success;
+		}
 	}
 
 	public boolean isRightPassword(Password password, PasswordEntity contra) throws InternalErrorException {

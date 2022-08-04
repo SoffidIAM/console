@@ -1406,6 +1406,11 @@ div.databox div.container, div.databox div.container span {
 	white-space: pre; 
 }
 
+div.databox div.container span.binary {
+	display: inline-block;
+	margin-top: 6px;
+}
+
 div.databox div.container img.dataimage,
 div.databox img.dataimage {
 	max-width: 96px;
@@ -1416,6 +1421,11 @@ div.databox img.dataimage {
 div.databox div.container input.name {
 	width: 30%;
 	min-width: 250px;
+}
+
+div.databox-popup img.upload-menu-icon {
+	width: 16px;
+	margin-right: 12px;
 }
 
 span.fixedtext,

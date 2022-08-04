@@ -60,7 +60,7 @@ fi
 cd $base/target/dist/opt/soffid/iam-console-3
 cat $base/target/wix/head.wxs  >$base/target/wix/console.wxs
 echo >$base/target/wix/feature.wxs
-dump . "" ROOT $base/target/dist/opt/soffid/iam-console-3 "$1">>$base/target/wix/console.wxs
+dump . "" ROOT target/dist/opt/soffid/iam-console-3 "$1">>$base/target/wix/console.wxs
 cat $base/target/wix/middle.wxs  >>$base/target/wix/console.wxs
 cat $base/target/wix/feature.wxs  >>$base/target/wix/console.wxs
 cat $base/target/wix/tail.wxs >>$base/target/wix/console.wxs

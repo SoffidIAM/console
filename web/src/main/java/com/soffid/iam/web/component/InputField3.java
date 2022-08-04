@@ -1,14 +1,17 @@
 package com.soffid.iam.web.component;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xml.HTMLs;
@@ -33,10 +37,14 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
+import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Menuitem;
+import org.zkoss.zul.Menupopup;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.BinaryData;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.OsType;
@@ -333,8 +341,16 @@ public class InputField3 extends Databox
 				}
 				setSelectIcon2(getSelectIcon().substring(0, getSelectIcon().length()-4)+"-white.svg");
 			}
-			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE)
-				setVisible(false);
+			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE) {
+				setType(Databox.Type.BINARY);
+				setSelectIcon("/img/clip.svg");
+				setUploadIcon("/img/import.svg");
+				setDownloadIcon("/img/download.svg");
+				setClearIcon("/img/remove.svg");
+				setUploadMessage(Labels.getLabel("altaDocumento.btnBrowse"));
+				setDownloadMessage(Labels.getLabel("contenidoTarea.btnDescargar"));
+				setClearMessage(Labels.getLabel("dadesAddicionals.zul.Esborra"));
+			}
 			else if (dataType.getType() == TypeEnumeration.BOOLEAN_TYPE) {
 				setType(Databox.Type.BOOLEAN);
 				setSclass("databox databox_switch");
@@ -914,7 +930,7 @@ public class InputField3 extends Databox
 	}
 	
 	
-	public void openSelectWindow(Integer position) throws UiException {
+	public void openSelectWindow(final Integer position) throws UiException {
 		if (noPermissions)
 			return;
 		if (dataHandler != null)
@@ -961,6 +977,60 @@ public class InputField3 extends Databox
 			Editor.edit(this, javascript == null ? "{}" : javascript);
 		}
 	}
+
+	@Override
+	public void onUpload(final Integer position) {
+		FileUpload2.get((event2) -> {
+			UploadEvent ue = (UploadEvent) event2;
+			Media m = ue.getMedia();
+			BinaryData bd;
+			if (m.isBinary() && m.inMemory())
+				bd = new BinaryData(m.getName(), m.getByteData());
+			else if (m.isBinary()) 
+				bd = new BinaryData(m.getName(), m.getStreamData());
+			else if (m.inMemory()) 
+				bd = new BinaryData(m.getName(), m.getStringData().getBytes(StandardCharsets.UTF_8));
+			else 
+				bd = new BinaryData(m.getName(), m.getReaderData());
+			onItemChange(bd, position);
+			invalidate();
+		});
+	}
+
+	@Override
+	public void onClear(final Integer position) {
+		onItemChange(null, position);
+		invalidate();
+	}
+
+	@Override
+	public void onDownload(final Integer position) {
+		Object data = binder.getValue();
+		Object value = null;
+		if (dataType.isMultiValued()) {
+			List values = (List) data;
+			if (values != null && values.size() > position.intValue())
+				value = values.get(position.intValue());
+		} else {
+			value = data;
+		}
+
+		if (value instanceof BinaryData) {
+			BinaryData bd = (BinaryData) value;
+			AMedia m;
+			try {
+				m = new AMedia(bd.getName(), null, "binary/octet-stream", bd.getInputStream());
+			} catch (FileNotFoundException e) {
+				throw new UiException(e);
+			}
+			Filedownload.save(m);
+		} else {
+			AMedia m = new AMedia("noname", null, "binary/octet-stream", (byte[]) value);
+			Filedownload.save(m);
+		}
+		invalidate();
+	}
+
 
 	class FinderListener implements EventListener {
 		@Override
@@ -1186,4 +1256,12 @@ public class InputField3 extends Databox
 			raisePrivileges = false;
 		}
 	}
+	
+	public Object translateToUserInterface(Object o) {
+		if (dataType.getType() == TypeEnumeration.BINARY_TYPE && o != null && o instanceof BinaryData) 
+			return ((BinaryData)o).getName();
+		else
+			return super.translateToUserInterface(o);
+	}
+
 }

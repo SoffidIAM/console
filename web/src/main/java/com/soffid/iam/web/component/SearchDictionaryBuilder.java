@@ -191,7 +191,8 @@ public class SearchDictionaryBuilder {
 		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypes(scope))
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
-				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()))
+				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+				! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()))
 			{
 				SearchAttributeDefinition sad = new SearchAttributeDefinition();
 				sad.setLocalizedName(att.getLabel());
@@ -285,7 +286,8 @@ public class SearchDictionaryBuilder {
 		for (DataType att: EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName(objectType, null))
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
-				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()))
+				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+				! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()))
 			{
 				SearchAttributeDefinition sad = new SearchAttributeDefinition();
 				sad.setLocalizedName(att.getLabel());
@@ -324,7 +326,9 @@ public class SearchDictionaryBuilder {
 		{
 			for (DataType att: EJBLocator.getAdditionalDataService().findSystemDataTypes(d.getName()))
 			{
-				if (!TypeEnumeration.BINARY_TYPE.equals(att.getType()) && !TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+				if (!TypeEnumeration.BINARY_TYPE.equals(att.getType()) && 
+						!TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+						! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()) &&
 					att.getLabel() != null && att.getType() != null && att.getCode() != null)
 				{
 					SearchAttributeDefinition sad = new SearchAttributeDefinition();

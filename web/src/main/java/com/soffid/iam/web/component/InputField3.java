@@ -341,7 +341,8 @@ public class InputField3 extends Databox
 				}
 				setSelectIcon2(getSelectIcon().substring(0, getSelectIcon().length()-4)+"-white.svg");
 			}
-			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE) {
+			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE ||
+					dataType.getType() == TypeEnumeration.ATTACHMENT_TYPE) {
 				setType(Databox.Type.BINARY);
 				setSelectIcon("/img/clip.svg");
 				setUploadIcon("/img/import.svg");
@@ -1258,8 +1259,16 @@ public class InputField3 extends Databox
 	}
 	
 	public Object translateToUserInterface(Object o) {
-		if (dataType.getType() == TypeEnumeration.BINARY_TYPE && o != null && o instanceof BinaryData) 
-			return ((BinaryData)o).getName();
+		if (dataType != null && dataType.getType() == TypeEnumeration.ATTACHMENT_TYPE && o != null) {
+			String name = null;
+			if (o instanceof BinaryData) 
+				name = ((BinaryData)o).getName();
+			if (name == null) name = Labels.getLabel("inbox.lblAttachment");
+			return name;
+		}
+		else if (dataType != null  && dataType.getType() == TypeEnumeration.BINARY_TYPE && o != null) {
+			return Labels.getLabel("inbox.lblAttachment");
+		}
 		else
 			return super.translateToUserInterface(o);
 	}

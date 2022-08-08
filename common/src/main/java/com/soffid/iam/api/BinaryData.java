@@ -7,12 +7,22 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.CharBuffer;
 import java.util.Arrays;
+import java.util.Calendar;
 
-public class BinaryData implements Comparable<Object> {
+import es.caib.seycon.util.Base64;
+
+public class BinaryData implements Comparable<Object>, Serializable {
+	private static final long serialVersionUID = 1L;
 	String name;
 	byte data[];
 	File temporaryFile;
@@ -37,7 +47,6 @@ public class BinaryData implements Comparable<Object> {
 		byte buffer[] = new byte[64000];
 		for (int read = in.read(buffer); read > 0; read = in.read(buffer))
 			out.write(buffer, 0, read);
-		out.write(data);
 		out.close();
 		in.close();
 		temporaryFile.deleteOnExit();
@@ -121,4 +130,75 @@ public class BinaryData implements Comparable<Object> {
 		else
 			return 1;
 	}
+	
+	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
+		name = (String) in.readObject();
+		temporaryFile = null;
+		byte buffer[] = new byte[64000];
+		FileOutputStream out = null;
+		boolean first = true;
+		for (int read = in.readInt(); read >= 0; read = in.readInt()) {
+			in.read(buffer, 0, read);
+			if (first) { 
+				this.data = Arrays.copyOf(buffer, read);
+				first = false;
+			}
+			else 
+			{
+				if (out == null) {
+					temporaryFile = File.createTempFile("data", "raw");
+					out = new FileOutputStream(temporaryFile);
+					out.write(data);
+					data = null;
+					temporaryFile.deleteOnExit();				
+				}
+				out.write(buffer, 0, read);
+			}
+		}
+		if (out != null)
+			out.close();
+	}
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeObject(name);
+		byte buffer[] = new byte[64000];
+		InputStream in = getInputStream();
+		for (int read = in.read(buffer); read > 0; read = in.read(buffer)) {
+			out.writeInt(read);
+			out.write(buffer, 0, read);
+		}
+		out.writeInt(-1);
+	}
+	
+	public static BinaryData fromString(String s) throws IOException {
+		int i = s.indexOf(":");
+		if (i >= 0) {
+			String name = null;
+			byte[] data = Base64.decode(s.substring(i+1).trim());
+			try {
+				name = URLDecoder.decode(s.substring(0, i), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+			}
+			return new BinaryData(name, data);
+		} else {
+			return new BinaryData(null, Base64.decode(s));
+		}
+	}
+
+	public String toString() {
+		try {
+			StringBuffer sb = new StringBuffer();
+			if (name != null) 
+				sb.append(URLEncoder.encode(name, "UTF-8")).append(":");
+			
+			InputStream in = getInputStream();
+			byte buffer[] = new byte[64000];
+			for (int read = in.read(buffer); read > 0; read = in.read(buffer))
+				sb.append(Base64.encodeBytes(buffer, 0, read, Base64.DONT_BREAK_LINES));
+			return sb.toString();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 }

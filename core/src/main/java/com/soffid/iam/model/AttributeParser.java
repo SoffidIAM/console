@@ -3,6 +3,8 @@ package com.soffid.iam.model;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,7 +32,7 @@ public class AttributeParser {
 			value = null;
 			blobValue = null;
 		} 
-		else if (type.equals( TypeEnumeration.BINARY_TYPE)  && v instanceof BinaryData)
+		else if (type.equals( TypeEnumeration.ATTACHMENT_TYPE)  && v instanceof BinaryData)
 		{
 			try {
 				BinaryData d = (BinaryData) v;
@@ -49,13 +51,25 @@ public class AttributeParser {
 			}
 		}
 		else if (type.equals( TypeEnumeration.BINARY_TYPE) ||
+				type.equals( TypeEnumeration.ATTACHMENT_TYPE) ||
 				type.equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			value = null;
 			if (v instanceof byte[])
 				blobValue = (byte[]) v;
-			else
-				blobValue = Base64.decode(v.toString());
+			else {
+				String s = v.toString();
+				int i = s.indexOf(":");
+				if (i >= 0) {
+					blobValue = Base64.decode(s.substring(i+1).trim());
+					try {
+						value = URLDecoder.decode(s.substring(0, i), "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+					}
+				} else {
+					blobValue = Base64.decode(s);
+				}
+			}
 		}
 		else if (type.equals( TypeEnumeration.HTML))
 		{
@@ -119,7 +133,7 @@ public class AttributeParser {
 	public static Object getObjectValue(TypeEnumeration type, String value2, byte[] blobDataValue) {
 		if (type == null)
 			return value2;
-		else if (type.equals( TypeEnumeration.BINARY_TYPE) ) {
+		else if (type.equals( TypeEnumeration.ATTACHMENT_TYPE) ) {
 			if (blobDataValue == null)
 				return null;
 			else if (value2 != null)
@@ -131,7 +145,7 @@ public class AttributeParser {
 			else
 				return blobDataValue;
 		}
-		else if (type.equals( TypeEnumeration.PHOTO_TYPE))
+		else if (type.equals( TypeEnumeration.PHOTO_TYPE)  || type.equals( TypeEnumeration.BINARY_TYPE))
 		{
 			return blobDataValue;
 		}

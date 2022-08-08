@@ -44,6 +44,7 @@ public class UsersListbox extends DataListbox implements AfterCompose {
 					}
 					else if ( TypeEnumeration.HTML.equals(tda.getType()) ||
 							TypeEnumeration.BINARY_TYPE.equals(tda.getType()) ||
+							TypeEnumeration.ATTACHMENT_TYPE.equals(tda.getType()) ||
 							TypeEnumeration.PHOTO_TYPE.equals(tda.getType()))
 					{
 						

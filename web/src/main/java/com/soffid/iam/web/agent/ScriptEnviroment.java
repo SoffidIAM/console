@@ -353,6 +353,8 @@ public class ScriptEnviroment {
 			sb.append(openAttribute()).append(name).append(closeAttribute()).append(":\"");
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
+			else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+				sb.append("com.soffid.iam.api.BinaryData");
 			else if (t == TypeEnumeration.DATE_TYPE)
 				sb.append("java.util.Calendar");
 			else
@@ -376,6 +378,8 @@ public class ScriptEnviroment {
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
+			else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+				sb.append("com.soffid.iam.api.BinaryData");
 			else if (t == TypeEnumeration.DATE_TYPE)
 				sb.append("java.util.Calendar");
 			else
@@ -399,6 +403,8 @@ public class ScriptEnviroment {
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
+			else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+				sb.append("com.soffid.iam.api.BinaryData");
 			else if (t == TypeEnumeration.DATE_TYPE)
 				sb.append("java.util.Calendar");
 			else
@@ -422,6 +428,8 @@ public class ScriptEnviroment {
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
+			else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+				sb.append("com.soffid.iam.api.BinaryData");
 			else if (t == TypeEnumeration.DATE_TYPE)
 				sb.append("java.util.Calendar");
 			else
@@ -452,6 +460,8 @@ public class ScriptEnviroment {
 				TypeEnumeration t = td.getType();
 				if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 					sb.append("byte");
+				else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+					sb.append("com.soffid.iam.api.BinaryData");
 				else if (t == TypeEnumeration.DATE_TYPE)
 					sb.append("java.util.Calendar");
 				else
@@ -478,6 +488,8 @@ public class ScriptEnviroment {
 			TypeEnumeration t = td.getType();
 			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
 				sb.append("byte");
+			else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+				sb.append("com.soffid.iam.api.BinaryData");
 			else if (t == TypeEnumeration.DATE_TYPE)
 				sb.append("java.util.Calendar");
 			else

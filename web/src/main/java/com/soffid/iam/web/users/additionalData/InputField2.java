@@ -1765,7 +1765,7 @@ public class InputField2 extends Div implements XPathSubscriber
 				}
 				result = sb.toString();
 			}
-			else if(TypeEnumeration.BINARY_TYPE.equals(type))
+			else if(TypeEnumeration.BINARY_TYPE.equals(type) || TypeEnumeration.ATTACHMENT_TYPE.equals(type))
 			{
 				boolean visible = fileAlreadySaved();
 				result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " + //$NON-NLS-1$

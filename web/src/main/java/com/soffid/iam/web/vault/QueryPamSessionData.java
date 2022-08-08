@@ -2,6 +2,8 @@ package com.soffid.iam.web.vault;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -50,6 +52,7 @@ public class QueryPamSessionData extends Label implements AfterCompose {
 			if (session != null)
 			{
 				List<Long> chapters = session.getChapters();
+				chapters = removeDummyChapters(chapters);
 				Collections.sort(chapters);
 				JSONArray captions = new JSONArray();
 				JSONArray videos = new JSONArray();
@@ -86,6 +89,23 @@ public class QueryPamSessionData extends Label implements AfterCompose {
 			getNamespace().setVariable("error", error, true);
 			log.warn("Error retrieving session information", e);
 		}
+	}
+
+	private List<Long> removeDummyChapters(List<Long> chapters) {
+		if (chapters.isEmpty())
+			return chapters;
+		
+		List<Long> l = new LinkedList<>();
+		Iterator<Long> it = chapters.iterator();
+		Long previous = it.next();
+		while (it.hasNext()) {
+			Long current = it.next();
+			if (current.longValue() - previous.longValue() > 500) // Minimum half a second
+				l.add(previous);
+			previous = current;
+		}
+		l.add(previous);
+		return l ;
 	}
 
 }

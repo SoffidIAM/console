@@ -62,7 +62,8 @@ public class BshJainClassManager extends BshClassManager {
 			return false;
 		
 		if (name.startsWith("java.")
-				|| name.startsWith("javax."))
+				|| name.startsWith("javax.") 
+				|| name.startsWith("com.soffid.iam.utils.MailUtils"))
 			return true;
 			
 		String s = name.replace('.', '/') + ".class";

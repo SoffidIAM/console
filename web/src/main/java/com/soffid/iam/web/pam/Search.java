@@ -6,6 +6,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -122,6 +124,7 @@ public class Search extends FrameHandler
 				setDatabox("pamSession.accountName", session.getAccountName());
 	
 				List<Long> chapters = session.getChapters();
+				chapters = removeDummyChapters(chapters);
 				Collections.sort(chapters);
 				JSONArray captions = new JSONArray();
 				JSONArray videos = new JSONArray();
@@ -164,6 +167,24 @@ public class Search extends FrameHandler
 			}
 		}
 	}
+
+	private List<Long> removeDummyChapters(List<Long> chapters) {
+		if (chapters.isEmpty())
+			return chapters;
+		
+		List<Long> l = new LinkedList<>();
+		Iterator<Long> it = chapters.iterator();
+		Long previous = it.next();
+		while (it.hasNext()) {
+			Long current = it.next();
+			if (current.longValue() - previous.longValue() > 500) // Minimum half a second
+				l.add(previous);
+			previous = current;
+		}
+		l.add(previous);
+		return l ;
+	}
+
 
 	private void setDatabox(final String compId, Object value) {
 		((Databox) getFellow(compId)).setValue(value);

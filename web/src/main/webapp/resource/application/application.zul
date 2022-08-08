@@ -92,7 +92,8 @@
 						<div id="dades"> 
 							<form id="form" onChangeXPath="ref:frame.onChangeForm"
 								dataPath="/listbox:/." width="100%">
-								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
+								<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+								    expectClass="com.soffid.iam.api.Application" 
 									requiredPermissions="application:update application:create"
 									objectType="com.soffid.iam.api.Application"
 									dataPath="/." id="applicationAttributes"/>

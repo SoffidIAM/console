@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service ( serverPath="/seycon/CertificateValidationService",
 	 translatedName="CertificateValidationService",
 	 translatedPackage="com.soffid.iam.service",
+	 serverRole = "agent",
 	 grantees={roles.anonymous.class})
 public abstract class CertificateValidationService {
 

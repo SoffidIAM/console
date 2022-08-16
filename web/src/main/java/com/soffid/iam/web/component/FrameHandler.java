@@ -86,9 +86,9 @@ public class FrameHandler extends Frame {
 			}
 			if (option != null)
 			{
-				setTitle(Labels.getLabel(option.getLabel()));
+//				setTitle(Labels.getLabel(option.getLabel()));
 			} else {
-				setTitle ("");
+//				setTitle ("");
 				if (! nomenu) {
 					setVisible(false);
 					throw new SecurityException("This URL is forbidden");

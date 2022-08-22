@@ -34,8 +34,17 @@
 				className="com.soffid.iam.api.RuleAssignedRole">
 			</new-instance-bean>
 		</finder>
+		<finder name="updateStatus" type="updateStatus">
+			<script-finder>
+				return new java.util.LinkedList();
+			</script-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.ApplyRuleProcess">
+			</new-instance-bean>
+		</finder>
 	</datanode>
 
+	<datanode name="updateStatus" transient="true" />
 	
 	<datanode name="ruleAssignedRole">
 		<script-handler>

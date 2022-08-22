@@ -159,7 +159,7 @@ public class HideColumnsComponent extends Toolbarbutton
 	private boolean[] getCurrentPreferences () throws InternalErrorException, NamingException, CreateException
 	{
 		String u = EJBLocator.getPreferencesService().findMyPreference("hcc-"+preferenceName);
-		Long stored = Long.decode(u);
+		Long stored = u == null ? 0: Long.decode(u);
 		// Now create and populate array
 		int columns = getNumberOfColumns();
 		boolean result[] = new boolean [columns];

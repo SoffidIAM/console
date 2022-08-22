@@ -1530,6 +1530,13 @@ li.attribute-search-box:hover > button div span {
 	display:inline;
 }
 
+div.progress {
+	background-color: {SKY};
+	height: 4px;
+	transition: width 1.1s;
+	transition-timing-function: linear;
+}
+
 img.progress {
 	height: 24px;
 	vertical-align: middle;
@@ -1616,7 +1623,7 @@ div.identity-tag-role img.imageclic:hover {
 }
 
 input[type="radio"] {
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 div.menupopup {
@@ -2019,9 +2026,11 @@ div.inputField {
 
 span.inputField_label {
 	display: table-cell;
-	width: 120px;
+	width: 192px;
 	vertical-align: top;
 	padding-top: 4px
+	color: 	{BLUE};
+	margin-left: 8px;
 }
 			
 div.inputField_input {
@@ -2029,6 +2038,7 @@ div.inputField_input {
 	vertical-align: top;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	min-width: 260px;
 }
 
 div.inputField_input {
@@ -2040,7 +2050,7 @@ div.inputField_input {
 }
 
 div.inputField_input img.imageclic {
-	width: 24px;	
+	width: 24px !important ;	
 }			
 
 span.inputField_tail {
@@ -3464,6 +3474,10 @@ div.databox div.container.switch, div.databox div.container.switch.wrapped {
 	margin-left: 0;
 }
 
+
+div.databox div.container select {
+	width: 100%;
+}
 
 div.databox div.container input.text ,
 div.databox div.container textarea.text,

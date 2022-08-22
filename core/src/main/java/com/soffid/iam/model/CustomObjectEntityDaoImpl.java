@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.Security;
 
@@ -56,7 +57,7 @@ public class CustomObjectEntityDaoImpl extends CustomObjectEntityDaoBase {
 	@Override
 	public Collection<CustomObjectEntity> findByText(CriteriaSearchConfiguration criteria, String objectType,
 			String text) {
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 2];
 		
 		StringBuffer sb = new StringBuffer("select u "

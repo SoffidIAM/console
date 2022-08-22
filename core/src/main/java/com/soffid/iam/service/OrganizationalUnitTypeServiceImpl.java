@@ -147,7 +147,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	String generateQuickSearchQuery (String text) {
 		if (text == null )
 			return  "";
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)

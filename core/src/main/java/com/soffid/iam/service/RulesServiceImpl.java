@@ -9,6 +9,7 @@
  */
 package com.soffid.iam.service;
 
+import com.soffid.iam.api.ApplyRuleProcess;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
@@ -142,7 +143,15 @@ public class RulesServiceImpl extends RulesServiceBase
 	}
 
 
-    private void auditRule(String accio, RuleEntity rule) {
+	@Override
+	protected ApplyRuleProcess handleApplyAsync (Rule rule) throws Exception
+	{
+		RuleEntity ruleEntity = getRuleEntityDao().load(rule.getId());
+		return getRuleEvaluatorService().applyAsync(ruleEntity);
+	}
+
+
+	private void auditRule(String accio, RuleEntity rule) {
         String codiUsuari = Security.getCurrentAccount();
         Audit auditoria = new Audit();
         auditoria.setAction(accio);
@@ -178,4 +187,10 @@ public class RulesServiceImpl extends RulesServiceBase
 		File f = getRuleEvaluatorService().dryRun(ruleEntity);
 		return f.getAbsolutePath();
 	}
+
+	@Override
+	protected ApplyRuleProcess handleQueryProcessStatus(ApplyRuleProcess process) throws Exception {
+		return getRuleEvaluatorService().queryProcessStatus(process);
+	}
+
 }

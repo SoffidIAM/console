@@ -141,7 +141,7 @@ public class ScimHelper {
 	String generateQuickSearchQuery (String text) throws InternalErrorException {
 		if (text == null || text.trim().isEmpty())
 			return  "";
-		String[] split = text.trim().split(" +");
+		String[] split = text.trim().split("[ ,./-]+");
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)
@@ -255,5 +255,13 @@ public class ScimHelper {
 
 	public void setSession(Session session) {
 		this.session = session;
+	}
+
+
+	public static String[] split(String text) {
+		if (text.startsWith("\"") && text.endsWith("\"") && text.length() > 2)
+			return new String[] {text.substring(1, text.length()-1)};
+		else
+			return text.trim().split("[ ,./-]+");
 	}
 }

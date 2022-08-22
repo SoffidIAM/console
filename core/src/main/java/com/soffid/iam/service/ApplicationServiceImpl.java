@@ -3066,7 +3066,7 @@ public class ApplicationServiceImpl extends
 		if (text == null )
 			return  "";
 		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.APPLICATION);
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)
@@ -3738,7 +3738,7 @@ public class ApplicationServiceImpl extends
 		if (text == null )
 			return  "";
 		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.ROLE);
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)

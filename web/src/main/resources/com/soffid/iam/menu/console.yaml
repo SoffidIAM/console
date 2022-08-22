@@ -22,7 +22,7 @@
 - name: wheel.menu
   img: /img/menu/wheel.svg
   url: /self/account.zul
-  permissions: ["authorization:all"]
+  permissions: ["authorization:not-enabled-yet"]
 - name: soffid.admin
   img: /img/menu/laboratory.svg
   options:

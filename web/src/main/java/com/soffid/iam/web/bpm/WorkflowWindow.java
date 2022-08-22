@@ -2,6 +2,7 @@ package com.soffid.iam.web.bpm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -216,5 +217,10 @@ public class WorkflowWindow extends Window implements WorkflowWindowInterface {
     public void onTaskTabSelected(String selectedId){
     	
     }
+
+	@Override
+	public CompletableFuture<Boolean> confirmTransition(String transitionName) {
+		return null;
+	}
     
 }

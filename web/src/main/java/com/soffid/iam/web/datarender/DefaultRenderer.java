@@ -50,6 +50,12 @@ public class DefaultRenderer extends DataTypeRenderer {
 			o.put("value", "parseInt ("+prefix+dt.getName()+")");
 			o.put("className", "statusColumn");
 		}
+		else if (dt.getType() == TypeEnumeration.BINARY_TYPE) {
+			o.put("value", prefix+dt.getName());
+		}
+		else if (dt.getType() == TypeEnumeration.ATTACHMENT_TYPE) {
+			o.put("value", prefix+dt.getName()+".name");
+		}
 		else if (dt.getType() == TypeEnumeration.PASSWORD_TYPE) {
 			o.put("template", "*******");
 			o.put("className", "statusColumn");

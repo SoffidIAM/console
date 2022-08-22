@@ -48,6 +48,7 @@ public class FrameHandler extends Frame {
 	String menu = "console.yaml";
 	boolean nomenu = false;
 	boolean registerUrl = true;
+	String pageTitle = "";
 	
 	public FrameHandler() throws InternalErrorException {
 		setStyle("position:relative");
@@ -64,18 +65,18 @@ public class FrameHandler extends Frame {
 							String.format("try {"
 									+ "if (! window.location.pathname.startsWith(\"%s\")) "
 									+ "    window.history.pushState(\"%s\", \"%s\", window.location.protocol+\"//\"+window.location.host+\"%s\");"
+									+ "document.title=\"%s\";"
 									+ "} catch (e) {console.log(e);}",
 									ctx + url, 
 									ctx + url, 
-									getPage().getTitle(), 
-									ctx + url)));
+									pageTitle, 
+									ctx + url,
+									pageTitle)));
 		}
 	}
 	@Override
 	public void afterCompose() {
 		if (getPage() != null) {
-			setUrl(getPage().getRequestPath());
-			
 			MenuParser menuParser = new MenuParser();
 			List<MenuOption> options;
 			MenuOption option = null;
@@ -86,14 +87,18 @@ public class FrameHandler extends Frame {
 			}
 			if (option != null)
 			{
-				setTitle(Labels.getLabel(option.getLabel()));
+				if (option.getLiteral() != null)
+					pageTitle = option.getLiteral();
+				else
+					pageTitle = Labels.getLabel(option.getLabel());
 			} else {
-				setTitle ("");
 				if (! nomenu) {
 					setVisible(false);
 					throw new SecurityException("This URL is forbidden");
 				}
 			}
+			
+			setUrl(getPage().getRequestPath());
 			
 			Application.registerPage(this);
 			

@@ -303,7 +303,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		if (text == null )
 			return  "";
 		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)

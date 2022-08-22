@@ -1,5 +1,7 @@
 package com.soffid.iam.web.bpm;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.zkoss.zk.ui.Component;
 
 import com.soffid.iam.bpm.api.ProcessInstance;
@@ -18,6 +20,7 @@ public interface WorkflowWindowInterface extends Component {
 
 	public static final String TAB_SELECTED_EVENT = "onTabSelected"; //$NON-NLS-1$
 
+	CompletableFuture<Boolean> confirmTransition(String transitionName);
 
 	boolean isCanAddAttachments();
 

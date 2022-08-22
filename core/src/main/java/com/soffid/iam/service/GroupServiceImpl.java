@@ -854,7 +854,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (text == null )
 			return  "";
 		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.GROUP);
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)

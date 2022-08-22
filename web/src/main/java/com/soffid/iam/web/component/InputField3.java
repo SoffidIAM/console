@@ -1,16 +1,22 @@
 package com.soffid.iam.web.component;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -20,9 +26,19 @@ import java.util.Map;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.xel.Function;
+import org.zkoss.xel.FunctionMapper;
+import org.zkoss.xel.VariableResolver;
+import org.zkoss.xel.XelContext;
+import org.zkoss.xel.XelException;
+import org.zkoss.xel.el.ELFactory;
+import org.zkoss.xel.el.ELXelExpression;
+import org.zkoss.xel.util.SimpleXelContext;
 import org.zkoss.xml.HTMLs;
 import org.zkoss.xml.XMLs;
 import org.zkoss.zk.ui.Component;
@@ -33,10 +49,14 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
+import org.zkoss.zul.Filedownload;
+import org.zkoss.zul.Menuitem;
+import org.zkoss.zul.Menupopup;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.BinaryData;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.OsType;
@@ -104,6 +124,8 @@ public class InputField3 extends Databox
 	String keysPath = null;
 	String valuesPath = null;
 	String javascript = null;
+	String descriptionExpression = null;
+	SimpleXelContext xelContext = new SimpleXelContext();
 	
 	private SearchFilter filter;
 
@@ -114,6 +136,8 @@ public class InputField3 extends Databox
 	private EventListener listener;
 
 	private boolean noPermissions;
+
+	private org.zkoss.xel.Expression descriptionExpressionCompiled;
 	
 	public DataType getDataType() {
 		return dataType;
@@ -333,8 +357,17 @@ public class InputField3 extends Databox
 				}
 				setSelectIcon2(getSelectIcon().substring(0, getSelectIcon().length()-4)+"-white.svg");
 			}
-			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE)
-				setVisible(false);
+			else if (dataType.getType() == TypeEnumeration.BINARY_TYPE ||
+					dataType.getType() == TypeEnumeration.ATTACHMENT_TYPE) {
+				setType(Databox.Type.BINARY);
+				setSelectIcon("/img/clip.svg");
+				setUploadIcon("/img/import.svg");
+				setDownloadIcon("/img/download.svg");
+				setClearIcon("/img/remove.svg");
+				setUploadMessage(Labels.getLabel("altaDocumento.btnBrowse"));
+				setDownloadMessage(Labels.getLabel("contenidoTarea.btnDescargar"));
+				setClearMessage(Labels.getLabel("dadesAddicionals.zul.Esborra"));
+			}
 			else if (dataType.getType() == TypeEnumeration.BOOLEAN_TYPE) {
 				setType(Databox.Type.BOOLEAN);
 				setSclass("databox databox_switch");
@@ -829,7 +862,15 @@ public class InputField3 extends Databox
 			if (raisePrivileges)
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
-				String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+				String d = null;
+				if (descriptionExpression == null)
+					d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+				else {
+					Object o = dataHandler.getObject(name.toString(), dataType.getFilterExpression());
+					if ( o != null ) {
+						d = evaluateDescriptionExpression(o);
+					}
+				}
 				String link = dataHandler.followLink(name.toString());
 				if (link != null) {
 					d = "<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>";
@@ -843,7 +884,15 @@ public class InputField3 extends Databox
 				noPermissions = true;
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 				try {
-					String d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+					String d = null;
+					if (descriptionExpression == null)
+						d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+					else {
+						Object o = dataHandler.getObject(name.toString(), dataType.getFilterExpression());
+						if ( o != null ) {
+							d = evaluateDescriptionExpression(o);
+						}
+					}
 					return  d == null ? "" : XMLs.encodeAttribute(d);
 				} finally {
 					Security.nestedLogoff();
@@ -853,6 +902,32 @@ public class InputField3 extends Databox
 					Security.nestedLogoff();
 			}
 		}
+	}
+
+	
+	private String evaluateDescriptionExpression(final Object value) {
+		xelContext.setVariableResolver(new VariableResolver() {
+			@Override
+			public Object resolveVariable(String name) throws XelException {
+				if ("this".equals(name))
+					return value;
+				Object p;
+				try {
+					p = PropertyUtils.getProperty(value, name);
+					if (p == null)
+						return null;
+					if (p instanceof Date)
+						return DateFormats.getDateFormat().format((Date)p);
+					if (p instanceof Calendar)
+						return DateFormats.getDateFormat().format(((Calendar)p).getTime());
+				} catch (Exception e) {
+					throw new XelException ( e );
+				}
+				return p;
+			}
+		});
+		xelContext.setFunctionMapper( getPage().getFunctionMapper());
+		return (String) descriptionExpressionCompiled.evaluate(xelContext);
 	}
 
 	@Override
@@ -900,6 +975,9 @@ public class InputField3 extends Databox
 					if (i++ >= currentPosition)
 					{
 						String[] row = ((InputFieldDataHandler<Object>)dataHandler).toNameDescription(o);
+						if (descriptionExpression != null) {
+							row[1] = evaluateDescriptionExpression(o);
+						}
 						result.add(row);
 						currentPosition ++;
 					}
@@ -914,7 +992,7 @@ public class InputField3 extends Databox
 	}
 	
 	
-	public void openSelectWindow(Integer position) throws UiException {
+	public void openSelectWindow(final Integer position) throws UiException {
 		if (noPermissions)
 			return;
 		if (dataHandler != null)
@@ -961,6 +1039,60 @@ public class InputField3 extends Databox
 			Editor.edit(this, javascript == null ? "{}" : javascript);
 		}
 	}
+
+	@Override
+	public void onUpload(final Integer position) {
+		FileUpload2.get((event2) -> {
+			UploadEvent ue = (UploadEvent) event2;
+			Media m = ue.getMedia();
+			BinaryData bd;
+			if (m.isBinary() && m.inMemory())
+				bd = new BinaryData(m.getName(), m.getByteData());
+			else if (m.isBinary()) 
+				bd = new BinaryData(m.getName(), m.getStreamData());
+			else if (m.inMemory()) 
+				bd = new BinaryData(m.getName(), m.getStringData().getBytes(StandardCharsets.UTF_8));
+			else 
+				bd = new BinaryData(m.getName(), m.getReaderData());
+			onItemChange(bd, position);
+			invalidate();
+		});
+	}
+
+	@Override
+	public void onClear(final Integer position) {
+		onItemChange(null, position);
+		invalidate();
+	}
+
+	@Override
+	public void onDownload(final Integer position) {
+		Object data = binder.getValue();
+		Object value = null;
+		if (dataType.isMultiValued()) {
+			List values = (List) data;
+			if (values != null && values.size() > position.intValue())
+				value = values.get(position.intValue());
+		} else {
+			value = data;
+		}
+
+		if (value instanceof BinaryData) {
+			BinaryData bd = (BinaryData) value;
+			AMedia m;
+			try {
+				m = new AMedia(bd.getName(), null, "binary/octet-stream", bd.getInputStream());
+			} catch (FileNotFoundException e) {
+				throw new UiException(e);
+			}
+			Filedownload.save(m);
+		} else {
+			AMedia m = new AMedia("noname", null, "binary/octet-stream", (byte[]) value);
+			Filedownload.save(m);
+		}
+		invalidate();
+	}
+
 
 	class FinderListener implements EventListener {
 		@Override
@@ -1186,4 +1318,37 @@ public class InputField3 extends Databox
 			raisePrivileges = false;
 		}
 	}
+	
+	public Object translateToUserInterface(Object o) {
+		if (dataType != null && dataType.getType() == TypeEnumeration.ATTACHMENT_TYPE && o != null) {
+			String name = null;
+			if (o instanceof BinaryData) 
+				name = ((BinaryData)o).getName();
+			if (name == null) name = Labels.getLabel("inbox.lblAttachment");
+			return name;
+		}
+		else if (dataType != null  && dataType.getType() == TypeEnumeration.BINARY_TYPE && o != null) {
+			return Labels.getLabel("inbox.lblAttachment");
+		}
+		else
+			return super.translateToUserInterface(o);
+	}
+
+	
+	public String getDescriptionExpression() {
+		return descriptionExpression;
+	}
+
+	
+	public void setDescriptionExpression(String descriptionExpression) {
+		this.descriptionExpression = descriptionExpression;
+		if (descriptionExpression == null)
+			descriptionExpressionCompiled = null;
+		else {
+			xelContext.setFunctionMapper(getPage().getFunctionMapper());
+			descriptionExpressionCompiled = new ELFactory()
+				.parseExpression(xelContext, descriptionExpression.replace("#{", "${"), String.class);
+		}
+	}
+
 }

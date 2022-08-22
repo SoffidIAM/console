@@ -78,7 +78,11 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.Identity;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchDictionaryBuilder;
+import com.soffid.iam.web.component.inputField.ApplicationDataHandler;
+import com.soffid.iam.web.component.inputField.CustomObjectDataHandler;
+import com.soffid.iam.web.component.inputField.GroupDataHandler;
 import com.soffid.iam.web.component.inputField.RoleDataHandler;
+import com.soffid.iam.web.component.inputField.UserDataHandler;
 import com.soffid.iam.web.popup.FinderHandler;
 
 import bsh.EvalError;
@@ -922,7 +926,7 @@ public class InputField2 extends Div implements XPathSubscriber
 		XPathUtils.getComponentContext(this).getDataSource().commit();
 	}
 
-	public void openUser(Event event) {
+	public void openUser(Event event) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		if ( Security.isUserInRole( Security.AUTO_SEU_VIEW_USUARIS))
 		{
 			Component c = event.getTarget().getParent().getFirstChild();
@@ -933,35 +937,43 @@ public class InputField2 extends Div implements XPathSubscriber
 			}
 			InputElement textbox = (InputElement) c;
 			String user = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user="+user, "_new"); //$NON-NLS-1$ //$NON-NLS-2$
+			Executions.getCurrent().sendRedirect(
+					new UserDataHandler(dataType).followLink(user).substring(7),
+					"_new");
 		}
 	}
 
-	public void openGroup(Event event) {
+	public void openGroup(Event event) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		if ( Security.isUserInRole( Security.AUTO_SEU_VIEW_GRUPS))
 		{
 			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
 			String grup = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + grup, "_new"); //$NON-NLS-1$ //$NON-NLS-2$
+			Executions.getCurrent().sendRedirect(
+					new GroupDataHandler(dataType).followLink(grup).substring(7),
+					"_new");
 		}
 	}
 
-	public void openApplication(Event event) {
+	public void openApplication(Event event) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		if ( Security.isUserInRole( Security.AUTO_SEU_VIEW_APLICACIONS))
 		{
 			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
 			String application = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + application, "_new"); //$NON-NLS-1$ //$NON-NLS-2$
+			Executions.getCurrent().sendRedirect(
+					new ApplicationDataHandler(dataType).followLink(application).substring(7),
+					"_new");
 		}
 	}
 
-	public void openCustomObject(Event event) {
+	public void openCustomObject(Event event) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		if ( Security.isUserInRole( "seu:customObject:show")) //$NON-NLS-1$
 		{
 			String type = dataType.getDataObjectType();
 			InputElement textbox = (InputElement) event.getTarget().getPreviousSibling().getPreviousSibling();
 			String customObject = (String) textbox.getRawText();
-			Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + customObject, "_new"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Executions.getCurrent().sendRedirect(
+					new CustomObjectDataHandler(dataType).followLink(customObject).substring(7),
+					"_new");
 		}
 	}
 
@@ -1765,7 +1777,7 @@ public class InputField2 extends Div implements XPathSubscriber
 				}
 				result = sb.toString();
 			}
-			else if(TypeEnumeration.BINARY_TYPE.equals(type))
+			else if(TypeEnumeration.BINARY_TYPE.equals(type) || TypeEnumeration.ATTACHMENT_TYPE.equals(type))
 			{
 				boolean visible = fileAlreadySaved();
 				result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " + //$NON-NLS-1$

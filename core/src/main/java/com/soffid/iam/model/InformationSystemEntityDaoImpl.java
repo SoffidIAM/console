@@ -27,6 +27,7 @@ import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.bpm.service.BpmEngine;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
@@ -351,7 +352,7 @@ public class InformationSystemEntityDaoImpl
 
 		@Override
 		public Collection<InformationSystemEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
-			String[] split = text.trim().split(" +");
+			String[] split = ScimHelper.split(text);
 			Parameter[] params = new Parameter[split.length + 1];
 			
 			StringBuffer sb = new StringBuffer("select u "

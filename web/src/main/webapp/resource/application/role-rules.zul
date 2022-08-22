@@ -6,7 +6,9 @@
 	use="com.soffid.iam.web.application.RuleHandler" id="frame">
 	<script src='~./js/codemirror/java-classes.js'/>
 	<datamodel id="model" rootNode="root" src="rulesDescriptor.xml"/>
-
+	
+	<timer id="timer" delay="1000" onTimer="ref:frame.updateProgress" repeats="true" running="false" />
+	
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
@@ -60,6 +62,17 @@
 							language="java"
 							width="100%">
 						</codemirror>
+						<div style="width:100%; margin-bottom: 8px; border-radius: 4px; padding-left: 8px;padding-right: 8px;" 
+							id="progressdiv">
+							<div sclass="progress" id="progressbar"/>
+							<div>
+								<image src="/anonymous/wait.gif" sclass="imageclic" style="vertical-align: middle; height: 24px; width: 24px;"/>
+								<label value=" ${c:l('rules.progress') }:"/>
+								<label id="progress" style="display: inline-block; min-width: 150px; margin-left: 8px; margin-right: 8px;"/>
+								<label value="  ${c:l('rules.etf') }:"/>
+								<label id="etf" style="display: inline-block; min-width: 100px; margin-left: 8px; margin-right: 8px;"/>
+							</div>
+						</div>
 						<html><![CDATA[
 							<div>${c:l('rules.availableVariables') }</div>
 							<div style="display: table; margin-left: 36px">

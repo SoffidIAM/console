@@ -15,6 +15,7 @@ import bsh.ParseException;
 import bsh.TargetError;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.ApplyRuleProcess;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DelegationStatus;
 import com.soffid.iam.api.DomainValue;
@@ -26,6 +27,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserData;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.DomainValueEntity;
@@ -41,6 +43,7 @@ import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.RuleDryRunMethod;
 import com.soffid.iam.service.impl.RuleEvaluatorGrantRevokeMethod;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -52,6 +55,7 @@ import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 
 import java.io.File;
 import java.util.Calendar;
@@ -69,6 +73,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.jbpm.graph.node.ProcessState;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -498,4 +503,93 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		report.close();
 		return report.getFile();
 	};
+
+	Map<Long,ApplyRuleProcess> proc = new HashMap<>();
+	
+	@Override
+	protected ApplyRuleProcess handleApplyAsync (RuleEntity rule) throws Exception
+	{
+		ApplyRuleProcess old = proc.get(rule.getId());
+		if (old != null)
+			old.setCancelled(true);
+		final ApplyRuleProcess p = new ApplyRuleProcess();
+		p.setId(rule.getId());
+		proc.put(p.getId(), p);
+		p.setStart(new Date());
+		
+		if (sessionFactory == null)
+			sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+
+		final SoffidPrincipal principal = Security.getSoffidPrincipal();
+		
+		new Thread ( () -> {
+			
+			Session session = SessionFactoryUtils.getSession(sessionFactory, true) ;
+			final Number count = (Number) session
+					.createQuery( "select count(*) from com.soffid.iam.model.UserEntity as us "
+								+ "where us.active='S' and us.tenant.id=:tenantId ")
+					.setParameter("tenantId", Security.getCurrentTenantId())
+					.list()
+					.iterator()
+					.next();
+			
+			int pos = 0; 
+			int step = 100;
+			Object end = Boolean.FALSE;
+			Security.nestedLogin(principal);
+			try {
+				p.setProgress(0);
+				final CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+				criteria.setFirstResult(0);
+				criteria.setFetchSize(step);
+				while (! Boolean.TRUE.equals(end) && ! p.isCancelled()) {
+					end = getAsyncRunnerService().runNewTransaction(
+						() -> {
+							RuleEntity entity = getRuleEntityDao().load(rule.getId());
+							List<UserEntity> list = getUserEntityDao().query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId order by us.id", 
+									new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())},
+									criteria );
+							if (list.isEmpty())
+								return Boolean.TRUE;
+							int i = 0;
+							for (UserEntity user: list) {
+								if (p.isCancelled())
+									return Boolean.TRUE;
+								p.setCurrent(user.getUserName());
+								apply (entity, user);
+								i++;
+								p.setProgress( (float) ( criteria.getFirstResult() + i ) / count.floatValue());
+							}
+							session.flush();
+							session.clear();
+							criteria.setFirstResult(criteria.getFirstResult().intValue() + list.size());
+							return Boolean.FALSE;
+						}
+					);
+				}
+				p.setCurrent(null);
+				p.setStart(new Date());
+				p.setErrorMessage(null);
+				p.setFinished(true);
+			} catch (Exception e) {
+				log.warn("Error evaluating rules", e);
+				p.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
+				p.setStart(new Date());
+				p.setFinished(true);
+			} finally {
+				Security.nestedLogoff();
+				session.close();
+			}
+		} ).start();
+		
+		return p;
+		
+	}
+
+	@Override
+	protected ApplyRuleProcess handleQueryProcessStatus(ApplyRuleProcess process) throws Exception {
+		return proc.get(process.getId());
+	}
+
+
 }

@@ -70,6 +70,7 @@ import com.soffid.iam.api.UserCriteria;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.BpmEngine;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -3088,7 +3089,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if (text == null )
 			return  "";
 		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)

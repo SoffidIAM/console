@@ -30,6 +30,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.binder.SingletonBinder;
+import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.xml.XmlDataNode;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -43,6 +44,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	 * 
 	 */
 	
+	String expectClass;
 	String dataPath;
 	boolean readonly;
 	Object ownerObject;
@@ -156,10 +158,29 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	public void refresh() {
 		if (recursive)
 			return;
+		
+		if ( expectClass != null) {
+			Object v = binder.getValue();
+			if (v instanceof DataNode) {
+				v = ((DataNode) v).getDataContext().getData();
+			}
+			try {
+				if (Class.forName(expectClass).isAssignableFrom(v.getClass()))
+					setVisible(true);
+				else {
+					setVisible(false);
+					return;
+				}
+			} catch (ClassNotFoundException e) {
+				throw new UiException(e);
+			}
+		}
+
 		recursive = true ;
 		Div section = null;
 		boolean emptySection = true;
 		try {
+			
 			while (getFirstChild() != null)
 				removeChild(getFirstChild());
 			fields.clear();
@@ -398,5 +419,15 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 				}
 			}
 		}
+	}
+
+	
+	public String getExpectClass() {
+		return expectClass;
+	}
+
+	
+	public void setExpectClass(String expectClass) {
+		this.expectClass = expectClass;
 	}
 }

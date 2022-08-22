@@ -18,6 +18,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Identity;
 import com.soffid.iam.api.Task;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupTypeEntity;
@@ -710,7 +711,7 @@ public class GroupEntityDaoImpl extends
 
 	@Override
 	public Collection<GroupEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 1];
 		
 		StringBuffer sb = new StringBuffer("select u "

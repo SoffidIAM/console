@@ -17,6 +17,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.PasswordValidation;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.spring.JCSCacheProvider;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -501,7 +502,7 @@ public class AccountEntityDaoImpl extends
 
 	@Override
 	public Collection<AccountEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 1];
 		
 		StringBuffer sb = new StringBuffer("select u "

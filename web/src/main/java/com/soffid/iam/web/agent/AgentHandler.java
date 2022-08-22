@@ -699,23 +699,32 @@ public class AgentHandler extends FrameHandler {
 
 			boolean warnDelete = false;
 			Account acc = EJBLocator.getAccountService().findAccount(user, system);
+			String accountName = user;
 			if (acc != null)
 			{
-				if (acc.getStatus() == AccountStatus.REMOVED)
+				if (acc.getStatus() == AccountStatus.REMOVED) {
 					warnDelete = true;
+				}
 			} else {
+				warnDelete = true;
 				for (UserAccount uacc: EJBLocator.getAccountService().findUsersAccounts(user, system)) {
-					if (uacc.getStatus() == AccountStatus.REMOVED)
+					if (uacc.getStatus() == AccountStatus.REMOVED) {
+						accountName = acc.getName();
 						warnDelete = true;
+						break;
+					}
+					warnDelete = false;
 				}
 			}
-			if (warnDelete)
+			if (warnDelete) {
+				final String accountName2 = accountName;
 				Missatgebox.confirmaYES_NO(Labels.getLabel("agents.zul.warnDelete"), 
 						(event) -> {
 							if (event.getName().equals("onYes")) {
-								testPropagateObject (system, SoffidObjectType.OBJECT_USER, user, null);
+								testPropagateObject (system, SoffidObjectType.OBJECT_ACCOUNT, accountName2, null);
 							}
 						});
+			}
 			else
 				testPropagateObject (system, SoffidObjectType.OBJECT_USER, user, null);
 		}

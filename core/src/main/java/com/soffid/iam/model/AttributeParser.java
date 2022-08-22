@@ -1,10 +1,18 @@
 package com.soffid.iam.model;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.apache.activemq.util.ByteArrayOutputStream;
+
+import com.soffid.iam.api.BinaryData;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.util.Base64;
@@ -24,14 +32,44 @@ public class AttributeParser {
 			value = null;
 			blobValue = null;
 		} 
+		else if (type.equals( TypeEnumeration.ATTACHMENT_TYPE)  && v instanceof BinaryData)
+		{
+			try {
+				BinaryData d = (BinaryData) v;
+				value = d.getName();
+				byte buffer[] = new byte[64000];
+				InputStream in = d.getInputStream();
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				for (int read = in.read(buffer); read >= 0; read = in.read(buffer)) {
+					out.write(buffer, 0, read);
+				}
+				out.close();
+				in.close();
+				blobValue = out.toByteArray();
+			} catch (IOException e) {
+				throw new RuntimeException("Error serializing blob data", e);
+			}
+		}
 		else if (type.equals( TypeEnumeration.BINARY_TYPE) ||
+				type.equals( TypeEnumeration.ATTACHMENT_TYPE) ||
 				type.equals( TypeEnumeration.PHOTO_TYPE))
 		{
 			value = null;
 			if (v instanceof byte[])
 				blobValue = (byte[]) v;
-			else
-				blobValue = Base64.decode(v.toString());
+			else {
+				String s = v.toString();
+				int i = s.indexOf(":");
+				if (i >= 0) {
+					blobValue = Base64.decode(s.substring(i+1).trim());
+					try {
+						value = URLDecoder.decode(s.substring(0, i), "UTF-8");
+					} catch (UnsupportedEncodingException e) {
+					}
+				} else {
+					blobValue = Base64.decode(s);
+				}
+			}
 		}
 		else if (type.equals( TypeEnumeration.HTML))
 		{
@@ -95,8 +133,19 @@ public class AttributeParser {
 	public static Object getObjectValue(TypeEnumeration type, String value2, byte[] blobDataValue) {
 		if (type == null)
 			return value2;
-		else if (type.equals( TypeEnumeration.BINARY_TYPE) ||
-				type.equals( TypeEnumeration.PHOTO_TYPE))
+		else if (type.equals( TypeEnumeration.ATTACHMENT_TYPE) ) {
+			if (blobDataValue == null)
+				return null;
+			else if (value2 != null)
+				try {
+					return new com.soffid.iam.api.BinaryData(value2, blobDataValue);
+				} catch (IOException e) {
+					throw new RuntimeException("Error fetching blob data", e);
+				}
+			else
+				return blobDataValue;
+		}
+		else if (type.equals( TypeEnumeration.PHOTO_TYPE)  || type.equals( TypeEnumeration.BINARY_TYPE))
 		{
 			return blobDataValue;
 		}

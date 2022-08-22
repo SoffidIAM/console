@@ -5,6 +5,7 @@
 //
 
 package com.soffid.iam.service;
+import com.soffid.iam.api.ApplyRuleProcess;
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.model.RuleEntity;
 import com.soffid.mda.annotation.*;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 	com.soffid.iam.service.SoffidEventListener.class,
 	es.caib.seycon.ng.model.TasqueEntity.class,
 	UsuariService.class,
+	AsyncRunnerService.class,
 	RolEntity.class})
 public abstract class RuleEvaluatorService {
 
@@ -51,10 +53,24 @@ public abstract class RuleEvaluatorService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public ApplyRuleProcess applyAsync(
+		com.soffid.iam.model.RuleEntity rule)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
 	@Transactional(readOnly=true,noRollbackFor={java.lang.Exception.class})
 	public File dryRun(
 		RuleEntity rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Transactional(readOnly=false,noRollbackFor={java.lang.Exception.class})
+	@Description("Query the rule process status")
+	public ApplyRuleProcess queryProcessStatus(
+		ApplyRuleProcess process)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
+
 }

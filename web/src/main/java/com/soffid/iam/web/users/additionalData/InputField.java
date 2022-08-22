@@ -36,6 +36,11 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.DataType;
+import com.soffid.iam.web.component.inputField.ApplicationDataHandler;
+import com.soffid.iam.web.component.inputField.CustomObjectDataHandler;
+import com.soffid.iam.web.component.inputField.GroupDataHandler;
+import com.soffid.iam.web.component.inputField.UserDataHandler;
 import com.soffid.iam.web.popup.FileUpload2;
 
 import es.caib.seycon.ng.EJBLocator;
@@ -172,21 +177,27 @@ public class InputField extends Div implements XPathSubscriber
 		binder.setValue(data);
 	}
 
-	public void openUser() {
-		Executions.getCurrent().sendRedirect("/index.zul?target=/usuaris.zul&user=" + binder.getValue(), "_new");
+	public void openUser() throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		Executions.getCurrent().sendRedirect(
+				new UserDataHandler( DataType.toDataType(metaData)).followLink((String) binder.getValue()).substring(7),
+				"_new");
 	}
 
-	public void openGroup() {
-		Executions.getCurrent().sendRedirect("/index.zul?target=/grups.zul&group=" + binder.getValue(), "_new");
+	public void openGroup() throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		Executions.getCurrent().sendRedirect(
+				new GroupDataHandler(null).followLink((String) binder.getValue()).substring(7), "_new");
 	}
 
-	public void openApplication() {
-		Executions.getCurrent().sendRedirect("/index.zul?target=/aplicacions.zul&application=" + binder.getValue(), "_new");
+	public void openApplication() throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		Executions.getCurrent().sendRedirect(
+				new ApplicationDataHandler(null).followLink((String) binder.getValue()).substring(7), "_new");
 	}
 
-	public void openCustomObject() {
+	public void openCustomObject() throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		String type = metaData.getDataObjectType();
-		Executions.getCurrent().sendRedirect("/index.zul?target=/customObjects.zul&type="+type+"&customobject=" + binder.getValue(), "_new");
+		Executions.getCurrent().sendRedirect(
+				new CustomObjectDataHandler( DataType.toDataType(metaData)).followLink((String) binder.getValue()).substring(7),
+				"_new");
 	}
 
 	public boolean updateUser()
@@ -459,7 +470,7 @@ public class InputField extends Div implements XPathSubscriber
 							result = sb.toString();
 						}
 					}
-					else if(TypeEnumeration.BINARY_TYPE.equals(type))
+					else if(TypeEnumeration.BINARY_TYPE.equals(type) || TypeEnumeration.ATTACHMENT_TYPE.equals(type))
 					{
 						boolean visible = fileAlreadySaved();
 						result = "<h:span xmlns:h=\"http://www.w3.org/1999/xhtml\"><button label=\"Upload\" " +

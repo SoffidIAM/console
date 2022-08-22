@@ -15,6 +15,7 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Domain;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.DomainValueEntity;
@@ -249,7 +250,7 @@ public class DomainValueEntityDaoImpl extends
     }
 	@Override
 	public Collection<DomainValueEntity> findByText(CriteriaSearchConfiguration criteria, Domain domain, String text) {
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 3];
 		
 		StringBuffer sb = new StringBuffer("select u "

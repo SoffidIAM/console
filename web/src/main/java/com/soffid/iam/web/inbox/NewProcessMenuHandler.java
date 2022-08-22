@@ -1,5 +1,6 @@
 package com.soffid.iam.web.inbox;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,14 +34,41 @@ public class NewProcessMenuHandler implements DynamicMenuHandler {
 			o.setUrl("/wf/my-requests.zul");
 			list.add(o);
 			
+			String path = null;
 			for (ProcessDefinition p: EJBLocator.getBpmEngine().findInitiatorProcessDefinitions()) {
+				String[] split = p.getName().split(" */ *");
+				int i;
+				List<MenuOption> parentList = list;
+				for (i = 0; i < split.length - 1; i++) {
+					if (path == null) path = split[i];
+					else path += "/"+split[i];
+					String menuName = split[i];
+					boolean found = false;
+					for (MenuOption parentOption: parentList) {
+						if (parentOption.getLiteral() != null && parentOption.getLiteral().equals(menuName)) {
+							parentList = parentOption.getOptions();
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						MenuOption parentOption = new MenuOption();
+						parentOption.setImg("/img/menu/container.svg");
+						parentOption.setLiteral(menuName);
+						parentOption.setLabel("new-process."+path);
+						parentOption.setOptions(new LinkedList<>());
+						parentList.add(parentOption);
+						parentList = parentOption.getOptions();
+					}
+				}
 				o = new MenuOption();
 				o.setImg( "/img/wf/"+p.getId() );
-				o.setLiteral(p.getName());
-				o.setUrl("/wf/task.zul?def="+URLEncoder.encode(p.getName()));
-				list.add(o);
+				o.setLabel("new-process."+p.getName());
+				o.setLiteral(split[split.length - 1]);
+				o.setUrl("/wf/task.zul?def="+URLEncoder.encode(p.getName(), "UTF-8"));
+				parentList.add(o);
 			}
-		} catch (InternalErrorException | BPMException | NamingException | CreateException e) {
+		} catch (InternalErrorException | BPMException | NamingException | CreateException | UnsupportedEncodingException e) {
 			log.warn("Error fetching process to start", e);
 		}
 		return list;

@@ -1,5 +1,7 @@
 package com.soffid.iam.web.dsp;
 
+import java.util.Date;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
@@ -59,6 +61,16 @@ public class ZulFns {
 
 	public static final String getDateTimeFormat() {
 		return DateFormats.getDateTimeFormatString();
+	}
+
+	public static final String formatDate(Date d) {
+		if (d == null) return "";
+		return DateFormats.getDateFormat().format(d);
+	}
+
+	public static final String formatDateTime(Date d) {
+		if (d == null) return "";
+		return DateFormats.getDateTimeFormat().format(d);
 	}
 
 

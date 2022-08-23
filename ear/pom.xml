@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.3.46-SNAPSHOT</version>
+		<version>3.3.46</version>
 	</parent>
 	<artifactId>iam-ear</artifactId>
 	<packaging>ear</packaging>

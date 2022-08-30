@@ -1814,6 +1814,9 @@ input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, in
     border-radius: 4px;
 }
 
+input.textbox.widetextbox {
+	width: 450px;
+}
 div.databox.databox-label div.datahtml {
 	border-color: transparent;
 	background: transparent;	

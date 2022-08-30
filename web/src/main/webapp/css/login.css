@@ -26,7 +26,7 @@ div.login {
 	transform-style: preserve-3d ;
     transform: translateY(-50%)translateX(-50%);
 }
-div.login.progress {
+div.login.loginprogress {
     transform: translateY(-50%)translateX(-50%)rotateX( 90deg );
 }
 
@@ -69,7 +69,7 @@ div.wait {
 div.wait p {
 	font-weight: bold;
 }
-div.wait.progress {
+div.wait.loginprogress {
 	display: block;
     transform: rotateX( 0deg );
 }

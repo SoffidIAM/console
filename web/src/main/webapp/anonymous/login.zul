@@ -27,15 +27,15 @@
 		}
 		
 		function preparesubmit(event) {
-			if (document.getElementById("login").classList.contains("progress"))
+			if (document.getElementById("login").classList.contains("loginprogress"))
 				return true;
 			else {
-				document.getElementById("login").classList.add("progress");
+				document.getElementById("login").classList.add("loginprogress");
 				setTimeout(() => {
  					document.getElementById("loginForm").submit();
 				}, 50);
 				setTimeout(() => {
-					document.getElementById("wait").classList.add("progress");
+					document.getElementById("wait").classList.add("loginprogress");
 				}, 500);
 				event.preventDefault();
 	  			return false;

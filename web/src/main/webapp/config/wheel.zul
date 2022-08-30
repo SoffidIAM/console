@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
-<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml" >
-
+<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml" use="com.soffid.iam.web.config.WheelHandler" id="frame">
+	<div id="box1">
+		<button label="${c:l('aplicaIntranet_autoritzacio.Next') }" onClick="ref:frame.next1"/>
+	</div>
 
 
 </frame>

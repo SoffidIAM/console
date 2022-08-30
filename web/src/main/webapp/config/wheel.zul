@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml" >
+
+
+
+</frame>

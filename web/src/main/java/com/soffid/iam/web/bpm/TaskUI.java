@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -668,102 +669,34 @@ public class TaskUI extends FrameHandler implements EventListener {
             				WorkflowWindowInterface.PREPARE_TRANSITION_EVENT,
             				workflowWindow, transicion));
                 } catch (Exception ex) {
-                	if (ex instanceof UiException)
-                		throw (UiException) ex;
-                    log.error(Messages.getString("TaskUI.TransitionError"), ex); //$NON-NLS-1$
-                    // Localizar el mensaje
-                    String message = Labels.getLabel("task.msgError") + " " //$NON-NLS-1$ //$NON-NLS-2$
-                            + ex.toString();
-                    Throwable ex2 = ex;
-                    while (ex2 != null) {
-                        if (ex2 instanceof WorkflowException)
-                        {
-                            message = Labels.getLabel("task.msgError") //$NON-NLS-1$
-                                    + " " + ex2.getMessage(); //$NON-NLS-1$
-                            Missatgebox.error(message);
-                            return;
-                        }
-                        if (ex2 instanceof EJBException)
-                        	ex2 = ((EJBException)ex2).getCausedByException();
-                        else if (ex2.getCause() == ex2)
-                            ex2 = null;
-                        else
-                            ex2 = ex2.getCause();
-                    }
-                    throw new UiException(message, ex);
+        			workflowWindow.refresh();
+                	handleWorkflowException(ex);
+                	return;
                 }
-                try {
-                    final TaskInstance task = new TaskInstance( currentTask );
-                    EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
-						@Override
-						public Object run() throws Exception
-						{
-							ProcessInstance process = getCurrentProcess();
-							TaskInstance task2 = engine.update(task);
-							if (process.isDummyProcess())
-								process = engine.getProcessInstance(task2);
-							
-							
-							if (newCommentBox.getValue() != null
-									&& ! newCommentBox.getValue().toString().trim().isEmpty()) {
-								engine.addComment(task2, newCommentBox.getValue().toString());
-								// workflowWindow.setTask(task);
-							}
-							
-							engine.executeTask(task2, transicion);
-							// workflowWindow.setTask(task);
-							
-							currentProcess = process;
-							return null;
-						}
-					});
-
-                    Events.sendEvent(new Event(
-                    		WorkflowWindowInterface.COMPLETE_TRANSITION_EVENT,
-                    		workflowWindow, transicion));
-                    
-                    // Locate next task from same process
-                    List<TaskInstance> tasks = engine.getPendingTasks(currentProcess);
-
-                    getDataModel().commit();
-                    if (tasks != null)
-                    {
-                    	for (TaskInstance ti: tasks)
-                    	{
-                    		if (ti.getActorId() != null && ti.getActorId().equals (Security.getCurrentUser()))
-                    		{
-                                ti = engine.startTask(ti);
-                                Application.jumpTo(BPMApplication.getTaskURL(ti));
-                                return ;
-                    			
-                    		}
-                    	}
-                    }
-                    cerrarTarea();
-                } catch (Exception ex) {
-                    log.error(Messages.getString("TaskUI.TransitionError"), ex); //$NON-NLS-1$
-                    workflowWindow.refresh();
-                    // Localizar el mensaje
-                    String message = Labels.getLabel("task.msgError") + " " //$NON-NLS-1$ //$NON-NLS-2$
-                            + ex.toString();
-                    Throwable ex2 = ex;
-                    while (ex2 != null) {
-                        if (ex2 instanceof WorkflowException)
-                        {
-                            message = Labels.getLabel("task.msgError") //$NON-NLS-1$
-                                    + " " + ex2.getMessage(); //$NON-NLS-1$
-                            Missatgebox.error(message);
-                            return;
-                        }
-                        if (ex2 instanceof EJBException)
-                        	ex2 = ((EJBException)ex2).getCausedByException();
-                        else if (ex2.getCause() == ex2)
-                            ex2 = null;
-                        else
-                            ex2 = ex2.getCause();
-                    }
-                    throw new UiException(message, ex);
-                }
+        		try {
+	            	CompletableFuture<Boolean> future = workflowWindow.confirmTransition(transicion);
+	            	if (future == null)
+	            		completeTransition(transicion, engine, workflowWindow);
+	            	else {
+	            		future.thenApply((b)-> {
+	            			if (b.booleanValue()) {
+	                    		try {
+	                    			completeTransition(transicion, engine, workflowWindow);
+	                    		} catch (Exception ex) {
+	                    			handleWorkflowException(ex);
+	                    		}
+	            			}
+	            			return null;
+	            		})
+	            		.exceptionally(ex -> {
+	            			handleWorkflowException(ex);
+	            			return null;
+	            		});
+	            	}
+        		} catch (Exception ex) {
+        			handleWorkflowException(ex);
+        			return;
+        		}
             } else {
             	Missatgebox.info(Labels.getLabel("task.msgSeleccionTarea"), //$NON-NLS-1$
                         "Workflow BPM"); //$NON-NLS-1$
@@ -771,6 +704,83 @@ public class TaskUI extends FrameHandler implements EventListener {
         } finally {
         }
     }
+
+	private void handleWorkflowException(Throwable ex) {
+		getWorkflowWindow().refresh();
+		if (ex instanceof UiException)
+			throw (UiException) ex;
+		log.error(Messages.getString("TaskUI.TransitionError"), ex); //$NON-NLS-1$
+		// Localizar el mensaje
+		String message = Labels.getLabel("task.msgError") + " " //$NON-NLS-1$ //$NON-NLS-2$
+		        + ex.toString();
+		Throwable ex2 = ex;
+		while (ex2 != null) {
+		    if (ex2 instanceof WorkflowException)
+		    {
+		        message = Labels.getLabel("task.msgError") //$NON-NLS-1$
+		                + " " + ex2.getMessage(); //$NON-NLS-1$
+		        Missatgebox.error(message);
+		        return;
+		    }
+		    if (ex2 instanceof EJBException)
+		    	ex2 = ((EJBException)ex2).getCausedByException();
+		    else if (ex2.getCause() == ex2)
+		        ex2 = null;
+		    else
+		        ex2 = ex2.getCause();
+		}
+		throw new UiException(message, ex);
+	}
+
+	private void completeTransition(final String transicion, final BpmEngine engine, final WorkflowWindowInterface workflowWindow) throws CommitException, InternalErrorException, NamingException, CreateException, BPMException {
+	    final TaskInstance task = new TaskInstance( currentTask );
+	    EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
+			@Override
+			public Object run() throws Exception
+			{
+				ProcessInstance process = getCurrentProcess();
+				TaskInstance task2 = engine.update(task);
+				if (process.isDummyProcess())
+					process = engine.getProcessInstance(task2);
+				
+				
+				if (newCommentBox.getValue() != null
+						&& ! newCommentBox.getValue().toString().trim().isEmpty()) {
+					engine.addComment(task2, newCommentBox.getValue().toString());
+					// workflowWindow.setTask(task);
+				}
+				
+				engine.executeTask(task2, transicion);
+				// workflowWindow.setTask(task);
+				
+				currentProcess = process;
+				return null;
+			}
+		});
+
+	    Events.sendEvent(new Event(
+	    		WorkflowWindowInterface.COMPLETE_TRANSITION_EVENT,
+	    		workflowWindow, transicion));
+	    
+	    // Locate next task from same process
+	    List<TaskInstance> tasks = engine.getPendingTasks(currentProcess);
+
+	    getDataModel().commit();
+	    if (tasks != null)
+	    {
+	    	for (TaskInstance ti: tasks)
+	    	{
+	    		if (ti.getActorId() != null && ti.getActorId().equals (Security.getCurrentUser()))
+	    		{
+	                ti = engine.startTask(ti);
+	                Application.jumpTo(BPMApplication.getTaskURL(ti));
+	                return ;
+	    			
+	    		}
+	    	}
+	    }
+	    cerrarTarea();
+	}
 
 
     private WorkflowWindowInterface getWorkflowWindow() {

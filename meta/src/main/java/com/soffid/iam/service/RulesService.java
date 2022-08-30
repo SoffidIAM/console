@@ -5,6 +5,7 @@
 //
 
 package com.soffid.iam.service;
+import com.soffid.iam.api.ApplyRuleProcess;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.mda.annotation.*;
 
@@ -92,4 +93,20 @@ public abstract class RulesService {
 		com.soffid.iam.api.Rule rule,
 		Collection<RuleAssignedRole> grants)
 		throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
+	
+	@Operation ( grantees={roles.rule_admin.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public ApplyRuleProcess applyAsync(
+		com.soffid.iam.api.Rule rule)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation ( grantees={roles.rule_admin.class})
+	@Transactional(readOnly=true,noRollbackFor={java.lang.Exception.class})
+	@Description("Query the rule process status")
+	public ApplyRuleProcess queryProcessStatus(
+		ApplyRuleProcess process)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
+	
 }

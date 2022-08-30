@@ -2,6 +2,7 @@ package es.caib.bpm.toolkit;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -228,6 +229,11 @@ public class WorkflowWindow extends Window implements WorkflowWindowInterface {
 	@Override
 	public void setProcessInstance(com.soffid.iam.bpm.api.ProcessInstance instance) {
 		setProcessInstance(ProcessInstance.toProcessInstance(instance));
+	}
+
+	@Override
+	public CompletableFuture<Boolean> confirmTransition(String transitionName) {
+		return null;
 	}
     
 }

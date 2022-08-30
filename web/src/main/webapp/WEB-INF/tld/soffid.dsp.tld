@@ -77,4 +77,21 @@
 		</description>
 	</function>
 	
+	<function>
+		<name>formatdate</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String formatDate(java.util.Date date)</function-signature>
+		<description>
+		Gets date format.
+		</description>
+	</function>
+
+	<function>
+		<name>formatdatetime</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String formatDateTime(java.util.Date date)</function-signature>
+		<description>
+		Formts with date &amp; time format.
+		</description>
+	</function>
 </taglib>

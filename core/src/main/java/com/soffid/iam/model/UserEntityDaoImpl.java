@@ -56,7 +56,7 @@ import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
 import com.soffid.iam.bpm.api.BPMUser;
-
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
@@ -1162,7 +1162,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
 	@Override
 	public Collection<UserEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 1];
 		
 		StringBuffer sb = new StringBuffer("select u "

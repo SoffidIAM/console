@@ -11,7 +11,7 @@ public class NameParser {
 	
 	public String [] parse (String name, int size) {
 		Vector v = new Vector ();
-		String names [] = name.split(" +"); //$NON-NLS-1$
+		String names [] = name.split("[ ,]+"); //$NON-NLS-1$
 		for (int i = 0; i < names.length; i++)
 			v.add(names[i]);
 		

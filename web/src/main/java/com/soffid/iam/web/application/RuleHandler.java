@@ -1,11 +1,14 @@
 package com.soffid.iam.web.application;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -16,10 +19,13 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.codemirror.Codemirror;
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.ApplyRuleProcess;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
@@ -36,7 +42,10 @@ import com.soffid.iam.web.popup.ImportCsvHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
+import es.caib.zkib.component.Div;
 import es.caib.zkib.component.Wizard;
+import es.caib.zkib.datamodel.DataModelCollection;
+import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
@@ -52,9 +61,8 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 		
 	}
 
-	public void onChangeForm() {
-		Codemirror cm = (Codemirror) getFellow("ru_script");
-//		cm.invalidate();
+	public void onChangeForm(Event event) {
+		updateProgress(event);
 	}
 	
 	public void importCsv () throws IOException, CommitException {
@@ -242,13 +250,114 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 		previewWindow.doHighlighted();
 	}
 	
-	public void applyRule(Event e) throws CommitException, InternalErrorException, NamingException, CreateException {
+	public void applyRule(Event e) throws Exception {
 		closePreview(e);
+		
+		DataNode current = (DataNode) XPathUtils.eval(getForm(), "/.");
 		getModel().commit();
 		com.soffid.iam.api.Rule r = (Rule) ((DataNode)XPathUtils.getValue(getForm(), "/.")).getInstance();
-		EJBLocator.getRulesService().apply(r);
+		
+		
+		ApplyRuleProcess p = EJBLocator.getRulesService().applyAsync(r);
+		DataModelCollection coll = current.getListModel("updateStatus");
+		DataNode dn;
+		if (coll.getSize() > 0)
+			dn = (DataNode) coll.getDataModel(0);
+		else
+			dn = (DataNode) coll.newInstance();
+		
+		ApplyRuleProcess p2 = (ApplyRuleProcess) dn.getInstance();
+		copyRuleProgress(p, p2);
+		getTimer().start();
+		updateProgress(e);
+	}
+
+	private void copyRuleProgress(ApplyRuleProcess p, ApplyRuleProcess p2) {
+		p2.setCurrent(p.getCurrent());
+		p2.setEnd(p.getEnd());
+		p2.setErrorMessage(p.getErrorMessage());
+		p2.setFinished(p.isFinished());
+		p2.setId(p.getId());
+		p2.setProgress(p.getProgress());
+		p2.setReport(p.getReport());
+		p2.setStart(p.getStart());
 	}
 	
+	TimeZone utcTimeZone = TimeZone.getTimeZone("GMT");
+	
+	public void updateProgress(Event event) {
+		Div d = (Div) getFellow("progressdiv");
+		try {
+			DataNode current = (DataNode) XPathUtils.eval(getForm(), "/.");
+			DataModelCollection coll = current.getListModel("updateStatus");
+			if (coll.getSize() == 0) {
+				d.setVisible(false);
+				getTimer().stop();
+			}
+			else {
+				ApplyRuleProcess status = (ApplyRuleProcess) ((DataNode)coll.getDataModel(0)).getInstance();
+				if (status.isFinished()) {
+					getTimer().stop();
+					d.setVisible(false);
+				}
+				else
+				{
+					ApplyRuleProcess p = EJBLocator.getRulesService().queryProcessStatus(status);
+					copyRuleProgress(p, status);
+					if (p.isFinished()) {
+						d.setVisible(false);
+						getTimer().stop();
+						if (p.getErrorMessage() != null) {
+							throw new UiException(p.getErrorMessage());
+						}
+					}
+					else
+					{
+						getTimer().start();
+						d.setVisible(true);
+//						String s = String.format("%1$s %2$d%%", p.getCurrent() == null ? "": p.getCurrent(), (int) (p.getProgress() * 100));
+						String s = p.getCurrent() == null ? "": p.getCurrent();
+						((Label)getFellow("progress")).setValue(s);
+						((Div)getFellow("progressbar")).setWidth(""+((int) (p.getProgress() * 100))+"%");
+						if (p.getProgress() == 0.0) 
+							s = "-";
+						else {
+							int etf =(int) ( (1.0 - p.getProgress()) / p.getProgress() * ( System.currentTimeMillis() - p.getStart().getTime() ) );
+							if (etf < 60_000) 
+								s = "" + (etf / 1000) + " s";
+							else if (etf < 60 * 60_000) {
+								SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+								sdf.setTimeZone(utcTimeZone);
+								s = sdf.format(new Date(etf));
+							}
+							else if (etf < 24 * 60 * 60_000) {
+								SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+								sdf.setTimeZone(utcTimeZone);
+								s = sdf.format(new Date(etf));
+							}
+							else {
+								SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+								sdf.setTimeZone(utcTimeZone);
+								s = ""+(etf / (24 * 60 * 60_000)) + " days " + sdf.format(new Date(etf));
+							}
+						}
+						((Label)getFellow("etf")).setValue(s);
+					}
+				}
+			}
+		} catch (UiException e) {
+			throw e;
+		} catch (Exception e) {
+			getTimer().stop();
+			d.setVisible(false);
+		}
+
+	}
+	
+	private Timer getTimer() {
+		return (Timer) getFellow("timer");
+	}
+
 	public void closePreview(Event e) {
 		Window previewWindow = (Window) getFellow("previewWindow");
 		previewWindow.setVisible(false);

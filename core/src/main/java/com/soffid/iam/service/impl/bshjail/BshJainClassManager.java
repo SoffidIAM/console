@@ -91,6 +91,7 @@ public class BshJainClassManager extends BshClassManager {
 		if (slash > 0)
 			file = file.substring(slash + 1);
 		if (file.matches("iam-common-.*\\.jar") ||
+			file.matches("syncserver-.*\\.jar") ||
 				file.matches ("plugin.*\\.jar"))
 			return true;
 		

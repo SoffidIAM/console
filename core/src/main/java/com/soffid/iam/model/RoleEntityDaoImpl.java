@@ -26,6 +26,7 @@ import com.soffid.iam.api.UserData;
 import com.soffid.iam.bpm.api.ProcessDefinition;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.bpm.service.BpmEngine;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.ApplicationDomainEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.DomainValueEntity;
@@ -1663,7 +1664,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
 	@Override
 	public Collection<RoleEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
-		String[] split = text.trim().split(" +");
+		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 1];
 		
 		StringBuffer sb = new StringBuffer("select u "

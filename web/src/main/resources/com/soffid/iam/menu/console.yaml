@@ -98,6 +98,9 @@
           img_old: /img/menu/settings.png
           img: /img/menu/gear.svg
           options:
+          - name: wheel.menu
+            img: /img/menu/wheel.svg
+            url: /config/wheel.zul
           - name: seu.tenants
             url: /config/tenants.zul
             permissions: ["seu:tenant:show"]

@@ -326,19 +326,19 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 							if (etf < 60_000) 
 								s = "" + (etf / 1000) + " s";
 							else if (etf < 60 * 60_000) {
-								SimpleDateFormat sdf = new SimpleDateFormat("MM:ss");
+								SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
 								sdf.setTimeZone(utcTimeZone);
 								s = sdf.format(new Date(etf));
 							}
 							else if (etf < 24 * 60 * 60_000) {
-								SimpleDateFormat sdf = new SimpleDateFormat("HH:MM:ss");
+								SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 								sdf.setTimeZone(utcTimeZone);
 								s = sdf.format(new Date(etf));
 							}
 							else {
-								SimpleDateFormat sdf = new SimpleDateFormat("HH:MM:ss");
+								SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 								sdf.setTimeZone(utcTimeZone);
-								s = ""+(etf / 24 * 60 * 60_000) + " days " + sdf.format(new Date(etf));
+								s = ""+(etf / (24 * 60 * 60_000)) + " days " + sdf.format(new Date(etf));
 							}
 						}
 						((Label)getFellow("etf")).setValue(s);

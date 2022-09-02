@@ -174,11 +174,15 @@ public class AttributeSearchBox extends XulElement {
 					.append(escape(value))
 					.append('"');
 				}
-				int i = attributeDef.getValues().indexOf(value);
-				if (i >= 0)
-					sb2.append( attributeDef.getLabels().get(i) );
-				else
+				if (attributeDef.getValues() == null)
 					sb2.append( value );
+				else {
+					int i = attributeDef.getValues().indexOf(value);
+					if (i >= 0)
+						sb2.append( attributeDef.getLabels().get(i) );
+					else
+						sb2.append( value );
+				}
 			}
 			sb.append(")");
 			queryExpression = sb.toString();

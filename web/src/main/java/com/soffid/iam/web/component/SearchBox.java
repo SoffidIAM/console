@@ -424,17 +424,19 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		timer.addEventListener("onTimer", new SerializableEventListener() {
 			@Override
 			public void onEvent(Event event) throws Exception {
-				boolean end = !modelCollection.isInProgress();
-				timer.setDelay(1000);
-				try {
-					modelCollection.updateProgressStatus();
-				} finally {
-					if (end)
-					{
-						timer.stop();
-						progressImage.setVisible(false);
-						if (modelCollection.getSize() == 1)
-							Events.postEvent("onSingleRecord",  SearchBox.this, null);
+				if (modelCollection != null) {
+					boolean end = !modelCollection.isInProgress();
+					timer.setDelay(1000);
+					try {
+						modelCollection.updateProgressStatus();
+					} finally {
+						if (end)
+						{
+							timer.stop();
+							progressImage.setVisible(false);
+							if (modelCollection.getSize() == 1)
+								Events.postEvent("onSingleRecord",  SearchBox.this, null);
+						}
 					}
 				}
 			}

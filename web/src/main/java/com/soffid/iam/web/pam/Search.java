@@ -177,7 +177,7 @@ public class Search extends FrameHandler
 		Long previous = it.next();
 		while (it.hasNext()) {
 			Long current = it.next();
-			if (current.longValue() - previous.longValue() > 500) // Minimum half a second
+			if (current.longValue() - previous.longValue() > 0) // Minimum one second
 				l.add(previous);
 			previous = current;
 		}

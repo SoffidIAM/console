@@ -1,6 +1,7 @@
 package com.soffid.iam.web.component;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Calendar;
 import java.util.Collection;
@@ -24,9 +25,11 @@ import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.service.ejb.AdditionalDataService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
+import com.soffid.iam.web.WebDataType;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Dispatcher;
@@ -67,6 +70,28 @@ public class SearchDictionaryBuilder {
 	public static SearchDictionary build (String clazz) throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
 		SearchDictionary sd = map.get(clazz);
+		
+		String objectType = null;
+		if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
+			objectType = clazz.substring(COM_SOFFID_IAM_API_CUSTOM_OBJECT.length());
+		else
+			objectType = clazz;
+		
+		AdditionalDataService ejb = EJBLocator.getAdditionalDataService();
+		CustomObjectType ot = ejb.findCustomObjectTypeByName(objectType);
+		if (ot == null) {
+			sd = generateLegacyDictionary(clazz);
+		} else {
+			sd = generateStandardDictionary(clazz);
+		}
+		return sd;
+	}
+
+	private static SearchDictionary generateLegacyDictionary(String clazz)
+			throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
+		SearchDictionary sd;
+		sd = generateDefaultBuilder(clazz);
+
 		if (sd == null)
 		{
 			if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
@@ -86,6 +111,8 @@ public class SearchDictionaryBuilder {
 			}
 			map.put(clazz, sd);
 		}
+		
+		
 		
 		// Add tenant dependent attributes
 		if (clazz.equals("com.soffid.iam.api.User")) {
@@ -156,13 +183,7 @@ public class SearchDictionaryBuilder {
 					else 
 					{
 						try {
-							@SuppressWarnings("unchecked")
-							List<String> names = (List<String>) cl.getMethod("names").invoke(null);
-							@SuppressWarnings("unchecked")
-							List<String> values = (List<String>) cl.getMethod("values").invoke(null);
-							sad.setValues(values);
-							sad.setLabels(names);
-							sad.setType(TypeEnumeration.STRING_TYPE);
+							setAttributeValues(sad, t);
 						} catch (Exception e) {
 							sad = null;
 						}
@@ -175,6 +196,23 @@ public class SearchDictionaryBuilder {
 			cl = cl.getSuperclass();
 		} while (cl != null);
 		return sd;
+	}
+
+	private static void setAttributeValues(SearchAttributeDefinition sad, Class<?> t)
+			throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		@SuppressWarnings("unchecked")
+		List<String> names = (List<String>) t.getMethod("names").invoke(null);
+		@SuppressWarnings("unchecked")
+		List<String> literals = (List<String>) t.getMethod("literals").invoke(null);
+		sad.setValues(literals);
+		LinkedList<String> l = new LinkedList<>();
+		for (String name: names) {
+			String s = Labels.getLabel(t.getCanonicalName()+"."+name);
+			if (s == null || s.trim().isEmpty()) l.add(name);
+			else l.add(s);
+		}
+		sad.setLabels(l);
+		sad.setType(TypeEnumeration.STRING_TYPE);
 	}
 
 	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope) throws InternalErrorException, NamingException, CreateException {
@@ -194,11 +232,18 @@ public class SearchDictionaryBuilder {
 				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
 				! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()))
 			{
+				WebDataType watt = new WebDataType(att);
 				SearchAttributeDefinition sad = new SearchAttributeDefinition();
-				sad.setLocalizedName(att.getLabel());
+				sad.setLocalizedName(watt.getLabel());
 				sad.setType(att.getType());
 				sad.setName(attributesPath+"."+att.getCode());
-				if (att.getValues() != null && ! att.getValues().isEmpty())
+				if (att.getEnumeration() != null) {
+					try {
+						setAttributeValues(sad, Class.forName(att.getEnumeration()));
+					} catch (Exception e) {
+					}
+				}
+				else if (att.getValues() != null && ! att.getValues().isEmpty())
 				{
 					List<String> labels = new LinkedList<String>();
 					List<String> values = new LinkedList<String>();
@@ -258,27 +303,7 @@ public class SearchDictionaryBuilder {
 		addJoin(sd, "acl.user.userName", "acl.user.userName", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "roles.role.name", "roles.role.name", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "users.user.userName", "users.user.userName", TypeEnumeration.STRING_TYPE);
-		addAccountType(sd);
 	}
-
-	@SuppressWarnings("unchecked")
-	private static void addAccountType(SearchDictionary sd) {
-		SearchAttributeDefinition sad = new SearchAttributeDefinition();
-		sad.setLabelName("seyconserver.zul.Tipus");
-		sad.setType(TypeEnumeration.STRING_TYPE);
-		sad.setName("type");
-		sad.setJavaType(String.class);
-		LinkedList<String> listLabels = new LinkedList<String>();
-		for (Object s : AccountType.literals()) {
-			String label = "accountType."+s.toString();
-			listLabels.add(org.zkoss.util.resource.Labels.getLabel(label));
-		}
-		sad.setLabels(listLabels);
-		sad.setValues(AccountType.literals());
-		sd.getAttributes().add(sad);
-	}
-
-
 
 	private static SearchDictionary addCustomAttributes(SearchDictionary sd1, MetadataScope scope, String objectType) throws InternalErrorException, NamingException, CreateException {
 		SearchDictionary sd2 = new SearchDictionary(sd1);
@@ -315,6 +340,73 @@ public class SearchDictionaryBuilder {
 				}
 				sd2.getAttributes().add(sad);
 			}
+		}
+		return sd2;
+	}
+
+	private static SearchDictionary generateStandardDictionary(String objectType) throws InternalErrorException, NamingException, CreateException, ClassNotFoundException {
+		SearchDictionary sd2 = new SearchDictionary();
+		sd2.setTimestamp(System.currentTimeMillis());
+		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>());
+		final Collection<DataType> dataTypes = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(objectType, null);
+		if (dataTypes == null || dataTypes.isEmpty())
+			return generateLegacyDictionary(objectType);
+		for (DataType att: dataTypes)
+		{
+			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
+				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+				! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()))
+			{
+				SearchAttributeDefinition sad = new SearchAttributeDefinition();
+				if (att.getLabel() != null && !att.getLabel().trim().isEmpty())
+					sad.setLocalizedName(att.getLabel());
+				else
+					sad.setLabelName(att.getNlsLabel());
+				sad.setType(att.getType());
+				if (! Boolean.TRUE.equals(att.getBuiltin())) 
+					sad.setName("attributes."+att.getCode());
+				else
+					sad.setName(att.getCode());
+				if (att.getEnumeration() != null) {
+					try {
+						setAttributeValues(sad, Class.forName(att.getEnumeration()));
+					} catch (Exception e) {
+					}
+				}
+				else if (att.getValues() != null && ! att.getValues().isEmpty())
+				{
+					LinkedList<String> values = new LinkedList<String>();
+					LinkedList<String> labels = new LinkedList<String>();
+					for ( String s: att.getValues())
+					{
+						if (s.contains(":"))
+						{
+							values.add ( s.substring(0, s.indexOf(":")).trim());
+							labels.add( s.substring(s.indexOf(":")+1).trim());
+						}
+						else
+						{
+							values.add(s);
+							labels.add(s);
+						}
+					}
+					sad.setLabels(labels);
+					sad.setValues(values);
+				}
+				sd2.getAttributes().add(sad);
+			}
+		}
+		if (objectType.equals("com.soffid.iam.api.User")) {
+			addUserJoins(sd2);
+		} else if (objectType.equals("com.soffid.iam.api.Role")) {
+			addRoleJoins(sd2);
+		} else if (objectType.equals("com.soffid.iam.api.Application")) {
+			addApplicationJoins(sd2);
+		} else if (objectType.equals("com.soffid.iam.api.Group")) {
+			addGroupJoins(sd2);
+		} else if (objectType.equals("com.soffid.iam.api.Account")) {
+			addAccountsJoins(sd2);
+			addAccountAttributes(sd2);
 		}
 		return sd2;
 	}

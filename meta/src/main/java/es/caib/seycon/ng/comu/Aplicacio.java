@@ -45,9 +45,9 @@ public abstract class Aplicacio {
 	@Attribute(translated = "source")
 	public java.lang.String directoriFonts;
 
-	@Description("User code of the responsible for the application.")
+	@Description("User name of the owner of the application.")
 	@Nullable
-	@Attribute(translated = "owner" )
+	@Attribute(translated = "owner", type = "USER" )
 	public java.lang.String codiPersonaContacte;
 
 	@Description("Where the executables are located")
@@ -65,7 +65,7 @@ public abstract class Aplicacio {
 
 	@Description("full name of application responsible")
 	@Nullable
-	@Attribute(translated = "ownerName", type = "USER" )
+	@Attribute(translated = "ownerName", hidden = true )
 	public java.lang.String nomComplertPersonaContacte;
 
 	@Nullable

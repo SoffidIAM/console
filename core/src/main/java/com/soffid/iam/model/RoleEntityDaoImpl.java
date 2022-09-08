@@ -211,7 +211,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 	{
 		java.util.Date now = new java.util.Date();
 		String approvalProcess = role.getInformationSystem().getRoleDefinitionProcess();
-		if (Security.isUserInRole("internal:recertification-process")) {
+		if (Security.isSyncServer()) {
+			return false;
+		} else if (Security.isUserInRole("internal:recertification-process")) {
 			return true; 
 		}
 		else if (approvalProcess == null || approvalProcess.trim().isEmpty())

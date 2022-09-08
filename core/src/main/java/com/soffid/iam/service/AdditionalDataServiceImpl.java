@@ -16,6 +16,7 @@ package com.soffid.iam.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,9 +50,11 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomDialect;
+import com.soffid.iam.model.CustomObjectRoleEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
@@ -63,6 +66,7 @@ import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -473,6 +477,7 @@ public class AdditionalDataServiceImpl extends
 		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().newCustomObjectTypeEntity();
 		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
 		getCustomObjectTypeEntityDao().create(entity);
+		updateRoles(entity, obj);
 		
 		MetaDataEntity name = getMetaDataEntityDao().newMetaDataEntity();
 		name.setBuiltin(true);
@@ -484,6 +489,7 @@ public class AdditionalDataServiceImpl extends
 		name.setSize(100);
 		name.setType(TypeEnumeration.STRING_TYPE);
 		getMetaDataEntityDao().create(name);
+		
 		
 		MetaDataEntity description = getMetaDataEntityDao().newMetaDataEntity();
 		description.setBuiltin(true);
@@ -499,9 +505,40 @@ public class AdditionalDataServiceImpl extends
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}
 
+	private void updateRoles(CustomObjectTypeEntity entity, CustomObjectType obj) throws InternalErrorException {
+		getCustomObjectRoleEntityDao().remove(entity.getAccessRoles());
+		if (obj != null && !obj.isBuiltin()) {
+			for (String g: obj.getManagerRoles())
+			{
+				RoleEntity r = getRoleEntityDao().findByShortName(g);
+				if (r == null)
+					throw new InternalErrorException("Wrong role "+g);
+				CustomObjectRoleEntity c = getCustomObjectRoleEntityDao().newCustomObjectRoleEntity();
+				c.setCustomObjectType(entity);
+				c.setLevel(AccountAccessLevelEnum.ACCESS_MANAGER);
+				c.setRole(r);
+				getCustomObjectRoleEntityDao().create(c);
+			}
+			for (String g: obj.getUserRoles())
+			{
+				RoleEntity r = getRoleEntityDao().findByShortName(g);
+				if (r == null)
+					throw new InternalErrorException("Wrong role "+g);
+				CustomObjectRoleEntity c = getCustomObjectRoleEntityDao().newCustomObjectRoleEntity();
+				c.setCustomObjectType(entity);
+				c.setLevel(AccountAccessLevelEnum.ACCESS_USER);
+				c.setRole(r);
+				getCustomObjectRoleEntityDao().create(c);
+			}
+		}
+	}
 	@Override
 	protected void handleDeleteCustomObjectType(CustomObjectType obj) throws Exception {
-		getCustomObjectTypeEntityDao().remove(obj.getId());
+		CustomObjectTypeEntity t = getCustomObjectTypeEntityDao().load(obj.getId());
+				
+		getCustomObjectRoleEntityDao().remove(t.getAccessRoles());
+		
+		getCustomObjectTypeEntityDao().remove(t);
 	}
 
 	@Override
@@ -553,7 +590,8 @@ public class AdditionalDataServiceImpl extends
 	protected CustomObjectType handleUpdateCustomObjectType(CustomObjectType obj) throws Exception {
 		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().load(obj.getId());
 		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
-		getCustomObjectTypeEntityDao().create(entity);
+		getCustomObjectTypeEntityDao().update(entity);
+		updateRoles(entity, obj);
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}
 
@@ -843,5 +881,36 @@ public class AdditionalDataServiceImpl extends
 		}
 		
 		throw new InternalErrorException ("Unknown data type "+type);
+	}
+	@Override
+	protected AccountAccessLevelEnum handleGetAccessLevel(CustomObjectType type) throws Exception {
+		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().load(type.getId());
+		if (entity == null || entity.isBuiltin())
+			return null;
+		if (entity.getPublicAccess() == null || entity.getPublicAccess().booleanValue())
+			return AccountAccessLevelEnum.ACCESS_MANAGER;
+		
+		String[] soffidRoles = Security.getSoffidPrincipal().getSoffidRoles();
+		AccountAccessLevelEnum e = AccountAccessLevelEnum.ACCESS_NONE;
+		for ( CustomObjectRoleEntity role: entity.getAccessRoles() ) {
+			String roleName = role.getRole().getName()+ "@" + role.getRole().getSystem().getName();
+			if (Arrays.binarySearch(soffidRoles, roleName) >= 0) {
+				if (isBetter(role.getLevel(), e))
+					e = role.getLevel();
+			}
+		}
+		return e;
+	}
+	private boolean isBetter(AccountAccessLevelEnum level, AccountAccessLevelEnum e) {
+		if (level == AccountAccessLevelEnum.ACCESS_OWNER)
+			return true;
+		else if (level == AccountAccessLevelEnum.ACCESS_MANAGER)
+			return e != AccountAccessLevelEnum.ACCESS_OWNER;
+		else if (level == AccountAccessLevelEnum.ACCESS_USER)
+			return e != AccountAccessLevelEnum.ACCESS_OWNER && e != AccountAccessLevelEnum.ACCESS_MANAGER;
+		else if (level == AccountAccessLevelEnum.ACCESS_NAVIGATE)
+			return e != AccountAccessLevelEnum.ACCESS_OWNER && e != AccountAccessLevelEnum.ACCESS_MANAGER && e != AccountAccessLevelEnum.ACCESS_USER;
+		else
+			return false;
 	}
 }

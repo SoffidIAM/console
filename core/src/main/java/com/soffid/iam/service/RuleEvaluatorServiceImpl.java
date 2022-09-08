@@ -542,6 +542,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				final CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
 				criteria.setFirstResult(0);
 				criteria.setFetchSize(step);
+				criteria.setMaximumResultSize(step);
 				while (! Boolean.TRUE.equals(end) && ! p.isCancelled()) {
 					end = getAsyncRunnerService().runNewTransaction(
 						() -> {

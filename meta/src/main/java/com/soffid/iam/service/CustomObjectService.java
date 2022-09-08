@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
@@ -19,6 +20,7 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
@@ -75,5 +77,4 @@ public class CustomObjectService {
 	@Operation(grantees={customObject_query.class})
 	public AsyncList<CustomObject> findCustomObjectByTextAndJsonQueryAsync(@Nullable String text, @Nullable String filter) { return null; }
 
-	
 }

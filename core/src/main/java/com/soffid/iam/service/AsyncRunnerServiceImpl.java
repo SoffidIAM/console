@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.common.TransactionalTask;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
 
 public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
@@ -17,10 +18,11 @@ public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
 		final List<String> auths = Security.getAuthorizations();
 		final String tenant = Security.getCurrentTenantName();
 		final String account = Security.getCurrentAccount();
+		final SoffidPrincipal principal = Security.getSoffidPrincipal();
 		new Thread (  ) {
 			public void run () {
 				try {
-					Security.nestedLogin(tenant, account, auths.toArray(new String[auths.size()]));
+					Security.nestedLogin(principal);
 					ars.runInternal(runnable, result);
 				} catch (Throwable e) {
 					result.cancel(e);

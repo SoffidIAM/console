@@ -22,6 +22,7 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
+import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.popup.Editor;
 
@@ -191,7 +192,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose{
 			throw new UiException(e);
 		}
 	}
-	
+
 }
 
 class OrderComparator implements Comparator<DataType>

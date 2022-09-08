@@ -3,9 +3,10 @@
 <zkib-model>
 	<datanode name="objects">
 		<finder name="object" type="object">
-			<ejb-finder jndi="java:comp/env/ejb/v2/CustomObjectEJB" method="findCustomObjectByJsonQuery"
-			 if = "${query != null}">
+			<ejb-finder jndi="java:comp/env/ejb/v2/CustomObjectEJB" method="findCustomObjectByTextAndFilterAsync"
+			 if = "${query != null || textQuery != null}">
 				<parameter value="${objectType}"/>
+				<parameter value="${textQuery}"/>
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.CustomObject">

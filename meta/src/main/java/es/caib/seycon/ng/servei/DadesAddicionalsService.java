@@ -15,6 +15,7 @@ import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectEntity;
+import com.soffid.iam.model.CustomObjectRoleEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -22,8 +23,10 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.model.DispatcherEntity;
+import es.caib.seycon.ng.model.RolEntity;
 import roles.Tothom;
 import roles.customObjectType_create;
 import roles.customObjectType_delete;
@@ -38,7 +41,9 @@ import roles.customObjectType_update;
 		com.soffid.iam.service.RuleEvaluatorService.class,
 		AuditoriaService.class,
 		CustomObjectTypeEntity.class,
-		CustomObjectEntity.class})
+		CustomObjectEntity.class,
+		CustomObjectRoleEntity.class,
+		RolEntity.class})
 public abstract class DadesAddicionalsService {
 
 	@Operation(translated = "getDataTypes", grantees={Tothom.class})
@@ -201,4 +206,9 @@ public abstract class DadesAddicionalsService {
 	
 	@Operation(grantees = { roles.metadata_update.class })
 	public void registerStandardObject ( String resourceName, @Nullable MetadataScope scope, boolean reset) { }
+
+	@Operation(grantees = { Tothom.class })
+	public AccountAccessLevelEnum getAccessLevel(CustomObjectType type) { return null; }
+	
+
 }

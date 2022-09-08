@@ -78,11 +78,11 @@ public class SearchDictionaryBuilder {
 			objectType = clazz;
 		
 		AdditionalDataService ejb = EJBLocator.getAdditionalDataService();
-		CustomObjectType ot = ejb.findCustomObjectTypeByName(objectType);
+ 		CustomObjectType ot = ejb.findCustomObjectTypeByName(objectType);
 		if (ot == null) {
 			sd = generateLegacyDictionary(clazz);
 		} else {
-			sd = generateStandardDictionary(clazz);
+			sd = generateStandardDictionary(objectType);
 		}
 		return sd;
 	}

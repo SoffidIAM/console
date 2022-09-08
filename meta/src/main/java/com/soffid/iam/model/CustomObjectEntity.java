@@ -6,6 +6,7 @@ import java.util.Date;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.DaoFinder;
+import com.soffid.mda.annotation.DaoOperation;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Entity;
@@ -25,7 +26,7 @@ public class CustomObjectEntity {
 	
 	@Column(name="COB_DESCR", length=250)
 	public String description;
-
+	
 	@Column(name="COB_COT_ID", composition=true, reverseAttribute="objects")
 	public CustomObjectTypeEntity type;
 
@@ -47,6 +48,7 @@ public class CustomObjectEntity {
 	public java.util.List<String> findCustomObjectNames(String type) {
 		return null;
 	}
+	
 }
 
 @Index(columns={"COB_COT_ID", "COB_NAME"}, unique=true, name="SC_CUSOBJ_UK", entity=CustomObjectEntity.class)

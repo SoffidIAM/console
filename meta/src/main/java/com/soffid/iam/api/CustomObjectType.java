@@ -1,5 +1,7 @@
 package com.soffid.iam.api;
 
+import java.util.List;
+
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.mda.annotation.Attribute;
@@ -23,4 +25,9 @@ public class CustomObjectType {
 	public MetadataScope scope;
 
 	public boolean builtin;
+	
+	public Boolean publicAccess;
+
+	List<String> managerRoles;
+	List<String> userRoles;
 }

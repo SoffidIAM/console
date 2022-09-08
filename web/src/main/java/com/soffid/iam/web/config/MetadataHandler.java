@@ -109,6 +109,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		Boolean builtin = Boolean.TRUE;
 		try {
 			builtin = (Boolean) XPathUtils.getValue(getForm(), "@builtin" );
+			onChangePublicAccess(event);
 		} catch (Exception e) {}
 		((CustomField3)getFellow("objectTypeName")).setReadonly(builtin);
 		((CustomField3)getFellow("objectTypeDescription")).setReadonly(builtin);
@@ -567,6 +568,33 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		description.setSize(100);
 		description.setType(TypeEnumeration.STRING_TYPE);
 		XPathUtils.createPath((DataSource) getListbox(), "/metadata", description);
+	}
+
+	public void onChangePublicAccess(Event ev) {
+		DataTable dt = (DataTable) getListbox();
+		if (dt.getSelectedIndex() >= 0) {
+			Boolean builtin = (Boolean) XPathUtils.eval(dt, "builtin");
+			Boolean pub = (Boolean) XPathUtils.eval(dt, "publicAccess");
+			CustomField3 pa = (CustomField3) getFellow("publicAccess");
+			CustomField3 userRoles = (CustomField3) getFellow("ownerRoles");
+			CustomField3 ownerRoles = (CustomField3) getFellow("userRoles");
+			if (builtin != null && builtin.booleanValue()) {
+				pa.setVisible(false);
+				userRoles.setVisible(false);
+				ownerRoles.setVisible(false);
+			}
+			else {
+				pa.setVisible(true);
+				pa.setDisabled(false);
+				if (pub == null || pub.booleanValue()) {
+					userRoles.setVisible(false);
+					ownerRoles.setVisible(false);
+				} else {
+					userRoles.setVisible(true);
+					ownerRoles.setVisible(true);
+				}
+			}
+		}
 	}
 }
 

@@ -1,5 +1,6 @@
 package com.soffid.iam.web.custom;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.CustomObjectType;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.menu.DynamicMenuHandler;
 import com.soffid.iam.web.menu.MenuOption;
 
@@ -22,17 +25,31 @@ public class CustomObjectMenuHandler implements DynamicMenuHandler {
 		List<MenuOption> list = new LinkedList<MenuOption>();
 		try {
 			for (CustomObjectType cu: EJBLocator.getAdditionalDataService().findCustomObjectTypeByJsonQuery("builtin eq \"false\"")) {
-				MenuOption o = new MenuOption();
-				o.setImg("/img/menu/custom-object.svg");
-				o.setLiteral(cu.getDescription());
-				o.setUrl("/custom/custom.zul?type="+cu.getName());
-				list.add(o);				
+				if (allowed(cu)) {
+					MenuOption o = new MenuOption();
+					o.setImg("/img/menu/custom-object.svg");
+					o.setLiteral(cu.getDescription());
+					o.setUrl("/custom/custom.zul?type="+cu.getName());
+					list.add(o);				
+				}
 			}
 		} catch ( Exception e) {
 			log.warn("Error fetching process to start", e);
 		}
 		option.setSmall(list.size() > 6);
 		return list;
+	}
+
+
+	private boolean allowed(CustomObjectType cu) {
+		if (Boolean.TRUE.equals(cu.getPublicAccess()))
+			return true;
+		if (cu.getManagerRoles() == null) return false;
+		SoffidPrincipal principal = Security.getSoffidPrincipal();
+		for (String role: cu.getManagerRoles())
+			if (Arrays.binarySearch(principal.getSoffidRoles(), role) >= 0)
+				return true;
+		return false;
 	}
 
 

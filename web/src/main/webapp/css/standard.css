@@ -1406,6 +1406,12 @@ div.databox div.container, div.databox div.container span {
 	white-space: pre; 
 }
 
+div.databox div.container.scrollable {
+	overflow-y: auto;
+	border-top: solid 2px {BLUE};
+	border-bottom: solid 2px {BLUE};
+}
+
 div.databox div.container span.binary {
 	display: inline-block;
 	margin-top: 6px;

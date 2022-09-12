@@ -221,6 +221,7 @@ public class InputField3 extends Databox
 			}
 			calculateVisibility();
 			super.setMultiValue(dataType.isMultiValued());
+			super.setMaxrows(dataType.getMultiValuedRows());
 			if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||

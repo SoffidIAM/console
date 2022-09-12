@@ -2177,7 +2177,7 @@ public class EntryPointServiceImpl extends
 				for (Iterator<EntryPointEntity> it = cerca.iterator(); it
 						.hasNext();) {
 					EntryPointEntity pue = it.next();
-					if (pue.getInformationSystem().equals(aplicacio))
+					if (pue.getInformationSystem() != null && pue.getInformationSystem().equals(aplicacio))
 						resFiltrats.add(pue);
 				}
 				cerca = resFiltrats; // Filtrem

@@ -39,7 +39,7 @@ public class TaskEntityImpl extends com.soffid.iam.model.TaskEntity {
 
         if (transactionCode.equals(TaskHandler.UPDATE_ROLE)  
         		|| transactionCode.equals(TaskHandler.RECONCILE_ROLE)) //$NON-NLS-1$
-            result = result + " " + getRole() + getDb(); //$NON-NLS-1$
+            result = result + " " + getRole() + " @ " + getDb(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.CREATE_FOLDER)) //$NON-NLS-1$
             result = result + " " + getFolder(); //$NON-NLS-1$

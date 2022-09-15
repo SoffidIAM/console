@@ -243,6 +243,10 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             propagarRolsAtorgatsGrups(rolsAPropagar);
             createTask(usuari);
 
+            getSession().createQuery("delete from com.soffid.iam.model.NoticeEntity where user.id=:userid")
+            	.setParameter("userid", usuari.getId())
+            	.executeUpdate();
+            
             super.remove(usuari);
 
             auditarUsuari("D", codiUsuari, usuari.getPrimaryGroup()); //$NON-NLS-1$

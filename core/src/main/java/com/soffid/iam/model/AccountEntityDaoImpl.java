@@ -45,7 +45,7 @@ public class AccountEntityDaoImpl extends
 				auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 	}
-
+r
 	@Override
 	public void create(com.soffid.iam.model.AccountEntity entity) {
 		super.create(entity);
@@ -83,10 +83,8 @@ public class AccountEntityDaoImpl extends
 		entity.getRoles().clear();
         getNetworkDiscoveryAccountEntityDao().remove(entity.getNetworkDiscovery());
         entity.getNetworkDiscovery().clear();
-        if (entity.getSnapshot() != null) {
-        	getAccountSnapshotEntityDao().remove(entity.getSnapshot());
-        	entity.setSnapshot(null);
-        }
+        AccountSnapshotEntity snapshot = entity.getSnapshot();
+        
 		try {
 			getAuditEntityDao().unlinkAccounts(entity);
 		} catch (InternalErrorException e) {
@@ -94,6 +92,9 @@ public class AccountEntityDaoImpl extends
 		}
 		super.remove(entity);
 		auditar("D", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
+		if (snapshot != null) {
+			getAccountSnapshotEntityDao().remove(snapshot);
+		}
 	}
 
 	public com.soffid.iam.model.AccountEntity accountToEntity(Account instance) {

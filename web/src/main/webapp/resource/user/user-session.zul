@@ -14,6 +14,7 @@
 	<datatable id="listbox" autocommit="true" 
 			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 			preference="session"
+			incrementalrefresh="true"
 			dataPath="${arg.listbox}:/session" 
 			maxheight="70vh" 
 			enablefilter="true" >
@@ -31,7 +32,7 @@
 - name: ${c:l('usuaris.zul.Port')}
   value: port
 - name: ${c:l('usuaris.zul.DataInici')}
-  value: stardDate
+  value: startDate
   template: #{startDate_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Tipus') }

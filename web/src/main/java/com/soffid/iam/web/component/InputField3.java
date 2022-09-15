@@ -124,6 +124,7 @@ public class InputField3 extends Databox
 	String keysPath = null;
 	String valuesPath = null;
 	String javascript = null;
+	String javascripthelp = null;
 	String descriptionExpression = null;
 	SimpleXelContext xelContext = new SimpleXelContext();
 	
@@ -1037,7 +1038,9 @@ public class InputField3 extends Databox
 			HtmlEditor.edit(this);
 		}
 		else if (isMultiline()) {
-			Editor.edit(this, javascript == null ? "{}" : javascript);
+			if (javascripthelp == null)
+				javascripthelp = (String) getAttribute("javascripthelp");
+			Editor.edit(this, javascript == null ? "{}" : javascript, javascripthelp);
 		}
 	}
 
@@ -1350,6 +1353,16 @@ public class InputField3 extends Databox
 			descriptionExpressionCompiled = new ELFactory()
 				.parseExpression(xelContext, descriptionExpression.replace("#{", "${"), String.class);
 		}
+	}
+
+	
+	public String getJavascripthelp() {
+		return javascripthelp;
+	}
+
+	
+	public void setJavascripthelp(String javascripthelp) {
+		this.javascripthelp = javascripthelp;
 	}
 
 }

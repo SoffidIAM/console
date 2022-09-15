@@ -3481,6 +3481,7 @@ div.databox div.container.switch, div.databox div.container.switch.wrapped {
 	width: 80px;
 	flex-grow: 0;
 	margin-left: 0;
+	overflow: visible;
 }
 
 

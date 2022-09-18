@@ -58,15 +58,28 @@
   default: true
 - name: ${c:l('usuaris.zul.startDate')}
   width: 150px
-  value: startDate_date
+  value: startDate
+  template: #{startDate_date}
   default: true
 - name: ${c:l('usuaris.zul.endDate')}
   width: 150px
-  value: endDate_date
+  value: endDate
+  template: #{endDate_date}
   default: true
 - name: ${c:l('usuaris.zul.holderGroup')}
   width: 150px
   value: holderGroup
+- name: ${c:l('usuaris.zul.delegatedBy')}
+  width: 150px
+  value: ownerAccount
+- name: ${c:l('usuaris.zul.delegatedSince')}
+  width: 150px
+  value: delegateSince
+  template: #{delegateSince_date}
+- name: ${c:l('usuaris.zul.delegatedUntil')}
+  width: 150px
+  value: delegateUntil
+  template: #{delegateUntil_date}
 		]]>
 		</attribute>
 	</datatable>

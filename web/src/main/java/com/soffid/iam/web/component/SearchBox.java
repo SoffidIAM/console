@@ -361,10 +361,21 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 							if (child instanceof AttributeSearchBox)
 								((AttributeSearchBox) child).detach();
 						}
+						
+						HashSet<String> atts = new HashSet<>();
+						for (String att: defaultAttributes.split("[ ,]+"))
+						{
+							atts.add(att);
+							addAttribute(att);
+						}
+						
 						for ( int i = 0; i < l.length(); i++)
 						{
 							String s = l.getString(i);
-							addAttribute(s);
+							if (!atts.contains(s)) {
+								addAttribute(s);
+								atts.add(s);
+							}
 						}
 					}
 				}

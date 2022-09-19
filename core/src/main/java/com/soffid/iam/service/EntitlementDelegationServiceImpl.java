@@ -12,7 +12,6 @@ import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserEntity;
-
 import com.soffid.iam.api.DelegationStatus;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
@@ -60,7 +59,7 @@ public class EntitlementDelegationServiceImpl extends EntitlementDelegationServi
 				ra.setOwnerAccount(ra.getAccount());
 			ra.setDelegateAccount(targetAccountEntity);
 			String auditType;
-			if (new Date().after(since))
+			if (new Date().after(since) || new Date().equals(since))
 			{
 				ra.setDelegationStatus(DelegationStatus.DELEGATION_ACTIVE);
 				ra.setAccount(targetAccountEntity);
@@ -83,6 +82,10 @@ public class EntitlementDelegationServiceImpl extends EntitlementDelegationServi
 	}
 
 	private boolean checkOwnership(RoleAccountEntity ra) {
+
+		if (Security.isUserInRole("soffid:delegate/*"))
+			return true;
+				
 		if (checkAccountOwnership ( ra.getOwnerAccount() ))
 			return true;
 		
@@ -133,6 +136,7 @@ public class EntitlementDelegationServiceImpl extends EntitlementDelegationServi
 		ra.setDelegateAccount(null);
 		ra.setDelegateSince(null);
 		ra.setDelegateUntil(null);
+		ra.setOwnerAccount(null);
 		getRoleAccountEntityDao().update(ra, "m");
 		return getRoleAccountEntityDao().toRoleAccount(ra);
 	}
@@ -170,6 +174,7 @@ public class EntitlementDelegationServiceImpl extends EntitlementDelegationServi
 			roleAccountEntity.setDelegateUntil(null);
 			roleAccountEntity.setDelegateAccount(null);
 			roleAccountEntity.setDelegationStatus(null);
+			roleAccountEntity.setOwnerAccount(null);
 			getRoleAccountEntityDao().update(roleAccountEntity,"M");
 		}
 	}

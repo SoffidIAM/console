@@ -26,8 +26,12 @@ public class CustomObjectType {
 
 	public boolean builtin;
 	
+	@Nullable
 	public Boolean publicAccess;
 
+	@Nullable
 	List<String> managerRoles;
+	
+	@Nullable
 	List<String> userRoles;
 }

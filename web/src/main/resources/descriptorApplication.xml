@@ -10,7 +10,7 @@
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
-				if = '${enableQuery == null || ( (queryText == "" || queryText == null) &amp;&amp; (query == null ||query == "") )}'>
+				if = '${enableQuery != null &amp;&amp; ( (queryText == "" || queryText == null) &amp;&amp; (query == null ||query == "") )}'>
 				<parameter value=""/>
 				<parameter value="not parent pr"/>
 			</ejb-finder>

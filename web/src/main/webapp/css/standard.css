@@ -3788,3 +3788,24 @@ div.graphjs {
 	display: inline-block;
 	vertical-align: bottom;
 }
+
+div.tutorialMessage{
+	position:fixed;
+	z-index:2;
+	text-align: center;
+}
+div.tutorialMessage span{
+	color: {BLUETEXT}; 
+	padding:16px;
+	border-radius:10px; 
+	padding-block: 10px; 
+	background-color:{BLUE};
+	display: block;
+}
+div.tutorialMessage button{
+	
+}
+
+
+
+

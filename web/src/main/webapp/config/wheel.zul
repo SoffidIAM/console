@@ -1,10 +1,120 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
 <frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml" use="com.soffid.iam.web.config.WheelHandler" id="frame">
-	<div id="box1">
-		<button label="${c:l('aplicaIntranet_autoritzacio.Next') }" onClick="ref:frame.next1"/>
-	</div>
+<style>
+		.cls-32.shadow {
+			fill: red; 
+		}
+		.cls-32.shadow2 {
+			fill: green; 
+		}
+		
+		#am01:hover ,#am02:hover ,#am03:hover, #am04:hover {
+ 		 fill: green;
+		}
+		#iga01:hover ,#iga02:hover ,#iga03:hover, #iga04:hover {
+ 		 fill: blue;
+		}
+		#irc01:hover ,#irc02:hover ,#irc03:hover, #irc04:hover {
+ 		 fill: black;
+		}
+		#pam01:hover ,#pam02:hover ,#pam03:hover, #pam04:hover {
+ 		 fill: red;
+		}
+</style>
+<script>
+		function shadowBackground(item) {
+			var element = document.getElementById(item);
+			var class = element.classname;
+			element.classname= class+"-shadow";
+		};
+		
+		
+		function changeFill(color){
+			var element = document.getElementById("pam01");
+			element.style.fill= color;
+		}
+</script>
 
 
+		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/restart.svg" if="${canRestartConsole}" label="${c:l('plugins.zul.RestartServer') }" onClick="ref:frame.restartConsole"/>
+					<menu2item image="/img/add.svg"  if="${canUpdatePlugins}"  label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+
+<!-- 1.- USER OPTIONS-->
+		<!-- Capa que opaca el resto de info y resalta dónde queremos llamar la atención-->
+		<div id="cloakLayer1" style="z-index: 1; position: fixed; top:0; right:0; lefT:0; bottom:0" onClick="ref:frame.showHelpOptionsMessageBox()">
+		<!-- Flecha en la que si haces click te muestra el siguiente mensaje/pantalla de ayuda-->
+			<image  id="userOptionsArrow" src="/img/new/SFF_Iconos-37.svg" visible="true"
+				style="position:fixed; top:0; right:0;transform:rotate(315deg);margin-top:30px;margin-right:25px;z-index: 2;" 
+				height="50px" width="50px" onClick="ref:frame.showHelpOptionsMessageBox()"/>
+		<!-- El propio mensaje de ayuda con un boton -->			
+			<div id="userOptionsMessageBox" 
+				 sclass="tutorialMessage"
+				 style=" top:0; right:0;margin-top:80px;margin-right:85px;" >
+			 <label value="${c:l('tutorial.userOptionsMessageBox')} " /> 
+			</div>	 
+		</div>
+		
+	
+<!-- 2.-HELP MENU-->
+		<div id="cloakLayer2" style="z-index: 1; position: fixed; top:0; right:0; lefT:0; bottom:0" visible="false"  onClick="ref:frame.showSearchOptionsMessageBox()">
+			 <image id="helpOptionsArrow" src="/img/new/SFF_Iconos-37.svg" visible="false"
+			 		style="position:fixed; top:0; right:0;transform:rotate(315deg);margin-top:30px;margin-right:55px; z-index: 2;"  
+				    height="50px" width="50px" onClick="ref:frame.showSearchOptionsMessageBox()" />
+			<div id="helpOptionsMessageBox" visible="false"				    
+				 sclass="tutorialMessage"
+				 style="position:fixed; top:0; right:0;margin-top:80px;margin-right:105px;"> 
+			 <label value="${c:l('tutorial.helpOptionsMessageBox')}"  
+			 		style="border: 1px solid green; border-radius:10px; padding-block: 10px; background-color:#2BD7E2; " /> 
+			</div>	
+		</div>
+	
+<!-- 3.- SEARCH BAR -->
+		<div id="cloakLayer3" style="z-index: 1; position: fixed; top:0; right:0; lefT:0; bottom:0;" visible="false" onClick="ref:frame.showMainNavigationMessageBox()">
+			<image id="searchOptionsArrow" src="/img/new/SFF_Iconos-37.svg" visible="false"
+			 		style="position:fixed; top:0; middle:0; transform:rotate(270deg);margin-top:40px;margin-left:900px; z-index: 2;"  
+				    height="50px" width="50px" onClick="ref:frame.showMainNavigationMessageBox()" />
+			<div id="searchOptionsMessageBox" visible="false"
+				 style="position:fixed; top:0; right:0;margin-top:90px;margin-right:600px; z-index: 2;"> 
+			 <label value="${c:l('tutorial.searchOptionsMessageBox')}"  
+			 		style="border: 1px solid green; border-radius:10px; padding-block: 10px; background-color:#2BD7E2; " />  
+			</div>	
+		</div> 
+
+<!-- 4.- MAIN NAVIGATION MENU -->
+		<div id="cloakLayer4" style="z-index: 1; position: fixed; top:0; right:0; lefT:0; bottom:0" visible="false" onClick="ref:frame.showBreadscrumsOptionsMessageBox()"> 
+			<image id="mainNavigationArrow" src="/img/new/SFF_Iconos-37.svg"  visible="false" 
+					style="position:fixed; top:0; left:0;transform:rotate(215deg);margin-top:40px; margin-left:40px; z-index: 2;"  
+					height="50px" width="50px" onClick="ref:frame.showBreadscrumsOptionsMessageBox()"/>
+			<div id="mainNavigationMessageBox" visible="false"
+				style="position:fixed; top:0; left:0;margin-top:80px;margin-left:95px; z-index: 2;"> 
+			 <label value="${c:l('tutorial.mainNavigationMessageBox')}"  
+			 		style="border: 1px solid green; border-radius:10px; padding-block: 10px; background-color:#2BD7E2; " /> 
+			</div>	
+		</div>
+<!-- 5.- BREADSCRUMS -->
+		<div id="cloakLayer5" style="z-index: 1; position: fixed; top:0; right:0; lefT:0; bottom:0;" visible="false" onClick="ref:frame.hideBreadscrumsOptionsMessageBox()">
+			<image id="breadscrumsOptionsArrow" src="/img/new/SFF_Iconos-37.svg" visible="false"
+				style="position:fixed; top:0; left:225px; transform:rotate(270deg); margin-top:70px;margin-left:0; z-index: 2;" 
+				height="50px" width="50px" onClick="ref:frame.hideBreadscrumsOptionsMessageBox()"/>
+			<div id="breadscrumsOptionsMessageBox" visible="false" 
+				style="position:fixed; top:0; left:0;margin-top:100px;margin-left:265px; z-index: 2;">
+			 <label value="${c:l('tutorial.breadscrumsOptionsMessageBox')}"  
+			 		style="border: 1px solid green; border-radius:10px; padding-block: 10px; background-color:#2BD7E2; " /> 
+			</div>	
+		</div>
+		
+	<!-- 5.-WHEEL (Ahora mismo visible pero luego ocultada hasta que acabe el tutorial) -->
+		<div id="wheelContainer" style=" margin:auto; margin-top:70px; width:1024px; heigh:1024px;" visible="true">
+			<html id="wheel"></html>
+		</div>
+	
 </frame>

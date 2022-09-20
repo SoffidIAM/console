@@ -1587,9 +1587,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		usuari.setModifiedDate(GregorianCalendar.getInstance());
 		UserEntity entity = getUserEntityDao().userToEntity(usuari);
 		if (entity != null) {
-			getUserEntityDao().update(entity);
 			if (usuari.getAttributes() != null)
 				handleUpdateUserAttributes(usuari.getUserName(), usuari.getAttributes(), false);
+			getUserEntityDao().update(entity);
 			
 			getAccountService().generateUserAccounts(usuari.getUserName());
 			if (revokeHolderGroupRoles)

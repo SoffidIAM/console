@@ -1278,7 +1278,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password)
 			throws InternalErrorException, IOException {
 
-		if ("S".equals(account.getSystem().getTrusted()) && account.getSystem().getUrl() != null) {
+		if (account.getSystem().getUrl() != null) {
 			try {
 				log.info("Invoking validate account "+account.getName()+" on "+account.getSystem().getName());
 				ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService()

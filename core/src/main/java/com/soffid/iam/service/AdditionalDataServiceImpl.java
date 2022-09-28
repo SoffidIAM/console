@@ -773,6 +773,18 @@ public class AdditionalDataServiceImpl extends
 			}
 		}
 		
+		if (reset) {
+			current = getMetaDataEntityDao().findByObjectTypeAndName(className, null);
+			for (Iterator<MetaDataEntity> it = current.iterator(); it.hasNext();) {
+				MetaDataEntity md = it.next();
+				if (md.getBuiltin() == null || ! md.getBuiltin().booleanValue()) {
+					md.setOrder(last ++);
+					getMetaDataEntityDao().update(md);
+				}
+			}
+			
+		}
+		
 	}
 
 	protected List<DataType> getDescriptorMetadata(String resourceName)

@@ -51,8 +51,12 @@ public class ApplicationHandler extends FrameHandler {
 		SearchBox sb = (SearchBox) getFellow("searchBox");
 		if (name != null) {
 			sb.addAttribute("name").setSearchFilter(name);
+			vars.declareVariable("enableQuery", true);
+			sb.search();
+		} else if (req.getParameter("filter") != null) {
+			vars.declareVariable("enableQuery", true);
+			sb.search();
 		}
-		sb.search();
 	}
 	
 	public void onChangeForm(Event event) {

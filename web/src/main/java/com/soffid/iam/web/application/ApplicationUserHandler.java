@@ -65,10 +65,15 @@ public class ApplicationUserHandler extends Div implements AfterCompose {
 		getModel().commit();
 		
 		String[][] data = { 
-				{"name", Labels.getLabel("parametres.zul.Parametre-2")},
-				{"networkName", Labels.getLabel("parametres.zul.Xarxa-2")},
-				{"value", Labels.getLabel("parametres.zul.Valor-2")},
-				{"description", Labels.getLabel("parametres.zul.Descripcia-2")}
+				{"accountName", Labels.getLabel("aplica_usuarisRolllista.zul.Codi")},
+				{"accountId", Labels.getLabel("aplica_usuarisRolllista.zul.AccountId")},
+				{"accountSystem", Labels.getLabel("aplica_usuarisRolllista.zul.Bbdd")},
+				{"domainValue", Labels.getLabel("aplica_usuarisRolllista.zul.DescripciadeDomini")},
+				{"startDate", Labels.getLabel("usuaris.zul.DataInici")},
+				{"endDate", Labels.getLabel("usuaris.zul.DataFi")},
+				{"user", Labels.getLabel("com.soffid.iam.api.User.userName")},
+				{"roleName", Labels.getLabel("aplicacions.zul.NomRol-2")},
+				{"roleSystem", Labels.getLabel("aplicacions.zul.RoleSystem")}
 		};
 		
 		String title = Labels.getLabel("tenant.zul.import");
@@ -88,8 +93,10 @@ public class ApplicationUserHandler extends Div implements AfterCompose {
 		int removed = 0;
 		try {
 			ApplicationService appSvc = EJBLocator.getApplicationService();
+			int line = 0;
 			for ( Iterator<Map<String, String>> iterator = parser.iterator(); iterator.hasNext(); )
 			{
+				line ++;
 				m = iterator.next();
 				String name = m.get("accountName");
 				String accountId = m.get("accountId");
@@ -104,14 +111,26 @@ public class ApplicationUserHandler extends Div implements AfterCompose {
 				RoleAccount ra = new RoleAccount();
 				ra.setAccountName(name == null || name.trim().isEmpty() ? null: name);
 				ra.setAccountId(accountId == null || accountId.trim().isEmpty() ? null: Long.parseLong(accountId));
-				ra.setAccountSystem(accountSystem == null || accountSystem.trim().isEmpty() ? null: accountSystem);
+				ra.setAccountSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
+						(roleSystem == null || roleSystem.trim().isEmpty() ? null: roleSystem): accountSystem);
 				if (domainValue != null && ! domainValue.trim().isEmpty()) {
 					ra.setDomainValue(new DomainValue());
 					ra.getDomainValue().setValue(domainValue);
 				}
+				ra.setUserCode(user == null || user.trim().isEmpty() ? null: user);
 				ra.setStartDate(startDate == null || startDate.trim().isEmpty()? new Date(): DateFormats.getDateFormat().parse(startDate));
-				ra.setEndDate(endDate == null || endDate.trim().isEmpty()? new Date(): DateFormats.getDateFormat().parse(endDate));
+				ra.setEndDate(endDate == null || endDate.trim().isEmpty()? null: DateFormats.getDateFormat().parse(endDate));
+	
+				ra.setRoleName(roleName == null || roleName.trim().isEmpty() ? null: roleName);
+				ra.setSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
+						(roleSystem == null || roleSystem.trim().isEmpty() ? null: roleSystem): accountSystem);
 				
+				if (ra.getRoleName() == null)
+					throw new UiException ("Missing role name at line "+line);
+				if (ra.getSystem() == null)
+					throw new UiException ("Missing system name at line "+line);
+				if (ra.getUserCode() == null && ra.getAccountName() == null)
+					throw new UiException ("Missing user or account name at line "+line);
 				appSvc.create(ra);
 				inserts ++;
 			}
@@ -127,7 +146,7 @@ public class ApplicationUserHandler extends Div implements AfterCompose {
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
 
 		SingletonBinder b = new SingletonBinder(this);
-		b.setDataPath(listboxPath);
+		b.setDataPath(listboxPath+":/user");
 		DataModelCollection coll = (DataModelCollection) b.getValue();
 		try {
 			coll.refresh();

@@ -25,7 +25,7 @@
 			</div>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Application" 
-				defaultAttributes="relativeName, description"
+				defaultAttributes="name, description"
 				preference="com.soffid.iam.api.Application"
 				dataPath="/model:/application" variableName="query" variableNameText="queryText"></searchbox>
 

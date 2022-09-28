@@ -46,8 +46,6 @@ public class CustomField3 extends InputField3 {
 
 	private DataType dataTypeObj;
 
-	private Object ownerObject;
-
 	private String filterExpression;
 
 	public void updateMetadata()  {
@@ -236,14 +234,6 @@ public class CustomField3 extends InputField3 {
 		return attributeValidateAll();
 	}
 
-	public Object getOwnerObject() {
-		return ownerObject;
-	}
-
-	public void setOwnerObject(Object ownerObject) {
-		this.ownerObject = ownerObject;
-	}
-	
 	public void adjustVisibility ()
 	{
 		super.setVisible ( visible && attributeVisible() );

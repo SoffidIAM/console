@@ -7,6 +7,8 @@
 		<label bind="${arg.listbox}:/@name"></label> - <label bind="${arg.listbox}:/@description"/>
 		<menu2>
 			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" 
+				if="${soffid:isUserInRole('user:role:create') || soffid:isUserInRole('user:role:delete')}" onClick="ref:handler.importCsv"/>
 		</menu2>
 	</div>
 
@@ -25,7 +27,7 @@
 - name: ${c:l('aplicacions.zul.Bbdd')}
   value: system
 - name: ${c:l('aplica_rolinfo.zul.Domini')}
-  value: domainValue.description
+  value: domainValue.value
 - name: ${c:l('usuaris.zul.recertification')}
   value: certificationDate_date
 ]]></attribute>

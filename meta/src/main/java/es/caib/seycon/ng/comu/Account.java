@@ -35,7 +35,6 @@ public class Account {
 	public java.lang.String oldName;
 
 	@Description("Account description")
-	@Nullable
 	public java.lang.String description;
 
 	@Description("Account type")

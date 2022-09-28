@@ -165,7 +165,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 				v = ((DataNode) v).getDataContext().getData();
 			}
 			try {
-				if (Class.forName(expectClass).isAssignableFrom(v.getClass()))
+				if (v == null || Class.forName(expectClass).isAssignableFrom(v.getClass()))
 					setVisible(true);
 				else {
 					setVisible(false);

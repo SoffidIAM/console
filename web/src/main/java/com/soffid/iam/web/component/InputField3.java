@@ -66,6 +66,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.bpm.api.TaskInstance;
 import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
@@ -631,11 +632,11 @@ public class InputField3 extends Databox
 				vars.put("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 				vars.put("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 			}
-			if (ownerObject instanceof Task)
+			if (ownerObject instanceof TaskInstance || ownerObject instanceof es.caib.bpm.vo.TaskInstance )
 			{
 				vars.put("task",  ownerObject); //$NON-NLS-1$
 			}
-			if (ownerObject instanceof ProcessInstance)
+			if (ownerObject instanceof ProcessInstance || ownerObject instanceof es.caib.bpm.vo.ProcessInstance)
 			{
 				vars.put("process", ownerObject); //$NON-NLS-1$
 			}

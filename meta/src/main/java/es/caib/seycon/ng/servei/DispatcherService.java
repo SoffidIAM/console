@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.servei;
 
+import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.List;
@@ -14,12 +15,14 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
+import com.soffid.iam.model.RuleEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.ScheduledTaskService;
@@ -84,6 +87,22 @@ public abstract class DispatcherService {
 	public void applyConfiguration(es.caib.seycon.ng.comu.Dispatcher dispatcher)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Operation(grantees = { roles.agent_update.class })
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public AsyncProcessTracker applyConfigurationAsync(
+		Dispatcher dispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+
+	@Transactional(readOnly=false,noRollbackFor={java.lang.Exception.class})
+	@Operation(grantees = { roles.agent_update.class })
+	@Description("Query the apply process status")
+	public AsyncProcessTracker queryProcessStatus(
+		AsyncProcessTracker process)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
 
 	@Operation(grantees = { roles.agent_update.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })

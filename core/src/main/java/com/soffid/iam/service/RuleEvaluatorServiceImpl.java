@@ -15,7 +15,8 @@ import bsh.ParseException;
 import bsh.TargetError;
 
 import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.ApplyRuleProcess;
+import com.soffid.iam.api.AsyncProcessTracker;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DelegationStatus;
 import com.soffid.iam.api.DomainValue;
@@ -504,15 +505,15 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		return report.getFile();
 	};
 
-	Map<Long,ApplyRuleProcess> proc = new HashMap<>();
+	Map<Long,AsyncProcessTracker> proc = new HashMap<>();
 	
 	@Override
-	protected ApplyRuleProcess handleApplyAsync (RuleEntity rule) throws Exception
+	protected AsyncProcessTracker handleApplyAsync (RuleEntity rule) throws Exception
 	{
-		ApplyRuleProcess old = proc.get(rule.getId());
+		AsyncProcessTracker old = proc.get(rule.getId());
 		if (old != null)
 			old.setCancelled(true);
-		final ApplyRuleProcess p = new ApplyRuleProcess();
+		final AsyncProcessTracker p = new AsyncProcessTracker();
 		p.setId(rule.getId());
 		proc.put(p.getId(), p);
 		p.setStart(new Date());
@@ -588,7 +589,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	}
 
 	@Override
-	protected ApplyRuleProcess handleQueryProcessStatus(ApplyRuleProcess process) throws Exception {
+	protected AsyncProcessTracker handleQueryProcessStatus(AsyncProcessTracker process) throws Exception {
 		return proc.get(process.getId());
 	}
 

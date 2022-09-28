@@ -43,6 +43,7 @@ import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import com.soffid.iam.api.AccessControl;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Configuration;
@@ -62,6 +63,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserTypeDispatcher;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccessControlEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -76,9 +78,11 @@ import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.ObjectMappingEntity;
 import com.soffid.iam.model.ObjectMappingPropertyEntity;
 import com.soffid.iam.model.ObjectMappingTriggerEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.model.ReconcileTriggerEntityDao;
 import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.RuleEntity;
 import com.soffid.iam.model.ServerCertificateEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
@@ -116,6 +120,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 
 /**
  * @see es.caib.seycon.ng.servei.DispatcherServiceh
@@ -125,6 +130,7 @@ public class DispatcherServiceImpl extends
 		implements ApplicationContextAware {
 	org.apache.commons.logging.Log log = LogFactory
 			.getLog(getClass().getName());
+	private SessionFactory sessionFactory;
 
 	/**
 	 * @see es.caib.seycon.ng.servei.DispatcherService#create(es.caib.seycon.ng.comu.Dispatcher)
@@ -1567,11 +1573,7 @@ public class DispatcherServiceImpl extends
 			}
 		}
 
-		List<Long> allUsers = new LinkedList<Long>();
-		for (UserEntity u: getUserEntityDao().loadAll())
-		{
-			allUsers.add(u.getId());
-		}
+		List<Long> allUsers = loadAllUserIds();
 		
 		UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
 		if (ud == null)
@@ -1719,11 +1721,7 @@ public class DispatcherServiceImpl extends
 				}
 			}
 	
-			List<Long> allUsers = new LinkedList<Long>();
-			for (UserEntity u: getUserEntityDao().loadAll())
-			{
-				allUsers.add(u.getId());
-			}
+			List<Long> allUsers = loadAllUserIds();
 			
 			UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
 			if (ud == null)
@@ -1748,8 +1746,68 @@ public class DispatcherServiceImpl extends
 			report.close();
 			report.getFile().delete();
 		} finally {
-			getTaskEntityDao().finishVirtualSourceTransaction(t);
+			getTaskEntityDao().finishVirtualSourceTransaction(t);			HashSet<String> groups = new HashSet<String>();
+			if (dispatcher.getGroups() != null && ! dispatcher.getGroups().isEmpty())
+			{
+				for (String s: dispatcher.getGroups().split("[, ]+"))
+				{
+					groups.add(s);
+				}
+			}
+	
+			HashSet<String> types = new HashSet<String>();
+			if (dispatcher.getUserTypes() != null && ! dispatcher.getUserTypes().isEmpty())
+			{
+				for (String s: dispatcher.getUserTypes().split("[, ]+"))
+				{
+					types.add(s);
+				}
+			}
+	
+			List<Long> allUsers = loadAllUserIds();
+			
+			UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
+			if (ud == null)
+				throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
+			
+			AccountDiffReport report = new AccountDiffReport();
+			report.setSystem(dispatcher);
+			report.setApply(true);
+			report.setAccountEntityDao(getAccountEntityDao());
+			report.setUserEntityDao(getUserEntityDao());
+			report.setAccountService(getAccountService());
+			report.generateHeader ();
+			for (Long l: allUsers)
+			{
+				session.flush();
+				session.clear();
+				UserEntity u = getUserEntityDao().load(l);
+	
+				analyze (u, dispatcher, groups, types, ud,
+						report);
+			}
+			report.close();
+			report.getFile().delete();
+
 		}
+	}
+
+	private List<Long> loadAllUserIds() {
+		List<Long> allUsers = new LinkedList<Long>();
+		CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+		criteria.setFirstResult(0);
+		criteria.setMaximumResultSize(1000);
+		do {
+			List<UserEntity> l = getUserEntityDao().query("select usu from com.soffid.iam.model.UserEntity as usu "
+					+ "where usu.tenant.id=:tenantId", new Parameter[] {new Parameter("tenantId", Security.getCurrentTenantId())} , criteria);
+			if (l.isEmpty()) break;
+			for (UserEntity u: l)
+			{
+				allUsers.add(u.getId());
+			}
+			criteria.setFirstResult(criteria.getFirstResult().intValue() + l.size());
+		} while (true);
+		return allUsers;
 	}
 
 	@Override
@@ -2009,6 +2067,123 @@ public class DispatcherServiceImpl extends
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
 		return svc.invoke(dispatcher, verb, object, attributes);
+	}
+
+	Map<Long,AsyncProcessTracker> proc = new HashMap<>();
+	@Override
+	protected AsyncProcessTracker handleApplyConfigurationAsync(System dispatcher) throws Exception {
+		AsyncProcessTracker old = proc.get(dispatcher.getId());
+		if (old != null)
+			old.setCancelled(true);
+		handleUpdate(dispatcher);
+		final AsyncProcessTracker p = new AsyncProcessTracker();
+		p.setId(dispatcher.getId());
+		proc.put(p.getId(), p);
+		p.setStart(new Date());
+		
+		if (sessionFactory == null)
+			sessionFactory = (SessionFactory) ctx.getBean("sessionFactory");
+
+		final SoffidPrincipal principal = Security.getSoffidPrincipal();
+		
+		new Thread ( () -> {
+			
+			Session session = SessionFactoryUtils.getSession(sessionFactory, true) ;
+			final Number count = (Number) session
+					.createQuery( "select count(*) from com.soffid.iam.model.UserEntity as us "
+								+ "where us.tenant.id=:tenantId ")
+					.setParameter("tenantId", Security.getCurrentTenantId())
+					.list()
+					.iterator()
+					.next();
+			
+			int pos = 0; 
+			int step = 100;
+			Object end = Boolean.FALSE;
+			final HashSet<String> groups = new HashSet<String>();
+			if (dispatcher.getGroups() != null && ! dispatcher.getGroups().isEmpty())
+			{
+				for (String s: dispatcher.getGroups().split("[, ]+"))
+				{
+					groups.add(s);
+				}
+			}
+			
+			final HashSet<String> types = new HashSet<String>();
+			if (dispatcher.getUserTypes() != null && ! dispatcher.getUserTypes().isEmpty())
+			{
+				for (String s: dispatcher.getUserTypes().split("[, ]+"))
+				{
+					types.add(s);
+				}
+			}
+			Security.nestedLogin(principal);
+			try {
+				p.setProgress(0);
+				final CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+				criteria.setFirstResult(0);
+				criteria.setFetchSize(step);
+				criteria.setMaximumResultSize(step);
+				while (! Boolean.TRUE.equals(end) && ! p.isCancelled()) {
+					end = getAsyncRunnerService().runNewTransaction(
+						() -> {
+							UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
+							if (ud == null)
+								throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
+							
+							AccountDiffReport report = new AccountDiffReport();
+							report.setSystem(dispatcher);
+							report.setApply(true);
+							report.setAccountEntityDao(getAccountEntityDao());
+							report.setUserEntityDao(getUserEntityDao());
+							report.setAccountService(getAccountService());
+							report.generateHeader ();
+
+							List<UserEntity> list = getUserEntityDao().query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId order by us.id", 
+									new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())},
+									criteria );
+							if (list.isEmpty())
+								return Boolean.TRUE;
+							int i = 0;
+							for (UserEntity user: list) {
+								if (p.isCancelled())
+									return Boolean.TRUE;
+								p.setCurrent(user.getUserName());
+								analyze (user, dispatcher, groups, types, ud, report);
+								i++;
+								p.setProgress( (float) ( criteria.getFirstResult() + i ) / count.floatValue());
+							}
+							report.close();
+							report.getFile().delete();
+							
+							session.flush();
+							session.clear();
+							criteria.setFirstResult(criteria.getFirstResult().intValue() + list.size());
+							return Boolean.FALSE;
+						}
+					);
+				}
+				p.setCurrent(null);
+				p.setStart(new Date());
+				p.setErrorMessage(null);
+				p.setFinished(true);
+			} catch (Exception e) {
+				log.warn("Error evaluating rules", e);
+				p.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
+				p.setStart(new Date());
+				p.setFinished(true);
+			} finally {
+				Security.nestedLogoff();
+				session.close();
+			}
+		} ).start();
+		
+		return p;
+	}
+
+	@Override
+	protected AsyncProcessTracker handleQueryProcessStatus(AsyncProcessTracker process) throws Exception {
+		return proc.get(process.getId());
 	}
 
 }

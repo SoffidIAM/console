@@ -5,7 +5,7 @@
 //
 
 package com.soffid.iam.service;
-import com.soffid.iam.api.ApplyRuleProcess;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.mda.annotation.*;
 
@@ -96,7 +96,7 @@ public abstract class RulesService {
 	
 	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
-	public ApplyRuleProcess applyAsync(
+	public AsyncProcessTracker applyAsync(
 		com.soffid.iam.api.Rule rule)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
@@ -105,8 +105,8 @@ public abstract class RulesService {
 	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(readOnly=true,noRollbackFor={java.lang.Exception.class})
 	@Description("Query the rule process status")
-	public ApplyRuleProcess queryProcessStatus(
-		ApplyRuleProcess process)
+	public AsyncProcessTracker queryProcessStatus(
+		AsyncProcessTracker process)
 		throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
 	
 }

@@ -39,7 +39,7 @@
 				return new java.util.LinkedList();
 			</script-finder>
 			<new-instance-bean
-				className="com.soffid.iam.api.ApplyRuleProcess">
+				className="com.soffid.iam.api.AsyncProcessTracker">
 			</new-instance-bean>
 		</finder>
 	</datanode>

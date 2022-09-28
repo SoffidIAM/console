@@ -313,8 +313,18 @@
 		</validator>
 
 
+		<finder name="updateStatus" type="updateStatus">
+			<script-finder>
+				return new java.util.LinkedList();
+			</script-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.AsyncProcessTracker">
+			</new-instance-bean>
+		</finder>
 	</datanode>
-	
+
+	<datanode name="updateStatus" transient="true" />
+
 	<datanode name="tasks" transient="true" />
 
 	<datanode name="metadata">

@@ -6,7 +6,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 
 @ValueObject
-public class ApplyRuleProcess {
+public class AsyncProcessTracker {
 	Long id;
 	
 	float progress;

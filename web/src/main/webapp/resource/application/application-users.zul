@@ -7,6 +7,8 @@
 		<label bind="${arg.listbox}:/@name"></label> - <label bind="${arg.listbox}:/@description"/>
 		<menu2>
 			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" 
+				if="${soffid:isUserInRole('user:role:create') || soffid:isUserInRole('user:role:delete')}" onClick="ref:frame.importCsv"/>
 		</menu2>
 	</div>
 

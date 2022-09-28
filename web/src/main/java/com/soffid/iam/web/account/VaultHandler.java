@@ -30,6 +30,8 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.System;
@@ -104,11 +106,12 @@ public class VaultHandler extends FrameHandler {
 					att.refresh();
 				}
 				getFellow("accountBasics").setVisible(owner);
+				try {
+					DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "../services");
+					boolean display = owner && instance.getAccount().getType() == AccountType.SHARED;
+					getFellow("servicesSection").setVisible(display);
+				} catch (Exception e) {}
 			}
-			try {
-				DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "../services");
-				getFellow("servicesSection").setVisible(!coll.isEmpty());
-			} catch (Exception e) {}
 		}
 		updateStatus();
 	}
@@ -650,4 +653,69 @@ public class VaultHandler extends FrameHandler {
 		}
 	}
 
+	public void addNewService(Event event) throws CommitException {
+		getModel().commit();
+		DataTable dt = (DataTable) getFellow("servicesList");
+		dt.addNew();
+		
+		Account account = (Account) XPathUtils.eval(getListbox(), "instance");
+		XPathUtils.setValue(dt, "accountId", account.getId());
+		XPathUtils.setValue(dt, "accountName", account.getName());
+		XPathUtils.setValue(dt, "accountSystem", account.getSystem());
+		XPathUtils.setValue(dt, "manual", Boolean.TRUE);
+		
+		openService(event);
+	}
+
+	public void openService(Event event) throws CommitException {
+		Window w = (Window) getFellow("serviceWindow");
+		Component form = w.getFellow("form");
+		HostService current = (HostService) XPathUtils.eval(form, "instance");
+		((CustomField3)w.getFellow("service")).setReadonly(! current.isManual());
+		((CustomField3)w.getFellow("hostName")).setReadonly(! current.isManual());
+		w.doHighlighted();
+		if (current.getId() == null)
+			((CustomField3)w.getFellow("service")).focus();
+		else
+			((CustomField3)w.getFellow("command")).focus();
+	}
+	
+	public void undoService(Event event) throws Exception {
+		Window w = (Window) getFellow("serviceWindow");
+		DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getListbox(), "services");
+		coll.refresh();
+		w.setVisible(false);
+	}
+
+	public void applyService(Event event) throws Exception {
+		Window w = (Window) getFellow("serviceWindow");
+
+		if ( ((CustomField3)w.getFellow("service")).attributeValidateAll() &&
+			((CustomField3)w.getFellow("hostName")).attributeValidateAll() &&
+			((CustomField3)w.getFellow("command")).attributeValidateAll() ) {
+			
+			Component form = w.getFellow("form");
+			
+			CustomField3 cf = (CustomField3)w.getFellow("hostName");
+			Host host = (Host) cf.getValueObject();
+			XPathUtils.setValue(form, "hostId", host.getId());
+			
+			getModel().commit();
+			w.setVisible(false);
+		}
+	}
+
+	public void deleteService(Event event) throws Exception {
+		Missatgebox.confirmaOK_CANCEL(Labels.getLabel("common.delete"), 
+				(event2) -> {
+					if (event2.getName().equals("onOK")) {
+						Window w = (Window) getFellow("serviceWindow");
+						DataTable dt = (DataTable) getFellow("servicesList");
+						dt.delete();
+						getModel().commit();
+						w.setVisible(false);
+					}
+				});
+
+	}
 }

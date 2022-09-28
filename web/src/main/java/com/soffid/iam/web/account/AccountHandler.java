@@ -89,7 +89,8 @@ public class AccountHandler extends FrameHandler {
 		updateStatus();
 		try {
 			DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "/services");
-			getFellow("servicesSection").setVisible(!coll.isEmpty());
+			AccountType type = (AccountType) XPathUtils.eval(getForm(), "@type");
+			getFellow("servicesSection").setVisible(type == AccountType.SHARED);
 			
 			Component b = getFellow("detailsButton");
 			

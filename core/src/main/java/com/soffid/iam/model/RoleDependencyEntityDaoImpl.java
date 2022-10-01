@@ -176,6 +176,7 @@ public class RoleDependencyEntityDaoImpl extends
         		TipusDomini.APPLICATIONS.equals(tipus) ) &&
         		source.getDomainApplication() != null) {
             target.setDomainValue(source.getDomainApplication().getName());
+            target.setDomainDescription(source.getDomainApplication().getDescription());
             target.setHasDomain(true);
         } else if ((TipusDomini.GRUPS.equals(tipus) || 
         		TipusDomini.GRUPS_USUARI.equals(tipus) ||
@@ -183,11 +184,13 @@ public class RoleDependencyEntityDaoImpl extends
         		TipusDomini.MEMBERSHIPS.equals(tipus) ) && 
         		source.getDomainGroup() != null) {
             target.setDomainValue(source.getDomainGroup().getName());
+            target.setDomainDescription(source.getDomainGroup().getDescription());
             target.setHasDomain(true);
         } else if ((TipusDomini.DOMINI_APLICACIO.equals(tipus)  ||
         		TipusDomini.CUSTOM.equals(tipus) ) && 
         		source.getDomainApplicationValue() != null) {
             target.setDomainValue(source.getDomainApplicationValue().getValue());
+            target.setDomainDescription(source.getDomainApplicationValue().getDescription());
             target.setHasDomain(true);
         } else if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipus) ) {
             target.setHasDomain(true);

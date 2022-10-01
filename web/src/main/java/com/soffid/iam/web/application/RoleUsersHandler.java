@@ -48,9 +48,11 @@ import com.soffid.iam.web.popup.SelectColumnsHandler;
 
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.binder.SingletonBinder;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.component.Wizard;
+import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
@@ -359,102 +361,6 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 			((DataTable) lb).download();
 	}
 	
-	public void importCsv () throws IOException, CommitException {
-		DataSource model = (DataSource) Path.getComponent(listboxPath);
-		model.commit();
-		
-		String[][] data = { 
-				{"system", Labels.getLabel("usuaris.zul.Bbdd")},
-				{"roleName", Labels.getLabel("usuaris.zul.Rol")},
-				{"domainValue/value", Labels.getLabel("aplica_usuarisRolllista.zul.DescripciadeDomini")},
-				{"accountName", Labels.getLabel("usuaris.zul.Account")},
-				{"startDate", Labels.getLabel("usuaris.zul.startDate")},
-				{"endDate", Labels.getLabel("usuaris.zul.endDate")},
-				{"holderGroup", Labels.getLabel("usuaris.zul.holderGroup")}
-		};
-		
-		String title = Labels.getLabel("tenant.zul.import");
-		ImportCsvHandler.startWizard(title, data, this, 
-				parser -> importCsv(parser));
-	}
-
-	private void importCsv(CsvParser parser) {
-		Map<String,String> m = null;
-		int updates = 0;
-		int inserts = 0;
-		int unchanged = 0;
-		int removed = 0;
-		try {
-			DataTable usersListbox = getUsersListbox();
-			String userName = (String) XPathUtils.getValue((DataSource) usersListbox, "@userName");
-
-			ApplicationService appSvc = EJBLocator.getApplicationService();
-			for ( Iterator<Map<String, String>> iterator = parser.iterator(); iterator.hasNext(); )
-			{
-				m = iterator.next();
-				String system = m.get("system");
-				String roleName = m.get("roleName");
-				String domainValue = m.get("domainValue/value");
-				String accountName = m.get("accountName");
-				String startDate = m.get("startDate");
-				String endDate = m.get("endDate");
-				String holderGroup = m.get("holderGroup");
-
-				if (roleName != null && !roleName.trim().isEmpty())
-				{
-					currentRole = EJBLocator.getApplicationService().findRoleByNameAndSystem(roleName, system);
-
-					RoleAccount currentRoleAccount = new RoleAccount();
-					currentRoleAccount.setUserCode(userName);
-					currentRoleAccount.setCertificationDate(new Date());
-					if (startDate == null || startDate.trim().isEmpty())
-						currentRoleAccount.setStartDate(new Date());
-					else {
-						try {
-							Date start = DateFormats.getDateFormat().parse(startDate);
-							currentRoleAccount.setStartDate(start);
-						} catch (ParseException e) {
-							throw new InternalErrorException("Wrong date "+startDate, e);
-						}
-					}
-					if (endDate != null && !endDate.trim().isEmpty()) {
-						try {
-							Date end = DateFormats.getDateFormat().parse(endDate);
-							currentRoleAccount.setEndDate(end);
-						} catch (ParseException e) {
-							throw new InternalErrorException("Wrong date "+endDate, e);
-						}
-					}
-					currentRoleAccount.setEnabled(true);
-					currentRoleAccount.setRoleName(currentRole.getName());
-					currentRoleAccount.setSystem(currentRole.getSystem());
-					if (accountName != null && ! accountName.trim().isEmpty())
-						currentRoleAccount.setAccountName(accountName);
-					DomainValue dv = new DomainValue();
-					dv.setDomainName(currentRole.getDomain());
-					dv.setExternalCodeDomain(currentRole.getInformationSystemName());
-					dv.setValue(domainValue);
-					currentRoleAccount.setDomainValue(dv);
-
-					appSvc.create(currentRoleAccount);
-					inserts ++;
-				}
-			}
-			DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue((DataSource)usersListbox, "/role");
-			coll.refresh();
-		} catch (UiException e) {
-			throw e;
-		} catch (Exception e) {
-			if (m == null)
-				throw new UiException(e);
-			else
-				throw new UiException("Error loading parameter "+m.get("name"), e);
-		}
-		
-		
-		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
-	}
-
 	public void displayRemoveButton(Component lb, boolean display) {
 		HtmlBasedComponent d = (HtmlBasedComponent) lb.getNextSibling();
 		if (d != null && d instanceof Div) {
@@ -488,5 +394,107 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 						}
 					});
 		}
+	}
+	
+	public void importCsv () throws IOException, CommitException {
+		getModel().commit();
+		
+		String[][] data = { 
+				{"accountName", Labels.getLabel("aplica_usuarisRolllista.zul.Codi")},
+				{"accountId", Labels.getLabel("aplica_usuarisRolllista.zul.AccountId")},
+				{"accountSystem", Labels.getLabel("aplica_usuarisRolllista.zul.Bbdd")},
+				{"domainValue", Labels.getLabel("aplica_usuarisRolllista.zul.DescripciadeDomini")},
+				{"startDate", Labels.getLabel("usuaris.zul.DataInici")},
+				{"endDate", Labels.getLabel("usuaris.zul.DataFi")},
+				{"user", Labels.getLabel("com.soffid.iam.api.User.userName")},
+				{"roleName", Labels.getLabel("aplicacions.zul.NomRol-2")},
+				{"roleSystem", Labels.getLabel("aplicacions.zul.RoleSystem")}
+		};
+		
+		String title = Labels.getLabel("tenant.zul.import");
+		ImportCsvHandler.startWizard(title, data, this, 
+				parser -> importCsv(parser));
+	}
+
+	private DataTable getModel() {
+		return (DataTable) getFellow("listbox");
+	}
+
+	private void importCsv(CsvParser parser) {
+		Map<String,String> m = null;
+		int updates = 0;
+		int inserts = 0;
+		int unchanged = 0;
+		int removed = 0;
+
+		SingletonBinder brole = new SingletonBinder(this);
+		brole.setDataPath(listboxPath+":/instance");
+		Role role = (Role) brole.getValue();
+		brole.setParent(null);
+
+		try {
+			ApplicationService appSvc = EJBLocator.getApplicationService();
+			int line = 0;
+			for ( Iterator<Map<String, String>> iterator = parser.iterator(); iterator.hasNext(); )
+			{
+				line ++;
+				m = iterator.next();
+				String name = m.get("accountName");
+				String accountId = m.get("accountId");
+				String accountSystem = m.get("accountSystem");
+				String domainValue = m.get("domainValue");
+				String startDate = m.get("startDate");
+				String endDate = m.get("endDate");
+				String user = m.get("user");
+				String roleName = m.get("roleName");
+				String roleSystem = m.get("roleSystem");
+				
+				RoleAccount ra = new RoleAccount();
+				ra.setAccountName(name == null || name.trim().isEmpty() ? null: name);
+				ra.setAccountId(accountId == null || accountId.trim().isEmpty() ? null: Long.parseLong(accountId));
+				ra.setAccountSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
+						(roleSystem == null || roleSystem.trim().isEmpty() ? null: roleSystem): accountSystem);
+				if (domainValue != null && ! domainValue.trim().isEmpty()) {
+					ra.setDomainValue(new DomainValue());
+					ra.getDomainValue().setValue(domainValue);
+				}
+				ra.setUserCode(user == null || user.trim().isEmpty() ? null: user);
+				ra.setStartDate(startDate == null || startDate.trim().isEmpty()? new Date(): DateFormats.getDateFormat().parse(startDate));
+				ra.setEndDate(endDate == null || endDate.trim().isEmpty()? null: DateFormats.getDateFormat().parse(endDate));
+	
+				ra.setRoleName(roleName == null || roleName.trim().isEmpty() ? null: roleName);
+				ra.setSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
+						(roleSystem == null || roleSystem.trim().isEmpty() ? null: roleSystem): accountSystem);
+				
+				if (ra.getRoleName() == null) 
+					ra.setRoleName(role.getName());
+				if (ra.getSystem() == null) {
+					ra.setSystem(role.getSystem());
+					ra.setAccountSystem(role.getSystem());
+				}
+				if (ra.getUserCode() == null && ra.getAccountName() == null)
+					throw new UiException ("Missing user or account name at line "+line);
+				appSvc.create(ra);
+				inserts ++;
+			}
+		} catch (UiException e) {
+			throw e;
+		} catch (Exception e) {
+			if (m == null)
+				throw new UiException(e);
+			else
+				throw new UiException("Error loading parameter "+m.get("name"), e);
+		}
+
+		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
+
+		SingletonBinder b = new SingletonBinder(this);
+		b.setDataPath(listboxPath+":/grant");
+		DataModelCollection coll = (DataModelCollection) b.getValue();
+		try {
+			coll.refresh();
+		} catch (Exception e) {
+		}
+		b.setParent(null);
 	}
 }

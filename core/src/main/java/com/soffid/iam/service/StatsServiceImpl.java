@@ -101,7 +101,7 @@ public class StatsServiceImpl extends StatsServiceBase {
 		getStatsEntityDao().purge(daysNumber);
 	}
 
-	static int lastRun = 0;
+	static long lastRun = 0;
 	@Override
 	protected void handleUpdateStats() throws Exception {
 		updatePamUsers();
@@ -109,8 +109,11 @@ public class StatsServiceImpl extends StatsServiceBase {
 		updateHpaAccounts();
 		updatePamAccounts();
 		updatePamStorage();
-		if (System.currentTimeMillis() - lastRun > 24 * 60  * 60 * 1000L)
+		if (System.currentTimeMillis() - lastRun > 8 * 60  * 60 * 1000L)
+		{
+			lastRun = System.currentTimeMillis();
 			handlePurge();
+		}
  	}
 
 	private void updatePamStorage() throws InternalErrorException {

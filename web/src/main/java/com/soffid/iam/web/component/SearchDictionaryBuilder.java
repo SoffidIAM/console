@@ -230,6 +230,7 @@ public class SearchDictionaryBuilder {
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
 				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+				! TypeEnumeration.SEPARATOR.equals(att.getType()) &&
 				! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()))
 			{
 				WebDataType watt = new WebDataType(att);

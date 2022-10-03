@@ -67,6 +67,7 @@
 		<finder name="plugin" type="plugin">
 			<script-finder>
 				sp = new com.soffid.iam.api.AgentDescriptor();
+				sp.id = 0;
 				sp.setClassName("- no class -");
 				sp.setDescription("-");
 				return sp;

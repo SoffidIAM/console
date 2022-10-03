@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<div use="com.soffid.iam.web.application.ApplicationManagersHandler" id="handler"
+	listboxPath="${arg.listbox }">
+	<div sclass="navigation-bar">
+		<label bind="${arg.listbox }:/@name"></label> - <label bind="${arg.listbox }:/@description"/>
+	</div>
+
+
+	<datatree2 id="listbox"
+		width="100%" dataPath="${arg.listbox }:/"
+		header="${c:l('aplicacions.zul.Rol') } / ${c:l('aplicacions.Responsables') } " 
+		openLevels="0"
+		enablefilter="false"
+		maxheight="70vh"
+		onCompleteAddManager="ref:handler.completeManager"
+		onAddManager="ref:handler.addManager">
+		<attribute name="finders">
+		<![CDATA[
+		- path: /managementRole
+		  icon: /img/role.svg
+		  value: name
+		  leaf: false
+		  columns:
+		    - value: description
+		  ${soffid:isUserInRole('user:role:create') ? "tail":"no-tail"}: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddManager')">${c:l('group.addNewManager')}</button>
+		- path: /manager
+		  icon: /img/user.svg
+		  value: userCode
+		  leaf: true
+		  columns:
+		    - value: userFullName
+		  ]]>
+		</attribute>
+		<attribute name="columns"><![CDATA[
+		- name: ${c:l('com.soffid.iam.api.Group.description')}
+		]]>
+		</attribute>
+	</datatree2>
+
+</div>

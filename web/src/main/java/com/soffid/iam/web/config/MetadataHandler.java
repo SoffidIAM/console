@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -183,6 +184,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 							dt.setOperatorVisibility(AttributeVisibilityEnum.fromString(value));
 						} else if (s.equals("userVisibility") && value != null) {
 							dt.setUserVisibility(AttributeVisibilityEnum.fromString(value));
+						} else if (s.equals("values") && value != null) {
+							dt.setValues(value == null ? null: Arrays.asList(value.split(",")));
 						} else if (value != null && !value.trim().isEmpty()) {
 							BeanUtils.setProperty(dt, s, value);
 						}
@@ -193,7 +196,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 	    	for (DataNode dataNode: (Collection<DataNode>)coll) {
 	    		if ( !dataNode.isDeleted()) {
 	    			DataType dt = (DataType) dataNode.getInstance();
-	    			if (! names.contains(dt.getName())) {
+	    			if (! names.contains(dt.getName()) && Boolean.FALSE.equals(dt.getBuiltin())) {
 	    				removed ++;
 	    				dataNode.delete();
 	    			}

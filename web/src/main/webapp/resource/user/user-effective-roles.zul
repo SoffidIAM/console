@@ -48,6 +48,7 @@
              #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}
              #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", ruleName): ""}
              #{roleName != null ? c:cat3("${c:l('accounts.role')} <b>", roleName, " </b> "): ""}
+             #{domainValue != null ? c:cat3(" / <b>", domainValue, " </b> "): ""}
           columns:
           - value: system
           - template: >-
@@ -55,6 +56,7 @@
                 #{groupName != null ? groupDescription: ""}
                 #{ruleName != null ? "": ""}
                 #{roleName != null ? roleDescription: ""}
+                #{domainValue != null ? c:cat3(" / ", domainDescription, " </b> "): ""}
 		]]>
 		</attribute>
 	</datatree2>

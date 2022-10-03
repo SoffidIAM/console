@@ -60,6 +60,12 @@
 				<parameter value="${instance.name}" />
 			</ejb-finder>
 		</finder>
+		<finder name="managementRole" type="managementRole" >  <!-- application:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findApplicationManagementRoles">
+			</ejb-finder>
+		</finder>
+
 		<finder name="effectiveuser" type="userRole">
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findEffectiveUserRolesByInformationSystem">
 				<parameter value="${instance.name}" />
@@ -165,4 +171,30 @@
 		</ejb-handler>
 	</datanode>
 
+	<datanode name="managementRole">
+		<finder name="manager" type="manager">
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findApplicationManagers">
+				<parameter value="${parent.instance.name}" />
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="manager">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
 </zkib-model>

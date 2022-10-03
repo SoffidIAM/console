@@ -507,7 +507,7 @@ public class AdditionalDataServiceImpl extends
 
 	private void updateRoles(CustomObjectTypeEntity entity, CustomObjectType obj) throws InternalErrorException {
 		getCustomObjectRoleEntityDao().remove(entity.getAccessRoles());
-		if (obj != null && !obj.isBuiltin()) {
+		if (obj != null && !obj.isBuiltin() && Boolean.FALSE.equals( obj.getPublicAccess())) {
 			for (String g: obj.getManagerRoles())
 			{
 				RoleEntity r = getRoleEntityDao().findByShortName(g);

@@ -1411,6 +1411,7 @@ div.databox div.container.scrollable {
 	overflow-x: clip;
 	border-top: solid 2px {BLUE};
 	border-bottom: solid 2px {BLUE};
+	padding-right: 32px;
 }
 
 div.databox div.container span.binary {

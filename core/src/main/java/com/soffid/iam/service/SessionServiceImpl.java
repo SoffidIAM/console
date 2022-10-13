@@ -267,12 +267,14 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     protected void handleDestroySession(Session sessio) throws Exception {
         SessionEntity se = getSessionEntityDao().load(sessio.getId());
 
-        if (se.getLoginLogInfo() != null)
-        {
-        	se.getLoginLogInfo().setEndDate(new Date());
-        	getAccessLogEntityDao().update(se.getLoginLogInfo());
+        if (se != null) {
+	        if (se.getLoginLogInfo() != null)
+	        {
+	        	se.getLoginLogInfo().setEndDate(new Date());
+	        	getAccessLogEntityDao().update(se.getLoginLogInfo());
+	        }
+	        getSessionEntityDao().remove(se);
         }
-        getSessionEntityDao().remove(se);
     }
 
     @Override

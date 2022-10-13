@@ -16,7 +16,6 @@
 				header="${c:l('com.soffid.iam.api.Group.name') }" 
 				openLevels="1"
 				enablefilter="true"
-				maxheight="70vh"
 				onOpenAccounts="ref:frame.openAccounts"
 				onOpenSystem="ref:frame.openSystem"
 				onAddSystem="ref:frame.addSystem"

@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -65,10 +66,10 @@ public class CsvParser {
 		charset = charsUtf16LE >= charsUtf16BE &&
 					charsUtf16LE >= charsUtf8 &&
 					charsUtf16LE >= charsIso &&
-					charsUtf16LE >= charsWin ? "UTF16-LE":
+					charsUtf16LE >= charsWin ? "UTF-16LE":
 				charsUtf16BE >= charsUtf8 &&
 					charsUtf16BE >= charsIso &&
-					charsUtf16BE >= charsWin ? "UTF16-BE":
+					charsUtf16BE >= charsWin ? "UTF-16BE":
 				charsUtf8 >= charsIso &&
 					charsUtf8 >= charsWin ? "UTF-8":
 				charsIso >= charsWin ? "ISO-8859-1":
@@ -81,7 +82,7 @@ public class CsvParser {
 		int chars = 0;
 		int weirds = 0; 
 		try {
-			Reader r = new InputStreamReader ( new FileInputStream(file), charsetName);
+			Reader r = new InputStreamReader ( new FileInputStream(file), Charset.forName(charsetName));
 			int read;
 			while (( read = r.read() ) >= 0 )
 			{

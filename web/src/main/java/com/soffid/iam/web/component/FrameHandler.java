@@ -123,6 +123,25 @@ public class FrameHandler extends Frame {
 				applyFilter(sb, filter);
 			}
 		}
+		// Set table height
+		try {
+			Component lb = getListbox();
+			int substract = 215;
+			if (sb != null)
+				substract += 80; 
+			if (lb instanceof DataTable) {
+				DataTable dt = (DataTable) lb;
+				if (dt.isEnablefilter() || true) substract += 30;
+				if (dt.getMaxheight() == null)
+					dt.setMaxheight("calc( 100vh - "+substract+"px )");
+			}
+			if (lb instanceof DataTree2) {
+				DataTree2 dt = (DataTree2) lb;
+				if (dt.isEnablefilter()) substract += 30;
+				if (dt.getMaxheight() == null)
+					dt.setMaxheight("calc( 100vh - "+substract+"px )");
+			}
+		} catch (ComponentNotFoundException e) {}
 	}
 
 	public void applyFilter(SearchBox sb, String filter) {

@@ -429,7 +429,7 @@ public class DocumentServiceImpl extends DocumentServiceBase {
 		
 		if(result== null || !result.getHash().equals(reference.getHash()))
 		{
-			throw new DocumentBeanException("No se encontro un documento con referencia " + reference);
+			return; // Document already removed
 		}
 		
 		getNASManager().deleteFile(result.getFsPath());

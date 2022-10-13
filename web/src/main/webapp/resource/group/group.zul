@@ -34,7 +34,6 @@
 				header="${c:l('com.soffid.iam.api.Group.name') }" 
 				openLevels="1"
 				enablefilter="false"
-				maxheight="70vh"
 				use='com.soffid.iam.web.group.GroupDataTree2'
 				onAddGroup="ref:frame.addGroup"
 				onSelect="ref:frame.showDetails">

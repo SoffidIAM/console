@@ -34,7 +34,7 @@
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 				preference="account"
-				dataPath="/model:/account" maxheight="65vh"
+				dataPath="/model:/account" 
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('account:create')}" >

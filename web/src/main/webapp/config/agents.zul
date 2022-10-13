@@ -80,7 +80,7 @@
 			</searchbox>
 
 			<datatable id="listbox" autocommit="true" use="com.soffid.iam.web.agent.AgentsTable"
-				dataPath="/model:/agent" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/agent" sortColumn="0"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 				onSelect="ref:frame.showDetails" enablefilter="false">

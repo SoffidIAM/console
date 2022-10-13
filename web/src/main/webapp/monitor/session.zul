@@ -22,7 +22,7 @@
 			use="com.soffid.iam.web.audit.SessionDatatable"
 			preference="session"
 			onSelect="ref:frame.open"
-			dataPath="/model:/session" maxheight="70vh" 
+			dataPath="/model:/session"  
 			incrementalrefresh="true"
 			enablefilter="true" >
 		<attribute name="allColumns">

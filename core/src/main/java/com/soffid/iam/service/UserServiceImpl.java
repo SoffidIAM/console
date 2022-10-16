@@ -1500,10 +1500,15 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					previousUser.getModifiedByUser())
 					&& !usuari.getModifiedDate().equals(
 							previousUser.getModifiedDate())) {
+				log.warn("User modification conflict");
+				log.warn("Change requested by   :" + Security.getCurrentAccount());
+				log.warn("Change timestamp      :" + usuari.getModifiedDate().getTime().getTime());
+				log.warn("Last change done by   :" + previousUser.getModifiedByUser());
+				log.warn("Last change timestamp :" + previousUser.getModifiedDate().getTime().getTime());
 				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 				throw new InternalErrorException(
 						String.format(
-								"The user %s cannot be modified as it has been modified by %s on %s",
+								"The user %s cannot be modified as it has been modified by %s t %s",
 								previousUser.getUserName(), previousUser
 										.getModifiedByUser(), sdf
 										.format(usuariAbans
@@ -1582,9 +1587,9 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		usuari.setModifiedDate(GregorianCalendar.getInstance());
 		UserEntity entity = getUserEntityDao().userToEntity(usuari);
 		if (entity != null) {
-			getUserEntityDao().update(entity);
 			if (usuari.getAttributes() != null)
 				handleUpdateUserAttributes(usuari.getUserName(), usuari.getAttributes(), false);
+			getUserEntityDao().update(entity);
 			
 			getAccountService().generateUserAccounts(usuari.getUserName());
 			if (revokeHolderGroupRoles)

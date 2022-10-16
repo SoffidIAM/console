@@ -67,6 +67,7 @@
 		<finder name="plugin" type="plugin">
 			<script-finder>
 				sp = new com.soffid.iam.api.AgentDescriptor();
+				sp.id = 0;
 				sp.setClassName("- no class -");
 				sp.setDescription("-");
 				return sp;
@@ -313,8 +314,18 @@
 		</validator>
 
 
+		<finder name="updateStatus" type="updateStatus">
+			<script-finder>
+				return new java.util.LinkedList();
+			</script-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.AsyncProcessTracker">
+			</new-instance-bean>
+		</finder>
 	</datanode>
-	
+
+	<datanode name="updateStatus" transient="true" />
+
 	<datanode name="tasks" transient="true" />
 
 	<datanode name="metadata">

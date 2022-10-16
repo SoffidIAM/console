@@ -25,7 +25,7 @@ import org.zkoss.zul.Window;
 
 import com.soffid.codemirror.Codemirror;
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.ApplyRuleProcess;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
@@ -258,7 +258,7 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 		com.soffid.iam.api.Rule r = (Rule) ((DataNode)XPathUtils.getValue(getForm(), "/.")).getInstance();
 		
 		
-		ApplyRuleProcess p = EJBLocator.getRulesService().applyAsync(r);
+		AsyncProcessTracker p = EJBLocator.getRulesService().applyAsync(r);
 		DataModelCollection coll = current.getListModel("updateStatus");
 		DataNode dn;
 		if (coll.getSize() > 0)
@@ -266,13 +266,13 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 		else
 			dn = (DataNode) coll.newInstance();
 		
-		ApplyRuleProcess p2 = (ApplyRuleProcess) dn.getInstance();
+		AsyncProcessTracker p2 = (AsyncProcessTracker) dn.getInstance();
 		copyRuleProgress(p, p2);
 		getTimer().start();
 		updateProgress(e);
 	}
 
-	private void copyRuleProgress(ApplyRuleProcess p, ApplyRuleProcess p2) {
+	private void copyRuleProgress(AsyncProcessTracker p, AsyncProcessTracker p2) {
 		p2.setCurrent(p.getCurrent());
 		p2.setEnd(p.getEnd());
 		p2.setErrorMessage(p.getErrorMessage());
@@ -295,14 +295,14 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 				getTimer().stop();
 			}
 			else {
-				ApplyRuleProcess status = (ApplyRuleProcess) ((DataNode)coll.getDataModel(0)).getInstance();
+				AsyncProcessTracker status = (AsyncProcessTracker) ((DataNode)coll.getDataModel(0)).getInstance();
 				if (status.isFinished()) {
 					getTimer().stop();
 					d.setVisible(false);
 				}
 				else
 				{
-					ApplyRuleProcess p = EJBLocator.getRulesService().queryProcessStatus(status);
+					AsyncProcessTracker p = EJBLocator.getRulesService().queryProcessStatus(status);
 					copyRuleProgress(p, status);
 					if (p.isFinished()) {
 						d.setVisible(false);

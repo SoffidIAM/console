@@ -1601,9 +1601,9 @@
 	</autoritzacio>
 	
 	<autoritzacio>
-		<codi>seu:delegate</codi>
-		<descripcio>Delegate own roles</descripcio>
-		<ambit>SelfService</ambit>
+		<codi>soffid:delegate</codi>
+		<descripcio>Manage role delegations</descripcio>
+		<ambit>Applications</ambit>
 	</autoritzacio>
 
 	<autoritzacio>

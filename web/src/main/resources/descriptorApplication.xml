@@ -4,27 +4,13 @@
 
 	<datanode name="applications">
 		<finder name="application" type="application" >
-			<ejb-finder jndi="java:/module/ApplicationService-v2" 
-				method="findApplicationByJsonQueryAsync"
-				if = "${query != null &amp;&amp; query != '' &amp;&amp; synchro == null}">
-				<parameter value="${query}"/>
-			</ejb-finder>
-			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByJsonQuery" 
-				if = "${query != null  &amp;&amp; synchro != null}">
-				<parameter value="${query}"/>
-			</ejb-finder>
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
-				if = "${queryText != null  &amp;&amp; queryText != '' &amp;&amp; synchro == null}">
+				if = '${enableQuery != null &amp;&amp; ((queryText != null &amp;&amp; queryText != "") || (query != null &amp;&amp;query != ""))}'>
 				<parameter value="${queryText}"/>
 				<parameter value="${query}"/>
 			</ejb-finder>
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
-				if = "${queryText != null &amp;&amp; synchro != null}">
-				<parameter value="${queryText}"/>
-				<parameter value="${query}"/>
-			</ejb-finder>
-			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findApplicationByTextAndFilterAsync" 
-				if = '${enableQuery &amp;&amp; (queryText == null || queryText == "") &amp;&amp; (query == null || query == "") &amp;&amp; synchro == null}'>
+				if = '${enableQuery != null &amp;&amp; ( (queryText == "" || queryText == null) &amp;&amp; (query == null ||query == "") )}'>
 				<parameter value=""/>
 				<parameter value="not parent pr"/>
 			</ejb-finder>
@@ -74,6 +60,12 @@
 				<parameter value="${instance.name}" />
 			</ejb-finder>
 		</finder>
+		<finder name="managementRole" type="managementRole" >  <!-- application:query -->
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findApplicationManagementRoles">
+			</ejb-finder>
+		</finder>
+
 		<finder name="effectiveuser" type="userRole">
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findEffectiveUserRolesByInformationSystem">
 				<parameter value="${instance.name}" />
@@ -179,4 +171,30 @@
 		</ejb-handler>
 	</datanode>
 
+	<datanode name="managementRole">
+		<finder name="manager" type="manager">
+			<ejb-finder jndi="java:/module/ApplicationService-v2"
+				method="findApplicationManagers">
+				<parameter value="${parent.instance.name}" />
+				<parameter value="${instance.name}" />
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.RoleAccount">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+	
+	<datanode name="manager">
+		<ejb-handler jndi="java:/module/ApplicationService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+	
 </zkib-model>

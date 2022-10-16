@@ -416,7 +416,7 @@ public class DiscoveryHandler extends FrameHandler {
 		parentNode.getListModel("dispatcherHolder").refresh();
 		
 		for (ScheduledTask task: EJBLocator.getScheduledTaskService().listTasks()) {
-			if (task.getHandlerName().equals("com.soffid.iam.sync.engine.cron.ReconcileAgentTask") &&
+			if (task.getHandlerName().equals("system:reconcile-dispatcher") &&
 					task.getParams().equals(system.getId().toString())) {
 				EJBLocator.getScheduledTaskService().startNow(task);
 			}

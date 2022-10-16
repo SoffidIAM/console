@@ -2310,11 +2310,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 					.getGraphSession().getProcessDefinition(def.getId());
 
 			FileDefinition fileDefinition = definition.getFileDefinition();
-			if (fileDefinition == null)
+			if (fileDefinition == null || ! fileDefinition.hasFile("processimage.jpg"))
 				return null;
 			else
 				return fileDefinition.getBytes("processimage.jpg"); //$NON-NLS-1$
-
+		} catch (NullPointerException e) {
+			return null;
 		} catch (RuntimeException ex) {
 			throw ex;
 		} finally {

@@ -38,6 +38,10 @@ public class RolGrant {
 	@Nullable
 	public java.lang.String domainValue;
 
+	@Description("The grant domain or scope description")
+	@Nullable
+	public java.lang.String domainDescription;
+
 	@Nullable
 	public java.lang.String ownerAccountName;
 

@@ -141,6 +141,13 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 	protected void handleRemove (ScheduledTask task) throws Exception
 	{
 		ScheduledTaskEntity entity = getScheduledTaskEntityDao().scheduledTaskToEntity(task);
+		for (ScheduledTaskLogEntity log: entity.getLogs()) {
+			if (log.getLogReferenceID() != null) {
+				getDocumentService().deleteDocument( new DocumentReference(log.getLogReferenceID()));
+			}
+		}
+		if (entity.getLogReferenceID() != null)
+			getDocumentService().deleteDocument( new DocumentReference(entity.getLogReferenceID()));
 		getScheduledTaskLogEntityDao().remove(entity.getLogs());
 		getScheduledTaskEntityDao().remove(entity);
 		audit (task.getName(), "R"); //$NON-NLS-1$
@@ -211,6 +218,9 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 			});
 			while ( l.size() >= max) {
 				ScheduledTaskLogEntity last = l.pollLast();
+				if (last.getLogReferenceID() != null)
+					getDocumentService().deleteDocument( new DocumentReference(last.getLogReferenceID()));
+
 				getScheduledTaskLogEntityDao().remove(last);
 				entity.getLogs().remove(last);
 			}

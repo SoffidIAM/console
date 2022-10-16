@@ -43,7 +43,7 @@ public abstract class RuleEntity {
 
 	@DaoFinder("select rule \nfrom com.soffid.iam.model.RuleEntity as rule\n"
 			+ "where rule.tenant.id=:tenantId and "
-			+ "(rule.description like :description or :description is null)")
+			+ "(rule.description like :description or :description is null or rule.name like :description)")
 	public java.util.List<com.soffid.iam.model.RuleEntity> findByDescription(
 		@Nullable java.lang.String description) {
 	 return null;

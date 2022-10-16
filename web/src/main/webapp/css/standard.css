@@ -1406,6 +1406,14 @@ div.databox div.container, div.databox div.container span {
 	white-space: pre; 
 }
 
+div.databox div.container.scrollable {
+	overflow-y: auto;
+	overflow-x: clip;
+	border-top: solid 2px {BLUE};
+	border-bottom: solid 2px {BLUE};
+	padding-right: 32px;
+}
+
 div.databox div.container span.binary {
 	display: inline-block;
 	margin-top: 6px;
@@ -2207,6 +2215,12 @@ div.datatree div.tree-label.dashed div.tree-cell,
 div.databox.dashed select {
 	text-decoration: line-through;
 }
+div.datatable table.tbody tr.grayed td,
+div.datatree div.tree-label.grayed,
+div.datatree div.tree-label.grayed div.tree-cell,
+div.databox.grayed select {
+	color: #808080;
+}
 div.datatable table.tbody tr.bold td,
 div.databox.bold select {
 	font-weight: bold;
@@ -2554,7 +2568,7 @@ div.datatable div.sort-indicator-disabled {
 .card,  .single-face-card {
   width: 100%;
   height: 100%;
-  min-height: calc( 100vh - 85px );
+  min-height: calc( 100vh - 50px );
   position: relative;
   transition: transform 1s;
   transform-style: preserve-3d ;
@@ -2870,6 +2884,25 @@ div.options {
 	display: none;
 }
 
+
+.options div.menuoption-tip-shadow {
+	width: 272px;
+	hegiht: 154px;
+	position: absolute;
+}
+
+.options.options-small div.menuoption-tip-shadow {
+	width: 200px;
+	hegiht: 84px;
+	position: absolute;
+}
+
+.options.options-tiny div.menuoption-tip-shadow {
+	width: 60px;
+	hegiht: 54px;
+	position: absolute;
+}
+
 .options span.menuoption-tip {
     display: block;
     position: relative;
@@ -2879,7 +2912,7 @@ div.options {
     text-color: {GREENTEXT};
     font-weight: bold;
     border-radius: 8px;
-    top: -45px;
+    margin-top: 173px;
     padding-left: 10px;
     padding-right: 10px;
     float: right;
@@ -2892,6 +2925,13 @@ div.options {
 	padding-top: 6px;
 	padding-bottom: 6px;
 	background-color: #e8e8e8;
+}
+
+.options.options-small .menuoption:hover img {
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
 }
 
 .options.options-small .menuoption:hover img {
@@ -2921,6 +2961,104 @@ div.options {
 	overflow-x: hidden;
 }
 
+.options.options-small div.menuoption-tip-shadow {
+	width: 204px;
+}
+.options.options-small span.menuoption-tip {
+	margin-top: 113px; 
+}
+.options.options-small div.menuoption-tip-shadow {
+	width: 80px;
+}
+.options.options-small span.menuoption-tip {
+	margin-top: 43px; 
+}
+/*********************** MENU RESPONSIVE **********/
+@media only screen and (max-width: 900px) {
+	.options .menuoption {
+		width: 250px; 
+		padding: 20px;
+	}
+	.options.options .menuoption img {
+		object-fit: contain;
+		padding-left: 39px;
+		padding-right: 39px;
+		padding-top: 27px;
+		padding-bottom: 27px;
+		border-radius: 10px; 
+		width: 200px;
+		height: 140px; 
+	}
+	.options .menuoption .menuoption-suboptions { 
+		display: none;
+	}
+	.options.options .menuoption:hover img {
+		padding-left: 0px;
+		padding-right: 0px;
+		padding-top: 0px;
+		padding-bottom: 0px;
+	}
+	
+	
+	.options div.menuoption-tip-shadow ,
+	.options.options-small div.menuoption-tip-shadow {
+		width: 204px;
+		position: absolute;
+	}
+	.options span.menuoption-tip {
+		margin-top: 113px; 
+	}
+	
+	.options.options-tiny div.menuoption-tip-shadow {
+		width: 60px;
+		hegiht: 54px;
+		position: absolute;
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	.options .menuoption,
+	.options.options-small .menuoption {
+		width: 100px;
+		padding: 10px;
+	}
+	
+	.options.options .menuoption img,
+	.options.options-small .menuoption img {
+		object-fit: contain;
+		padding-left: 9px;
+		padding-right: 9px;
+		padding-top: 7px;
+		padding-bottom: 7px;
+		border-radius: 5px; 
+		width: 100px;
+		height: 70px; 
+	}
+	.options .menuoption .menuoption-suboptions {
+		display: none;
+	}
+	.options .menuoption .menuoption-title,
+	.options.options-small .menuoption .menuoption-title,
+	.options.options-tiny .menuoption .menuoption-title {
+		font-size: 10pt;
+	}
+	
+	.options div.menuoption-tip-shadow ,
+	.options.options-small div.menuoption-tip-shadow ,
+	.options.options-tiny div.menuoption-tip-shadow {
+		width: 80px;
+	}
+
+	.options.options span.menuoption-tip,
+	.options.options-small span.menuoption-tip,
+	.options.options-tiny span.menuoption-tip {
+		background-color: {GREEN}80;
+		border-color: transparent;
+		margin-top: 43px; 
+	}
+}
+
+/********* MENU BAR **************/
 div.navigation-bar {
 	padding: 10px 0 10px 0;
 	margin-bottom: 10px;
@@ -3320,7 +3458,7 @@ img.menu3starter:hover {
 }
 
 div.card div.form {
-	height: calc( 100vh - 140px);
+	height: calc( 100vh - 120px);
 	overflow-y: auto;
 	overflow-x: hidden; 
 }
@@ -3475,6 +3613,7 @@ div.databox div.container.switch, div.databox div.container.switch.wrapped {
 	width: 80px;
 	flex-grow: 0;
 	margin-left: 0;
+	overflow: visible;
 }
 
 

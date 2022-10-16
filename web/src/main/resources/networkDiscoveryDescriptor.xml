@@ -126,6 +126,17 @@
 				<parameter value="${instance}" />
 			</ejb-finder>
 		</finder>
+		<custom-attribute name="dispatchers">
+		<![CDATA[
+			String s = "";
+			for (service: com.soffid.iam.EJBLocator.getNetworkDiscoveryService().findHostSystems(instance)) {
+				if (! s.isEmpty()) s += ", ";
+				s += service.name;
+			} 
+			return s.isEmpty() ? org.zkoss.mesg.Messages.get(org.zkoss.zul.mesg.MZul.NO) : 
+				org.zkoss.mesg.Messages.get(org.zkoss.zul.mesg.MZul.YES)+": "+s;
+			]]>
+		</custom-attribute>
 		<validator>
 			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="hosts.nameValidation2"/>
 			<attribute-validator expr="${instance.os}" notNull="true" friendlyName="hosts.OSValidation2"/>

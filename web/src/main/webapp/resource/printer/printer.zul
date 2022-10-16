@@ -25,7 +25,7 @@
 
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
-				dataPath="/model:/printer" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/printer" sortColumn="0"
 				multiselect="true"
 				preference="printer"
 				onMultiSelect="ref:frame.multiSelect"

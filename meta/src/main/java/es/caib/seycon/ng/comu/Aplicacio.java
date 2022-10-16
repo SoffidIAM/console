@@ -27,16 +27,18 @@ public abstract class Aplicacio {
 	@Attribute(defaultValue = "com.soffid.iam.api.ApplicationType.APPLICATION")
 	public ApplicationType type;
 	
-	@Attribute(translated = "name", hidden = true )
-	public java.lang.String codi;
 
-	@Attribute(translated = "parent", type = "APPLICATION")
+	@Attribute(translated = "parent", type = "APPLICATION", customUiHandler = "com.soffid.iam.web.application.ParentFieldHandler")
 	@JsonAttribute(hibernateAttribute = "parent.name")
 	@Nullable
 	public java.lang.String parent;
 
+	@Attribute(customUiHandler = "com.soffid.iam.web.application.NameFieldHandler")
 	public java.lang.String relativeName;
 
+	@Attribute(translated = "name", readonly = true  )
+	public java.lang.String codi;
+	
 	@Attribute(translated = "description" )
 	public java.lang.String nom;
 
@@ -45,9 +47,10 @@ public abstract class Aplicacio {
 	@Attribute(translated = "source")
 	public java.lang.String directoriFonts;
 
-	@Description("User code of the responsible for the application.")
+	@Description("User name of the owner of the application.")
 	@Nullable
-	@Attribute(translated = "owner" )
+	@JsonAttribute(hibernateAttribute = "contactPerson.userName")
+	@Attribute(translated = "owner", type = "USER" )
 	public java.lang.String codiPersonaContacte;
 
 	@Description("Where the executables are located")
@@ -65,7 +68,7 @@ public abstract class Aplicacio {
 
 	@Description("full name of application responsible")
 	@Nullable
-	@Attribute(translated = "ownerName", type = "USER" )
+	@Attribute(translated = "ownerName", hidden = true )
 	public java.lang.String nomComplertPersonaContacte;
 
 	@Nullable

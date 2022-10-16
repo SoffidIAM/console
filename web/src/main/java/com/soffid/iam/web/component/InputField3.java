@@ -66,6 +66,7 @@ import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.api.ProcessInstance;
+import com.soffid.iam.bpm.api.TaskInstance;
 import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.utils.Security;
@@ -124,6 +125,7 @@ public class InputField3 extends Databox
 	String keysPath = null;
 	String valuesPath = null;
 	String javascript = null;
+	String javascripthelp = null;
 	String descriptionExpression = null;
 	SimpleXelContext xelContext = new SimpleXelContext();
 	
@@ -221,6 +223,7 @@ public class InputField3 extends Databox
 			}
 			calculateVisibility();
 			super.setMultiValue(dataType.isMultiValued());
+			super.setMaxrows(dataType.getMultiValuedRows());
 			if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||
@@ -629,11 +632,11 @@ public class InputField3 extends Databox
 				vars.put("application", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 				vars.put("object", Application.toApplication((Aplicacio) ownerObject)); //$NON-NLS-1$
 			}
-			if (ownerObject instanceof Task)
+			if (ownerObject instanceof TaskInstance || ownerObject instanceof es.caib.bpm.vo.TaskInstance )
 			{
 				vars.put("task",  ownerObject); //$NON-NLS-1$
 			}
-			if (ownerObject instanceof ProcessInstance)
+			if (ownerObject instanceof ProcessInstance || ownerObject instanceof es.caib.bpm.vo.ProcessInstance)
 			{
 				vars.put("process", ownerObject); //$NON-NLS-1$
 			}
@@ -1036,7 +1039,9 @@ public class InputField3 extends Databox
 			HtmlEditor.edit(this);
 		}
 		else if (isMultiline()) {
-			Editor.edit(this, javascript == null ? "{}" : javascript);
+			if (javascripthelp == null)
+				javascripthelp = (String) getAttribute("javascripthelp");
+			Editor.edit(this, javascript == null ? "{}" : javascript, javascripthelp);
 		}
 	}
 
@@ -1349,6 +1354,16 @@ public class InputField3 extends Databox
 			descriptionExpressionCompiled = new ELFactory()
 				.parseExpression(xelContext, descriptionExpression.replace("#{", "${"), String.class);
 		}
+	}
+
+	
+	public String getJavascripthelp() {
+		return javascripthelp;
+	}
+
+	
+	public void setJavascripthelp(String javascripthelp) {
+		this.javascripthelp = javascripthelp;
 	}
 
 }

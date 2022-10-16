@@ -2,6 +2,7 @@ package com.soffid.iam.service;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,28 +14,22 @@ import java.util.Map;
 
 import org.json.JSONException;
 
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.PagedResult;
-import com.soffid.iam.api.Role;
-import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
-import com.soffid.iam.model.AccountEntity;
-import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectEntityDao;
+import com.soffid.iam.model.CustomObjectRoleEntity;
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
-import com.soffid.iam.model.RoleAttributeEntity;
-import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.TaskEntity;
-import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
@@ -46,14 +41,20 @@ import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class CustomObjectServiceImpl extends CustomObjectServiceBase {
-
+	AccountAccessLevelEnum OWNERLEVEL[] = new AccountAccessLevelEnum[] { AccountAccessLevelEnum.ACCESS_OWNER };
+	AccountAccessLevelEnum MANAGER_LEVEL[] = new AccountAccessLevelEnum[] { AccountAccessLevelEnum.ACCESS_OWNER, AccountAccessLevelEnum.ACCESS_MANAGER };
+	AccountAccessLevelEnum USER_LEVEL[] = new AccountAccessLevelEnum[] { AccountAccessLevelEnum.ACCESS_OWNER, AccountAccessLevelEnum.ACCESS_MANAGER, AccountAccessLevelEnum.ACCESS_USER };
+	
 	@Override
 	protected CustomObject handleCreateCustomObject(CustomObject obj) throws Exception {
 		CustomObjectEntity entity = getCustomObjectEntityDao().newCustomObjectEntity();
 		getCustomObjectEntityDao().customObjectToEntity(obj, entity, true);
+		if (! hasAccessLevel(entity.getType(), MANAGER_LEVEL))
+			throw new SecurityException("Access denied. Not authorized to create a custom object of class "+obj.getType());
 		getCustomObjectEntityDao().create(entity);
 		updateAttributes(obj, entity);
 		generateAudit(entity, "C");
@@ -66,6 +67,8 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		CustomObjectEntity entity = getCustomObjectEntityDao().load(obj.getId());
 		if (entity == null)
 			return;
+		if (! hasAccessLevel(entity.getType(), MANAGER_LEVEL))
+			throw new SecurityException("Access denied. Not authorized to remove a remove object of class "+obj.getType());
 		getCustomObjectEntityDao().remove(entity);
 		generateAudit(entity, "D");
 		generateTask(entity);
@@ -98,6 +101,9 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 	}
 
 	protected void findCustomObjectByJsonQuery(AsyncList<CustomObject> result, String objectType, String query) throws Exception {
+		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().findByName(objectType);
+		if (! hasAccessLevel(entity, USER_LEVEL))
+			throw new SecurityException("Access denied. Not authorized to query a custom object of class "+objectType);
 
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
@@ -146,6 +152,9 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		if (entity == null)
 			throw new InternalErrorException("Custom object "+obj.getId()+" not found");
 		
+		if (! hasAccessLevel(entity.getType(), MANAGER_LEVEL))
+			throw new SecurityException("Access denied. Not authorized to modify a custom object of class "+entity.getType().getName());
+
 		if (! entity.getName().equals(obj.getName()))
 		{
 			generateTask(entity);
@@ -288,6 +297,10 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 	@Override
 	protected CustomObject handleFindCustomObjectByTypeAndName(String objectType, String name)
 			throws Exception {
+		CustomObjectTypeEntity type = getCustomObjectTypeEntityDao().findByName(objectType);
+		if (! hasAccessLevel(type, USER_LEVEL))
+			throw new SecurityException("Access denied. Not authorized to query a custom object of class "+type.getName());
+		
 		CustomObjectEntity o = getCustomObjectEntityDao().findByTypeAndName(objectType, name);
 		if (o == null)
 			return null;
@@ -405,7 +418,11 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		h.setTenantFilter("type.tenant.id");
 //		h.setOrder("o.name");
 		h.setGenerator((entity) -> {
-			return dao.toCustomObject((CustomObjectEntity) entity);
+			final CustomObjectEntity co = (CustomObjectEntity) entity;
+			if (hasAccessLevel(co.getType(), USER_LEVEL))
+				return dao.toCustomObject(co);
+			else
+				return null;
 		}); 
 
 		h.search("", query, (Collection) result); 
@@ -418,4 +435,25 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		return pr;
 	}
 
+	boolean hasAccessLevel(CustomObjectTypeEntity entity, AccountAccessLevelEnum levels[]) {
+		if (Security.isSyncServer())
+			return true;
+
+		if (entity == null)
+			return false;
+		if (entity.getPublicAccess() == null || entity.getPublicAccess().booleanValue())
+			return true;
+		
+		String[] soffidRoles = Security.getSoffidPrincipal().getSoffidRoles();
+		AccountAccessLevelEnum e = AccountAccessLevelEnum.ACCESS_NONE;
+		for ( CustomObjectRoleEntity role: entity.getAccessRoles() ) {
+			String roleName = role.getRole().getName()+ "@" + role.getRole().getSystem().getName();
+			if (Arrays.binarySearch(soffidRoles, roleName) >= 0) 
+				for ( AccountAccessLevelEnum level: levels ) {
+					if (role.getLevel() == level)
+						return true;
+			}
+		}
+		return false;
+	}
 }

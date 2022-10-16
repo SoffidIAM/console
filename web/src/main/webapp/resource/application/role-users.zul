@@ -10,6 +10,8 @@
 			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
 			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }"  if="${soffid:isUserInRole('user:role:create')}"  onClick="ref:handler.addNew"/>
 			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" 
+				if="${soffid:isUserInRole('user:role:create') || soffid:isUserInRole('user:role:delete')}" onClick="ref:handler.importCsv"/>
 		</menu2>
 	</div>
 
@@ -39,10 +41,10 @@
   value: userFullName
   default: true
 - name: ${c:l('aplica_usuarisRolllista.zul.DescripciadeDomini')}
-  value: domainValue/value
+  value: domainValue.value
   default: false
 - name: ${c:l('aplicacions.zul.DomainDescription')}
-  value: domainValue/description
+  value: domainValue.description
   default: false
 - name: ${c:l('usuaris.zul.startDate')}
   className: dateColumn

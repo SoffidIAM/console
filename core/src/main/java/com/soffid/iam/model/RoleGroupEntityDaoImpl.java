@@ -205,15 +205,18 @@ public class RoleGroupEntityDaoImpl extends
         		source.getGrantedApplicationDomain() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedApplicationDomain().getName());
+        	target.setDomainDescription(source.getGrantedApplicationDomain().getDescription());
         } else if ((TipusDomini.GRUPS.equals(tipus) || TipusDomini.GRUPS_USUARI.equals(tipus)
         		|| TipusDomini.GROUPS.equals(tipus) || TipusDomini.MEMBERSHIPS.equals(tipus)) &&
         		source.getGrantedGroupDomain() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedGroupDomain().getName());
+        	target.setDomainDescription(source.getGrantedGroupDomain().getDescription());
         } else if ((TipusDomini.DOMINI_APLICACIO.equals(tipus) ||
         		TipusDomini.CUSTOM.equals(tipus)) && source.getGrantedDomainValue() != null) {
         	target.setHasDomain(true);
         	target.setDomainValue(source.getGrantedDomainValue().getValue());
+        	target.setDomainDescription(source.getGrantedDomainValue().getDescription());
         } else {
             target.setHasDomain(false);
             target.setDomainValue(null);

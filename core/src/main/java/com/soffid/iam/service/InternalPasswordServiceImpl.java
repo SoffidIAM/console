@@ -119,6 +119,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		if (politica.getMinimumPeriod() == null || politica.getMinimumPeriod() == 0)
 			return PolicyCheckResult.VALID;
+		
 		for (PasswordEntity pe : getPasswordEntityDao().findLastByUserDomain(user, politica.getPasswordDomain())) {
 			if (pe==null || pe.getDate()==null )
 				return PolicyCheckResult.NOT_YET;
@@ -1440,7 +1441,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private PasswordValidation validatePasswordOnServer(AccountEntity account, Password password)
 			throws InternalErrorException, IOException {
 
-		if ("S".equals(account.getSystem().getTrusted()) && account.getSystem().getUrl() != null) {
+		if (account.getSystem().getUrl() != null) {
 			try {
 				log.info("Checking account in sync server: "+account.getName()+" at "+account.getSystem().getName());
 				ConsoleLogonService ls = (ConsoleLogonService) getSyncServerService()
@@ -1723,8 +1724,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 		addCondition(b, Messages.getString("PasswordServiceImpl.PasswordMaxDurationCondition"), //$NON-NLS-1$
 				politica.getAvailableTime());
-		addCondition(b, Messages.getString("PasswordServiceImpl.ExpiredPasswordMaxDurationCondition"), //$NON-NLS-1$
-				politica.getGracePeriodTime());
+		addCondition(b, Messages.getString("PasswordServiceImpl.RenewalTimeCondition"), //$NON-NLS-1$
+				politica.getRenewalTime());
+		addCondition(b, Messages.getString("PasswordServiceImpl.MinimumDurationCondition"), //$NON-NLS-1$
+				politica.getMinimumPeriod());
 		return b.toString();
 	}
 

@@ -1114,6 +1114,7 @@ public class RoleAccountEntityDaoImpl
 				TipusDomini.APPLICATIONS.equals(tipus))
 				&& source.getInformationSystem() != null) {
 			target.setDomainValue(source.getInformationSystem().getName());
+			target.setDomainDescription(source.getInformationSystem().getDescription());
 			target.setHasDomain(true);
 		} else if ((TipusDomini.GRUPS.equals(tipus) || 
 				TipusDomini.GRUPS_USUARI.equals(tipus) ||
@@ -1121,11 +1122,13 @@ public class RoleAccountEntityDaoImpl
 				TipusDomini.MEMBERSHIPS.equals(tipus)) && 
 				source.getGroup() != null) {
 			target.setDomainValue(source.getGroup().getName());
+			target.setDomainDescription(source.getGroup().getDescription());
 			target.setHasDomain(true);
 		} else if ((TipusDomini.DOMINI_APLICACIO.equals(tipus) ||
 				TipusDomini.CUSTOM.equals(tipus))
 				&& source.getDomainValue() != null) {
 			target.setDomainValue(source.getDomainValue().getValue());
+			target.setDomainDescription(source.getDomainValue().getDescription());
 			target.setHasDomain(true);
 		} else if (TipusDomini.QUALQUE_VALOR_DOMINI.equals(tipus)) {
 			target.setHasDomain(true);

@@ -9,7 +9,7 @@
  */
 package com.soffid.iam.service;
 
-import com.soffid.iam.api.ApplyRuleProcess;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
@@ -144,7 +144,7 @@ public class RulesServiceImpl extends RulesServiceBase
 
 
 	@Override
-	protected ApplyRuleProcess handleApplyAsync (Rule rule) throws Exception
+	protected AsyncProcessTracker handleApplyAsync (Rule rule) throws Exception
 	{
 		RuleEntity ruleEntity = getRuleEntityDao().load(rule.getId());
 		return getRuleEvaluatorService().applyAsync(ruleEntity);
@@ -189,7 +189,7 @@ public class RulesServiceImpl extends RulesServiceBase
 	}
 
 	@Override
-	protected ApplyRuleProcess handleQueryProcessStatus(ApplyRuleProcess process) throws Exception {
+	protected AsyncProcessTracker handleQueryProcessStatus(AsyncProcessTracker process) throws Exception {
 		return getRuleEvaluatorService().queryProcessStatus(process);
 	}
 

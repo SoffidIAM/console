@@ -33,7 +33,7 @@
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 				preference="user"
-				dataPath="/model:/role" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/role" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 

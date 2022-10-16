@@ -7,6 +7,7 @@
 <?component name="application_roles" macro-uri="application-roles.zul"?>
 <?component name="application_users" macro-uri="application-users.zul"?>
 <?component name="application_users2" macro-uri="application-users2.zul"?>
+<?component name="application_managers" macro-uri="application-managers.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.application.ApplicationHandler" id="frame">
@@ -25,7 +26,7 @@
 			</div>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Application" 
-				defaultAttributes="relativeName, description"
+				defaultAttributes="name, description"
 				preference="com.soffid.iam.api.Application"
 				dataPath="/model:/application" variableName="query" variableNameText="queryText"></searchbox>
 
@@ -36,7 +37,6 @@
 				header="${c:l('com.soffid.iam.api.Application.relativeName') }" 
 				openLevels="1"
 				enablefilter="false"
-				maxheight="65vh"
 				onAddApplication="ref:frame.addApplication"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">
@@ -80,6 +80,7 @@
 					<tab label="${c:l('aplicacions.zul.Rols')}" id="roleTab" />
 					<tab id="usersTab" label="${c:l('aplicacions.zul.Usuaris')}"/>
 					<tab id="usersTab2" label="${c:l('aplicacions.zul.EffectiveUsers')}"/>
+					<tab if="${soffid:isUserInRole('user:role:query') }"  label="${c:l('aplicacions.zul.Responsables')}" id="tabmanagers"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
@@ -116,6 +117,9 @@
 					</tabpanel>
 					<tabpanel fulfill="usersTab2.onSelect">
 						<application_users2 listbox="//application/listbox"/>
+					</tabpanel>
+					<tabpanel id="managers" fulfill="tabmanagers.onSelect"  if="${soffid:isUserInRole('user:role:query') }"  >
+						<application_managers listbox="//application/listbox" id="application_managers"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

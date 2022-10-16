@@ -1100,7 +1100,7 @@ public class ApplicationServiceImpl extends
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
-			if (app != null && app.getApprovalProcess() != null)
+			if (app != null && app.getApprovalProcess() != null && !app.getApprovalProcess().isEmpty())
 			{
 				return true;
 			}
@@ -1117,7 +1117,7 @@ public class ApplicationServiceImpl extends
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
-			if (app != null && app.getApprovalProcess() != null)
+			if (app != null && app.getApprovalProcess() != null && !app.getApprovalProcess().trim().isEmpty())
 			{
 				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_GRANT_APPROVAL);
 				if (def.isEmpty())
@@ -2213,7 +2213,16 @@ public class ApplicationServiceImpl extends
             if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
             if (rad.rolRol != null) {
                 rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
-                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
+                if (rad.qualifier != null) {
+                	rg.setDomainValue(rad.qualifier.getValue());
+                	rg.setDomainDescription(rad.qualifier.getDescription());
+                } else if (rad.qualifierAplicacio != null) {
+                	rg.setDomainValue(rad.qualifierAplicacio.getName()); 
+                	rg.setDomainDescription(rad.qualifierAplicacio.getDescription());
+                } else if (rad.qualifierGroup != null) {
+                	rg.setDomainValue(rad.qualifierGroup.getName());
+                	rg.setDomainDescription(rad.qualifierGroup.getDescription());
+                }
             }
             if (rad.rolGrup != null) rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
             if (rg != null) {
@@ -2237,19 +2246,34 @@ public class ApplicationServiceImpl extends
 		populateRoles(radSet, ALL, user, group, false);
 		LinkedList<RoleGrant> rgl = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
-            RoleGrant rg = null;
-            if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
-            if (rad.rolRol != null) {
-                rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
-                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
-            }
-            if (rad.rolGrup != null) rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
+            RoleGrant rg = toRoleGrant(rad);
             if (rg != null) {
                 if (rad.account != null) rg.setOwnerAccountName(rad.account.getName());
                 rgl.add(rg);
             }
         }
 		return rgl;
+	}
+	private RoleGrant toRoleGrant(RolAccountDetail rad) {
+		RoleGrant rg = null;
+		if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) 
+			rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
+		if (rad.rolRol != null) {
+		    rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
+		    if (rad.qualifier != null) {
+		    	rg.setDomainValue(rad.qualifier.getValue());
+		    	rg.setDomainDescription(rad.qualifier.getDescription());
+		    } else if (rad.qualifierAplicacio != null) {
+		    	rg.setDomainValue(rad.qualifierAplicacio.getName()); 
+		    	rg.setDomainDescription(rad.qualifierAplicacio.getDescription());
+		    } else if (rad.qualifierGroup != null) {
+		    	rg.setDomainValue(rad.qualifierGroup.getName());
+		    	rg.setDomainDescription(rad.qualifierGroup.getDescription());
+		    }
+		}
+		if (rad.rolGrup != null) 
+			rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
+		return rg;
 	}
 
 	@Override
@@ -2269,13 +2293,9 @@ public class ApplicationServiceImpl extends
 		LinkedList<RoleGrant> rg = new LinkedList<RoleGrant>();
 		for (RolAccountDetail rad : radSet) {
             if (rad.account != null && rad.account.getId().longValue() == accountId) {
-                if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) rg.add(getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
-                if (rad.rolRol != null) {
-                    RoleGrant r = getRoleDependencyEntityDao().toRoleGrant(rad.rolRol);
-                    if (rad.qualifier != null) r.setDomainValue(rad.qualifier.getValue()); else if (rad.qualifierAplicacio != null) r.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) r.setDomainValue(rad.qualifierGroup.getName());
-                    rg.add(r);
-                }
-                if (rad.rolGrup != null) rg.add(getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
+            	RoleGrant r = toRoleGrant(rad);
+            	if (r != null)
+            		rg.add(r);
             }
         }
 		return rg;
@@ -2313,18 +2333,7 @@ public class ApplicationServiceImpl extends
 
 	private void toRoleGrantList(HashSet<RolAccountDetail> radSet, LinkedList<RoleGrant> rg) {
 		for (RolAccountDetail rad : radSet) {
-            RoleGrant grant;
-            if (rad.rolAccount != null) 
-            	grant = getRoleAccountEntityDao().toRoleGrant(rad.rolAccount); 
-            else if (rad.rolRol != null) 
-            {
-                grant = getRoleDependencyEntityDao().toRoleGrant(rad.rolRol);
-                if (rad.qualifier != null) 
-                	grant.setDomainValue(rad.qualifier.getValue());
-                else if (rad.qualifierAplicacio != null) 
-                	grant.setDomainValue(rad.qualifierAplicacio.getName()); else if (rad.qualifierGroup != null) grant.setDomainValue(rad.qualifierGroup.getName());
-            } else 
-            	grant = getRoleGroupEntityDao().toRoleGrant(rad.rolGrup);
+            RoleGrant grant = toRoleGrant(rad);
             if (rad.account != null && rad.account.getId() != null) {
                 grant.setOwnerAccountName(rad.account.getName());
                 grant.setOwnerSystem(rad.account.getSystem().getName());
@@ -3072,7 +3081,7 @@ public class ApplicationServiceImpl extends
 		for (int i = 0; i < split.length; i++)
 		{
 			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (t.trim().isEmpty()) {
+			if (! t.trim().isEmpty()) {
 				if (sb.length() > 0)
 					sb.append(" and ");
 				sb.append("(");
@@ -3744,19 +3753,22 @@ public class ApplicationServiceImpl extends
 		for (int i = 0; i < split.length; i++)
 		{
 			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (sb.length() > 0)
-				sb.append(" and ");
-			sb.append("(");
-			sb.append("name co \""+t+"\"");
-			sb.append(" or description co \""+t+"\"");
-			for (MetaDataEntity att: atts)
-			{
-				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+			if (! t.trim().isEmpty()) {
+				if (sb.length() > 0)
+					sb.append(" and ");
+				sb.append("(");
+				sb.append("name co \""+t+"\"");
+				sb.append(" or description co \""+t+"\"");
+				for (MetaDataEntity att: atts)
 				{
-					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+					if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+					{
+						sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+					}
 				}
+				sb.append(")");
+				
 			}
-			sb.append(")");
 		}
 		return sb.toString();
 	}
@@ -4016,16 +4028,7 @@ public class ApplicationServiceImpl extends
             RoleGrant rg = null;
             
             if (rad.hierarchy == null) {
-	            if (rad.rolAccount != null && shouldBeEnabled(rad.rolAccount)) 
-	            	rg = (getRoleAccountEntityDao().toRoleGrant(rad.rolAccount));
-	            if (rad.rolRol != null) {
-	                rg = (getRoleDependencyEntityDao().toRoleGrant(rad.rolRol));
-	                if (rad.qualifier != null) rg.setDomainValue(rad.qualifier.getValue()); 
-	                else if (rad.qualifierAplicacio != null) rg.setDomainValue(rad.qualifierAplicacio.getName()); 
-	                else if (rad.qualifierGroup != null) rg.setDomainValue(rad.qualifierGroup.getName());
-	            }
-	            if (rad.rolGrup != null) 
-	            	rg = (getRoleGroupEntityDao().toRoleGrant(rad.rolGrup));
+            	rg = toRoleGrant(rad);
 	            if (rg != null) {
 	            	rad.hierarchy = new RoleGrantHierarchy();
 	            	PropertyUtils.copyProperties(rad.hierarchy, rg);

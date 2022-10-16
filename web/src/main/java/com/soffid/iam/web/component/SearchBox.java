@@ -361,10 +361,21 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 							if (child instanceof AttributeSearchBox)
 								((AttributeSearchBox) child).detach();
 						}
+						
+						HashSet<String> atts = new HashSet<>();
+						for (String att: defaultAttributes.split("[ ,]+"))
+						{
+							atts.add(att);
+							addAttribute(att);
+						}
+						
 						for ( int i = 0; i < l.length(); i++)
 						{
 							String s = l.getString(i);
-							addAttribute(s);
+							if (!atts.contains(s)) {
+								addAttribute(s);
+								atts.add(s);
+							}
 						}
 					}
 				}
@@ -424,17 +435,19 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		timer.addEventListener("onTimer", new SerializableEventListener() {
 			@Override
 			public void onEvent(Event event) throws Exception {
-				boolean end = !modelCollection.isInProgress();
-				timer.setDelay(1000);
-				try {
-					modelCollection.updateProgressStatus();
-				} finally {
-					if (end)
-					{
-						timer.stop();
-						progressImage.setVisible(false);
-						if (modelCollection.getSize() == 1)
-							Events.postEvent("onSingleRecord",  SearchBox.this, null);
+				if (modelCollection != null) {
+					boolean end = !modelCollection.isInProgress();
+					timer.setDelay(1000);
+					try {
+						modelCollection.updateProgressStatus();
+					} finally {
+						if (end)
+						{
+							timer.stop();
+							progressImage.setVisible(false);
+							if (modelCollection.getSize() == 1)
+								Events.postEvent("onSingleRecord",  SearchBox.this, null);
+						}
 					}
 				}
 			}

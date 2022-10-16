@@ -30,7 +30,6 @@
 				header="${c:l('com.soffid.iam.api.Account.name') }" 
 				openLevels="1"
 				enablefilter="false"
-				maxheight="70vh"
 				onAdd="ref:frame.addNew"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">

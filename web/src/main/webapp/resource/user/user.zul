@@ -40,7 +40,8 @@
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 				preference="user"
-				dataPath="/model:/user" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/user"
+				sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${canCreateUser}" >
@@ -60,7 +61,7 @@
 			<tabbox id="panels" width="${amplaria2}" class="thicktabbox">
 				<tabs>
 					<tab label="${c:l('usuaris.zul.Informaciabasica')}" />
-					<tab label="${c:l('agents.zul.Grups')}" if="${soffid:isUserInRole('user:group:delete') }" id="tabgroup"/>
+					<tab label="${c:l('agents.zul.Grups')}" id="tabgroup"/>
 					<tab label="${c:l('usuaris.zul.Accounts')}" id="tabaccount" />
 					<tab label="${c:l('usuaris.zul.Rols')}" id="tabroles" />
 					<tab label="${c:l('usuaris.zul.RolsHeretats')}" id="tabeffectiveroles" />
@@ -94,7 +95,7 @@
 							<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 						</div>
 					</tabpanel>
-					<tabpanel if="${soffid:isUserInRole('user:group:delete') }" fulfill="tabgroup.onSelect" >
+					<tabpanel fulfill="tabgroup.onSelect" >
 						<user_groups listbox="//user/listbox"/>
 					</tabpanel>
 					<tabpanel id="account" fulfill="tabaccount.onSelect" >

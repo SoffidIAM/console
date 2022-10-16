@@ -1,5 +1,6 @@
 package com.soffid.iam.web.user;
 
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -116,6 +117,9 @@ public class AccountDetailsHandler extends Window implements AfterCompose {
 				r = r + stringify(k, indent+" ") + ": "+stringify (map.get(k), indent+"  ");
 			}
 			return r + "}";
+		}
+		if (obj instanceof byte[]) {
+			return Base64.getEncoder().encodeToString((byte[]) obj);
 		}
 		if (obj.getClass().isArray())
 		{

@@ -5,7 +5,9 @@ import java.util.LinkedList;
 
 import org.json.JSONWriter;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.System;
 
 import es.caib.zkib.binder.tree.FullTreeModelProxy;
 import es.caib.zkib.binder.tree.TreeModelProxyNode;
@@ -14,8 +16,7 @@ import es.caib.zkib.datamodel.DataNode;
 
 
 public class UserAccountsTree extends DataTree2 {
-	HashMap<String, Boolean> status = new HashMap<String, Boolean>();
-	
+	HashMap<String, System> systems = new HashMap<>();
 	
 	protected String getRowClass(TreeModelProxyNode node) {
 		DataNode dataNode = (DataNode) node.getValue();
@@ -23,6 +24,17 @@ public class UserAccountsTree extends DataTree2 {
 			Account acc = (Account) dataNode.getInstance();
 			if (acc.isDisabled())
 				return "dashed";
+			System s = systems.get(acc.getSystem());
+			if (s == null) {
+				try {
+					s = EJBLocator.getDispatcherService().findDispatcherByName(acc.getSystem());
+					systems.put(acc.getSystem(), s);
+				} catch (Exception e) {
+					return "not-dashed";
+				}
+			}
+			if (s == null || (s.isReadOnly() || s.getUrl() == null) && ! "- no class -".equals(s.getClassName()))
+				return "grayed";
 		}
 		return "not-dashed";
 	}

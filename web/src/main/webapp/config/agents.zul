@@ -80,7 +80,7 @@
 			</searchbox>
 
 			<datatable id="listbox" autocommit="true" use="com.soffid.iam.web.agent.AgentsTable"
-				dataPath="/model:/agent" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/agent" sortColumn="0"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 				onSelect="ref:frame.showDetails" enablefilter="false">
@@ -125,6 +125,7 @@
 			<form2 id="form" dataPath="listbox:/."
 				onChangeXPath="ref:frame.onChangeForm" width="100%"  >
 				<timer delay="20000" onTimer="ref:frame.refreshTasks()" id="refreshTasksTimer" running="false" repeats="true" />
+				<timer id="timer" delay="1000" onTimer="ref:frame.updateProgress" repeats="true" running="false" />
 				<tabbox id="panels" width="100%" onSelect="ref:frame.onChangeTab">
 					<tabs>
 						<tab id="r_basica" label="${c:l('agents.zul.Informaciabasica')}"/>
@@ -149,8 +150,20 @@
 										<textbox bind="@name" id="agentName" maxlength="50" style="width:100%; max-width: 50em" constraint="no empty"/>
 										<div id="missatge" visible="false">
 											<label value="${c:l('agents.zul.AlertSpreadUsers')}" style="color:red;"/>
-											<button label="${c:l('rules.preview')}" onClick="ref:frame.preview">
-											</button>
+											<button label="${c:l('rules.preview')}" onClick="ref:frame.preview" />
+											<button label="${c:l('rules.apply')}" onClick="ref:frame.applyChanges"/>
+										</div>
+										<div style="width:100%; margin-bottom: 8px; border-radius: 4px; padding-left: 8px;padding-right: 8px;"
+											visible="false" 
+											id="progressdiv">
+											<div sclass="progress" id="progressbar"/>
+											<div>
+												<image src="/anonymous/wait.gif" sclass="imageclic" style="vertical-align: middle; height: 24px; width: 24px;"/>
+												<label value=" ${c:l('agent.progress') }:"/>
+												<label id="progress" style="display: inline-block; min-width: 150px; margin-left: 8px; margin-right: 8px;"/>
+												<label value="  ${c:l('rules.etf') }:"/>
+												<label id="etf" style="display: inline-block; min-width: 100px; margin-left: 8px; margin-right: 8px;"/>
+											</div>
 										</div>
 									</div>
 								</row>

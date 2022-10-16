@@ -29,7 +29,7 @@
 				preference="network"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
-				dataPath="/model:/network" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/network" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			<attribute name="allColumns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.Network.name') }

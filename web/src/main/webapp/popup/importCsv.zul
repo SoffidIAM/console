@@ -34,7 +34,7 @@
 	- label: UTF-16 Low Endian
 	  value: UTF-16LE
 	- label: UTF-16 Big Endian
-	  value: UTF-16LE
+	  value: UTF-16BE
 	- label: UTF-8
 	  value: UTF-8
 	- label: Windows legacy

@@ -14,9 +14,12 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.ui.Executions;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.Frame;
 import com.soffid.iam.web.component.Menu3;
 
 import es.caib.bpm.filters.WorkflowInterceptor;
+import es.caib.zkib.zkiblaf.Application;
+import es.caib.zkib.zkiblaf.Frameable;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 
@@ -31,7 +34,15 @@ public class MainWindow extends Window {
 	}
 	
 	public void help (Event event) {
-		org.zkoss.zk.ui.Executions.getCurrent().sendRedirect("https://bookstack.soffid.com", "_blank");
+		Frameable frameInfo = Application.getActiveFrame();
+		String url = "https://bookstack.soffid.com";
+		if (frameInfo != null && frameInfo instanceof Frame) {
+			Frame frame = (Frame) frameInfo;
+			if (frame.getHelp() != null && !frame.getHelp().isEmpty() )
+				url = frame.getHelp();
+			
+		}
+		org.zkoss.zk.ui.Executions.getCurrent().sendRedirect(url, "_blank");
 	}
 
 	@Override

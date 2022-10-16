@@ -1,5 +1,6 @@
 package com.soffid.iam.web.error;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -21,7 +22,6 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Component;

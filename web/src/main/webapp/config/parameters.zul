@@ -2,6 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/soffid-parameters"
 	use="com.soffid.iam.web.config.ParameterHandler" id="frame">
 
 	<datamodel id="model" rootNode="parameters" src="descriptorParametre.xml"/>

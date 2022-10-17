@@ -5,6 +5,7 @@
 <?page id="network"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/pam-deployment/page/pam-rules"
 	use="com.soffid.iam.web.vault.PamRuleHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="pamRuleDescriptor.xml"/>
 	<div sclass="card" id="card">

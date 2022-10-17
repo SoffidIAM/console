@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/metadata"
 	use="com.soffid.iam.web.config.MetadataHandler" id="frame">
 	<style>
 		tr.dropping td {

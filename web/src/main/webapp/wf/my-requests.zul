@@ -9,6 +9,7 @@
 	id="frame" title="${c:l('selfService.MyProcess')}"
 	mold="div"
 	nomenu="true"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/my-tasks"
 	use="com.soffid.iam.web.bpm.process.MyRequestsHandler">
 		
 

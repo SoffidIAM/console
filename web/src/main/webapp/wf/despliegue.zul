@@ -8,6 +8,7 @@
 	xmlns:zk="http://www.zkoss.org/2005/zk"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	id="frame"
+	help="https://bookstack.soffid.com/books/bpm-editor/page/business-process-definition"
 	use="es.caib.bpm.ui.admin.DespliegueUI">
 	
 	<datamodel id="model" rootNode="root" src="descriptorProcessDefinition.xml" use="es.caib.bpm.ui.admin.DeploymentModel"/>

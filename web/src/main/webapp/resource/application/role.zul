@@ -6,6 +6,7 @@
 <?component name="role_users" macro-uri="role-users.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/roles"
 	use="com.soffid.iam.web.application.RoleHandler" id="frame">
 	<datamodel id="model" rootNode="applications" src="descriptorApplication.xml"/>
 	<div sclass="card" id="card">

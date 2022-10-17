@@ -7,6 +7,7 @@
 <?component name="host_acl" macro-uri="host-acl.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/custom-objects"
 	use="com.soffid.iam.web.custom.CustomObjectHandler" id="frame"
 	type="${execution.nativeRequest.parameterMap['type'][0] }">
 	<datamodel id="model" rootNode="objects" src="customObjectDescriptor.xml"/>

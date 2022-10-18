@@ -37,7 +37,6 @@
 				header="${c:l('com.soffid.iam.api.Application.relativeName') }" 
 				openLevels="1"
 				enablefilter="false"
-				maxheight="65vh"
 				onAddApplication="ref:frame.addApplication"
 				onSelect="ref:frame.showDetails">
 				<attribute name="finders">

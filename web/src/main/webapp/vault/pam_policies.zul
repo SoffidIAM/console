@@ -29,7 +29,7 @@
 				preference="pamPolicies"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
-				dataPath="/model:/policy" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/policy" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			<attribute name="allColumns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.PamPolicy.name') }

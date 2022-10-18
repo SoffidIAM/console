@@ -47,7 +47,6 @@
 				header="${c:l('com.soffid.iam.api.Account.name') }" 
 				openLevels="1"
 				enablefilter="false"
-				maxheight="70vh"
 				onAddFolder="ref:frame.addFolder"
 				onAddAccount="ref:frame.addAccount"
 				onViewPassword="ref:frame.viewPassword2"

@@ -36,7 +36,6 @@
 				dataPath="/model:/rule" variableName="query" />
 
 			<datatable id="listbox" autocommit="true" dataPath="/model:/rule"
-			    maxheight="70vh"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 			    enablefilter="false"

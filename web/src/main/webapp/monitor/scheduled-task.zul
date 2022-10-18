@@ -27,7 +27,6 @@
 				preference="task"
 				sortColumn="5"
 				sortDirection="-1"
-				maxheight="70vh" 
 				onSelect="ref:frame.showDetails" enablefilter="true">
 				<attribute name="allColumns"><![CDATA[
 - name: ${c:l('jobadmin.enable')}

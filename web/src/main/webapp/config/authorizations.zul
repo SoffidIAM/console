@@ -27,7 +27,6 @@
 				
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/autoritzacio"
-			    maxheight="70vh"
 				use="com.soffid.iam.web.config.AuthorizationTable"
 				sortColumn="0" onSelect="ref:frame.showDetails">
 				<attribute name="columns">

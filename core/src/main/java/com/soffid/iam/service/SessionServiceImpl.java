@@ -19,6 +19,7 @@ import com.soffid.iam.api.Session;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccessLogEntityDao;
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.ServiceEntityDao;
@@ -27,7 +28,9 @@ import com.soffid.iam.model.SessionEntityDao;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.utils.Security;
 
+import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.TipusSessio;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
 import java.io.FileNotFoundException;
@@ -267,12 +270,14 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     protected void handleDestroySession(Session sessio) throws Exception {
         SessionEntity se = getSessionEntityDao().load(sessio.getId());
 
-        if (se.getLoginLogInfo() != null)
-        {
-        	se.getLoginLogInfo().setEndDate(new Date());
-        	getAccessLogEntityDao().update(se.getLoginLogInfo());
+        if (se != null) {
+	        if (se.getLoginLogInfo() != null)
+	        {
+	        	se.getLoginLogInfo().setEndDate(new Date());
+	        	getAccessLogEntityDao().update(se.getLoginLogInfo());
+	        }
+	        getSessionEntityDao().remove(se);
         }
-        getSessionEntityDao().remove(se);
     }
 
     @Override
@@ -347,13 +352,30 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         for (Iterator<SessionEntity> it = dao.loadAll().iterator(); it.hasNext(); ) {
             SessionEntity sessioEntity = it.next();
             if (sessioEntity.getUser().getTenant().getId().equals(Security.getCurrentTenantId())) {
-	            Session s = dao.toSession(sessioEntity);
-	            s.setKey(null);
-	            s.setTemporaryKey(null);
-	            sessions.add(s);
+            	if (isAllowed(sessioEntity)) {
+		            Session s = dao.toSession(sessioEntity);
+		            s.setKey(null);
+		            s.setTemporaryKey(null);
+		            sessions.add(s);
+            	}
             }
         }
         return sessions;
+	}
+
+	private boolean isAllowed(SessionEntity sessioEntity) throws InternalErrorException {
+		if (Security.isSyncServer())
+			return true;
+		final TipusSessio type = sessioEntity.getType();
+		if (type == TipusSessio.PAM || type == TipusSessio.PAMRDP || type == TipusSessio.PAMSSH) {
+			AccountEntity account = sessioEntity.getAccount();
+			if (account == null)
+				return false;
+			AccountAccessLevelEnum level = getAccountEntityDao().getAccessLevel(account, Security.getCurrentUser());
+			return level == AccountAccessLevelEnum.ACCESS_OWNER;
+		} else {
+			return false;
+		}
 	}
 
 }

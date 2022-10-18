@@ -16,7 +16,6 @@
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/parameter"
-			    maxheight="70vh"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
 				sortColumn="0" onSelect="ref:frame.showDetails">

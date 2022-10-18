@@ -27,6 +27,7 @@ public class CustomObjectType {
 	public boolean builtin;
 	
 	@Nullable
+	@Attribute(defaultValue = "true")
 	public Boolean publicAccess;
 
 	@Nullable

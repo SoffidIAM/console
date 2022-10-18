@@ -17,7 +17,6 @@
 		header="${c:l('aplicacions.zul.Domini')} / ${c:l('aplicacions.zul.Valor')}" 
 		openLevels="1"
 		enablefilter="false"
-		maxheight="70vh"
 		onAddDomain="ref:handler.addNew"
 		onAddDomainValue="ref:handler.addNewValue"
 		onSelect="ref:handler.showDetails">

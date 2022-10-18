@@ -1100,7 +1100,7 @@ public class ApplicationServiceImpl extends
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
-			if (app != null && app.getApprovalProcess() != null)
+			if (app != null && app.getApprovalProcess() != null && !app.getApprovalProcess().isEmpty())
 			{
 				return true;
 			}
@@ -1117,7 +1117,7 @@ public class ApplicationServiceImpl extends
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
-			if (app != null && app.getApprovalProcess() != null)
+			if (app != null && app.getApprovalProcess() != null && !app.getApprovalProcess().trim().isEmpty())
 			{
 				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_GRANT_APPROVAL);
 				if (def.isEmpty())

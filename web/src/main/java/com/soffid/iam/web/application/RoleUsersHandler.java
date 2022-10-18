@@ -462,9 +462,9 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 				ra.setStartDate(startDate == null || startDate.trim().isEmpty()? new Date(): DateFormats.getDateFormat().parse(startDate));
 				ra.setEndDate(endDate == null || endDate.trim().isEmpty()? null: DateFormats.getDateFormat().parse(endDate));
 	
-				ra.setRoleName(roleName == null || roleName.trim().isEmpty() ? null: roleName);
+				ra.setRoleName(roleName == null || roleName.trim().isEmpty() ? role.getSystem(): roleName);
 				ra.setSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
-						(roleSystem == null || roleSystem.trim().isEmpty() ? null: roleSystem): accountSystem);
+						(roleSystem == null || roleSystem.trim().isEmpty() ? role.getSystem(): roleSystem): accountSystem);
 				
 				if (ra.getRoleName() == null) 
 					ra.setRoleName(role.getName());

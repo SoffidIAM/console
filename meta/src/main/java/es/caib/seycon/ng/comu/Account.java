@@ -34,6 +34,7 @@ public class Account {
 	@Attribute(hidden = true)
 	public java.lang.String oldName;
 
+	@Nullable
 	@Description("Account description")
 	public java.lang.String description;
 

@@ -473,6 +473,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("107");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("107"))
+		{
+			registerCustomObjectsPermissions();
+			cfg.setValue("108");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void fixAgentDescriptor() {
@@ -1431,6 +1437,18 @@ public class ApplicationBootServiceImpl extends
 			getAdditionalDataService().create(td);
 	}
 
+	
+	private void registerCustomObjectsPermissions() throws Exception {
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Application.ui.json", MetadataScope.APPLICATION, false);
+
+		for (CustomObjectTypeEntity entity: getCustomObjectTypeEntityDao().loadAll()) {
+			if (! entity.isBuiltin() && entity.getPublicAccess() == null) {
+				entity.setPublicAccess(true);
+				getCustomObjectTypeEntityDao().update(entity);
+			}
+		}
+	}
+	
 	private void createStandardAttributes() throws Exception {
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Group.ui.json", MetadataScope.GROUP, true);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/GroupUser.ui.json", MetadataScope.GROUP_MEMBERSHIP, true);

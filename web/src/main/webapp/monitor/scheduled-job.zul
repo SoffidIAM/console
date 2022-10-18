@@ -24,7 +24,7 @@
 				use="com.soffid.iam.web.bpm.JobDatatable"
 				dataPath="/model:/job"
 				preference="job"
-				maxheight="70vh" sortColumn="0"
+				sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
 				<attribute name="allColumns"><![CDATA[
 - name: ${c:l('job.lblId')}

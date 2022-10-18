@@ -147,7 +147,7 @@ public class ScimHelper {
 		for (int i = 0; i < split.length; i++)
 		{
 			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (t.trim().isEmpty()) {
+			if (! t.trim().isEmpty()) {
 				if (sb.length() > 0)
 					sb.append(" and ");
 				sb.append("(");

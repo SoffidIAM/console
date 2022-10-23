@@ -18,8 +18,9 @@ div.highlighted {
 	margin: 0; 
 	padding: 0;
 	box-shadow: 0px 0px 20px 3px #2b2b2b;
+	background-color: white
 }
- 
+
 p, div, span, label, a, input, textarea, 
 button, input.button, input.file {
 	font-family: inherit;
@@ -92,8 +93,14 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Borde dels windows de tipus Llista */
 div.wc-modal, div.wc-modal-none, div.wc-highlighted, div.wc-highlighted-none {
-	border: 2px solid {BLUE}; background: #FFF;
+	border: 2px solid {BLUE}; 
+	background: #FFF;
 	padding: 16px;
+	box-sizing: content-box;
+}
+
+div.wc-modal *, div.wc-modal-none *, div.wc-highlighted *, div.wc-highlighted-none * {
+	box-sizing: border-box;
 }
 
 

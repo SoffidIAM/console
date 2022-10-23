@@ -7,11 +7,16 @@ import java.util.Collection;
 
 import javax.swing.text.Element;
 import javax.swing.text.html.HTMLDocument;
+
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuScript;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Html;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Window;
 
 import com.lowagie.text.Document;
 import com.soffid.iam.ServiceLocator;
@@ -24,6 +29,11 @@ import es.caib.zkib.component.Form;
 public class WheelHandler extends FrameHandler {
 	private boolean existSyncServer;
 	
+	int welcomePosition = 0;
+
+	private Window welcome;
+
+	private Label welcomeMessage;
 	
 	public WheelHandler () throws Exception {
 		System.out.println("");
@@ -32,11 +42,9 @@ public class WheelHandler extends FrameHandler {
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
-		response(null,new org.zkoss.zk.au.out.AuScript(this, "document.body.appendChild(document.getElementById('"+getFellow("cloakLayer1").getUuid()+"'))"));
-		response(null,new org.zkoss.zk.au.out.AuScript(this, "document.body.appendChild(document.getElementById('"+getFellow("cloakLayer2").getUuid()+"'))"));
-		response(null,new org.zkoss.zk.au.out.AuScript(this, "document.body.appendChild(document.getElementById('"+getFellow("cloakLayer3").getUuid()+"'))"));
-		response(null,new org.zkoss.zk.au.out.AuScript(this, "document.body.appendChild(document.getElementById('"+getFellow("cloakLayer4").getUuid()+"'))"));
-		response(null,new org.zkoss.zk.au.out.AuScript(this, "document.body.appendChild(document.getElementById('"+getFellow("cloakLayer5").getUuid()+"'))"));
+		
+		welcome = (Window) getFellow("welcome");
+		welcomeMessage = (Label) welcome.getFellow("welcomelabel");
 		
 		 try {
 			 InputStream in = getClass().getResourceAsStream("/com/soffid/iam/web/wheel.svg");
@@ -46,12 +54,16 @@ public class WheelHandler extends FrameHandler {
 			            out.write(b, 0, read);
 			     }
 			     Html html = (Html) getFellow("wheel");
-			     html.setContent(out.toString("UTF-8"));
-				 }catch(IOException ex) { //De momento solo saco la traza, no hago nada con la excepcion
+			     String text = out.toString("UTF-8");
+			     text = text.replaceFirst("<\\?xml.*\n", "")
+			    		 .replaceFirst("<svg", "<svg style='width: 100%; height: 100%; max-height: calc( 100vh - 120px) '");
+			     html.setContent(text);
+			 }catch(IOException ex) { //De momento solo saco la traza, no hago nada con la excepcion
 					 throw new UiException(ex);
-		 }
+			 }
 		 
 		 
+	 	 welcome.doHighlighted();
 		 //COndiciones, cada una con su funcion;
 		 //String testColor = existSyncServer()?"red":"green"; 
 		 
@@ -60,6 +72,55 @@ public class WheelHandler extends FrameHandler {
 			response(null,new org.zkoss.zk.au.out.AuScript(this, "document.getElementById('pam01').classList.add('shadow')"));			
 		}else {
 			response(null,new org.zkoss.zk.au.out.AuScript(this, "document.getElementById('pam01').classList.add('shadow2')"));				
+		}
+	}
+	
+	public void nextWelcome (Event ev) {
+		Window w;
+		switch (welcomePosition++) {
+		case 0:
+			w = (Window) getFellow("cloakLayer1");
+			w.doOverlapped();
+			welcomeMessage.setValue(Labels.getLabel("tutorial.userOptionsMessageBox"));
+			break;
+		case 1:
+			w = (Window) getFellow("cloakLayer1");
+			w.setVisible(false);
+			w = (Window) getFellow("cloakLayer2");
+			w.doOverlapped();
+			welcomeMessage.setValue(Labels.getLabel("tutorial.helpOptionsMessageBox"));
+			break;
+		case 2:
+			w = (Window) getFellow("cloakLayer2");
+			w.setVisible(false);
+			w = (Window) getFellow("cloakLayer3");
+			w.doOverlapped();
+			welcomeMessage.setValue(Labels.getLabel("tutorial.searchOptionsMessageBox"));
+			break;
+		case 3:
+			w = (Window) getFellow("cloakLayer3");
+			w.setVisible(false);
+			w = (Window) getFellow("cloakLayer4");
+			w.doOverlapped();
+			welcomeMessage.setValue(Labels.getLabel("tutorial.mainNavigationMessageBox"));
+			break;
+		case 4:
+			w = (Window) getFellow("cloakLayer4");
+			w.setVisible(false);
+			w = (Window) getFellow("cloakLayer5");
+			w.doOverlapped();
+			welcomeMessage.setValue(Labels.getLabel("tutorial.breadscrumsOptionsMessageBox"));
+			break;
+		case 5:
+			w = (Window) getFellow("cloakLayer5");
+			w.setVisible(false);
+			welcomeMessage.setValue(Labels.getLabel("tutorial.end"));
+			Button b = (Button) welcome.getFellow("next");
+			b.setLabel(Labels.getLabel("user_createaccount.Finish"));
+			welcome.getFellow("showagain").setVisible(true);
+			break;
+		default:
+			welcome.setVisible(false);
 		}
 	}
 

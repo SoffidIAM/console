@@ -11,7 +11,7 @@
 	closable="false"
 	width="650px">
 
-	<fileupload style="width: 650px; height: 120px; padding: 35px 120px 20px 120px"
+	<fileupload style="width: 100%; height: 120px; padding: 35px 120px 20px 120px"
 		id="${c:l('csvimport.upload') }" 
 		onUpload="ref:file-upload.onUpload"
 		onClose ="ref:file-upload.cancelUpload"

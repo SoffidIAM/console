@@ -1312,6 +1312,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		tasque.setDate(new Timestamp(System.currentTimeMillis()));
 		tasque.setTransaction(transa);
 		tasque.setSystemName(dispatcher);
+		tasque.setDb(dispatcher);
 		tasque.setUser(account);
 		tasque.setPassword(password.toString());
 		tasque.setChangePassword(mustChange ? "S" : "N"); //$NON-NLS-1$ //$NON-NLS-2$

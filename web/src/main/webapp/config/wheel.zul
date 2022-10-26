@@ -3,42 +3,28 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
 
-<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml" use="com.soffid.iam.web.config.WheelHandler" id="frame">
+<frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml" use="com.soffid.iam.web.wheel.WheelHandler" id="frame">
 <style>
-		.cls-32.shadow {
-			fill: red; 
+		g.g_iga, g.g_pam, g.g_irc, g.g_am {
+			cursor: pointer;
 		}
-		.cls-32.shadow2 {
-			fill: green; 
+		g.g_iga:hover .cls-35 { 
+ 		 fill: #20ffff;
+		}
+		g.g_irc:hover .cls-34 { 
+ 		 fill: #c0c0c0;
+		}
+		g.g_pam:hover .cls-32 { 
+ 		 fill: #ffc0c0;
+		}
+		g.g_am:hover .cls-33 { 
+ 		 fill: #edff00;
 		}
 		
-		#am01:hover ,#am02:hover ,#am03:hover, #am04:hover {
- 		 fill: green;
-		}
-		#iga01:hover ,#iga02:hover ,#iga03:hover, #iga04:hover {
- 		 fill: blue;
-		}
-		#irc01:hover ,#irc02:hover ,#irc03:hover, #irc04:hover {
- 		 fill: black;
-		}
-		#pam01:hover ,#pam02:hover ,#pam03:hover, #pam04:hover {
- 		 fill: red;
+		g.dim {
+			filter: brightness(0.5);
 		}
 </style>
-<script>
-		function shadowBackground(item) {
-			var element = document.getElementById(item);
-			var class = element.classname;
-			element.classname= class+"-shadow";
-		};
-		
-		
-		function changeFill(color){
-			var element = document.getElementById("pam01");
-			element.style.fill= color;
-		}
-</script>
-
 
 		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
@@ -49,8 +35,9 @@
 			</div>
 
 <!-- 1.- USER OPTIONS-->
-		<window id="welcome" visible="false" title="${c:l('wheel.popup.title') }" position="center, center" closable="false"
-			style="width: 80%; height: 450px; max-width: 600px ">
+		<timer delay="200" onTimer="ref:frame.showWelcome" repeats="false" running="true"/>
+		<window id="welcome" visible="false" title="${c:l('wheel.popup.title') }" position="center" closable="false"
+			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
 			<label value="${c:l('wheel.popup.message') }" multiline="true" id="welcomelabel" />
 			<div style="position: absolute; bottom: 0px; left: 0px; width: calc(100% - 40px); padding: 20px">
 				<button label="${c:l('aplicaIntranet_autoritzacio.Next') }" id="next" 

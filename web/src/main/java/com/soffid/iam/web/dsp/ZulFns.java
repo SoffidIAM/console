@@ -12,6 +12,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.laf.StandardColors;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DateFormats;
@@ -85,4 +86,5 @@ public class ZulFns {
 		}
 		return "NTS".equals(h.getOs()) ? "/img/windows-black.svg" : "LIN".equals(h.getOs()) ? "/img/linux-black.svg" : "/img/host-black.svg";
 	}
+	
 }

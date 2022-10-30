@@ -84,6 +84,7 @@ public class CustomField3 extends InputField3 {
 			dataTypeObj.setFilterExpression(filterExpression);
 			dataTypeObj.setBuiltinHandler(uiHandler);
 			dataTypeObj.setLabel(label);
+			dataTypeObj.setMultiValuedRows(getMaxrows());
 			if (listOfValues != null)
 				dataTypeObj.setValues(Arrays.asList(listOfValues));
 
@@ -327,6 +328,13 @@ public class CustomField3 extends InputField3 {
 	
 	public void setUiHandler(String uiHandler) {
 		this.uiHandler = uiHandler;
+	}
+
+	@Override
+	public void setMaxrows(Integer maxrows) {
+		super.setMaxrows(maxrows);
+		if (dataTypeObj != null)
+			dataTypeObj.setMultiValuedRows(maxrows);
 	}
 
 }

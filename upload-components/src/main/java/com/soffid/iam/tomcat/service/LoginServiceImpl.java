@@ -2,7 +2,6 @@ package com.soffid.iam.tomcat.service;
 
 import java.security.Principal;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,9 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.ejb.Local;
-import javax.ejb.Stateless;
 
 import org.apache.catalina.Realm;
 import org.apache.commons.logging.Log;
@@ -31,18 +27,15 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
-import com.soffid.iam.lang.MessageFactory;
-import com.soffid.iam.model.UserAccountEntity;
-import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.PasswordService;
+import com.soffid.iam.service.PreferencesService;
 import com.soffid.iam.service.SamlService;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
-import com.soffid.iam.service.PreferencesService;
 import com.soffid.iam.tomcat.LoginService;
 import com.soffid.iam.tomcat.SoffidRealm;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -308,7 +301,7 @@ public class LoginServiceImpl implements LoginService {
     	com.soffid.iam.api.System soffidSystem = ServiceLocator.instance().getDispatcherService().findSoffidDispatcher();
     	for ( RoleGrant grant: groups)
     	{
-    		if (grant.getSystem().equals(soffidSystem.getName()))
+    		if (soffidSystem.getName().equals( grant.getSystem() ) && acc.getName().equals(grant.getOwnerAccountName()))
     			result.add(grant.getRoleName());
     		result.add(grant.getRoleName()+"@"+grant.getSystem());
     		if (grant.getDomainValue() != null)

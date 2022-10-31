@@ -10,6 +10,7 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml"
 	style="position: relative" use="com.soffid.iam.web.agent.AgentHandler"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/agents"
 	id="frame">
 
 	<script>

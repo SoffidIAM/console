@@ -6,6 +6,7 @@
 <?page title="Gestió d'autoritzacions" ?>
 <frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml"
 	use="com.soffid.iam.web.config.AuthorizationHandler" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/authorizations"
 	onAddRole="ref:frame.addRole">
 	
 	<xmldatasource id="autoritzacions" src="/es/caib/seycon/autoritzacions.xml"/>

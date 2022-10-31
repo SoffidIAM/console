@@ -9,6 +9,7 @@
 	xmlns:zk="http://www.zkoss.org/2005/zk"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	mold="div"
+	help="https://bookstack.soffid.com/books/pam-monitoring/page/search-in-pam-recordings"
 	use="com.soffid.iam.web.pam.Search">
 		
 	<style>

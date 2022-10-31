@@ -9,6 +9,7 @@
 	xmlns:zk="http://www.zkoss.org/2005/zk"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	mold="div"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/process-search"
 	use="com.soffid.iam.web.bpm.search.Search">
 		
 	<div sclass="card" id="card">

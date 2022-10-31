@@ -10,6 +10,7 @@
 <?component name="application_managers" macro-uri="application-managers.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/information-systems"
 	use="com.soffid.iam.web.application.ApplicationHandler" id="frame">
 	<datamodel id="model" rootNode="applications" src="descriptorApplication.xml"/>
 	<div sclass="card" id="card">

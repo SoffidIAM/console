@@ -6,6 +6,7 @@
 <?component name="group_roles" macro-uri="group-roles.zul"?>
 <?component name="group_managers" macro-uri="group-managers.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/groups"
 	use="com.soffid.iam.web.group.GroupHandler" id="frame">
 	<datamodel id="model" rootNode="groups" src="descriptorGroup.xml"/>
 	<div sclass="card" id="card">

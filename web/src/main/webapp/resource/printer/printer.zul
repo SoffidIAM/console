@@ -4,6 +4,7 @@
 <?page id="printer"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/printers"
 	use="com.soffid.iam.web.printer.PrinterHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="printerDescriptor.xml"/>
 	<div sclass="card" id="card">

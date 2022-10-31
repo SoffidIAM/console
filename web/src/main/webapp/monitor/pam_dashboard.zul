@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?page title="${c:l('seu.pamDashboard')}" ?>
-<frame id="frame" saveContent="false" title="${c:l('seu.pamDashboard')}" width="99%" use="com.soffid.iam.web.component.FrameHandler">
+<frame id="frame" saveContent="false" title="${c:l('seu.pamDashboard')}" width="99%" 
+  help="https://bookstack.soffid.com/books/pam-monitoring/page/privileged-accounts-dashboard"
+  use="com.soffid.iam.web.component.FrameHandler">
 	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 	</div>
 	<graphjs use="com.soffid.iam.web.graph.PamAccountsGraphjs" refresh="60000"/>

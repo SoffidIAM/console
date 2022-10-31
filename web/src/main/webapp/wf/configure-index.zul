@@ -7,6 +7,7 @@
 	xmlns:zk="http://www.zkoss.org/2005/zk"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
 	id="ui"
+	help="https://bookstack.soffid.com/books/bpm-editor/page/configure-workflow-engine"
 	use="es.caib.bpm.ui.admin.ConfigureIndex">
 	
 	<div sclass="card" id="card">

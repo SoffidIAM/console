@@ -4,7 +4,9 @@
 
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
-	id="frame" title="${c:l('main.lblAdminJobs')}" use="com.soffid.iam.web.bpm.ActiveJobHandler" 
+	id="frame" title="${c:l('main.lblAdminJobs')}" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/scheduled-jobs"
+	use="com.soffid.iam.web.bpm.ActiveJobHandler" 
 	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
 	
 	<datamodel id="model" rootNode="root" src="jobDescriptor.xml"/>

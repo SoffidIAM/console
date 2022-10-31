@@ -8,6 +8,7 @@
 <?page id="account"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/accounts"
 	use="com.soffid.iam.web.account.AccountHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="accountDescriptor.xml"/>
 	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />

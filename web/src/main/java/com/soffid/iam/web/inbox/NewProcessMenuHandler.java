@@ -34,11 +34,11 @@ public class NewProcessMenuHandler implements DynamicMenuHandler {
 			o.setUrl("/wf/my-requests.zul");
 			list.add(o);
 			
-			String path = null;
 			for (ProcessDefinition p: EJBLocator.getBpmEngine().findInitiatorProcessDefinitions()) {
 				String[] split = p.getName().split(" */ *");
 				int i;
 				List<MenuOption> parentList = list;
+				String path = null;
 				for (i = 0; i < split.length - 1; i++) {
 					if (path == null) path = split[i];
 					else path += "/"+split[i];

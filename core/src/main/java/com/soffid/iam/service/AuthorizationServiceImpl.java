@@ -255,14 +255,16 @@ public class AuthorizationServiceImpl extends
         HashMap<Long, List<RoleGrant>> rols = new HashMap<Long, List<RoleGrant>>();
         // explorem rols de l'usuari (poden tindre domini)
         for (RoleGrant rg : grants) {
-            Long rolId = rg.getRoleId();
-            if (!rols.containsKey(rolId)) {
-                LinkedList<RoleGrant> grantList = new LinkedList<RoleGrant>();
-                grantList.add(rg);
-                rols.put(rolId, grantList);
-            } else {
-                rols.get(rolId).add(rg);
-            }
+        	if (! account.getSystem().equals( rg.getOwnerSystem()) || account.getName().equals(rg.getOwnerAccountName())) {
+	            Long rolId = rg.getRoleId();
+	            if (!rols.containsKey(rolId)) {
+	                LinkedList<RoleGrant> grantList = new LinkedList<RoleGrant>();
+	                grantList.add(rg);
+	                rols.put(rolId, grantList);
+	            } else {
+	                rols.get(rolId).add(rg);
+	            }
+        	}
         }
 
         // guardem les autoritzacions (per id)

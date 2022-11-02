@@ -917,11 +917,12 @@ public class TaskUI extends FrameHandler implements EventListener {
             TaskAttachmentManager business= new TaskAttachmentManager(getCurrentTask());
             Session sesion= this.getDesktop().getSession();
             
-            FileUpload2.get((event) -> {
-            	org.zkoss.util.media.Media dataSubida = ((UploadEvent)event).getMedia();
+            FileUpload2.get(true, (event) -> {
+            	Media[] dataSubida = ((UploadEvent)event).getMedias();
             
-            	if(dataSubida!= null)
+            	if(dataSubida!= null && dataSubida.length > 0)
 	            {
+            		for (Media media: dataSubida) {
 	                    String tag = ((HttpSession)sesion.getNativeSession()).getId();
 	                    List tags = business.getTags();
 	                    int counter = 0;
@@ -930,8 +931,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 	                    	counter++;
 	                    	tag = ((HttpSession)sesion.getNativeSession()).getId()+"_"+counter;
 	                    }
-	                    business.uploadFile(dataSubida, tag);
-	                    refreshListadoArchivos();
+	                    business.uploadFile(media, tag);
+            		}
+            		refreshListadoArchivos();
 	            }
             });
     }

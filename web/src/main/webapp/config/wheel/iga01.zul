@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="iga01_w" position="top-center" closable="false" sizable="false"
+		use="com.soffid.iam.web.wheel.Iga01Handler"
+			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
+	<timer id="timer" delay="1000" repeats="true" onTimer="ref:iga01_w.onTimer" running="false"/>
+	<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("wheel.syncserver.first")}
+	- ${c:l("wheel.syncserver.first")}
+	- ${c:l("user_createaccount.Finish")}
+			</attribute>
+			<div id="step1">
+				<div style="height: 320px">
+					<label multiline="true" value="${c:l('wheel.syncserver.explanation') }" />
+					<radiogroup id="radio" onCheck="ref:iga01_w.onRadio()">
+						<radio value="deb" label="Debian, Ubuntu or any other Debian derivatives" style="display:block"></radio>
+						<radio value="rpm" label="Redhat, Centos or Suse" style="display:block"></radio>
+						<radio value="psh" label="Windows" style="display:block"></radio>
+					</radiogroup>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga01_w.back" />
+					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga01_w.step2" id="step2Button"/>
+				</div>
+						
+			</div>
+			<div id="step2">
+				<div style="height: 320px">
+					<label multiline="true" id="explanation2" style="word-break: initial; display: block"/>
+					<div id="explanation2b"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga01_w.back" />
+					<image style="height: 24px; vertical-align:middle" src="/anonymous/wait.gif" id="step3Wait"/>
+					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga01_w.step2" id="step3Button"/>
+				</div>
+			</div>
+		
+	</wizard>
+</window>

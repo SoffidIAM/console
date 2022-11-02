@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
 import javax.swing.text.Element;
 import javax.swing.text.html.HTMLDocument;
 
@@ -22,12 +24,16 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
 import com.lowagie.text.Document;
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Server;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.InputField3;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.Form;
+import es.caib.zkib.component.Switch;
 
 public class WheelHandler extends FrameHandler {
 	int welcomePosition = 0;
@@ -72,7 +78,7 @@ public class WheelHandler extends FrameHandler {
 	 					new Sector("am03"),
 	 					new Sector("am04")),
 	 			new Quarter("iga", 
-	 					new Sector("iga01"),
+	 					new InstallSynserverSector("iga01"),
 	 					new Sector("iga02"),
 	 					new Sector("iga03"),
 	 					new Sector("iga04")),
@@ -92,11 +98,20 @@ public class WheelHandler extends FrameHandler {
 	 		q.installHanlder(this);
 	 		q.updateStatus(this);
 	 	}
+	 	
+	 	
 	}
 	
 	public void showWelcome(Event ev) {
 		
-		welcome.doHighlighted();
+		try {
+			String hideTips = EJBLocator.getPreferencesService().findMyPreference("wheel-tips");
+			if ("true".equals(hideTips)) 
+				welcome.setVisible(false);
+			else
+				welcome.doHighlighted();
+		} catch (Exception e) {
+		}
 	}
 	
 	public void nextWelcome (Event ev) {
@@ -162,6 +177,12 @@ public class WheelHandler extends FrameHandler {
 		getFellow("helpOptionsArrow").setVisible(true);
 		getFellow("helpOptionsMessageBox").setVisible(true);
 		
+	}
+	
+	public void onChangeShowagainswitch(Event ev) throws InternalErrorException, NamingException, CreateException {
+		Switch i = (Switch) ev.getTarget();
+		String value = i.isChecked() ? "true": "false";
+		EJBLocator.getPreferencesService().updateMyPreference("wheel-tips", value);
 	}
 	
 	//3.-searchOptions 

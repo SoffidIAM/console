@@ -34,7 +34,7 @@ public class MainWindow extends Window {
 	}
 	
 	public void help (Event event) {
-		Frameable frameInfo = Application.getActiveFrame();
+		Frameable frameInfo = (Frameable) Application.getActiveFrame();
 		String url = "https://bookstack.soffid.com";
 		if (frameInfo != null && frameInfo instanceof Frame) {
 			Frame frame = (Frame) frameInfo;

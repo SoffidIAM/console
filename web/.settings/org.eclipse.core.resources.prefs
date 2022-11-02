@@ -1,5 +1,9 @@
 eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
+encoding//src/main/resources=UTF-8
 encoding//src/main/resources/com/soffid/iam/web/iam-label.properties=UTF-8
 encoding//src/main/resources/com/soffid/iam/web/iam-label_es.properties=UTF-8
 encoding//src/main/resources/es/caib/bpm/properties/bpm-label.properties-old=UTF-8
 encoding//src/main/resources/es/caib/bpm/properties/bpm-label_es.properties-old=UTF-8
+encoding//src/test/java=UTF-8
+encoding/<project>=UTF-8

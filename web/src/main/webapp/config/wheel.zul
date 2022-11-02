@@ -43,7 +43,7 @@
 				<button label="${c:l('aplicaIntranet_autoritzacio.Next') }" id="next" 
 					image="/img/next-r.svg" style="float:right" onClick="ref:frame.nextWelcome"/>
 				<div style="display:block" visible="false" id="showagain">
-					<switch id="showagainswitch"/>
+					<switch id="showagainswitch" onCheck="ref:frame.onChangeShowagainswitch"/>
 					${c:l('wheel.popup.noshowagain') }
 				</div>
 			</div>

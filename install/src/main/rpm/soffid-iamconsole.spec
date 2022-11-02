@@ -6,7 +6,7 @@ Summary: Soffid IAM Console
 License: GPL
 Distribution: Soffid IAM
 Group: Administration/Network
-Requires: java
+Requires: java-11-openjdk
 
 %define _rpmdir target
 %define _rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm

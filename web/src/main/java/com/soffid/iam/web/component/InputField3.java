@@ -1047,19 +1047,22 @@ public class InputField3 extends Databox
 
 	@Override
 	public void onUpload(final Integer position) {
-		FileUpload2.get((event2) -> {
+		FileUpload2.get(dataType.isMultiValued(), (event2) -> {
 			UploadEvent ue = (UploadEvent) event2;
-			Media m = ue.getMedia();
-			BinaryData bd;
-			if (m.isBinary() && m.inMemory())
-				bd = new BinaryData(m.getName(), m.getByteData());
-			else if (m.isBinary()) 
-				bd = new BinaryData(m.getName(), m.getStreamData());
-			else if (m.inMemory()) 
-				bd = new BinaryData(m.getName(), m.getStringData().getBytes(StandardCharsets.UTF_8));
-			else 
-				bd = new BinaryData(m.getName(), m.getReaderData());
-			onItemChange(bd, position);
+			int pos = position.intValue();
+			for (Media m: ue.getMedias()) {
+				BinaryData bd;
+				if (m.isBinary() && m.inMemory())
+					bd = new BinaryData(m.getName(), m.getByteData());
+				else if (m.isBinary()) 
+					bd = new BinaryData(m.getName(), m.getStreamData());
+				else if (m.inMemory()) 
+					bd = new BinaryData(m.getName(), m.getStringData().getBytes(StandardCharsets.UTF_8));
+				else 
+					bd = new BinaryData(m.getName(), m.getReaderData());
+				onItemChange(bd, pos);
+				pos++;
+			}
 			invalidate();
 		});
 	}

@@ -20,6 +20,7 @@
 						<radio value="deb" label="Debian, Ubuntu or any other Debian derivatives" style="display:block"></radio>
 						<radio value="rpm" label="Redhat, Centos or Suse" style="display:block"></radio>
 						<radio value="psh" label="Windows" style="display:block"></radio>
+						<radio value="docker" label="Docker" style="display:block"></radio>
 					</radiogroup>
 				</div>
 				<div style="text-align: right; width: 100%">
@@ -32,11 +33,12 @@
 				<div style="height: 320px">
 					<label multiline="true" id="explanation2" style="word-break: initial; display: block"/>
 					<div id="explanation2b"/>
+					<customfield3 dataType="BOOLEAN" id="openMonitor" label="${c:l('wheel.syncserver.openMonitoring') }" value="true" style="position: absolute; bottom: 60px"/>
 				</div>
 				<div style="text-align: right; width: 100%">
 					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga01_w.back" />
 					<image style="height: 24px; vertical-align:middle" src="/anonymous/wait.gif" id="step3Wait"/>
-					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga01_w.step2" id="step3Button"/>
+					<button image="/img/next-r.svg" label="${c:l('user-account-new.Finish')}" onClick="ref:iga01_w.end" id="step3Button"/>
 				</div>
 			</div>
 		

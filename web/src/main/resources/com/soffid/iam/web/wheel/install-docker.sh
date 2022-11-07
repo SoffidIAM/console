@@ -1,0 +1,1 @@
+docker run -d --name syncserver -e SOFFID_CONFIG='URL' --restart always soffid/iam-sync:VERSION

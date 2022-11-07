@@ -30,10 +30,14 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Server;
 import com.soffid.iam.api.ServerRegistrationToken;
+import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.CustomField3;
 
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.Wizard;
 import es.caib.zkib.zkiblaf.ImageClic;
@@ -50,7 +54,11 @@ public class Iga01Handler extends Window {
 	private Timer timer;
 	private Image step3Wait;
 	private String newToken;
-
+	CustomField3 openMonitor;
+	
+	int substep;
+	int currentServers;
+	
 	public void back(Event ev) {
 		if (wizard.getSelected() == 0)
 			setVisible(false);
@@ -60,20 +68,60 @@ public class Iga01Handler extends Window {
 	}
 	
 	public void onTimer(Event ev) throws InternalErrorException, NamingException, CreateException {
-		if ( ! EJBLocator.getDispatcherService().isRegistrationTokenAlive(newToken)) {
+		if (substep == 0) {
+			if ( ! EJBLocator.getDispatcherService().isRegistrationTokenAlive(newToken)) {
+				explanation2b.setVisible(false);
+				if (currentServers == 0) {
+					substep = 1;
+					explanation2.setValue(Labels.getLabel("wheel.syncserver.waiting"));
+				} else {
+					substep = 3;
+					explanation2.setValue(Labels.getLabel("wheel.syncserver.configured2"));
+				}
+			}
+		}
+		else if (substep == 1) {
+			int s = EJBLocator.getDispatcherService().findAllServers().size();
+			if (s > currentServers) {
+				substep = 2;
+				explanation2.setValue(Labels.getLabel("wheel.syncserver.configured1"));				
+			}
+		}
+		else if (substep == 2) {
+			for (Server server: EJBLocator.getSyncServerService().getSyncServers()) {
+				if (server.getType() == ServerType.MASTERSERVER) {
+					try {
+						SyncServerInfo i = EJBLocator.getSyncServerService().getSyncServerInfo(server.getUrl());
+						if (i.getStatus().equals("OK")) {
+							substep = 3;
+							explanation2.setValue(Labels.getLabel("wheel.syncserver.configured1b"));											
+							openMonitor.setVisible(true);
+							openMonitor.setValue(true);
+						}
+					} catch (Exception e) {
+						// Ignore failures
+					}
+				}
+			}
+		}
+		if (substep == 3) {
 			step3Button.setVisible(true);
 			step3Wait.setVisible(false);
 		}
 	}
 	
-	public void step2(Event ev) throws MalformedURLException, InternalErrorException, IOException {
+	public void step2(Event ev) throws MalformedURLException, InternalErrorException, IOException, NamingException, CreateException {
+		substep = 0;
+		currentServers = EJBLocator.getDispatcherService().findAllServers().size();
 		type = radio.getSelectedItem().getValue();
 		wizard.next();
 		explanation2.setValue( Labels.getLabel( "psh".equals(type) ? "wheel.syncserver.download-windows" : "wheel.syncserver.download-linux") );
+		explanation2b.setVisible(true);
 		downloadFile();
 		step3Wait.setVisible(true);
 		step3Button.setDisabled(false);
 		step3Button.setVisible(false);
+		openMonitor.setVisible(false);
 		timer.start();
 	}
 	
@@ -93,6 +141,7 @@ public class Iga01Handler extends Window {
 		step3Wait = (Image) getFellow("step3Wait");
 		wizard.setSelected(0);
 		
+		openMonitor = (CustomField3) getFellow("openMonitor");
 		explanation2 = (Label) getFellow("explanation2");
 		explanation2b = (Div) getFellow("explanation2b");
 	}
@@ -104,19 +153,9 @@ public class Iga01Handler extends Window {
 		newToken = ServiceLocator.instance().getDispatcherService().preRegisterServer(srt);
 
 
-    	String fileName;
-		if ("rpm".equals(type))
-			fileName = "install-syncserver.sh";
-		else if ("deb".equals(type))
-			fileName = "install-syncserver.sh";
-		else if ("psh".equals(type))
-			fileName = "install-syncserver.psh";
-		else {
-			throw new UiException("Wrong type "+type);
-		}
-
-
-		String url = ConfigurationCache.getProperty("AutoSSOURL");
+		String url = ConfigurationCache.getProperty("soffid.externalURL");
+		if (url == null)
+			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null) {
 			HttpServletRequest request = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 			url = request.getScheme()+"//"+request.getHeader("Host")+":"+request.getLocalPort()+"/";
@@ -124,14 +163,12 @@ public class Iga01Handler extends Window {
 		if (!url.endsWith("/")) url = url + "/";
 		url += "soffid/anonymous/syncserver/script/"+newToken;
 				
-		
 		String resource = readInputStream(getClass().getResourceAsStream("install-"+type+".sh"));
 		resource = resource.replace("VERSION", lastVersion);
 		resource = resource.replace("URL", url);
 
 		while ( explanation2b.getFirstChild() != null )
 			explanation2b.getFirstChild().detach();
-		
 
 		Textbox tb = new Textbox();
 		tb.setVisible(false);
@@ -173,6 +210,8 @@ public class Iga01Handler extends Window {
 					last = version;
 			}
 		}
+		if (last == null) // Not released yet
+			last = coreVersion;
 		return last;
 	}
 	
@@ -211,5 +250,14 @@ public class Iga01Handler extends Window {
 		return out.toString("UTF-8");
 	}
 
+	
+	public void end(Event event) {
+		if (currentServers == 0) {
+			if (Boolean.TRUE.equals(openMonitor.getValue()))
+			{
+				Executions.getCurrent().sendRedirect("/monitor/syncserver.zul", "_blank");
+			}
+		}
+	}
 
 }

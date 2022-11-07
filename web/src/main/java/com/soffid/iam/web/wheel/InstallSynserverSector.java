@@ -22,7 +22,7 @@ public class InstallSynserverSector extends Sector {
 	public boolean isDone() {
 		try {
 			Collection<Server> list = EJBLocator.getDispatcherService().findAllServers();
-			return list.size() >= 0;
+			return list.size() > 0;
 		}
 		catch (Exception e) {
 			return true;

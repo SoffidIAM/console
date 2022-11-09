@@ -77,6 +77,9 @@
 					onOK="ref:handler.onSetPassword">
 				</textbox>
 			</div>
+			<div style="width:100%">
+				<switch id="temporary"/><label value="${c:l('user.zul.temporaryPassword') }"	/>	
+			</div>
 			<div align="right" style="width: 100%; margin-top: 1em">
 				<button
 					label="${c:l('accounts.setPassword.Cancel')}"
@@ -103,7 +106,7 @@
 		<div>
 			<label id="popupPwd" multiline="true"/>
 		</div>
-		
+
 		<separator spacing="10px"/>
 		<separator bar="true" spacing="15px"/>
 		<hbox style="margin-left:auto; margin-right:auto">

@@ -33,6 +33,8 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 
 import com.soffid.iam.api.Account;
@@ -92,6 +94,7 @@ import es.caib.seycon.ng.exception.SeyconException;
  * @see es.caib.seycon.ng.servei.GrupService
  */
 public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
+	Log log = LogFactory.getLog(getClass());
 	/**
 	 * @throws InternalErrorException 
 	 * @see es.caib.seycon.ng.servei.GrupService#createGrup(es.caib.seycon.ng.comu.Grup)
@@ -876,16 +879,18 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 		return sb.toString();
 	}
-	
+
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAndFilterAsync(String text, String filter) throws Exception {
+		String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
+		
 		String q = generateQuickSearchQuery(text);
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+") and ( not endDate pr )";
+			q = "("+q+") and ("+filter+") and ( not endDate pr  or endDate ge \""+s+"\")";
 		else if ( filter != null && ! filter.trim().isEmpty())
-			q = "("+filter+")  and ( not endDate pr )";
+			q = "("+filter+")  and ( not endDate pr  or endDate ge \""+s+"\")";
 		else if (!q.isEmpty())
-			q = "("+q+")  and ( not endDate pr )";
+			q = "("+q+")  and ( not endDate pr or endDate ge \""+s+"\")";
 		else
 			q = "not endDate pr";
 		return handleFindGroupByJsonQueryAsync(q);

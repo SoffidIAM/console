@@ -78,7 +78,8 @@ public class TaskAttachmentManager extends AbstractAttachmentManager {
         HttpSession sesion = (HttpSession) Sessions.getCurrent()
                 .getNativeSession();
         BpmEngine engine = EJBLocator.getBpmEngine();
-        engine.update(task);
+        if (task.getId() != 0)
+        	engine.update(task);
     }
 
     protected Set getVariables() {
@@ -91,7 +92,8 @@ public class TaskAttachmentManager extends AbstractAttachmentManager {
         HttpSession sesion = (HttpSession) Sessions.getCurrent()
                 .getNativeSession();
         BpmEngine engine = EJBLocator.getBpmEngine();
-        engine.update(task);
+        if (task.getId() != 0)
+        	engine.update(task);
     }
 
     protected void putVariable(String key, Object value) {

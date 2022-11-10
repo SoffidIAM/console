@@ -231,6 +231,17 @@
 		<servlet-name>zkLoader</servlet-name>
 		<url-pattern>*.zhtml</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<description>The file uploader</description>
+		<servlet-name>uploader</servlet-name>
+		<servlet-class>com.soffid.iam.web.component.UploaderServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>uploader</servlet-name>
+		<url-pattern>/zkau/uploader</url-pattern>
+	</servlet-mapping>
+
 	<servlet>
 		<description>The asynchronous update engine for ZK</description>
 		<servlet-name>auEngine</servlet-name>
@@ -239,7 +250,6 @@
 	<servlet-mapping>
 		<servlet-name>auEngine</servlet-name>
 		<url-pattern>/zkau/*</url-pattern>
-		<!-- //// -->
 	</servlet-mapping>
 
 	<servlet>

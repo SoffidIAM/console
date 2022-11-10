@@ -114,6 +114,17 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>user:password:set-no-temporary</codi>
+		<descripcio>Set non-temporary password for any user</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+		<hereta>
+			user:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>user:query</codi>
 		<descripcio>View users</descripcio>
 		<tipusDomini>GRUPS</tipusDomini>

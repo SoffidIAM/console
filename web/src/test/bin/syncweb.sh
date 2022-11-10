@@ -1,6 +1,5 @@
 #!/bin/bash
-dir=$(dirname $0)
-for i in ~/SEU/jboss/server/default/deploycaib/iam-ear.ear/iam-web-*.war
-do
-	rsync -rvz --exclude CVS --exclude WEB-INF $dir/../../main/webapp/ $i
-done
+cp -ru /home/gbuades/soffid/console/web/src/main/webapp/*    /home/gbuades/soffid/test/iam-console-3/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/
+cp -ru /home/gbuades/soffid/console/web/src/main/resources/* /home/gbuades/soffid/test/iam-console-3/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/WEB-INF/classes/
+#cp -ru /home/gbuades/soffid/console/web/target/classes/* /home/gbuades/soffid/test/iam-console-3/work/soffid/iam-ear.ear/iam-web-*-SNAPSHOT/WEB-INF/classes/
+ 

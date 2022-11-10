@@ -808,9 +808,14 @@ public class TaskUI extends FrameHandler implements EventListener {
 	}
 
 	public void salvarTarea() throws InterruptedException, IOException,
-		CreateException, NamingException {
-		salvarTarea(true);
+		CreateException, NamingException, CommitException {
+		if (getCurrentTask() == null || getCurrentTask().isDummyTask())
+			cerrarTarea();
+		else
+			salvarTarea(true);
 	}
+	
+	
 	public void salvarTarea(boolean exit) throws InterruptedException, IOException,
             CreateException, NamingException {
         WorkflowWindowInterface workflowWindow = null;

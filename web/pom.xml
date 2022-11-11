@@ -155,6 +155,7 @@
 		<dependency>
 	        <groupId>commons-fileupload</groupId>
 	        <artifactId>commons-fileupload</artifactId>
+	        <scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.zkib</groupId>

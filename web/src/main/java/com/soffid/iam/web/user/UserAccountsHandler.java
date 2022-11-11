@@ -20,10 +20,12 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.service.ejb.UserService;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTree2;
+import es.caib.zkib.component.Switch;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
@@ -60,6 +62,8 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 			Radiogroup gt = (Radiogroup) w.getFellow("generationType");
 			Radio radioRandom = (Radio) w.getFellow("generationRandom");
 			gt.setSelectedItem(radioRandom);
+			Switch s = (Switch) w.getFellow("temporary");
+			s.setChecked(true);
 			onChangeSelectedGeneration(null);
 			w.doHighlighted();
 		} else {
@@ -87,10 +91,14 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		String user = (String) listbox.getJXPathContext().getValue("userName");
 		String domain = (String) tree.getJXPathContext().getValue("name");
 		
+		Switch s = (Switch) w.getFellow("temporary");
 		if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
-			userService.setTemporaryPassword(user, domain, new Password(password.getValue()));
+			if (s.isChecked())
+				userService.setTemporaryPassword(user, domain, new Password(password.getValue()));
+			else
+				userService.setPassword(user, domain, new Password(password.getValue()));
 			es.caib.zkib.zkiblaf.Missatgebox
 					.avis(org.zkoss.util.resource.Labels
 							.getLabel("accounts.setPassword.msg"));
@@ -112,13 +120,16 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		Textbox password = (Textbox) w.getFellow("password");
 		Div passworddiv = (Div) w.getFellow("passworddiv");
 		Button setButton = (Button) w.getFellow("setButton");
+		Switch s = (Switch) w.getFellow("temporary");
 		
 		if (generationType.getSelectedItem() != radioRandom)
 		{
+			s.getParent().setVisible(Security.isUserInRole("user:password:set-no-temporary"));
 			password.setDisabled (false);
 			password.setFocus(true);
 			passworddiv.setStyle("visibility: visible");
 		} else {
+			s.getParent().setVisible(false);
 			password.setSclass("text");
 			password.setDisabled (true);
 			password.invalidate();

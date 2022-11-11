@@ -2847,12 +2847,6 @@ div.options {
 	text-align: center;
 }
 
-.options.options-tiny .menuoption {
-	width: 100px;
-	padding: 10px;
-	text-align: center;
-}
-
 .options .menuoption img {
 	object-fit: contain;
 	padding-left: 47px;
@@ -2877,6 +2871,12 @@ div.options {
 	border-radius: 10px; 
 	width: 200px;
 	height: 140px; 
+}
+
+.options.options-tiny .menuoption {
+	width: 100px;
+	padding: 10px;
+	text-align: center;
 }
 
 .options.options-tiny .menuoption img {
@@ -3021,6 +3021,20 @@ div.options {
 		hegiht: 54px;
 		position: absolute;
 	}
+
+	.options.options-tiny .menuoption {
+		width: 100px;
+		padding: 10px;
+		text-align: center;
+	}
+	
+	.options.options-tiny .menuoption img {
+		object-fit: contain;
+		padding: 14px;
+		width: 80px;
+		height: 80px; 
+	}
+	
 }
 
 @media only screen and (max-width: 600px) {
@@ -3063,6 +3077,20 @@ div.options {
 		border-color: transparent;
 		margin-top: 43px; 
 	}
+
+	.options.options-tiny .menuoption {
+		width: 100px;
+		padding: 10px;
+		text-align: center;
+	}
+	
+	.options.options-tiny .menuoption img {
+		object-fit: contain;
+		padding: 14px;
+		width: 80px;
+		height: 80px; 
+	}
+	
 }
 
 /********* MENU BAR **************/
@@ -3544,10 +3572,11 @@ div.tree-tail button {
 	background-image: none;
 	background-color: {SKY};
 	color: {SKYTEXT};
+	box-shadow: none;
 }
 
 form.upload-form input[type="submit"] {display:none;}
-form.upload-form input[type="button"] {float: right;}
+.inputfile + label + input[type="button"] {float: right;}
 	
 	/************* databox *****************/
 div.databox {

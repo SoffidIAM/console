@@ -273,15 +273,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (password.getPassword().toLowerCase().contains(acc.getName().toLowerCase()))
 				return PolicyCheckResult.CONTAINS_ACCOUNTNAME;
 
-			if (password.getPassword().toLowerCase().contains(acc.getDescription().toLowerCase()))
+			if (acc.getDescription() != null && password.getPassword().toLowerCase().contains(acc.getDescription().toLowerCase()))
 				return PolicyCheckResult.CONTAINS_NAME;
 		}
 
 		// Check for display name inclussion
 		for (AccountEntity acc : accounts) {
-			for (String part : acc.getDescription().split("[,.#-_ &\t]+")) {
-				if (part.length() >= 3 && password.getPassword().toLowerCase().contains(part.toLowerCase()))
-					return PolicyCheckResult.CONTAINS_NAME;
+			if (acc.getDescription() != null) {
+				for (String part : acc.getDescription().split("[,.#-_ &\t]+")) {
+					if (part.length() >= 3 && password.getPassword().toLowerCase().contains(part.toLowerCase()))
+						return PolicyCheckResult.CONTAINS_NAME;
+				}
 			}
 		}
 

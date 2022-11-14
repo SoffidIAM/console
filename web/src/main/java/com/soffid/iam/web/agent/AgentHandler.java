@@ -19,6 +19,7 @@ import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -352,7 +353,14 @@ public class AgentHandler extends FrameHandler {
 			{
 				Missatgebox.avis("Warning: There is no connector loaded. Please load them from the plugins management page");
 			}
-
+			HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+			String wizard = req.getParameter("wizard");
+			if ("ad-source".equals(wizard)) {
+				Executions.createComponents("/config/agent/wizard-ad-source.zul", this, new HashMap<>());
+			}
+			if ("sql-source".equals(wizard)) {
+				Executions.createComponents("/config/agent/wizard-sql-source.zul", this, new HashMap<>());
+			}
 		}
 	}
 

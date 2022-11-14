@@ -52,6 +52,7 @@ public class UserHandler extends FrameHandler {
 	private boolean canDeleteUser;
 	private boolean canQueryUser;
 	private ConfigurationService configSvc;
+	private String wizard;
 
 	public UserHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
@@ -116,66 +117,6 @@ public class UserHandler extends FrameHandler {
 		}
 	}
 
-	private void importCsv(CsvParser parser) {
-		Map<String,String> m = null;
-		int updates = 0;
-		int inserts = 0;
-		int unchanged = 0;
-		int removed = 0;
-		try {
-			configSvc = EJBLocator.getConfigurationService();
-			for ( Iterator<Map<String, String>> iterator = parser.iterator(); iterator.hasNext(); )
-			{
-				m = iterator.next();
-				String name = m.get("name");
-				String network = m.get("networkName");
-				String description = m.get("description");
-				String value = m.get("value");
-				if (network != null && network.isEmpty()) network = null;
-
-				if (name != null && !name.trim().isEmpty() && m.containsKey("value"))
-				{
-					Configuration cfg = configSvc.findParameterByNameAndNetworkName(name, network);
-					if (cfg != null)
-					{
-						if (value == null) {
-							configSvc.delete(cfg);
-							removed ++;
-						}
-						else if (cfg.getValue() != null && cfg.getValue().equals(value))
-						{
-							unchanged ++;
-						} else {
-							cfg.setValue(value);
-							if (m.containsKey("description"))
-								cfg.setDescription(description);
-							configSvc.update(cfg);
-							updates ++;
-						}
-					} else if (value != null) {
-						inserts ++;
-						cfg = new Configuration();
-						cfg.setValue(value);
-						cfg.setDescription(description);
-						cfg.setName(name);
-						cfg.setNetworkCode(network);
-						configSvc.create(cfg);
-					}
-				}
-			}
-		} catch (UiException e) {
-			throw e;
-		} catch (Exception e) {
-			if (m == null)
-				throw new UiException(e);
-			else
-				throw new UiException("Error loading parameter "+m.get("name"), e);
-		}
-		
-		getModel().refresh();
-		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
-	}
-	
 	public void addNew() throws Exception {
 		super.addNew();
 	}
@@ -184,6 +125,21 @@ public class UserHandler extends FrameHandler {
 	public void afterCompose() {
 		super.afterCompose();
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		wizard = req.getParameter("wizard");
+		if ("csv".equals(wizard) ) {
+			try {
+				importCsv();
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
+		}
+		if ("form".equals(wizard) ) {
+			try {
+				addNew();
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
+		}
 		String user = req.getParameter("userName");
 		if (user != null) {
 			SearchBox sb = (SearchBox) getFellow("searchBox");

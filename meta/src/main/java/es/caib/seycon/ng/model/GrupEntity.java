@@ -35,14 +35,14 @@ public abstract class GrupEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="GRU_CODI", length=50, translated="name")
+	@Column (name="GRU_CODI", length=150, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="GRU_UNIOFI", length=2, translated="driveLetter")
 	@Nullable
 	public java.lang.String unitatOfimatica;
 
-	@Column (name="GRU_DESCRI", length=100, translated="description")
+	@Column (name="GRU_DESCRI", length=250, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 

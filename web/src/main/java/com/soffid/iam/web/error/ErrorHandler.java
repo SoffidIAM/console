@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.ejb.EJBException;
+import javax.ejb.EJBTransactionRolledbackException;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -83,8 +84,9 @@ public class ErrorHandler extends Window implements AfterCompose {
 		Textbox exceptionLabel = (Textbox)getFellow("exception");
 		if (e instanceof Throwable)
 		{
+			StringBuffer msgBuffer = new StringBuffer();
 		    Throwable original = (Throwable) e;
-		    e = getRootException(e);
+		    e = getRootException(e, msgBuffer);
 
 		    if (e instanceof ObserveObligationException) {
 		    	ObligationManager om = new ObligationManager();
@@ -96,15 +98,17 @@ public class ErrorHandler extends Window implements AfterCompose {
 		    			return;
 		    		} catch (Exception e2) {
 		    			original = e = e2;
-		    		    e = getRootException(e);
+		    			msgBuffer = new StringBuffer();
+		    		    e = getRootException(e, msgBuffer);
 		    		}
 		    	}
 		    }
 		    
-		    
+		    msg = msgBuffer.toString();
 		    
 		    if (e instanceof javax.security.auth.login.LoginException )
 			{
+				getFellow("categoryDiv").setVisible(false);
 				messageLabel.setValue ( Labels.getLabel("error.SessionExpired") );
 				getFellow("closeButton").setVisible(false);
 				getFellow("resetButton").setVisible(false);
@@ -114,19 +118,25 @@ public class ErrorHandler extends Window implements AfterCompose {
 			}
 			else
 			{
-				msg = e.getMessage();
-				if (msg == null)
+				if (msg == null || msg.trim().isEmpty())
 					msg = e.toString();
-				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException)
+				((Label)getFellow("category")).setValue(e.getClass().getSimpleName());
+				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException) {
+					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( msg );
-				else if (e instanceof UserWorkflowException)
+				}
+				else if (e instanceof UserWorkflowException) {
+					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( e.getMessage() );
-				else if (e instanceof UiException)
+				}
+				else if (e instanceof UiException) {
+					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( e.getMessage() );
+				}
 				else if (e instanceof SecurityException)
 					messageLabel.setValue( Labels.getLabel("error.securityException")+ ": "+  msg );
 				else
-					messageLabel.setValue( e.getClass().getSimpleName()+": "+msg );
+					messageLabel.setValue( msg );
 				
 			} 
 			c = es.caib.seycon.ng.exception.SoffidStackTrace.getStackTrace(original);
@@ -247,20 +257,36 @@ public class ErrorHandler extends Window implements AfterCompose {
 				.replace("\n", "<br>");
 	}
 
-	public Throwable getRootException(Throwable e) {
-		boolean noTeAutoritzacions;
+	public Throwable getRootException(Throwable e, StringBuffer msgBuffer) {
 		Throwable cause = null;
+		String lastMessage = e.getMessage();
+		int lastPos = 0;
+		msgBuffer.append(e.getMessage());
 		do {
 			if ( e instanceof javax.ejb.EJBException ) 
 				cause = ((EJBException)e).getCausedByException ();
 			else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
 				cause = e.getCause ();
-				noTeAutoritzacions = true;
 			}
 			else
 				cause = e.getCause ();
 			if (cause == null || cause == e)
 				break;
+			if (lastMessage.equals(cause.toString()))
+				msgBuffer.delete(lastPos, msgBuffer.length());
+			String m = cause.getMessage();
+			if ( m == null ) m = cause.getClass().getSimpleName();
+			if (! (cause instanceof EJBException)) {
+				// Remove previous message
+				if (! msgBuffer.toString().contains(m))
+				{
+					lastMessage = m;
+					lastPos = msgBuffer.length();
+					if (msgBuffer.length() > 0)
+						msgBuffer.append("\ncaused by: ");
+					msgBuffer.append(m);
+				}
+			}
 			e = cause;
 		} while (true);
 		return e;

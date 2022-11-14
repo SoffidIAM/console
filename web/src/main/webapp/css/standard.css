@@ -3857,6 +3857,10 @@ input[type='radio'] + label {
 	margin-right: 10px;
 	margin-top: 6px;
 	height: 31px;
+    display: inline-block;
+    width: calc(100% - 40px);
+    word-break: break-word;
+    margin-bottom: 15px;
 }
 
 

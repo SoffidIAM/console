@@ -1,6 +1,10 @@
 package com.soffid.iam.web.wheel;
 
+import java.util.HashMap;
+
 import org.zkoss.zk.au.out.AuScript;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zul.Window;
 
 public class Sector {
 	private String tag;
@@ -10,7 +14,7 @@ public class Sector {
 		this.tag = tag;
 	}
 	public boolean isDone() {
-		return tag.equals("am03");
+		return false;
 	}
 
 	public void installHandler(WheelHandler handler) {
@@ -29,8 +33,13 @@ public class Sector {
 		handler.response(null, new AuScript(handler, "document.getElementById('g_"+tag+"').classList.add('dim');"));
 //				+ "document.getElementById('g_"+tag+"').classList.remove('"+parentClassName+"');"));
 	}
+
 	public void onClick(String tag2) {
 		if (tag2.equals(tag)) {
+			Window w = (Window) getHandler().getFellowIfAny(getTag()+"_w");
+			if (w == null)
+				w = (Window) Executions.getCurrent().createComponents("/config/wheel/"+getTag()+".zul", getHandler(), new HashMap<>());
+			w.doHighlighted();
 			dim(handler);
 		}
 	}

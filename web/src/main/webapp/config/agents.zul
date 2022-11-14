@@ -17,19 +17,19 @@
 		function diagramAction(action, arg0, arg1, arg2) {
 			zkau.send ({uuid: '${frame.uuid}', cmd: "diagramAction", data: [action, JSON.stringify(arg0), JSON.stringify(arg1), JSON.stringify(arg2)]}, 5);
 		}
-	function collapse(id) {
-		e = document.getElementById(id);
-		if (e) {
-			i = e.firstElementChild.nextElementSibling.firstElementChild;
-			if (e.className == 'method-collapsed-div') {
-				e.className = 'method-full-div';
-				i.src = "${execution.contextPath }/icons/up.png";
-			} else {
-				e.className = 'method-collapsed-div';
-				i.src = "${execution.contextPath }/icons/down.png";
+		function collapse(id) {
+			e = document.getElementById(id);
+			if (e) {
+				i = e.firstElementChild.nextElementSibling.firstElementChild;
+				if (e.className == 'method-collapsed-div') {
+					e.className = 'method-full-div';
+					i.src = "${execution.contextPath }/icons/up.png";
+				} else {
+					e.className = 'method-collapsed-div';
+					i.src = "${execution.contextPath }/icons/down.png";
+				}
 			}
 		}
-	}
 	</script>
 
 	<style>

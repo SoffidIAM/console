@@ -14,7 +14,8 @@ public class AutodetectEvaluator extends Evaluator {
 	}
 
 	public boolean isJavascript(String script) {
-		return script.startsWith("//js") || script.startsWith("//javascript");
+		return script.startsWith("//js") || script.startsWith("//javascript") ||
+				script.startsWith("/*js*/");
 	}
 
 	@Override

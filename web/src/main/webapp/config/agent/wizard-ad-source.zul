@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="ad_source" position="top-center" closable="false" sizable="false"
+			use="com.soffid.iam.web.agent.AdSourceWizardHandler"
+			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
+	<timer id="timer" delay="1000" repeats="true" onTimer="ref:ad_source.onTimer" running="false"/>
+	<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("wizard-ad-source.connectivity")}
+	- ${c:l('wizard-ad-source.loadUsers') }
+	- ${c:l("wizard-ad-source.loadPermissions")}
+	- ${c:l("user_createaccount.Finish")}
+			</attribute>
+			<div id="step1">
+				<div style="height: 320px">
+					<customfield3 label="Active directory name" dataType="STRING" placeholder="dc=soffid,dc=com" required="true" id="name"/>
+					<customfield3 label="User name" dataType="STRING" placeholder="" required="true" id="user"/>
+					<customfield3 label="Password" dataType="PASSWORD" placeholder="" required="true" id="pass"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:ad_source.back" />
+					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:ad_source.next" id="step2Button"/>
+				</div>
+						
+			</div>
+			<div id="step2">
+				<div style="height: 320px; padding-top: 150px; text-align:center">
+					<label multiline="true" id="explanation2" style="word-break: initial;"/>
+					<image style="height: 24px; vertical-align:middle" src="/anonymous/wait.gif" id="step3Wait"/>
+				</div>
+			</div>
+			<div id="step3">
+				<div style="height: 320px; padding-top: 150px; text-align:center">
+					<label multiline="true" id="explanation3" style="word-break: initial;"/>
+					<image style="height: 24px; vertical-align:middle" src="/anonymous/wait.gif"/>
+				</div>
+			</div>
+			<div id="step4">
+				<div style="height: 320px; padding-top: 150px; text-align:center">
+					<label multiline="true" value="${c:l('wizard-ad-source.Finish') }" style="word-break: initial;"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/ok-r.svg" label="${c:l('error.zul.Tancar')}" onClick="ref:ad_source.end"/>
+				</div>
+			</div>
+					
+	</wizard>
+</window>

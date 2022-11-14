@@ -106,7 +106,7 @@ public abstract class CsvImporter<E> {
 			if (m == null)
 				throw new UiException(e);
 			else
-				throw new UiException("Error loading parameter "+m.get("name"), e);
+				throw new UiException("Error loading object "+m, e);
 		}
 		
 		model.refresh();

@@ -220,23 +220,29 @@ public class ServerPluginParser {
     
         		NodeList nodes3 = (NodeList) xpath.evaluate("mapping", child, XPathConstants.NODESET); //$NON-NLS-1$
         		List<AttributeMapping> mappings = new LinkedList<AttributeMapping>();
-        		for (int j = 0; j < nodes3.getLength(); j++) {
-        			Element child2 = (Element) nodes3.item(j);
-        			String soffidAttribute = child2.getAttribute("soffidAttribute"); //$NON-NLS-1$
-        			String systemAttribute = child2.getAttribute("systemAttribute"); //$NON-NLS-1$
-        			String direction = child2.getAttribute("direction"); //$NON-NLS-1$
-        			AttributeMapping mapping = new AttributeMapping ();
-        			mapping.setSoffidAttribute(soffidAttribute);
-        			mapping.setSystemAttribute(systemAttribute);
-        			mapping.setDirection("in".equalsIgnoreCase(direction) ? AttributeDirection.INPUT : //$NON-NLS-1$
-        								 "out".equalsIgnoreCase(direction) ? AttributeDirection.OUTPUT: //$NON-NLS-1$
-        									 AttributeDirection.INPUTOUTPUT);
-            		object.getAttributes().add(mapping);
-        
-        		}
+        		loadAttributeMappings(object, nodes3);
+        		nodes3 = (NodeList) xpath.evaluate("mapping-ext", child, XPathConstants.NODESET); //$NON-NLS-1$
+        		loadAttributeMappings(object, nodes3);
     		}
     		ad.setObjects(objects);
 
+		}
+	}
+
+	private void loadAttributeMappings(InternalObjectMapping object, NodeList nodes3) {
+		for (int j = 0; j < nodes3.getLength(); j++) {
+			Element child2 = (Element) nodes3.item(j);
+			String soffidAttribute = child2.getAttribute("soffidAttribute"); //$NON-NLS-1$
+			String systemAttribute = child2.getAttribute("systemAttribute"); //$NON-NLS-1$
+			String direction = child2.getAttribute("direction"); //$NON-NLS-1$
+			AttributeMapping mapping = new AttributeMapping ();
+			mapping.setSoffidAttribute(soffidAttribute);
+			mapping.setSystemAttribute(systemAttribute);
+			mapping.setDirection("in".equalsIgnoreCase(direction) ? AttributeDirection.INPUT : //$NON-NLS-1$
+								 "out".equalsIgnoreCase(direction) ? AttributeDirection.OUTPUT: //$NON-NLS-1$
+									 AttributeDirection.INPUTOUTPUT);
+			object.getAttributes().add(mapping);
+      
 		}
 	}
 

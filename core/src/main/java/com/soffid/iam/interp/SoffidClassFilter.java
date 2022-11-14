@@ -13,6 +13,8 @@ public class SoffidClassFilter implements ClassFilter {
 		else if (className.startsWith("com.soffid.iam.addon") &&
 					(className.contains(".common.") || className.contains(".api.")))
 			return true;
+		else if (className.equals("javax.naming.ldap.LdapName"))
+			return true;
 		else
 			return false;
 	}

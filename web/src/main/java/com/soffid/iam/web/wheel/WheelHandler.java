@@ -79,7 +79,7 @@ public class WheelHandler extends FrameHandler {
 	 					new Sector("am04")),
 	 			new Quarter("iga", 
 	 					new InstallSynserverSector("iga01"),
-	 					new Sector("iga02"),
+	 					new LoadUsersSector("iga02"),
 	 					new Sector("iga03"),
 	 					new Sector("iga04")),
 	 			new Quarter("irc", 
@@ -95,7 +95,7 @@ public class WheelHandler extends FrameHandler {
 	 	};
 	 	
 	 	for (Quarter q: quarters) {
-	 		q.installHanlder(this);
+	 		q.installHandler(this);
 	 		q.updateStatus(this);
 	 	}
 	 	

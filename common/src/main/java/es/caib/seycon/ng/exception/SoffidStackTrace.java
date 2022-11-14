@@ -33,17 +33,24 @@ public class SoffidStackTrace
     			cn.startsWith("org.jboss.") || //$NON-NLS-1$
     			cn.startsWith("org.springframework.") || //$NON-NLS-1$
     			cn.startsWith("org.apache.catalina.") || //$NON-NLS-1$
+    			cn.startsWith("org.apache.coyote.") || //$NON-NLS-1$
+    			cn.startsWith("org.apache.tomee.") || //$NON-NLS-1$
+    			cn.startsWith("org.apache.tomcat.") || //$NON-NLS-1$
+    			cn.startsWith("org.apache.openejb.") || //$NON-NLS-1$
     			cn.startsWith("org.zkoss.") ||  //$NON-NLS-1$
     			cn.startsWith("com.sun.net.") ||  //$NON-NLS-1$
+    			cn.startsWith("jdk.") ||  //$NON-NLS-1$
     			cn.startsWith("java.net.") ||  //$NON-NLS-1$
     			cn.startsWith("org.mortbay.") ||  //$NON-NLS-1$
     			cn.startsWith("sun.") ||  //$NON-NLS-1$
     			cn.startsWith("javax.servlet.") ||  //$NON-NLS-1$
     			cn.startsWith("java.lang.") ||  //$NON-NLS-1$
+    			cn.startsWith("java.security.") ||  //$NON-NLS-1$
     			cn.startsWith("$") ||  //$NON-NLS-1$
     			cn.startsWith("bsh.") ) //$NON-NLS-1$
     		return false;
-    	if (cn.endsWith("DaoBase") || cn.endsWith("ServiceBase")) //$NON-NLS-1$ //$NON-NLS-2$
+    	if (cn.endsWith("DaoBase") || cn.endsWith("ServiceBase") ||
+    			cn.contains("DaoBase$") || cn.contains("ServiceBase$")) //$NON-NLS-1$ //$NON-NLS-2$
     		return false;
    		return true;
     }
@@ -121,12 +128,10 @@ public class SoffidStackTrace
         	s.print (Messages.getString("Throws")); //$NON-NLS-1$
         }
 
-        if ( (ourCause != null && ourCause != th) || th.getClass() == InternalErrorException.class)
-        {
-	        s.print(th.getClass().getName());
-	        s.print(": "); //$NON-NLS-1$
-        }
-        s.println (th.getMessage());
+        s.print(th.getClass().getName());
+        s.print(": "); //$NON-NLS-1$
+        if (th.getMessage() != null)
+        	s.println (th.getMessage());
         if (th instanceof InternalErrorException)
         {
 
@@ -160,49 +165,40 @@ public class SoffidStackTrace
         s.flush();
     }
 
-	public static String generateShortDescription(Exception e) {
-		StringBuffer sb = new StringBuffer();
-	   	Throwable root = e;
-	   	String last = null;
-	   	String lastMessage = null;
-	   	LinkedList<String> significantExceptions = new LinkedList<>();
-	   	do
-	   	{
-	   		String next ;
-	   		if ( root instanceof InternalErrorException)
-	   			next = root.getMessage();
-	   		else
-	   			next = root.toString();
-	   		if (next != null)
-	   		{
-	   			if ( root instanceof EJBException) {
-	   				// Ignore
-	   			}
-	   			else if (last == null || ! last.contains(next))
-		   		{
-		   			significantExceptions.add(next);
-		   			last = next;
-		   			lastMessage = root.getMessage();
-		   		}
-		   		else if (lastMessage.equals(root.toString()))
-		   		{
-		   			significantExceptions.removeLast();
-		   			significantExceptions.add(next);
-		   			last = next;
-		   			lastMessage = root.getMessage();
-		   		}
-	   		}
-	   		if (root.getCause() == null || root.getCause() == root)
-	   			break;
-	   		else
-	   			root = root.getCause ();
-	   	} while (true);
-	   	for ( String s: significantExceptions) {
-   			if ( sb.length() > 0)
-   				sb.append("\ncaused by ");
-   			sb.append(s);
-	   	}
-	   	return sb.toString();
+	public static String generateShortDescription(Throwable e) {
+		Throwable cause = null;
+		String lastMessage = e.getMessage();
+		int lastPos = 0;
+		StringBuffer msgBuffer = new StringBuffer();
+		msgBuffer.append(e.getMessage());
+		do {
+			if ( e instanceof javax.ejb.EJBException ) 
+				cause = ((EJBException)e).getCausedByException ();
+			else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
+				cause = e.getCause ();
+			}
+			else
+				cause = e.getCause ();
+			if (cause == null || cause == e)
+				break;
+			if (lastMessage.equals(cause.toString()))
+				msgBuffer.delete(lastPos, msgBuffer.length());
+			String m = cause.getMessage();
+			if ( m == null ) m = cause.getClass().getSimpleName();
+			if (! (cause instanceof EJBException)) {
+				// Remove previous message
+				if (! msgBuffer.toString().contains(m))
+				{
+					lastMessage = m;
+					lastPos = msgBuffer.length();
+					if (msgBuffer.length() > 0)
+						msgBuffer.append("\ncaused by: ");
+					msgBuffer.append(m);
+				}
+			}
+			e = cause;
+		} while (true);
+		return msgBuffer.toString();
 	}
 
 

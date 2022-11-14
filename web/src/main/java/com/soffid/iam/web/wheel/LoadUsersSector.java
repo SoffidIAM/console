@@ -8,25 +8,28 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.api.User;
 
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class InstallSynserverSector extends Sector {
+public class LoadUsersSector extends Sector {
 
-	public InstallSynserverSector(String tag) {
+	public LoadUsersSector(String tag) {
 		super(tag);
 	}
 
 	@Override
 	public boolean isDone() {
 		try {
-			Collection<Server> list = EJBLocator.getDispatcherService().findAllServers();
-			return list.size() > 0;
+			PagedResult<User> list = EJBLocator.getUserService().findUserByJsonQuery(null, null, 2);
+			return list.getResources().size() > 1;
 		}
 		catch (Exception e) {
 			return true;
 		}
 	}
+
 
 }

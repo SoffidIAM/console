@@ -19,7 +19,7 @@ public class Quarter {
 				sector.dim(handler);
 			}
 		}
-		handler.response(null, new AuScript(handler, "document.getElementById('"+tag+"_counter').innerText='"+done+"/"+sectors.length+"';"));
+		handler.response(null, new AuScript(handler, "document.getElementById('"+tag+"_counter').innerHTML='"+done+"/"+sectors.length+"';"));
 	}
 
 	public void onSector(String tag) {
@@ -27,7 +27,7 @@ public class Quarter {
 			s.onClick(tag);
 	}
 
-	public void installHanlder(WheelHandler wheelHandler) {
+	public void installHandler(WheelHandler wheelHandler) {
 		for (Sector s: sectors)
 			s.installHandler(wheelHandler);
 	}

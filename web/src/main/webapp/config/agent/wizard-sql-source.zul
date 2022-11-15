@@ -44,12 +44,6 @@
 			</div>
 			<div id="step4">
 				<div style="height: 320px; padding-top: 150px; text-align:center">
-					<label multiline="true" id="explanation3" style="word-break: initial;"/>
-					<image style="height: 24px; vertical-align:middle" src="/anonymous/wait.gif"/>
-				</div>
-			</div>
-			<div id="step5">
-				<div style="height: 320px; padding-top: 150px; text-align:center">
 					<label multiline="true" value="${c:l('wizard-ad-source.Finish') }" style="word-break: initial;"/>
 				</div>
 				<div style="text-align: right; width: 100%">

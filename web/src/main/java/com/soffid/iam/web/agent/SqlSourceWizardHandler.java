@@ -3,6 +3,7 @@ package com.soffid.iam.web.agent;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -27,19 +28,25 @@ import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.ObjectMapping;
+import com.soffid.iam.api.ObjectMappingProperty;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordDomain;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.service.SystemScheduledTasks;
+import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.web.WebDataType;
 import com.soffid.iam.web.component.CustomField3;
 
+import es.caib.seycon.ng.comu.AttributeDirection;
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -47,6 +54,7 @@ import es.caib.zkib.component.Select;
 import es.caib.zkib.component.Wizard;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class SqlSourceWizardHandler extends Window implements AfterCompose{
 
@@ -57,7 +65,6 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 	private Timer timer;
 	private Label explanation2;
 	private System currentSystem;
-	private Label explanation3;
 	private CustomField3 type;
 	private CustomField3 url;
 	private CustomField3 sql;
@@ -75,7 +82,6 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 		sql = (CustomField3) getFellow("sql");
 		timer = (Timer) getFellow("timer");
 		explanation2 = (Label) getFellow("explanation2");
-		explanation3 = (Label) getFellow("explanation3");
 		form = (Div) getFellow("form");
 		doHighlighted();
 	}
@@ -96,7 +102,63 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 				createAgent((String)type.getValue(),(String) url.getValue(), userName, (Password) pass.getValue());
 				wizard.next();
 			}
+			break;
+		case 1:
+			loadFields();
+			break;
 		}
+	}
+
+	private void loadFields() throws Exception {
+		List<AttributeMapping> maps = new LinkedList<>();
+		boolean userNameFound = false;
+		for (CustomField3 cf: ( List<CustomField3>) form.getChildren() ) {
+			String v = (String) cf.getValue();
+			if (v != null && !v.trim().isEmpty()) {
+				AttributeMapping m = new AttributeMapping();
+				m.setSystemAttribute((String) cf.getAttribute("column"));
+				m.setDirection(AttributeDirection.INPUT);
+				m.setSoffidAttribute(v);
+				maps.add(m);
+				if (v.equals("userName")) userNameFound = true;
+			}
+		}
+		
+		if (!userNameFound)
+		{
+			Missatgebox.avis(Labels.getLabel("wizard-sql-source.selectUserName"));
+			return;
+		}
+		final DispatcherService svc = EJBLocator.getDispatcherService();
+		for (ObjectMapping o: svc.findObjectMappingsByDispatcher(currentSystem.getId())) {
+			svc.delete(o);
+		}
+		
+		ObjectMapping o = new ObjectMapping();
+		o.setAuthoritative(true);
+		o.setDispatcherId(currentSystem.getId());
+		o.setSystemObject("user");
+		o.setSoffidObject(SoffidObjectType.OBJECT_USER);
+		o = svc.create(o);
+		
+		List<ObjectMappingProperty>props = new LinkedList<>();
+		ObjectMappingProperty prop = new ObjectMappingProperty();
+		prop.setProperty("selectAll");
+		prop.setObjectId(o.getId());
+		prop.setValue((String) sql.getValue());
+		svc.create(prop);
+
+
+		for (AttributeMapping m: maps) {
+			m.setObjectId(o.getId());
+			svc.create(m);
+		}
+		
+		currentSystem = EJBLocator.getDispatcherService().update(currentSystem);
+		EJBLocator.getDispatcherService().checkConnectivity(currentSystem.getName());
+		
+		startTask(currentSystem);
+		wizard.next();
 	}
 
 	private void createAgent(String type, String url, String user, Password pass) throws Exception {
@@ -162,7 +224,7 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 	}
 	
 
-	private void loadColumns() throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException {
+	private void loadColumns() throws Exception {
 		Collection<Map<String, Object>> result = EJBLocator.getDispatcherService().invoke(currentSystem.getName(), (String) sql.getValue(), "", new HashMap<>());
 		if (! result.iterator().hasNext()) {
 			throw new UiException(Labels.getLabel("wizard-sql-source.emptySet"));
@@ -180,7 +242,7 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 			if (datatype.getType() != TypeEnumeration.SEPARATOR && ! datatype.isReadOnly()) {
 				WebDataType wdt = new WebDataType(datatype);
 				String name = wdt.getName();
-				if (! Boolean.TRUE.equals(wdt.getBuiltin())) name = "attributes."+name;
+				if (! Boolean.TRUE.equals(wdt.getBuiltin())) name = "attributes{\""+name+"\"}";
 				values.add(URLEncoder.encode(name, "UTF-8")+":"+wdt.getLabel());
 			}
 		}
@@ -190,9 +252,11 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 			cf.setLabel(column);
 			cf.setDataType("STRING");
 			cf.setListOfValues(valuesArray);
+			cf.setAttribute("column", column);
 			form.appendChild(cf);
 			cf.afterCompose();
 		}
+		
 	}
 
 	public void startTask(System system) throws Exception {
@@ -204,50 +268,18 @@ public class SqlSourceWizardHandler extends Window implements AfterCompose{
 					currentTask = task;
 				}
 			}
-			
 		}
-
 		com.soffid.iam.EJBLocator.getScheduledTaskService().startNow (currentTask);
 		explanation2.setValue(currentTask.getName());
 		timer.start();
 	}
 	
 	public void onTimer(Event event) throws Exception {
-		switch (wizard.getSelected()) {
-		case 1:
-			currentTask = EJBLocator.getScheduledTaskService().load(currentTask.getId());
-			if (! currentTask.isActive()) {
-				wizard.next();
-				startReconcileTask(currentSystem);
-				explanation3.setValue(currentTask.getName());
-			}
-			break;
-		case 2:
-			currentTask = EJBLocator.getScheduledTaskService().load(currentTask.getId());
-			if (! currentTask.isActive()) {
-				wizard.next();
-				timer.stop();
-			}
-			break;
-			
+		currentTask = EJBLocator.getScheduledTaskService().load(currentTask.getId());
+		if (! currentTask.isActive()) {
+			wizard.next();
+			timer.stop();
 		}
-		
-	}
-	
-	public void startReconcileTask(System system) throws Exception {
-		for (ScheduledTask task: EJBLocator.getScheduledTaskService().listTasks())
-		{
-			if ( system.getId().toString().equals(task.getParams()))
-			{
-				if (task.getHandlerName().equals(SystemScheduledTasks.RECONCILE_DISPATCHER)) {
-					currentTask = task;
-				}
-			}
-			
-		}
-
-		com.soffid.iam.EJBLocator.getScheduledTaskService().startNow (currentTask);
-		timer.start();
 	}
 	
 	public void end(Event e) {

@@ -52,8 +52,8 @@ public class QueryPamSessionData extends Label implements AfterCompose {
 			if (session != null)
 			{
 				List<Long> chapters = session.getChapters();
-				chapters = removeDummyChapters(chapters);
 				Collections.sort(chapters);
+				chapters = removeDummyChapters(chapters);
 				JSONArray captions = new JSONArray();
 				JSONArray videos = new JSONArray();
 				JSONArray chapterStart = new JSONArray();
@@ -94,14 +94,15 @@ public class QueryPamSessionData extends Label implements AfterCompose {
 	private List<Long> removeDummyChapters(List<Long> chapters) {
 		if (chapters.isEmpty())
 			return chapters;
-		
+
 		List<Long> l = new LinkedList<>();
 		Iterator<Long> it = chapters.iterator();
 		Long previous = it.next();
 		while (it.hasNext()) {
 			Long current = it.next();
-			if (current.longValue() - previous.longValue() > 0) // Minimum one second
+			if (current.longValue() - previous.longValue() > 0) { // Minimum one second
 				l.add(previous);
+			}
 			previous = current;
 		}
 		l.add(previous);

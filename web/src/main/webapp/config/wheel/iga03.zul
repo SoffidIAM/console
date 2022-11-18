@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="iga03_w" position="top-center" closable="false" sizable="false"
+		title="${c:l('wheel.users.title') }"
+		use="com.soffid.iam.web.wheel.Iga03Handler"
+		style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
+	<div id="step1">
+		<div style="height: 320px; overflow: auto">
+			<label multiline="true" value="${c:l('wheel.system.addApplication') }" style="display: block"/>
+			<div sclass="options options-tiny" style="display: inline-block; text-align: left">
+				<div sclass="menuoption" onClick="ref:frame.addActiveDirectory">
+					<image src="/img/other/windows.svg"/>
+					<label sclass='menuoption-title' value="Active Directory" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.addSap">
+					<image src="/img/other/sap.svg"/>
+					<label sclass='menuoption-title' value="SAP R/3" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/menu/network-discovery.svg"/>
+					<label sclass='menuoption-title' value="${c:l('seu.networkDiscovery') }" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/servicenow.svg"/>
+					<label sclass='menuoption-title' value="Service now" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/aws.svg"/>
+					<label sclass='menuoption-title' value="AWS" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/google.svg"/>
+					<label sclass='menuoption-title' value="Google workplace" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/azure.svg"/>
+					<label sclass='menuoption-title' value="Azure" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/atlassian.svg"/>
+					<label sclass='menuoption-title' value="Atlassian" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/mariadb.svg"/>
+					<label sclass='menuoption-title' value="MariaDB" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/oracle.svg"/>
+					<label sclass='menuoption-title' value="Oracle DB" />
+				</div> 
+				<div sclass="menuoption" onClick="ref:frame.discovery">
+					<image src="/img/other/sqlserver.svg"/>
+					<label sclass='menuoption-title' value="SQL Server" />
+				</div> 
+			</div>			
+		</div>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga02_w.back" />
+			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga02_w.step2" id="step2Button"/>
+		</div>
+				
+	</div>
+</window>

@@ -73,14 +73,14 @@ public class WheelHandler extends FrameHandler {
 	 
 	 	quarters = new Quarter[] {
 	 			new Quarter("am", 
-	 					new Sector("am01"),
+	 					new LoadUsersSector("am01"),
 	 					new Sector("am02"),
 	 					new Sector("am03"),
 	 					new Sector("am04")),
 	 			new Quarter("iga", 
 	 					new InstallSynserverSector("iga01"),
 	 					new LoadUsersSector("iga02"),
-	 					new Sector("iga03"),
+	 					new AddTargetAppSector("iga03"),
 	 					new Sector("iga04")),
 	 			new Quarter("irc", 
 	 					new Sector("irc01"),

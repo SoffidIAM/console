@@ -6,6 +6,7 @@ import java.util.Map;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -27,6 +28,9 @@ public class Editor extends Window implements AfterCompose {
 	}
 	
 	public static void edit ( InputElement textbox, String vars, String env) {
+		edit(textbox, vars, env, null);
+	}
+	public static void edit ( InputElement textbox, String vars, String env, EventListener listener) {
 		Page p = textbox.getPage();
 		Editor editorWindow = (Editor) p.getFellowIfAny("editorWindow");
 		if (editorWindow == null) {
@@ -34,6 +38,7 @@ public class Editor extends Window implements AfterCompose {
 			args.put("textbox", textbox);
 			args.put("vars",  vars);
 			args.put("env", env);
+			args.put("listener", listener);
 			Executions.createComponents("/popup/editor.zul", null, args );
 		} else {
 			editorWindow.textbox = textbox;
@@ -43,6 +48,7 @@ public class Editor extends Window implements AfterCompose {
 			editorWindow.doHighlighted();
 			editorWindow.editor.setValue( textbox.getText() );
 			editorWindow.editor.focus();
+			editorWindow.listener = listener;
 			editorWindow.updateEnv();
 		}
 	}
@@ -67,14 +73,17 @@ public class Editor extends Window implements AfterCompose {
 		this.textbox = (InputElement) args.get("textbox");
 		this.vars = (String) args.get("vars");
 		this.env = (String) args.get("env");
+		this.listener = (EventListener) args.get("listener");
 	}
 	
-	public void cleanWindow(Event event) {
+	public void cleanWindow(Event event) throws WrongValueException, Exception {
 		editor.setValue("");
 		setVisible(false);
+		if (listener != null)
+			listener.onEvent(new Event("onChange", textbox, textbox.getText()));
 	}
 
-	public void accept(Event event) {
+	public void accept(Event event) throws WrongValueException, Exception {
 		textbox.setText(editor.getValue());
 		cleanWindow(event);
 	}

@@ -355,12 +355,12 @@ public class AgentHandler extends FrameHandler {
 			}
 			HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 			String wizard = req.getParameter("wizard");
-			if ("ad-source".equals(wizard)) {
+			if ("ad-source".equals(wizard)) 
 				Executions.createComponents("/config/agent/wizard-ad-source.zul", this, new HashMap<>());
-			}
-			if ("sql-source".equals(wizard)) {
+			if ("sql-source".equals(wizard)) 
 				Executions.createComponents("/config/agent/wizard-sql-source.zul", this, new HashMap<>());
-			}
+			if ("ad".equals(wizard)) 
+				Executions.createComponents("/config/agent/wizard-ad.zul", this, new HashMap<>());
 		}
 	}
 

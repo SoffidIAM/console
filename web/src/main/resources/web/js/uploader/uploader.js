@@ -35,7 +35,7 @@ zkUploader.uploadeNext=function(uploader) {
     const formData  = new FormData();
     formData.append("uuid", new Blob([uploader.id], {type: "text/plain"}));
     formData.append("file", file);
-	
+	formData.append("name", file.name);
     const fileName = file.name;
 	
 	zk.progress();

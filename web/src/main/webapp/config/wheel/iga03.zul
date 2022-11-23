@@ -11,7 +11,7 @@
 		<div style="height: 320px; overflow: auto">
 			<label multiline="true" value="${c:l('wheel.system.addApplication') }" style="display: block"/>
 			<div sclass="options options-tiny" style="display: inline-block; text-align: left">
-				<div sclass="menuoption" onClick="ref:frame.addActiveDirectory">
+				<div sclass="menuoption" onClick="ref:iga03_w.addActiveDirectory">
 					<image src="/img/other/windows.svg"/>
 					<label sclass='menuoption-title' value="Active Directory" />
 				</div> 
@@ -58,8 +58,7 @@
 			</div>			
 		</div>
 		<div style="text-align: right; width: 100%">
-			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga02_w.back" />
-			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga02_w.step2" id="step2Button"/>
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga03_w.onClose" />
 		</div>
 				
 	</div>

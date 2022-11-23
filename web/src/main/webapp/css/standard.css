@@ -2636,7 +2636,7 @@ div.addButton {
 div.deleteButton {
 	float: left;
 	background-color: {SKYDARK};
-	background-image: url(/soffid/img/remove-r.svg);
+	background-image: url(/soffid/img/remove-white.svg);
 }
 
 div.addButton:hover, div.deleteButton:hover {

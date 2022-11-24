@@ -78,6 +78,8 @@ public class UploaderServlet extends HttpServlet {
 					String attName = file.getFieldName();
 					if (attName.equals("uuid"))
 						uuid = readFile(file);
+					if (attName.equals("name"))
+						name = readFile(file);
 					if (attName.equals("file"))
 					{
 						byte buf2[] = new byte[64000];
@@ -93,7 +95,7 @@ public class UploaderServlet extends HttpServlet {
 					}
 					
 				}
-				AMedia media = new AMedia(f2, ctype, null);
+				AMedia media = new AMedia(name, null, ctype, f2, true);
 				tracker.track(f2, media);
 				Uploader.register(session, uuid, media);
 				resp.sendError(HttpServletResponse.SC_OK);

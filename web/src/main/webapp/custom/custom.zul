@@ -17,7 +17,7 @@
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
-					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('host:all:create') &amp;&amp; soffid:isUserInRole('network:all:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('customObject:delete') &amp;&amp; soffid:isUserInRole('customObject:create')}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
@@ -36,9 +36,9 @@
 				dataPath="/model:/object" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
-			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('network:all:create')}" >
-				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
-				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			<div width="100%" style="text-align: right"" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" if="${soffid:isUserInRole('customObject:delete)}' visible="false">-</div>
+				<div class="addButton" onClick="ref:frame.addNew"   if="${soffid:isUserInRole('customObject:create')}>+</div>
 			</div>
 		</div>
 		

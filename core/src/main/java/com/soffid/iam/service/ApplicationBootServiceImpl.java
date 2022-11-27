@@ -479,6 +479,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("108");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("108"))
+		{
+			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
+			cfg.setValue("109");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void fixAgentDescriptor() {

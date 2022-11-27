@@ -202,20 +202,23 @@ public class AccountEntityDaoImpl extends
 			target.setAttributes(new HashMap<String, Object>());
 			Map<String, Object> attributes = target.getAttributes();
 			for (AccountAttributeEntity att : source.getAttributes()) {
-				if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
-				{
-					LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
-					if (r == null)
+				final Object objectValue = att.getObjectValue();
+				if (objectValue != null) {
+					if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
 					{
-						r = new LinkedList<Object>();
-						attributes.put(att.getMetadata().getName(), r);
+						LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+						if (r == null)
+						{
+							r = new LinkedList<Object>();
+							attributes.put(att.getMetadata().getName(), r);
+						}
+						if (objectValue != null)
+							r.add(objectValue);
 					}
-					if (att.getObjectValue() != null)
-						r.add(att.getObjectValue());
-				}
-				else
-				{
-					attributes.put(att.getMetadata().getName(),att.getObjectValue());
+					else
+					{
+						attributes.put(att.getMetadata().getName(),objectValue);
+					}
 				}
 			}
 			if (source.getSnapshot() != null && Security.isSyncServer()) {

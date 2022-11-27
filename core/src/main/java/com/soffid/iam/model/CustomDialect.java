@@ -32,11 +32,10 @@ public class CustomDialect extends Dialect {
     
     public static Class dialectClass = null; 
     
-    boolean oracle = false;
-    boolean mysql = false;
-    boolean sqlServer = false;
+    static boolean oracle = false;
+    static boolean mysql = false;
+    static boolean sqlServer = false;
 
-    
     public CustomDialect() {
         super();
         if (dialectClass != null)
@@ -520,15 +519,15 @@ public class CustomDialect extends Dialect {
         return proxyDialect.supportsBindAsCallableArgument();
     }
 
-	public boolean isOracle() {
+	public static boolean isOracle() {
 		return oracle;
 	}
 
-	public boolean isMysql() {
+	public static boolean isMysql() {
 		return mysql;
 	}
 
-	public boolean isSqlServer() {
+	public static boolean isSqlServer() {
 		return sqlServer;
 	}
     

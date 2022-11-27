@@ -118,6 +118,11 @@ public class Account {
 	@Attribute(customUiHandler = "com.soffid.iam.web.account.ServerNameHandler")
 	String serverName;
 	
+	@Description("Ssh public key")
+	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.account.SshPublicKeyHandler")
+	String sshPublicKey;
+	
 	@Nullable
 	@Attribute(customUiHandler = "com.soffid.iam.web.account.VaultFieldHandler", separator = "_vault")
 	Long vaultFolderId;

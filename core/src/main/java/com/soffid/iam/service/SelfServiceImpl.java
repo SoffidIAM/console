@@ -264,6 +264,23 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		return getAccountService().queryAccountPasswordBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_USER);
 	}
 	
+	public Password handleQueryAccountSshKey (Account account) throws InternalErrorException
+	{
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "querySshKey");
+		return getAccountService().queryAccountSshKey(account);
+	}
+	
+	/* (non-Javadoc)
+	 * @see es.caib.seycon.ng.servei.SelfService#queryAccountPassword(es.caib.seycon.ng.comu.Account)
+	 */
+	public Password handleQueryAccountSshKeyBypassPolicy (Account account) throws InternalErrorException
+	{
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "querySshBypassPolicy");
+		return getAccountService().queryAccountSshKeyBypassPolicy(account.getId(), AccountAccessLevelEnum.ACCESS_USER);
+	}
+	
 	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.servei.SelfServiceBase#handlePasswordsStatus(es.caib.seycon.ng.comu.Account, es.caib.seycon.ng.comu.Usuari)
 	 */

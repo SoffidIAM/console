@@ -385,6 +385,29 @@ public abstract class AccountService {
 		return null;
 	}
 
+	@Description ("Gets the account password")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public boolean hasAccountSshKey(Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return false;
+	}
+
+	@Description ("Gets the account password")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password queryAccountSshKey(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Description ("Gets the account password bypassing passowrd policy. Used for SSO")
+	public Password queryAccountSshKeyBypassPolicy (long accountId, AccountAccessLevelEnum level)
+	{
+		return null;
+	}
+
 	@Description ("Checks if there is a password available")
 	@Operation ( grantees={roles.Tothom.class} )
 	public boolean isAccountPasswordAvailable (long accountId)
@@ -416,6 +439,23 @@ public abstract class AccountService {
 	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public Password generateAccountPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
+	@Description("Stores the account SSH private key")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Account setAccountSshPrivateKey(
+		es.caib.seycon.ng.comu.Account account,
+		String privateKey)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
+	@Description("Stores the account SSH private key")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Account generateAccountSshPrivateKey(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
 	}

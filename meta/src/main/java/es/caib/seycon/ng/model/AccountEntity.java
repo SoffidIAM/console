@@ -93,6 +93,10 @@ public abstract class AccountEntity {
 	@Nullable
 	public java.lang.String secrets;
 
+	@Column (name="ACC_SSHPKY", length=1024)
+	@Nullable
+	public java.lang.String sshPublicKey;
+
 	@Column(name = "ACC_DISABL", defaultValue = "false")
 	@Description("Do not use. Use status instead")
 	public boolean disabled;

@@ -998,6 +998,9 @@ public class InputField3 extends Databox
 	public void openSelectWindow(final Integer position) throws UiException {
 		if (noPermissions)
 			return;
+		if (customOpenDialog())
+			return;
+		
 		if (dataHandler != null)
 		{
 			try {
@@ -1042,6 +1045,14 @@ public class InputField3 extends Databox
 			if (javascripthelp == null)
 				javascripthelp = (String) getAttribute("javascripthelp");
 			Editor.edit(this, javascript == null ? "{}" : javascript, javascripthelp);
+		}
+	}
+
+	private boolean customOpenDialog() {
+		try {
+			return uiHandler != null && uiHandler.openSelectWindow(this);
+		} catch (Exception e) {
+			throw new UiException(e);
 		}
 	}
 

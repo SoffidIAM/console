@@ -903,7 +903,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
-		expression.setOracleWorkaround( new CustomDialect().isOracle());
+		expression.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expression.generateHSQLString(MailList.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

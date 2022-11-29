@@ -982,7 +982,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
-		expression.setOracleWorkaround( new CustomDialect().isOracle());
+		expression.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expression.generateHSQLString(Group.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

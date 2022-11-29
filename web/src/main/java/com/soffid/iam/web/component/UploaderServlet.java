@@ -78,7 +78,7 @@ public class UploaderServlet extends HttpServlet {
 					String attName = file.getFieldName();
 					if (attName.equals("uuid"))
 						uuid = readFile(file);
-					if (attName.equals("uuid"))
+					if (attName.equals("name"))
 						name = readFile(file);
 					if (attName.equals("file"))
 					{

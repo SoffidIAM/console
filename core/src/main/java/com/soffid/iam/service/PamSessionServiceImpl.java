@@ -178,10 +178,15 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException, URISyntaxException, UnknownHostException
 	{
 		Password password = getAccountService().queryAccountPasswordBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
-		if (password == null)
+		Password sshKey = null;
+		try {
+			sshKey = getAccountService().queryAccountSshKeyBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
+		} catch (Exception e) {
+			// Ignore. Posible syncserver not updated yet
+		}
+		if (password == null && sshKey == null)
 			throw new InternalErrorException("Cannot retrieve password for account "+entity.getDescription());
 
-		
 		if (entity.getStatus() == AccountStatus.LOCKED)
 			throw new InternalErrorException("Account is locked");
 		else if (entity.isDisabled())
@@ -212,7 +217,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		}
 		data.put("syncServers", syncServers);
 		secrets.put("accountName", entity.getLoginName() == null? entity.getName(): entity.getLoginName());
-		secrets.put("password", password.getPassword());
+		if (password != null) secrets.put("password", password.getPassword());
+		if (sshKey != null) secrets.put("sshKey", sshKey.getPassword());
 
 		try {
 			response = 

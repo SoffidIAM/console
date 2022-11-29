@@ -75,6 +75,13 @@ public abstract class SecretStoreService {
 	}
 
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void setSshPrivateKey(
+		long accountId, 
+		es.caib.seycon.ng.comu.Password privateKey)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void setPasswordAndUpdateAccount(
 		long accountId, 
 		es.caib.seycon.ng.comu.Password value, 
@@ -89,6 +96,14 @@ public abstract class SecretStoreService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password getSshPrivateKey(
+		long accountId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<es.caib.seycon.ng.comu.Account> getAccountsWithPassword()
 		throws es.caib.seycon.ng.exception.InternalErrorException {

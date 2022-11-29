@@ -57,7 +57,8 @@
 - name: ${c:l('deploy.DeployedBy')}
   value: author
 - name: ${c:l('deploy.Date')}
-  value: deployed_datetime
+  value: deployed
+  template: #{deployed_datetime}
   className: datetimeColumn
 					]]>
 				</attribute>

@@ -32,6 +32,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.HostService;
+import com.soffid.iam.api.LaunchType;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.System;
@@ -95,6 +96,7 @@ public class VaultHandler extends FrameHandler {
 				getFellow("folder_acl4").setVisible(owner && !instance.getFolder().isPersonal());
 				getFellow("deleteAccountButton").setVisible(true);
 				getFellow("updatePasswordButton").setVisible(false);
+				getFellow("updateSshButton").setVisible(false);
 			} else {
 				updateAccountIcons();
 				ObjectAttributesDiv att = (ObjectAttributesDiv) getFellow("userAttributes");
@@ -137,6 +139,21 @@ public class VaultHandler extends FrameHandler {
 			getFellow("unlock_button").setVisible(false);
 			getFellow("view_password_button").setVisible(
 					type != AccountType.PRIVILEGED && ( accessLevel == AccountAccessLevelEnum.ACCESS_MANAGER || accessLevel == AccountAccessLevelEnum.ACCESS_OWNER) );
+		}
+		final Component updateSshButton = getFellow("updateSshButton");
+		try {
+			Account acc = (Account) XPathUtils.eval(getForm(), ".");
+			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+			if (acc.getSystem().equals(ssoSystem) && "Linux".equals(acc.getServerType()) ||
+				acc.getLaunchType() == LaunchType.LAUNCH_TYPE_PAM && 
+					acc.getLoginUrl() != null && 
+					acc.getLoginUrl().startsWith("ssh:")){
+				updateSshButton.setVisible(true);
+			} else {
+				updateSshButton.setVisible(false);
+			}
+		} catch (Exception e) {
+			updateSshButton.setVisible(false);
 		}
 	}
 	
@@ -267,6 +284,7 @@ public class VaultHandler extends FrameHandler {
 			doPasswordChange();
 		}
 	}
+
 
 	public void doPasswordChange() throws InternalErrorException, NamingException, CreateException {
 		AccountType type = (AccountType) XPathUtils.eval(getForm(), "type");
@@ -552,7 +570,13 @@ public class VaultHandler extends FrameHandler {
 		else
 		{
 			com.soffid.iam.api.Password pawd = EJBLocator.getSelfService().queryAccountPassword(account);
-			if(pawd!=null){
+			com.soffid.iam.api.Password sshkey = EJBLocator.getSelfService().queryAccountSshKey(account);
+			if (pawd!=null && !pawd.getPassword().isEmpty() ||
+				sshkey != null && ! sshkey.getPassword().isEmpty()) {
+				if (pawd == null || pawd.getPassword().isEmpty()) {
+					showPassword.getFellow("divPassword").setVisible(false);
+				} else {
+					showPassword.getFellow("divPassword").setVisible(true);
 					String cadena = pawd.getPassword();
 					String cadenaResultant = "";
 					((Textbox)showPassword.getFellow("qpassword")).setValue(cadena);
@@ -576,8 +600,15 @@ public class VaultHandler extends FrameHandler {
 					}
 					((Label)showPassword.getFellow("popupPwd")).setValue(cadenaResultant);
 					((Label)showPassword.getFellow("labelPWDis")).setVisible(true);
-					showPassword.setVisible(true);
-					showPassword.setMode("highlighted");
+				}
+				if (sshkey == null || sshkey.getPassword().isEmpty()) {
+					showPassword.getFellow("divSshKey").setVisible(false);
+				} else {
+					showPassword.getFellow("divSshKey").setVisible(true);
+					((Textbox)showPassword.getFellow("qsshkey")).setValue(sshkey.getPassword());
+				}
+				showPassword.setVisible(true);
+				showPassword.setMode("highlighted");
 			}
 			else{
 				Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("selfService.EmptyField"));
@@ -717,5 +748,49 @@ public class VaultHandler extends FrameHandler {
 					}
 				});
 
+	}
+	
+	public void setSshKey(Event event) throws InternalErrorException, NamingException, CreateException, CommitException {
+		getModel().commit();
+		Form2 form = (Form2) getFellow("accountProperties");
+		form.getDataSource().commit();
+		Window w = (Window) getFellow("sshWindow");
+		Radiogroup rg = (Radiogroup) w.getFellow("generationType");
+		rg.setSelectedIndex(0);
+		CustomField3 key = (CustomField3) w.getFellow("newKey");
+		key.setVisible(false);
+		key.setValue("");
+		w.doHighlighted();
+		
+	}
+
+	public void onChangeSelectedSshGeneration(Event ev) {
+		Component w = getFellow("sshWindow");
+		Radiogroup rg = (Radiogroup) w.getFellow("generationType");
+		CustomField3 cf = (CustomField3) w.getFellow("newKey");
+		cf.setVisible(rg.getSelectedIndex() == 1);
+	}
+	
+	public void undoSsh(Event ev) {
+		Component w = getFellow("sshWindow");
+		w.setVisible(false);
+	}
+	
+	public void applySsh(Event ev) throws InternalErrorException, NamingException, CreateException {
+		Component w = getFellow("sshWindow");
+		Radiogroup rg = (Radiogroup) w.getFellow("generationType");
+		CustomField3 cf = (CustomField3) w.getFellow("newKey");
+		Account acc = (Account) XPathUtils.eval(getForm(), ".");
+		if (rg.getSelectedIndex() == 1) {
+			if (!cf.attributeValidateAll())
+				return;
+			String key = (String) cf.getValue();
+			acc = EJBLocator.getAccountService().setAccountSshPrivateKey(acc, key);
+		}
+		else {
+			acc = EJBLocator.getAccountService().generateAccountSshPrivateKey(acc);
+		}
+		XPathUtils.setValue(getForm(), "sshPublicKey", acc.getSshPublicKey());
+		w.setVisible(false);
 	}
 }

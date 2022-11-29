@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -3195,7 +3196,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		                    Password p = getSshKey(level, usuari, acc, si.getUrl(), si.getAuth());
 		                    if (p != null)
 		                    	return p;
-		                } catch (Exception e) {
+  	                } catch (Exception e) {
 		                    lastException = e;
 		                }
             		}

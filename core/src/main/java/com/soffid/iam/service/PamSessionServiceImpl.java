@@ -178,7 +178,12 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException, URISyntaxException, UnknownHostException
 	{
 		Password password = getAccountService().queryAccountPasswordBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
-		Password sshKey = getAccountService().queryAccountSshKeyBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
+		Password sshKey = null;
+		try {
+			sshKey = getAccountService().queryAccountSshKeyBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
+		} catch (Exception e) {
+			// Ignore. Posible syncserver not updated yet
+		}
 		if (password == null && sshKey == null)
 			throw new InternalErrorException("Cannot retrieve password for account "+entity.getDescription());
 

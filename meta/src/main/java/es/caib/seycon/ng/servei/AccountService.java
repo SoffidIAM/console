@@ -372,7 +372,7 @@ public abstract class AccountService {
 	@Description ("Gets the account password")
 	@Operation ( grantees={roles.Tothom.class},
 			translated="queryAccountPassword")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Password queryAccountPassword(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -380,6 +380,7 @@ public abstract class AccountService {
 	}
 
 	@Description ("Gets the account password bypassing passowrd policy. Used for SSO")
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public Password queryAccountPasswordBypassPolicy (long accountId, AccountAccessLevelEnum level)
 	{
 		return null;
@@ -395,7 +396,7 @@ public abstract class AccountService {
 
 	@Description ("Gets the account password")
 	@Operation ( grantees={roles.Tothom.class})
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Password queryAccountSshKey(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -403,6 +404,7 @@ public abstract class AccountService {
 	}
 
 	@Description ("Gets the account password bypassing passowrd policy. Used for SSO")
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public Password queryAccountSshKeyBypassPolicy (long accountId, AccountAccessLevelEnum level)
 	{
 		return null;

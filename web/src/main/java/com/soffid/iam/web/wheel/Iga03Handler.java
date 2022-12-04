@@ -40,6 +40,14 @@ public class Iga03Handler extends Window {
 		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=servicenow", "_blank");
 	}
 
+	public void addAws(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=aws", "_blank");
+	}
+
+	public void addGoogle(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=google", "_blank");
+	}
+
 	public void discovery(Event ev) {
 		Executions.getCurrent().sendRedirect("/resource/network/discovery.zul?wizard=new", "_blank");
 	}

@@ -27,11 +27,11 @@
 					<image src="/img/other/servicenow.svg"/>
 					<label sclass='menuoption-title' value="Service now" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addAws">
 					<image src="/img/other/aws.svg"/>
 					<label sclass='menuoption-title' value="AWS" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addGoogle">
 					<image src="/img/other/google.svg"/>
 					<label sclass='menuoption-title' value="Google workplace" />
 				</div> 

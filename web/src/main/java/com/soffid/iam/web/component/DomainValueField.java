@@ -86,17 +86,20 @@ public class DomainValueField extends Databox
 		{
 			setType(Databox.Type.NAME_DESCRIPTION);
 			DataType dataType = null;
-			if ( TipusDomini.APPLICATIONS.equals(domain))
+			if ( TipusDomini.APPLICATIONS.equals(domain) || 
+					TipusDomini.APLICACIONS.equals(domain))
 			{
 				dataHandler = new ApplicationDataHandler(dataType);
 				setSelectIcon("/img/application.svg");
 			}
-			else if ( TipusDomini.GROUPS.equals(domain))
+			else if ( TipusDomini.GROUPS.equals(domain) || 
+					TipusDomini.GRUPS.equals(domain))
 			{
 				dataHandler = new GroupDataHandler(dataType);
 				setSelectIcon("/img/group.svg");
 			}
-			else if ( TipusDomini.MEMBERSHIPS.equals(domain))
+			else if ( TipusDomini.MEMBERSHIPS.equals(domain) ||
+					TipusDomini.GRUPS_USUARI.equals(domain))
 			{
 				dataHandler = new GroupDataHandler(dataType);
 				setSelectIcon("/img/group.svg");
@@ -155,7 +158,7 @@ public class DomainValueField extends Databox
 			try {
 				currentList = dataHandler.search(text, null);
 			} catch (Exception e) {
-				log.info("Error searchinf for "+text, e);
+				log.info("Error searching for "+text, e);
 			}
 			currentPosition = 0;
 			return fetchObjects();

@@ -184,6 +184,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 					dvf.setDomain(currentRole.getDomain());
 					dvf.setValue(new LinkedList<String>());
 					dvf.createField();
+					dvf.invalidate();
 				}
 			}
 		}

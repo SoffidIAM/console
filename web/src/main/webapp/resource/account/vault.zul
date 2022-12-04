@@ -95,6 +95,7 @@
 				<menu2>
 					<menu2item id="deleteAccountButton" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 					<menu2item id="updatePasswordButton" image="/img/password.svg" label="${c:l('usuaris.zul.setPassword') }" onClick="ref:frame.setPassword"/>
+					<menu2item id="updateSshButton" image="/img/password.svg" label="${c:l('accounts.generateSshKey') }" onClick="ref:frame.setSshKey"/>
 				</menu2>
 			</div>
 			<div id="dades">
@@ -305,7 +306,7 @@
 				<textbox bind="/listbox:/account/@loginName" disabled="true" readonly="true" />
 				<textbox bind="/listbox:/account/@loginName" id="loginName" readonly="true" style="display: none"/>
 			</div>
-			<div>
+			<div id="divPassword">
 				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}" sclass="label"  style="width: 200px"/>
 				<imageclic src="/img/copy.svg" action="onClick: doCopy(this.nextElementSibling.nextElementSibling.id)"
 					title="${c:l('vault.account.copy')}"/>
@@ -317,6 +318,15 @@
 					onMouseLeave: doView('${qpassword.uuid}','${fakeqpassword.uuid}')"
 					tooltip="toolPwd"
 				/>
+			</div>
+			<div id="divSshKey">
+				<label value="${c:l('selfService.TheSshKeyIs')}" sclass="label"  style="width: 200px"/>
+				<imageclic src="/img/copy.svg" action="onClick: doCopy(this.nextElementSibling.nextElementSibling.id)"
+					title="${c:l('vault.account.copy')}"/>
+				<textbox readonly="true" 
+					id="fakeqsshkey" value="****************"/> 
+				<textbox readonly="true" style="display:none;" 
+					id="qsshkey" tooltip="toolPwd" multiline="true"/>
 			</div>
 			<div style="margin-top: 2em; text-align:center">
 				<button label="${c:l('selfService.Close')}"
@@ -347,6 +357,27 @@
 				onClick="ref:frame.undoService" />
 			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
 				onClick="ref:frame.applyService"/>
+		</div>
+	</window>
+
+	<window closable="false" id="sshWindow" position="top,center" sizable="true"
+		title="${c:l('accounts.generateSshKey')}" visible="false" style="min-width:600px; width: 80%"
+		onClose="ref:frame.undoSsh">
+		<label value="${c:l('accounts.generateSshKeyDesc') }"/>
+		<radiogroup id="generationType" width="24em" orient="vertical"
+			onCheck="ref:frame.onChangeSelectedSshGeneration" style="display:block">
+			<radio label="${c:l('usuaris.zul.radomKey')}" 
+				id="generationRandom" width="20em" 
+				selected="true" value="random" onSelect=""/>
+			<radio label="${c:l('usuaris.zul.setKey')}" id ="generationSet" width="20em" 
+				value="set" onSelect="" />
+		</radiogroup>
+		<customfield3 dataType="STRING" multiline="true" label="${c:l('accounts.privateKey')}" id="newKey" required="true"/>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" 
+				onClick="ref:frame.undoSsh" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:frame.applySsh"/>
 		</div>
 	</window>
 

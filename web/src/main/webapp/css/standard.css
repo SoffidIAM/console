@@ -1822,6 +1822,7 @@ input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, in
     border-radius: 4px;
 }
 
+
 input.textbox.widetextbox {
 	width: 450px;
 }
@@ -3655,6 +3656,10 @@ div.databox div.container textarea.text,
 div.databox textarea.text {
 	width: 100%;
 	resize: vertical;
+}
+
+div.databox[forceselecticon='true'] div.container input.text {
+	width: calc(100% - 30px)
 }
 
 div.databox[selecticon] div.container textarea.text {

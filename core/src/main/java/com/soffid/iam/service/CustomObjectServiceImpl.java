@@ -109,7 +109,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(CustomObject.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

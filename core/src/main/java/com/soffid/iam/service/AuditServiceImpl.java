@@ -286,7 +286,7 @@ public class AuditServiceImpl extends
 			EvalException, InternalErrorException {
 
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(Audit.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

@@ -1,5 +1,6 @@
 package com.soffid.iam.service;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.hibernate.Hibernate;
 import org.jbpm.JbpmContext;
 import org.jbpm.logging.exe.LoggingInstance;
@@ -81,6 +83,7 @@ import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.account.AccountNameGenerator;
+import com.soffid.iam.service.impl.SshKeyGenerator;
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncStatusService;
@@ -2516,7 +2519,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -3084,4 +3087,160 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		account.setHasSnapshot(false);
 		return account;
 	}
+
+	@Override
+	protected Account handleGenerateAccountSshPrivateKey(Account account) throws Exception {
+		SshKeyGenerator gen = new SshKeyGenerator();
+		gen.generateKey();
+		return handleSetAccountSshPrivateKey(account, gen.getPrivateKeyString());
+	}
+
+	@Override
+	protected Account handleSetAccountSshPrivateKey(Account account, String privateKey) throws Exception {
+		Exception lastException = null;
+		SshKeyGenerator g = new SshKeyGenerator();
+		g.loadKey(privateKey);
+		boolean ok = false;
+		for (ServerEntity se : getServerEntityDao().loadAll()) {
+            if (se.getType().equals(ServerType.MASTERSERVER)) {
+				if (se.getInstances().isEmpty()) {
+	                try {
+	                    setAccountSshPrivateKey(account, privateKey, se.getUrl(), se.getAuth());
+	                    ok = true;
+	                    break;
+	                } catch (Exception e) {
+	                    lastException = e;
+	                }
+            	} else {
+            		for (ServerInstanceEntity si: se.getInstances()) {
+            			try {
+    	                    setAccountSshPrivateKey(account, privateKey, si.getUrl(), si.getAuth());
+    	                    ok = true;
+    	                    break;
+		                } catch (Exception e) {
+		                    lastException = e;
+		                }
+            		}
+            	}
+            }
+        }
+		if (lastException != null && !ok)
+			throw lastException;
+		
+		AccountEntity e = getAccountEntityDao().load(account.getId());
+		e.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem()));
+		getAccountEntityDao().update(e);
+		
+		return getAccountEntityDao().toAccount(e);
+	}
+
+	private void setAccountSshPrivateKey(Account account, String privateKey, String url, String auth) throws InternalErrorException, IOException {
+        RemoteServiceLocator rsl = new RemoteServiceLocator(url);
+        rsl.setAuthToken(auth);
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		SyncStatusService sss = rsl.getSyncStatusService();
+		sss.setAccountSshPrivateKey(account.getName(), account.getSystem(), new Password(privateKey));
+	    Audit audit = new Audit();
+	    audit.setAction("S");
+	    audit.setObject("SC_ACCOUN");
+	    audit.setAuthor(Security.getCurrentUser());
+	    audit.setCalendar(Calendar.getInstance());
+	    audit.setAccount(account.getName());
+	    audit.setDatabase(account.getSystem());
+	    getAuditService().create(audit);
+	}
+
+	@Override
+	protected Password handleQueryAccountSshKey (Account account) throws Exception
+	{
+		AccountEntity ae = getAccountEntityDao().load(account.getId());
+		// Check if policy allows user change
+		UserDomainService dominiUsuariService = getUserDomainService();
+		PasswordPolicy politica = dominiUsuariService.findPolicyByTypeAndPasswordDomain(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
+		if (politica == null)
+			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
+		if (!politica.isAllowPasswordQuery())
+			throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToQueryPassword")); //$NON-NLS-1$
+		
+
+		AccountAccessLevelEnum level = ae.getType() == AccountType.PRIVILEGED ? 
+				AccountAccessLevelEnum.ACCESS_OWNER :
+				AccountAccessLevelEnum.ACCESS_MANAGER;
+		return handleQueryAccountSshKeyBypassPolicy(account.getId(), level);
+	}
+
+	@Override
+	protected Password handleQueryAccountSshKeyBypassPolicy(long accountId, AccountAccessLevelEnum level)
+			throws InternalErrorException, Exception {
+		User usuari = getUserService().getCurrentUser();
+		
+		AccountEntity acc = getAccountEntityDao().load(accountId);
+		if (acc == null)
+			return null;
+		
+		ServerEntityDao dao = getServerEntityDao();
+		Exception lastException = null;
+		for (ServerEntity se : dao.loadAll()) {
+            if (se.getType().equals(ServerType.MASTERSERVER)) {
+            	if (se.getInstances().isEmpty()) {
+	                try {
+	                    Password p = getSshKey(level, usuari, acc, se.getUrl(), se.getAuth());
+	                    if (p != null)
+	                    	return p;
+	                } catch (Exception e) {
+	                    lastException = e;
+	                }
+            	} else {
+            		for (ServerInstanceEntity si: se.getInstances()) {
+            			try {
+		                    Password p = getSshKey(level, usuari, acc, si.getUrl(), si.getAuth());
+		                    if (p != null)
+		                    	return p;
+  	                } catch (Exception e) {
+		                    lastException = e;
+		                }
+            		}
+            	}
+            }
+        }
+		if (lastException != null)
+			throw lastException;
+		return null;
+	}
+
+	public Password getSshKey(AccountAccessLevelEnum level, User usuari, AccountEntity acc, 
+			String url, String auth) throws IOException, InternalErrorException {
+        RemoteServiceLocator rsl = new RemoteServiceLocator(url);
+        rsl.setAuthToken(auth);
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		SyncStatusService sss = rsl.getSyncStatusService();
+		Password p = sss.getAccountSshKey(usuari.getUserName(), acc.getId(), level);
+		if (p != null) {
+		    Audit audit = new Audit();
+		    audit.setAction("H");
+		    audit.setObject("SSO");
+		    audit.setAuthor(Security.getCurrentUser());
+		    audit.setCalendar(Calendar.getInstance());
+		    audit.setAccount(acc.getName());
+		    audit.setDatabase(acc.getSystem().getName());
+		    audit.setApplication("-");
+		    getAuditService().create(audit);
+		}
+		return p;
+	}
+
+	@Override
+	protected boolean handleHasAccountSshKey(Account account) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		if (entity.getSecrets() == null)
+			return false;
+		String id = "ssh.";
+		for (String secret: entity.getSecrets().split(","))
+		{
+			if (secret.startsWith(id))
+				return true;
+		}
+		return false;
+	}
+
 }

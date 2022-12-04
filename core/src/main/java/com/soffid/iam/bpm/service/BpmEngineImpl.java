@@ -3228,7 +3228,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			p.add(new Parameter("givenName", givenName.toUpperCase())); //$NON-NLS-1$
 		}
 		if (surName != null) {
-			if ( new CustomDialect().isOracle() )
+			if ( CustomDialect.isOracle() )
 				clauses.add("upper ( usuari.lastName ) like :surName"); //$NON-NLS-1$
 			else
 				clauses.add("upper(concat(usuari.lastName,' ',usuari.middleName)) like :surName"); //$NON-NLS-1$

@@ -3004,7 +3004,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(User.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

@@ -372,7 +372,7 @@ public abstract class AccountService {
 	@Description ("Gets the account password")
 	@Operation ( grantees={roles.Tothom.class},
 			translated="queryAccountPassword")
-	@Transactional(rollbackFor={java.lang.Exception.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Password queryAccountPassword(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -380,7 +380,32 @@ public abstract class AccountService {
 	}
 
 	@Description ("Gets the account password bypassing passowrd policy. Used for SSO")
+	@Transactional(noRollbackFor={java.lang.Exception.class})
 	public Password queryAccountPasswordBypassPolicy (long accountId, AccountAccessLevelEnum level)
+	{
+		return null;
+	}
+
+	@Description ("Gets the account password")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public boolean hasAccountSshKey(Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return false;
+	}
+
+	@Description ("Gets the account password")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(noRollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password queryAccountSshKey(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+	@Description ("Gets the account password bypassing passowrd policy. Used for SSO")
+	@Transactional(noRollbackFor={java.lang.Exception.class})
+	public Password queryAccountSshKeyBypassPolicy (long accountId, AccountAccessLevelEnum level)
 	{
 		return null;
 	}
@@ -416,6 +441,23 @@ public abstract class AccountService {
 	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public Password generateAccountPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
+	@Description("Stores the account SSH private key")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Account setAccountSshPrivateKey(
+		es.caib.seycon.ng.comu.Account account,
+		String privateKey)
+		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
+	}
+
+	@Description("Stores the account SSH private key")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public Account generateAccountSshPrivateKey(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException { return null;
 	}

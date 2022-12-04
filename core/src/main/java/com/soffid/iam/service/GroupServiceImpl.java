@@ -887,22 +887,14 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAndFilterAsync(String text, String filter) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
+		String q = generateQuickSearchQuery(text, filter);
 		return handleFindGroupByJsonQueryAsync(q);
 			
 	}
 
 	@Override
 	protected AsyncList<Group> handleFindGroupHistoryByTextAndFilterAsync(String text, String filter, Date date) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
+		String q = generateQuickSearchQuery(text, filter);
 		if (date == null)
 			return handleFindGroupByJsonQueryAsync(q);
 		else {
@@ -932,8 +924,17 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	@Override
 	protected PagedResult<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
-		String q = generateQuickSearchQuery(filter);
+		String q = generateQuickSearchQuery(text, filter);
 		return handleFindGroupByJsonQuery(q, first, pageSize);
+	}
+
+	private String generateQuickSearchQuery(String text, String filter) {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return q;
 	}
 
 	protected String generateQueryCurrent(String text, String filter) {

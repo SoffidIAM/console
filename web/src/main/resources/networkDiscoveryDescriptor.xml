@@ -4,9 +4,14 @@
 	<datanode name="root">
 		<finder name="network" type="network">
 			<ejb-finder jndi="java:/module/NetworkService-v2"
-				method="findNetworkByTextAndJsonQueryAsync">
-				<parameter value=""/>
-				<parameter value=""/>
+				method="findNetworkByFilter">
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
+				<parameter value="${null}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Network">
 			</new-instance-bean>

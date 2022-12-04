@@ -15,15 +15,15 @@
 					<image src="/img/other/windows.svg"/>
 					<label sclass='menuoption-title' value="Active Directory" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.addSap">
+				<div sclass="menuoption" onClick="ref:iga03_w.addSap">
 					<image src="/img/other/sap.svg"/>
 					<label sclass='menuoption-title' value="SAP R/3" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.discovery">
 					<image src="/img/menu/network-discovery.svg"/>
 					<label sclass='menuoption-title' value="${c:l('seu.networkDiscovery') }" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addServiceNow">
 					<image src="/img/other/servicenow.svg"/>
 					<label sclass='menuoption-title' value="Service now" />
 				</div> 

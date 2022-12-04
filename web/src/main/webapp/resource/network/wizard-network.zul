@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="network_wizard" position="top-center" closable="false" sizable="false"
+	use="com.soffid.iam.web.discovery.NetworkWizardHandler"
+	style="width: 80%; height: 450px; max-width: 800px; top: 200px !important;">
+	<wizard id="wizard">
+		<attribute name="steps">
+	- ${c:l("wizard-network.register")}
+	- ${c:l('wizard-network.credentials') }
+	- ${c:l("user_createaccount.Finish")}
+		</attribute>
+		<div id="step1">
+			<label multiline="true" value="${c:l('wizard-network.explanation') }" />
+			<customfield3 id="description"
+				label="${c:l('com.soffid.iam.api.Network.description') }"
+				dataType="string" required="true" maxlength="50" />
+			<customfield3 use="com.soffid.iam.web.network.IpField"
+				id="ip"
+				label="${c:l('com.soffid.iam.api.Network.ip') }" dataType="string"
+				required="true" maxlength="50" />
+			<customfield3 use="com.soffid.iam.web.network.MaskField"
+				label="${c:l('com.soffid.iam.api.Network.mask') }" dataType="string"
+				required="true" id="mask" maxlength="50" />
+			<div style="text-align: right; width: 100%">
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}"
+					onClick="ref:network_wizard.back" />
+				<button image="/img/next-r.svg"
+					label="${c:l('user_createaccount.Next')}" onClick="ref:network_wizard.next"
+					id="step2Button" />
+			</div>
+		</div>
+		<div>
+			<datatable style="width: calc( 100% - 200 px);" multiselect="true"
+				id="networkAccounts"
+				onSelect="ref:frame.multiSelect"
+				enablefilter="false"
+				onMultiSelect="ref:frame.multiSelect"
+				>
+				<attribute name="columns"><![CDATA[
+				- name: ${c:l('com.soffid.iam.api.Account.loginName') }
+				  value: loginName
+				]]></attribute>
+			</datatable>
+			<div style="width: 100%; text-align: right" >
+				<div class="deleteButton" onClick="ref:network_wizard.deleteAccount" visible="false" id="deleteAccountButton">-</div>
+				<div class="addButton" onClick="ref:network_wizard.addAccount">+</div>
+			</div>
+			<div style="text-align: right; width: 100%">
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}"
+					onClick="ref:network_wizard.back" />
+				<button image="/img/next-r.svg"
+					label="${c:l('user_createaccount.Next')}" onClick="ref:network_wizard.next" />
+			</div>
+		</div>
+		<div>
+			<label multiline="true" value="${c:l('wizard-network.explanation2') }" />
+			<div style="text-align: right; width: 100%; margin-top: 200px;">
+				<button image="/img/ok-r.svg"
+					label="${c:l('user_createaccount.Finish')}" onClick="ref:network_wizard.next" />
+			</div>
+		</div>
+	</wizard>
+
+	<window closable="false"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		id="add_account"
+		position="top, center" sizable="true"
+		title="${c:l('discovery.addAccount')}" visible="false"
+		style="width: 80%; max-width: 800px">
+
+		<radiogroup id="radio">
+			<radio id="radio_new_account" label="${c:l('discovery.newAccount') }" onCheck="ref:network_wizard.setNewAccount"></radio>
+			<radio id="radio_existing_account" label="${c:l('discovery.existingAccount') }" onCheck="ref:network_wizard.setExistingAccount"></radio>
+		</radiogroup>	
+
+		<div id="div_new_account">
+			<standardfield3 id="new_account" attribute="com.soffid.iam.api.Account.loginName" required="true"/>
+			<customfield3 id="new_password" dataType="PASSWORD" label="${c:l('accounts.setPassword.label') }" required="true"/>
+		</div>		
+		
+		<div id="div_existing_account">
+			<customfield3 id="existing_account" dataType="ACCOUNT" label="${c:l('aplica_usuarisRolllista.zul.Codi') }" required="true"
+				filterExpression="secrets pr and not type eq U"/>
+		</div>		
+
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 
+				onClick="ref:network_wizard.closeWindow" />
+			<button image="/img/save-r.svg" label="${c:l('common.apply') }"
+				onClick="ref:network_wizard.applyAddAccount"/>
+		</div>
+	</window>
+</window>

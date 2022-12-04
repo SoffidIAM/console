@@ -3,7 +3,7 @@
 
 
 <window id="ad" position="top-center" closable="false" sizable="false"
-			use="com.soffid.iam.web.agent.AdWizardHandler"
+			use="com.soffid.iam.web.agent.SapWizardHandler"
 			style="width: 80%; height: 450px; max-width: 800px; top: 200px !important;">
 	<style>
 		span.inline input[type='radio'] + label {
@@ -20,7 +20,13 @@
 			</attribute>
 			<div id="step1">
 				<div style="height: 320px">
-					<customfield3 label="Active directory name" dataType="STRING" placeholder="dc=soffid,dc=com" required="true" id="name"/>
+					<customfield3 label="SAP name" dataType="STRING" placeholder="" required="true" id="name"/>
+					<customfield3 label="Server name" dataType="STRING" placeholder="" required="true" id="server"/>
+					<customfield3 label="System number" dataType="NUMBER" placeholder="" required="true" id="system"/>
+					<customfield3 label="System type" dataType="STRING" listOfValues="sap: Standard SAP R/3,cua: Central User Messaging (CUA)" 
+						required="true" id="type"/>
+					<customfield3 label="Client number" dataType="NUMBER" placeholder="" required="true" id="client"/>
+					<customfield3 label="Language" dataType="STRING" placeholder="EN" required="true" id="lang"/>
 					<customfield3 label="User name" dataType="STRING" placeholder="" required="true" id="user"/>
 					<customfield3 label="Password" dataType="PASSWORD" placeholder="" required="true" id="pass"/>
 				</div>

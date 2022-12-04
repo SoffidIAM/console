@@ -1,11 +1,13 @@
 package com.soffid.iam.web.discovery;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.zkoss.zhtml.S;
 import org.zkoss.zk.ui.Component;
@@ -519,5 +521,14 @@ public class DiscoveryHandler extends FrameHandler {
 				return system.getName();
 		}
 		return systems.get(0).getName();
+	}
+
+	@Override
+	public void afterCompose() {
+		super.afterCompose();
+		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		String wizard = req.getParameter("wizard");
+		if ("new".equals(wizard)) 
+			Executions.createComponents("/resource/network/wizard-network.zul", this, new HashMap<>());
 	}
 }

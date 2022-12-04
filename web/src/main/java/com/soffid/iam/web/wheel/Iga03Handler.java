@@ -31,4 +31,16 @@ public class Iga03Handler extends Window {
 	public void addActiveDirectory(Event ev) {
 		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=ad", "_blank");
 	}
+
+	public void addSap(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=sap", "_blank");
+	}
+
+	public void addServiceNow(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=servicenow", "_blank");
+	}
+
+	public void discovery(Event ev) {
+		Executions.getCurrent().sendRedirect("/resource/network/discovery.zul?wizard=new", "_blank");
+	}
 }	

@@ -107,6 +107,7 @@
 									<fileset dir="${basedir}/target/lib" includes="shell-plugin.jar" />
 									<fileset dir="${basedir}/target/lib" includes="windows-plugin.jar" />
 									<fileset dir="${basedir}/target/lib" includes="sql-plugin.jar" />
+									<fileset dir="${basedir}/target/lib" includes="mariadb-plugin.jar" />
 									<fileset dir="${basedir}/target/lib" includes="rest-plugin.jar" />
 								</copy>
 								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid">
@@ -395,6 +396,12 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>sso-plugin</artifactId>
+			<version>1.0.2</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.sync.plugins</groupId>
+			<artifactId>mariadb-plugin</artifactId>
 			<version>1.0.2</version>
 			<type>jar</type>
 		</dependency>

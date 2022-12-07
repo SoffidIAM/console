@@ -48,6 +48,26 @@ public class Iga03Handler extends Window {
 		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=google", "_blank");
 	}
 
+	public void addAzure(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=azure", "_blank");
+	}
+
+	public void addAtlassian(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=atlassian", "_blank");
+	}
+
+	public void addMariadb(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=mariadb", "_blank");
+	}
+
+	public void addSqlserver(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=sqlserver", "_blank");
+	}
+
+	public void addOracle(Event ev) {
+		Executions.getCurrent().sendRedirect("/config/agents.zul?wizard=oracle", "_blank");
+	}
+
 	public void discovery(Event ev) {
 		Executions.getCurrent().sendRedirect("/resource/network/discovery.zul?wizard=new", "_blank");
 	}

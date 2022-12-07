@@ -3857,6 +3857,7 @@ div.wizard-bar div.separator-d {
 input[type='radio'] {
 	height: 31px;
 }
+
 input[type='radio'] + label {
 	margin-left: 10px;
 	margin-right: 10px;
@@ -3868,6 +3869,11 @@ input[type='radio'] + label {
     margin-bottom: 15px;
 }
 
+div.search-popup input[type='radio'] + label {
+	height: 24px;
+	width: 192px;
+	margin-bottom: 0px;
+}
 
 img.small-picture {
 	max-width: 32px;

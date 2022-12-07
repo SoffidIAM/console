@@ -10,28 +10,21 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Server;
-import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class AddTargetAppSector extends Sector {
+public class Iga02Sector extends Sector {
 
-	public AddTargetAppSector(String tag) {
+	public Iga02Sector(String tag) {
 		super(tag);
 	}
 
 	@Override
 	public boolean isDone() {
 		try {
-			Collection<System> list = EJBLocator.getDispatcherService().findAllActiveDispatchers();
-			int num = 0;
-			for (System s: list) {
-				if (!s.isAuthoritative())
-					num ++;
-				if (num > 1) return true;
-			}
-			return false;
+			PagedResult<User> list = EJBLocator.getUserService().findUserByJsonQuery(null, null, 2);
+			return list.getResources().size() > 1;
 		}
 		catch (Exception e) {
 			return true;

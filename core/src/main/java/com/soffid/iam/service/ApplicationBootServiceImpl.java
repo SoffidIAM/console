@@ -1102,6 +1102,16 @@ public class ApplicationBootServiceImpl extends
 			du = dominiSvc.create(du);
 		}
 
+		UserDomain du2 = dominiSvc.findUserDomainByName("EMAIL"); //$NON-NLS-1$
+		if (du2 == null) {
+			du2 = new UserDomain();
+			du2.setCode("EMAIL"); //$NON-NLS-1$
+			du2.setDescription("Email address"); //$NON-NLS-1$
+			du2.setType(TipusDominiUsuariEnumeration.SHELL);
+			du2.setBshExpr("user.emailAddress");
+			du2 = dominiSvc.create(du);
+		}
+
 		PasswordDomain dc = dominiSvc.findPasswordDomainByName("DEFAULT"); //$NON-NLS-1$
 		if (dc == null) {
 			dc = new PasswordDomain();

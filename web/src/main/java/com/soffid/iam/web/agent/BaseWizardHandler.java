@@ -154,11 +154,6 @@ public abstract class BaseWizardHandler extends Window implements AfterCompose{
 		getFellow("reconcilediv").setVisible(false);
 		getFellow("progressdiv").setVisible(true);
 		
-//		final String query = "system eq \""+
-//				currentSystem.getName().replace("\\", "\\\\")
-//				.replace("\"", "\\\"")
-//				.replace("\'", "\\\'") + 
-//				"\"";
 		final String query = null;
 		currentProcess.setCurrent("");
 		currentProcess.setStart(new Date());
@@ -218,6 +213,8 @@ public abstract class BaseWizardHandler extends Window implements AfterCompose{
 			final System ss = s;
 			Missatgebox.confirmaOK_CANCEL(msg, (ev) -> {
 				if (ev.getName().equals("onOK")) {
+					Window w = (Window) ev.getTarget().getSpaceOwner();
+					w.detach();
 					ss.setId(s2.getId());
 					System s3 = EJBLocator.getDispatcherService().update(ss);
 					checkConnectivity(s3, null);

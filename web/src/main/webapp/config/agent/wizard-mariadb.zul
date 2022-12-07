@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="ad" position="top-center" closable="false" sizable="false"
+			use="com.soffid.iam.web.agent.MariadbWizardHandler"
+			style="width: 80%; height: 450px; max-width: 800px; top: 200px !important;">
+	<style>
+		span.inline input[type='radio'] + label {
+			width: auto;
+		}
+	</style>
+	<timer id="timer" delay="1000" repeats="true" onTimer="ref:ad.onTimer" running="false"/>
+	<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("wizard-ad-source.connectivity")}
+	- ${c:l('wizard-ad.loadAccounts') }
+	- ${c:l("wizard-ad.bindAccountOwners")}
+	- ${c:l("user_createaccount.Finish")}
+			</attribute>
+			<div id="step1">
+				<div style="height: 320px">
+					<customfield3 label="Host" dataType="STRING" placeholder="" required="true" id="host"/>
+					<customfield3 label="Port" dataType="NUMBER" placeholder="3306" id="port"/>
+					<customfield3 label="User name" dataType="STRING" placeholder="" required="true" id="user"/>
+					<customfield3 label="Password" dataType="PASSWORD" placeholder="" required="true" id="pass"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:ad.back" />
+					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:ad.next" id="step2Button"/>
+				</div>
+						
+			</div>
+			<div>
+				<div style="height: 320px;">
+					<label multiline="true" id="explanation3" style="word-break: initial;" value="${c:l('wizard-ad.bindAccountOwnersExplanation') }"/>
+					<radiogroup id="radio" onCheck="ref:ad.onRadio()" style="display:block; margin-top: 20px">
+						<div>
+							<radio sclass="inline" value="attribute" label="${c:l('wizard-ad.bindOnAttribute') }"></radio>
+							<select id="attributeSelector"/>
+						</div>
+						<div>
+							<radio value="script" label="${c:l('wizard-ad.bindOnScript') }"></radio>
+						</div>
+						<div>
+							<radio value="manual" label="${c:l('wizard-ad.bindMaunally') }"></radio>
+						</div>
+						<div>
+							<radio value="no" label="${c:l('wizard-ad.noBind') }"></radio>
+						</div>
+					</radiogroup>
+					<textbox visible="false" multiline="true" id="script"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:ad.next" id="step4Button"/>
+				</div>
+			</div>
+			<div>
+				<div style="height: 320px; padding-top: 150px; text-align:center" id="reconcilediv">
+					<label multiline="true" id="explanation2" style="word-break: initial;"/>
+					<image style="height: 24px; vertical-align:middle; margin-left: 24px" src="/anonymous/wait.gif" id="step3Wait"/>
+				</div>
+				<div style="width:100%; margin-bottom: 8px; border-radius: 4px; padding-left: 8px;padding-right: 8px;padding-top: 150px; " 
+					id="progressdiv">
+					<div sclass="progress" id="progressbar"/>
+					<div>
+						<image src="/anonymous/wait.gif" sclass="imageclic" style="vertical-align: middle; height: 24px; width: 24px;"/>
+						<label value=" ${c:l('rules.progress') }:"/>
+						<label id="progress" style="display: inline-block; min-width: 150px; margin-left: 8px; margin-right: 8px;"/>
+						<label value="  ${c:l('rules.etf') }:"/>
+						<label id="etf" style="display: inline-block; min-width: 100px; margin-left: 8px; margin-right: 8px;"/>
+					</div>
+				</div>
+			</div>
+			<div>
+				<div style="height: 320px; padding-top: 150px; text-align:center">
+					<label multiline="true" value="${c:l('wizard-ad.done') }" style="word-break: initial;"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/ok-r.svg" label="${c:l('error.zul.Tancar')}" onClick="ref:ad.end"/>
+				</div>
+			</div>
+					
+	</wizard>
+</window>

@@ -20,42 +20,41 @@ import com.soffid.iam.api.System;
 import com.soffid.iam.web.component.CustomField3;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class ServiceNowWizardHandler extends BaseWizardHandler {
+public class AzureWizardHandler extends BaseWizardHandler {
 
-	private CustomField3 host;
-	private CustomField3 user;
-	private CustomField3 pass;
+	private CustomField3 domainName;
 	private CustomField3 clientId;
 	private CustomField3 clientSecret;
+	private CustomField3 domainId;
 
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
-		host = (CustomField3) getFellow("host");
-		user = (CustomField3) getFellow("user");
-		pass = (CustomField3) getFellow("pass");
+		domainName = (CustomField3) getFellow("domainName");
+		domainId = (CustomField3) getFellow("domainId");
 		clientId = (CustomField3) getFellow("clientId");
 		clientSecret = (CustomField3) getFellow("clientSecret");
 	}
 	
 	protected void configureAgent(System s) throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException {
 		super.configureAgent(s);
-		s.setName(host.getValue().toString());
-		s.setDescription("Service now "+host.getValue().toString());
+		s.setName("Azure "+domainName.getValue().toString());
+		s.setDescription("Azure "+domainName.getValue().toString());
 		s.setClassName("com.soffid.iam.sync.agent2.json.JSONAgent");
-		s.setParam0(user.getValue().toString());
-		s.setParam1(pass.getValue().toString());
 		s.setParam2("tokenOAuthCC");
-		s.setParam3("https://"+host.getValue().toString()+"/oauth_token.do");
-		s.setParam4("https://"+host.getValue().toString()+"/api/now/table/");
+		s.setParam3("https://login.microsoftonline.com/"+domainId.getValue().toString().trim()+"/oauth2/v2.0/token");
+		s.setParam4("https://graph.microsoft.com");
 		s.setParam7("access_token");
 		s.setParam8("false"); // Debug
 		s.setBlobParam(("{\"oauthParams\":["
 				+ "{\"oauthParam\":\"grant_type\",\"oauthValue\":\"client_credentials\"},"
 				+ "{\"oauthParam\":\"client_id\",\"oauthValue\":\""+encode(clientId.getValue().toString())+"\"},"
-				+ "{\"oauthParam\":\"client_secret\",\"oauthValue\":\""+encode(clientSecret.getValue().toString())+"\"}]}")
+				+ "{\"oauthParam\":\"client_secret\",\"oauthValue\":\""+encode(clientSecret.getValue().toString())+"\"},"
+				+ "{\"oauthParam\":\"scope\",\"oauthValue\":\"https://graph.microsoft.com/.default\"}]}")
 				.getBytes(StandardCharsets.UTF_8));
+		s.setUsersDomain("EMAIL");
 	}
 	
 	private String encode(String string) {
@@ -65,27 +64,48 @@ public class ServiceNowWizardHandler extends BaseWizardHandler {
 	}
 
 	protected boolean validateConnectionAttributes() {
-		if (host.attributeValidateAll() && user.attributeValidateAll() && pass.attributeValidateAll() &&
+		if (domainId.attributeValidateAll() && domainName.attributeValidateAll() && 
 				clientId.attributeValidateAll() && clientSecret.attributeValidateAll()) {
-			if (!host.getValue().toString().toLowerCase().endsWith(".service-now.com")) {
-				host.setWarning(0, Labels.getLabel("wizard-servicenow.wrongHost2"));
+			String d = domainId.getValue().toString().trim();
+			if (!validateDomain(d)) {
+				domainId.setWarning(0, Labels.getLabel("wizard-azure.wrongDomain"));
+				Missatgebox.avis(Labels.getLabel("wizard-azure.wrongDomain2"));
 				return false;
 			}
-			try {
-				InetAddress.getByName(host.getValue().toString());
-				return true;
-			} catch (Exception e) {
-				host.setWarning(0, Labels.getLabel("wizard-servicenow.wrongHost"));
+			if (!domainName.getValue().toString().contains(".") ) {
+				domainName.setWarning(0, Labels.getLabel("wizard-servicenow.wrongHost"));
 				return false;
 			}
+			return true;
 		}
 		else
 			return false;
 	}
+
+	protected boolean validateDomain(String d) {
+		if ( d.length() != 8 * 4 + 4 )
+			return false;
+		for (int i = 0; i < d.length(); i++) {
+			char ch = d.charAt(i);
+			switch (i) {
+			case 8:
+			case 13:
+			case 18:
+			case 23:
+				if (ch != '-') return false;
+				break;
+			default:
+				if (ch < '0' || ch > '9' && ch < 'a' || ch > 'f')
+					return false;
+				break;
+			}
+		}
+		return true;
+	}
 	
 	protected void loadMappings(System s) throws Exception {
-		InputStream in = getClass().getResourceAsStream("servicenow-mappings.xml");
-		AMedia m = new AMedia("servicenow-mappings.xml", null, "text/xml", in);
+		InputStream in = getClass().getResourceAsStream("azure-mappings.xml");
+		AMedia m = new AMedia("azure-mappings.xml", null, "text/xml", in);
 		new DirectImporter(s).doImport(m, null);
 	}
 }

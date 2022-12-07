@@ -35,23 +35,23 @@
 					<image src="/img/other/google.svg"/>
 					<label sclass='menuoption-title' value="Google workplace" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addAzure">
 					<image src="/img/other/azure.svg"/>
 					<label sclass='menuoption-title' value="Azure" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addAtlassian">
 					<image src="/img/other/atlassian.svg"/>
 					<label sclass='menuoption-title' value="Atlassian" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addMariadb">
 					<image src="/img/other/mariadb.svg"/>
 					<label sclass='menuoption-title' value="MariaDB" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addOracle">
 					<image src="/img/other/oracle.svg"/>
 					<label sclass='menuoption-title' value="Oracle DB" />
 				</div> 
-				<div sclass="menuoption" onClick="ref:frame.discovery">
+				<div sclass="menuoption" onClick="ref:iga03_w.addSqlserver">
 					<image src="/img/other/sqlserver.svg"/>
 					<label sclass='menuoption-title' value="SQL Server" />
 				</div> 

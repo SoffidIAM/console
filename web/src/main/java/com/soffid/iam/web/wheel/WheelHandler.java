@@ -7,32 +7,23 @@ import java.util.Collection;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
-import javax.swing.text.Element;
-import javax.swing.text.html.HTMLDocument;
 
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
-import org.zkoss.zk.au.AuScript;
 import org.zkoss.zk.au.Command;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Label;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
 
-import com.lowagie.text.Document;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Server;
 import com.soffid.iam.web.component.FrameHandler;
-import com.soffid.iam.web.component.InputField3;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.component.DataModel;
-import es.caib.zkib.component.Form;
 import es.caib.zkib.component.Switch;
 
 public class WheelHandler extends FrameHandler {
@@ -73,15 +64,15 @@ public class WheelHandler extends FrameHandler {
 	 
 	 	quarters = new Quarter[] {
 	 			new Quarter("am", 
-	 					new LoadUsersSector("am01"),
-	 					new Sector("am02"),
+	 					new Iga02Sector("am01"),
+	 					new Am02Sector("am02"),
 	 					new Sector("am03"),
 	 					new Sector("am04")),
 	 			new Quarter("iga", 
 	 					new InstallSynserverSector("iga01"),
-	 					new LoadUsersSector("iga02"),
-	 					new AddTargetAppSector("iga03"),
-	 					new Sector("iga04")),
+	 					new Iga02Sector("iga02"),
+	 					new Iga03Sector("iga03"),
+	 					new Iga04Sector("iga04")),
 	 			new Quarter("irc", 
 	 					new Sector("irc01"),
 	 					new Sector("irc02"),

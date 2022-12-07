@@ -36,12 +36,16 @@ public class Sector {
 
 	public void onClick(String tag2) {
 		if (tag2.equals(tag)) {
-			Window w = (Window) getHandler().getFellowIfAny(getTag()+"_w");
-			if (w == null)
-				w = (Window) Executions.getCurrent().createComponents("/config/wheel/"+getTag()+".zul", getHandler(), new HashMap<>());
-			w.doHighlighted();
+			activate();
 			dim(handler);
 		}
+	}
+
+	protected void activate() {
+		Window w = (Window) getHandler().getFellowIfAny(getTag()+"_w");
+		if (w == null)
+			w = (Window) Executions.getCurrent().createComponents("/config/wheel/"+getTag()+".zul", getHandler(), new HashMap<>());
+		w.doHighlighted();
 	}
 	
 	public String getTag() {

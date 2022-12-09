@@ -25,7 +25,6 @@ p, div, span, label, a, input, textarea,
 button, input.button, input.file {
 	font-family: inherit;
 	font-size: inherit;
-	word-break: break-all;
 	outline: none;
 }
 

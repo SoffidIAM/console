@@ -37,7 +37,7 @@
 				</div> 
 				<div sclass="menuoption" onClick="ref:iga03_w.addAzure">
 					<image src="/img/other/azure.svg"/>
-					<label sclass='menuoption-title' value="Azure" />
+					<label sclass='menuoption-title' value="Microsoft 365" />
 				</div> 
 				<div sclass="menuoption" onClick="ref:iga03_w.addAtlassian">
 					<image src="/img/other/atlassian.svg"/>

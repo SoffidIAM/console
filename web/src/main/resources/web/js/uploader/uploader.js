@@ -4,7 +4,9 @@ zkUploader.init=function(ed) {
 	input.uploader = ed;
 	ed.pendingFiles = [];
 	zk.listen(input, "change", zkUploader.upload);
-	zk.listen(document.getElementById(ed.id+"!cancel"), "click", zkUploader.cancel);
+	var cancel = document.getElementById(ed.id+"!cancel");
+	if (cancel)
+		zk.listen(cancel, "click", zkUploader.cancel);
 };
 
 zkUploader.upload=function(ev) {

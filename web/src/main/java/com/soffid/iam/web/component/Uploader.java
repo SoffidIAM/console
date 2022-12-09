@@ -1,6 +1,5 @@
 package com.soffid.iam.web.component;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,11 +15,10 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.UploadEvent;
+import org.zkoss.zk.ui.ext.AfterCompose;
 
-import es.caib.zkib.component.Databox;
 
-
-public class Uploader extends HtmlBasedComponent {
+public class Uploader extends HtmlBasedComponent implements AfterCompose {
 	boolean multiple;
 
 	
@@ -80,6 +78,13 @@ public class Uploader extends HtmlBasedComponent {
 			session.setAttribute("$$soffid-uploaded$$-"+uuid, medias);
 		}
 		medias.add(media);
+	}
+
+
+	@Override
+	public void afterCompose() {
+		if (getStyle() == null && "simple".equals(getMold()))
+			setStyle("display: inline-block");
 	}
 
 }

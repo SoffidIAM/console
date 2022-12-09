@@ -206,7 +206,7 @@ public abstract class BaseWizardHandler extends Window implements AfterCompose{
 		if (s2 == null) {
 			s = EJBLocator.getDispatcherService().create(s);
 			loadMappings(s);
-			checkConnectivity(s, s2);
+			checkConnectivity(s, s);
 			return true;
 		} else {
 			String msg = String.format(Labels.getLabel("wizard-ad.confirmReplace"), s.getName());

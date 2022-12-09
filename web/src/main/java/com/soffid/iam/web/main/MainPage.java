@@ -1,5 +1,9 @@
 package com.soffid.iam.web.main;
 
+import java.util.Arrays;
+
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -8,10 +12,12 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.ext.AfterCompose;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.utils.Security;
 
 import es.caib.bpm.filters.WorkflowInterceptor;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.Div;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -40,6 +46,16 @@ public class MainPage extends Div implements AfterCompose {
 			HttpServletRequest req = (HttpServletRequest) exec.getNativeRequest();
 			String target = (String) req.getAttribute("$soffid$target");
 	//		if (target != null) initialPage = target;
+			if (Arrays.binarySearch(p.getSoffidRoles(),"SOFFID_ADMIN") >= 0) {
+				String showWheel = null;
+				try {
+					showWheel = EJBLocator.getPreferencesService().findMyPreference("wheel-tips");
+				} catch (Exception e) {
+				}
+				if (!"false".equals(showWheel))
+					initialPage = "config/wheel.zul";
+			}
+
 			page.setVariable("initialPage", initialPage);
 			getDesktop().getSession().setAttribute("paginaActual", target);
 		}

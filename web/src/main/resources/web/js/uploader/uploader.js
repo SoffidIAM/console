@@ -56,7 +56,7 @@ zkUploader.uploadeNext=function(uploader) {
 		zk.progress();
 		var progress = document.getElementById("zk_loading");
 		var msg = progress.firstElementChild.lastChild;
-		msg.textContent = "Uploading "+fileName+ " "+ percent_completed.toFixed(1) + " %";
+		msg.textContent = "Uploading "+fileName+ " "+ percent_completed.toFixed(0) + " %";
     });
     request.addEventListener ("load", (e) => {
 		zkUploader.uploadeNext(uploader);

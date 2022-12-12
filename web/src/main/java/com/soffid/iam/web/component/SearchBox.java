@@ -40,6 +40,7 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.User;
+import com.soffid.iam.api.exception.ListFullException;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
@@ -190,7 +191,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 						throw new UiException(new InternalErrorException(Labels.getLabel("searchbox.badSyntax"), e.getCause()));
 					else
 						throw (UiException) e;
-				} catch (RowsLimitExceededException e) {
+				} catch (RowsLimitExceededException | ListFullException e) {
 					throw new UiException(String.format( Labels.getLabel("searchBox.maxRows"), modelCollection.getSize()));
 				} catch (Exception e) {
 					throw new UiException(e);
@@ -223,7 +224,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					throw new UiException(new InternalErrorException(Labels.getLabel("searchbox.badSyntax"), e.getCause()));
 				else
 					throw (UiException) e;
-			} catch (RowsLimitExceededException e) {
+			} catch (RowsLimitExceededException | ListFullException e) {
 				throw new UiException(String.format( Labels.getLabel("searchBox.maxRows"), modelCollection.getSize()));
 			} catch (Exception e) {
 				throw new UiException(e);
@@ -455,7 +456,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					timer.setDelay(1000);
 					try {
 						modelCollection.updateProgressStatus();
-					} catch (RowsLimitExceededException e) {
+					} catch (RowsLimitExceededException | ListFullException e) {
 						modelCollection.cancel();
 						throw new UiException(String.format( Labels.getLabel("searchBox.maxRows"), modelCollection.getSize()));
 					} finally {

@@ -36,9 +36,9 @@
 				dataPath="/model:/object" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
-			<div width="100%" style="text-align: right"" >
-				<div class="deleteButton" onClick="ref:frame.deleteSelected" if="${soffid:isUserInRole('customObject:delete)}' visible="false">-</div>
-				<div class="addButton" onClick="ref:frame.addNew"   if="${soffid:isUserInRole('customObject:create')}>+</div>
+			<div width="100%" style="text-align: right" >
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" if="${soffid:isUserInRole('customObject:delete')}" visible="false">-</div>
+				<div class="addButton" onClick="ref:frame.addNew"   if="${soffid:isUserInRole('customObject:create')}">+</div>
 			</div>
 		</div>
 		

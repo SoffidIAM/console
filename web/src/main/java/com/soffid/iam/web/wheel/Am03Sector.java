@@ -1,33 +1,20 @@
 package com.soffid.iam.web.wheel;
 
-import java.util.Collection;
-import java.util.HashMap;
-
-import javax.naming.InitialContext;
-
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zul.Window;
-
-import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.PagedResult;
-import com.soffid.iam.api.Server;
-import com.soffid.iam.api.System;
-import com.soffid.iam.api.User;
 
 import es.caib.zkib.zkiblaf.Missatgebox;
 
-public class Am02Sector extends Sector {
+public class Am03Sector extends Sector {
 
 	private Object actualSector;
 
-	public Am02Sector(String tag) {
+	public Am03Sector(String tag) {
 		super(tag);
 		try {
-			Class<?> actualClass = Class.forName("com.soffid.iam.web.wheel.ActualAm02Sector");
+			Class<?> actualClass = Class.forName("com.soffid.iam.web.wheel.ActualAm03Sector");
 			actualSector = actualClass.newInstance();
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (Throwable e) {
 			actualSector = null;
 		}
 	}
@@ -48,12 +35,11 @@ public class Am02Sector extends Sector {
 	@Override
 	protected void activate() {
 		if (actualSector == null)
-			Missatgebox.avis(Labels.getLabel("wheel.missingFederationAddon"), (ev) -> {
+			Missatgebox.avis(Labels.getLabel("wheel.missingFederationOtpAddon"), (ev) -> {
 				Executions.getCurrent().sendRedirect("https://download.soffid.com/download/", "_blank");
 			});
 		else
 			super.activate();
 	}
-
 
 }

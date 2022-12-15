@@ -669,7 +669,10 @@ public class SAMLServiceInternal {
 			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null)
 		{
-			url = "http://"+hostName;
+			if (hostName.startsWith("http"))
+				url = hostName;
+			else
+				url = "http://"+hostName;
 		}
 		if (! url.endsWith("/"))
 			url = url + "/";

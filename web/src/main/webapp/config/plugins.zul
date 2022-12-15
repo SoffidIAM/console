@@ -65,7 +65,7 @@
 			</datatable>
 			<div width="100%" style="text-align: right" if="${canUpdatePlugins}" >
 				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
-				<div class="addButton" onClick="ref:frame.addNew">+</div>
+				<uploader mold="addbutton" onUpload="ref:frame.processUpload"/>
 			</div>
 		</div>
 	

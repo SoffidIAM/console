@@ -66,7 +66,7 @@ public class WheelHandler extends FrameHandler {
 	 			new Quarter("am", 
 	 					new Iga02Sector("am01"),
 	 					new Am02Sector("am02"),
-	 					new Sector("am03"),
+	 					new Am03Sector("am03"),
 	 					new Sector("am04")),
 	 			new Quarter("iga", 
 	 					new InstallSynserverSector("iga01"),

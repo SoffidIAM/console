@@ -17,7 +17,6 @@ zkUploader.upload=function(ev) {
 		uploader.pendingFiles.push(files[filenum]);
     }
     input.value = "";
-    zk.progress();
 	zkUploader.uploadeNext(uploader);
 }
 
@@ -29,7 +28,8 @@ zkUploader.cancel=function(event) {
 zkUploader.uploadeNext=function(uploader) {
 	var file = uploader.pendingFiles.shift();
 	if (file == null) {
-		zk.progressDone();
+		var p = document.getElementById("uploadprog");
+		if (p) p.remove();
 		zkau.send ({uuid: uploader.id, cmd: "onUpload", data : []}, 5);		
 		return;
 	}
@@ -40,10 +40,9 @@ zkUploader.uploadeNext=function(uploader) {
 	formData.append("name", file.name);
     const fileName = file.name;
 	
-	zk.progress();
-	var progress = document.getElementById("zk_loading");
-	var msg = progress.firstElementChild.lastChild;
-	msg.textContent = "Uploading "+fileName;
+	var p = document.getElementById("uploadprog");
+	if (p) p.remove();
+	AU_progressbar("uploadprog", "Uploading "+fileName, zk.booting);
 	
     let request = new XMLHttpRequest();
     
@@ -53,16 +52,17 @@ zkUploader.uploadeNext=function(uploader) {
     request.setRequestHeader ("Accept", "application/json");
     request.upload.addEventListener('progress', function(e) {
     	let percent_completed = (e.loaded / e.total)*100;
-		zk.progress();
-		var progress = document.getElementById("zk_loading");
-		var msg = progress.firstElementChild.lastChild;
-		msg.textContent = "Uploading "+fileName+ " "+ percent_completed.toFixed(0) + " %";
+		var msg = "Uploading "+fileName+ " "+ percent_completed.toFixed(0) + " %";
+		var p = document.getElementById("uploadprog");
+		if (p) p.remove();
+		AU_progressbar("uploadprog", msg, zk.booting);
     });
     request.addEventListener ("load", (e) => {
 		zkUploader.uploadeNext(uploader);
     });
     request.addEventListener ("error", (e) => {
-		zk.progressdone();
+		var p = document.getElementById("uploadprog");
+		if (p) p.remove();
 		uploader.pendingFiles = [];
     });
     request.send(formData);

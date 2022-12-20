@@ -3890,6 +3890,9 @@ div.databox div.datahtml *, div.ck, div.ck ol, div.ck ul, div.ck li {
 
 div.databox div.datahtml {
 	min-height: 32px;
+	overflow-x: clip;
+	overflow-y: auto;
+	max-height: 125px;
 }
 
 div.ck.ck-editor__main {

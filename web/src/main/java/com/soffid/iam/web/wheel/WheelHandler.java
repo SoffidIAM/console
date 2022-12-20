@@ -67,7 +67,7 @@ public class WheelHandler extends FrameHandler {
 	 					new Iga02Sector("am01"),
 	 					new Am02Sector("am02"),
 	 					new Am03Sector("am03"),
-	 					new Sector("am04")),
+	 					new Am04Sector("am04")),
 	 			new Quarter("iga", 
 	 					new InstallSynserverSector("iga01"),
 	 					new Iga02Sector("iga02"),
@@ -79,9 +79,9 @@ public class WheelHandler extends FrameHandler {
 	 					new Sector("irc03"),
 	 					new Sector("irc04")),
 	 			new Quarter("pam", 
-	 					new Sector("pam01"),
-	 					new Sector("pam02"),
-	 					new Sector("pam03"),
+	 					new Pam01Sector("pam01"),
+	 					new Pam02Sector("pam02"),
+	 					new Pam03Sector("pam03"),
 	 					new Sector("pam04")),
 	 	};
 	 	

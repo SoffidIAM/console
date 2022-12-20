@@ -1,0 +1,52 @@
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="pam02_w" position="top-center" closable="false" sizable="false"
+		use="com.soffid.iam.web.wheel.Pam02Handler"
+			style="width: 80%; height: 80vh; max-width: 800px; top: 200px !important;">
+	<datamodel id="model" rootNode="root" src="accountDescriptor.xml"/>
+	<timer id="timer" delay="1000" repeats="true" onTimer="ref:pam02_w.onTimer" running="false"/>
+	<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("wizard-vault.selectAccounts")}
+	- ${c:l("user_createaccount.Finish")}
+			</attribute>
+			<div id="step1">
+				<div style="height: calc(80vh - 140px)">
+					<label multiline="true" value="${c:l('wizard-vault.selectAccountsExplanation') }" />
+					<searchbox auto="true" id="searchBox"
+						jsonObject="com.soffid.iam.api.Account" 
+						defaultAttributes="name, description, system, type"
+						preference="account"
+						enforcedFilter="(type eq 'I' or type eq 'S' or type eq 'P') and disabled eq false and not system eq 'SSO'" 
+						dataPath="/pam02_w/model:/account" variableName="query" variableNameText="textQuery"></searchbox>
+					<datatable id="listbox" autocommit="true" 
+						use="com.soffid.iam.web.account.AccountDatatable"
+						multiselect="true"
+						preference="account"
+						dataPath="/pam02_w/model:/account" 
+						maxheight="calc(80vh - 300px)"
+						enablefilter="false">
+					</datatable>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:pam02_w.back" />
+					<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:pam02_w.step2" id="step2Button"/>
+				</div>
+						
+			</div>
+			<div id="step2">
+				<div style="height: calc(80vh - 140px)">
+					<label multiline="true" value="${c:l('wizard-vault.selectAccountProgress')} " id="progress"/>
+				</div>
+				<div style="text-align: right; width: 100%">
+					<image style="height: 24px; vertical-align:middle" src="/anonymous/wait.gif" id="step3Wait"/>
+					<button image="/img/ok-r.svg" visible="false" label="${c:l('user-account-new.Finish')}" onClick="ref:pam02_w.end" id="step3Button"/>
+				</div>
+			</div>
+		
+	</wizard>
+</window>

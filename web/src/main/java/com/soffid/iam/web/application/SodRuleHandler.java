@@ -6,12 +6,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xel.fn.CommonFns;
 import org.zkoss.zk.au.out.AuInvoke;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -288,6 +291,14 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
+		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+		if ("add".equals(req.getParameter("wizard"))) {
+			try {
+				addNew();
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
+		}
 	}
 	
 	public void addNewRole(Event event) throws CommitException {

@@ -74,15 +74,15 @@ public class WheelHandler extends FrameHandler {
 	 					new Iga03Sector("iga03"),
 	 					new Iga04Sector("iga04")),
 	 			new Quarter("irc", 
-	 					new Sector("irc01"),
-	 					new Sector("irc02"),
+	 					new Irc01Sector("irc01"),
+	 					new Irc02Sector("irc02"),
 	 					new Sector("irc03"),
 	 					new Sector("irc04")),
 	 			new Quarter("pam", 
 	 					new Pam01Sector("pam01"),
 	 					new Pam02Sector("pam02"),
 	 					new Pam03Sector("pam03"),
-	 					new Sector("pam04")),
+	 					new Pam04Sector("pam04")),
 	 	};
 	 	
 	 	for (Quarter q: quarters) {
@@ -97,7 +97,7 @@ public class WheelHandler extends FrameHandler {
 		
 		try {
 			String hideTips = EJBLocator.getPreferencesService().findMyPreference("wheel-tips");
-			if ("true".equals(hideTips)) 
+			if ("false".equals(hideTips)) 
 				welcome.setVisible(false);
 			else
 				welcome.doHighlighted();
@@ -172,7 +172,7 @@ public class WheelHandler extends FrameHandler {
 	
 	public void onChangeShowagainswitch(Event ev) throws InternalErrorException, NamingException, CreateException {
 		Switch i = (Switch) ev.getTarget();
-		String value = i.isChecked() ? "true": "false";
+		String value = i.isChecked() ? "false": "true";
 		EJBLocator.getPreferencesService().updateMyPreference("wheel-tips", value);
 	}
 	

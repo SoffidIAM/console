@@ -604,8 +604,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 
         botonera.getChildren().clear();
 
-        btnTomar.setVisible(task.getStart() == null
-                || !user.equals(task.getActorId()));
+        btnTomar.setVisible(!task.isCancelled() && 
+        		task.getEnd() == null && 
+        		( task.getStart() == null || !user.equals(task.getActorId())));
 
         btnDelegar.setVisible(
         		(task.getStart() == null || user.equals(task.getActorId())) 

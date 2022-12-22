@@ -18,7 +18,7 @@
 	    padding-left: 10px;
 	    text-align: left;
 	}
-	
+
 </style>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">

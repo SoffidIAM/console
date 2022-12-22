@@ -686,14 +686,14 @@ select {
 
 
 /* imageclic: enlloc de imagemap */
-img.imageclic, img.search-icon {
+img.imageclic, img.search-icon, span.combobox span.rbtnbk img {
 	padding: 4px;
 	width: 32px;
 	cursor: pointer;	
 	vertical-align: top;
 }
 
-img.imageclic:hover, img.search-icon:hover {
+img.imageclic:hover, img.search-icon:hover, span.combobox span.rbtnbk img:hover {
 	background-image: url(/soffid/img/circle.svg);
 	background-size: cover;
 }
@@ -1820,7 +1820,8 @@ tr.grid td.gc {
 }
 
 input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text, div.text,
-	div.databox div.datahtml {
+	div.databox div.datahtml,
+	input.comboboxinp {
     box-sizing: border-box;
     padding: 4px 5px 2px 5px;
     border: 2px solid #e3e3e3;
@@ -1828,6 +1829,10 @@ input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, in
     border-radius: 4px;
 }
 
+span.combobox span.rbtnbk img {
+	width: 24px;
+	height: 24px;
+}
 
 input.textbox.widetextbox {
 	width: 450px;

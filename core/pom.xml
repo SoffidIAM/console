@@ -618,18 +618,12 @@
 		</dependency>
 		<dependency>
     		<groupId>org.bouncycastle</groupId>
-    		<artifactId>bcpkix-jdk15on</artifactId>
-    		<version>1.51</version>
-    		<exclusions>
-    			<exclusion>
-		    		<groupId>org.bouncycastle</groupId>
-		    		<artifactId>bcprov-jdk15on</artifactId>
-    			</exclusion>
-    		</exclusions>
+    		<artifactId>bcpkix-jdk18on</artifactId>
+    		<version>1.72</version>
 		</dependency>
 		<dependency>
     		<groupId>org.bouncycastle</groupId>
-    		<artifactId>bcprov-jdk15to18</artifactId>
+    		<artifactId>bcprov-jdk18on</artifactId>
     		<version>1.72</version>
 		</dependency>
 		<dependency>

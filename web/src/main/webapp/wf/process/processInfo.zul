@@ -34,7 +34,7 @@
 			</row>	
 		</rows>
 	</grid>
-	<datatable dataPath="model:/processInstance/log" id="logs" width="100%">
+	<datatable dataPath="model:/processInstance/log" id="logs" width="100%" maxheight="calc(100vh - 500px)">
 	<attribute name="columns"><![CDATA[
 - name: ${c:l('task.data')}
   value: date

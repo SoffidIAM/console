@@ -1,31 +1,14 @@
 package com.soffid.iam.web.wheel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 
-import org.zkoss.util.media.AMedia;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Div;
-import org.zkoss.zul.Filedownload;
-import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
-import org.zkoss.zul.Radiogroup;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
@@ -34,17 +17,11 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.Role;
-import com.soffid.iam.api.Server;
-import com.soffid.iam.api.ServerRegistrationToken;
-import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.service.AuthorizationService;
-import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
-import com.soffid.iam.web.component.CustomField3;
 
-import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
@@ -52,7 +29,6 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Wizard;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
-import es.caib.zkib.zkiblaf.ImageClic;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 

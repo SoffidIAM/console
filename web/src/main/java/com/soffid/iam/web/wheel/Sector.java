@@ -37,7 +37,8 @@ public class Sector {
 	public void onClick(String tag2) {
 		if (tag2.equals(tag)) {
 			activate();
-			dim(handler);
+			if (isDone())
+				dim(handler);
 		}
 	}
 

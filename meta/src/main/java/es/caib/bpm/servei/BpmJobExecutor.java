@@ -24,6 +24,14 @@ public abstract class BpmJobExecutor {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class},propagation=Propagation.REQUIRES_NEW)
+	public boolean lockJob(
+		long id, String lockOwner)
+		throws es.caib.seycon.ng.exception.InternalErrorException, java.lang.Exception {
+		return false;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class},propagation=Propagation.REQUIRES_NEW)
 	public void executeJob(
 		long id)

@@ -996,7 +996,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
 		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
-		cfg.setFetchSize(first);
+		cfg.setFirstResult(first);
 		cfg.setMaximumResultSize(pageSize);
 		// Execute HQL and generate result
 		int totalResults = 0;

@@ -124,7 +124,7 @@ public class AdSourceWizardHandler extends Window implements AfterCompose{
 		Collection<Server> servers = EJBLocator.getDispatcherService().findAllServers();
 		s.setUrl("local");
 		for (Server server: servers)
-			if (server.getType() == ServerType.PROXYSERVER)
+			if (server.getType() == ServerType.REMOTESERVER)
 				s.setUrl(server.getPublicUrl());
 		Collection<UserType> userTypes = EJBLocator.getUserDomainService().findAllUserType();
 		String userType = userTypes.iterator().next().getName();
@@ -147,7 +147,7 @@ public class AdSourceWizardHandler extends Window implements AfterCompose{
 			EJBLocator.getDispatcherService().checkConnectivity(s.getName());
 		} catch (Exception e) {
 			if (s2 == null)
-				EJBLocator.getDispatcherService().delete(s2);
+				EJBLocator.getDispatcherService().delete(s);
 			throw e;
 		}
 		startTask(s);

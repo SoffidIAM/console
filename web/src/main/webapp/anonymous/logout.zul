@@ -2,6 +2,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?link rel="icon" href="/anonymous/favicon.png" sizes="any" type="image/png"?>
 <zk xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml">
+	<style src="/css/login.css" />
 	<style>
 		body {
 			background-color: #5ec0a5;
@@ -35,12 +36,14 @@
 	</script>
 	<html id="htmlData"><![CDATA[
 		<div class="login" id='login'>
-			<p><img src="/soffid/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  alt="" /> </p> 
-       		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 
+			<div class="loginimage">
+				<img src="/soffid/anonymous/logo.png" style="max-width: 280px; max-height: 125px;"  alt="" />
+			</div>
 			<p style='margin-top: 24px; margin-bottom: 24px'>${c:l('LogoutServlet.3')}</p>
 			<p>
 				<input name="formUCboton" type="button" value="${c:l('LogoutServlet.4')}" onClick="reload()">
 			</p>
 		</div>
+       	<div class="soffid-logo-corner"><a href="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
 ]]></html>
 </zk>

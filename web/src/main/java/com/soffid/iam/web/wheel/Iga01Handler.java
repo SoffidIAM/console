@@ -252,6 +252,7 @@ public class Iga01Handler extends Window {
 
 	
 	public void end(Event event) {
+		detach();
 		if (currentServers == 0) {
 			if (Boolean.TRUE.equals(openMonitor.getValue()))
 			{

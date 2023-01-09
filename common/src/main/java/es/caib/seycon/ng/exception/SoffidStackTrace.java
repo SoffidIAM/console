@@ -181,7 +181,7 @@ public class SoffidStackTrace
 				cause = e.getCause ();
 			if (cause == null || cause == e)
 				break;
-			if (lastMessage.equals(cause.toString()))
+			if (lastMessage != null && lastMessage.equals(cause.toString()))
 				msgBuffer.delete(lastPos, msgBuffer.length());
 			String m = cause.getMessage();
 			if ( m == null ) m = cause.getClass().getSimpleName();

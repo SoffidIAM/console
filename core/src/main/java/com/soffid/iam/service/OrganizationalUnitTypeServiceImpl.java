@@ -87,7 +87,10 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	 */
 	protected OUType handleFindOUTypeByName(String CodiTipusUnitatOrganitzativa) throws Exception {
 		GroupTypeEntity entity = getGroupTypeEntityDao().findByName(CodiTipusUnitatOrganitzativa);
-		return getGroupTypeEntityDao().toOUType(entity);
+		if (entity == null)
+			return null;
+		else
+			return getGroupTypeEntityDao().toOUType(entity);
 	}
 
 	/**

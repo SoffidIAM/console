@@ -49,7 +49,9 @@ public class UserEntityImpl extends UserEntity
 		{ // mirem grups secundaris
 			for (UserGroupEntity userGroup: getSecondaryGroups())
 			{
-				if (userGroup.getGroup() != null && userGroup.getGroup().isAllowed(permission)) //$NON-NLS-1$
+				if (userGroup.getGroup() != null && 
+						!Boolean.TRUE.equals( userGroup.getDisabled() ) && 
+						userGroup.getGroup().isAllowed(permission)) //$NON-NLS-1$
 					return true;
 			}
 		}

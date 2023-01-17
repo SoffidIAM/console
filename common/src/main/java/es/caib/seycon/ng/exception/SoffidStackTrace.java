@@ -184,7 +184,7 @@ public class SoffidStackTrace
 		   			last = next;
 		   			lastMessage = root.getMessage();
 		   		}
-		   		else if (lastMessage.equals(root.toString()))
+		   		else if (lastMessage != null && lastMessage.equals(root.toString()))
 		   		{
 		   			significantExceptions.removeLast();
 		   			significantExceptions.add(next);

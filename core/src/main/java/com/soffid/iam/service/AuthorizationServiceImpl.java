@@ -16,6 +16,7 @@ package com.soffid.iam.service;
 import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.DomainValue;
@@ -312,7 +313,7 @@ public class AuthorizationServiceImpl extends
 	                    		dv.setValue(rg.getDomainValue());
 	                    		dv.setDomainName(tipusDomini);
 	                            autoRolVO.getUserRoleValueDomain().add(dv);
-	                            if (TipusDomini.GRUPS.equals(tipusDomini) || TipusDomini.GRUPS_USUARI.equals(tipusDomini)) {
+	                            if (DomainType.GROUPS.equals(tipusDomini) || DomainType.MEMBERSHIPS.equals(tipusDomini)) {
 	                                Collection grupsAutoritzacio = null;
 	                                if (Security.AUTO_SCOPE_PARES.equals(autoRolVO.getBusinessGroupScope())) {
 	                                    grupsAutoritzacio = getCodiGrupsParesGrup(rg.getDomainValue());
@@ -331,10 +332,18 @@ public class AuthorizationServiceImpl extends
 	                                for (Iterator git = grupsAutoritzacio.iterator(); git.hasNext(); ) {
 	                                    String codiGrup = (String) git.next();
 	    	                    		DomainValue dv2 = new DomainValue();
-	    	                    		dv.setValue(codiGrup);
-	    	                    		dv.setDomainName(tipusDomini);
+	    	                    		dv2.setValue(codiGrup);
+	    	                    		dv2.setDomainName(tipusDomini);
 	                                    autoRolVO.getUserRoleValueDomain().add(dv2);
 	                                }
+	                            }
+	                            else if (DomainType.APPLICATIONS.equals(tipusDomini)) {
+	                            	for (String app: getChildrenApp(rg.getDomainValue())) {
+	                            		DomainValue dv2 = new DomainValue();
+	                            		dv2.setValue(app);
+	                            		dv2.setDomainName(tipusDomini);
+	                            		autoRolVO.getUserRoleValueDomain().add(dv2);
+	                            	}
 	                            }
 	                        } else {
 	                    		DomainValue dv = new DomainValue();
@@ -370,6 +379,15 @@ public class AuthorizationServiceImpl extends
 
     }
 
+	private HashSet<String> getChildrenApp(String domainValue) throws InternalErrorException {
+		HashSet<String> s = new HashSet<>();
+		for (Application app: getApplicationService().findApplicationChildren(domainValue)) {
+			s.add(app.getName());
+			s.addAll(getChildrenApp(app.getName()));
+		}
+		return s;
+	}
+
 	protected String normalize(String s) {
 		if (DomainType.APLICACIONS.equals(s))
 			s = DomainType.APPLICATIONS;
@@ -404,7 +422,8 @@ public class AuthorizationServiceImpl extends
                 if (novaAutoHereta.getUserRoleValueDomain() != null) {
                     for (Iterator vit = novaAutoHereta.getUserRoleValueDomain().iterator(); vit.hasNext(); ) {
                         DomainValue vdc = (DomainValue) vit.next();
-                        if (!TIPUS_DOMINI_ESTRELLETA.equals(vdc.getDomainName()) && (tipusDominiHereta != null && tipusDominiHereta.indexOf(vdc.getDomainName()) == -1)) {
+                        if (!TIPUS_DOMINI_ESTRELLETA.equals(vdc.getDomainName()) &&
+                        		(tipusDominiHereta != null && tipusDominiHereta.indexOf(vdc.getDomainName()) == -1)) {
                             vit.remove();
                         }
                     }
@@ -487,7 +506,7 @@ public class AuthorizationServiceImpl extends
     protected String[] handleGetUserAuthorizationString(String codiAutoritzacio)
             throws Exception {
         return handleGetUserAuthorizationString(codiAutoritzacio,
-                getCodiUsuari());
+                Security.getCurrentAccount());
     }
 
     private String[] autoritzacionsToString(Collection autoritzacioRols) {
@@ -565,16 +584,16 @@ public class AuthorizationServiceImpl extends
     }
 
     protected Collection handleGetUserAuthorizations() throws Exception {
-        return handleGetUserAuthorizations(getCodiUsuari());
+        return handleGetUserAuthorizations(Security.getCurrentAccount());
     }
 
     protected Collection handleGetUserAuthorization(String codiAutoritzacio)
             throws Exception {
-        return handleGetUserAuthorization(codiAutoritzacio, getCodiUsuari());
+        return handleGetUserAuthorization(codiAutoritzacio, Security.getCurrentAccount());
     }
 
     protected String[] handleGetUserAuthorizationsString() throws Exception {
-        return handleGetUserAuthorizationsString(getCodiUsuari());
+        return handleGetUserAuthorizationsString(Security.getCurrentAccount());
     }
 
     protected String[] handleGetUserAuthorizationsString(String codiUsuari)
@@ -593,7 +612,7 @@ public class AuthorizationServiceImpl extends
     }
 
     protected Collection<AuthorizationRole> handleGetDescriptionUserAuthorizations() throws Exception {
-        return this.getDescriptionUserAuthorizations(getCodiUsuari());
+        return this.getDescriptionUserAuthorizations(Security.getCurrentAccount());
     }
 
     protected Collection<AuthorizationRole> handleGetDescriptionUserAuthorizations(String codiUsuari) throws Exception {

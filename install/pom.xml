@@ -237,7 +237,7 @@
 								</exec>
 								<exec failonerror="true" executable="docker" dir="${project.basedir}">
 									<arg value="push" />
-									<arg value="soffid/iam-console:latest-k" />
+									<arg value="soffid/iam-console:k" />
 								</exec>
 								<exec failonerror="true" executable="docker" dir="${project.basedir}">
 									<arg value="push" />

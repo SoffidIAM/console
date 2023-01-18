@@ -930,10 +930,14 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	private String generateQuickSearchQuery(String text, String filter) {
 		String q = generateQuickSearchQuery(text);
+		String [] split = removeOrderBy(filter);
+		filter = split[0];
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+")";
 		else if ( filter != null && ! filter.trim().isEmpty())
 			q = filter;
+		if (split[1] != null)
+			q += " "+split[1];
 		return q;
 	}
 
@@ -941,6 +945,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
 		
 		String q = generateQuickSearchQuery(text);
+		String [] split = removeOrderBy(filter);
+		filter = split[0];
+		
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
 			q = "("+q+") and ("+filter+") and ( not endDate pr  or endDate ge \""+s+"\")";
 		else if ( filter != null && ! filter.trim().isEmpty())
@@ -949,7 +956,19 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			q = "("+q+")  and ( not endDate pr or endDate ge \""+s+"\")";
 		else
 			q = "(not endDate pr) or endDate ge \""+s+"\"";
+		
+		if (split[1] != null)
+			q += " "+split[1];
+		
 		return q;
+	}
+
+	private String[] removeOrderBy(String filter) {
+		int i = filter.indexOf("$orderby");
+		if (i >= 0)
+			return new String[] { filter.substring(0,i).trim(), filter.substring(i) };
+		else
+			return new String[] { filter, null};
 	}
 
 	@Override

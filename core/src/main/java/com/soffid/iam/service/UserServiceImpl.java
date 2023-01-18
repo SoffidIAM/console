@@ -1184,6 +1184,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				getUserPreferenceEntityDao().remove(ua);
 			}
+			usuariEntity.getPreferences().clear();
 			for (UserAccountEntity ua: new LinkedList<UserAccountEntity> ( usuariEntity.getAccounts()))
 			{
 				AccountEntity acc = ua.getAccount();

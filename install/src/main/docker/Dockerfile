@@ -25,8 +25,5 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-VOLUME  /opt/soffid/iam-console-3/logs
-VOLUME  /opt/soffid/iam-console-3/docs
-VOLUME  /opt/soffid/iam-console-3/conf
 ENTRYPOINT /opt/soffid/iam-console-3/start.sh
 

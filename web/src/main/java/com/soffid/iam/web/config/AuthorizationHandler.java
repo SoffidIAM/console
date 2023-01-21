@@ -8,26 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.UserTransaction;
-
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Filedownload;
-import org.zkoss.zul.Listbox;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AuthorizationRole;
@@ -41,14 +26,9 @@ import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.IdentityHandler;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
-import es.caib.zkib.component.Form;
-import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
-import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -138,7 +118,7 @@ public class AuthorizationHandler extends FrameHandler {
 		return x;
 	}
 	
-	public void rolesTableAction(Event event) {
+	public void rolesTableAction(Event event) throws Exception {
 		DataTable t = (DataTable) getFellow("rolesTable");
 		String roleDescription = (String) XPathUtils.getValue((DataSource)t, "/role/name");
 		Missatgebox.confirmaOK_CANCEL(
@@ -260,4 +240,28 @@ public class AuthorizationHandler extends FrameHandler {
 		
 		getModel().refresh();
 	}
+	
+	public void deleteSelected(Event event0) {
+		Component b = event0.getTarget();
+		final Component lb = b.getParent().getPreviousSibling();
+		if (lb instanceof DataTable) {
+			final DataTable dt = (DataTable) lb;
+			if (dt.getSelectedIndexes() == null || dt.getSelectedIndexes().length == 0) return;
+			String msg = dt.getSelectedIndexes().length == 1 ? 
+					Labels.getLabel("common.delete") :
+					String.format(Labels.getLabel("common.deleteMulti"), dt.getSelectedIndexes().length);
+				
+			Missatgebox.confirmaOK_CANCEL(msg, 
+					(event) -> {
+						if (event.getName().equals("onOK")) {
+							dt.delete();
+							DataNode dn = (DataNode) XPathUtils.eval(getListbox(), "/");
+							if (dn != null)
+								dn.update();
+							displayRemoveButton(lb, false);
+						}
+					});
+		}
+	}
+
 }

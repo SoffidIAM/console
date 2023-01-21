@@ -3,11 +3,14 @@ package com.soffid.iam.web.inbox;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -160,6 +163,14 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
 					o.put("processName", task.getProcessName());
 					o.put("processId", task.getProcessId());
 					o.put("id", task.getId());
+					JSONObject atts = new JSONObject();
+					for (Entry<String, Object> att: ((Map<String, Object>)task.getVariables()).entrySet()) {
+						Object value = att.getValue();
+						if (value != null) {
+							listbox.wrapClientValue(atts, att.getKey(), value);
+						}
+					}
+					o.put("attributes", atts);
 					sb.append(o.toString());
 				}
 				sb.append("]");

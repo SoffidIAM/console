@@ -46,6 +46,7 @@ import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 import com.soffid.scimquery.parser.ParseException;
 
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
@@ -569,10 +570,20 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	public AttributeSearchBox addAttribute(String att) {
 		for (SearchAttributeDefinition def: dictionary.getAttributes())
 		{
-			if (def.getName().equals(att))
+			if (def.getName().equals(att) && canQueryByAttribute(def))
 				return addAttribute (def);
 		}
 		return null;
+	}
+
+	private boolean canQueryByAttribute(SearchAttributeDefinition def) {
+		if (def.getType() == TypeEnumeration.HTML || 
+				def.getType() == TypeEnumeration.PHOTO_TYPE || 
+				def.getType() == TypeEnumeration.ATTACHMENT_TYPE || 
+				def.getType() == TypeEnumeration.BINARY_TYPE)
+			return false;
+		else
+			return true;
 	}
 
 	public SearchDictionary getDictionary() {
@@ -628,7 +639,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 						}
 					}
 				}
-				if (! found)
+				if (! found && canQueryByAttribute(def))
 				{
 					anyMissing = true;
 					break;
@@ -683,7 +694,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		HashSet<String> atts = new HashSet();
 		for (final SearchAttributeDefinition def: dictionary.getAttributes())
 		{
-			if (! atts.contains(def.getName())) {
+			if (canQueryByAttribute(def) && ! atts.contains(def.getName())) {
 				atts.add(def.getName());
 				boolean found = false;
 				for ( Component component: (List<Component>)getChildren())
@@ -744,7 +755,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					}
 				}
 			}
-			if (!found) return true;
+			if (!found && canQueryByAttribute(def)) return true;
 		}
 		return false;
 	}

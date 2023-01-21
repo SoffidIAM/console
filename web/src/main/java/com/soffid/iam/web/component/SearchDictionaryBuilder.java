@@ -356,6 +356,7 @@ public class SearchDictionaryBuilder {
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&
 				! TypeEnumeration.PHOTO_TYPE.equals(att.getType()) &&
+				! TypeEnumeration.HTML.equals(att.getType()) &&
 				! TypeEnumeration.ATTACHMENT_TYPE.equals(att.getType()))
 			{
 				SearchAttributeDefinition sad = new SearchAttributeDefinition();

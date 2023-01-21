@@ -13,11 +13,14 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 				</menu2>
 				<databutton image="/img/restart.svg" label="${c:l('inbox.lblRecargar')}" onClick="ref:frame.refresh()" onlyIcon="true"/>
 			</div>
 	
 			<datatable enablefilter="true" id="listbox" 
+				preference="inbox"
+				use="com.soffid.iam.web.inbox.TaskDatatable" 
 				onSelect="ref:frame.openTask">
 			<attribute name="columns"><![CDATA[
 - name: ${c:l('deploy.lblIdProceso')}

@@ -472,6 +472,13 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("109");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("109"))
+		{
+			getAdditionalDataService().registerStandardObject("com/soffid/iam/bpm/api/ProcessInstance.ui.json", 
+					null, false);
+			cfg.setValue("110");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void fixAgentDescriptor() {

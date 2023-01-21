@@ -8,6 +8,7 @@
   value: time_datetime
 - name: ${c:l('task.comentari')}
   value: message
+  multiline: true
 		]]></attribute>
 	</datatable>
 </zk>

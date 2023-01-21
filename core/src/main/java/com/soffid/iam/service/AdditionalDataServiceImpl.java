@@ -479,28 +479,30 @@ public class AdditionalDataServiceImpl extends
 		getCustomObjectTypeEntityDao().create(entity);
 		updateRoles(entity, obj);
 		
-		MetaDataEntity name = getMetaDataEntityDao().newMetaDataEntity();
-		name.setBuiltin(true);
-		name.setObjectType(entity);
-		name.setName("name");
-		name.setNlsLabel("com.soffid.iam.api.CustomObject.name");
-		name.setOrder(1L);
-		name.setRequired(true);
-		name.setSize(100);
-		name.setType(TypeEnumeration.STRING_TYPE);
-		getMetaDataEntityDao().create(name);
-		
-		
-		MetaDataEntity description = getMetaDataEntityDao().newMetaDataEntity();
-		description.setBuiltin(true);
-		description.setObjectType(entity);
-		description.setName("description");
-		description.setNlsLabel("com.soffid.iam.api.CustomObject.description");
-		description.setOrder(2L);
-		description.setRequired(true);
-		description.setSize(100);
-		description.setType(TypeEnumeration.STRING_TYPE);
-		getMetaDataEntityDao().create(description);
+		if (! obj.isBuiltin()) {
+			MetaDataEntity name = getMetaDataEntityDao().newMetaDataEntity();
+			name.setBuiltin(true);
+			name.setObjectType(entity);
+			name.setName("name");
+			name.setNlsLabel("com.soffid.iam.api.CustomObject.name");
+			name.setOrder(1L);
+			name.setRequired(true);
+			name.setSize(100);
+			name.setType(TypeEnumeration.STRING_TYPE);
+			getMetaDataEntityDao().create(name);
+			
+			
+			MetaDataEntity description = getMetaDataEntityDao().newMetaDataEntity();
+			description.setBuiltin(true);
+			description.setObjectType(entity);
+			description.setName("description");
+			description.setNlsLabel("com.soffid.iam.api.CustomObject.description");
+			description.setOrder(2L);
+			description.setRequired(true);
+			description.setSize(100);
+			description.setType(TypeEnumeration.STRING_TYPE);
+			getMetaDataEntityDao().create(description);
+		}
 		
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}

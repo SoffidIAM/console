@@ -3,10 +3,13 @@ package com.soffid.iam.web.bpm.process;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -92,14 +95,22 @@ public class MyRequestsHandler extends com.soffid.iam.web.component.FrameHandler
 					if (sb.length() > 1) sb.append(",");
 					JSONObject o = new JSONObject();
 					o.put("id", process.getId());
-					o.put("name", process.getDescription());
-					o.put("task", process.getCurrentTask());
-					o.put("startDate_datetime", DateFormats.getDateTimeFormat().format(process.getStart()));
-					o.put("startDate", process.getStart().getTime());
+					o.put("description", process.getDescription() );
+					o.put("currentTask", process.getCurrentTask());
+					o.put("start_datetime", DateFormats.getDateTimeFormat().format(process.getStart()));
+					o.put("start", process.getStart().getTime());
 					if (process.getEnd() != null) {
-						o.put("endDate_datetime", DateFormats.getDateTimeFormat().format(process.getEnd()));
-						o.put("endDate", process.getEnd().getTime());
+						o.put("end_datetime", DateFormats.getDateTimeFormat().format(process.getEnd()));
+						o.put("end", process.getEnd().getTime());
 					}
+					JSONObject atts = new JSONObject();
+					for (Entry<String, Object> att: process.getVariables().entrySet()) {
+						Object value = att.getValue();
+						if (value != null) {
+							listbox.wrapClientValue(atts, att.getKey(), value);
+						}
+					}
+					o.put("attributes", atts);
 					sb.append(o.toString());
 				}
 				sb.append("]");

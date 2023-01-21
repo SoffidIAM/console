@@ -18,6 +18,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 				</menu2>
 			</div>
 	
@@ -68,21 +69,10 @@
 				</div>
 			</div>
 	
-			<datatable id="listbox"  onSelect="ref:frame.openProcess">
-			<attribute name="columns"><![CDATA[
-- name: ${c:l('observacion.lblIdProceso')}
-  value: id
-- name: ${c:l('observacion.lblProceso')}
-  value: description
-- name: ${c:l('observacion.lblTarea')}
-  value: task
-- name: ${c:l('observacion.lblFechaInicio')}
-  value: start
-  template: #{start_datetime}
-- name: ${c:l('observacion.lblFechaFinalizacion')}
-  value: end
-  template: #{end_datetime}
-			]]></attribute>
+			<datatable id="listbox"  onSelect="ref:frame.openProcess"
+				use="com.soffid.iam.web.bpm.process.ProcessDatatable" 
+				preference="processInstance"
+				>
 			</datatable>
 		</div>
 		<div sclass="card__face card__face--back">

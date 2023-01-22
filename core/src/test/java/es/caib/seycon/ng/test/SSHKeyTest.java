@@ -9,7 +9,7 @@ import com.soffid.iam.service.impl.SshKeyGenerator;
 import junit.framework.TestCase;
 
 public class SSHKeyTest extends TestCase {
-	public void testGenerate() throws NoSuchAlgorithmException {
+	public void testGenerate() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
 		SshKeyGenerator g = new SshKeyGenerator();
 		g.generateKey();
 		
@@ -81,4 +81,73 @@ public class SSHKeyTest extends TestCase {
 		System.out.println(s);
 		System.out.println(pub);
 	}
+	
+	public void testRead2() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
+		String key = "-----BEGIN OPENSSH PRIVATE KEY-----\n"
+				+ "b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn\n"
+				+ "NhAAAAAwEAAQAAAYEAvJp8SnCVNeDFG8xfwuU5ED9l+fSWL8+wmnfvAD0gqbooHHLNYH+7\n"
+				+ "maixhrERQT0FTuQ5de5IoiHeUKMb6n+YCSbHnadtTGxL2MSVQcELwlUQrtcOMb95IjvbGy\n"
+				+ "JBxDJYUaSbhZU5HvSkKJCwSupcxc5Y2XizdHWGqIpYRlRTurmj0lE3VFZz4+i83ffVcyjD\n"
+				+ "b6mtRPM2NoAwFWi8o6Ls1amVQ2kEzXRfaceR/TwjSgfKi10sxm76yIuNc4tfSDozKqNUKD\n"
+				+ "YQgjrmsIPB2Ilcjwq9vkX70NgT7YP90eS3Yn/X56bLHbL3vGqCG/vAWDFSq79FzjZ0B2Io\n"
+				+ "GBM0r29IkrtVPCAYx4bRjYItouyo1xW2qPUSEqN2Fm781A7wHwYwa0nPWiBKGZu5BUvqta\n"
+				+ "giMhZV+j6SVR8LOb6shMmhFXiKdcQ/TNiPuYGcCghQleHeyyMsp5gA/pBTgXUIgUU3BriD\n"
+				+ "9HQUviwOY3LGLmGCfxvPNm3b+zFrturHaJ8Qgl1vAAAFmBe2HWwXth1sAAAAB3NzaC1yc2\n"
+				+ "EAAAGBALyafEpwlTXgxRvMX8LlORA/Zfn0li/PsJp37wA9IKm6KBxyzWB/u5mosYaxEUE9\n"
+				+ "BU7kOXXuSKIh3lCjG+p/mAkmx52nbUxsS9jElUHBC8JVEK7XDjG/eSI72xsiQcQyWFGkm4\n"
+				+ "WVOR70pCiQsErqXMXOWNl4s3R1hqiKWEZUU7q5o9JRN1RWc+PovN331XMow2+prUTzNjaA\n"
+				+ "MBVovKOi7NWplUNpBM10X2nHkf08I0oHyotdLMZu+siLjXOLX0g6MyqjVCg2EII65rCDwd\n"
+				+ "iJXI8Kvb5F+9DYE+2D/dHkt2J/1+emyx2y97xqghv7wFgxUqu/Rc42dAdiKBgTNK9vSJK7\n"
+				+ "VTwgGMeG0Y2CLaLsqNcVtqj1EhKjdhZu/NQO8B8GMGtJz1ogShmbuQVL6rWoIjIWVfo+kl\n"
+				+ "UfCzm+rITJoRV4inXEP0zYj7mBnAoIUJXh3ssjLKeYAP6QU4F1CIFFNwa4g/R0FL4sDmNy\n"
+				+ "xi5hgn8bzzZt2/sxa7bqx2ifEIJdbwAAAAMBAAEAAAGABL8GXX7uzHYzWCs9xhVe+gRDNz\n"
+				+ "Okq4HyECgBXFkT2vsuVSk1O0utu6sWNWSeMrW4tII9L4p2QjLIU3l/U2E4jc7vqA1vIbwt\n"
+				+ "JNo+ZdmCx768mugrjHDgdPBBRal/zGOHjLc4cCrHV6VRJOkffHoTj2UJMSkpZmkZh4Mg0N\n"
+				+ "URkBN64BPBV8trscgAfUXmUU/f7qdm0yeKOfM3z1odS9NvWzIO8hwqa72VM+Y6wy3kA7hY\n"
+				+ "rFee0e9rGPDx1X8bSJCHIkWy326Zi1MEK8dpwCkR05wNyDVu4Aj7GMbub/HYbJxgqe+/b0\n"
+				+ "7XLXl6midsHEIgbKU0uSI5sUPS+poXYNIuQL7Dv/sDmNLPnzIjac5LBwKlB+9U0A8R1cqZ\n"
+				+ "bguypKClct1l5BNp1vBX5lrWHfJqrjJKtFmr+ES5FwXas8HiWPtN1Zg0dTSXX28BuJnJB6\n"
+				+ "tzIJXW5vAiqyMCYF8Bb1bXhTOaHk1ji7nZt7OX37BD14n90Ie2mZjJSWKYkPs07qsFAAAA\n"
+				+ "wAaJVho+2hvIeShqA3pooTvGwhwSry/QiXwiVvUtjA7gWKSejGRoAbojwppOiP1C6SCxKq\n"
+				+ "aHFlhtABYcTsBtHX4iGoFP0QBA/PVge3F/uK+7tS3GIyMx7kgM+hJXe0w6QBtKGhUggtmP\n"
+				+ "DlAGveHRQ2lSStuON2ObtR+epTxTNXQTHTWG/8WhpmXDjGxyUvglTciz0iL7UxvvUQo1Lj\n"
+				+ "hUstdEHwK+kCV0j4RbJ2fCcXomkj3nJh0mOmBpXM/IWM5qpgAAAMEA/DCx0IAy0VVF8k4G\n"
+				+ "MJsKekat20BUbqNGcvk8W9K/PhNhSxdvt+3ScSmhhB3OUxr7LqOLCRvFOPzYe5PZ2O2dYK\n"
+				+ "BW8Lj5D00r//pAUNnC+b/nY9Ba9dH5DxYr1yNTrEmtxabHpG5DfxEPaBUapTJpwJ1rMV9N\n"
+				+ "KOH9qTh8vERfgTfkWubfXEoRiEmtATrf48MY03SB8qTjB36XxPJyGsakx0l71XfTamd1CC\n"
+				+ "Iy8/S3FQatCayLwHshhKK69cGlsK4bAAAAwQC/c+EZlXV++QwPaOvTc9dBgR2KvSbBNb/v\n"
+				+ "JuiQ1Vv6g1TqXdsA35ZxyWPIfAE6yKJiHt1jldABQTmbXnSnpU1BawmqWS7iY0qUlEFrSU\n"
+				+ "xzjKjFyx+HIjtC5U5USUkATqGXenYmdvdKXwyPIoeGlG4IPCmWN0yx5cL87Ozf+hjvv7UO\n"
+				+ "8VFrY0bh2HEm64naqvN5QKwQ4gAC4p70rZAUuzvZRw78hkxnGAkMLMTTM04slTsy3dq2j9\n"
+				+ "073domQC3Esz0AAAAdZ2J1YWRlc0BnYnVhZGVzLVRoaW5rUGFkLVQ1OTABAgMEBQY=\n"
+				+ "-----END OPENSSH PRIVATE KEY-----";
+		SshKeyGenerator g = new SshKeyGenerator();
+		g.loadKey(key);
+
+		String s = g.getPrivateKeyString();
+		String pub = g.getPublicKeyString("Test");
+		
+		System.out.println(s);
+		System.out.println(pub);
+	}
+
+	public void testGenerateAndRead() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+		SshKeyGenerator g = new SshKeyGenerator();
+		g.generateKey();
+		
+		String s = g.getPrivateKeyString();
+		
+		System.out.println(s);
+		System.out.println(g.getPublicKeyString("Test"));
+
+		SshKeyGenerator g2 = new SshKeyGenerator();
+		g2.loadKey(s);
+		
+		String priv = g2.getPrivateKeyString();
+		String pub = g2.getPublicKeyString("Test");
+		
+		System.out.println(priv);
+		System.out.println(pub);
+	}
+
 }

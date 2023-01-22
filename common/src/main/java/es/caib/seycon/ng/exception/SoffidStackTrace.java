@@ -165,40 +165,49 @@ public class SoffidStackTrace
         s.flush();
     }
 
-	public static String generateShortDescription(Throwable e) {
-		Throwable cause = null;
-		String lastMessage = e.getMessage();
-		int lastPos = 0;
-		StringBuffer msgBuffer = new StringBuffer();
-		msgBuffer.append(e.getMessage());
-		do {
-			if ( e instanceof javax.ejb.EJBException ) 
-				cause = ((EJBException)e).getCausedByException ();
-			else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
-				cause = e.getCause ();
-			}
-			else
-				cause = e.getCause ();
-			if (cause == null || cause == e)
-				break;
-			if (lastMessage != null && lastMessage.equals(cause.toString()))
-				msgBuffer.delete(lastPos, msgBuffer.length());
-			String m = cause.getMessage();
-			if ( m == null ) m = cause.getClass().getSimpleName();
-			if (! (cause instanceof EJBException)) {
-				// Remove previous message
-				if (! msgBuffer.toString().contains(m))
-				{
-					lastMessage = m;
-					lastPos = msgBuffer.length();
-					if (msgBuffer.length() > 0)
-						msgBuffer.append("\ncaused by: ");
-					msgBuffer.append(m);
-				}
-			}
-			e = cause;
-		} while (true);
-		return msgBuffer.toString();
+	public static String generateShortDescription(Exception e) {
+		StringBuffer sb = new StringBuffer();
+	   	Throwable root = e;
+	   	String last = null;
+	   	String lastMessage = null;
+	   	LinkedList<String> significantExceptions = new LinkedList<>();
+	   	do
+	   	{
+	   		String next ;
+	   		if ( root instanceof InternalErrorException)
+	   			next = root.getMessage();
+	   		else
+	   			next = root.toString();
+	   		if (next != null)
+	   		{
+	   			if ( root instanceof EJBException) {
+	   				// Ignore
+	   			}
+	   			else if (last == null || ! last.contains(next))
+		   		{
+		   			significantExceptions.add(next);
+		   			last = next;
+		   			lastMessage = root.getMessage();
+		   		}
+		   		else if (lastMessage != null && lastMessage.equals(root.toString()))
+		   		{
+		   			significantExceptions.removeLast();
+		   			significantExceptions.add(next);
+		   			last = next;
+		   			lastMessage = root.getMessage();
+		   		}
+	   		}
+	   		if (root.getCause() == null || root.getCause() == root)
+	   			break;
+	   		else
+	   			root = root.getCause ();
+	   	} while (true);
+	   	for ( String s: significantExceptions) {
+   			if ( sb.length() > 0)
+   				sb.append("\ncaused by ");
+   			sb.append(s);
+	   	}
+	   	return sb.toString();
 	}
 
 

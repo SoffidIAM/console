@@ -59,7 +59,7 @@
 				<customfield3 label="${c:l('job.dueDate')}" readonly="true" bind="@dueDate" dataType="DATE_TIME"/>
 				<customfield3 label="${c:l('job.failures')}" readonly="true" bind="failures" dataType="NUMBER"/>
 				<customfield3 label="${c:l('job.status')}" readonly="true" dataType="STRING" id="status"/>
-				<customfield3 label="${c:l('job.error')}" readonly="true" dataType="STRING" id="errorLog" multiline="true"/>
+				<customfield3 label="${c:l('job.error')}" readonly="true" dataType="STRING" id="errorLog" multiline="true" bind="errorMessage"/>
 				<div style="text-align: right; width: 100%">
 				    <button id="closebutton" label="${c:l('job.button.close')}" onClick="ref:frame.hideDetails"/>
 				    <button id="pausebutton" label="${c:l('job.button.pause')}" onClick="ref:frame.pause"/>

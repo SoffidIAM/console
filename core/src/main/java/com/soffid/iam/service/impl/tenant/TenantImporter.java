@@ -101,7 +101,7 @@ public class TenantImporter extends TenantDataManager {
 		
 		do {
 			String action = (String) in.readObject();
-		if (action == null)	break;
+			if (action == null)	break;
 			if (action.equals("insert"))
 				insertTable(  );
 			else if (action.equals("update"))

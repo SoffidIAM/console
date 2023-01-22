@@ -206,6 +206,16 @@
 									<arg value="-f" />
 									<arg value="target/docker/Dockerfile" />
 									<arg value="-t" />
+									<arg value="soffid/iam-console:${pom.version}-k" />
+									<arg value="-t" />
+									<arg value="soffid/iam-console:k" />
+									<arg value="." />
+								</exec>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="build" />
+									<arg value="-f" />
+									<arg value="target/docker/Dockerfile2" />
+									<arg value="-t" />
 									<arg value="soffid/iam-console:${pom.version}" />
 									<arg value="-t" />
 									<arg value="soffid/iam-console:latest" />
@@ -222,6 +232,14 @@
 						<phase>deploy</phase>
 						<configuration>
 							<tasks>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="push" />
+									<arg value="soffid/iam-console:${pom.version}-k" />
+								</exec>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="push" />
+									<arg value="soffid/iam-console:k" />
+								</exec>
 								<exec failonerror="true" executable="docker" dir="${project.basedir}">
 									<arg value="push" />
 									<arg value="soffid/iam-console:${pom.version}" />

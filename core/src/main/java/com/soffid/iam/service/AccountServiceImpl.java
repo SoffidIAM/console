@@ -2560,7 +2560,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		List <AccountEntity> r = ( List <AccountEntity>) new QueryBuilder()
 				.query( hql.toString(), 
 						paramArray,
-						cs == null ? null: cs.getMaximumResultSize());
+						cs == null ?  new CriteriaSearchConfiguration() : cs);
 		PagedResult<Account> pagedResult = new PagedResult<Account>();
 		int totalResults = 0;
 		for (AccountEntity ue :r) {

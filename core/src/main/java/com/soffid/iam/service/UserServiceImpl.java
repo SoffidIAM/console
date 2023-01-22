@@ -1184,6 +1184,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				getUserPreferenceEntityDao().remove(ua);
 			}
+			usuariEntity.getPreferences().clear();
 			for (UserAccountEntity ua: new LinkedList<UserAccountEntity> ( usuariEntity.getAccounts()))
 			{
 				AccountEntity acc = ua.getAccount();
@@ -2542,7 +2543,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		LinkedList<GroupEntity> grups = new LinkedList<GroupEntity>();
 		HashMap<String, Group> result = new HashMap<String, Group>();
 
-		grups.add(entity.getPrimaryGroup());
+		if (entity.getPrimaryGroup() != null)
+			grups.add(entity.getPrimaryGroup());
 		for (Iterator<UserGroupEntity> it = entity.getSecondaryGroups()
 				.iterator(); it.hasNext();) {
 			UserGroupEntity uge = it.next();

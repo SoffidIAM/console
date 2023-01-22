@@ -22,12 +22,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.TimeZones;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
@@ -1379,5 +1381,13 @@ public class InputField3 extends Databox
 	public void setJavascripthelp(String javascripthelp) {
 		this.javascripthelp = javascripthelp;
 	}
+	
+	protected TimeZone getTimeZone() {
+		if (dataType != null && dataType.getType() == TypeEnumeration.DATE_TIME_TYPE)
+			return TimeZones.getCurrent();
+		else
+			return TimeZone.getDefault();
+	}
+
 
 }

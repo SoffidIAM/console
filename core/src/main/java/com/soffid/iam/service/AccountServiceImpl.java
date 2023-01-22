@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
@@ -1395,12 +1396,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	 * @param grupPrimari
 	 * @param accounts
 	 */
-	private void addGrantedAccounts(GroupEntity grup, Set<AccountEntity> accounts, AccountAccessLevelEnum level) {
+	private void addGrantedAccounts(GroupEntity grup, Map<AccountEntity, AccountAccessLevelEnum> accounts, AccountAccessLevelEnum level) {
 		for (AccountAccessEntity aae: grup.getAccountAccess())
 		{
 			if (!Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
 			{
-				accounts.add(aae.getAccount());
+            	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+            	if (current == null ||
+            			isGreaterOrIqualThan(aae.getLevel(), current))
+           			accounts.put(aae.getAccount(), aae.getLevel());
 			}
 		}
 		if (grup.getParent() != null)
@@ -2297,14 +2301,20 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
 		Collection<RoleGrant> grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
-		Set<AccountEntity> accounts = new HashSet<AccountEntity>();
+		Map<AccountEntity, AccountAccessLevelEnum> accounts = new HashMap<AccountEntity,AccountAccessLevelEnum>();
 		for (RoleGrant rg : grants) {
             RoleEntity r = getRoleEntityDao().load(rg.getRoleId());
             for (AccountAccessEntity aae : r.getAccountAccess()) {
-                if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level)) 
-                	accounts.add(aae.getAccount());
+                if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))  {
+                	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+                	if (current == null ||
+                			isGreaterOrIqualThan(aae.getLevel(), current))
+               			accounts.put(aae.getAccount(), aae.getLevel());
+                }
             }
         }
+		
+		
 		UserEntity ue = getUserEntityDao().load(usuari.getId());
 		addGrantedAccounts(ue.getPrimaryGroup(), accounts, level);
 		for (UserGroupEntity ug : ue.getSecondaryGroups()) {
@@ -2315,23 +2325,34 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (AccountAccessEntity aae: ue.getAccountAccess())
 		{
 			if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
-				accounts.add(aae.getAccount());
+			{
+            	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+            	if (current == null ||
+            			isGreaterOrIqualThan(aae.getLevel(), current))
+           			accounts.put(aae.getAccount(), aae.getLevel());
+				
+			}
 		}
 		
 		for (UserAccountEntity uae: ue.getAccounts())
 		{
-			if (uae.getAccount().getType().equals (AccountType.USER))
-				accounts.add(uae.getAccount());
+			if (uae.getAccount().getType().equals (AccountType.USER)) {
+     			accounts.put(uae.getAccount(), AccountAccessLevelEnum.ACCESS_OWNER);
+			}
 		}
 		List<Account> vos = new LinkedList<Account>();
-		for ( AccountEntity accEntity: accounts)
+		for ( Entry<AccountEntity, AccountAccessLevelEnum> entry: accounts.entrySet())
 		{
+			AccountEntity accEntity = entry.getKey();
 			if (!accEntity.isDisabled())
 			{
-				if (accEntity.getType().equals(AccountType.USER))
-					vos.addAll(getUserAccountEntityDao().toUserAccountList(accEntity.getUsers()));
-				else
-					vos.add(getAccountEntityDao().toAccount(accEntity));
+				Account acc = getAccountEntityDao().toAccount(accEntity);
+				if (accEntity.getType().equals(AccountType.USER)) {
+					for (UserAccountEntity uac: accEntity.getUsers())
+						acc = getUserAccountEntityDao().toUserAccount(uac);
+				}
+				acc.setAccessLevel(entry.getValue());
+				vos.add(acc);
 			}
 		}
 		return vos;

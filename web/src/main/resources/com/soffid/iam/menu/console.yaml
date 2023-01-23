@@ -128,7 +128,7 @@
           - name: wheel.menu
             img: /img/menu/wheel.svg
             url: /config/wheel.zul
-            permissions: ["authorization:all"]
+            permissions: ["parameter:create"]
         - name: seu.integration-engine
           img: /img/menu/integration.svg
           options:

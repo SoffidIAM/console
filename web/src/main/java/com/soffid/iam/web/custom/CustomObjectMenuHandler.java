@@ -60,7 +60,16 @@ public class CustomObjectMenuHandler implements DynamicMenuHandler {
 
 	@Override
 	public boolean isVisible(MenuOption option) {
-		return true;
+		try {
+			for (CustomObjectType cu: EJBLocator.getAdditionalDataService().findCustomObjectTypeByJsonQuery("builtin eq \"false\"")) {
+				if (allowed(cu)) {
+					return true;
+				}
+			}
+		} catch ( Exception e) {
+			log.warn("Error fetching process to start", e);
+		}
+		return false;
 	}
 
 

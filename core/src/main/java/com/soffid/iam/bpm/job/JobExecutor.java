@@ -116,7 +116,7 @@ public class JobExecutor {
 	private static String getHostName() {
 		if (hostName == null) {
 			try {
-				hostName = InetAddress.getLocalHost().getHostAddress();
+				hostName = InetAddress.getLocalHost().getHostName();
 			} catch (UnknownHostException e) {
 				hostName = "127.0.0.1"; //$NON-NLS-1$
 			}

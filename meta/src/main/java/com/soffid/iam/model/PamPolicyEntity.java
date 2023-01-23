@@ -40,5 +40,5 @@ public class PamPolicyEntity {
 	TenantEntity tenant;
 }
 
-@Index(name = "SC_PAMPOL_UK", entity = PamPolicyEntity.class, columns = {"PPO_NAME"}, unique = true)
+@Index(name = "SC_PAMPOL_UK", entity = PamPolicyEntity.class, columns = {"PPO_TEN_ID", "PPO_NAME"}, unique = true)
 class PamPolicyEntityUniqueKey {} 

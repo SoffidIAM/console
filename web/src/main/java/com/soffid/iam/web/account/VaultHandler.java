@@ -78,7 +78,14 @@ public class VaultHandler extends FrameHandler {
 	}
 		
 
+	public void onChangeForm2(Event ev) throws Exception {
+		changeVisibility(ev, false);
+	}
 	public void onChangeForm(Event ev) throws Exception {
+		changeVisibility(ev, true);
+	}
+	
+	public void changeVisibility(Event ev, boolean changeTab) throws Exception {
 		super.onChangeForm(ev);
 		DataTree2 lb = (DataTree2) getListbox();
 		if ( lb.getSelectedItemXPath() != null ) {
@@ -98,7 +105,7 @@ public class VaultHandler extends FrameHandler {
 				getFellow("updatePasswordButton").setVisible(false);
 				getFellow("updateSshButton").setVisible(false);
 			} else {
-				updateAccountIcons();
+				updateAccountIcons(changeTab);
 				ObjectAttributesDiv att = (ObjectAttributesDiv) getFellow("userAttributes");
 				
 				AccountAccessLevelEnum level = instance.getAccount().getAccessLevel();
@@ -118,9 +125,10 @@ public class VaultHandler extends FrameHandler {
 		updateStatus();
 	}
 
-	public void updateAccountIcons() {
+	public void updateAccountIcons(boolean changeTab) {
 		Long id = (Long) XPathUtils.eval(getForm(), "id");
-		((Tabbox)getFellow("accountTabbox")).setSelectedIndex(id == null ? 1 : 0);
+		if (changeTab)
+			((Tabbox)getFellow("accountTabbox")).setSelectedIndex(id == null ? 1 : 0);
 		String url = (String) XPathUtils.getValue(getForm(), "loginUrl");
 		AccountAccessLevelEnum accessLevel = (AccountAccessLevelEnum) XPathUtils.getValue(getForm(), "accessLevel"); 
 		AccountType type = (AccountType) XPathUtils.getValue(getForm(), "type");
@@ -532,7 +540,7 @@ public class VaultHandler extends FrameHandler {
 			.getLabel("accounts.setPassword.delayed.msg"));
 		}
 		w.setVisible(false);
-		updateAccountIcons();
+		updateAccountIcons(false);
 	}
 
 	public void unlockAccount() throws WrongValueException, InternalErrorException, NamingException, CreateException {
@@ -544,7 +552,7 @@ public class VaultHandler extends FrameHandler {
 							SelfService ejb = EJBLocator.getSelfService();
 							ejb.checkinHPAccount(account);
 							XPathUtils.setValue(getForm(), "lockedBy", null);
-							updateAccountIcons();
+							updateAccountIcons(false);
 						}
 					} );
 

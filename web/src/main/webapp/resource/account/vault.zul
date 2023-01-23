@@ -25,7 +25,7 @@
 	}
 	</script>
 	
-	<datamodel id="model" rootNode="root" src="descriptorVault.xml"/>
+	<datamodel id="model" rootNode="root" src="descriptorVault.xml" onCommit="ref:frame.onChangeForm2"/>
 	<timer onTimer="ref:frame.updateStatus" running="false" delay="5000" repeats="true" />
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">

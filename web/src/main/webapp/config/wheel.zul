@@ -27,12 +27,7 @@
 </style>
 
 		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
-				<menu2>
-					<menu2item image="/img/restart.svg" if="${canRestartConsole}" label="${c:l('plugins.zul.RestartServer') }" onClick="ref:frame.restartConsole"/>
-					<menu2item image="/img/add.svg"  if="${canUpdatePlugins}"  label="${c:l('agents.zul.Afegeixnou') }" onClick="ref:frame.addNew"/>
-					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
-				</menu2>
-			</div>
+		</div>
 
 <!-- 1.- USER OPTIONS-->
 		<timer delay="200" onTimer="ref:frame.showWelcome" repeats="false" running="true"/>

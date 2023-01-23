@@ -94,7 +94,10 @@ public class LoginPage extends Html {
 			} else {
 				setVariable("autoLogin", false, false);
 			}
-			setVariable("saml", saml, false);
+			boolean maintenance = "true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||
+					"true".equals(System.getProperty("soffid.auth.maintenance"));
+			setVariable("saml", saml && !maintenance, false);
+			setVariable("maintenance", maintenance, false);
 		} catch (InternalErrorException e) {
 			throw new UiException(e);
 		}

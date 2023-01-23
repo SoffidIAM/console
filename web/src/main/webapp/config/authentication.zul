@@ -13,6 +13,15 @@
 
 	<form dataPath="model:/conf" id="samlform" width="100%">
 		<div>
+			<label sclass="separator" value="${c:l('parametres.zul.maintenance')}"/>
+		</div>
+		<div style="margin-left: 150px">
+			<div width="100%">
+				<switch bind="maintenanceMode"  ></switch>
+				<label value="${c:l('parametres.zul.maintenanceMode')}"  style="margin-left: 16px" />
+			</div>
+		</div>
+		<div>
 			<label sclass="separator" value="${c:l('parametres.zul.classicMethod')}"/>
 		</div>
 		<div style="margin-left: 150px">

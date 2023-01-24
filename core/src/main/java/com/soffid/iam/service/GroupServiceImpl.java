@@ -964,6 +964,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	private String[] removeOrderBy(String filter) {
+		if (filter == null)
+			return new String[] {null, null};
 		int i = filter.indexOf("$orderby");
 		if (i >= 0)
 			return new String[] { filter.substring(0,i).trim(), filter.substring(i) };

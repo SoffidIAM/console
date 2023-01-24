@@ -78,11 +78,7 @@
    					<input style="margin: 15px 0px 0px 0px" type="button" value="${c:l('configure.samlLogin')}" onClick="location.href='${execution.contextPath }/saml'"/>
 				</p>                             
 ]]></html>
-<html if="${maintenance }"><![CDATA[
-            	<p style="font-weight: bold; margin-top: 25px" >
-   					${c:l('login.lblMaintenance') }
-				</p>                             
-]]></html>
+		<label if="${maintenance }" style="display: inline-block; font-weight: bold; margin-top: 25px" value="${c:l('login.lblMaintenance') }"/>
 <html><![CDATA[
 			</form>
 			</div>

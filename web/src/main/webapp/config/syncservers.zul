@@ -79,7 +79,7 @@
 							<label value="${c:l('servers.zul.JavaOptions')} :"/>
 							<textbox bind="@javaOptions" maxlength="256" multiline="true"
 									rows="1"
-									style="width:100%; resize: vertical" constraint="no empty"/>
+									style="width:100%; resize: vertical"/>
 						</row>
 					</rows>
 				</grid>

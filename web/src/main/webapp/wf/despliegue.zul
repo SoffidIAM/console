@@ -33,7 +33,7 @@
 - name: ${c:l('deploy.lblProceso') }
   value: name
 - name: ${c:l('deploy.lblVersion')}
-  value: version
+  value: tag
 - name: ${c:l('deploy.DeployedBy')}
   value: author
 - name: ${c:l('deploy.Date')}

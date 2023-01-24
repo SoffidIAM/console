@@ -35,6 +35,7 @@ import com.soffid.iam.api.AgentStatusInfo;
 import com.soffid.iam.api.Server;
 import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.api.SyncServerInfo;
+import com.soffid.iam.service.ejb.SyncServerService;
 import com.soffid.iam.ui.SeyconTask;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
@@ -771,5 +772,44 @@ public class SyncserverHandler extends FrameHandler {
 			throw new UiException (e);
 		}
 		
+	}
+	
+	public void downloadAgentCsv(Event ev) {
+		DataTable t = (DataTable) ev.getTarget().getFellow("table");
+		t.download();
+	}
+
+	public void cancelAgent(Event ev) {
+        if (currentAgentTasks == null) return;
+        
+		Missatgebox.confirmaOK_CANCEL(
+				Labels.getLabel("seyconserver.zul.ConfirmCancelAgentTask"),
+						(event2) -> {
+							if ("onOK".equals( event2.getName())) {
+								SyncServerService svc = EJBLocator.getSyncServerService();
+								for (SyncAgentTaskLog task: currentAgentTasks) {
+									try {
+										svc.cancelTask(task.getTaskId());
+									} catch (Exception e) {
+										
+									}
+								}
+								refreshAgentTasks(ev);
+							}
+						});
+	}
+
+	public void rescheduleAgent(Event ev) throws InternalErrorException, NamingException, CreateException {
+        if (currentAgentTasks == null) return;
+        
+		SyncServerService svc = EJBLocator.getSyncServerService();
+		for (SyncAgentTaskLog task: currentAgentTasks) {
+			try {
+				svc.boostTask(task.getTaskId());
+			} catch (Exception e) {
+				
+			}
+		}
+		refreshAgentTasks(ev);
 	}
 }

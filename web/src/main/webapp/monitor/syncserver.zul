@@ -134,6 +134,11 @@
 		title=""
 		visible="false">
 		<div sclass="dummy navigation-bar">
+			<menu2>
+				<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadAgentCsv"/>
+				<menu2item label="${c:l('seyconserver.zul.CancelTask') }" image="/img/remove.svg" onClick="ref:frame.cancelAgent"/>
+				<menu2item label="${c:l('seyconserver.reschedule') }" image="/img/play.svg" onClick="ref:frame.rescheduleAgent"/>
+			</menu2>
 			<databutton image="/img/refresh.svg" label="${c:l('seyconserver.Refresca') }"
 				 onClick="ref:frame.refreshAgentTasks" 
 				 onlyIcon="true" id="refreshButton" 
@@ -165,8 +170,8 @@
 		</datatable>
 		<div style="height: 24px">
 			<button label="${c:l('seyconserver.Log') }" onClick="ref:frame.downloadLog" image="/img/download-r.svg" id="log_button"/>
-			<button label="${c:l('seyconserver.zul.Reinicia') }" onClick="ref:frame.restartAgent" image="/img/restart-r.svg" id="restart_button"/>
-			<button label="${c:l('error.zul.Tancar') }" onClick="ref:frame.closeAgentWindow" style="float: right" image="/img/undo-r.svg"/>
+			<button label="${c:l('seyconserver.zul.Reinicia') }" onClick="ref:frame.restartAgent" image="/img/restart.svg" id="restart_button"/>
+			<button label="${c:l('error.zul.Tancar') }" onClick="ref:frame.closeAgentWindow" style="float: right" image="/img/undo.svg"/>
 		</div>
 	</window>
 

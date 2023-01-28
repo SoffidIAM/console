@@ -79,7 +79,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			auditarXarxaAC("U", xarxaAC.getNetwork().getName(), codiGrup, codiUsuari, nomRol, codiAplicacio, codiBbdd, maquines);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorUpdating"), xarxaAC.getHostsName(), message));
+			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorUpdating"), xarxaAC.getHostsName(), message), e);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 			xarxaAC.setId(xarxaAC.getId());
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorCreating"), xarxaAC.getHostsName(), message));
+			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorCreating"), xarxaAC.getHostsName(), message), e);
 		}
 	}
 
@@ -126,7 +126,7 @@ public class NetworkAuthorizationEntityDaoImpl extends
 					codiAplicacio, codiBbdd, maquines);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorDeleting"), xarxaAC.getHostsName(), message));
+			throw new SeyconException(String.format(Messages.getString("NetworkAuthorizationEntityDaoImpl.errorDeleting"), xarxaAC.getHostsName(), message), e);
 		}
 	}
 

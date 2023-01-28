@@ -88,7 +88,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 /**
  * @see es.caib.seycon.ng.servei.GrupService
@@ -242,7 +242,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		if (groupEntity != null && getAuthorizationService().hasPermission(Security.AUTO_GROUP_UPDATE, groupEntity)) {
 			getGroupEntityDao().setParentGroup(codiSubGrup, codiSuperGrup);
 		} else {
-			throw new SeyconException(String.format(Messages.getString("GroupServiceImpl.1"), codiSuperGrup)); //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("GroupServiceImpl.1"), codiSuperGrup)); //$NON-NLS-1$
 		}
 	}
 
@@ -252,12 +252,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		// 2) que el codi sigui lletres (minuscula) i numeros
 //		if (!grup.getName().equals("world") && (grup.getParentGroup() == null || grup.getParentGroup() != null && "".equals(grup.getParentGroup().trim())))
 //		{
-//                    throw new SeyconException(Messages.getString("GroupServiceImpl.3")); //$NON-NLS-1$
+//                    throw new InternalErrorException(Messages.getString("GroupServiceImpl.3")); //$NON-NLS-1$
 //		}
 		
 		GroupEntity groupsSameCode = getGroupEntityDao().findByName(grup.getName());
 		if(groupsSameCode != null)
-			throw new SeyconException(String.format(Messages.getString("GroupServiceImpl.CodeGroupExists"), grup.getName())); 
+			throw new InternalErrorException(String.format(Messages.getString("GroupServiceImpl.CodeGroupExists"), grup.getName())); 
 		
 		GroupEntity grupEntity = getGroupEntityDao().groupToEntity(grup);
 		if (grupEntity != null) {
@@ -278,7 +278,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected void handleDelete(Group grup) throws Exception {
 		GroupEntity grupEntity = getGroupEntityDao().findByName(grup.getName());
 		if (grupEntity == null) {
-			throw new SeyconException("Group not found: " + grup.getName());
+			throw new InternalErrorException("Group not found: " + grup.getName());
 		}
 		for (UserEntity u: grupEntity.getPrimaryGroupUsers())
 		{
@@ -521,7 +521,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		usuariGrupEntity.setEnd(null);
 		usuariGrupEntity.setDisabled(Boolean.FALSE);
 		if (usuariGrupEntity.getUser().getUserName().equals (Security.getCurrentUser())) {
-			throw new SeyconException(Messages.getString("GroupServiceImpl.7")); //$NON-NLS-1$
+			throw new InternalErrorException(Messages.getString("GroupServiceImpl.7")); //$NON-NLS-1$
 		}
 		UserEntity usuari = usuariGrupEntity.getUser();
 
@@ -571,7 +571,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
 
 		if (!esPotEliminarUsuariGrup(usuariGrupEntity)) {
-			throw new SeyconException(String.format(Messages.getString("GroupServiceImpl.8"), usuariGrup.getGroup(), usuariGrup.getUser()));
+			throw new InternalErrorException(String.format(Messages.getString("GroupServiceImpl.8"), usuariGrup.getGroup(), usuariGrup.getUser()));
 		}
 
 		// Mirem les autoritzacions

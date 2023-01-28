@@ -70,7 +70,7 @@ import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 /**
  * @see es.caib.seycon.ng.servei.DadesAddicionalsService
@@ -148,7 +148,7 @@ public class AdditionalDataServiceImpl extends
 			validateUniqueOrderForAccountMetadata(tipusDada);
 			AccountMetadataEntity tipusDadaMateixCodi = getAccountMetadataEntityDao().findByName(tipusDada.getSystemName(), tipusDada.getCode());
 			if(tipusDadaMateixCodi != null) {
-				throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
+				throw new InternalErrorException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
 			}
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().dataTypeToEntity(tipusDada);
 			if (tipusDadaEntity != null) {
@@ -171,7 +171,7 @@ public class AdditionalDataServiceImpl extends
 					return handleUpdate(tipusDada);
 				}
 				else
-					throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
+					throw new InternalErrorException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCode"), new Object[]{tipusDada.getCode()}));
 			}
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
 			if (tipusDadaEntity != null) {
@@ -231,8 +231,9 @@ public class AdditionalDataServiceImpl extends
 
 	/**
 	 * Validate unique order for different custom objects types
+	 * @throws InternalErrorException 
 	 */
-	private void validateUniqueOrderForAccountMetadata(DataType dataTypeVO) {
+	private void validateUniqueOrderForAccountMetadata(DataType dataTypeVO) throws InternalErrorException {
 		List<AccountMetadataEntity> dataTypeEntityList = getAccountMetadataEntityDao().findBySystem(dataTypeVO.getSystemName());
 		if (dataTypeVO.getOrder() == null || dataTypeVO.getOrder().equals( 0 ) ) {
 			long next = 10;
@@ -244,7 +245,7 @@ public class AdditionalDataServiceImpl extends
 			for (AccountMetadataEntity dataTypeEntity : dataTypeEntityList) {
 				if ((dataTypeVO.getId()==null || !dataTypeEntity.getId().equals(dataTypeVO.getId())) && 
 						dataTypeVO.getOrder().equals(dataTypeEntity.getOrder())) {
-					throw new SeyconException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
+					throw new InternalErrorException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationOrder"),
 							dataTypeVO.getOrder(), dataTypeVO.getCode(), dataTypeEntity.getName()));
 				}
 			}

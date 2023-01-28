@@ -23,7 +23,7 @@
 					value="${c:l('error.zul.Causatper')}" onClick="ref:showStack();" />
 			</div>
 			<textbox id="exception" visible="false" readonly="true"
-				rows="10" width="675px" />
+				rows="10" width="675px" style="word-break: break-all;white-space: pre;font-family: monospace;"/>
 		</vbox>
 	</div>
 	<zscript><![CDATA[

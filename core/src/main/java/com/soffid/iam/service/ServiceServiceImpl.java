@@ -21,7 +21,7 @@ import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.comu.ServeiSearchCriteria;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.util.Collection;
 import java.util.List;
@@ -39,7 +39,7 @@ public class ServiceServiceImpl extends
 	protected com.soffid.iam.api.Service handleCreate(com.soffid.iam.api.Service servei) throws java.lang.Exception {
 		ServiceEntity servicesSameCode = getServiceEntityDao().findByName(servei.getCode());
 		if(servicesSameCode != null)
-			throw new SeyconException(String.format(Messages.getString("ServiceServiceImpl.CodeServiceExists"), servei.getCode())); 
+			throw new InternalErrorException(String.format(Messages.getString("ServiceServiceImpl.CodeServiceExists"), servei.getCode())); 
 		ServiceEntity serveiEntity = getServiceEntityDao().serviceToEntity(servei);
 		getServiceEntityDao().create(serveiEntity);
 		servei.setId(serveiEntity.getId());

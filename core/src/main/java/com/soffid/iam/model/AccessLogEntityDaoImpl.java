@@ -35,7 +35,7 @@ public class AccessLogEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message));
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message), e);
         }
     }
 
@@ -45,7 +45,7 @@ public class AccessLogEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorDeleting"), registreAcces.getSessionId(), message));
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorDeleting"), registreAcces.getSessionId(), message), e);
         }
     }
 

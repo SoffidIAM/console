@@ -35,7 +35,7 @@ public class MetaDataEntityDaoImpl extends
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.0"), tipusDada.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.0"), tipusDada.getName(), message), e);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class MetaDataEntityDaoImpl extends
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.1"), tipusDada.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("MetaDataEntityDaoImpl.1"), tipusDada.getName(), message), e);
 		}
 	}
 

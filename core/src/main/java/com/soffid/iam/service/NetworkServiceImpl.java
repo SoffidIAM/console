@@ -78,7 +78,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.XarxaSearchCriteria;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownHostException;
 import es.caib.seycon.ng.exception.UnknownNetworkException;
 import es.caib.seycon.ng.exception.UnknownUserException;
@@ -184,7 +184,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             User usuari = getUserEntityDao().toUser(usuariEntity);
             return usuari;
         } else {
-            throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.SessionIDNotFound"), //$NON-NLS-1$
+            throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.SessionIDNotFound"), //$NON-NLS-1$
                     idSessio.longValue()));
         }
     }
@@ -209,16 +209,16 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         if (AutoritzacionsUsuari.canCreateAllNetworks()) {
         	NetworkEntity sameName = getNetworkEntityDao().findByName(xarxa.getCode());
     		if(sameName != null )
-    			throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.CodeNetworkExists"), xarxa.getCode()));
+    			throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.CodeNetworkExists"), xarxa.getCode()));
     		NetworkEntity sameIp = getNetworkEntityDao().findByAddress(xarxa.getIp());
     		if(sameIp != null)
-    			throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.IpNetworkExists"), xarxa.getIp())); 
+    			throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IpNetworkExists"), xarxa.getIp())); 
             NetworkEntity entity = getNetworkEntityDao().networkToEntity(xarxa);
             getNetworkEntityDao().create(entity);
             xarxa.setId(entity.getId());
             return getNetworkEntityDao().toNetwork(entity);
         }
-        throw new SeyconException(Messages.getString("NetworkServiceImpl.NotAuthorizedMakeNet")); //$NON-NLS-1$
+        throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedMakeNet")); //$NON-NLS-1$
     }
 
     /**
@@ -232,13 +232,13 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             for (Iterator iterator = maquines.iterator(); iterator.hasNext(); ) {
                 Host maquina = (Host) (iterator.next());
                 if (maquina.getIp() != null && !maquinaCompatibleAmbXarxa(maquina.getIp(), xarxa.getIp(), xarxa.getMask())) {
-                    throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.IncompatibleIPMessage"), xarxa.getIp(), xarxa.getMask(), maquina.getIp()));
+                    throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IncompatibleIPMessage"), xarxa.getIp(), xarxa.getMask(), maquina.getIp()));
                 }
             }
 
             getNetworkEntityDao().update(getNetworkEntityDao().networkToEntity(xarxa));
         } else {
-            throw new SeyconException(Messages.getString("NetworkServiceImpl.NotAuthorizedUpdateNet")); //$NON-NLS-1$
+            throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedUpdateNet")); //$NON-NLS-1$
         }
     }
 
@@ -267,12 +267,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			createHostTask(maq.getName());
         		}
         		else
-            		throw new SeyconException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
+            		throw new InternalErrorException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
     						new Object[]{xarxaEntity.getName(), maq.getName()}));
         	}
             getNetworkEntityDao().remove(xarxaEntity);
         } else {
-            throw new SeyconException(Messages.getString("NetworkServiceImpl.NotAuthorizedDeleteNet")); //$NON-NLS-1$
+            throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedDeleteNet")); //$NON-NLS-1$
         }
     }
 
@@ -285,7 +285,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             NetworkAuthorizationEntity entity = getNetworkAuthorizationEntityDao().networkAuthorizationToEntity(xarxaAC);
             getNetworkAuthorizationEntityDao().remove(entity);
         } else {
-            throw new SeyconException(
+            throw new InternalErrorException(
                     Messages.getString("NetworkServiceImpl.NotAuthorizedDeleteAuthorizations")); //$NON-NLS-1$
         }
     }
@@ -302,7 +302,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             }
             return new LinkedList<NetworkAuthorization>();
         }
-        throw new SeyconException(
+        throw new InternalErrorException(
                 Messages.getString("NetworkServiceImpl.NotAuthorizedViewListAccess")); //$NON-NLS-1$
     }
 
@@ -317,7 +317,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             return xarxa;
 
             // }
-            // throw new SeyconException(
+            // throw new InternalErrorException(
             // "L'usuari no té accés a la xarxa amb codi '" + codi + "'");
         }
         return null;
@@ -352,7 +352,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	            return getHostEntityDao().toHost(entity);
         	}
         }
-        throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.NotAuthorizedMakeMachine"), maquina.getName())); //$NON-NLS-1$
+        throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.NotAuthorizedMakeMachine"), maquina.getName())); //$NON-NLS-1$
     }
 
     /**
@@ -381,7 +381,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     maquinaTrobada = findHostByName(maquina.getName());
 
                 if (maquinaTrobada == null) {
-                    throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.MachineNotFound"), maquina.getName())); //$NON-NLS-1$
+                    throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.MachineNotFound"), maquina.getName())); //$NON-NLS-1$
                 }
                 // Fem els canvis permesos a la màquina original
                 // perquè la comparació dóne OK (només permet aquestos canvis)
@@ -395,10 +395,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     getHostEntityDao().update(getHostEntityDao().hostToEntity(maquinaTrobada));
         			createHostTask(maquina.getName());
                 } else {
-                    throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.OnlyChangeSOMachine"), maquina.getName()));
+                    throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.OnlyChangeSOMachine"), maquina.getName()));
                 }
             } else {
-                throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.NotAuthorizedToUpdateMachine"), maquina.getName()));
+                throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.NotAuthorizedToUpdateMachine"), maquina.getName()));
             }
         }
     }
@@ -480,7 +480,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
     	else
     	{
-            throw new SeyconException(Messages.getString("NetworkServiceImpl.NotAuthorizedToDeleteMachine")); //$NON-NLS-1$
+            throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedToDeleteMachine")); //$NON-NLS-1$
         }
     }
 
@@ -503,7 +503,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             if (this.teAccesLecturaMaquina(maquina)) {
                 return maquina;
             }
-            throw new SeyconException(String.format(
+            throw new InternalErrorException(String.format(
                     Messages.getString("NetworkServiceImpl.NotAuthorizedSearchMachine"), nom)); //$NON-NLS-1$
         }
         return null;
@@ -524,7 +524,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 			if (res.size() > limitResults)
 			{
 				return new LinkedList<Network>(res).subList(0, limitResults);
-//				throw new SeyconException(
+//				throw new InternalErrorException(
 //					Messages.getString("NetworkServiceImpl.BigSearchResults")); //$NON-NLS-1$
 			}
 			
@@ -685,7 +685,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 				(maquines.size() > limitResults))
 			{
     			maquines = new LinkedList<Host>(maquines).subList(0, limitResults);
-//                throw new SeyconException(
+//                throw new InternalErrorException(
 //                        Messages.getString("NetworkServiceImpl.BigSearchResults")); //$NON-NLS-1$
 			}
     		
@@ -704,7 +704,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             NetworkAuthorizationEntity entity = getNetworkAuthorizationEntityDao().networkAuthorizationToEntity(accessList);
             if (entity.getUser() != null) {
                 if (entity.getUser().getUserName().compareTo(u) == 0) {
-                    throw new SeyconException(
+                    throw new InternalErrorException(
                             Messages.getString("NetworkServiceImpl.NoAutoassignNetLists")); //$NON-NLS-1$
                 }
             }
@@ -712,10 +712,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             if(identity.getIdentityCode() != null && !identity.getIdentityCode().isEmpty())
             	getNetworkAuthorizationEntityDao().create(entity);
             else
-            	throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.IdentityValidation"), entity.getNetwork().getName())); //$NON-NLS-1$
+            	throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IdentityValidation"), entity.getNetwork().getName())); //$NON-NLS-1$
             return getNetworkAuthorizationEntityDao().toNetworkAuthorization(entity);
         }
-        throw new SeyconException(Messages.getString("NetworkServiceImpl.NotAuthorizedAdminNet")); //$NON-NLS-1$
+        throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedAdminNet")); //$NON-NLS-1$
     }
 
     protected void handleDelete(NetworkAuthorization accessList) throws Exception {
@@ -724,7 +724,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             NetworkAuthorizationEntity entity = getNetworkAuthorizationEntityDao().networkAuthorizationToEntity(accessList);
             getNetworkAuthorizationEntityDao().remove(entity);
         } else {
-            throw new SeyconException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
+            throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
         }
     }
 
@@ -735,7 +735,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             getNetworkAuthorizationEntityDao().update(entity);
             return getNetworkAuthorizationEntityDao().toNetworkAuthorization(entity);
         }
-        throw new SeyconException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
+        throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
     }
 
     protected List<Identity> handleFindIdentitiesByName(String codi) throws Exception {
@@ -767,7 +767,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 
             return identitats;
         }
-        throw new SeyconException(Messages.getString("NetworkServiceImpl.AdminNet")); //$NON-NLS-1$
+        throw new InternalErrorException(Messages.getString("NetworkServiceImpl.AdminNet")); //$NON-NLS-1$
     }
 
     protected Identity handleFindIdentityByName(String codi) throws Exception {
@@ -802,7 +802,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 
             return null;
         }
-        throw new SeyconException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
+        throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
     }
 
     protected NetworkAuthorization handleFindNetworkAuthorizationsByNetworkNameAndIdentityName(String codiXarxa, String codiIdentitat) throws Exception {
@@ -817,7 +817,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             }
             return null;
         }
-        throw new SeyconException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
+        throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NoAdminNets")); //$NON-NLS-1$
     }
 
     /*
@@ -847,7 +847,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 xarxes.add(newtworkAuthorization);
             }
         } else {
-            throw new SeyconException(
+            throw new InternalErrorException(
                     String.format(Messages.getString("NetworkServiceImpl.UserNotFound"), codiUsuari)); //$NON-NLS-1$
         }
         // llistes d'acces per grups
@@ -912,7 +912,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             String ipLliure = getNetworkEntityDao().getFirstFreeIP(xarxa.getAddress(), xarxa.getMask());
             return ipLliure;
         }
-        throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.NetNotFound"), codiXarxa)); //$NON-NLS-1$
+        throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.NetNotFound"), codiXarxa)); //$NON-NLS-1$
     }
 
     protected Long handleGetNotAvailableIPs(String codiXarxa) throws Exception {
@@ -922,10 +922,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             if (teAccesLecturaXarxa(xarxa)) {
     	        return getNetworkEntityDao().countByNetwork(codiXarxa);
             }
-            throw new SeyconException(String.format(
+            throw new InternalErrorException(String.format(
                     Messages.getString("NetworkServiceImpl.NoReadNetPermission"), codiXarxa)); //$NON-NLS-1$
         }
-        throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.NetNotFound"), codiXarxa)); //$NON-NLS-1$
+        throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.NetNotFound"), codiXarxa)); //$NON-NLS-1$
     }
 
     protected Long handleGetAvailableIPs(String codiXarxa) throws Exception {
@@ -943,10 +943,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	    			throw new RuntimeException("Invalid IP", e);
 	    		}
             }
-            throw new SeyconException(String.format(
+            throw new InternalErrorException(String.format(
                     Messages.getString("NetworkServiceImpl.NoReadNetPermission"), codiXarxa)); //$NON-NLS-1$
         }
-        throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.NetNotFound"), codiXarxa)); //$NON-NLS-1$
+        throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.NetNotFound"), codiXarxa)); //$NON-NLS-1$
     }
 
     protected Host handleFindHostById(Long idMaquina) throws Exception {
@@ -988,7 +988,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             getHostAliasEntityDao().create(entity);
             return getHostAliasEntityDao().toHostAlias(entity);
         } else
-            throw new SeyconException(
+            throw new InternalErrorException(
                     Messages.getString("NetworkServiceImpl.NoMakeAliasPermission")); //$NON-NLS-1$
 
     }
@@ -1000,7 +1000,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 
             getHostAliasEntityDao().remove(entity);
         } else
-            throw new SeyconException(
+            throw new InternalErrorException(
                     Messages.getString("NetworkServiceImpl.NoDeleteAliasPermission")); //$NON-NLS-1$
     }
 
@@ -1010,7 +1010,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         if (teAccesEscripturaMaquina(maquina)) {
             getHostAliasEntityDao().update(entity);
         } else
-            throw new SeyconException(
+            throw new InternalErrorException(
                     Messages.getString("NetworkServiceImpl.NoUpdateAliasPermission")); //$NON-NLS-1$
 
     }
@@ -1243,7 +1243,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 }
             }
         } else {
-            throw new SeyconException(
+            throw new InternalErrorException(
                     String.format(Messages.getString("NetworkServiceImpl.UserNotFound"), codiUsuari)); //$NON-NLS-1$
         }
         // llistes d'acces per rols
@@ -1621,7 +1621,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 
         // Comprovem que no estiga caducada
         if (autoritzacioAccesComAdministrador.getAuthorizationAccessExpirationDate().getTimeInMillis() < araMateix.getTimeInMillis()) {
-            throw new SeyconException(Messages.getString("NetworkServiceImpl.AuthorizacionExpired")); //$NON-NLS-1$
+            throw new InternalErrorException(Messages.getString("NetworkServiceImpl.AuthorizacionExpired")); //$NON-NLS-1$
         }
 
         autoritzacioAccesComAdministrador.setAuthorizationAccessExpirationDate(araMateix);
@@ -1895,7 +1895,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	{
 		OsTypeEntity osTypeEntity = getOsTypeEntityDao().osTypeToEntity(osType);
 		if(!osTypeEntity.getOperatingSystemHost().isEmpty())
-			throw new SeyconException(String.format(Messages.getString("NetworkServiceImpl.IntegrityViolationMachines"), osTypeEntity.getName())); //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IntegrityViolationMachines"), osTypeEntity.getName())); //$NON-NLS-1$
 		getOsTypeEntityDao().remove(osTypeEntity);
 	}
 

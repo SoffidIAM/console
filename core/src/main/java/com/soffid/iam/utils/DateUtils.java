@@ -5,11 +5,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+
 public class DateUtils {
 
 	public static Date nullDate = new Date(0);
 
-	private static DateQuery getDateQueryFromQuery(String dateQuery) {
+	private static DateQuery getDateQueryFromQuery(String dateQuery) throws InternalErrorException {
 		String dateQueryClean;
 		boolean secondsPrecision = false;
 		Date date = null;
@@ -36,7 +38,7 @@ public class DateUtils {
 					date = dateFormat.parse(dateQueryClean);
 					secondsPrecision = false;
 				} catch (Exception ex) {
-					throw new es.caib.seycon.ng.exception.SeyconException(
+					throw new es.caib.seycon.ng.exception.InternalErrorException(
 							String.format(Messages.getString("DateUtils.IncorrectFullDate"), //$NON-NLS-1$
 									dateQueryClean, e.getMessage()));
 				}
@@ -45,11 +47,11 @@ public class DateUtils {
 		return new DateQuery(dateQuery, date, secondsPrecision);
 	}
 
-	public static LimitDates getLimitDatesFromQuery(String query) {
+	public static LimitDates getLimitDatesFromQuery(String query) throws InternalErrorException {
 		if (query.indexOf("-") != -1) { //$NON-NLS-1$
 			String[] queries = query.split("-"); //$NON-NLS-1$
 			if (queries.length != 2) {
-				throw new es.caib.seycon.ng.exception.SeyconException(
+				throw new es.caib.seycon.ng.exception.InternalErrorException(
 						String.format(Messages.getString("DateUtils.IncorrectDate")));  //$NON-NLS-1$
 			}
 			String maxQuery = queries[1];
@@ -121,8 +123,9 @@ public class DateUtils {
 	 * @param fecha cadena en formato dd/mm/yyyy [kk:mm:ss]
 	 * @param esDataFi Indica si es la fecha fin, para ponerla en el último instante del día indicado
 	 * @return
+	 * @throws InternalErrorException 
 	 */
-	public static Date stringToDate (String fecha, boolean esDataFi) {
+	public static Date stringToDate (String fecha, boolean esDataFi) throws InternalErrorException {
 		Date data=null;
 		try {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -141,7 +144,7 @@ public class DateUtils {
 					data = cal.getTime();					
 				}
 			} catch (Exception ex) {
-				throw new es.caib.seycon.ng.exception.SeyconException(
+				throw new es.caib.seycon.ng.exception.InternalErrorException(
 						String.format(Messages.getString("DateUtils.InvalidShortDate"), //$NON-NLS-1$
 								fecha, e.getMessage()));
 			}

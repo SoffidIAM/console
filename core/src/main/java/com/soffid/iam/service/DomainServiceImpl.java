@@ -37,7 +37,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -64,7 +64,7 @@ public class DomainServiceImpl extends
 				(domini.getName().compareToIgnoreCase(TipusDomini.MEMBERSHIPS) == 0) || 
 				(domini.getName().compareToIgnoreCase(TipusDomini.APPLICATIONS) == 0) || 
 				(domini.getName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DomainServiceImpl.0")); //$NON-NLS-1$
 		}
 		ApplicationDomainEntity dominiEntity = getApplicationDomainEntityDao().domainToEntity(domini);
@@ -79,7 +79,7 @@ public class DomainServiceImpl extends
 	 */
 	protected void handleDelete(com.soffid.iam.api.Domain domini) throws java.lang.Exception {
 		if ((domini.getName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || (domini.getName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || (domini.getName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DomainServiceImpl.1")); //$NON-NLS-1$
 		}
 		
@@ -101,7 +101,7 @@ public class DomainServiceImpl extends
 		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
 				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || 
 				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DomainServiceImpl.3")); //$NON-NLS-1$
 		}
 		DomainValueEntity valorDominiAplicacioEntity = getDomainValueEntityDao().domainValueToEntity(valorDomini);
@@ -118,7 +118,7 @@ public class DomainServiceImpl extends
 		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
 				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) || 
 				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DomainServiceImpl.3")); //$NON-NLS-1$
 		}
 		DomainValueEntity entity = getDomainValueEntityDao().load(valorDomini.getId());
@@ -135,7 +135,7 @@ public class DomainServiceImpl extends
 		if ((valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS) == 0) || 
 				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.GRUPS_USUARI) == 0) ||
 				(valorDomini.getDomainName().compareToIgnoreCase(TipusDomini.APLICACIONS) == 0)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DomainServiceImpl.4")); //$NON-NLS-1$
 		}
 		

@@ -244,7 +244,7 @@ public class RoleAccountEntityDaoImpl
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.1"), rolsUsuaris
 					.getRole().getName(), rolsUsuaris.getAccount().getName(),
-					message));
+					message), e);
 		}
 	}
 
@@ -368,7 +368,7 @@ public class RoleAccountEntityDaoImpl
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.4"), rolsUsuaris
 					.getRole().getName(), rolsUsuaris.getAccount().getName(),
-					message));
+					message), e);
 		}
 	}
 
@@ -456,7 +456,7 @@ public class RoleAccountEntityDaoImpl
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.6"), rolsUsuaris
 					.getRole().getName(), rolsUsuaris.getAccount().getName(),
-					message));
+					message), e);
 		}
 	}
 

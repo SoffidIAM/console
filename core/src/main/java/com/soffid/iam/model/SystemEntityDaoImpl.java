@@ -89,7 +89,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
             auditarDispatcher("C", dispatcherEntity.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.0"), dispatcherEntity.getName(), message));
+            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.0"), dispatcherEntity.getName(), message), e);
         }
     }
 
@@ -100,7 +100,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
             auditarDispatcher("U", dispatcherEntity.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.1"), dispatcherEntity.getName(), message));
+            throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.1"), dispatcherEntity.getName(), message), e);
         }
     }
 
@@ -172,7 +172,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 		catch (Throwable e)
 		{
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.2"), dispatcherEntity.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("SystemEntityDaoImpl.2"), dispatcherEntity.getName(), message), e);
 		}
 	}
 

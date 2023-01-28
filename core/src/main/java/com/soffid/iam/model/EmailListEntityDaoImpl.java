@@ -63,7 +63,7 @@ public class EmailListEntityDaoImpl extends
 			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.4"), llistaCorreu.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.4"), llistaCorreu.getName(), message), e);
 		}
 	}
 
@@ -76,7 +76,7 @@ public class EmailListEntityDaoImpl extends
 			generateUpdateTasks(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.6"), llistaCorreu.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.6"), llistaCorreu.getName(), message), e);
 		}
 	}
 
@@ -89,7 +89,7 @@ public class EmailListEntityDaoImpl extends
 			super.remove(llistaCorreu);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.8"), llistaCorreu.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListEntityDaoImpl.8"), llistaCorreu.getName(), message), e);
 		}
 	}
 

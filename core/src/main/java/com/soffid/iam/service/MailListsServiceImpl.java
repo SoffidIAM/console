@@ -68,7 +68,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownApplicationException;
 import es.caib.seycon.ng.exception.UnknownGroupException;
 import es.caib.seycon.ng.exception.UnknownMailListException;
@@ -401,7 +401,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	protected MailDomain handleCreate(MailDomain dominiCorreu) throws Exception {
 		EmailDomainEntity domainsSameCode = getEmailDomainEntityDao().findByCode(dominiCorreu.getCode());
 		if(domainsSameCode != null)
-			throw new SeyconException(String.format(Messages.getString("MailListsServiceImpl.CodeDomainExists"), dominiCorreu.getCode())); 
+			throw new InternalErrorException(String.format(Messages.getString("MailListsServiceImpl.CodeDomainExists"), dominiCorreu.getCode())); 
 		EmailDomainEntity dominiCorreuEntity = this.getEmailDomainEntityDao().mailDomainToEntity(dominiCorreu);
 		getEmailDomainEntityDao().create(dominiCorreuEntity);
 		dominiCorreu.setId(dominiCorreuEntity.getId());
@@ -411,9 +411,9 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	protected void handleDelete(MailDomain dominiCorreu) throws Exception {
 		EmailDomainEntity dominiCorreuEntity = this.getEmailDomainEntityDao().mailDomainToEntity(dominiCorreu);
 		if (!dominiCorreuEntity.getMailLists().isEmpty())
-			throw new SeyconException(String.format(Messages.getString("DominiCorreuEntityDaoImpl.IntegrityException"), dominiCorreu.getCode()));
+			throw new InternalErrorException(String.format(Messages.getString("DominiCorreuEntityDaoImpl.IntegrityException"), dominiCorreu.getCode()));
 		if (!dominiCorreuEntity.getUsers().isEmpty())
-			throw new SeyconException(String.format(Messages.getString("DominiCorreuEntityDaoImpl.IntegrityException2"), dominiCorreu.getCode()));
+			throw new InternalErrorException(String.format(Messages.getString("DominiCorreuEntityDaoImpl.IntegrityException2"), dominiCorreu.getCode()));
 		getEmailDomainEntityDao().remove(dominiCorreuEntity);
 	}
 

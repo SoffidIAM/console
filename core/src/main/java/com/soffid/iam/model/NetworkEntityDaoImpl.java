@@ -78,7 +78,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             auditarXarxa("C", xarxa.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.0"), xarxa.getName(), message));
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.0"), xarxa.getName(), message), e);
         }
     }
 
@@ -96,7 +96,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             auditarXarxa("D", codiXarxa); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.1"), xarxa.getName(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.1"), xarxa.getName(), message), e); //$NON-NLS-1$
         }
     }
 
@@ -112,7 +112,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             auditarXarxa("U", xarxa.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.2"), xarxa.getName(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("NetworkEntityDaoImpl.2"), xarxa.getName(), message), e); //$NON-NLS-1$
         }
     }
 
@@ -297,7 +297,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
             }
             return ipXarxa;
         } catch (Exception e) {
-            throw new SeyconException(e.toString());
+            throw new SeyconException(e.toString(), e);
         }
     }
 

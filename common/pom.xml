@@ -272,6 +272,11 @@
 			<groupId>com.soffid.iam</groupId>
 			<artifactId>nashorn-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>dbtools</artifactId>
+			<version>1.17</version>
+		</dependency>
 	</dependencies>
   <reporting>
     <plugins>

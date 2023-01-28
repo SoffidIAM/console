@@ -58,7 +58,7 @@ public class ApplicationDomainEntityDaoImpl extends
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-            throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.4") + dominiAplicacio.getName() + "\'.\n" + message); //$NON-NLS-1$
+            throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.4") + dominiAplicacio.getName() + "\'.\n" + message, e); //$NON-NLS-1$
         }
     }
 
@@ -72,7 +72,7 @@ public class ApplicationDomainEntityDaoImpl extends
             auditarDominiAplicacio("D", nomDominiAplicacio, codiAplicacio); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.7") + dominiAplicacio.getName() + "\'.\n" + message); //$NON-NLS-1$
+            throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.7") + dominiAplicacio.getName() + "\'.\n" + message, e); //$NON-NLS-1$
         }
     }
 
@@ -85,7 +85,7 @@ public class ApplicationDomainEntityDaoImpl extends
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-            throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.10") + dominiAplicacio.getName() + "\'.\n" + message); //$NON-NLS-1$
+            throw new SeyconException(Messages.getString("ApplicationDomainEntityDaoImpl.10") + dominiAplicacio.getName() + "\'.\n" + message, e); //$NON-NLS-1$
         }
     }
 

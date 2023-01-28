@@ -868,7 +868,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			String segonLlinatge, String multiSessio, String comentari,
 			String tipusUsuari, String servidorPerfil, String servidorHome,
 			String servidorCorreu, String codiGrupPrimari, String dni,
-			String dominiCorreu, String grupSecundari, Boolean restringeixCerca) {
+			String dominiCorreu, String grupSecundari, Boolean restringeixCerca) throws InternalErrorException {
 		String query = "select usuari " //$NON-NLS-1$
 				+ "from com.soffid.iam.model.UserEntity usuari " //$NON-NLS-1$
 				+ "left join usuari.profileServer as servidorPerfil " //$NON-NLS-1$
@@ -2729,7 +2729,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	private void addDateRange(String value, String hqlAttribute,
 			String joinArray[], List<String> joins, List<String> queries,
-			List<Parameter> params) {
+			List<Parameter> params) throws InternalErrorException {
 		if (value != null && value.trim().compareTo("") != 0 //$NON-NLS-1$
 				&& value.trim().compareTo("%") != 0) { //$NON-NLS-1$
 			value = value.trim();

@@ -123,7 +123,7 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SoffidStackTrace;
 
 /**
@@ -176,7 +176,7 @@ public class DispatcherServiceImpl extends
 			SystemEntity dispatchersSameCode = getSystemEntityDao().findByName(
 					dispatcher.getName());
 			if (dispatchersSameCode != null)
-				throw new SeyconException(String.format(Messages
+				throw new InternalErrorException(String.format(Messages
 						.getString("DipatcherServiceImpl.CodeDispatcherExists"),
 						dispatcher.getName()));
 	
@@ -608,11 +608,11 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
 		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
 		if (agent == null || agent.getUrl() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
 		
@@ -643,7 +643,7 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
 
 		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
@@ -651,7 +651,7 @@ public class DispatcherServiceImpl extends
 
 		SystemEntity system = getSystemEntityDao().findByName(codiAgent);
 		if (system == null || system.getUrl() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
 		
@@ -1287,11 +1287,11 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
 		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
 		if (agent == null || agent.getUrl() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
 		// Obtenim tots els rols de l'agent:

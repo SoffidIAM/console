@@ -73,7 +73,7 @@ public class DomainValueEntityDaoImpl extends
                     valorDominiString);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("DomainValueEntityDaoImpl.errorCreating"), valorDomini.getValue(), message));
+			throw new SeyconException(String.format(Messages.getString("DomainValueEntityDaoImpl.errorCreating"), valorDomini.getValue(), message), e);
         }
     }
 
@@ -95,7 +95,7 @@ public class DomainValueEntityDaoImpl extends
                     valorDominiString);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("DomainValueEntityDaoImpl.errorUpdating"), valorDomini.getValue(), message));
+			throw new SeyconException(String.format(Messages.getString("DomainValueEntityDaoImpl.errorUpdating"), valorDomini.getValue(), message), e);
         }
     }
 
@@ -117,7 +117,7 @@ public class DomainValueEntityDaoImpl extends
                     valorDominiString);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("DomainValueEntityDaoImpl.errorCreating"), valorDomini.getValue(), message));
+			throw new SeyconException(String.format(Messages.getString("DomainValueEntityDaoImpl.errorCreating"), valorDomini.getValue(), message), e);
         }
     }
 

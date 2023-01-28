@@ -50,7 +50,7 @@ public class PasswordEntityDaoImpl extends
             getSession().flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-                        throw new SeyconException(String.format(Messages.getString("PasswordEntityDaoImpl.0"), contrasenyaEntity.getPassword(), message));
+                        throw new SeyconException(String.format(Messages.getString("PasswordEntityDaoImpl.0"), contrasenyaEntity.getPassword(), message), e);
         }
     }
 
@@ -60,7 +60,7 @@ public class PasswordEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PasswordEntityDaoImpl.1"), contrasenya.getPassword(), message));
+			throw new SeyconException(String.format(Messages.getString("PasswordEntityDaoImpl.1"), contrasenya.getPassword(), message), e);
         }
     }
 
@@ -70,7 +70,7 @@ public class PasswordEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PasswordEntityDaoImpl.2"), contrasenya.getPassword(), message));
+			throw new SeyconException(String.format(Messages.getString("PasswordEntityDaoImpl.2"), contrasenya.getPassword(), message), e);
         }
     }
 

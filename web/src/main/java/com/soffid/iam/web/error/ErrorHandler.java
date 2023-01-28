@@ -47,6 +47,8 @@ import com.soffid.iam.web.obligation.ObligationManager;
 
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -121,22 +123,19 @@ public class ErrorHandler extends Window implements AfterCompose {
 				if (msg == null || msg.trim().isEmpty())
 					msg = e.toString();
 				((Label)getFellow("category")).setValue(e.getClass().getSimpleName());
-				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException) {
-					getFellow("categoryDiv").setVisible(false);
-					messageLabel.setValue( msg );
-				}
-				else if (e instanceof UserWorkflowException) {
-					getFellow("categoryDiv").setVisible(false);
-					messageLabel.setValue( e.getMessage() );
-				}
-				else if (e instanceof UiException) {
+				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException ||
+						e instanceof SeyconException ||
+						e instanceof UserWorkflowException ||
+						e instanceof RuntimeException) {
 					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( e.getMessage() );
 				}
 				else if (e instanceof SecurityException)
 					messageLabel.setValue( Labels.getLabel("error.securityException")+ ": "+  msg );
+				else if (e instanceof Exception)
+					messageLabel.setValue( SoffidStackTrace.generateEndUserDescription((Exception) original) );
 				else
-					messageLabel.setValue( msg );
+					messageLabel.setValue(msg);
 				
 			} 
 			c = es.caib.seycon.ng.exception.SoffidStackTrace.getStackTrace(original);

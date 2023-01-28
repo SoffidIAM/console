@@ -13,7 +13,7 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.PrincipalStore;
 import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -158,7 +158,7 @@ public class CreateDisableUserServiceImpl extends com.soffid.iam.service.workflo
 		UserService usuariService = getUserService();
 		if (isAnyValueCode(codiUsuari) && isAnyValueCode(dni) && isAnyValueCode(nom) && isAnyValueCode(primerLlinatge)
 				&& isAnyValueCode(segonLlinatge)) {
-			throw new SeyconException(Messages.getString("CreateDisableUserServiceImpl.RestrictionAlert")); //$NON-NLS-1$
+			throw new InternalErrorException(Messages.getString("CreateDisableUserServiceImpl.RestrictionAlert")); //$NON-NLS-1$
 		}
 		Collection<User> usuaris = usuariService.findUsersByCoreData(codiUsuari, nom, primerLlinatge, segonLlinatge, dni);
 		return usuaris;
@@ -287,7 +287,7 @@ public class CreateDisableUserServiceImpl extends com.soffid.iam.service.workflo
 		Collection<GroupEntity> grups = getGroupEntityDao().findByCriteria(codi, pare, unitatOfimatica, descripcio, tipus, obsolet);
 		if (grups != null) {
 			if (grups.size() >= 201) { // PJR: poso >= en comptes de ==
-				throw new SeyconException(Messages.getString("CreateDisableUserServiceImpl.BigSearchResults")); //$NON-NLS-1$
+				throw new InternalErrorException(Messages.getString("CreateDisableUserServiceImpl.BigSearchResults")); //$NON-NLS-1$
 			}
 			return getGroupEntityDao().toGroupList(grups);
 		}

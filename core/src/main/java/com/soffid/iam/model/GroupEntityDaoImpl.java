@@ -110,7 +110,7 @@ public class GroupEntityDaoImpl extends
                         getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.0"), grup.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.0"), grup.getName(), message), e);
 		}
 	}
 
@@ -158,7 +158,7 @@ public class GroupEntityDaoImpl extends
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.1"), grup.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.1"), grup.getName(), message), e);
 		}
 	}
 
@@ -218,7 +218,7 @@ public class GroupEntityDaoImpl extends
 			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.2"), grup.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.2"), grup.getName(), message), e);
 		}
 	}
 
@@ -400,7 +400,7 @@ public class GroupEntityDaoImpl extends
 			}
 		} catch (Exception e) {
 			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.7"),  //$NON-NLS-1$
-					sourceVO.getQuota()));
+					sourceVO.getQuota()), e);
 		}
 	}
 

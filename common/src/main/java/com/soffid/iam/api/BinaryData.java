@@ -25,7 +25,7 @@ public class BinaryData implements Comparable<Object>, Serializable {
 	private static final long serialVersionUID = 1L;
 	String name;
 	byte data[];
-	File temporaryFile;
+	transient File temporaryFile;
 
 	public BinaryData (String name, byte[] data) throws IOException {
 		this.name = name;
@@ -118,7 +118,6 @@ public class BinaryData implements Comparable<Object>, Serializable {
 	protected void finalize() throws Throwable {
 		if (temporaryFile != null)
 			temporaryFile.delete();
-		super.finalize();
 	}
 
 	@Override

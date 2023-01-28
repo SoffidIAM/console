@@ -63,7 +63,7 @@ public class InformationSystemEntityDaoImpl
 			auditarAplicacions("C", aplicacio.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.0"), aplicacio.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.0"), aplicacio.getName(), message), e);
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class InformationSystemEntityDaoImpl
 			auditarAplicacions("U", aplicacio.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.1"), aplicacio.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.1"), aplicacio.getName(), message), e);
 		}
 	}
 	
@@ -86,7 +86,7 @@ public class InformationSystemEntityDaoImpl
 			auditarAplicacions("D", codiAplicacio);			 //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.2"), aplicacio.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.2"), aplicacio.getName(), message), e);
 		}
 	}
 
@@ -293,7 +293,7 @@ public class InformationSystemEntityDaoImpl
 			}
 			catch (InternalErrorException e)
 			{
-				throw new SeyconException (e.toString());
+				throw new SeyconException (e.toString(), e);
 			}
 		}
 

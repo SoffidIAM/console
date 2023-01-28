@@ -56,6 +56,7 @@ public class Maquina {
 
 	@Nullable
 	@Attribute(translated = "hostAlias", defaultValue = "new java.util.LinkedList<String>()", multivalue = true )
+	@JsonAttribute(hibernateAttribute = "hostAlias.alias")
 	public List<java.lang.String> aliasMaquina;
 
 	@Nullable

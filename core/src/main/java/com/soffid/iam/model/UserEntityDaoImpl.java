@@ -122,7 +122,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorCreating"), usuari.getUserName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorCreating"), usuari.getUserName(), message),
+            		e);
         }
     }
 
@@ -207,7 +208,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorUpdating"), usuari.getUserName(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorUpdating"), usuari.getUserName(), message), e); //$NON-NLS-1$
         }
     }
 

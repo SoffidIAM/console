@@ -110,7 +110,7 @@ public class AuditEntityDaoImpl extends
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("AuditEntityDaoImpl.1"),   //$NON-NLS-1$
 					auditoria.getId(),
-					message));
+					message), e);
 		}
 	}
 
@@ -162,7 +162,7 @@ public class AuditEntityDaoImpl extends
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("AuditEntityDaoImpl.2"),   //$NON-NLS-1$
 					auditoria.getId(),
-					message));
+					message), e);
 		}
 	}
 

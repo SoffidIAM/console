@@ -77,7 +77,7 @@ public class AsyncList<E> implements List<E>, java.util.concurrent.Future<Collec
 	}
 
 	public boolean contains(Object o) {
-		for (Entry<?> e = source.first; e != null; e = e.next)
+		for (Entry<?> e = first; e != null; e = e.next)
 		{
 			if (e.element.equals(o))
 				return true;

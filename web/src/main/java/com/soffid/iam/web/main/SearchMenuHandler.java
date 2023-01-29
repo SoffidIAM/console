@@ -91,7 +91,8 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 			String s = option.getLiteral() == null ? Labels.getLabel(option.getLabel()) : option.getLiteral();
 			if (matches(terms, s)) 
 			{
-				l.add(option);
+				if (! l.contains(option))
+					l.add(option);
 			}
 			if ( loaded >= max) return;
 			List<MenuOption> options2 = null;

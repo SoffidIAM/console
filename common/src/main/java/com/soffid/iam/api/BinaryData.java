@@ -137,7 +137,13 @@ public class BinaryData implements Comparable<Object>, Serializable {
 		FileOutputStream out = null;
 		boolean first = true;
 		for (int read = in.readInt(); read >= 0; read = in.readInt()) {
-			in.read(buffer, 0, read);
+			int total = 0;
+			do {
+				int r = in.read(buffer, total, read - total);
+				if (r <= 0)
+					throw new IOException("Unable to read binary data. EOF");
+				total += r;
+			} while (total < read);
 			if (first) { 
 				this.data = Arrays.copyOf(buffer, read);
 				first = false;

@@ -109,7 +109,9 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             auditarUsuariGrup("U", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.2"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.2"), 
+            		usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message),
+            		e);
         }
     }
 
@@ -153,7 +155,8 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             String message = ExceptionTranslator.translate(e);
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.5"),
             		usuariGrup.getUser() == null ? "<Unknown>": usuariGrup.getUser().getUserName(), 
-            		usuariGrup.getGroup() == null ? "<Unknown>": usuariGrup.getGroup().getName(), message));
+            		usuariGrup.getGroup() == null ? "<Unknown>": usuariGrup.getGroup().getName(), message),
+            		e);
         }
     }
 
@@ -206,7 +209,9 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             auditarUsuariGrup("D", codiUsuari, codiGrup); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.7"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.7"), 
+            		usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message),
+            		e);
         }
     }
 

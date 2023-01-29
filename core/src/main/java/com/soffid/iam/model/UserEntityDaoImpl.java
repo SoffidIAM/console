@@ -257,7 +257,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             auditarUsuari("D", codiUsuari, usuari.getPrimaryGroup()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorDeleting"), usuari.getUserName(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorDeleting"), usuari.getUserName(), message), e); //$NON-NLS-1$
         }
     }
 

@@ -130,7 +130,9 @@ public class UserEmailEntityDaoImpl extends
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("UserEmailEntityDaoImpl.2"), llistaCorreuUsuari.getMailList().getName(), llistaCorreuUsuari.getUser().getUserName(), message));
+			throw new SeyconException(String.format(Messages.getString("UserEmailEntityDaoImpl.2"), 
+					llistaCorreuUsuari.getMailList().getName(), llistaCorreuUsuari.getUser().getUserName(), message),
+					e);
         }
     }
 

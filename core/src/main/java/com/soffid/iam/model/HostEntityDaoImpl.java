@@ -274,7 +274,7 @@ public class HostEntityDaoImpl extends
             auditarMaquina("D", nomMaquina); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.2"), maquinaEntity.getName(), message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.2"), maquinaEntity.getName(), message), e); //$NON-NLS-1$
 		}
     }
 
@@ -285,7 +285,7 @@ public class HostEntityDaoImpl extends
             auditarMaquina("C", maquina.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.3"), maquina.getName(), message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.3"), maquina.getName(), message), e); //$NON-NLS-1$
         }
     }
 
@@ -302,7 +302,7 @@ public class HostEntityDaoImpl extends
             super.update(maquina);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.4"), maquina.getName(), message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("HostEntityDaoImpl.4"), maquina.getName(), message), e); //$NON-NLS-1$
         }
     }
 

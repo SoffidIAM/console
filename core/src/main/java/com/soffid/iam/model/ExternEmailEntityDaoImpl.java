@@ -49,7 +49,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-            throw new SeyconException(String.format(Messages.getString("ExternEmailEntityDaoImpl.1"), correuExtern.getAddress(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("ExternEmailEntityDaoImpl.1"), correuExtern.getAddress(), message), e); //$NON-NLS-1$
         }
     }
 
@@ -66,7 +66,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("ExternEmailEntityDaoImpl.2"), correuExtern.getAddress(), message));
+            throw new SeyconException(String.format(Messages.getString("ExternEmailEntityDaoImpl.2"), correuExtern.getAddress(), message), e);
         }
     }
 

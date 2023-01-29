@@ -522,7 +522,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			}
 		} catch (Exception e) {
 			log.warn(Messages.getString("UserServiceImpl.Error"), e); //$NON-NLS-1$
-			throw new SeyconException(e.getMessage());
+			throw new SeyconException(e.getMessage(), e);
 		}
 	}
 

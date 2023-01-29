@@ -172,7 +172,7 @@ public class AccessLogEntityDaoImpl extends
                 numRegs = Integer.parseInt(numRegistres);
             } catch (Exception ex) {
                 throw new SeyconException(
-                        Messages.getString("AccessLogEntityDaoImpl.wrongFormat")); //$NON-NLS-1$
+                        Messages.getString("AccessLogEntityDaoImpl.wrongFormat"), ex); //$NON-NLS-1$
             }
         }
         if (numRegs >= 201) {

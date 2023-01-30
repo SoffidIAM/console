@@ -16,7 +16,7 @@ public class Quarter {
 		for (Sector sector: sectors) {
 			if (sector.isDone()) {
 				done ++;
-				sector.dim(handler);
+				sector.done(handler);
 			}
 		}
 		handler.response(null, new AuScript(handler, "document.getElementById('"+tag+"_counter').innerHTML='"+done+"/"+sectors.length+"';"));

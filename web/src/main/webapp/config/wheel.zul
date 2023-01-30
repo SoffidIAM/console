@@ -21,6 +21,17 @@
  		 fill: #edff00;
 		}
 		
+		g.done {
+			fill-opacity: 0.6;
+		}
+		
+		g.tick path {
+			fill-opacity: 0.0;
+		}
+		
+		g.done g.tick path {
+			fill-opacity: 1.0;
+		}
 		g.dim {
 			filter: brightness(0.5);
 		}
@@ -31,6 +42,7 @@
 
 <!-- 1.- USER OPTIONS-->
 		<timer delay="200" onTimer="ref:frame.showWelcome" repeats="false" running="true"/>
+		<timer delay="5000" onTimer="ref:frame.updateStatus" repeats="true" running="true"/>
 		<window id="welcome" visible="false" title="${c:l('wheel.popup.title') }" position="center" closable="false"
 			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
 			<label value="${c:l('wheel.popup.message') }" multiline="true" id="welcomelabel" />

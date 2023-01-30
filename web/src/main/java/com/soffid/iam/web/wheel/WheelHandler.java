@@ -4,10 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.util.Locales;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
@@ -47,7 +49,16 @@ public class WheelHandler extends FrameHandler {
 		welcomeMessage = (Label) welcome.getFellow("welcomelabel");
 		
 		 try {
-			 InputStream in = getClass().getResourceAsStream("/com/soffid/iam/web/wheel.svg");
+			 Locale locale = Locales.getCurrent();
+			 InputStream in = null;
+			 if (locale != null)
+				 in = getClass().getResourceAsStream("/com/soffid/iam/web/wheel-"+
+						 locale.getLanguage().toLowerCase()
+						 +".svg");
+
+			 if (in == null)
+				 in = getClass().getResourceAsStream("/com/soffid/iam/web/wheel.svg");
+			 
 		     ByteArrayOutputStream out = new ByteArrayOutputStream();
 		     byte b[] = new byte[4096]; //Por qué este valor? Preguntar a Biel
 		     for (int read = in.read(b); read >= 0; read = in.read(b)) {
@@ -91,6 +102,12 @@ public class WheelHandler extends FrameHandler {
 	 	}
 	 	
 	 	
+	}
+	
+	public void updateStatus(Event ev) {
+	 	for (Quarter q: quarters) {
+	 		q.updateStatus(this);
+	 	}
 	}
 	
 	public void showWelcome(Event ev) {

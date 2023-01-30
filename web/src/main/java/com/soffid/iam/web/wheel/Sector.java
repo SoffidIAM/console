@@ -29,15 +29,19 @@ public class Sector {
 	}
 	
 	public void dim(WheelHandler handler) {
-		String parentClassName = "g_"+tag.substring(0, tag.length()-2);
 		handler.response(null, new AuScript(handler, "document.getElementById('g_"+tag+"').classList.add('dim');"));
-//				+ "document.getElementById('g_"+tag+"').classList.remove('"+parentClassName+"');"));
+	}
+
+	public void done(WheelHandler handler) {
+		handler.response(null, new AuScript(handler, "document.getElementById('g_"+tag+"').classList.remove('dim');document.getElementById('g_"+tag+"').classList.add('done');"));
 	}
 
 	public void onClick(String tag2) {
 		if (tag2.equals(tag)) {
 			activate();
 			if (isDone())
+				done(handler);
+			else
 				dim(handler);
 		}
 	}

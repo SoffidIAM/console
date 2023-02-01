@@ -41,6 +41,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 	</div>
 	<popup id="searchBox" use="com.soffid.iam.web.main.SearchBoxWindow" sclass="main-search ctxpopup">
 		<timer id="timer" running="false" repeats="true" delay="200" onTimer="ref:searchBox.onTimer"/>	
+		<image style="height: 32px; float: right " src="/anonymous/wait.gif" id="waiting"/>
 	</popup>
 	<script src="/js/ssokm.js"/>
 	<h:div id="soffidAraleExtensionDetector"/>

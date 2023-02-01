@@ -1,5 +1,6 @@
 package com.soffid.iam.web.main;
 
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.InputEvent;
@@ -23,10 +24,13 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 			new SearchUserHandler(),
 			new SearchGroupHandler(),
 			new SearchApplicationHandler()};
+
+	private Component waiting;
 	
 	@Override
 	public void afterCompose() {
 		timer = (Timer) getFellow("timer");
+		waiting = getFellow("waiting");
 		for (SearchHandler handler: handlers) {
 			Div div = new Div();
 			div.setSclass("search-divisor");
@@ -42,6 +46,7 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 				handler.startSearch(inputEvent.getValue());
 			}
 			timer.start();
+			waiting.setVisible(true);
 			onTimer(inputEvent);
 			open (inputEvent.getTarget());
 			for (SearchHandler handler: handlers) {
@@ -57,8 +62,10 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 			if (! handler.isFinished())
 				pending = true;
 		}
-		if (!pending)
+		if (!pending) {
+			waiting.setVisible(false);
 			timer.stop();
+		}
 	}
 	
 	public void onNavigate( MouseEvent event) {

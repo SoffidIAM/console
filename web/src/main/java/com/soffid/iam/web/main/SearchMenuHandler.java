@@ -3,6 +3,7 @@ package com.soffid.iam.web.main;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
@@ -36,8 +37,12 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 						MenuParser menuParser = new MenuParser();
 						options = menuParser.getMenus("console.yaml");
 					}
-					findMenu (options, term.split(" ,+"), l, false);
-					findMenu (options, term.split(" ,+"), l, true);
+					final String[] terms = term.split(" ,+");
+					for (int i = 0; i < terms.length; i++) {
+						terms[i] = StringUtils.stripAccents(terms[i]).toLowerCase();
+					}
+					findMenu (options, terms, l, false);
+					findMenu (options, terms, l, true);
 				} catch (Throwable e) {
 					l.cancel(e);
 				} finally {
@@ -121,9 +126,11 @@ public class SearchMenuHandler extends SearchHandler<MenuOption> {
 	private boolean matches(String[] terms, String s) {
 		if (s == null)
 			return false;
-		for (String term: terms)
-			if ( ! s.toLowerCase().contains(term.toLowerCase()))
+		final String lowerCase = StringUtils.stripAccents(s).toLowerCase();
+		for (String term: terms) {
+			if ( ! lowerCase.contains(term))
 				return false;
+		}
 		return true;
 	}
 

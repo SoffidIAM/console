@@ -47,16 +47,9 @@
 		</finder>
 		<finder name="agent" type="agent">
 			<ejb-finder jndi="java:/module/DispatcherService-v2"
-					method="findSystemByTextAndJsonQueryAsync" if="${query != null  &amp;&amp; synchro == null}">
-				<parameter value=""/>
+					method="findSystemByTextAndJsonQueryAsync" if="${query != null || text != null}">
+				<parameter value="${text}"/>
 				<parameter value="${query}"/>
-			</ejb-finder>
-			<ejb-finder jndi="java:/module/DispatcherService-v2"
-					method="findSystemByTexntAndJsonQuery" if="${query != null  &amp;&amp; synchro != null}">
-				<parameter value=""/>
-				<parameter value="${query}"/>
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
 			</ejb-finder>
 			<new-instance-bean
 				className="com.soffid.iam.api.System">

@@ -75,6 +75,7 @@
 			</div>
 
 			<searchbox auto="true" id="searchBox"
+				variableNameText="text"
 				jsonObject="com.soffid.iam.api.System"
 				defaultAttributes="name,description,url" dataPath="model:/agent"
 				variableName="query">

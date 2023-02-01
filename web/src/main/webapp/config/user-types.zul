@@ -24,8 +24,8 @@
 		  value: name
 		- name: ${c:l('accounts.description')}
 		  value: description
-		- name: ${c:l('dominiUsuaris.zul.Unmanaged')}
-		  template: ${"${"}unmanaged? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"${"}"}
+		- name: ${c:l('discovery.managed')}
+		  template: ${"${"}managed? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"${"}"}
 					]]>
 				</attribute>
 			</datatable>
@@ -66,8 +66,8 @@
 
 								
 								<row>
-									<label value="${c:l('dominiUsuaris.zul.Unmanaged')} :"/>
-									<switch bind="unmanaged" disabled="${!canUpdateUserType }"/>
+									<label value="${c:l('discovery.managed')} :"/>
+									<switch bind="managed" disabled="${!canUpdateUserType }"/>
 								</row>
 
 							</rows>

@@ -3660,6 +3660,10 @@ div.databox div.label, span.label, span label {
 	margin-left: 8px;
 }
 
+div.databox.longlabel div.label, span.label.longlabel {
+	min-width: 292px;
+}
+
 span.label.black {
 	width: auto;
 	color: 	black;
@@ -3699,7 +3703,17 @@ div.databox div.container {
     width: calc(100% - 200px);
 }
 
+div.databox.longlabel div.container {
+    width: calc(100% - 300px);
+}
+
+
 div.databox div.container.wrapped {
+	margin-left: 300px;
+	display: block;
+}
+
+div.databox.longlabel div.container.wrapped {
 	margin-left: 200px;
 	display: block;
 }

@@ -473,6 +473,8 @@ public class FrameHandler extends Frame {
 	public void multiSelect(Event event) {
 		DataTable lb = (DataTable) event.getTarget();
 		displayRemoveButton( lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+		if (!isSingleFaceCard()) 
+			getCard().setSclass ( "card" );
 	}
 
 	public void deleteSelected(Event event0) {

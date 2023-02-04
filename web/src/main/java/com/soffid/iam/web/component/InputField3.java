@@ -382,9 +382,11 @@ public class InputField3 extends Databox
 				setType(Databox.Type.DATE);
 				setFormat(  DateFormats.getDateTimeFormatString());
 				setCalendarIcon("/img/calendar.svg");
+				setTime(true);
 			}
 			else if (dataType.getType() == TypeEnumeration.DATE_TYPE)
 			{
+				setTime(false);
 				setType(Databox.Type.DATE);
 				setFormat( DateFormats.getDateFormatString());
 				setCalendarIcon("/img/calendar.svg");

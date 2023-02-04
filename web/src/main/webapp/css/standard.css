@@ -869,12 +869,73 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {BLUE}; backgroun
 
 .titol_tancar_back:hover {background-color:#FFF7EE;}
 div.head-cell-inner {text-align:{TEXT_ALIGN_LEFT};}
+div.flatpickr-calendar span.flatpickr-next-month, 
+div.flatpickr-calendar span.flatpickr-prev-month {
+	fill: {SKY};
+}
+
+div.flatpickr-calendar .flatpickr-months .flatpickr-prev-month:hover svg, 
+div.flatpickr-calendar .flatpickr-months .flatpickr-next-month:hover svg {
+	fill: {SKYLIGHT}
+}
+
+div.flatpickr-calendar div.flatpickr-current-month {
+	font-size: 100%;
+}
+div.flatpickr-calendar .flatpickr-day.selected, 
+div.flatpickr-calendar .flatpickr-day.selected:focus, 
+div.flatpickr-calendar .flatpickr-day.selected:hover {
+    background: {SKY};
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    color: {SKYTEXT};
+    border-color: {SKY};
+    border-top-color: {SKY};
+    border-right-color: {SKY};
+    border-bottom-color: {SKY};
+    border-left-color: {SKY};
+}
+
+div.dayContainer {
+	width: 212px;
+	min-width: 212px;
+	max-width: 212px;
+}
+div.flatpickr-days {
+	width: 100%;
+}
+
+div.flatpickr-calendar span.flatpickr-day  {
+	height: 30px;
+	width: 30px;
+	line-height: 30px;
+}
+
+
+div.flatpickr-calendar {
+	width: 213px;
+}
+
+
+div.flatpickr-calendar.hasTime div.flatpickr-time,
+div.flatpickr-time div.numInputWrapper {
+	height: 30px;
+	line-height: 30px;
+}
+
+div.container.datebox input.dateboxinp {
+    background-image: url(/soffid/img/calendar.svg);
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-size: contain;
+}
+
 .dateboxinp  {
 	font-family: inherit;
 	font-size: inherit;
 	padding-left: 2px;
 	padding-right: 24px;
-	width: 140px;
+	width: 200px;
 }
 .dateboxread input {border: 0px !important; font-family: inherit;
 	font-size: inherit;

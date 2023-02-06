@@ -68,7 +68,10 @@ public class JobExecutorThread extends NotLoggedThread {
 						Long l = (Long) iter.next();
 						log.info (String.format(Messages.getString("JobExecutorThread.ExecutingJob"), l.longValue()));  //$NON-NLS-1$
 						try {
-							executor.executeJob(l.longValue());
+							if (executor.lockJob(l, getName())) 
+								executor.executeJob(l.longValue());
+							else
+								log.warn("Job "+l+" is locked by another thread");
 						} catch (Exception e) {
 							executor.anotateFailure(l.longValue(), e);
 						}

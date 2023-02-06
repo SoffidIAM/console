@@ -124,8 +124,8 @@ public class Search extends FrameHandler
 				setDatabox("pamSession.accountName", session.getAccountName());
 	
 				List<Long> chapters = session.getChapters();
-				chapters = removeDummyChapters(chapters);
 				Collections.sort(chapters);
+				chapters = removeDummyChapters(chapters);
 				JSONArray captions = new JSONArray();
 				JSONArray videos = new JSONArray();
 				JSONArray chapterStart = new JSONArray();

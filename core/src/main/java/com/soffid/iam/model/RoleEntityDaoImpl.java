@@ -493,11 +493,14 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			anyChange = true;
 			deleteRolDependency(entity);
 		}
-		if ( entity.getMandatory() == null ||
-				!entity.getMandatory().equals(grant.getMandatory()))
-			anyChange = true;
-		entity.setMandatory(grant.getMandatory());
-		getRoleDependencyEntityDao().update(entity);
+		else
+		{
+			if ( entity.getMandatory() == null ||
+					!entity.getMandatory().equals(grant.getMandatory()))
+				anyChange = true;
+			entity.setMandatory(grant.getMandatory());
+			getRoleDependencyEntityDao().update(entity);
+		}
 		return anyChange;
 	}
 

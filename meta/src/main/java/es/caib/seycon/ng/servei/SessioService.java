@@ -12,6 +12,8 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.AccountEntity;
+
 @Service ( translatedName="SessionService",
 	translatedPackage="com.soffid.iam.service",
 	serverPath="/seycon/SessioService", serverRole="agent")
@@ -19,7 +21,8 @@ import com.soffid.mda.annotation.Service;
 	es.caib.seycon.ng.model.ServeiEntity.class,
 	es.caib.seycon.ng.model.SessioEntity.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
-	es.caib.seycon.ng.model.UsuariEntity.class})
+	es.caib.seycon.ng.model.UsuariEntity.class,
+	AccountEntity.class})
 public abstract class SessioService {
 
 	@Operation (translated="registerSession")

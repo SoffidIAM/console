@@ -21,10 +21,20 @@ public class FileUpload2 extends Window {
 		get ( Labels.getLabel("fileupload.upload"), listener);
 	}
 
+	public static void get (boolean multiple, EventListener listener) {
+		get ( Labels.getLabel("fileupload.upload"), multiple, listener);
+	}
+
 	public static void get (String title, EventListener listener) {
+		get (title, false, listener);
+	}
+	
+	public static void get (String title, boolean multiple, EventListener listener) {
+		
 		Map args = new HashMap();
 		args.put("listener", listener);
 		args.put("title",  title);
+		args.put("multiple", multiple);
 		
 		Executions.createComponents("/popup/upload.zul", null, args );
 	}

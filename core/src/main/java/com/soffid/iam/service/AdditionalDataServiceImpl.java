@@ -546,7 +546,7 @@ public class AdditionalDataServiceImpl extends
 		ClassConfig config = Configuration.getClassConfig(CustomObjectType.class);
 
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(CustomObjectType.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

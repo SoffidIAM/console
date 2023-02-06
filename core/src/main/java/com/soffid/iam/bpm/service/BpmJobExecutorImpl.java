@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.LockMode;
 import org.jbpm.JbpmContext;
 import org.jbpm.db.JobSession;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -43,29 +44,11 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 				log.debug(Messages.getString("BpmJobExecutorImpl.QueryingAcquirableJob")); //$NON-NLS-1$
 				Job job = jobSession.getFirstAcquirableJob(lockOwner);
 				if (job != null) {
-					if (job.isExclusive()) {
-						log.debug(String.format(Messages.getString("BpmJobExecutorImpl.ExclusiveJobFounded"), job));  //$NON-NLS-1$
-						ProcessInstance processInstance = job
-								.getProcessInstance();
-						log.debug(String.format(Messages.getString("BpmJobExecutorImpl.FindingExclusiveJobs"), processInstance)); //$NON-NLS-1$
-						jobsToLock = jobSession.findExclusiveJobs(lockOwner,
-								processInstance);
-						log.debug(String.format(Messages.getString("BpmJobExecutorImpl.TryObtainExclusiveLocks"), jobsToLock, //$NON-NLS-1$
-								processInstance)); 
-					} else {
-						log.debug(String.format(Messages.getString("BpmJobExecutorImpl.TryObtainLock"), job));  //$NON-NLS-1$
-						jobsToLock = Collections.singletonList(job);
-					}
-
 					Date lockTime = new Date();
-					for (Iterator iter = jobsToLock.iterator(); iter.hasNext();) {
-						job = (Job) iter.next();
-						job.setLockOwner(lockOwner);
-						job.setLockTime(lockTime);
-						jbpmContext.getSession().update(job);
-						jobs.add(new Long(job.getId()));
-					}
-
+					job.setLockOwner(lockOwner);
+					job.setLockTime(lockTime);
+					jbpmContext.getSession().update(job);
+					jobs.add(new Long(job.getId()));
 				} else {
 					log.debug(Messages.getString("BpmJobExecutorImpl.NoAcquirableJobs")); //$NON-NLS-1$
 				}
@@ -223,6 +206,31 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 				ctx.close();
 			}
 		} while (nextProcess != null);
+	}
+	@Override
+	protected boolean handleLockJob(long id, String lockOwner) throws Exception {
+		Vector jobs = new Vector();
+		Collection acquiredJobs;
+		synchronized (lock) {
+			JbpmContext jbpmContext = getContext();
+			try {
+				JobSession jobSession = jbpmContext.getJobSession();
+				Job job = jobSession.getJob(id);
+				if (job != null) {
+					jbpmContext.getSession().lock(job, LockMode.FORCE);
+					if (lockOwner.equals(job.getLockOwner())) {
+						job.setLockTime(new Date());
+						jbpmContext.getSession().update(job);
+						return true;
+					}
+				} else {
+					log.debug(Messages.getString("BpmJobExecutorImpl.NoAcquirableJobs")); //$NON-NLS-1$
+				}
+			} finally {
+				jbpmContext.close();
+			}
+		}
+		return false;
 	}
 
 }

@@ -28,6 +28,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Div;
@@ -43,6 +44,7 @@ import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.obligation.ObligationManager;
 
+import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -117,6 +119,10 @@ public class ErrorHandler extends Window implements AfterCompose {
 					msg = e.toString();
 				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException)
 					messageLabel.setValue( msg );
+				else if (e instanceof UserWorkflowException)
+					messageLabel.setValue( e.getMessage() );
+				else if (e instanceof UiException)
+					messageLabel.setValue( e.getMessage() );
 				else if (e instanceof SecurityException)
 					messageLabel.setValue( Labels.getLabel("error.securityException")+ ": "+  msg );
 				else

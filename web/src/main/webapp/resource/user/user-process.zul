@@ -19,10 +19,12 @@
 		  value: currentTask
 		- name: ${c:l('usuaris.zul.DataInici')}
 		  width: 150px
-		  value: start_datetime
+		  template: #{start_datetime }
+		  value: start
 		- name: ${c:l('usuaris.zul.DataFi')}
 		  width: 150px
-		  value: end_datetime
+		  template: #{end_datetime}
+		  value: end
 		]]>
 		</attribute>
 	</datatable>

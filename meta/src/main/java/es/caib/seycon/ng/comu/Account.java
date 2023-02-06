@@ -34,6 +34,7 @@ public class Account {
 	@Attribute(hidden = true)
 	public java.lang.String oldName;
 
+	@Nullable
 	@Description("Account description")
 	public java.lang.String description;
 
@@ -116,6 +117,11 @@ public class Account {
 	@Nullable
 	@Attribute(customUiHandler = "com.soffid.iam.web.account.ServerNameHandler")
 	String serverName;
+	
+	@Description("Ssh public key")
+	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.account.SshPublicKeyHandler")
+	String sshPublicKey;
 	
 	@Nullable
 	@Attribute(customUiHandler = "com.soffid.iam.web.account.VaultFieldHandler", separator = "_vault")

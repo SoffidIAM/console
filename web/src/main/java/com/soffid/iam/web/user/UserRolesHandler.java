@@ -184,6 +184,7 @@ public class UserRolesHandler extends Div implements AfterCompose {
 					dvf.setDomain(currentRole.getDomain());
 					dvf.setValue(new LinkedList<String>());
 					dvf.createField();
+					dvf.invalidate();
 				}
 			}
 		}
@@ -423,7 +424,9 @@ public class UserRolesHandler extends Div implements AfterCompose {
 				if (roleName != null && !roleName.trim().isEmpty())
 				{
 					currentRole = EJBLocator.getApplicationService().findRoleByNameAndSystem(roleName, system);
-
+					if (currentRole == null)
+						throw new UiException(String.format(Labels.getLabel("user.zul.wrongRole"), roleName, system));
+					
 					currentRoleAccount = new RoleAccount();
 					currentRoleAccount.setUserCode(userName);
 					currentRoleAccount.setCertificationDate(new Date());

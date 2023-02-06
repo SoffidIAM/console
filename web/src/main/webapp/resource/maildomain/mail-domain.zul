@@ -17,7 +17,6 @@
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/mailDomain"
-			    maxheight="70vh"
 				sortColumn="0" onSelect="ref:frame.showDetails"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"

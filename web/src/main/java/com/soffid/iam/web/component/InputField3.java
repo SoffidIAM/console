@@ -998,6 +998,9 @@ public class InputField3 extends Databox
 	public void openSelectWindow(final Integer position) throws UiException {
 		if (noPermissions)
 			return;
+		if (customOpenDialog())
+			return;
+		
 		if (dataHandler != null)
 		{
 			try {
@@ -1045,21 +1048,32 @@ public class InputField3 extends Databox
 		}
 	}
 
+	private boolean customOpenDialog() {
+		try {
+			return uiHandler != null && uiHandler.openSelectWindow(this);
+		} catch (Exception e) {
+			throw new UiException(e);
+		}
+	}
+
 	@Override
 	public void onUpload(final Integer position) {
-		FileUpload2.get((event2) -> {
+		FileUpload2.get(dataType.isMultiValued(), (event2) -> {
 			UploadEvent ue = (UploadEvent) event2;
-			Media m = ue.getMedia();
-			BinaryData bd;
-			if (m.isBinary() && m.inMemory())
-				bd = new BinaryData(m.getName(), m.getByteData());
-			else if (m.isBinary()) 
-				bd = new BinaryData(m.getName(), m.getStreamData());
-			else if (m.inMemory()) 
-				bd = new BinaryData(m.getName(), m.getStringData().getBytes(StandardCharsets.UTF_8));
-			else 
-				bd = new BinaryData(m.getName(), m.getReaderData());
-			onItemChange(bd, position);
+			int pos = position.intValue();
+			for (Media m: ue.getMedias()) {
+				BinaryData bd;
+				if (m.isBinary() && m.inMemory())
+					bd = new BinaryData(m.getName(), m.getByteData());
+				else if (m.isBinary()) 
+					bd = new BinaryData(m.getName(), m.getStreamData());
+				else if (m.inMemory()) 
+					bd = new BinaryData(m.getName(), m.getStringData().getBytes(StandardCharsets.UTF_8));
+				else 
+					bd = new BinaryData(m.getName(), m.getReaderData());
+				onItemChange(bd, pos);
+				pos++;
+			}
 			invalidate();
 		});
 	}

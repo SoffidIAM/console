@@ -1100,7 +1100,7 @@ public class ApplicationServiceImpl extends
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
-			if (app != null && app.getApprovalProcess() != null)
+			if (app != null && app.getApprovalProcess() != null && !app.getApprovalProcess().isEmpty())
 			{
 				return true;
 			}
@@ -1117,7 +1117,7 @@ public class ApplicationServiceImpl extends
 		if (role != null)
 		{
 			InformationSystemEntity app = role.getInformationSystem();
-			if (app != null && app.getApprovalProcess() != null)
+			if (app != null && app.getApprovalProcess() != null && !app.getApprovalProcess().trim().isEmpty())
 			{
 				List def = getBpmEngine().findProcessDefinitions(app.getApprovalProcess(), PredefinedProcessType.ROLE_GRANT_APPROVAL);
 				if (def.isEmpty())
@@ -2881,7 +2881,7 @@ public class ApplicationServiceImpl extends
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround(CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(Role.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -3021,7 +3021,7 @@ public class ApplicationServiceImpl extends
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);
 		HQLQuery hql = expr.generateHSQLString(Application.class);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
 			qs = "o.tenant.id = :tenantId";

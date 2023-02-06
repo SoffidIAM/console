@@ -101,6 +101,22 @@ public abstract class SyncStatusService {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password getAccountSshKey(
+		java.lang.String user, 
+		java.lang.Long accountId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Description("Method user for SSO. Provides the password if the user has the right access level on the account")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password getAccountSshKey(
+		java.lang.String user, 
+		java.lang.Long accountId,
+		AccountAccessLevelEnum level)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public byte[] getMazingerRules(
 		java.lang.String user)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
@@ -177,5 +193,9 @@ public abstract class SyncStatusService {
 
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void setAccountPassword(java.lang.String accountName, String serverName, Password password, boolean mustChange)
+			throws es.caib.seycon.ng.exception.InternalErrorException {	}
+
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public void setAccountSshPrivateKey(java.lang.String accountName, String serverName, Password privateKey)
 			throws es.caib.seycon.ng.exception.InternalErrorException {	}
 }

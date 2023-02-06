@@ -147,8 +147,21 @@ public abstract class SelfService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	@Operation
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password queryAccountSshKey(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Password queryAccountPasswordBypassPolicy(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Password queryAccountSshKeyBypassPolicy(
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;

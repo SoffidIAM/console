@@ -21,7 +21,7 @@
 				use="com.soffid.iam.web.pam.JumpserverTable"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
-				dataPath="/model:/pamServerGroup" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/pamServerGroup" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
 				<attribute name="columns"><![CDATA[
 - name: ${c:l('jumpserver.groupName')} 

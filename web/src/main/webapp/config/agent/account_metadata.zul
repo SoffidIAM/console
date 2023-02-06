@@ -12,7 +12,7 @@
 		}
 	</style>
 	<datatable id="metadataGrid" autocommit="true" use="com.soffid.iam.web.agent.MetadataTable"
-				dataPath="/metadata" maxheight="70vh" sortColumn="0"
+				dataPath="/metadata" sortColumn="0"
 				sclass="datatable hideFirstCol"
 				reorder="true"
 				onReorder="ref:frame.reorder"

@@ -28,7 +28,7 @@
 
 			<datatable id="listbox" autocommit="true"
 				use="com.soffid.iam.web.agent.ServersTable"
-				dataPath="/model:/server" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/server" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
 				<attribute name="columns"><![CDATA[
 - name: ${c:l('servers.zul.Name')} 

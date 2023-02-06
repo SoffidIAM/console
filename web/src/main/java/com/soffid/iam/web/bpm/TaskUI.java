@@ -604,8 +604,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 
         botonera.getChildren().clear();
 
-        btnTomar.setVisible(task.getStart() == null
-                || !user.equals(task.getActorId()));
+        btnTomar.setVisible(!task.isCancelled() && 
+        		task.getEnd() == null && 
+        		( task.getStart() == null || !user.equals(task.getActorId())));
 
         btnDelegar.setVisible(
         		(task.getStart() == null || user.equals(task.getActorId())) 
@@ -734,19 +735,22 @@ public class TaskUI extends FrameHandler implements EventListener {
 
 	private void completeTransition(final String transicion, final BpmEngine engine, final WorkflowWindowInterface workflowWindow) throws CommitException, InternalErrorException, NamingException, CreateException, BPMException {
 	    final TaskInstance task = new TaskInstance( currentTask );
+	    boolean newProcess = getCurrentProcess().isDummyProcess();
 	    EJBLocator.getAsyncRunnerService().runTransaction(new TransactionalTask() {
 			@Override
 			public Object run() throws Exception
 			{
 				ProcessInstance process = getCurrentProcess();
+				boolean newProcess = process.isDummyProcess();
 				TaskInstance task2 = engine.update(task);
-				if (process.isDummyProcess())
+				if (newProcess)
 					process = engine.getProcessInstance(task2);
 				
 				
 				if (newCommentBox.getValue() != null
 						&& ! newCommentBox.getValue().toString().trim().isEmpty()) {
 					engine.addComment(task2, newCommentBox.getValue().toString());
+                    newCommentBox.setValue("");
 					// workflowWindow.setTask(task);
 				}
 				
@@ -754,6 +758,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 				// workflowWindow.setTask(task);
 				
 				currentProcess = process;
+				if (newProcess) {
+					currentProcess = engine.getProcess(process.getId());
+				}
 				return null;
 			}
 		});
@@ -779,7 +786,15 @@ public class TaskUI extends FrameHandler implements EventListener {
 	    		}
 	    	}
 	    }
-	    cerrarTarea();
+	    
+		if (newProcess && getCurrentProcess().getEnd() == null) {
+			Missatgebox.avis(String.format( Labels.getLabel("task.newProcessMessage"), currentProcess.getId()),
+					(event) -> {
+						cerrarTarea();
+					});
+		}
+		else
+			cerrarTarea();
 	}
 
 
@@ -794,9 +809,14 @@ public class TaskUI extends FrameHandler implements EventListener {
 	}
 
 	public void salvarTarea() throws InterruptedException, IOException,
-		CreateException, NamingException {
-		salvarTarea(true);
+		CreateException, NamingException, CommitException {
+		if (getCurrentTask() == null || getCurrentTask().isDummyTask())
+			cerrarTarea();
+		else
+			salvarTarea(true);
 	}
+	
+	
 	public void salvarTarea(boolean exit) throws InterruptedException, IOException,
             CreateException, NamingException {
         WorkflowWindowInterface workflowWindow = null;
@@ -816,6 +836,7 @@ public class TaskUI extends FrameHandler implements EventListener {
                             && ! newCommentBox.getValue().toString().trim().isEmpty())
                     {
                         task = engine.addComment(task, newCommentBox.getValue().toString());
+                        newCommentBox.setValue("");
                         workflowWindow.setTask(task);
                     }
 
@@ -885,6 +906,7 @@ public class TaskUI extends FrameHandler implements EventListener {
             if (newCommentBox.getValue() != null
                     && ! newCommentBox.getValue().toString().trim().isEmpty())
                 currentTask = engine.addComment(currentTask, newCommentBox.getValue().toString());
+            newCommentBox.setValue("");
             currentTask = engine.delegateTaskToUser(currentTask, (String) cf.getValue());
             cerrarTarea();
 		}
@@ -901,11 +923,12 @@ public class TaskUI extends FrameHandler implements EventListener {
             TaskAttachmentManager business= new TaskAttachmentManager(getCurrentTask());
             Session sesion= this.getDesktop().getSession();
             
-            FileUpload2.get((event) -> {
-            	org.zkoss.util.media.Media dataSubida = ((UploadEvent)event).getMedia();
+            FileUpload2.get(true, (event) -> {
+            	Media[] dataSubida = ((UploadEvent)event).getMedias();
             
-            	if(dataSubida!= null)
+            	if(dataSubida!= null && dataSubida.length > 0)
 	            {
+            		for (Media media: dataSubida) {
 	                    String tag = ((HttpSession)sesion.getNativeSession()).getId();
 	                    List tags = business.getTags();
 	                    int counter = 0;
@@ -914,8 +937,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 	                    	counter++;
 	                    	tag = ((HttpSession)sesion.getNativeSession()).getId()+"_"+counter;
 	                    }
-	                    business.uploadFile(dataSubida, tag);
-	                    refreshListadoArchivos();
+	                    business.uploadFile(media, tag);
+            		}
+            		refreshListadoArchivos();
 	            }
             });
     }

@@ -87,7 +87,10 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	 */
 	protected OUType handleFindOUTypeByName(String CodiTipusUnitatOrganitzativa) throws Exception {
 		GroupTypeEntity entity = getGroupTypeEntityDao().findByName(CodiTipusUnitatOrganitzativa);
-		return getGroupTypeEntityDao().toOUType(entity);
+		if (entity == null)
+			return null;
+		else
+			return getGroupTypeEntityDao().toOUType(entity);
 	}
 
 	/**
@@ -112,7 +115,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 
 		// Prepare query HQL
 		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( new CustomDialect().isOracle());
+		expr.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expr.generateHSQLString(OUType.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -218,7 +221,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
-		expression.setOracleWorkaround( new CustomDialect().isOracle());
+		expression.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expression.generateHSQLString(OUType.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())

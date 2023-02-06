@@ -368,11 +368,13 @@ public class UserInterfaceBusiness {
 
 		        TaskInstance ti = (TaskInstance) taskIterator.next();
 		        String taskName = ti.getName();
-		        boolean exactName = taskName.equals(ti.getTask().getName());
-		        Task targetTask = (Task) tasks.get(ti);
-		        ti.setTask(targetTask);
-		        if (!exactName) {
-		            ti.setName(taskName);
+		        if (ti.getTask() != null) {
+			        boolean exactName = taskName.equals(ti.getTask().getName());
+			        Task targetTask = (Task) tasks.get(ti);
+			        ti.setTask(targetTask);
+			        if (!exactName) {
+			            ti.setName(taskName);
+			        }
 		        }
 		    }
 		    for (Iterator tokenIterator = tokens.keySet().iterator(); tokenIterator

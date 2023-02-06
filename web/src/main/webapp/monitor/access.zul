@@ -25,7 +25,7 @@
 		<datatable id="listbox" autocommit="true" 
 			use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 			preference="audit"
-			dataPath="/model:/accessLog" maxheight="70vh" 
+			dataPath="/model:/accessLog"  
 			enablefilter="true"
 			onSelect="ref:frame.openSession" >
 		<attribute name="allColumns">

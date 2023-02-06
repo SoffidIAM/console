@@ -132,8 +132,7 @@ public class ScimHelper {
 	static Boolean oracle = null;
 	public boolean isOracle() {
 		if (oracle == null) {
-			CustomDialect cd = new CustomDialect();
-			oracle = cd.isOracle() || cd.isSqlServer();
+			oracle = CustomDialect.isOracle() || CustomDialect.isSqlServer();
 		}
 		return oracle.booleanValue();
 	}
@@ -147,7 +146,7 @@ public class ScimHelper {
 		for (int i = 0; i < split.length; i++)
 		{
 			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (t.trim().isEmpty()) {
+			if (! t.trim().isEmpty()) {
 				if (sb.length() > 0)
 					sb.append(" and ");
 				sb.append("(");

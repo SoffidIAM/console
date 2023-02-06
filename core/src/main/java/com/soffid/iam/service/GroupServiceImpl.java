@@ -33,6 +33,8 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 
 import com.soffid.iam.api.Account;
@@ -92,6 +94,7 @@ import es.caib.seycon.ng.exception.SeyconException;
  * @see es.caib.seycon.ng.servei.GrupService
  */
 public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
+	Log log = LogFactory.getLog(getClass());
 	/**
 	 * @throws InternalErrorException 
 	 * @see es.caib.seycon.ng.servei.GrupService#createGrup(es.caib.seycon.ng.comu.Grup)
@@ -869,36 +872,29 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			{
 				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
 				{
-					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+					if (! att.getName().equals("name") && ! att.getName().equals("description")) {
+						if (Boolean.TRUE.equals(att.getBuiltin()))
+							sb.append(" or "+att.getName()+" co \""+t+"\"");
+						else
+							sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
+					}
 				}
 			}
 			sb.append(")");
 		}
 		return sb.toString();
 	}
-	
+
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAndFilterAsync(String text, String filter) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+") and ( not endDate pr )";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = "("+filter+")  and ( not endDate pr )";
-		else if (!q.isEmpty())
-			q = "("+q+")  and ( not endDate pr )";
-		else
-			q = "not endDate pr";
+		String q = generateQuickSearchQuery(text, filter);
 		return handleFindGroupByJsonQueryAsync(q);
 			
 	}
 
 	@Override
 	protected AsyncList<Group> handleFindGroupHistoryByTextAndFilterAsync(String text, String filter, Date date) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
+		String q = generateQuickSearchQuery(text, filter);
 		if (date == null)
 			return handleFindGroupByJsonQueryAsync(q);
 		else {
@@ -921,45 +917,71 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	@Override
 	protected List<Group> handleFindGroupByTextAndFilter(String text, String filter) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+") and ( not endDate pr )";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = "("+filter+")  and ( not endDate pr )";
-		else if (! q.isEmpty())
-			q = "("+q+")  and ( not endDate pr )";
-		else
-			q = "not endDate pr";
+		String q = generateQueryCurrent(text, filter);
+
 		return handleFindGroupByJsonQuery(q);
 	}
 
 	@Override
 	protected PagedResult<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
+		String q = generateQuickSearchQuery(text, filter);
+		return handleFindGroupByJsonQuery(q, first, pageSize);
+	}
+
+	private String generateQuickSearchQuery(String text, String filter) {
 		String q = generateQuickSearchQuery(text);
+		String [] split = removeOrderBy(filter);
+		filter = split[0];
 		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+") and ( not endDate pr )";
+			q = "("+q+") and ("+filter+")";
 		else if ( filter != null && ! filter.trim().isEmpty())
 			q = filter;
-		return handleFindGroupByJsonQuery(q, first, pageSize);
+		if (split[1] != null)
+			q += " "+split[1];
+		return q;
+	}
+
+	protected String generateQueryCurrent(String text, String filter) {
+		String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
+		
+		String q = generateQuickSearchQuery(text);
+		String [] split = removeOrderBy(filter);
+		filter = split[0];
+		
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+") and ( not endDate pr  or endDate ge \""+s+"\")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = "("+filter+")  and ( not endDate pr  or endDate ge \""+s+"\")";
+		else if (!q.isEmpty())
+			q = "("+q+")  and ( not endDate pr or endDate ge \""+s+"\")";
+		else
+			q = "(not endDate pr) or endDate ge \""+s+"\"";
+		
+		if (split[1] != null)
+			q += " "+split[1];
+		
+		return q;
+	}
+
+	private String[] removeOrderBy(String filter) {
+		if (filter == null)
+			return new String[] {null, null};
+		int i = filter.indexOf("$orderby");
+		if (i >= 0)
+			return new String[] { filter.substring(0,i).trim(), filter.substring(i) };
+		else
+			return new String[] { filter, null};
 	}
 
 	@Override
 	protected List<Group> handleFindGroupByText(String text) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (! q.isEmpty())
-			q = "("+q+")  and ( not endDate pr )";
-		else
-			q = "not endDate pr";
+		String q = generateQueryCurrent(text, null);
 		return handleFindGroupByJsonQuery(q);
 	}
 	
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAsync(final String text) throws Exception {
 		String q = generateQuickSearchQuery(text);
-		if (! q.isEmpty())
-			q = "("+q+")  and ( not endDate pr )";
-		else
-			q = "not endDate pr";
 		return handleFindGroupByJsonQueryAsync(q);
 	}
 
@@ -977,7 +999,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 		// Prepare query HQL
 		AbstractExpression expression = ExpressionParser.parse(query);
-		expression.setOracleWorkaround( new CustomDialect().isOracle());
+		expression.setOracleWorkaround( CustomDialect.isOracle());
 		HQLQuery hql = expression.generateHSQLString(Group.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
@@ -995,7 +1017,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
 
 		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
-		cfg.setFetchSize(first);
+		cfg.setFirstResult(first);
 		cfg.setMaximumResultSize(pageSize);
 		// Execute HQL and generate result
 		int totalResults = 0;
@@ -1032,11 +1054,9 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected List<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		if (! query.isEmpty())
-			query = "("+query+")  and ( not endDate pr )";
-		else
-			query = "not endDate pr";
-		findByJsonQuery(result, query, new CriteriaSearchConfiguration());
+
+		String q = generateQueryCurrent(null, query);
+		findByJsonQuery(result, q, new CriteriaSearchConfiguration());
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
@@ -1047,11 +1067,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	protected PagedResult<Group> handleFindGroupByJsonQuery(String query, Integer first, Integer pageSize) throws InternalErrorException, Exception {
 		AsyncList<Group> result = new AsyncList<Group>();
 		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		if (! query.isEmpty())
-			query = "("+query+")  and ( not endDate pr )";
-		else
-			query = "not endDate pr";
-		PagedResult<Group> pr = findByJsonQuery(result, query, first, pageSize);
+		String q = generateQueryCurrent(null, query);
+		PagedResult<Group> pr = findByJsonQuery(result, q, first, pageSize);
 		if (result.isCancelled())
 			TimeOutUtils.generateException();
 		result.done();
@@ -1065,11 +1082,7 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					String q = query;
-					if (! q.isEmpty())
-						q = "("+q+")  and ( not endDate pr )";
-					else
-						q = "not endDate pr";
+					String q = generateQueryCurrent(null, query);
 					findByJsonQuery(result, q, new CriteriaSearchConfiguration());
 				} catch (Exception e) {
 					result.cancel(e);

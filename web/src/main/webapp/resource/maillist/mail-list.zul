@@ -34,7 +34,7 @@
 				preference="mailList"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
-				dataPath="/model:/mailList" maxheight="70vh" sortColumn="0"
+				dataPath="/model:/mailList" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('mail:create')}" >

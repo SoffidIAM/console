@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.3.56-SNAPSHOT</version>
+		<version>3.3.75-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>iam-core</artifactId>
@@ -499,6 +499,10 @@
 					<groupId>org.bouncycastle</groupId>
 					<artifactId>bctsp-jdk14</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk15on</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
  		<dependency>
@@ -599,7 +603,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>3.10.1</version>
+			<version>5.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>
@@ -614,19 +618,13 @@
 		</dependency>
 		<dependency>
     		<groupId>org.bouncycastle</groupId>
-    		<artifactId>bcpkix-jdk15on</artifactId>
-    		<version>1.51</version>
-    		<exclusions>
-    			<exclusion>
-		    		<groupId>org.bouncycastle</groupId>
-		    		<artifactId>bcprov-jdk15on</artifactId>
-    			</exclusion>
-    		</exclusions>
+    		<artifactId>bcpkix-jdk18on</artifactId>
+    		<version>1.72</version>
 		</dependency>
 		<dependency>
     		<groupId>org.bouncycastle</groupId>
-    		<artifactId>bcprov-jdk15on</artifactId>
-    		<version>1.66</version>
+    		<artifactId>bcprov-jdk18on</artifactId>
+    		<version>1.72</version>
 		</dependency>
 		<dependency>
     		<groupId>org.apache.santuario</groupId>

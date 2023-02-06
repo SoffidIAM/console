@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.3.56-SNAPSHOT</version>
+		<version>3.3.75-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>install</artifactId>
@@ -116,7 +116,7 @@
 									<fileset dir="${basedir}/target/lib">
 										<include name="iam-tomee.jar" />
 										<include name="mariadb-java-client.jar" />
-										<include name="ojdbc7.jar" />
+										<include name="ojdbc10.jar" />
 										<include name="sqljdbc4.jar" />
 										<include name="postgresql.jar" />
 									</fileset>
@@ -205,6 +205,16 @@
 									<arg value="-f" />
 									<arg value="target/docker/Dockerfile" />
 									<arg value="-t" />
+									<arg value="soffid/iam-console:${pom.version}-k" />
+									<arg value="-t" />
+									<arg value="soffid/iam-console:k" />
+									<arg value="." />
+								</exec>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="build" />
+									<arg value="-f" />
+									<arg value="target/docker/Dockerfile2" />
+									<arg value="-t" />
 									<arg value="soffid/iam-console:${pom.version}" />
 									<arg value="-t" />
 									<arg value="soffid/iam-console:latest" />
@@ -221,6 +231,14 @@
 						<phase>deploy</phase>
 						<configuration>
 							<tasks>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="push" />
+									<arg value="soffid/iam-console:${pom.version}-k" />
+								</exec>
+								<exec failonerror="true" executable="docker" dir="${project.basedir}">
+									<arg value="push" />
+									<arg value="soffid/iam-console:k" />
+								</exec>
 								<exec failonerror="true" executable="docker" dir="${project.basedir}">
 									<arg value="push" />
 									<arg value="soffid/iam-console:${pom.version}" />
@@ -346,9 +364,10 @@
 			<version>1.8.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc7</artifactId>
-			<version>12.1.0.2.0</version>
+			<groupId>com.oracle.ojdbc</groupId>
+			<artifactId>ojdbc10</artifactId>
+			<version>19.3.0.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
@@ -390,48 +409,83 @@
 			<artifactId>add-agent-wf</artifactId>
 			<version>1.0.4</version>
 			<type>par</type>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>sso-plugin</artifactId>
 			<version>1.0.2</version>
 			<type>jar</type>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>sqlserver-plugin</artifactId>
 			<version>1.0.1</version>
 			<type>jar</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>cglib</groupId>
+					<artifactId>cglib</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>oracle-plugin</artifactId>
 			<version>2.2.4</version>
 			<type>jar</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc14</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>shell-plugin</artifactId>
 			<version>1.4.2</version>
 			<type>jar</type>
+			<exclusions>
+				<exclusion>
+					<groupId>cglib</groupId>
+					<artifactId>cglib</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>windows-plugin</artifactId>
 			<version>5.3.3</version>
 			<type>jar</type>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>sql-plugin</artifactId>
 			<version>1.7.6</version>
 			<type>jar</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sf.jt400</groupId>
+					<artifactId>jt400</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.jtds</groupId>
+					<artifactId>jtds</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>rest-plugin</artifactId>
 			<version>1.2.10</version>
 			<type>jar</type>
+			<scope>provided</scope>
 		</dependency> 
 	</dependencies>
 	<reporting>

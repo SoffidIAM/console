@@ -170,6 +170,18 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 				d.addEventHandler("onClick", new EventHandler(ZScript.parseContent("ref:"+getId()+".openMenu"), null));
 				d.setAttribute("menuOption", option);
 				optionsDiv.appendChild(d);
+				if (option.getHandler() != null) {
+					tip = option.getHandler().getTip(option);
+					if (tip != null) {
+						Div dd = new Div();
+						dd.setSclass("menuoption-tip-shadow");
+						d.appendChild(dd);
+						Label d3 = new Label();
+						d3.setSclass("menuoption-tip");
+						d3.setValue(tip);
+						dd.appendChild(d3);
+					}
+				}
 				if (option.getImg() != null)
 				{
 					Img img = new Img();
@@ -178,15 +190,6 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 					else
 						img.setDynamicProperty("src", getDesktop().getExecution().getContextPath() + option.getImg());
 					d.appendChild(img);
-				}
-				if (option.getHandler() != null) {
-					tip = option.getHandler().getTip(option);
-					if (tip != null) {
-						Label d3 = new Label();
-						d3.setSclass("menuoption-tip");
-						d3.setValue(tip);
-						d.appendChild(d3);
-					}
 				}
 				if (option.getLiteral() != null) {
 					Label l = new Label( option.getLiteral());

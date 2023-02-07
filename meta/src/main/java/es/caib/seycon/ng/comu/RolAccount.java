@@ -35,6 +35,11 @@ public class RolAccount {
 	public java.lang.String nomRol;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "role.id")
+	@Attribute(hidden = true )
+	public java.lang.Long roleId;
+
+	@Nullable
 	@JsonAttribute(hibernateAttribute = "role.name")
 	public java.lang.String roleCategory;
 

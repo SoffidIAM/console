@@ -930,6 +930,10 @@ div.container.datebox input.dateboxinp {
     background-size: contain;
 }
 
+div.container.datebox input.dateboxinp.readonly {
+	background-image: none;
+}
+
 .dateboxinp  {
 	font-family: inherit;
 	font-size: inherit;

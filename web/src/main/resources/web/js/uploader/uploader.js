@@ -4,6 +4,7 @@ zkUploader.init=function(ed) {
 	input.uploader = ed;
 	ed.pendingFiles = [];
 	zk.listen(input, "change", zkUploader.upload);
+	zk.listen(input, "click", zkUploader.preupload);
 	zk.listen(document.getElementById(ed.id+"!cancel"), "click", zkUploader.cancel);
 };
 
@@ -66,3 +67,7 @@ zkUploader.uploadeNext=function(uploader) {
     request.send(formData);
 }
 
+zkUploader.preupload=function(uploader) {
+	var uploader = document.getElementById($uuid(event.target));
+	zkau.send ({uuid: uploader.id, cmd: "onChooseFile", data : []}, 5);		
+}

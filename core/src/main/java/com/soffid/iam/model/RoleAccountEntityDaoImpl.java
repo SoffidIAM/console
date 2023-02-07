@@ -680,12 +680,12 @@ public class RoleAccountEntityDaoImpl
 		String codiAplicacioRol = sourceVO.getInformationSystemName();
 		String codiBBDD = sourceVO.getSystem();
 		RoleEntity rol = null;
-		if (sourceVO.getRoleId() != null)
-			rol = getRoleEntityDao().load(sourceVO.getRoleId());
 		if (rol == null && nomRolDomini != null) {
 			rol = findRolByNomAndCodiApliacio(nomRolDomini, codiAplicacioRol,
 					codiBBDD);
 		}
+		if (rol == null && sourceVO.getRoleId() != null)
+			rol = getRoleEntityDao().load(sourceVO.getRoleId());
 		if (rol == null) {
 			throw new SeyconException(
 					String.format(

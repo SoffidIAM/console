@@ -13,15 +13,24 @@ import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.web.component.DatatypeColumnsDatatable;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.zkdb.yaml.Yaml2Json;
 
 
 public class TaskDatatable extends DatatypeColumnsDatatable {
 	HashMap<String, System> systems = new HashMap<>();
+	String customColumns = null;
 
 	static String[] defaultColumns = {
-			"id", "processName", "task", "date", "dueDate", "actor"
+			"processId", "processName", "task", "date", "duedate", "actor"
 	};
 	
+	public String getCustomColumns() throws Exception {
+		if (customColumns == null)
+			return null;
+		else
+			return new Yaml2Json().transform(customColumns);
+	}
+
 	public TaskDatatable() throws Exception {
 	}
 	
@@ -43,6 +52,11 @@ public class TaskDatatable extends DatatypeColumnsDatatable {
 	@Override
 	public String[] getDefaultColumns() throws Exception {
 		return defaultColumns;
+	}
+
+	
+	public void setCustomColumns(String customColumns) {
+		this.customColumns = customColumns;
 	}
 
 }

@@ -9,7 +9,6 @@
 	
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
-	
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
@@ -22,24 +21,30 @@
 				preference="inbox"
 				use="com.soffid.iam.web.inbox.TaskDatatable" 
 				onSelect="ref:frame.openTask">
-			<attribute name="columns"><![CDATA[
+			<attribute name="customColumns"><![CDATA[
 - name: ${c:l('deploy.lblIdProceso')}
   value: processId
   className: datetimeColumn
+  default: true
 - name: ${c:l('deploy.lblProceso')}
   value: processName
+  default: true
 - name: ${c:l('inbox.lbldefinicionTarea')}
   value: task
+  default: true
 - name: ${c:l('inbox.lblFecha')}
   value: date
   className: datetimeColumn
   template: #{date_datetime }
+  default: true
 - name: ${c:l('inbox.lblFechaPrevistaFin')}
   value: duedate
   template: #{duedate_datetime }
   className: datetimeColumn
+  default: true
 - name: ${c:l('inbox.lblActoresAsignados')}
   value: actor
+  default: true
 			]]></attribute>
 			</datatable>
 		</div>

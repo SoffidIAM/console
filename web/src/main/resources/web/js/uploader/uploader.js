@@ -7,6 +7,7 @@ zkUploader.init=function(ed) {
 	var cancel = document.getElementById(ed.id+"!cancel");
 	if (cancel)
 		zk.listen(cancel, "click", zkUploader.cancel);
+	zk.listen(input, "click", zkUploader.preupload);
 };
 
 zkUploader.upload=function(ev) {
@@ -68,3 +69,7 @@ zkUploader.uploadeNext=function(uploader) {
     request.send(formData);
 }
 
+zkUploader.preupload=function(uploader) {
+	var uploader = document.getElementById($uuid(event.target));
+	zkau.send ({uuid: uploader.id, cmd: "onChooseFile", data : []}, 5);		
+}

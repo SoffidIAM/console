@@ -52,6 +52,14 @@ public class Uploader extends HtmlBasedComponent implements AfterCompose {
 		}
 	};
 	
+	private static Command _onChooseFileCommand = new ComponentCommand("onChooseFile", 0) {
+		@Override
+		protected void process(AuRequest request) {
+			Uploader uploader = (Uploader) request.getComponent();
+			List<Media> medias = uploader.getUploaded();
+			Events.postEvent( new UploadEvent("onUpload", uploader, medias.toArray(new Media[medias.size()])));
+		}
+	};
 	
 	public Command getCommand(String cmdId) {
 		if (_onCancelCommand.equals(cmdId))
@@ -59,6 +67,9 @@ public class Uploader extends HtmlBasedComponent implements AfterCompose {
 
 		if (_onUploadCommand.getId().equals(cmdId))
 			return _onUploadCommand;
+
+		if (_onChooseFileCommand.getId().equals(cmdId))
+			return _onChooseFileCommand;
 
 		return super.getCommand(cmdId);
 	}

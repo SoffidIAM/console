@@ -126,7 +126,7 @@ public class ErrorHandler extends Window implements AfterCompose {
 				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException ||
 						e instanceof SeyconException ||
 						e instanceof UserWorkflowException ||
-						e instanceof RuntimeException) {
+						e.getClass() == RuntimeException.class) {
 					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( e.getMessage() );
 				}

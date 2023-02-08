@@ -48,9 +48,6 @@
   				</attribute>
   			</datatree2>
 
-			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('sso:createSharedFolders')}" >
-				<div class="addButton" onClick="ref:frame.addNew">+</div>
-			</div>
 		</div>
 		
 		<div sclass="card__face card__face--back">

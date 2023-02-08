@@ -44,7 +44,7 @@
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
-		<finder name="metadata" type="metadata">
+		<finder name="metadata" type="metadata" refreshAfterCommit="true">
 			<custom-finder className="com.soffid.iam.web.metadata.MetadataCustomFinder"/>
 			<new-instance-script>
 				obj = new com.soffid.iam.api.DataType();

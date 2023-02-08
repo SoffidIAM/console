@@ -1513,6 +1513,11 @@ div.databox.fixedtext div.container div.text {
 	font-family: monospace;
 	white-space: pre-line;
 }
+
+div.databox.fixedtext div.container div.text {
+	word-break: break-all;
+}
+
 .button-container {
 	margin-top: 7px;
 }

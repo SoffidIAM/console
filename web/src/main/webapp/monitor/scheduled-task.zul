@@ -112,7 +112,8 @@
 				</div>
 				<div sclass="section" id="logsSection">
 					<customfield3 label="${c:l('scheduledTask.proviousExecution') }" dataType="SEPARATOR"/>
-					<datatable dataPath="logs" id="logs" onDownloadLog="ref:frame.downloadOtherLog" enablefilter="false">
+					<datatable dataPath="logs" id="logs" onDownloadLog="ref:frame.downloadOtherLog" enablefilter="false"
+									incrementalrefresh="true">
 					<attribute name="columns"><![CDATA[
 - name: ${c:l('llistaRegistreAccesUsuari.zul.Datainici') }
   value: time

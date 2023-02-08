@@ -381,11 +381,13 @@ public class AuthorizationServiceImpl extends
 
 	private HashSet<String> getChildrenApp(String domainValue) throws InternalErrorException {
 		HashSet<String> s = new HashSet<>();
-		final Collection<Application> apps = getApplicationService().findApplicationChildren(domainValue);
-		if (apps != null) {
-			for (Application app: apps) {
-				s.add(app.getName());
-				s.addAll(getChildrenApp(app.getName()));
+		if (domainValue != null && !domainValue.trim().isEmpty()) {
+			final Collection<Application> apps = getApplicationService().findApplicationChildren(domainValue);
+			if (apps != null) {
+				for (Application app: apps) {
+					s.add(app.getName());
+					s.addAll(getChildrenApp(app.getName()));
+				}
 			}
 		}
 		return s;

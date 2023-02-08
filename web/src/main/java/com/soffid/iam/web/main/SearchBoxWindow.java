@@ -30,7 +30,7 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 	@Override
 	public void afterCompose() {
 		timer = (Timer) getFellow("timer");
-		waiting = getFellow("waiting");
+		waiting = getFellowIfAny("waiting");
 		for (SearchHandler handler: handlers) {
 			Div div = new Div();
 			div.setSclass("search-divisor");
@@ -46,7 +46,7 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 				handler.startSearch(inputEvent.getValue());
 			}
 			timer.start();
-			waiting.setVisible(true);
+			if (waiting != null) waiting.setVisible(true);
 			onTimer(inputEvent);
 			open (inputEvent.getTarget());
 			for (SearchHandler handler: handlers) {
@@ -63,7 +63,7 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 				pending = true;
 		}
 		if (!pending) {
-			waiting.setVisible(false);
+			if (waiting != null) waiting.setVisible(false);
 			timer.stop();
 		}
 	}

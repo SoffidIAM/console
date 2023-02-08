@@ -349,8 +349,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 			}
 			DataType dt2 = new DataType();
 			dt2.setOrder(next);
-			XPathUtils.createPath(form.getDataSource(), "/metadata", dt2);
-			((DataTable)lb).setSelectedIndex(coll.getSize()-1);
+			((DataTable)lb).addNew();
+			XPathUtils.setValue(lb, "/order", next);
 			objectAttributeWindow.doHighlighted();
 		}
 	}

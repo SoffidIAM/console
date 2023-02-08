@@ -74,8 +74,8 @@
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.userRoles')}" required="false" dataType="ROLE" bind="@userRoles" id="userRoles" multiValue="true"/>
 					</div>
 					<style>
-						div.datatable.hideFirstCol div.tbodydiv table.tbody tr td:first-child,
-						div.datatable.hideFirstCol table.thead tr td:first-child  {
+						div.datatable.hideFirstCol div.tbodydiv table.tbody tr td:nth-child(2),
+						div.datatable.hideFirstCol table.thead tr td:nth-child(2)  {
 							display:none;
 							width: 0px;
 						}

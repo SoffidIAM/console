@@ -22,6 +22,10 @@ public class ScheduledTaskLogEntity {
 	@Nullable
 	public java.util.Date time;
 
+	@Column (name="SCT_LASEND")
+	@Nullable
+	public java.util.Date end;
+
 	@Column (name="SCT_LOGDOC")
 	@Nullable
 	public java.lang.String logReferenceID;

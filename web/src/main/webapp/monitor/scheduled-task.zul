@@ -118,6 +118,10 @@
   value: time
   template: #{time_datetime}
   className: datatimeColumn
+- name: ${c:l('llistaRegistreAccesUsuari.zul.Datafi') }
+  value: end
+  template: #{end_datetime}
+  className: datatimeColumn
 - name: ${c:l('jobadmin.status') }
   template: <img class="small-icon" src="${execution.contextPath }/img/#{error ? 'warning.svg': 'ok.svg'}">
   value: error

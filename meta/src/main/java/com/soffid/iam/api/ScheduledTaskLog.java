@@ -15,6 +15,9 @@ public class ScheduledTaskLog {
 	public java.util.Date time;
 
 	@Nullable
+	public java.util.Date end;
+
+	@Nullable
 	public java.lang.String logReferenceID;
 
 	@Attribute ( defaultValue="false")

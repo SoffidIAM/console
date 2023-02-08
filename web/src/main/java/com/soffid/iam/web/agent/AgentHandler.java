@@ -921,11 +921,15 @@ public class AgentHandler extends FrameHandler {
 		es.caib.zkib.jxpath.JXPathContext ctx = getModel().getJXPathContext ();
 		DataNode dn = (DataNode) ctx.getValue("/plugin[className='"+value+"']");
 		DataModelCollection coll = dn.getListModel("pluginWorkflow");
-		if (coll == null || coll.getSize() == 0) {
+		try {
+			if (coll == null || coll.getSize() == 0) {
+				setVisibleWorkflows(false);
+			} else {
+				setVisibleWorkflows(true);
+				fillWorkflowsTable (coll);
+			}
+		} catch (Exception e) {
 			setVisibleWorkflows(false);
-		} else {
-			setVisibleWorkflows(true);
-			fillWorkflowsTable (coll);
 		}
 	}
 	

@@ -60,7 +60,7 @@
 		<finder name="plugin" type="plugin">
 			<script-finder>
 				sp = new com.soffid.iam.api.AgentDescriptor();
-				sp.id = 0;
+				sp.id = 0L;
 				sp.setClassName("- no class -");
 				sp.setDescription("-");
 				return sp;
@@ -492,7 +492,7 @@
 	<datanode name="plugin" transient="true">
 		<finder name="pluginWorkflow" type="pluginWorkflow">
 			<ejb-finder jndi="java:/module/ServerPluginService-v2"
-					method="findAgentDescriptorWorkflows"> 
+					method="findAgentDescriptorWorkflows" if=${instance.id != null}"> 
 				<parameter value="${instance}"/>
 			</ejb-finder>
 		</finder>

@@ -26,6 +26,7 @@ import com.soffid.iam.model.ServiceEntityDao;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SessionEntityDao;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -71,6 +72,9 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         HostEntity maquina = getHostEntityDao().findByName(nomOrIp);
 
         if (maquina == null)
+        	maquina = getHostEntityDao().findBySerialNumber(nomOrIp);
+        
+        if (maquina == null)
             maquina = findMaquinaByIp(nomOrIp);
 
         if (maquina == null) {
@@ -86,8 +90,11 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     }
 
     private HostEntity findMaquinaByIp(String nomOrIp) {
+        CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+        criteria.setMaximumResultSize(1);
+
         @SuppressWarnings(value = "rawtypes")
-        Collection maquines = getHostEntityDao().findHostByCriteria(null, null, nomOrIp, null, null, null, null, null, null, null);
+        Collection maquines = getHostEntityDao().findHostByCriteria(criteria , null, null, nomOrIp, null, null, null, null, null, null, null);
         if (maquines.size() >= 1)
             return (HostEntity) maquines.iterator().next();
         else

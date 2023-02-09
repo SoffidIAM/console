@@ -46,7 +46,7 @@
 		
 		<div sclass="card__face card__face--back" use="com.soffid.iam.web.application.ApplicationRoleHandler"
 			id="handler">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"  lastAction="ref:frame.hideDetails" visible="${!embed }">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"  lastAction="ref:frame.confirmApply" visible="${!embed }">
 				<pager datatable="listbox"/>
 				<databutton image="/img/trash.svg" onlyIcon="true"
 						 if="${soffid:isUserInRole('user:group:delete')}" 

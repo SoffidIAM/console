@@ -54,7 +54,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox"/>
 								
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"

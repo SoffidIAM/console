@@ -223,7 +223,7 @@ public class FrameHandler extends Frame {
 	}
 
 	public void hideDetails() throws CommitException {
-		if (getModel() != null)
+ 		if (getModel() != null)
 			getModel().commit();
 		
 		try {
@@ -234,7 +234,7 @@ public class FrameHandler extends Frame {
 				if (lb instanceof DataTree2)
 					((DataTree2) lb).setSelectedIndex(new int[0]);
 				
-			}
+			} 
 		} catch (ComponentNotFoundException e) {
 			
 		}
@@ -494,6 +494,18 @@ public class FrameHandler extends Frame {
 							displayRemoveButton(lb, false);
 						}
 					});
+		}
+	}
+	
+	public void confirmApply (Event e) throws CommitException {
+		if (getModel() == null || ! getModel().isCommitPending()) {
+			hideDetails();
+		} else {
+			Missatgebox.confirmaYES_NO(Labels.getLabel("aplica_usuarisRolllista.zul.Confirm"), (event) -> {
+				if (event.getName().equals("onYes")) {
+					apply(e);
+				}
+			});
 		}
 	}
 }

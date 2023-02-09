@@ -87,7 +87,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatree2="listbox"/>
 								
 				<imageclic src="/img/sync.svg" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />

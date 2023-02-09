@@ -55,7 +55,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails" id="navigator2">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply" id="navigator2">
 				<label id="dateNavigator2b" value=" &gt; " visible="false"/>
 				<label id="dateNavigator2" sclass="link" onClick="ref:frame.hideDetails" visible="false"/>
 				<pager datatree2="listbox"/>

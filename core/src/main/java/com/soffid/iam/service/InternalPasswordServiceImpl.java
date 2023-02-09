@@ -1411,7 +1411,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		if (account.isDisabled()) {
 			if (debugPasswords()) {
-            	log.info("CheckAccountPassword " +account.getName() +  " @ " + account.getSystem() + " : FALSE (Account disabled)");
+            	log.info("CheckAccountPassword " +account.getName() +  " @ " + account.getSystem().getName() + " : FALSE (Account disabled)");
             }
 			return PasswordValidation.PASSWORD_WRONG;
 		}
@@ -1428,29 +1428,29 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				if (isRightPassword(password, contra)) 
 				{
 					if (debugPasswords()) {
-		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : Current password matches");
+		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : Current password matches");
 		            }				
 					if (new Date().before(contra.getExpirationDate())) {
 						if (debugPasswords()) 
-			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD");
+			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : GOOD");
 						return PasswordValidation.PASSWORD_GOOD;
 					} else if (checkExpired) {
 						if (debugPasswords()) 
-			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : EXPIRED");
+			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : EXPIRED");
 						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
 					} else {
 						if (debugPasswords()) 
-			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG (Expired)");
+			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : WRONG (Expired)");
 						return PasswordValidation.PASSWORD_WRONG;
 					}
 				} else {
 					if (debugPasswords()) {
-		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : Current password does not match "+hash(password.getPassword()));
+		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : Current password does not match "+hash(password.getPassword()));
 		            }				
 				}
 			} else {
 				if (debugPasswords()) {
-	            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : No current password found");
+	            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : No current password found");
 	            }				
 			}
 
@@ -1486,7 +1486,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			} catch (NoSuchBeanDefinitionException e) {
 				if (checkTrusted) {
 					if (debugPasswords())
-						log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : Sending request to server");
+						log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : Sending request to server");
 					return validatePasswordOnServer(account, password);
 				}
 
@@ -1513,11 +1513,11 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							password.getPassword());
 					if (debugPasswords()) {
 						if (r == PasswordValidation.PASSWORD_GOOD)
-							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD Password accepted by syncserver");
+							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName() + " : GOOD Password accepted by syncserver");
 						if (r == PasswordValidation.PASSWORD_GOOD_EXPIRED)
-							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : GOOD_EXPIRED Password accepted by syncserver");
+							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName() + " : GOOD_EXPIRED Password accepted by syncserver");
 						if (r == PasswordValidation.PASSWORD_WRONG)
-							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG Password accepted by syncserver "+hash(password.getPassword()));
+							log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName() + " : WRONG Password accepted by syncserver "+hash(password.getPassword()));
 					}
 					return r;
 				}
@@ -1526,7 +1526,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			}
 		} else {
 			if (debugPasswords()) {
-				log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem()+ " : WRONG (System not trusted or offline)");
+				log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName() + " : WRONG (System not trusted or offline)");
 			}
 		}
 

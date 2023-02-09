@@ -150,6 +150,8 @@ public class NavigationBar extends Div implements AfterCompose {
 
 	
 	public void setLastAction(String lastAction) {
+		if ("ref:frame.confirmApply".equals(lastAction)) // Compatibility for newer addons ready for console 3.4
+			this.lastAction = "ref:frame.hideDetails";
 		this.lastAction = lastAction;
 	}
 

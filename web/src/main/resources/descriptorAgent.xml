@@ -492,7 +492,7 @@
 	<datanode name="plugin" transient="true">
 		<finder name="pluginWorkflow" type="pluginWorkflow">
 			<ejb-finder jndi="java:/module/ServerPluginService-v2"
-					method="findAgentDescriptorWorkflows" if=${instance.id != null}"> 
+					method="findAgentDescriptorWorkflows"> 
 				<parameter value="${instance}"/>
 			</ejb-finder>
 		</finder>

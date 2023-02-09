@@ -282,8 +282,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 		for (UserEntity u: grupEntity.getPrimaryGroupUsers())
 		{
-			u.setPrimaryGroup(grupEntity.getParent());
-			getUserEntityDao().update(u);
+			if (grupEntity.getParent() != null) {
+				u.setPrimaryGroup(grupEntity.getParent());
+				getUserEntityDao().update(u);
+			}
+			else 
+				throw new InternalErrorException(String.format("Cannot remove group as it contains som users (%s)", u.getUserName() ));
 		}
 		
 		for (RoleAccountEntity ra: grupEntity.getHoldedRoleAssignments())

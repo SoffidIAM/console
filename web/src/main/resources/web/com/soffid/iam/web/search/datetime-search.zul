@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding='utf-8'?>
+<div style="margin: 10px">
+	<div>
+		<customfield3 
+			label="${c:l('attributeQuery.Since')}"
+			dataType="DATE_TIME" id='db1' />
+		<customfield3 
+			label="${c:l('attributeQuery.Until')}"
+			dataType="DATE_TIME" id='db2' />
+	</div>
+	<div class='button-container'>
+		<div class='buttons'>
+			<button id='okbutton' label="${c:l('agentsllista.zul.Accepta') }"/>
+			<button id='cancelbutton' label="${c:l('agents.zul.Esborra')}"/>
+		</div>
+	</div>
+</div>

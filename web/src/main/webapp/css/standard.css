@@ -1502,6 +1502,12 @@ div.databox div.container input.name {
 	min-width: 250px;
 }
 
+div.databox div.container span.name {
+	min-width: 100px;
+	background-color: transparent;
+	margin-right: 64px;
+}
+
 div.databox-popup img.upload-menu-icon {
 	width: 16px;
 	margin-right: 12px;

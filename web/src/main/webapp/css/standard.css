@@ -3724,12 +3724,12 @@ div.databox.longlabel div.container {
 
 
 div.databox div.container.wrapped {
-	margin-left: 300px;
 	display: block;
+	margin-left: 200px;
 }
 
 div.databox.longlabel div.container.wrapped {
-	margin-left: 200px;
+	margin-left: 300px;
 	display: block;
 }
 

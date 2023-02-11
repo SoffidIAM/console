@@ -3775,6 +3775,7 @@ div.databox[selecticon] div.container button.icon-button {
 
 div.databox div.container input.description,
 div.databox[multivalue='true'] div.container input.text ,
+div.databox[multivalue='true'] div.container select.select ,
 div.databox[multivalue='true'] div.container textarea.text {
 	width: 90%;
 	width: calc( 100% - 1em - 8px );

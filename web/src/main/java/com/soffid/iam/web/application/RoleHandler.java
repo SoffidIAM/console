@@ -32,10 +32,6 @@ public class RoleHandler extends FrameHandler {
 		}
 	}
 	
-	public void importCsv () throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
-		new RoleImporter().importCsv(this);
-	}
-
 	@Override
 	public void onPageAttached(Page newpage, Page oldpage) {
 		super.onPageAttached(newpage, oldpage);

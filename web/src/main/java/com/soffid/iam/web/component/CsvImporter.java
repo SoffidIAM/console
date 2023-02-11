@@ -26,6 +26,7 @@ import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.service.ejb.CustomObjectService;
 import com.soffid.iam.web.WebDataType;
+import com.soffid.iam.web.application.ApplicationRoleHandler;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 
@@ -33,6 +34,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
 import es.caib.zkib.component.DataModel;
+import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.zkiblaf.Missatgebox;
@@ -60,6 +62,20 @@ public abstract class CsvImporter<E> {
 				parser -> importCsv(parser));
 	}
 
+	public void importCsv (ApplicationRoleHandler frame) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		DataTable dt = frame.getListbox();
+		dt.commit();
+		List<String[]> def = new LinkedList<>();
+		for ( DataType data: getMetadata())
+		{
+			WebDataType wdt = new WebDataType(data);
+			def.add(new String[] { wdt.getName(), wdt.getLabel()});
+		}
+		
+		String title = Labels.getLabel("tenant.zul.import");
+		ImportCsvHandler.startWizard(title, def.toArray(new String[def.size()][]), frame, 
+				parser -> importCsv(parser));
+	}
 	
 	private void importCsv(CsvParser parser) {
 		Map<String,String> m = null;

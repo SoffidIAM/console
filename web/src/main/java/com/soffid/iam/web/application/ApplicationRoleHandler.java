@@ -695,4 +695,8 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		}
 	}
 
+	public void importCsv (Event ev) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		new RoleImporter().importCsv(this);
+	}
+
 }

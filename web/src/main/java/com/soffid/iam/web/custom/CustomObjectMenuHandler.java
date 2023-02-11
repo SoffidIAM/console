@@ -44,11 +44,17 @@ public class CustomObjectMenuHandler implements DynamicMenuHandler {
 	private boolean allowed(CustomObjectType cu) {
 		if (Boolean.TRUE.equals(cu.getPublicAccess()))
 			return true;
-		if (cu.getManagerRoles() == null) return false;
 		SoffidPrincipal principal = Security.getSoffidPrincipal();
-		for (String role: cu.getManagerRoles())
-			if (Arrays.binarySearch(principal.getSoffidRoles(), role) >= 0)
-				return true;
+		if (cu.getManagerRoles() != null) {
+			for (String role: cu.getManagerRoles())
+				if (Arrays.binarySearch(principal.getSoffidRoles(), role) >= 0)
+					return true;
+		}
+		if (cu.getUserRoles() != null) {
+			for (String role: cu.getUserRoles())
+				if (Arrays.binarySearch(principal.getSoffidRoles(), role) >= 0)
+					return true;
+		}
 		return false;
 	}
 

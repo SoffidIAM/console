@@ -54,7 +54,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-
+import com.soffid.iam.model.impl.SchemaTools;
 import com.soffid.iam.bpm.api.BPMUser;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -251,6 +251,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             getUserEmailEntityDao().remove(usuari.getUserMailList());
             getUserPreferenceEntityDao().remove(usuari.getPreferences());
             getUserPrinterEntityDao().remove(usuari.getPrinters());
+            
+            new SchemaTools().deleteDependencies(getSession(), "SC_USUARI", usuari.getId());
             
             super.remove(usuari);
 

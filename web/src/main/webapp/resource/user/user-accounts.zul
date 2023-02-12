@@ -66,13 +66,15 @@
 				<radio label="${c:l('usuaris.zul.radomPassword')}" 
 					id="generationRandom" width="20em" 
 					selected="true" value="random" onSelect=""/>
-				<div>
-					<textbox id="antipasswordsave" disabled="true" 
-						style="border: none; color: white;  background-color: white"/>
-				</div>
 				<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
 					value="set" onSelect="" />
+				<radio label="${c:l('usuaris.zul.sendCurrentPassword')}" id ="sendCurrent" width="20em" 
+					value="send" onSelect="" />
 			</radiogroup>
+			<div>
+				<textbox id="antipasswordsave" disabled="true" 
+					style="border: none; color: white;  background-color: white"/>
+			</div>
 			<div style="visibility: hidden" id="passworddiv">
 				<label 
 					value="${c:l('accounts.setPassword.label')}">

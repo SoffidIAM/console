@@ -362,6 +362,13 @@ public abstract class UsuariService {
 	}
 
 
+	@Description("Sends the current account password back to the target system")
+	@Operation(grantees = { roles.user_password_update.class })
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void sendPassword(String userName, String passwordDomain)
+		throws es.caib.seycon.ng.exception.InternalErrorException{
+	}
+
 	@Operation(grantees = { roles.user_refresh.class, roles.user_query.class }, translated = "getTasks")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public java.lang.String[] getTasques(java.lang.String codiUsuari)

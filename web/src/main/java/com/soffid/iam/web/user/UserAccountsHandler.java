@@ -87,12 +87,16 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		Window w = (Window) getFellow("newPassword2");
 		Radiogroup gt = (Radiogroup) w.getFellow("generationType");
 		Radio radioRandom = (Radio) w.getFellow("generationRandom");
+		Radio sendCurrent = (Radio) w.getFellow("sendCurrent");
 
 		String user = (String) listbox.getJXPathContext().getValue("userName");
 		String domain = (String) tree.getJXPathContext().getValue("name");
 		
 		Switch s = (Switch) w.getFellow("temporary");
-		if (gt.getSelectedItem() != radioRandom)
+		if (gt.getSelectedItem() == sendCurrent) {
+			userService.sendPassword(user, domain);
+		}
+		else if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
 			if (s.isChecked())
@@ -117,12 +121,13 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		Window w = (Window) getFellow("newPassword2");
 		Radiogroup generationType = (Radiogroup) w.getFellow("generationType");
 		Radio radioRandom = (Radio) w.getFellow("generationRandom");
+		Radio radioSet = (Radio) w.getFellow("generationSet");
 		Textbox password = (Textbox) w.getFellow("password");
 		Div passworddiv = (Div) w.getFellow("passworddiv");
 		Button setButton = (Button) w.getFellow("setButton");
 		Switch s = (Switch) w.getFellow("temporary");
 		
-		if (generationType.getSelectedItem() != radioRandom)
+		if (generationType.getSelectedItem() == radioSet)
 		{
 			s.getParent().setVisible(Security.isUserInRole("user:password:set-no-temporary"));
 			password.setDisabled (false);

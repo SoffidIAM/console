@@ -90,6 +90,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SecretEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
+import com.soffid.iam.model.ServerInstanceEntity;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
@@ -105,8 +106,10 @@ import com.soffid.iam.model.UserProcessEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.impl.CertificateParser;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
@@ -121,13 +124,12 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.sync.servei.SyncStatusService;
 import es.caib.signatura.api.ParsedCertificate;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.cliente.ValidadorCertificados;
@@ -3566,5 +3568,50 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
         }
         return r;
 	}
+
+	@Override
+	protected void handleSendPassword(String userName, String passwordDomain) throws Exception {
+		UserEntity user = getUserEntityDao().findByUserName(userName);
+		
+		Password result = null;
+		
+		if ( "S".equals(user.getActive()))
+		{
+			for (ServerEntity se : getServerEntityDao().loadAll()) {
+	            if (se.getType().equals(ServerType.MASTERSERVER)) {
+	            	if (se.getInstances().isEmpty()) {
+	            		if (resendPasswordNow(user, passwordDomain, se.getUrl(), se.getAuth())) 
+	            			return;
+	            	} else {
+	            		for (ServerInstanceEntity si: se.getInstances()) {
+		            		if (resendPasswordNow(user, passwordDomain, si.getUrl(), si.getAuth())) 
+		            			return;
+	            			
+	            		}
+	            	}
+	            }
+	        }
+		}
+	}
+
+	private boolean resendPasswordNow(UserEntity user, String passwordDomain, String url, String auth)
+			throws InternalErrorException {
+		com.soffid.iam.sync.service.SyncStatusService sss = null;
+		try {
+		    RemoteServiceLocator rsl = new RemoteServiceLocator(url);
+		    rsl.setAuthToken(auth);
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		    sss = rsl.getSyncStatusService();
+		} catch (Exception e) {
+			log.warn("Error sending password", e);
+		}
+		if (sss != null)
+		{
+			sss.resendUserPassword(user.getUserName(), passwordDomain);
+			return true;
+		} else
+			return false;
+	}
+	
 
 }

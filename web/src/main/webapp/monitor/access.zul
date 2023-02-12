@@ -38,10 +38,12 @@
   value: accessProtocol
   default: true
 - name: ${c:l('registreAcces.zul.Datainici')}
-  value: startDate_datetime
+  value: startDate
+  template: #{startDate_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Datafi')}
-  value: endDate_datetime
+  value: endDate
+  template: #{endDate_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Sessia')}
   value: sessionId

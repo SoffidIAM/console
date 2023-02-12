@@ -51,5 +51,5 @@ public class PamRuleEntity {
 	TenantEntity tenant;
 }
 
-@Index(name = "SC_PAMRUL_UK", entity = PamRuleEntity.class, columns = {"PRU_NAME"}, unique = true)
+@Index(name = "SC_PAMRUL_UK", entity = PamRuleEntity.class, columns = {"PRU_TEN_ID, PRU_NAME"}, unique = true)
 class PamRuelEntityUniqueKey {} 

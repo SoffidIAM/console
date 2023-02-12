@@ -213,6 +213,11 @@ public class ProfileHandler extends FrameHandler {
 
 	}
 	
+	@Override
+	public void undo(Event ev) throws CommitException {
+		Application.goBack();
+	}
+	
 	public void setPassword(Event event) {
 		Window wnd = (Window) getFellow("newPassword");
 		Databox p0 = (Databox) wnd.getFellow("p0");

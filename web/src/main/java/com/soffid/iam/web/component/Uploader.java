@@ -57,9 +57,7 @@ public class Uploader extends HtmlBasedComponent {
 	private static Command _onChooseFileCommand = new ComponentCommand("onChooseFile", 0) {
 		@Override
 		protected void process(AuRequest request) {
-			Uploader uploader = (Uploader) request.getComponent();
-			List<Media> medias = uploader.getUploaded();
-			Events.postEvent( new UploadEvent("onUpload", uploader, medias.toArray(new Media[medias.size()])));
+			// Nothing to do
 		}
 	};
 	

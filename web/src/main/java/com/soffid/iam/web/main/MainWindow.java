@@ -1,5 +1,7 @@
 package com.soffid.iam.web.main;
 
+import java.util.Arrays;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -89,5 +91,14 @@ public class MainWindow extends Window {
 					
 				});						
 
+	}
+	
+	public void goHome(Event ev) {
+		SoffidPrincipal p = Security.getSoffidPrincipal();
+		if (Arrays.binarySearch(p.getSoffidRoles(),"SOFFID_ADMIN") >= 0) {
+			Application.jumpTo("/config/wheel.zul");
+		} else {
+			Application.jumpTo("/index.zul");
+		}
 	}
 }

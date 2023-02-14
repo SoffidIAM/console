@@ -49,6 +49,7 @@ public class FrameHandler extends Frame {
 	boolean nomenu = false;
 	boolean registerUrl = true;
 	String pageTitle = "";
+	private InputField3 errorField;
 	
 	public FrameHandler() throws InternalErrorException {
 		setStyle("position:relative");
@@ -222,7 +223,7 @@ public class FrameHandler extends Frame {
 	}
 
 	public void hideDetails() throws CommitException {
-		if (getModel() != null)
+ 		if (getModel() != null)
 			getModel().commit();
 		
 		try {
@@ -233,7 +234,7 @@ public class FrameHandler extends Frame {
 				if (lb instanceof DataTree2)
 					((DataTree2) lb).setSelectedIndex(new int[0]);
 				
-			}
+			} 
 		} catch (ComponentNotFoundException e) {
 			
 		}
@@ -393,16 +394,19 @@ public class FrameHandler extends Frame {
 			form = (Component) getForm();
 		} catch (ComponentNotFoundException e) {
 		}
+		errorField = null;
 		if (validateAttributes (form)) {
 			getModel().commit();
 			return true;
 		} else {
+			if (errorField != null) errorField.focus();
 			return false;
 		}
 	}
 
 	
 	public boolean validateAttributes(Component form) {
+		boolean ok = true;
 		if (form == null || !form.isVisible()) return true;
 		if (form instanceof ObjectAttributesDiv) {
 			return ((ObjectAttributesDiv) form).validate();
@@ -411,12 +415,15 @@ public class FrameHandler extends Frame {
 			InputField3 inputField = (InputField3)form;
 			if (inputField.isReadonly() || inputField.isDisabled())
 				return true;
-			else
-				return inputField.attributeValidateAll();
+			else {
+				ok = inputField.attributeValidateAll();
+				if (!ok && errorField == null)
+					errorField = inputField;
+				return ok;
+			}
 		}
-		boolean ok = true;
 		for (Component child = form.getFirstChild(); child != null; child = child.getNextSibling())
-			if (! validateAttributes(child))
+			if (! validateAttributes(child)) 
 				ok = false;
 		return ok;
 	}
@@ -466,6 +473,8 @@ public class FrameHandler extends Frame {
 	public void multiSelect(Event event) {
 		DataTable lb = (DataTable) event.getTarget();
 		displayRemoveButton( lb, lb.getSelectedIndexes() != null && lb.getSelectedIndexes().length > 0);
+		if (!isSingleFaceCard() && lb == getListbox()) 
+			getCard().setSclass ( "card" );
 	}
 
 	public void deleteSelected(Event event0) {
@@ -485,6 +494,18 @@ public class FrameHandler extends Frame {
 							displayRemoveButton(lb, false);
 						}
 					});
+		}
+	}
+	
+	public void confirmApply (Event e) throws CommitException {
+		if (getModel() == null || ! getModel().isCommitPending()) {
+			hideDetails();
+		} else {
+			Missatgebox.confirmaYES_NO(Labels.getLabel("aplica_usuarisRolllista.zul.Confirm"), (event) -> {
+				if (event.getName().equals("onYes")) {
+					apply(e);
+				}
+			});
 		}
 	}
 }

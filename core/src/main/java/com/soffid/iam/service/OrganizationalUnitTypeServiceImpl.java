@@ -40,7 +40,7 @@ import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 /**
  * Servei per a accedir a TipusUnitatOrganitzativa Created on 01/06/2009
@@ -56,7 +56,7 @@ public class OrganizationalUnitTypeServiceImpl extends com.soffid.iam.service.Or
 	protected com.soffid.iam.api.OUType handleCreate(com.soffid.iam.api.OUType tipus) throws java.lang.Exception {
 		GroupTypeEntity tipusSameCode = getGroupTypeEntityDao().findByName(tipus.getCode());
 		if(tipusSameCode != null)
-			throw new SeyconException(String.format(Messages.getString("OrganizationalUnitTypeServiceImpl.CodeTypeExists"), tipus.getCode())); 
+			throw new InternalErrorException(String.format(Messages.getString("OrganizationalUnitTypeServiceImpl.CodeTypeExists"), tipus.getCode())); 
 		GroupTypeEntity entity = getGroupTypeEntityDao().oUTypeToEntity(tipus);
 		getGroupTypeEntityDao().create(entity);
 		tipus.setId(entity.getId());

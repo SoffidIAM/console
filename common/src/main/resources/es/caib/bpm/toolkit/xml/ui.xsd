@@ -76,6 +76,9 @@
             <xs:element name="task" type="TaskUpgradeType"
 				maxOccurs="unbounded" minOccurs="0">
 			</xs:element>
+            <xs:element name="node" type="TaskUpgradeType"
+				maxOccurs="unbounded" minOccurs="0">
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 

@@ -45,6 +45,7 @@ public class SamlDataModel extends SimpleDataNode {
 				c.alwaysTrust = "true".equals(ConfigurationCache.getProperty("soffid.saml.metadata.alwaysTrust"));
 				c.metadata = ConfigurationCache.getProperty("soffid.saml.metadata.url");
 				c.hostName = ConfigurationCache.getProperty("soffid.externalURL");
+				c.maintenanceMode = "true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance"));
 				if (c.hostName == null)
 				{
 					HttpServletRequest req = ((HttpServletRequest)Executions.getCurrent().getNativeRequest());

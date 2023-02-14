@@ -109,7 +109,9 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             auditarUsuariGrup("U", usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.2"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.2"), 
+            		usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message),
+            		e);
         }
     }
 
@@ -153,7 +155,8 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             String message = ExceptionTranslator.translate(e);
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.5"),
             		usuariGrup.getUser() == null ? "<Unknown>": usuariGrup.getUser().getUserName(), 
-            		usuariGrup.getGroup() == null ? "<Unknown>": usuariGrup.getGroup().getName(), message));
+            		usuariGrup.getGroup() == null ? "<Unknown>": usuariGrup.getGroup().getName(), message),
+            		e);
         }
     }
 
@@ -206,7 +209,9 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             auditarUsuariGrup("D", codiUsuari, codiGrup); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.7"), usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.7"), 
+            		usuariGrup.getUser().getUserName(), usuariGrup.getGroup().getName(), message),
+            		e);
         }
     }
 
@@ -223,9 +228,11 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @param targetVO
      */
     private void toUsuariGrupCustom(com.soffid.iam.model.UserGroupEntity sourceEntity, com.soffid.iam.api.GroupUser targetVO) {
+    	targetVO.setUser(sourceEntity.getUser().getUserName());
+    	targetVO.setUserId(sourceEntity.getUser().getId());
         targetVO.setGroup(sourceEntity.getGroup().getName());
-        targetVO.setUser(sourceEntity.getUser().getUserName());
         targetVO.setGroupDescription(sourceEntity.getGroup().getDescription());
+        targetVO.setGroupId(sourceEntity.getGroup().getId());
         UserEntity user = sourceEntity.getUser();
         String nomComplet = user.getFullName();
         targetVO.setFullName(nomComplet);
@@ -299,12 +306,20 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
      * @param targetEntity
      */
     private void usuariGrupToEntityCustom(com.soffid.iam.api.GroupUser sourceVO, com.soffid.iam.model.UserGroupEntity targetEntity) {
-        UserEntity usuari = getUserEntityDao().findByUserName(sourceVO.getUser());
+        UserEntity usuari = null;
+        if (sourceVO.getUser() != null)
+        	usuari = getUserEntityDao().findByUserName(sourceVO.getUser());
+        if (usuari == null && sourceVO.getUserId() != null)
+        	usuari = getUserEntityDao().load(sourceVO.getUserId());
         if (usuari == null) {
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.8"), sourceVO.getUser()));
         }
         targetEntity.setUser(usuari);
-        GroupEntity grup = getGroupEntityDao().findByName(sourceVO.getGroup());
+        GroupEntity grup = null;
+        if (sourceVO.getGroup() != null)
+        	grup = getGroupEntityDao().findByName(sourceVO.getGroup());
+        if (grup != null && sourceVO.getGroupId() != null)
+        	grup = getGroupEntityDao().load(sourceVO.getGroupId());
         if (grup == null) {
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.9"), sourceVO.getGroup()));
         } else {

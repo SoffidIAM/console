@@ -10,6 +10,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.soffid.iam.api.exception.ListFullException;
+
 
 public class AsyncList<E> implements List<E>, java.util.concurrent.Future<Collection<E>> {
 	Entry<E> first = null;
@@ -17,6 +19,7 @@ public class AsyncList<E> implements List<E>, java.util.concurrent.Future<Collec
 	int size = 0;
 	AsyncList<?> parent = null;
 	private long timeout = 0;
+	private Integer maxSize ;
 
 	boolean done = false;
 	boolean cancelled = false;
@@ -74,7 +77,7 @@ public class AsyncList<E> implements List<E>, java.util.concurrent.Future<Collec
 	}
 
 	public boolean contains(Object o) {
-		for (Entry<?> e = source.first; e != null; e = e.next)
+		for (Entry<?> e = first; e != null; e = e.next)
 		{
 			if (e.element.equals(o))
 				return true;
@@ -116,6 +119,10 @@ public class AsyncList<E> implements List<E>, java.util.concurrent.Future<Collec
 			cancel ();
 
 		checkMemoryUsage();
+		
+		if (maxSize != null && size >= maxSize.intValue() ||
+			parent != null && parent.maxSize != null && size >= parent.maxSize.intValue())
+			throw new ListFullException();
 
 		Entry<E> entry = new Entry<E>();
 		entry.previous = last;
@@ -323,6 +330,14 @@ public class AsyncList<E> implements List<E>, java.util.concurrent.Future<Collec
 	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
 		throw new IllegalArgumentException("Sublists are not supported");
+	}
+
+	public Integer getMaxSize() {
+		return maxSize;
+	}
+
+	public void setMaxSize(Integer maxSize) {
+		this.maxSize = maxSize;
 	}
 
 }

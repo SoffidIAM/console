@@ -67,7 +67,7 @@ public class InternalErrorException extends Exception {
     public void printStackTrace(PrintStream s) {
         // Afegim el stacktrace del cause
         super.printStackTrace(s);
-        if (_cause != null) {
+        if (_cause != null && realCause == null) {
             s.print(Messages.getString("InternalErrorException.CausedBy")); //$NON-NLS-1$
             s.println(_cause);
         }
@@ -76,7 +76,7 @@ public class InternalErrorException extends Exception {
     public void printStackTrace(PrintWriter s) {
         // Afegim el stacktrace del cause
         super.printStackTrace(s);
-        if (_cause != null) {
+        if (_cause != null && realCause == null) {
             s.print(Messages.getString("InternalErrorException.CausedBy")); //$NON-NLS-1$
             s.println(_cause);
         }

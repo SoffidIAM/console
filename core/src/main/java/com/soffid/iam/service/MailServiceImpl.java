@@ -3,18 +3,22 @@ package com.soffid.iam.service;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.mail.Address;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.Group;
@@ -368,5 +372,97 @@ public class MailServiceImpl extends MailServiceBase {
 				return null;
 		}
 
+	}
+
+	@Override
+	protected void handleSendHtmlMail(String to, String subject, String body, Collection mimeBodyParts)
+			throws Exception {
+		Session session = MailUtils.getSession(null);
+
+		MimeMessage msg = new MimeMessage(session);
+
+		// -- Create a new message --
+		// -- Set the FROM and TO fields --
+		try
+		{
+			msg.setFrom(new InternetAddress(getFrom()));
+			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+			// -- Set the subject and body text --
+			msg.setSubject(subject, "UTF-8");
+
+			// -- Set some other header information --
+			msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
+			msg.setSentDate(new Date());
+			
+			MimeMultipart multipart = new MimeMultipart("related");
+			BodyPart messageBodyPart = new MimeBodyPart();
+			messageBodyPart.setContent(body, "text/html; charset=utf-8");
+			multipart.addBodyPart(messageBodyPart);
+
+			for (Object mimeBodyPart: mimeBodyParts) {
+				multipart.addBodyPart((BodyPart)mimeBodyPart);
+			}
+			
+			msg.setContent(multipart);
+			// -- Send the message --
+			Transport.send(msg);
+		}
+		catch (AddressException e)
+		{
+			e.printStackTrace();
+			// throw e;
+		}
+		catch (MessagingException e)
+		{
+			e.printStackTrace();
+			// throw e;
+		}
+	}
+
+	@Override
+	protected void handleSendTextMailToActors(String[] actors, String subject, String body, Collection mimeBodyParts)
+			throws Exception {
+		Session session = MailUtils.getSession(null);
+
+		MimeMessage msg = new MimeMessage(session);
+
+		try
+		{
+			Address[] address = getAddress(actors);
+			if (address.length > 0)
+			{
+				msg.setFrom(new InternetAddress(getFrom()));
+				msg.setRecipients(Message.RecipientType.TO, address);
+				// -- Set the subject and body text --
+				msg.setSubject(subject, "UTF-8");
+	
+				// -- Set some other header information --
+				msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
+				msg.setSentDate(new Date());
+				
+				MimeMultipart multipart = new MimeMultipart("related");
+				BodyPart messageBodyPart = new MimeBodyPart();
+				messageBodyPart.setContent(body, "text/html; charset=utf-8");
+				multipart.addBodyPart(messageBodyPart);
+
+				for (Object mimeBodyPart: mimeBodyParts) {
+					multipart.addBodyPart((BodyPart)mimeBodyPart);
+				}
+				
+				msg.setContent(multipart);
+				// -- Send the message --
+				Transport.send(msg);
+			}
+		}
+		catch (AddressException e)
+		{
+			e.printStackTrace();
+			// throw e;
+		}
+		catch (MessagingException e)
+		{
+			e.printStackTrace();
+			// throw e;
+		}
 	}
 }

@@ -54,7 +54,7 @@ public class EmailDomainEntityDaoImpl
 			auditarDominiCorreu("C", dominiCorreu.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.0"), dominiCorreu.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.0"), dominiCorreu.getName(), message), e);
 		}
 	}
 	
@@ -66,7 +66,7 @@ public class EmailDomainEntityDaoImpl
 			auditarDominiCorreu("D", codiDominiCorreu);			 //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.6"), dominiCorreu.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.6"), dominiCorreu.getName(), message), e);
 		}
 	}
 	
@@ -77,7 +77,7 @@ public class EmailDomainEntityDaoImpl
 			auditarDominiCorreu("U", dominiCorreu.getName()); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.8"), dominiCorreu.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailDomainEntityDaoImpl.8"), dominiCorreu.getName(), message), e);
 		}
 	}
 	

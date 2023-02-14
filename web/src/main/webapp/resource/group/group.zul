@@ -6,6 +6,7 @@
 <?component name="group_roles" macro-uri="group-roles.zul"?>
 <?component name="group_managers" macro-uri="group-managers.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/groups"
 	use="com.soffid.iam.web.group.GroupHandler" id="frame">
 	<datamodel id="model" rootNode="groups" src="descriptorGroup.xml"/>
 	<div sclass="card" id="card">
@@ -54,7 +55,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails" id="navigator2">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply" id="navigator2">
 				<label id="dateNavigator2b" value=" &gt; " visible="false"/>
 				<label id="dateNavigator2" sclass="link" onClick="ref:frame.hideDetails" visible="false"/>
 				<pager datatree2="listbox"/>

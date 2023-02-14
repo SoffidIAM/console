@@ -4,6 +4,7 @@
 <?page id="group"?>
 <?component name="scheduled_task" macro-uri="scheduled-task.zul"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/network-discovery"
 	use="com.soffid.iam.web.discovery.DiscoveryHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="networkDiscoveryDescriptor.xml"/>
 	<div sclass="card" id="card">
@@ -102,7 +103,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatree2="listbox"/>
 				
 				<menu2>

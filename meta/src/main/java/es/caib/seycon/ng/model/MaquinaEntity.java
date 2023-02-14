@@ -41,7 +41,7 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public java.lang.String descripcio;
 
-	@Column (name="MAQ_PARDHC", length=50)
+	@Column (name="MAQ_PARDHC", length=150)
 	@Nullable
 	public java.lang.String dhcp;
 

@@ -18,11 +18,13 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.ReconcileTrigger;
+import com.soffid.iam.api.ServerRegistrationToken;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.model.RuleEntity;
+import com.soffid.iam.model.ServerRegistrationTokenEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.ScheduledTaskService;
@@ -48,6 +50,8 @@ import roles.agent_create;
 import roles.agent_query;
 import roles.agent_queryObjects;
 import roles.agent_update;
+import roles.server_manage_proxy;
+import roles.server_manage_server;
 
 @Service(translatedName = "DispatcherService", translatedPackage = "com.soffid.iam.service")
 @Depends({ es.caib.seycon.ng.model.ControlAccessEntity.class, es.caib.seycon.ng.model.UsuariEntity.class,
@@ -65,7 +69,8 @@ import roles.agent_update;
 		ServerCertificateEntity.class,
 		AsyncRunnerService.class,
 		AuditoriaService.class,
-		HostSystemEntity.class})
+		HostSystemEntity.class,
+		ServerRegistrationTokenEntity.class})
 public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_create.class }, translated = "create")
@@ -556,4 +561,14 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = {agent_query.class})
 	protected void finishVirtualSourceTransaction(String transactionId) { }
+	
+	@Description("Pre-registers a new sync-server and returns the registration token")
+	@Operation(grantees = {server_manage_server.class, server_manage_proxy.class})
+	public String preRegisterServer(ServerRegistrationToken register) {return null;}
+	
+	@Operation
+	public ServerRegistrationToken consumeRegistrationToken(String token) { return null;}
+
+	@Operation(grantees = {server_manage_server.class, server_manage_proxy.class})
+	public boolean isRegistrationTokenAlive(String token) { return false;}
 }

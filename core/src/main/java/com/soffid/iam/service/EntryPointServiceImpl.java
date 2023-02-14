@@ -91,7 +91,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
 /**
@@ -120,7 +120,7 @@ public class EntryPointServiceImpl extends
 
 		// Verificamos que el padre sea de tipo menú:
 		if (puntEntrada.getParentId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.ObtaintParentPointEntryError")); //$NON-NLS-1$
 
 		EntryPointEntity pareE = getEntryPointEntityDao().load(
@@ -157,7 +157,7 @@ public class EntryPointServiceImpl extends
 				&& !"".equals(puntEntrada.getXmlAccessTree())) { //$NON-NLS-1$
 			String resValida = validateXMLApplicationAccess(puntEntrada);
 			if (resValida != null && !"".equals(resValida.trim())) //$NON-NLS-1$
-				throw new SeyconException(String.format(Messages
+				throw new InternalErrorException(String.format(Messages
 						.getString("EntryPointServiceImpl.XMLValidationError"),
 						puntEntrada.getName(), resValida));
 		}
@@ -261,7 +261,7 @@ public class EntryPointServiceImpl extends
 				&& !"".equals(puntEntrada.getXmlAccessTree())) { //$NON-NLS-1$
 			String resValida = validateXMLApplicationAccess(puntEntrada);
 			if (resValida != null && !"".equals(resValida.trim())) //$NON-NLS-1$
-				throw new SeyconException(String.format(Messages
+				throw new InternalErrorException(String.format(Messages
 						.getString("EntryPointServiceImpl.XMLValidationError"),
 						puntEntrada.getName(), resValida));
 		}
@@ -521,7 +521,7 @@ public class EntryPointServiceImpl extends
 		// Comprovem autorització
 		if (!canView(existingEntity)) // No donem error
 			return new LinkedList<AccessTree>();// throw new
-												// SeyconException("no autoritzat");
+												// InternalErrorException("no autoritzat");
 
 		Collection<EntryPointTreeEntity> arbre = existingEntity.getChildrenEntryPointTree();
 		if (arbre != null && arbre.size() != 0) {// Verificamos permisos
@@ -938,14 +938,14 @@ public class EntryPointServiceImpl extends
     		return false;
     	AccessTree existing2 = getEntryPointEntityDao().toAccessTree(existingEntity2);
 		if (!canAdmin(existing1) || !canAdmin(existing2))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAdminPermission")); //$NON-NLS-1$
 
 		// Analitzem l'arbre dels pares del node destí per verificar que no es
 		// mou
 		// un node origen dintre de la seua branca
 		if (isOrigenAncestorDesti(idPueOrigen, idPareArbreDesti))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NotNodeMoviment")); //$NON-NLS-1$
 
 		// Podem tenir 2 casos: mateix pare (REORDENAR) o pare distint (MOURE)
@@ -1021,7 +1021,7 @@ public class EntryPointServiceImpl extends
 						.hasNext();) {
 					EntryPointTreeEntity arbreActual = it.next();
 					if (arbreActual.getChild().getId().equals(idPueOrigen))
-						throw new SeyconException(
+						throw new InternalErrorException(
 								Messages.getString("EntryPointServiceImpl.EntryPointDuplicated"));
 				}
 
@@ -1111,7 +1111,7 @@ public class EntryPointServiceImpl extends
 		// menú
 		// 1) Verifiquem que el destí siga de tipus menú
 		if (!puntEntradaMenuDesti.isMenu()) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.EntryPointTypeError")); //$NON-NLS-1$
 
 		// 2) Verifiquem autoritzacions: origen, desti i pare del destí
@@ -1122,14 +1122,14 @@ public class EntryPointServiceImpl extends
 						       		puntEntradaMenuDesti.getParentId() : puntEntradaMenuDesti.getId();
 		if (idPueOrigen == null || idParePuntEntradaMoure == null
 				|| idPueDesti == null || idParePuntEntradaDesti == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.EntryPointConfirmChanges")); //$NON-NLS-1$
 
 		// Analitzem l'arbre dels pares del node destí per verificar que no es
 		// mou
 		// un node origen dintre de la seua branca
 		if (isOrigenAncestorDesti(idPueOrigen, idPueDesti))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NotNodeMoviment")); //$NON-NLS-1$
 
 		EntryPointEntity pareOrigenE = getEntryPointEntityDao().load(
@@ -1151,13 +1151,13 @@ public class EntryPointServiceImpl extends
     		return false;
     	AccessTree existing2 = getEntryPointEntityDao().toAccessTree(existingEntity2);
 		if (!canAdmin(existing1) || !canAdmin(existing2))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NotAuthorizedToMoveEntryPoint")); //$NON-NLS-1$
 
 		// Si el origen NO es menú tiene que tener permisos en el menú
 		// contenedor padre del origen (para mover)
 		if (!puntEntradaMoure.isMenu() && !canAdmin(pareOrigen)) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NotAuthorizedToMoveEntryPointNoPermission")); //$NON-NLS-1$
 
 		// Obtenim l'arbre del punt d'entrada origen i destí
@@ -1382,7 +1382,7 @@ public class EntryPointServiceImpl extends
 			AccessTree puntEntradaMenuDesti) throws Exception {
 		// 1) Verifiquem que el destí siga de tipus menú
 		if (!puntEntradaMenuDesti.isMenu()) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.EntryPointTypeError")); //$NON-NLS-1$
 
 		// 2) Verifiquem autoritzacions: origen, desti i pare del destí
@@ -1393,14 +1393,14 @@ public class EntryPointServiceImpl extends
 				    		puntEntradaMenuDesti.getParentId() : puntEntradaMenuDesti.getId();
 		if (idPueOrigen == null || idParePuntEntradaClonar == null
 				|| idPueDesti == null || idParePuntEntradaDesti == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.CopyEntryPointConfirmChanges")); //$NON-NLS-1$
 
 		// Analitzem l'arbre dels pares del node destí per verificar que no es
 		// mou
 		// un node origen dintre de la seua branca
 		if (isOrigenAncestorDesti(idPueOrigen, idPueDesti))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NodeCopyError")); //$NON-NLS-1$
 
 		// Obtenim l'entitat a clonar
@@ -1452,7 +1452,7 @@ public class EntryPointServiceImpl extends
 		// menú
 		// 1) Verifiquem que el destí siga de tipus menú
 		if (!puntEntradaMenuDesti.isMenu()) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.EntryPointTypeError")); //$NON-NLS-1$
 
 		// 2) Verifiquem autoritzacions: origen, desti i pare del destí
@@ -1463,14 +1463,14 @@ public class EntryPointServiceImpl extends
 				        		puntEntradaMenuDesti.getParentId() : puntEntradaMenuDesti.getId();
 		if (idPueOrigen == null || idParePuntEntradaCopiar == null
 				|| idPueDesti == null || idParePuntEntradaDesti == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.CopyEntryPointConfirmChanges")); //$NON-NLS-1$
 
 		// Analitzem l'arbre dels pares del node destí per verificar que no es
 		// mou
 		// un node origen dintre de la seua branca
 		if (isOrigenAncestorDesti(idPueOrigen, idPueDesti))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NodeCopyError")); //$NON-NLS-1$
 
 		// Tiene que tener permisos en el punto de entrada origen y destino (es
@@ -1484,7 +1484,7 @@ public class EntryPointServiceImpl extends
     		return false;
     	AccessTree existing2 = getEntryPointEntityDao().toAccessTree(existingEntity2);
 		if (!canAdmin(existing1) || !canAdmin(existing2))
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToCopyEntryPoint")); //$NON-NLS-1$
 
 		EntryPointEntity pareOrigenE = getEntryPointEntityDao().load(
@@ -1494,7 +1494,7 @@ public class EntryPointServiceImpl extends
 		// Si el origen NO es menú tiene que tener permisos en el menú
 		// contenedor padre del origen (para copiar)
 		if (!puntEntradaCopiar.isMenu() && !canAdmin(pareOrigen)) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToCopyEntryPointNoPermission")); //$NON-NLS-1$
 
 		// Verificamos que no exista ya en el destino una copia del mismo
@@ -1506,7 +1506,7 @@ public class EntryPointServiceImpl extends
 					.hasNext();) {
 				EntryPointTreeEntity arbreActual = it.next();
 				if (arbreActual.getChild().getId().equals(idPueOrigen))
-					throw new SeyconException(
+					throw new InternalErrorException(
 							Messages.getString("EntryPointServiceImpl.EntryPointDuplicated"));
 			}
 
@@ -1560,7 +1560,7 @@ public class EntryPointServiceImpl extends
 		Long idEntitat = null;
 
 		if (puntEntrada == null || puntEntrada.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAssignedEntryPoint")); //$NON-NLS-1$
 		else {
 			puntEntradaE = getEntryPointEntityDao().accessTreeToEntity(
@@ -1575,7 +1575,7 @@ public class EntryPointServiceImpl extends
 		// Verificamos autoritzación
 		if (!isAuthorized(puntEntrada,
 				TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToMakeAutoritations")); //$NON-NLS-1$
 		}
 
@@ -1680,7 +1680,7 @@ public class EntryPointServiceImpl extends
 		{
 			UserEntity user = getUserEntityDao().findByUserName(grantee);
 			if (user == null)
-				throw new SeyconException(
+				throw new InternalErrorException(
 						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
 			idEntitat = user.getId();
 		}
@@ -1688,7 +1688,7 @@ public class EntryPointServiceImpl extends
 		{
 			RoleEntity role = getRoleEntityDao().findByShortName(grantee);
 			if (role == null)
-				throw new SeyconException(
+				throw new InternalErrorException(
 						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
 			idEntitat = role.getId();
 		}
@@ -1699,7 +1699,7 @@ public class EntryPointServiceImpl extends
 			String system = i > 0 ? grantee.substring(i+1): getDispatcherService().findSoffidDispatcher().getName();
 			AccountEntity account = getAccountEntityDao().findByNameAndSystem(name, system);
 			if (account == null)
-				throw new SeyconException(
+				throw new InternalErrorException(
 						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
 			idEntitat = account.getId();
 		}
@@ -1707,11 +1707,11 @@ public class EntryPointServiceImpl extends
 		{
 			GroupEntity group = getGroupEntityDao().findByName(grantee);
 			if (group == null)
-				throw new SeyconException(
+				throw new InternalErrorException(
 						Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
 			idEntitat = group.getId();
 		} else {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAssignedEntityID")); //$NON-NLS-1$
 		}
 		return idEntitat; 
@@ -1721,18 +1721,18 @@ public class EntryPointServiceImpl extends
 			AccessTreeAuthorization autoritzacio) throws Exception {
 
 		if (puntEntrada == null || puntEntrada.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAssignedEntryPoint")); //$NON-NLS-1$
 
 		// Verificamos autoritzación
 		if (!isAuthorized(puntEntrada,
 				TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToDeleteAuthoritations")); //$NON-NLS-1$
 		}
 
 		if (autoritzacio.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NullAuthoritationID")); // Cas //$NON-NLS-1$
 		// de
 		// noves??
@@ -1772,7 +1772,7 @@ public class EntryPointServiceImpl extends
 	protected AccessTreeExecution handleCreateExecution(AccessTree puntEntrada,
 			AccessTreeExecution execucio) throws Exception {
 		if (puntEntrada == null || puntEntrada.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAssignedEntryPoint")); //$NON-NLS-1$
 
 		execucio.setAccessTreeId(puntEntrada.getId()); // Guardem id del punt
@@ -1780,7 +1780,7 @@ public class EntryPointServiceImpl extends
 		// Verificamos autoritzación
 		if (!isAuthorized(puntEntrada,
 				TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToMakeExecutionMethods")); //$NON-NLS-1$
 		}
 
@@ -1920,18 +1920,18 @@ public class EntryPointServiceImpl extends
 																// fa al punt
 																// d'entrada
 		if (puntEntrada == null || puntEntrada.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAssignedEntryPoint")); //$NON-NLS-1$
 
 		// Verificamos autoritzación
 		if (!isAuthorized(puntEntrada,
 				TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToDeleteExecutionMethods")); //$NON-NLS-1$
 		}
 
 		if (execucio.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NullExecutionID")); // Cas //$NON-NLS-1$
 		// de
 		// noves??
@@ -1957,12 +1957,12 @@ public class EntryPointServiceImpl extends
 		// Verificamos autoritzación
 		if (!isAuthorized(puntEntrada,
 				TipusAutoritzacioPuntEntrada.NIVELL_A_DESCRIPCIO)) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NoAuthorizedToUpdateExecMethods")); //$NON-NLS-1$
 		}
 
 		if (execucio.getId() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("EntryPointServiceImpl.NullExecutionID")); // Cas //$NON-NLS-1$
 		// de
 		// noves??
@@ -2055,7 +2055,7 @@ public class EntryPointServiceImpl extends
 		// Comprovem autorització
 		if (!canView(existing))
 			return new LinkedList<AccessTree>();// throw new
-												// SeyconException("no autoritzat");
+												// InternalErrorException("no autoritzat");
 
 		Collection<EntryPointTreeEntity> arbre = getEntryPointTreeEntityDao()
 				.findByParent(puntEntrada.getId());
@@ -2165,7 +2165,7 @@ public class EntryPointServiceImpl extends
 				aplicacio = getInformationSystemEntityDao().findByCode(
 						codiAplicacio);
 				if (aplicacio == null) {
-					throw new SeyconException(
+					throw new InternalErrorException(
 							String.format(
 									Messages.getString("EntryPointServiceImpl.ApplicationNotFounded"), codiAplicacio)); //$NON-NLS-1$
 				}

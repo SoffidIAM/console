@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
@@ -1395,12 +1396,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	 * @param grupPrimari
 	 * @param accounts
 	 */
-	private void addGrantedAccounts(GroupEntity grup, Set<AccountEntity> accounts, AccountAccessLevelEnum level) {
+	private void addGrantedAccounts(GroupEntity grup, Map<AccountEntity, AccountAccessLevelEnum> accounts, AccountAccessLevelEnum level) {
 		for (AccountAccessEntity aae: grup.getAccountAccess())
 		{
 			if (!Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
 			{
-				accounts.add(aae.getAccount());
+            	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+            	if (current == null ||
+            			isGreaterOrIqualThan(aae.getLevel(), current))
+           			accounts.put(aae.getAccount(), aae.getLevel());
 			}
 		}
 		if (grup.getParent() != null)
@@ -1566,72 +1570,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private Password setAccountPasswordInternal(Account account, Password password, boolean temporary, boolean online)
 			throws InternalErrorException, BadPasswordException, Exception {
-		log.info("set account password");
 		AccountEntity ae = getAccountEntityDao().load(account.getId());
-		String principal = Security.getCurrentAccount();
-		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
 		
 		Password result = null;
+		checkCanSetPassword(account, ae);
 		
-		if (ae.getType().equals(AccountType.PRIVILEGED))
-		{
-			throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedToChangePassword"))); //$NON-NLS-1$
-		}
-
-		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
-		{
-			String dispatcher = ips.getDefaultDispatcher();
-			AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
-			if (caller == null)
-				throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
-			if (! caller.getId().equals( ae.getId()))
-			{
-				UserEntity callerUe = getUserForAccount(caller);
-				if (ae.getType().equals(AccountType.USER))
-				{
-					UserEntity ue2 = getUserForAccount(ae);
-					if (ue2 != null)
-					{
-						if (callerUe == null)
-							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-						
-						if (!callerUe.getId().equals(ue2.getId()) && !getAuthorizationService().hasPermission(Security.AUTO_USER_SET_PASSWORD, ue2))
-							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					}
-					else
-						throw new InternalErrorException(Messages.getString("AccountServiceImpl.AccounNotBounForUser")); //$NON-NLS-1$
-				}
-				else if (ae.getType().equals(AccountType.IGNORED) && 
-						! ae.getSystem().getName().equals( ConfigurationCache.getProperty("AutoSSOSystem")) )
-				{
-					throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoAuthorizedChangePassAccDisabled"))); //$NON-NLS-1$
-				}
-				else if (ae.getType().equals(AccountType.SHARED))
-				{
-					if (callerUe == null)
-						throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
-					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
-					boolean found = false;
-					for (String user : users) {
-                        if (user.equals(callerUe.getUserName())) {
-                            found = true;
-                            break;
-                        }
-                    }
-
-					if (!found)
-						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
-				}
-			}
-			// Check if policy allows user change
-			UserDomainService dominiUsuariService = getUserDomainService();
-			PasswordPolicy politica = dominiUsuariService.findPolicyByTypeAndPasswordDomain(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
-			if (politica == null)
-				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
-			if (!politica.isAllowPasswordChange())
-				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
-		}
-		
+		InternalPasswordService ips = getInternalPasswordService();
 		/// Now, do the job
 		if (password == null)
 		{
@@ -1663,7 +1607,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
-		log.info("Seting password for "+account.getSystem().getName());
 		if ( ! account.isDisabled() && account.getSystem().getUrl() != null)
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
@@ -1681,11 +1624,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	            }
 	        }
 		}
-		log.info("Cannot send. Store locally");
 		getInternalPasswordService().storeAndForwardAccountPassword(account, password, temporary, null);
 	}
 
-	public boolean sendPasswordNow(AccountEntity account, Password password, boolean temporary, String url, String auth)
+	private boolean sendPasswordNow(AccountEntity account, Password password, boolean temporary, String url, String auth)
 			throws InternalErrorException {
 		SyncStatusService sss = null;
 		try {
@@ -2297,14 +2239,20 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
 		}
 		Collection<RoleGrant> grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
-		Set<AccountEntity> accounts = new HashSet<AccountEntity>();
+		Map<AccountEntity, AccountAccessLevelEnum> accounts = new HashMap<AccountEntity,AccountAccessLevelEnum>();
 		for (RoleGrant rg : grants) {
             RoleEntity r = getRoleEntityDao().load(rg.getRoleId());
             for (AccountAccessEntity aae : r.getAccountAccess()) {
-                if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level)) 
-                	accounts.add(aae.getAccount());
+                if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))  {
+                	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+                	if (current == null ||
+                			isGreaterOrIqualThan(aae.getLevel(), current))
+               			accounts.put(aae.getAccount(), aae.getLevel());
+                }
             }
         }
+		
+		
 		UserEntity ue = getUserEntityDao().load(usuari.getId());
 		addGrantedAccounts(ue.getPrimaryGroup(), accounts, level);
 		for (UserGroupEntity ug : ue.getSecondaryGroups()) {
@@ -2315,23 +2263,34 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for (AccountAccessEntity aae: ue.getAccountAccess())
 		{
 			if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
-				accounts.add(aae.getAccount());
+			{
+            	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+            	if (current == null ||
+            			isGreaterOrIqualThan(aae.getLevel(), current))
+           			accounts.put(aae.getAccount(), aae.getLevel());
+				
+			}
 		}
 		
 		for (UserAccountEntity uae: ue.getAccounts())
 		{
-			if (uae.getAccount().getType().equals (AccountType.USER))
-				accounts.add(uae.getAccount());
+			if (uae.getAccount().getType().equals (AccountType.USER)) {
+     			accounts.put(uae.getAccount(), AccountAccessLevelEnum.ACCESS_OWNER);
+			}
 		}
 		List<Account> vos = new LinkedList<Account>();
-		for ( AccountEntity accEntity: accounts)
+		for ( Entry<AccountEntity, AccountAccessLevelEnum> entry: accounts.entrySet())
 		{
+			AccountEntity accEntity = entry.getKey();
 			if (!accEntity.isDisabled())
 			{
-				if (accEntity.getType().equals(AccountType.USER))
-					vos.addAll(getUserAccountEntityDao().toUserAccountList(accEntity.getUsers()));
-				else
-					vos.add(getAccountEntityDao().toAccount(accEntity));
+				Account acc = getAccountEntityDao().toAccount(accEntity);
+				if (accEntity.getType().equals(AccountType.USER)) {
+					for (UserAccountEntity uac: accEntity.getUsers())
+						acc = getUserAccountEntityDao().toUserAccount(uac);
+				}
+				acc.setAccessLevel(entry.getValue());
+				vos.add(acc);
 			}
 		}
 		return vos;
@@ -3241,6 +3200,117 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				return true;
 		}
 		return false;
+	}
+
+	@Override
+	protected void handleSendAccountPassword(Account account) throws Exception {
+		AccountEntity ae = getAccountEntityDao().load(account.getId());
+		
+		Password result = null;
+		
+		checkCanSetPassword(account, ae);
+		
+		if ( ! ae.isDisabled() && ae.getSystem().getUrl() != null)
+		{
+			for (ServerEntity se : getServerEntityDao().loadAll()) {
+	            if (se.getType().equals(ServerType.MASTERSERVER)) {
+	            	if (se.getInstances().isEmpty()) {
+	            		if (resendPasswordNow(ae, se.getUrl(), se.getAuth())) 
+	            			return;
+	            	} else {
+	            		for (ServerInstanceEntity si: se.getInstances()) {
+		            		if (resendPasswordNow(ae, si.getUrl(), si.getAuth())) 
+		            			return;
+	            			
+	            		}
+	            	}
+	            }
+	        }
+		}
+	}
+
+	private boolean resendPasswordNow(AccountEntity account, String url, String auth)
+			throws InternalErrorException {
+		SyncStatusService sss = null;
+		try {
+		    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
+		    rsl.setAuthToken(auth);
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		    sss = rsl.getSyncStatusService();
+		} catch (Exception e) {
+			log.warn("Error sending password", e);
+		}
+		if (sss != null)
+		{
+			sss.resendAccountPassword(account.getId());
+			return true;
+		} else
+			return false;
+	}
+	
+	
+	private void checkCanSetPassword(Account account, AccountEntity ae)
+			throws InternalErrorException, BadPasswordException {
+		String principal = Security.getCurrentAccount();
+		com.soffid.iam.service.InternalPasswordService ips = getInternalPasswordService();
+		if (ae.getType().equals(AccountType.PRIVILEGED))
+		{
+			throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedToChangePassword"))); //$NON-NLS-1$
+		}
+
+		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_PASSWORD))
+		{
+			String dispatcher = ips.getDefaultDispatcher();
+			AccountEntity caller = getAccountEntityDao().findByNameAndSystem(principal, dispatcher);
+			if (caller == null)
+				throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), principal, dispatcher)); //$NON-NLS-1$
+			if (! caller.getId().equals( ae.getId()))
+			{
+				UserEntity callerUe = getUserForAccount(caller);
+				if (ae.getType().equals(AccountType.USER))
+				{
+					UserEntity ue2 = getUserForAccount(ae);
+					if (ue2 != null)
+					{
+						if (callerUe == null)
+							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
+						
+						if (!callerUe.getId().equals(ue2.getId()) && !getAuthorizationService().hasPermission(Security.AUTO_USER_SET_PASSWORD, ue2))
+							throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
+					}
+					else
+						throw new InternalErrorException(Messages.getString("AccountServiceImpl.AccounNotBounForUser")); //$NON-NLS-1$
+				}
+				else if (ae.getType().equals(AccountType.IGNORED) && 
+						! ae.getSystem().getName().equals( ConfigurationCache.getProperty("AutoSSOSystem")) )
+				{
+					throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoAuthorizedChangePassAccDisabled"))); //$NON-NLS-1$
+				}
+				else if (ae.getType().equals(AccountType.SHARED))
+				{
+					if (callerUe == null)
+						throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoChangePasswordAuthorized"))); //$NON-NLS-1$
+					Collection<String> users = handleGetAccountUsers(account, AccountAccessLevelEnum.ACCESS_MANAGER);
+					boolean found = false;
+					for (String user : users) {
+                        if (user.equals(callerUe.getUserName())) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+					if (!found)
+						throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.NotAuthorizedChangePassForAccount"))); //$NON-NLS-1$
+				}
+			}
+			// Check if policy allows user change
+			UserDomainService dominiUsuariService = getUserDomainService();
+			PasswordPolicy politica = dominiUsuariService.findPolicyByTypeAndPasswordDomain(ae.getPasswordPolicy().getName(), ae.getSystem().getPasswordDomain().getName());
+			if (politica == null)
+				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NoPolicyDefined")); //$NON-NLS-1$
+			if (!politica.isAllowPasswordChange())
+				throw new BadPasswordException(Messages.getString("AccountServiceImpl.NotAllowedToChangePassword")); //$NON-NLS-1$
+		}
 	}
 
 }

@@ -31,8 +31,19 @@ public class UsuariGrup {
 	public java.lang.String descripcioGrup;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "group.id")
+	@Attribute(hidden = true )
+	public java.lang.Long groupId;
+
+	@Nullable
 	@Attribute(hidden=true)
 	public java.lang.Long id;
+
+	@Nullable
+	@JsonAttribute(hibernateAttribute = "user.id")
+	@Attribute(hidden = true )
+	public java.lang.Long userId;
+
 
 	@Attribute(translated = "fullName", hidden = true )
 	@Nullable

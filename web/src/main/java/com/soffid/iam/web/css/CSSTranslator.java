@@ -12,8 +12,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.laf.StandardColors;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public abstract class CSSTranslator extends HttpServlet {
 	String getText () throws IOException {
@@ -59,6 +62,13 @@ public abstract class CSSTranslator extends HttpServlet {
 		String skyText = ConfigurationCache.getProperty("soffid.ui.text3");
 		if (skyText == null) skyText = "white";
 
+		String showLogo = "none";
+		try {
+			if (ServiceLocator.instance().getConfigurationService().getBlob("logo") != null)
+				showLogo ="block";
+		} catch (InternalErrorException e) {
+		}
+		
 		String t = getText();
 		t = t.replaceAll("\\{GREENLIGHT\\}", greenLight)
 			.replaceAll("\\{GREENDARK\\}", greenDark)
@@ -89,7 +99,7 @@ public abstract class CSSTranslator extends HttpServlet {
 			.replaceAll("\\{TEXT_ALIGN_LEFT\\}", rtl? "right": "left")
 			.replaceAll("\\{TEXT_ALIGN_RIGHT\\}", rtl? "left": "right")
 			.replaceAll("\\{COLLAPSE_IMG\\}", rtl? "collapse-rtl": "collapse")
-			
+			.replace("{SHOWLOGO}", showLogo)
 			;
 		
 		byte[] b = t.getBytes("UTF-8");

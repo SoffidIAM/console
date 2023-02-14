@@ -222,7 +222,7 @@ public class AccountHandler extends FrameHandler {
 
 	}
 
-	public void setPassword(Event event) {
+	public void setPassword(Event event) throws InternalErrorException, NamingException, CreateException {
 		DataSource listbox = (DataSource) getListbox();
 		Account acc = (Account) listbox.getJXPathContext().getValue("instance");
 		try {
@@ -274,10 +274,15 @@ public class AccountHandler extends FrameHandler {
 		}
 	}
 
-	public void doPasswordChange() {
+	public void doPasswordChange() throws InternalErrorException, NamingException, CreateException {
 		Window w = (Window) getFellow("newPassword2");
 		Radiogroup gt = (Radiogroup) w.getFellow("generationType");
 		Radio radioRandom = (Radio) w.getFellow("generationRandom");
+		Radio sendCurrent = (Radio) w.getFellow("sendCurrent");
+		Long id = (Long) XPathUtils.eval(getForm(), "@id");
+		boolean available = EJBLocator.getAccountService().isAccountPasswordAvailable(id);
+		sendCurrent.setVisible(available);
+		
 		gt.setSelectedItem(radioRandom);
 		onChangeSelectedGeneration(null);
 		w.doHighlighted();
@@ -299,10 +304,15 @@ public class AccountHandler extends FrameHandler {
 		Window w = (Window) getFellow("newPassword2");
 		Radiogroup gt = (Radiogroup) w.getFellow("generationType");
 		Radio radioRandom = (Radio) w.getFellow("generationRandom");
-
+		Radio radioSend = (Radio) w.getFellow("sendCurrent");
+		
 		Account account = (Account) ((DataNode)XPathUtils.getValue(getListbox(), "/")).getInstance();
 		
-		if (gt.getSelectedItem() != radioRandom)
+		if (gt.getSelectedItem() == radioSend) 
+		{
+			EJBLocator.getAccountService().sendAccountPassword(account);
+		}
+		else if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
 			EJBLocator.getAccountService().setAccountPassword(account, new Password( password.getValue()) );
@@ -324,11 +334,12 @@ public class AccountHandler extends FrameHandler {
 		Window w = (Window) getFellow("newPassword2");
 		Radiogroup generationType = (Radiogroup) w.getFellow("generationType");
 		Radio radioRandom = (Radio) w.getFellow("generationRandom");
+		Radio radioSet = (Radio) w.getFellow("generationSet");
 		Textbox password = (Textbox) w.getFellow("password");
 		Div passworddiv = (Div) w.getFellow("passworddiv");
 		Button setButton = (Button) w.getFellow("setButton");
 		
-		if (generationType.getSelectedItem() != radioRandom)
+		if (generationType.getSelectedItem() == radioSet)
 		{
 			password.setDisabled (false);
 			password.setFocus(true);

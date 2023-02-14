@@ -3,6 +3,7 @@
 <?component name="input_password" macro-uri="/comu/input_password.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/authentication"
 	use="com.soffid.iam.web.config.AuthenticationHandler"> 
 
 	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
@@ -11,6 +12,15 @@
 	<datamodel id="model" class="com.soffid.web.saml.SamlDataModel"/>
 
 	<form dataPath="model:/conf" id="samlform" width="100%">
+		<div>
+			<label sclass="separator" value="${c:l('parametres.zul.maintenance')}"/>
+		</div>
+		<div style="margin-left: 150px">
+			<div width="100%">
+				<switch bind="maintenanceMode"  ></switch>
+				<label value="${c:l('parametres.zul.maintenanceMode')}"  style="margin-left: 16px" />
+			</div>
+		</div>
 		<div>
 			<label sclass="separator" value="${c:l('parametres.zul.classicMethod')}"/>
 		</div>

@@ -40,11 +40,13 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.User;
+import com.soffid.iam.api.exception.ListFullException;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.SearchAttributeDefinition;
 import com.soffid.iam.web.SearchDictionary;
 import com.soffid.scimquery.parser.ParseException;
 
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
@@ -190,7 +192,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 						throw new UiException(new InternalErrorException(Labels.getLabel("searchbox.badSyntax"), e.getCause()));
 					else
 						throw (UiException) e;
-				} catch (RowsLimitExceededException e) {
+				} catch (RowsLimitExceededException | ListFullException e) {
 					throw new UiException(String.format( Labels.getLabel("searchBox.maxRows"), modelCollection.getSize()));
 				} catch (Exception e) {
 					throw new UiException(e);
@@ -223,7 +225,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					throw new UiException(new InternalErrorException(Labels.getLabel("searchbox.badSyntax"), e.getCause()));
 				else
 					throw (UiException) e;
-			} catch (RowsLimitExceededException e) {
+			} catch (RowsLimitExceededException | ListFullException e) {
 				throw new UiException(String.format( Labels.getLabel("searchBox.maxRows"), modelCollection.getSize()));
 			} catch (Exception e) {
 				throw new UiException(e);
@@ -455,7 +457,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					timer.setDelay(1000);
 					try {
 						modelCollection.updateProgressStatus();
-					} catch (RowsLimitExceededException e) {
+					} catch (RowsLimitExceededException | ListFullException e) {
 						modelCollection.cancel();
 						throw new UiException(String.format( Labels.getLabel("searchBox.maxRows"), modelCollection.getSize()));
 					} finally {
@@ -568,10 +570,20 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	public AttributeSearchBox addAttribute(String att) {
 		for (SearchAttributeDefinition def: dictionary.getAttributes())
 		{
-			if (def.getName().equals(att))
+			if (def.getName().equals(att) && canQueryByAttribute(def))
 				return addAttribute (def);
 		}
 		return null;
+	}
+
+	private boolean canQueryByAttribute(SearchAttributeDefinition def) {
+		if (def.getType() == TypeEnumeration.HTML || 
+				def.getType() == TypeEnumeration.PHOTO_TYPE || 
+				def.getType() == TypeEnumeration.ATTACHMENT_TYPE || 
+				def.getType() == TypeEnumeration.BINARY_TYPE)
+			return false;
+		else
+			return true;
 	}
 
 	public SearchDictionary getDictionary() {
@@ -627,7 +639,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 						}
 					}
 				}
-				if (! found)
+				if (! found && canQueryByAttribute(def))
 				{
 					anyMissing = true;
 					break;
@@ -682,7 +694,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		HashSet<String> atts = new HashSet();
 		for (final SearchAttributeDefinition def: dictionary.getAttributes())
 		{
-			if (! atts.contains(def.getName())) {
+			if (canQueryByAttribute(def) && ! atts.contains(def.getName())) {
 				atts.add(def.getName());
 				boolean found = false;
 				for ( Component component: (List<Component>)getChildren())
@@ -743,7 +755,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 					}
 				}
 			}
-			if (!found) return true;
+			if (!found && canQueryByAttribute(def)) return true;
 		}
 		return false;
 	}

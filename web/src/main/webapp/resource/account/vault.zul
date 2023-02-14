@@ -8,6 +8,7 @@
 <?page id="vault"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/password-vault"
 	use="com.soffid.iam.web.account.VaultHandler" id="frame">
 	<script>
 	function doCopy (uuid) {
@@ -24,7 +25,7 @@
 	}
 	</script>
 	
-	<datamodel id="model" rootNode="root" src="descriptorVault.xml"/>
+	<datamodel id="model" rootNode="root" src="descriptorVault.xml" onCommit="ref:frame.onChangeForm2"/>
 	<timer onTimer="ref:frame.updateStatus" running="false" delay="5000" repeats="true" />
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
@@ -86,7 +87,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatree2="listbox"/>
 								
 				<imageclic src="/img/sync.svg" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />

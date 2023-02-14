@@ -37,7 +37,7 @@ public class HostAliasEntityDaoImpl
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostAliasEntityDaoImpl.0"), aliasMaquinaEntity.getAlias(), message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("HostAliasEntityDaoImpl.0"), aliasMaquinaEntity.getAlias(), message), e); //$NON-NLS-1$
 		}		
 		
 	}
@@ -49,7 +49,7 @@ public class HostAliasEntityDaoImpl
 			getSession(false).flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostAliasEntityDaoImpl.1"), aliasMaquinaEntity.getAlias(), message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("HostAliasEntityDaoImpl.1"), aliasMaquinaEntity.getAlias(), message), e); //$NON-NLS-1$
 		}		
 	}
 
@@ -60,7 +60,7 @@ public class HostAliasEntityDaoImpl
 			//auditarAlies("U", aplicacio.getCodi());
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("HostAliasEntityDaoImpl.2"), aliasMaquinaEntity.getAlias(), message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("HostAliasEntityDaoImpl.2"), aliasMaquinaEntity.getAlias(), message), e); //$NON-NLS-1$
 		}
 	}
 	

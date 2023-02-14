@@ -55,6 +55,7 @@ import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.TipusDomini;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.seycon.ng.exception.UnknownRoleException;
 
 import java.security.Principal;
@@ -105,7 +106,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(
 					String.format(
-							Messages.getString("RoleEntityDaoImpl.1"), Role.getName(), message)); //$NON-NLS-1$
+							Messages.getString("RoleEntityDaoImpl.1"), Role.getName(), message), e); //$NON-NLS-1$
 		}
 	}
 
@@ -619,7 +620,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(
 					String.format(
-							Messages.getString("RoleEntityDaoImpl.11"), roleEntity.getName(), message)); //$NON-NLS-1$
+							Messages.getString("RoleEntityDaoImpl.11"), roleEntity.getName(), message), e); //$NON-NLS-1$
 		}
 	}
 
@@ -1471,7 +1472,7 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             return entity;
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), message));  //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), message), e);  //$NON-NLS-1$
         }
 	}
 
@@ -1558,10 +1559,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
             updateMailLists (entity);
             return entity;
-        } catch (Throwable e) {
+        } catch (Exception e) {
+        	LogFactory.getLog(getClass()).warn("Error updating role: ", e);
             String message = ExceptionTranslator.translate(e);
-            LogFactory.getLog(getClass()).warn("Error updating role: ", e);
-			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), e));  //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("RoleEntityDaoImpl.2"), role.getName(), ""), e);  //$NON-NLS-1$
         }
 	}
 

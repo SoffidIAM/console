@@ -22,8 +22,10 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.web.component.DomainValueField;
+import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
+import com.soffid.iam.web.popup.SelectColumnsHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
@@ -255,4 +257,9 @@ public class GroupRolesHandler extends Div implements AfterCompose {
 					});
 		}
 	}
+	
+	public void changeColumns(Event event) throws IOException {
+		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
+	}
+
 }

@@ -49,8 +49,11 @@
 			<img src="${execution.contextPath }/anonymous/wait.gif" />
 		</div>
 		<div class="login" id='login'>
-		<p><img src="/soffid/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  alt="" /> </p> 
-        		<p><img src="/soffid/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" alt="Soffid logo" /> </p> 
+		<p>
+			<div class="loginimage">
+				<img src="/soffid/anonymous/logo.png" style="max-width: 280px; max-height: 125px;"  alt="" />
+			</div>
+		</p>
 			<div class="loginbox" id="loginbox"> 
 				<p>${c:l('configure.header')}</p>
 				<form method="post" action="j_security_check" id='loginForm' accept-charset="utf-8" onsubmit="preparesubmit(event)" >
@@ -75,10 +78,14 @@
    					<input style="margin: 15px 0px 0px 0px" type="button" value="${c:l('configure.samlLogin')}" onClick="location.href='${execution.contextPath }/saml'"/>
 				</p>                             
 ]]></html>
+		<html if="${!maintenance}">
+		</html>
+		<label if="${maintenance }" style="display: inline-block; font-weight: bold; margin-top: 25px" value="${c:l('login.lblMaintenance') }"/>
 <html><![CDATA[
 			</form>
 			</div>
 		</div>
+       	<div class="soffid-logo-corner"><a href="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
 		]]></html>
 		<html if="${autoLogin}"><![CDATA[
 			<script type="text/javascript">

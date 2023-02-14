@@ -26,6 +26,7 @@ import com.soffid.iam.api.SoffidObjectType;
 import es.caib.seycon.ng.comu.AttributeDirection;
 import es.caib.seycon.ng.comu.SoffidObjectTrigger;
 import es.caib.seycon.ng.comu.TypeEnumeration;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.DataSource;
@@ -46,21 +47,7 @@ public class Importer {
 		else
 			doc = dBuilder.parse(new InputSource(m.getReaderData()));
 		
-		DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(ds, "/objectMapping");
-		for (int i = 0; i < coll.getSize(); i++)
-		{
-			DataModelNode dn = coll.getDataModel(i);
-			if (dn != null && ! dn.isDeleted())
-				dn.delete();
-		}
-		
-		coll = (DataNodeCollection) XPathUtils.getValue(ds, "/reconcileTrigger");
-		for (int i = 0; i < coll.getSize(); i++)
-		{
-			DataModelNode dn = coll.getDataModel(i);
-			if (dn != null && ! dn.isDeleted())
-				dn.delete();
-		}
+		clearMappings(ds);
 
 		NodeList nodes = doc.getElementsByTagName("objectMapping");
 		for (int i = 0; i < nodes.getLength(); i++)
@@ -73,11 +60,11 @@ public class Importer {
 			om.setSoffidObject(SoffidObjectType.fromString(n.getAttribute("soffidObject")));
 			
 			// Add object to path
-			String path = XPathUtils.createPath(ds, "/objectMapping", om);
+			String path = createObject(ds, om);
 			
-			addProperties (n, ds, path);
-			addAttributes(n, ds, path);
-			addTriggers(n, ds, path);
+			addProperties (n, ds, path, om);
+			addAttributes(n, ds, path, om);
+			addTriggers(n, ds, path, om);
 		}
 				
 		nodes = doc.getElementsByTagName("loadTrigger");
@@ -90,7 +77,7 @@ public class Importer {
 			om.setTrigger( SoffidObjectTrigger.fromString( n.getAttribute("trigger")));
 			om.setScript(n.getAttribute("script"));
 
-			XPathUtils.createPath(ds, "/reconcileTrigger", om);
+			createReconcileTrigger(ds, om);
 			
 		}
 				
@@ -139,12 +126,43 @@ public class Importer {
 			}
 			dt.setValues(l);
 
-			XPathUtils.createPath(ds, "/metadata", dt);
+			createMetadata(ds, dt);
 			
 		}
 	}
 
-	private void addProperties(Element mappingElement, DataSource ds, String path) throws Exception {
+	protected void createMetadata(DataSource ds, DataType dt) throws Exception {
+		XPathUtils.createPath(ds, "/metadata", dt);
+	}
+
+	protected void createReconcileTrigger(DataSource ds, ReconcileTrigger om) throws Exception {
+		XPathUtils.createPath(ds, "/reconcileTrigger", om);
+	}
+
+	protected String createObject(DataSource ds, ObjectMapping om) throws Exception {
+		String path = XPathUtils.createPath(ds, "/objectMapping", om);
+		return path;
+	}
+
+	protected void clearMappings(DataSource ds) throws InternalErrorException {
+		DataNodeCollection coll = (DataNodeCollection) XPathUtils.getValue(ds, "/objectMapping");
+		for (int i = 0; i < coll.getSize(); i++)
+		{
+			DataModelNode dn = coll.getDataModel(i);
+			if (dn != null && ! dn.isDeleted())
+				dn.delete();
+		}
+		
+		coll = (DataNodeCollection) XPathUtils.getValue(ds, "/reconcileTrigger");
+		for (int i = 0; i < coll.getSize(); i++)
+		{
+			DataModelNode dn = coll.getDataModel(i);
+			if (dn != null && ! dn.isDeleted())
+				dn.delete();
+		}
+	}
+
+	private void addProperties(Element mappingElement, DataSource ds, String path, ObjectMapping om) throws Exception {
 		NodeList nodes = mappingElement.getElementsByTagName("property");
 		for (int i = 0; i < nodes.getLength(); i++)
 		{
@@ -155,11 +173,15 @@ public class Importer {
 			omp.setValue(n.getAttribute("value"));
 			
 			// Add object to path
-			XPathUtils.createPath(ds, path+"/property", omp);
+			createProperty(ds, path, omp, om);
 		}
 	}
 
-	private void addTriggers(Element mappingElement, DataSource ds, String path) throws Exception {
+	protected void createProperty(DataSource ds, String path, ObjectMappingProperty omp, ObjectMapping om) throws Exception {
+		XPathUtils.createPath(ds, path+"/property", omp);
+	}
+
+	private void addTriggers(Element mappingElement, DataSource ds, String path, ObjectMapping om) throws Exception {
 		NodeList nodes = mappingElement.getElementsByTagName("trigger");
 		for (int i = 0; i < nodes.getLength(); i++)
 		{
@@ -170,11 +192,15 @@ public class Importer {
 			omp.setScript(n.getAttribute("script"));
 			
 			// Add object to path
-			XPathUtils.createPath(ds, path+"/objectMappingTrigger", omp);
+			createObjectMappingTrigger(ds, path, omp, om);
 		}
 	}
 
-	private void addAttributes(Element mappingElement, DataSource ds, String path) throws Exception {
+	protected void createObjectMappingTrigger(DataSource ds, String path, ObjectMappingTrigger omp, ObjectMapping om) throws Exception {
+		XPathUtils.createPath(ds, path+"/objectMappingTrigger", omp);
+	}
+
+	private void addAttributes(Element mappingElement, DataSource ds, String path, ObjectMapping om) throws Exception {
 		NodeList nodes = mappingElement.getElementsByTagName("attributeMapping");
 		for (int i = 0; i < nodes.getLength(); i++)
 		{
@@ -190,7 +216,11 @@ public class Importer {
 				am.setDirection(AttributeDirection.fromString(
 						(String)AttributeDirection.literals().get(index)));
 			// Add object to path
-			XPathUtils.createPath(ds, path+"/attributeMapping", am);
+			createAttribute(ds, path, am, om);
 		}
+	}
+
+	protected void createAttribute(DataSource ds, String path, AttributeMapping am, ObjectMapping om) throws Exception {
+		XPathUtils.createPath(ds, path+"/attributeMapping", am);
 	}
 }

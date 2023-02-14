@@ -8,6 +8,7 @@
 <?page id="account"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/accounts"
 	use="com.soffid.iam.web.account.AccountHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="accountDescriptor.xml"/>
 	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />
@@ -44,7 +45,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox"/>
 								
 				<imageclic src="/img/sync.svg" id="pendingChanges" sclass="progress" title="${c:l('account.synchronizationInProgress') }" visible="false" />
@@ -120,14 +121,16 @@
 				<radio label="${c:l('usuaris.zul.radomPassword')}" 
 					id="generationRandom" width="20em" 
 					selected="true" value="random" onSelect=""/>
+				<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
+					value="set" onSelect="" />
+				<radio label="${c:l('usuaris.zul.sendCurrentPassword')}" id ="sendCurrent" width="20em" 
+					value="send" onSelect="" />
+			</radiogroup>
+			<div style="visibility: hidden" id="passworddiv">
 				<div>
 					<textbox id="antipasswordsave" disabled="true" 
 						style="border: none; color: white;  background-color: white"/>
 				</div>
-				<radio label="${c:l('usuaris.zul.setPassword')}" id ="generationSet" width="20em" 
-					value="set" onSelect="" />
-			</radiogroup>
-			<div style="visibility: hidden" id="passworddiv">
 				<label 
 					value="${c:l('accounts.setPassword.label')}">
 				</label>

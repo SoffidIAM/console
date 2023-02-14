@@ -82,6 +82,7 @@ import org.opensaml.saml.common.assertion.ValidationContext;
 import org.opensaml.saml.common.assertion.ValidationResult;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.metadata.criteria.entity.EvaluableEntityDescriptorCriterion;
+import org.opensaml.saml.metadata.resolver.impl.AbstractMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.FilesystemMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.HTTPMetadataResolver;
@@ -669,7 +670,10 @@ public class SAMLServiceInternal {
 			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null)
 		{
-			url = "http://"+hostName;
+			if (hostName.startsWith("http"))
+				url = hostName;
+			else
+				url = "http://"+hostName;
 		}
 		if (! url.endsWith("/"))
 			url = url + "/";
@@ -781,8 +785,25 @@ public class SAMLServiceInternal {
 
 	private AbstractReloadingMetadataResolver configureMetadataResolver(String metadataUrl, String metadataCache)
 			throws ResolverException, ComponentInitializationException, MalformedURLException {
-		
-		if (metadataUrl.startsWith("http"))
+
+		if (metadataUrl.startsWith("java:")) {
+			AbstractReloadingMetadataResolver r;
+			try {
+				r = (AbstractReloadingMetadataResolver) Class.forName(metadataUrl.substring(5)).newInstance();
+			} catch (Exception e) {
+				throw new MalformedURLException(metadataUrl);
+			}
+			r.setMinRefreshDelay(Long.parseLong(metadataCache) * 1000L);
+			r.setId(metadataUrl);
+			r.setResolveViaPredicatesOnly(true);
+			r.setUseDefaultPredicateRegistry(true);
+			BasicParserPool pool = new BasicParserPool();
+			pool.initialize();
+			r.setParserPool(pool);
+			r.initialize();
+			return r;
+		}
+		else if (metadataUrl.startsWith("http"))
 		{
 			HttpClient client = HttpClients.createDefault();
 			HTTPMetadataResolver r = new HTTPMetadataResolver(client, metadataUrl);

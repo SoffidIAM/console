@@ -37,6 +37,7 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.Form2;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathRerunEvent;
@@ -160,9 +161,11 @@ public class ScheduledTaskHandler extends FrameHandler {
 					XPathUtils.setValue(ctx, "lastExecution", task.getLastExecution());
 					XPathUtils.setValue(ctx, "logReferenceID", task.getLogReferenceID());
 					XPathUtils.setValue(ctx, "logs", task.getLogs());
+					ctx.getDataSource().sendEvent(new XPathRerunEvent(ctx.getDataSource(), "/logs"));
 					onChangeForm(event);
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

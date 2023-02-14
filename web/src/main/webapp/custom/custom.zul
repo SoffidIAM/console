@@ -7,6 +7,7 @@
 <?component name="host_acl" macro-uri="host-acl.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/custom-objects"
 	use="com.soffid.iam.web.custom.CustomObjectHandler" id="frame"
 	type="${execution.nativeRequest.parameterMap['type'][0] }">
 	<datamodel id="model" rootNode="objects" src="customObjectDescriptor.xml"/>
@@ -16,8 +17,8 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" pageArgs="type=${execution.nativeRequest.parameterMap['type'][0] }">
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
-					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
-					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('customObject:delete') &amp;&amp; soffid:isUserInRole('customObject:create')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('customObject:create')}" id="addMenu" onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('customObject:delete') &amp;&amp; soffid:isUserInRole('customObject:create')}" onClick="ref:frame.importCsv" id="importMenu"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
@@ -37,19 +38,19 @@
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 			<div width="100%" style="text-align: right" >
-				<div class="deleteButton" onClick="ref:frame.deleteSelected" if="${soffid:isUserInRole('customObject:delete')}" visible="false">-</div>
-				<div class="addButton" onClick="ref:frame.addNew"   if="${soffid:isUserInRole('customObject:create')}">+</div>
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" if="${soffid:isUserInRole('customObject:delete')}" visible="false" id="deleteButton">-</div>
+				<div class="addButton" onClick="ref:frame.addNew"   if="${soffid:isUserInRole('customObject:create')}" id="addButton">+</div>
 			</div>
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails"
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply"
 				pageArgs="type=${execution.nativeRequest.parameterMap['type'][0] }">
 				<pager datatable="listbox"/>
 								
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>
 				<menu2>
-					<menu2item id="deleteHost" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					<menu2item image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete" id="deleteMenu"/>
 				</menu2>
 			</div>
 			<form id="form" onChangeXPath="ref:frame.onChangeForm"

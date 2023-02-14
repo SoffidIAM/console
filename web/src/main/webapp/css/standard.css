@@ -18,13 +18,13 @@ div.highlighted {
 	margin: 0; 
 	padding: 0;
 	box-shadow: 0px 0px 20px 3px #2b2b2b;
+	background-color: white
 }
- 
+
 p, div, span, label, a, input, textarea, 
 button, input.button, input.file {
 	font-family: inherit;
 	font-size: inherit;
-	word-break: break-all;
 	outline: none;
 }
 
@@ -92,8 +92,14 @@ td.rwt-modal, td.rwt-highlighted, td.rwt-overlapped
 
 /* Borde dels windows de tipus Llista */
 div.wc-modal, div.wc-modal-none, div.wc-highlighted, div.wc-highlighted-none {
-	border: 2px solid {BLUE}; background: #FFF;
+	border: 2px solid {BLUE}; 
+	background: #FFF;
 	padding: 16px;
+	box-sizing: content-box;
+}
+
+div.wc-modal *, div.wc-modal-none *, div.wc-highlighted *, div.wc-highlighted-none * {
+	box-sizing: border-box;
 }
 
 
@@ -680,14 +686,14 @@ select {
 
 
 /* imageclic: enlloc de imagemap */
-img.imageclic, img.search-icon {
+img.imageclic, img.search-icon, span.combobox span.rbtnbk img {
 	padding: 4px;
 	width: 32px;
 	cursor: pointer;	
 	vertical-align: top;
 }
 
-img.imageclic:hover, img.search-icon:hover {
+img.imageclic:hover, img.search-icon:hover, span.combobox span.rbtnbk img:hover {
 	background-image: url(/soffid/img/circle.svg);
 	background-size: cover;
 }
@@ -863,12 +869,77 @@ div.wc-highlighted, div.wc-highlighted-none {border: 2px solid {BLUE}; backgroun
 
 .titol_tancar_back:hover {background-color:#FFF7EE;}
 div.head-cell-inner {text-align:{TEXT_ALIGN_LEFT};}
+div.flatpickr-calendar span.flatpickr-next-month, 
+div.flatpickr-calendar span.flatpickr-prev-month {
+	fill: {SKY};
+}
+
+div.flatpickr-calendar .flatpickr-months .flatpickr-prev-month:hover svg, 
+div.flatpickr-calendar .flatpickr-months .flatpickr-next-month:hover svg {
+	fill: {SKYLIGHT}
+}
+
+div.flatpickr-calendar div.flatpickr-current-month {
+	font-size: 100%;
+}
+div.flatpickr-calendar .flatpickr-day.selected, 
+div.flatpickr-calendar .flatpickr-day.selected:focus, 
+div.flatpickr-calendar .flatpickr-day.selected:hover {
+    background: {SKY};
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    color: {SKYTEXT};
+    border-color: {SKY};
+    border-top-color: {SKY};
+    border-right-color: {SKY};
+    border-bottom-color: {SKY};
+    border-left-color: {SKY};
+}
+
+div.dayContainer {
+	width: 212px;
+	min-width: 212px;
+	max-width: 212px;
+}
+div.flatpickr-days {
+	width: 100%;
+}
+
+div.flatpickr-calendar span.flatpickr-day  {
+	height: 30px;
+	width: 30px;
+	line-height: 30px;
+}
+
+
+div.flatpickr-calendar {
+	width: 213px;
+}
+
+
+div.flatpickr-calendar.hasTime div.flatpickr-time,
+div.flatpickr-time div.numInputWrapper {
+	height: 30px;
+	line-height: 30px;
+}
+
+div.container.datebox input.dateboxinp {
+    background-image: url(/soffid/img/calendar.svg);
+    background-repeat: no-repeat;
+    background-position-x: right;
+    background-size: contain;
+}
+
+div.container.datebox input.dateboxinp.readonly {
+	background-image: none;
+}
+
 .dateboxinp  {
 	font-family: inherit;
 	font-size: inherit;
 	padding-left: 2px;
 	padding-right: 24px;
-	width: 140px;
+	width: 200px;
 }
 .dateboxread input {border: 0px !important; font-family: inherit;
 	font-size: inherit;
@@ -1431,6 +1502,12 @@ div.databox div.container input.name {
 	min-width: 250px;
 }
 
+div.databox div.container span.name {
+	min-width: 100px;
+	background-color: transparent;
+	margin-right: 64px;
+}
+
 div.databox-popup img.upload-menu-icon {
 	width: 16px;
 	margin-right: 12px;
@@ -1442,6 +1519,11 @@ div.databox.fixedtext div.container div.text {
 	font-family: monospace;
 	white-space: pre-line;
 }
+
+div.databox.fixedtext div.container div.text {
+	word-break: break-all;
+}
+
 .button-container {
 	margin-top: 7px;
 }
@@ -1814,7 +1896,8 @@ tr.grid td.gc {
 }
 
 input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, input.name, input.description, textarea.text, div.text,
-	div.databox div.datahtml {
+	div.databox div.datahtml,
+	input.comboboxinp {
     box-sizing: border-box;
     padding: 4px 5px 2px 5px;
     border: 2px solid #e3e3e3;
@@ -1822,6 +1905,10 @@ input.textbox2, input.textbox2m, input.textbox, input.dateboxinp, input.text, in
     border-radius: 4px;
 }
 
+span.combobox span.rbtnbk img {
+	width: 24px;
+	height: 24px;
+}
 
 input.textbox.widetextbox {
 	width: 450px;
@@ -2165,6 +2252,7 @@ div.datatable table, div.datatable table td, table.preview-table {
 	border: solid 1px #c0c0c0;
 	border-collapse: collapse;
 	min-width: 80px;
+	word-break: break-all;
 }
 
 div.datatable table tr td.selector {
@@ -2346,6 +2434,7 @@ div.datatable table.tbody td {
 	padding-top: 3px;
 	padding-bottom: 3px;
 	margin: 0px;
+	vertical-align:top;
 }
 
 div.datatable table.tbody td.green {
@@ -2606,7 +2695,7 @@ div.datatable div.sort-indicator-disabled {
 }
 
 
-div.addButton, div.deleteButton {
+div.addButton, div.deleteButton, div.uploader-addbutton .inputfile + label {
 	display: inline-block;
 	margin: 5px;
 	height: 40px;
@@ -2623,17 +2712,17 @@ div.addButton, div.deleteButton {
     background-repeat: no-repeat;
 }
 
-div.addButton {
+div.addButton, div.uploader-addbutton .inputfile + label {
 	background-image: url(/soffid/img/add-w.svg);
 }
 
 div.deleteButton {
 	float: left;
 	background-color: {SKYDARK};
-	background-image: url(/soffid/img/remove-r.svg);
+	background-image: url(/soffid/img/remove-white.svg);
 }
 
-div.addButton:hover, div.deleteButton:hover {
+div.addButton:hover, div.deleteButton:hover, div.uploader-addbutton .inputfile + label:hover {
 	margin: 0px;
 	height: 50px;
 	width: 50px;
@@ -3586,6 +3675,10 @@ div.databox div.label, span.label, span label {
 	margin-left: 8px;
 }
 
+div.databox.longlabel div.label, span.label.longlabel {
+	min-width: 292px;
+}
+
 span.label.black {
 	width: auto;
 	color: 	black;
@@ -3625,8 +3718,18 @@ div.databox div.container {
     width: calc(100% - 200px);
 }
 
+div.databox.longlabel div.container {
+    width: calc(100% - 300px);
+}
+
+
 div.databox div.container.wrapped {
+	display: block;
 	margin-left: 200px;
+}
+
+div.databox.longlabel div.container.wrapped {
+	margin-left: 300px;
 	display: block;
 }
 
@@ -3672,6 +3775,7 @@ div.databox[selecticon] div.container button.icon-button {
 
 div.databox div.container input.description,
 div.databox[multivalue='true'] div.container input.text ,
+div.databox[multivalue='true'] div.container select.select ,
 div.databox[multivalue='true'] div.container textarea.text {
 	width: 90%;
 	width: calc( 100% - 1em - 8px );
@@ -3850,13 +3954,23 @@ div.wizard-bar div.separator-d {
 input[type='radio'] {
 	height: 31px;
 }
+
 input[type='radio'] + label {
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-top: 6px;
 	height: 31px;
+    display: inline-block;
+    width: calc(100% - 40px);
+    word-break: break-word;
+    margin-bottom: 15px;
 }
 
+div.search-popup input[type='radio'] + label {
+	height: 24px;
+	width: 192px;
+	margin-bottom: 0px;
+}
 
 img.small-picture {
 	max-width: 32px;
@@ -3874,6 +3988,9 @@ div.databox div.datahtml *, div.ck, div.ck ol, div.ck ul, div.ck li {
 
 div.databox div.datahtml {
 	min-height: 32px;
+	overflow-x: clip;
+	overflow-y: auto;
+	max-height: 125px;
 }
 
 div.ck.ck-editor__main {
@@ -3961,3 +4078,24 @@ div.graphjs {
 	display: inline-block;
 	vertical-align: bottom;
 }
+
+div.tutorialMessage{
+	position:fixed;
+	z-index:2;
+	text-align: center;
+}
+div.tutorialMessage span{
+	color: {BLUETEXT}; 
+	padding:16px;
+	border-radius:10px; 
+	padding-block: 10px; 
+	background-color:{BLUE};
+	display: block;
+}
+div.tutorialMessage button{
+	
+}
+
+
+
+

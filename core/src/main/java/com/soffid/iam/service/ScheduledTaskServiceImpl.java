@@ -229,6 +229,7 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 			taskLog.setLogReferenceID(entity.getLogReferenceID());
 			taskLog.setTask(entity);
 			taskLog.setTime(entity.getLastExecution());
+			taskLog.setEnd(entity.getLastEnd());
 			getScheduledTaskLogEntityDao().create(taskLog);
 			entity.getLogs().add(taskLog);
 			entity.setLogReferenceID(null);

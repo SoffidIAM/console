@@ -48,7 +48,7 @@ import com.soffid.scimquery.parser.ExpressionParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -82,7 +82,7 @@ public class PrinterServiceImpl extends
     protected com.soffid.iam.api.Printer handleCreate(com.soffid.iam.api.Printer impressora) throws java.lang.Exception {
 		PrinterEntity printersSameCode = getPrinterEntityDao().findByName(impressora.getCode());
 		if(printersSameCode != null)
-			throw new SeyconException(String.format(Messages.getString("PrinterServiceImpl.CodePrinterExists"), impressora.getCode())); 
+			throw new InternalErrorException(String.format(Messages.getString("PrinterServiceImpl.CodePrinterExists"), impressora.getCode())); 
         PrinterEntity entity = getPrinterEntityDao().printerToEntity(impressora);
         getPrinterEntityDao().create(entity);
         updateUsersAndGroups(entity, impressora);
@@ -297,7 +297,7 @@ public class PrinterServiceImpl extends
 
         // Un usuari no pot afegir-se a si mateix impressores
         if (getPrincipal() != null && usuariEntity.getUserName().compareTo(Security.getCurrentUser()) == 0) {
-            throw new SeyconException(
+            throw new InternalErrorException(
                     Messages.getString("PrinterServiceImpl.1")); //$NON-NLS-1$
         }
 

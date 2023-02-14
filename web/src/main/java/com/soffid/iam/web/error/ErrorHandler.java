@@ -1,5 +1,6 @@
 package com.soffid.iam.web.error;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -7,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.ejb.EJBException;
+import javax.ejb.EJBTransactionRolledbackException;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,7 +23,6 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Component;
@@ -46,6 +47,8 @@ import com.soffid.iam.web.obligation.ObligationManager;
 
 import es.caib.bpm.toolkit.exception.UserWorkflowException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -83,8 +86,9 @@ public class ErrorHandler extends Window implements AfterCompose {
 		Textbox exceptionLabel = (Textbox)getFellow("exception");
 		if (e instanceof Throwable)
 		{
+			StringBuffer msgBuffer = new StringBuffer();
 		    Throwable original = (Throwable) e;
-		    e = getRootException(e);
+		    e = getRootException(e, msgBuffer);
 
 		    if (e instanceof ObserveObligationException) {
 		    	ObligationManager om = new ObligationManager();
@@ -96,15 +100,17 @@ public class ErrorHandler extends Window implements AfterCompose {
 		    			return;
 		    		} catch (Exception e2) {
 		    			original = e = e2;
-		    		    e = getRootException(e);
+		    			msgBuffer = new StringBuffer();
+		    		    e = getRootException(e, msgBuffer);
 		    		}
 		    	}
 		    }
 		    
-		    
+		    msg = msgBuffer.toString();
 		    
 		    if (e instanceof javax.security.auth.login.LoginException )
 			{
+				getFellow("categoryDiv").setVisible(false);
 				messageLabel.setValue ( Labels.getLabel("error.SessionExpired") );
 				getFellow("closeButton").setVisible(false);
 				getFellow("resetButton").setVisible(false);
@@ -114,19 +120,22 @@ public class ErrorHandler extends Window implements AfterCompose {
 			}
 			else
 			{
-				msg = e.getMessage();
-				if (msg == null)
+				if (msg == null || msg.trim().isEmpty())
 					msg = e.toString();
-				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException)
-					messageLabel.setValue( msg );
-				else if (e instanceof UserWorkflowException)
+				((Label)getFellow("category")).setValue(e.getClass().getSimpleName());
+				if (e instanceof es.caib.seycon.ng.exception.InternalErrorException ||
+						e instanceof SeyconException ||
+						e instanceof UserWorkflowException ||
+						e.getClass() == RuntimeException.class) {
+					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( e.getMessage() );
-				else if (e instanceof UiException)
-					messageLabel.setValue( e.getMessage() );
+				}
 				else if (e instanceof SecurityException)
 					messageLabel.setValue( Labels.getLabel("error.securityException")+ ": "+  msg );
+				else if (e instanceof Exception)
+					messageLabel.setValue( SoffidStackTrace.generateEndUserDescription((Exception) original) );
 				else
-					messageLabel.setValue( e.getClass().getSimpleName()+": "+msg );
+					messageLabel.setValue(msg);
 				
 			} 
 			c = es.caib.seycon.ng.exception.SoffidStackTrace.getStackTrace(original);
@@ -247,20 +256,36 @@ public class ErrorHandler extends Window implements AfterCompose {
 				.replace("\n", "<br>");
 	}
 
-	public Throwable getRootException(Throwable e) {
-		boolean noTeAutoritzacions;
+	public Throwable getRootException(Throwable e, StringBuffer msgBuffer) {
 		Throwable cause = null;
+		String lastMessage = e.getMessage();
+		int lastPos = 0;
+		msgBuffer.append(e.getMessage());
 		do {
 			if ( e instanceof javax.ejb.EJBException ) 
 				cause = ((EJBException)e).getCausedByException ();
 			else if (e instanceof SecurityException || e instanceof javax.ejb.AccessLocalException) {
 				cause = e.getCause ();
-				noTeAutoritzacions = true;
 			}
 			else
 				cause = e.getCause ();
 			if (cause == null || cause == e)
 				break;
+			if (lastMessage.equals(cause.toString()))
+				msgBuffer.delete(lastPos, msgBuffer.length());
+			String m = cause.getMessage();
+			if ( m == null ) m = cause.getClass().getSimpleName();
+			if (! (cause instanceof EJBException)) {
+				// Remove previous message
+				if (! msgBuffer.toString().contains(m))
+				{
+					lastMessage = m;
+					lastPos = msgBuffer.length();
+					if (msgBuffer.length() > 0)
+						msgBuffer.append("\ncaused by: ");
+					msgBuffer.append(m);
+				}
+			}
 			e = cause;
 		} while (true);
 		return e;

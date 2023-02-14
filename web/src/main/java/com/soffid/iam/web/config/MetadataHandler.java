@@ -349,8 +349,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 			}
 			DataType dt2 = new DataType();
 			dt2.setOrder(next);
-			XPathUtils.createPath(form.getDataSource(), "/metadata", dt2);
-			((DataTable)lb).setSelectedIndex(coll.getSize()-1);
+			((DataTable)lb).addNew();
+			XPathUtils.setValue(lb, "/order", next);
 			objectAttributeWindow.doHighlighted();
 		}
 	}
@@ -527,6 +527,26 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 					});
 	}
 	
+	public void deleteSelectedAttribute (Event event) {
+		final DataTable metadataGrid = (DataTable) getFellow("metadataGrid");
+		final Window metadataWindow = (Window) getFellow("objectAttributeWindow");
+		
+		Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.DeleteAgent"),
+				org.zkoss.util.resource.Labels.getLabel("process.warning"),
+					(evt) -> {
+						if ("onOK".equals(evt.getName())) {
+							String msg = org.zkoss.util.resource.Labels.getLabel("dadesAddicionals.zul.confirmMultiDelete");
+							DataTable dt = (DataTable) getFellow("metadataGrid");
+							msg = String.format(msg, dt.getSelectedIndexes().length);
+							Missatgebox.confirmaYES_NO(msg, (evt2) -> {
+								if ("onYes".equals(evt2.getName())) {
+									deleteSelected(event);
+								}
+							});
+						}
+					});
+	}
+
 	public void editScript(Event event) throws ComponentNotFoundException, InternalErrorException, NamingException, CreateException, IOException {
 		Editor.edit((Textbox) event.getTarget().getPreviousSibling(),
 				new com.soffid.iam.web.agent.ScriptEnviroment().getUserAttributeValidationVars(null));

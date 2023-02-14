@@ -10,25 +10,26 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml"
 	style="position: relative" use="com.soffid.iam.web.agent.AgentHandler"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/agents"
 	id="frame">
 
 	<script>
 		function diagramAction(action, arg0, arg1, arg2) {
 			zkau.send ({uuid: '${frame.uuid}', cmd: "diagramAction", data: [action, JSON.stringify(arg0), JSON.stringify(arg1), JSON.stringify(arg2)]}, 5);
 		}
-	function collapse(id) {
-		e = document.getElementById(id);
-		if (e) {
-			i = e.firstElementChild.nextElementSibling.firstElementChild;
-			if (e.className == 'method-collapsed-div') {
-				e.className = 'method-full-div';
-				i.src = "${execution.contextPath }/icons/up.png";
-			} else {
-				e.className = 'method-collapsed-div';
-				i.src = "${execution.contextPath }/icons/down.png";
+		function collapse(id) {
+			e = document.getElementById(id);
+			if (e) {
+				i = e.firstElementChild.nextElementSibling.firstElementChild;
+				if (e.className == 'method-collapsed-div') {
+					e.className = 'method-full-div';
+					i.src = "${execution.contextPath }/icons/up.png";
+				} else {
+					e.className = 'method-collapsed-div';
+					i.src = "${execution.contextPath }/icons/down.png";
+				}
 			}
 		}
-	}
 	</script>
 
 	<style>
@@ -74,6 +75,7 @@
 			</div>
 
 			<searchbox auto="true" id="searchBox"
+				variableNameText="text"
 				jsonObject="com.soffid.iam.api.System"
 				defaultAttributes="name,description,url" dataPath="model:/agent"
 				variableName="query">
@@ -106,7 +108,7 @@
 
 		<div sclass="card__face card__face--back">
 			<div use="com.soffid.iam.web.component.NavigationBar"
-				frame="frame" lastAction="ref:frame.hideDetails">
+				frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox" />
 
 				<menu2>

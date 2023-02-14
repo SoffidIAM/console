@@ -10,7 +10,7 @@ import com.soffid.mda.annotation.*;
 @ValueObject ( translatedName="UserType",
 	 translatedPackage="com.soffid.iam.api")
 @JsonObject(hibernateClass = es.caib.seycon.ng.model.TipusUsuariEntity.class)
-public class TipusUsuari {
+public abstract class TipusUsuari {
 
 	@Nullable
 	public java.lang.Long id;
@@ -26,4 +26,8 @@ public class TipusUsuari {
 	@Description ("True if this user or account should not be synchronized")
 	@Attribute (defaultValue="false")
 	public boolean unmanaged;
+	
+	@Description ("True if this user or account should be synchronized")
+	@Attribute (defaultValue="true")
+	public boolean managed;
 }

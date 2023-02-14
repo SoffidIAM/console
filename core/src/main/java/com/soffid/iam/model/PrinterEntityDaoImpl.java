@@ -69,7 +69,7 @@ public class PrinterEntityDaoImpl extends
             auditarImpressora("C", impressora.getName()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.0"), impressora.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.0"), impressora.getName(), message), e);
         }
     }
 
@@ -83,7 +83,7 @@ public class PrinterEntityDaoImpl extends
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.1"), impressora.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.1"), impressora.getName(), message), e);
         }
     }
 
@@ -99,7 +99,7 @@ public class PrinterEntityDaoImpl extends
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.2"), impressora.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterEntityDaoImpl.2"), impressora.getName(), message), e);
         }
     }
 

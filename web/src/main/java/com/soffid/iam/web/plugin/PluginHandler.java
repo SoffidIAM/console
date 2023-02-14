@@ -70,31 +70,36 @@ public class PluginHandler extends FrameHandler {
 	
 	public void addNew() throws InternalErrorException, DuplicatedClassException, NamingException, CreateException, InterruptedException, IOException {
         FileUpload2.get(true, (event) -> {
-        	for (Media dataSubida: ((UploadEvent)event).getMedias()) {
-	        	if (dataSubida == null) return; //Per si l'usuari pitja en Cancelar
-	        	if (!dataSubida.isBinary()) {
-	        		throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
-	        	}
-	        	byte data[];
-	        	if (dataSubida.inMemory()) {
-	        		data = dataSubida.getByteData();
-	        	} else {
-	        		ByteArrayOutputStream os = new ByteArrayOutputStream();
-	        		InputStream is = dataSubida.getStreamData();
-	        		byte b[] = new byte[2048];
-	        		int read = is.read(b);
-	        		while (read > 0) {
-	        			os.write(b, 0, read);
-	        			read = is.read(b);
-	        		}
-	        		is.close();
-	        		os.close();
-	        		data = os.toByteArray();
-	        	}
-	        	EJBLocator.getServerPluginService().deployPlugin(data);
-        	}
-        	getModel().refresh();
+        	processUpload(event);
         });
+	}
+
+	public void processUpload(Event event)
+			throws IOException, InternalErrorException, DuplicatedClassException, NamingException, CreateException {
+		for (Media dataSubida: ((UploadEvent)event).getMedias()) {
+			if (dataSubida == null) return; //Per si l'usuari pitja en Cancelar
+			if (!dataSubida.isBinary()) {
+				throw new UiException(Messages.getString("PluginsUI.NotBinaryFileError")); //$NON-NLS-1$
+			}
+			byte data[];
+			if (dataSubida.inMemory()) {
+				data = dataSubida.getByteData();
+			} else {
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				InputStream is = dataSubida.getStreamData();
+				byte b[] = new byte[2048];
+				int read = is.read(b);
+				while (read > 0) {
+					os.write(b, 0, read);
+					read = is.read(b);
+				}
+				is.close();
+				os.close();
+				data = os.toByteArray();
+			}
+			EJBLocator.getServerPluginService().deployPlugin(data);
+		}
+		getModel().refresh();
 	}
 	
 	public void showDetails() {

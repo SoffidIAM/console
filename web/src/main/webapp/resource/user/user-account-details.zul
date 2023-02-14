@@ -7,11 +7,13 @@
 	<window closable="false"
 		use="com.soffid.iam.web.user.AccountDetailsHandler"
 		id="window"
-		position="center, center" sizable="true"
+		position="top center" sizable="true"
 		title="${c:l('user_renameaccount.Titol')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:window.onWindowClose">
 
 		<div class="navigation-bar">
+			<label bind="${dataSource }:/name" /> @
+			<label bind="${dataSource }:/system" />
 			<menu2>
 				<menu2item if="${soffid:isUserInRole('user:update')}" image="/img/trash.svg" 
 					label="${c:l('plugins.zul.Delete') }" 
@@ -19,9 +21,11 @@
 				<menu2item image="/img/question.svg" label="${c:l('vault.details')}" onClick="ref:window.doQuery()" 
 					id="detailsButton"/>
 			</menu2>
+			<pager datatree2="${dataSource}" style="float: right"/>
 		</div>
 
-		<form id="form" width="100%" dataPath="${dataSource }:/">
+		<form id="form" width="100%" dataPath="${dataSource }:/"
+			onChangeXPath="ref:window.hideOrDisplay">
 			<customfield3 bind="@system" dataType="STRING" required="true"
 				readonly="true"
 				label="${c:l('accounts.dispatcher')}"/>

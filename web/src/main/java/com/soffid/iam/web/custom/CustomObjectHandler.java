@@ -1,37 +1,31 @@
 package com.soffid.iam.web.custom;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 
-import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.UiException;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.Configuration;
-import com.soffid.iam.api.CustomObject;
-import com.soffid.iam.api.DataType;
-import com.soffid.iam.service.ejb.CustomObjectService;
-import com.soffid.iam.web.WebDataType;
+import com.soffid.iam.api.CustomObjectType;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.FrameHandler;
-import com.soffid.iam.web.popup.CsvParser;
-import com.soffid.iam.web.popup.ImportCsvHandler;
+import com.soffid.iam.web.component.ObjectAttributesDiv;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
-import es.caib.zkib.zkiblaf.Missatgebox;
 
 
 public class CustomObjectHandler extends FrameHandler {
 	String type;
+	private boolean readonly;
+	private boolean read;
+	private boolean write;
 	
 	public CustomObjectHandler() throws InternalErrorException {
 		super();
@@ -51,6 +45,47 @@ public class CustomObjectHandler extends FrameHandler {
 	public void afterCompose() {
 		getModel().getJXPathContext().getVariables().declareVariable("objectType", type);
 		setUrl("/custom/custom.zul?type="+type);
+		read = false;
+		write = false;
+		try {
+			CustomObjectType dm = EJBLocator.getAdditionalDataService().findCustomObjectTypeByName(type);
+			if (dm != null) {
+				if (Boolean.FALSE.equals(dm.getPublicAccess())) {
+					SoffidPrincipal principal = Security.getSoffidPrincipal();
+					if (dm.getManagerRoles() != null) {
+						for (String role: dm.getManagerRoles())
+							if (Arrays.binarySearch(principal.getSoffidRoles(), role) >= 0)
+								write = true;;
+					}
+					if (dm.getUserRoles() != null) {
+						for (String role: dm.getUserRoles())
+							if (Arrays.binarySearch(principal.getSoffidRoles(), role) >= 0)
+								read = true;
+					}
+					
+				} else {
+					read = write = true;
+				}
+			}
+		} catch (Exception e) {
+			throw new UiException(e);
+		}
+		if (!read && !write)
+			throw new SecurityException("Not allowed to query custom objects of type "+type);
+		ObjectAttributesDiv d = (ObjectAttributesDiv) getFellow("attributes");
+		d.setReadonly(! write);
+		if (!write) {
+			Component b = getFellowIfAny("addButton");
+			if (b != null) b.detach();
+			b = getFellowIfAny("removeButton");
+			if (b != null) b.detach();
+			b = getFellowIfAny("addMenu");
+			if (b != null) b.detach();
+			b = getFellowIfAny("removeMenu");
+			if (b != null) b.detach();
+			b = getFellowIfAny("importMenu");
+			if (b != null) b.detach();
+		}
 	}
 
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><agent-config>
+  <objectMapping condition="" soffidObject="role" systemObject="group">
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertPath" value="/Groups"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadPath" value="/Groups"/>
+    <property name="loadResults" value="Resources"/>
+    <property name="loadTemplate" value="application/json"/>
+    <property name="selectEncoding" value="application/json"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/Groups?$filter=displayName+eq+${displayName}"/>
+    <property name="selectResults" value="Resources"/>
+    <property name="updateEncoding" value="application/json"/>
+    <property name="updateMethod" value="PUT"/>
+    <property name="updatePath" value="/Groups/${id}"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="name" systemAttribute="displayName"/>
+    <attributeMapping direction="INPUT" soffidAttribute="description" systemAttribute="displayName"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="l = new LinkedList();&#10;for ( account: allGrantedAccountNames) {&#10;  m = new HashMap();&#10;  m.put(&quot;userName&quot;, account);&#10;  r = dispatcherService.invoke (&quot;invoke&quot;,  &quot;account.select&quot;, m);&#10;  l1 = new HashMap();&#10;  if (r.size() &gt; 0) {&#10;    l1.put(&quot;value&quot;, r.get(0).get(&quot;id&quot;));&#10;    l.add(l1);&#10;  } else {&#10;    throw new Exception(&quot;User &quot;+account+&quot; is not synchronized yet&quot;);&#10;  }&#10;}&#10;return l;" systemAttribute="members"/>
+    <trigger script="newObject{&quot;id&quot;}=oldObject{&quot;id&quot;}" type="preUpdate"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="user" systemObject="user">
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertPath" value="/Users"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadParams" value="-"/>
+    <property name="loadPath" value="/Users"/>
+    <property name="selectEncoding" value="application/json"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/Users?filter=userName+eq+%22${userName}%22"/>
+    <property name="selectResults" value="Resources"/>
+    <property name="updateEncoding" value="application/json"/>
+    <property name="updateMethod" value="PUT"/>
+    <property name="updatePath" value="/Users/${id}"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountName" systemAttribute="userName"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="fullName" systemAttribute="name{&quot;formatted&quot;}"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="! accountDisabled" systemAttribute="active"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="l = new LinkedList();&#10;l1 = new HashMap();&#10;l1.put(&quot;value&quot;, accountName);&#10;l1.put(&quot;primary&quot;, true);&#10;l.add(l1);&#10;return l;" systemAttribute="emails"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="l = new LinkedList();&#10;for ( role: allGranted) {&#10;   l1 = new HashMap();&#10;   l1.put(&quot;display&quot;, role);&#10;    m = new HashMap();&#10;    m.put(&quot;name&quot;, role);&#10;    r = dispatcherService.invoke (&quot;invoke&quot;,  &quot;group.select&quot;, m);&#10;    l1 = new HashMap();&#10;    if (r.size() &gt; 0) {&#10;      l1.put(&quot;type&quot;, &quot;group&quot;);&#10;      l1.put(&quot;$ref&quot;, r.get(0).get(&quot;meta&quot;).get(&quot;location&quot;));&#10;      l1.put(&quot;value&quot;, r.get(0).get(&quot;id&quot;));&#10;      l.add(l1);&#10;    }&#10;}&#10;return l;" systemAttribute="groups"/>
+    <trigger script="newObject{&quot;id&quot;} = oldObject{&quot;id&quot;};&#10;return true;&#10;" type="preUpdate"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="account" systemObject="account">
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertPath" value="/Users"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadParams" value="-"/>
+    <property name="loadPath" value="/Users"/>
+    <property name="selectEncoding" value="application/json"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/Users?filter=userName+eq+%22${userName}%22"/>
+    <property name="selectResults" value="Resources"/>
+    <property name="updateEncoding" value="application/json"/>
+    <property name="updateMethod" value="PUT"/>
+    <property name="updatePath" value="/Users/${id}"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountName" systemAttribute="userName"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountDescription" systemAttribute="name{&quot;formatted&quot;}"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="! accountDisabled" systemAttribute="active"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="l = new LinkedList();&#10;l1 = new HashMap();&#10;l1.put(&quot;value&quot;, accountName);&#10;l1.put(&quot;primary&quot;, true);&#10;l.add(l1);&#10;return l;" systemAttribute="emails"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="l = new LinkedList();&#10;for ( role: allGranted) {&#10;   l1 = new HashMap();&#10;   l1.put(&quot;display&quot;, role);&#10;    m = new HashMap();&#10;    m.put(&quot;name&quot;, role);&#10;    r = dispatcherService.invoke (&quot;invoke&quot;,  &quot;group.select&quot;, m);&#10;    l1 = new HashMap();&#10;    if (r.size() &gt; 0) {&#10;      l1.put(&quot;type&quot;, &quot;group&quot;);&#10;      l1.put(&quot;$ref&quot;, r.get(0).get(&quot;meta&quot;).get(&quot;location&quot;));&#10;      l1.put(&quot;value&quot;, r.get(0).get(&quot;id&quot;));&#10;      l.add(l1);&#10;    }&#10;}&#10;return l;" systemAttribute="groups"/>
+    <trigger script="newObject{&quot;id&quot;} = oldObject{&quot;id&quot;};&#10;return true;&#10;" type="preUpdate"/>
+  </objectMapping>
+</agent-config>

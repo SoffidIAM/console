@@ -166,7 +166,7 @@ public class AuthorizationEntityDaoImpl
 			auditarAutoritzacio("C", autoritzacioRolEntity); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AuthorizationEntityDaoImpl.0"), autoritzacioRolEntity.getAuthorization(), autoritzacioRolEntity.getRole().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("AuthorizationEntityDaoImpl.0"), autoritzacioRolEntity.getAuthorization(), autoritzacioRolEntity.getRole().getName(), message), e);
 		}
 	}
 
@@ -189,7 +189,7 @@ public class AuthorizationEntityDaoImpl
 			auditarAutoritzacio("U", autoritzacioRolEntity); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AuthorizationEntityDaoImpl.1"), autoritzacioRolEntity.getAuthorization(), autoritzacioRolEntity.getRole().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("AuthorizationEntityDaoImpl.1"), autoritzacioRolEntity.getAuthorization(), autoritzacioRolEntity.getRole().getName(), message), e);
 		}
 
 	}
@@ -215,7 +215,7 @@ public class AuthorizationEntityDaoImpl
 
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AuthorizationEntityDaoImpl.2"), autoritzacioRolEntity.getAuthorization(), autoritzacioRolEntity.getRole().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("AuthorizationEntityDaoImpl.2"), autoritzacioRolEntity.getAuthorization(), autoritzacioRolEntity.getRole().getName(), message), e);
 		}
 	}
 

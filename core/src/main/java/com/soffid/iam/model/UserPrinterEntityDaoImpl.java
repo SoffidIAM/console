@@ -83,7 +83,9 @@ public class UserPrinterEntityDaoImpl extends
             auditarUsuariImpressora("U", usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName());
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.0"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.0"), 
+            		usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message),
+            		e);
         }
     }
 
@@ -110,7 +112,9 @@ public class UserPrinterEntityDaoImpl extends
             }
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.2"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.2"), 
+            		usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message),
+            		e);
         }
     }
 
@@ -133,7 +137,9 @@ public class UserPrinterEntityDaoImpl extends
             auditarUsuariImpressora("D", codiUsuari, codiImpressora); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.3"), usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserPrinterEntityDaoImpl.3"), 
+            		usuariImpressora.getUser().getUserName(), usuariImpressora.getPrinter().getName(), message),
+            		e);
         }
     }
 

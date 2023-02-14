@@ -35,7 +35,7 @@ public class AccessLogEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message));
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message), e);
         }
     }
 
@@ -45,7 +45,7 @@ public class AccessLogEntityDaoImpl extends
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorDeleting"), registreAcces.getSessionId(), message));
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorDeleting"), registreAcces.getSessionId(), message), e);
         }
     }
 
@@ -172,7 +172,7 @@ public class AccessLogEntityDaoImpl extends
                 numRegs = Integer.parseInt(numRegistres);
             } catch (Exception ex) {
                 throw new SeyconException(
-                        Messages.getString("AccessLogEntityDaoImpl.wrongFormat")); //$NON-NLS-1$
+                        Messages.getString("AccessLogEntityDaoImpl.wrongFormat"), ex); //$NON-NLS-1$
             }
         }
         if (numRegs >= 201) {

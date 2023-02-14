@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="iga02_w" position="top-center" closable="false" sizable="false"
+		title="${c:l('wheel.users.title') }"
+		use="com.soffid.iam.web.wheel.Iga02Handler"
+			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
+	<div id="step1">
+		<div style="height: 320px">
+			<label multiline="true" value="${c:l('wheel.users.explanation') }" />
+			<radiogroup id="radio" onCheck="ref:iga02_w.onRadio()" style="display:block; margin-top: 20px">
+				<radio value="csv" label="${c:l('wheel.users.loadcsv') }" style="display:block"></radio>
+				<radio value="auth" label="${c:l('wheel.users.loadauth') }" style="display:block"></radio>
+				<radio value="form" label="${c:l('wheel.users.manually') }" style="display:block"></radio>
+			</radiogroup>
+		</div>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga02_w.back" />
+			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga02_w.step2" id="step2Button"/>
+		</div>
+				
+	</div>
+	<div id="step2">
+		<div style="height: 320px">
+			<label multiline="true" value="${c:l('wheel.users.explanation2') }" />
+			<radiogroup id="radio2" onCheck="ref:iga02_w.onRadio2()" style="display:block; margin-top:20px">
+				<radio value="ad" label="${c:l('wheel.users.ad') }" style="display:block"></radio>
+				<radio value="sql" label="${c:l('wheel.users.relationalDatabase') }" style="display:block"></radio>
+			</radiogroup>
+		</div>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga02_w.back" />
+			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga02_w.step3" id="step3Button"/>
+		</div>
+				
+	</div>
+</window>

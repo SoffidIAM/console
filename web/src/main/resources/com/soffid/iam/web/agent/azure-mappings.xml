@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><agent-config>
+  <objectMapping condition="" soffidObject="role" systemObject="Group">
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertPath" value="/v1.0/groups"/>
+    <property name="loadEncoding" value="application/json"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadParams" value="-"/>
+    <property name="loadPath" value="/v1.0/groups?$select=displayName"/>
+    <property name="loadResults" value="value"/>
+    <property name="selectEncoding" value="application/json"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/v1.0/groups?$select=displayName,description,id&amp;$filter=displayName+eq+'${displayName}'"/>
+    <property name="selectResults" value="value"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="name" systemAttribute="displayName"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="description" systemAttribute="description"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="false" systemAttribute="mailEnabled"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="name" systemAttribute="mailNickname"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="true" systemAttribute="securityEnabled"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="account" systemObject="Account">
+    <property name="loadMethod" value="GET"/>
+    <property name="loadNext" value="return THIS{&quot;@odata.nextLink&quot;};"/>
+    <property name="loadParams" value="-"/>
+    <property name="loadPath" value="/v1.0/users?$select=userPrincipalName,mail"/>
+    <property name="loadResults" value="value"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/v1.0/users/${userPrincipalName}?$select=userPrincipalName,mail,givenName,surname,surname,displayName,officeLocation,jobTitle,accountEnabled,country,city,department,usageLocation,id"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountName" systemAttribute="userPrincipalName"/>
+    <attributeMapping direction="INPUT" soffidAttribute="accountDescription" systemAttribute="displayName"/>
+    <attributeMapping direction="INPUT" soffidAttribute="accountDisabled" systemAttribute="!accountEnabled"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="grant" systemObject="Grant">
+    <property name="deleteEncoding" value="application/json"/>
+    <property name="deleteMethod" value="DELETE"/>
+    <property name="deleteParams" value="-"/>
+    <property name="deletePath" value="/v1.0/groups/${id}/members/${userId}/$ref"/>
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertParams" value="@odata.id"/>
+    <property name="insertPath" value="/v1.0/groups/${id}/members/$ref"/>
+    <property name="selectEncoding" value="application/json"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/v1.0/users/${accountName}/memberOf?$select=displayName,id"/>
+    <property name="selectResults" value="value"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="ownerAccount" systemAttribute="accountName"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if (grantedRole == null)&#10;  return null;&#10;m = new HashMap();&#10;m.put(&quot;displayName&quot;, grantedRole);&#10;r = dispatcherService.invoke(&quot;invoke&quot;, &quot;Group.select&quot;, m);&#10;if (r.size() == 0) return null;&#10;return r.get(0).get(&quot;id&quot;);" systemAttribute="id"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if (ownerAccount == null)&#10;  return null;&#10;m = new HashMap();&#10;m.put(&quot;userPrincipalName&quot;, ownerAccount);&#10;r = dispatcherService.invoke(&quot;invoke&quot;, &quot;Account.select&quot;, m);&#10;if (r.size() == 0) return null;&#10;return &quot;https://graph.microsoft.com/v1.0/users/&quot;+r.get(0).get(&quot;id&quot;);" systemAttribute="THIS{&quot;@odata.id&quot;}"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if (ownerAccount == null)&#10;  return null;&#10;m = new HashMap();&#10;m.put(&quot;userPrincipalName&quot;, ownerAccount);&#10;r = dispatcherService.invoke(&quot;invoke&quot;, &quot;Account.select&quot;, m);&#10;if (r.size() == 0) return null;&#10;return &quot;https://graph.microsoft.com/v1.0/users/&quot;+r.get(0).get(&quot;id&quot;);" systemAttribute="userId"/>
+    <attributeMapping direction="INPUT" soffidAttribute="grantedRole" systemAttribute="displayName"/>
+    <trigger script="ownerAccount=source{&quot;ownerAccount&quot;};&#10;if (ownerAccount == null)&#10;  return null;&#10;m = new HashMap();&#10;m.put(&quot;userPrincipalName&quot;, ownerAccount);&#10;r = dispatcherService.invoke(&quot;invoke&quot;, &quot;Account.select&quot;, m);&#10;if (r.size() &gt; 0) {&#10;&#9;oldObject{&quot;userId&quot;} = r.get(0).get(&quot;id&quot;);&#10;}&#10;return true;" type="preDelete"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="user" systemObject="USER (SYNC)">
+    <property name="insert1Encoding" value="application/json"/>
+    <property name="insert1Method" value="POST"/>
+    <property name="insert1Params" value="userPrincipalName,displayName,accountEnabled,officeLocation,department,jobTitle,passwordProfile,mailNickname,givenName,surname,usageLocation"/>
+    <property name="insert1Path" value="/v1.0/users"/>
+    <property name="insert2Encoding" value="application/json"/>
+    <property name="insert2Method" value="POST"/>
+    <property name="insert2Params" value="addLicenses,removeLicenses"/>
+    <property name="insert2Path" value="/v1.0/users/${userPrincipalName}/assignLicense"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="/v1.0/users/${userPrincipalName}?$select=userPrincipalName,mail,givenName,surname,surname,displayName,officeLocation,jobTitle,accountEnabled,country,city,department,usageLocation"/>
+    <property name="update1Encoding" value="application/json"/>
+    <property name="update1Method" value="PATCH"/>
+    <property name="update1Params" value="displayName,accountEnabled,officeLocation,department,jobTitle,mailNickname,givenName,surname,usageLocation,passwordProfile"/>
+    <property name="update1Path" value="/v1.0/users/${userPrincipalName}"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountName" systemAttribute="userPrincipalName"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="firstName + &quot; &quot; + lastName" systemAttribute="displayName"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="!accountDisabled" systemAttribute="accountEnabled"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="attributes{&quot;company&quot;}" systemAttribute="officeLocation"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="attributes{&quot;department&quot;}" systemAttribute="department"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="attributes{&quot;job&quot;}" systemAttribute="jobTitle"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="(mustChange!=void &amp;&amp; mustChange!=null) ? password : null" systemAttribute="passwordProfile.password"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="mustChange" systemAttribute="passwordProfile.forceChangePasswordNextSignIn"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="(mustChange!=void &amp;&amp; mustChange!=null) ? false : null" systemAttribute="passwordProfile.forceChangePasswordNextSignInWithMfa"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="accountName.split(&quot;@&quot;)[0]" systemAttribute="mailNickname"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="firstName " systemAttribute="givenName"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="lastName" systemAttribute="surname"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="hm = new HashMap();&#10;//hm.put(&quot;disabledPlans&quot;, new String[0]);&#10;//hm.put(&quot;skuId&quot;, &quot;18181a46-0d4e-45cd-891e-60aabd171b4e&quot;);&#10;&#10;ahm = new HashMap[1];&#10;ahm[0] = hm;&#10;return ahm;&#10;" systemAttribute="addLicenses"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="new String[0];" systemAttribute="removeLicenses"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="&quot;ES&quot;" systemAttribute="usageLocation"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="accountName" systemAttribute="onPremisesImmutableId"/>
+    <trigger script="pp = new HashMap();&#10;p = serverService.getOrGenerateUserPassword( source{&quot;accountName&quot;}, source{&quot;system&quot;} );&#10;System.out.println(&quot;Setting password &quot;+p);&#10;pp.put(&quot;password&quot;, p.getPassword() );&#10;pp.put(&quot;forceChangePasswordNextSignIn&quot;, false);&#10;pp.put(&quot;forceChangePasswordNextSignInWithMfa&quot;, false);&#10;newObject.put(&quot;passwordProfile&quot;, pp);&#10;return true;&#10;" type="preInsert"/>
+  </objectMapping>
+</agent-config>

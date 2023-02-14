@@ -42,7 +42,10 @@ public class AsyncRunnerServiceImpl extends AsyncRunnerServiceBase {
 			result.done();
 		} catch (Throwable th) {
 			log.info("Exception during async run process "+runnable.toString(), th );
-			result.cancel(th);
+			if (th instanceof RuntimeException && th.getCause() != null) 
+				result.cancel(th.getCause());
+			else
+				result.cancel(th);
 		}
 	}
 

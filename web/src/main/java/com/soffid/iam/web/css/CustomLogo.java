@@ -22,7 +22,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 @WebServlet(name="custom.logo", urlPatterns="/anonymous/logo.png")
 public class CustomLogo extends HttpServlet {
 	byte[] getOriginalImage () throws IOException {
-		InputStream in = getServletContext().getResourceAsStream("/img/pixel.png");
+		InputStream in = getServletContext().getResourceAsStream("/anonymous/logo - iam.svg");
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		for (int i = in.read(); i >= 0; i = in.read())
 		{
@@ -42,10 +42,12 @@ public class CustomLogo extends HttpServlet {
 			if (img == null)
 			{
 				img = getOriginalImage();
+				resp.setContentType("image/svg+xml");
+			} else {
+				resp.setContentType("image/png");
 			}
 			resp.setStatus( HttpServletResponse.SC_OK);
 			resp.setContentLength(img.length);
-			resp.setContentType("image/png");
 			ServletOutputStream outputStream = resp.getOutputStream();
 			outputStream.write(img);
 			outputStream.close();

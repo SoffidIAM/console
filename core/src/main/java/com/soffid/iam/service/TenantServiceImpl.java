@@ -204,6 +204,7 @@ public class TenantServiceImpl extends TenantServiceBase {
 		{
 			if (tep.getTenantServer().getName().equals(server))
 			{
+				getTenantServerEntityDao().remove(tep);
 				te.getServers().remove(tep);
 				break;
 			}

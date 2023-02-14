@@ -62,7 +62,7 @@ public class ConfigEntityDaoImpl extends
 			auditarConfiguracio("C", parametre); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.0"), configuracio.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.0"), configuracio.getName(), message), e);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class ConfigEntityDaoImpl extends
 			auditarConfiguracio("U", parametre); //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.1"), configuracio.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.1"), configuracio.getName(), message), e);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class ConfigEntityDaoImpl extends
 			auditarConfiguracio("D", parametre);			 //$NON-NLS-1$
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.2"), configuracio.getName(), message));
+			throw new SeyconException(String.format(Messages.getString("ConfigEntityDaoImpl.2"), configuracio.getName(), message), e);
 		}
 	}
 

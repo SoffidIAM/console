@@ -34,7 +34,6 @@ public class JavascriptEvaluator extends Evaluator {
 		if (!vars.containsKey("out"))
 			vars.put("out", System.out);
 		NashornScriptEngineFactory factory = new NashornScriptEngineFactory ();
-		Account acc = new Account();
 		ScriptEngine engine = factory.getScriptEngine(classFilter);
 		Bindings bindings = new DynamicBindings(vars);
 		engine.setBindings(bindings , ScriptContext.ENGINE_SCOPE);

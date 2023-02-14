@@ -1,5 +1,7 @@
 package com.soffid.iam.service;
 
+import java.util.Collection;
+
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Service;
@@ -22,7 +24,11 @@ public class MailService {
 
 	public void sendTextMail(String to, String subject, String body) {}
 
+	public void sendHtmlMail(String to, String subject, String body, Collection mimeBodyParts) {}
+
 	public void sendHtmlMailToActors(String[] actors, String subject, String body) {}
 
 	public void sendTextMailToActors(String[] actors, String subject, String body) {}
+
+	public void sendTextMailToActors(String[] actors, String subject, String body, Collection mimeBodyParts) {}
 }

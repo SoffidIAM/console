@@ -125,7 +125,7 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
 /**
@@ -180,7 +180,7 @@ public class ApplicationServiceImpl extends
         // application:create val
     	InformationSystemEntity aplicationsSameCode = getInformationSystemEntityDao().findByCode(aplicacio.getName());
 		if(aplicationsSameCode != null)
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.CodeAplicationExists"), aplicacio.getName())); 
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.CodeAplicationExists"), aplicacio.getName())); 
         InformationSystemEntity apl = getInformationSystemEntityDao().applicationToEntity(aplicacio);
         if (getAuthorizationService().hasPermission(Security.AUTO_APPLICATION_CREATE, apl))
         {
@@ -192,7 +192,7 @@ public class ApplicationServiceImpl extends
             }
             return (getInformationSystemEntityDao().toApplication(apl));
         }
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoUserPermission"), //$NON-NLS-1$
+		throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoUserPermission"), //$NON-NLS-1$
 				Security.getCurrentAccount())); //$NON-NLS-1$
     }
 
@@ -232,14 +232,14 @@ public class ApplicationServiceImpl extends
                 manageApplication(administracioAplicacio);
             }
             if(!aplEntity.getRoles().isEmpty())
-            	throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.IntegrityExceptionRol"), aplEntity.getName()));
+            	throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.IntegrityExceptionRol"), aplEntity.getName()));
             getInformationSystemEntityDao().remove(aplEntity);
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
                     "delete (Aplicacio)", "application:delete", //$NON-NLS-1$ //$NON-NLS-2$
                     Messages.getString("ApplicationServiceImpl.NotAuthorizedToDelete")); //$NON-NLS-1$
             /*
-             * throw new SeyconException(
+             * throw new InternalErrorException(
              * "Usuari no té permisos per actualitzar l'aplicació amb codi '" +
              * aplicacio.getCodi() + "'.");
              */
@@ -466,7 +466,7 @@ public class ApplicationServiceImpl extends
             // Mirem el número de registres després de filtar per rol (movem el
             // filtre de máx files)
             /*
-             * if (filtraPerRol.size() >= 201) { throw new SeyconException(
+             * if (filtraPerRol.size() >= 201) { throw new InternalErrorException(
              * "Massa registres trobats: és necessari donar un filtre més restrictiu."
              * ); }
              */
@@ -512,7 +512,7 @@ public class ApplicationServiceImpl extends
 
         // Comprovem que l'usuari creador no siga el mateix a qui se li atorga
         if (administracioAplicacio.getUserName().compareTo(Security.getCurrentUser()) == 0) {
-            throw new SeyconException(
+            throw new InternalErrorException(
                     Messages.getString("ApplicationServiceImpl.NotAdminPermissionAuthorized")); //$NON-NLS-1$
         }
         RoleAccountEntity administracioAplicacioEntity = getRoleAccountEntityDao().applicationAdministrationToEntity(administracioAplicacio);
@@ -525,7 +525,7 @@ public class ApplicationServiceImpl extends
             administracioAplicacio = getRoleAccountEntityDao().toApplicationAdministration(administracioAplicacioEntity);
             return administracioAplicacio;
         }
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToAsign"), Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
+		throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToAsign"), Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
     }
 
     protected void handleManageApplication(ApplicationAdministration administracioAplicacio) throws Exception {
@@ -538,7 +538,7 @@ public class ApplicationServiceImpl extends
         {
             getRoleAccountEntityDao().remove(administracioAplicacioEntity);
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToDelete"), 
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoPermissionToDelete"), 
 					Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
         }
     }
@@ -597,7 +597,7 @@ public class ApplicationServiceImpl extends
             }
 
             if (rols.size() >= 201) {
-                throw new SeyconException(
+                throw new InternalErrorException(
                         Messages.getString("ApplicationServiceImpl.VeryRegFinded")); //$NON-NLS-1$
             }
 
@@ -670,7 +670,7 @@ public class ApplicationServiceImpl extends
         	if (getAuthorizationService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity)) {
                 return getRoleEntityDao().toRole(rolEntity);
 	        } else {
-				throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+				throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 						Security.getCurrentAccount(), nomRol));
 	        }
         } else
@@ -720,7 +720,7 @@ public class ApplicationServiceImpl extends
             }
             return toReturn;
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToSearch"), //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToSearch"), //$NON-NLS-1$
 				Security.getCurrentAccount(), codiAplicacio));
         }
     }
@@ -728,7 +728,7 @@ public class ApplicationServiceImpl extends
     protected Collection<RoleAccount> handleFindUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName(String nomRol, String codiAplicacio, String codiDispatcher) throws InternalErrorException {
         RoleEntity rolEntity = getRoleEntityDao().findRoleByNameInformationSystemAndStystem(nomRol, codiAplicacio, codiDispatcher);
     	if (!getAuthorizationService().hasPermission(Security.AUTO_ROLE_QUERY, rolEntity))
-    		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+    		throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 				Security.getCurrentAccount(), nomRol));
 
         List<RoleAccount> toReturn = new LinkedList<RoleAccount>();
@@ -750,7 +750,7 @@ public class ApplicationServiceImpl extends
                 String aplicacio = existingRole.getInformationSystem()
                         .getName();
 
-				throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.ExistentRole"), rol.getName(), rol.getSystem(), aplicacio));
+				throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.ExistentRole"), rol.getName(), rol.getSystem(), aplicacio));
         }
 
         if (rol.getSystem().equals("business"))
@@ -788,7 +788,7 @@ public class ApplicationServiceImpl extends
                 String aplicacio = existingRole.getInformationSystem()
                         .getName();
 
-				throw new SeyconException(
+				throw new InternalErrorException(
 						String.format(Messages.getString("AplicacioServiceImpl.ExistentRole"),  //$NON-NLS-1$
 								rol.getName(), rol.getSystem(), aplicacio));
         }
@@ -887,7 +887,7 @@ public class ApplicationServiceImpl extends
             return getRoleEntityDao().toRole(rolEntity);
         }
 
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UpdateApplicationError"), 
+		throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UpdateApplicationError"), 
 				Security.getCurrentAccount(), rol.getInformationSystemName()));
     }
 
@@ -1243,7 +1243,7 @@ public class ApplicationServiceImpl extends
         	UserEntity user = null;
             for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
                 if (ua.getUser().getUserName().equals(Security.getCurrentUser())) {
-                    throw new SeyconException(Messages.getString("ApplicationServiceImpl.UserAddRolError"));
+                    throw new InternalErrorException(Messages.getString("ApplicationServiceImpl.UserAddRolError"));
                 }
                 user = ua.getUser();
             }
@@ -1359,7 +1359,7 @@ public class ApplicationServiceImpl extends
             // Disable assigning roles to himself
             for (UserAccountEntity ua : rolsUsuarisEntity.getAccount().getUsers()) {
                 if (ua.getUser().getUserName().equals(Security.getCurrentUser())) {
-                    throw new SeyconException(Messages.getString("ApplicationServiceImpl.UserAddRolError"));
+                    throw new InternalErrorException(Messages.getString("ApplicationServiceImpl.UserAddRolError"));
                 }
             }
             
@@ -1544,7 +1544,7 @@ public class ApplicationServiceImpl extends
             administracioAplicacio = getRoleAccountEntityDao().toApplicationAdministration(administracioAplicacioEntity);
             return administracioAplicacio;
         }
-		throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToUpdate"), 
+		throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NotPermisionToUpdate"), 
 				Security.getCurrentAccount(), administracioAplicacio.getInformationSystemName()));
     }
 
@@ -1751,7 +1751,7 @@ public class ApplicationServiceImpl extends
             }
             return totPermis;
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
 					Security.getCurrentAccount(), codiAplicacioRol));
         }
 
@@ -1821,7 +1821,7 @@ public class ApplicationServiceImpl extends
             }
             return totPermis;
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
 					Security.getCurrentAccount(), codiAplicacioRol));
         }
 
@@ -1854,7 +1854,7 @@ public class ApplicationServiceImpl extends
             return totPermis;
 
         } else {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					String.format(Messages.getString("ApplicationServiceImpl.UserNotAccesToApplication"), //$NON-NLS-1$
 					Security.getCurrentAccount(), codiAplicacioRol));
         }
@@ -2609,7 +2609,7 @@ public class ApplicationServiceImpl extends
 		{
             return getRoleEntityDao().toRole(rolEntity);
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 					Security.getCurrentAccount(), name));
         }
 	}
@@ -2623,7 +2623,7 @@ public class ApplicationServiceImpl extends
 		{
             return getRoleEntityDao().toRole(rolEntity);
         } else {
-			throw new SeyconException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
+			throw new InternalErrorException(String.format(Messages.getString("ApplicationServiceImpl.NoAccessToRol"),  //$NON-NLS-1$
 					Security.getCurrentAccount(), name));
         }
 	}
@@ -2654,7 +2654,7 @@ public class ApplicationServiceImpl extends
             
         }
 
-		throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+		throw new InternalErrorException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
 				getPrincipal().getName(), rol.getInformationSystemName()));
 	}
 
@@ -2666,7 +2666,7 @@ public class ApplicationServiceImpl extends
 	    	return getRoleEntityDao().toRole(entity);
 		}
 	    else
-	    	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+	    	throw new InternalErrorException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
 				getPrincipal().getName(), rol.getInformationSystemName()));
 	
 	}
@@ -2679,7 +2679,7 @@ public class ApplicationServiceImpl extends
 	    	return getRoleEntityDao().toRole(entity);
 		}
 	    else
-	    	throw new SeyconException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
+	    	throw new InternalErrorException(String.format(Messages.getString("AplicacioServiceImpl.UpdateApplicationError"), //$NON-NLS-1$
 				getPrincipal().getName(), rol.getInformationSystemName()));
 	}
 

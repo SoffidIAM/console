@@ -19,10 +19,6 @@
   img: /img/menu/accounts.svg
   url: /self/account.zul
   permissions: ["selfservice:accounts"]
-- name: wheel.menu
-  img: /img/menu/wheel.svg
-  url: /self/account.zul
-  permissions: ["authorization:not-enabled-yet"]
 - name: soffid.admin
   img: /img/menu/laboratory.svg
   options:
@@ -99,7 +95,6 @@
         img: /img/menu/toolbox.svg
         options:
         - name: seu.settings
-          img_old: /img/menu/settings.png
           img: /img/menu/gear.svg
           options:
           - name: seu.tenants
@@ -130,6 +125,10 @@
             url: /config/metadata.zul
             img: /img/menu/metadata.svg
             permissions: ["seu:userTypes:show"]
+          - name: wheel.menu
+            img: /img/menu/wheel.svg
+            url: /config/wheel.zul
+            permissions: ["parameter:create"]
         - name: seu.integration-engine
           img: /img/menu/integration.svg
           options:

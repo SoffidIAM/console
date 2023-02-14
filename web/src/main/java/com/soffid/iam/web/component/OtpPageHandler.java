@@ -23,11 +23,14 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 public class OtpPageHandler {
 	private static final String OTP_TIME_SESSION_ATTR = "$Soffid-otp-time$";
 	Component component;
+	Component parent;
 	Window otpWindow;
 	String page;
 	boolean optional;
 	Challenge challenge;
-	
+	private Page parentPage;
+	HiddenComponent hidden = new HiddenComponent();
+			
 	public Component getComponent() {
 		return component;
 	}
@@ -62,7 +65,7 @@ public class OtpPageHandler {
 			return false;
 		String timeout = ConfigurationCache.getProperty("soffid.otp.timeout");
 		if (timeout == null || timeout.trim().isEmpty())
-			return true;
+			timeout = "3"; // Minimum of three seconds
 		
 		long to = 1000 * Long.parseLong(timeout);
 		
@@ -74,8 +77,13 @@ public class OtpPageHandler {
 	
 	public void enable ()
 	{
+		hidden.setEnabled(true);
 		component.setVisible(true);
+		component.invalidate();
+		hidden.invalidate();
+
 		otpWindow.detach();
+		
 		Long l = new Long (System.currentTimeMillis());
 		Sessions.getCurrent().setAttribute(OTP_TIME_SESSION_ATTR, l);
 	}
@@ -110,8 +118,6 @@ public class OtpPageHandler {
 	
 	public void showOtpDialog () throws InternalErrorException, NamingException, CreateException, SecurityException
 	{
-		if (component != null)
-			component.setVisible(false);
 		HashMap<String, Object> map = new HashMap<String, Object>();
 			
 		map.put("handler", this);
@@ -121,10 +127,16 @@ public class OtpPageHandler {
 			Page p = Executions.getCurrent().getDesktop().getPage(page);
 			otpWindow.setPage(p);
 		} 
-		else if (component.getParent() == null)
+		else if (component.getParent() == null) {
 			otpWindow.setPageBefore(component.getPage(), component);
-		else
+			hidden.setPageBefore(component.getPage(), component);
+			component.setParent(hidden);
+		}
+		else {
 			component.getParent().insertBefore(otpWindow, component);
+			component.getParent().insertBefore(hidden, component);
+			component.setParent(hidden);
+		}
 		Executions.getCurrent().createComponents("/popup/otp.zul", otpWindow, map);
 	}
 	
@@ -143,6 +155,8 @@ public class OtpPageHandler {
 			return false;
 		
 		component = comp;
+		parent = comp.getParent();
+		parentPage = comp.getPage();
 		page = resource;
 		try
 		{
@@ -190,5 +204,5 @@ public class OtpPageHandler {
 	public void setOtpWindow(Window otpWindow) {
 		this.otpWindow = otpWindow;
 	}
-
+	
 }

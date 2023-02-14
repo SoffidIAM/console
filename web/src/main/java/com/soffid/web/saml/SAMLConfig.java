@@ -17,6 +17,7 @@ public class SAMLConfig {
 	protected String requireToken;
 	protected String optionalToken;
 	protected Long tokenTimeout;
+	public boolean maintenanceMode;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -135,5 +136,13 @@ public class SAMLConfig {
 	
 	public void setTokenTimeout(Long tokenTimeout) {
 		this.tokenTimeout = tokenTimeout;
+	}
+	
+	public boolean isMaintenanceMode() {
+		return maintenanceMode;
+	}
+	
+	public void setMaintenanceMode(boolean maintenanceMode) {
+		this.maintenanceMode = maintenanceMode;
 	}
 }

@@ -5,6 +5,7 @@
 <?page id="syncserver"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/pam-monitoring/page/access-logs"
 	use="com.soffid.iam.web.audit.AccessLogHandler" id="frame">
 
 	<datamodel id="model" rootNode="root" src="accessDescriptor.xml"/>
@@ -37,10 +38,12 @@
   value: accessProtocol
   default: true
 - name: ${c:l('registreAcces.zul.Datainici')}
-  value: startDate_datetime
+  value: startDate
+  template: #{startDate_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Datafi')}
-  value: endDate_datetime
+  value: endDate
+  template: #{endDate_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Sessia')}
   value: sessionId

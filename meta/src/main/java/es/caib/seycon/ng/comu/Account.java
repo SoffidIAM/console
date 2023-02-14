@@ -192,6 +192,7 @@ public class Account {
 	Map<String, Object> attributes;
 	
 	@Description("True if there is an snapshot for delta changes")
+	@Attribute(hidden=true, defaultValue = "false")
 	boolean hasSnapshot;
 }
 

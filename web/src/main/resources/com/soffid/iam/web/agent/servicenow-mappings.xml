@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><agent-config>
+  <objectMapping condition="" soffidObject="role" systemObject="ROLE">
+    <property name="loadMethod" value="GET"/>
+    <property name="loadPath" value="sys_user_role?sysparm_exclude_reference_link=true&amp;sysparm_fields=grantable,description,name,sys_scope,sys_id"/>
+    <property name="loadResults" value="result"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="sys_user_role?sysparm_exclude_reference_link=true&amp;sysparm_fields=grantable,description,name,sys_scope,sys_id&amp;sysparm_query=name=${name}"/>
+    <property name="selectResults" value="result"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="name" systemAttribute="name"/>
+    <attributeMapping direction="INPUT" soffidAttribute="description" systemAttribute="if (description==null || description.trim().isEmpty()) {&#10;  return name;&#10;} else {&#10;  return description;&#10;}"/>
+    <attributeMapping direction="INPUT" soffidAttribute="category" systemAttribute="&quot;sys_user_role&quot;"/>
+    <attributeMapping direction="INPUT" soffidAttribute="ownedRoles" systemAttribute="list = dispatcherService.invoke (&quot;GET&quot;, &#10;  &quot;https://arxusdev.service-now.com/api/now/table/sys_user_role_contains?sysparm_exclude_reference_link=true&amp;sysparm_fields=contains,role&amp;sysparm_display_value=all&amp;sysparm_query=role=&quot;+sys_id, &#10;  null). &#10;  get(0).get(&quot;result&quot;);&#10;&#10;r = new java.util.LinkedList();&#10;for ( d: list)&#10;{&#10;  grant = new java.util.HashMap();&#10;  grant{&quot;grantedRole&quot;} = d.get(&quot;contains&quot;).get(&quot;display_value&quot;);&#10;  grant{&quot;grantedRoleSystem&quot;} = &quot;ServiceNow&quot;;&#10;  grant{&quot;ownerRoleName&quot;} = d.get(&quot;role&quot;).get(&quot;display_value&quot;);&#10;  grant{&quot;ownerSystem&quot;} = &quot;ServiceNow&quot;;&#10;  r.add  (grant);&#10;}&#10;  grant = new java.util.HashMap();&#10;  grant{&quot;grantedRole&quot;} = &quot;SERVICENOW&quot;;&#10;  grant{&quot;grantedRoleSystem&quot;} = &quot;ArxusIdP&quot;;&#10;  grant{&quot;ownerRoleName&quot;} = name;&#10;  grant{&quot;ownerSystem&quot;} = &quot;ServiceNow&quot;;&#10;  r.add  (grant);&#10;return r;"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="grant" systemObject="GRANT_GROUP">
+    <property name="deleteEncoding" value="application/json"/>
+    <property name="deleteMethod" value="DELETE"/>
+    <property name="deleteParams" value="-"/>
+    <property name="deletePath" value="sys_user_grmember/${sys_id}"/>
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertParams" value="group,user"/>
+    <property name="insertPath" value="sys_user_grmember"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadPath" value="sys_user_grmember?sysparm_exclude_reference_link=false&amp;sysparm_display_value=all&amp;sysparm_fields=group"/>
+    <property name="loadResults" value="result"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="sys_user_grmember?sysparm_exclude_reference_link=false&amp;sysparm_display_value=true&amp;sysparm_fields=group,user,sys_id&amp;sysparm_query=user=${var2}"/>
+    <property name="selectResults" value="result"/>
+    <attributeMapping direction="INPUT" soffidAttribute="grantedRole" systemAttribute="group{&quot;display_value&quot;}"/>
+    <attributeMapping direction="INPUT" soffidAttribute="ownerAccount" systemAttribute="result = dispatcherService.invoke (&quot;GET&quot;, &#10;  user{&quot;link&quot;},&#10;  null). &#10;  get(0).get(&quot;result&quot;);&#10;&#10;return result{&quot;user_name&quot;};"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if(ownerAccount == void){&#10;&#9;return null;&#10;}&#10;System.out.println(&quot;Searching id for &quot;+ownerAccount);&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;eo.setObjectType  (&quot;USER&quot;);&#10;eo{&quot;user_name&quot;} = ownerAccount;&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;System.out.println(&quot;FOUND &quot;+eo{&quot;sys_id&quot;});&#10;return eo{&quot;sys_id&quot;};" systemAttribute="var2"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if(ownerAccount == void){&#10;&#9;return null;&#10;}&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;eo.setObjectType  (&quot;USER&quot;);&#10;System.out.println(&quot;Searching for: &quot; +ownerAccount);&#10;eo{&quot;user_name&quot;} = ownerAccount;&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;return eo{&quot;sys_id&quot;};" systemAttribute="user"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if(grantedRole == void){&#10;&#9;return null;&#10;}&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;eo.setObjectType  (&quot;GROUP&quot;);&#10;eo{&quot;name&quot;} = grantedRole;&#10;System.out.println(&quot;LOGFLUCAS: Searching for granted role: &quot; + grantedRole);&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;return eo{&quot;sys_id&quot;};" systemAttribute="group"/>
+    <trigger script="System.out.println(&quot;Granting group '&quot;+source{&quot;grantedRole&quot;} + &quot;' catagory = &quot;+ source{&quot;grantedRoleObject&quot;}{&quot;category&quot;} + &quot;}&quot;);&#10;return source{&quot;grantedRoleObject&quot;}{&quot;category&quot;}. equals (&quot;sys_user_group&quot;);" type="preInsert"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="grant" systemObject="GRANT_ROLE">
+    <property name="deleteEncoding" value="application/json"/>
+    <property name="deleteMethod" value="DELETE"/>
+    <property name="deleteParams" value="-"/>
+    <property name="deletePath" value="sys_user_has_role/${sys_id}"/>
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertParams" value="role,user"/>
+    <property name="insertPath" value="sys_user_has_role"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadPath" value="sys_user_has_role?sysparm_exclude_reference_link=false&amp;sysparm_display_value=all&amp;sysparm_fields=role,granted_by,inherited,state,user"/>
+    <property name="loadResults" value="result"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="sys_user_has_role?sysparm_exclude_reference_link=false&amp;sysparm_display_value=true&amp;sysparm_fields=role,granted_by,inherited,state,user,sys_id&amp;sysparm_query=user=${var1}"/>
+    <property name="selectResults" value="result"/>
+    <attributeMapping direction="INPUT" soffidAttribute="grantedRole" systemAttribute="role{&quot;display_value&quot;}"/>
+    <attributeMapping direction="INPUT" soffidAttribute="ownerAccount" systemAttribute="result = dispatcherService.invoke (&quot;GET&quot;, &#10;  user{&quot;link&quot;},&#10;  null). &#10;  get(0).get(&quot;result&quot;);&#10;&#10;return result{&quot;user_name&quot;};"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if(ownerAccount == void){&#10;&#9;return null;&#10;}&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;eo.setObjectType  (&quot;USER&quot;);&#10;eo{&quot;user_name&quot;} = ownerAccount;&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;return eo{&quot;sys_id&quot;};" systemAttribute="var1"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if(ownerAccount == void){&#10;&#9;return null;&#10;}&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;eo.setObjectType  (&quot;USER&quot;);&#10;System.out.println(&quot;Searching for: &quot; +ownerAccount);&#10;eo{&quot;user_name&quot;} = ownerAccount;&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;return eo{&quot;sys_id&quot;};" systemAttribute="user"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="if(grantedRole == void){&#10;    System.out.println(&quot;LOGFLUCAS: granted role VOID: &quot;);&#10;&#9;return null;&#10;&#9;}&#10;&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;eo.setObjectType  (&quot;ROLE&quot;);&#10;eo{&quot;name&quot;} = grantedRole;&#10;System.out.println(&quot;LOGFLUCAS: Searching for granted role: &quot; + grantedRole);&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;return eo{&quot;sys_id&quot;};" systemAttribute="role"/>
+    <trigger script="! oldObject{&quot;inherited&quot;} .equals (&quot;true&quot;) " type="preDelete"/>
+    <trigger script="System.out.println(&quot;Granting role '&quot;+source{&quot;grantedRole&quot;} + &quot;' catagory = &quot;+ source{&quot;grantedRoleObject&quot;}{&quot;category&quot;} + &quot;}&quot;);&#10;return source{&quot;grantedRoleObject&quot;}{&quot;category&quot;}. equals (&quot;sys_user_role&quot;);" type="preInsert"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="account" systemObject="ACCOUNT">
+    <property name="deleteEncoding" value="application/json"/>
+    <property name="deleteMethod" value="DELETE"/>
+    <property name="deleteParams" value="-"/>
+    <property name="deletePath" value="sys_user/${var5}"/>
+    <property name="loadMethod" value="GET"/>
+    <property name="loadPath" value="sys_user?sysparm_exclude_reference_link=true&amp;sysparm_fields=name,country,active,phone,name,user_name,sys_id,company,sys_domain"/>
+    <property name="loadResults" value="result"/>
+    <property name="preventDeletion" value="false"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="sys_user?sysparm_exclude_reference_link=true&amp;sysparm_fields=name,country,active,phone,name,user_name,sys_id,company,sys_domain&amp;sysparm_query=user_name=${user_name}"/>
+    <property name="selectResults" value="result"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountName" systemAttribute="user_name"/>
+    <attributeMapping direction="INPUT" soffidAttribute="accountDescription" systemAttribute="name"/>
+    <attributeMapping direction="INPUT" soffidAttribute="passwordPolicy" systemAttribute="&quot;I&quot;"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="System.out.println(&quot;Searching id for &quot;+accountName);&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;&#10;&#10;eo.setObjectType  (&quot;ACCOUNT&quot;);&#10;eo{&quot;user_name&quot;} = accountName;&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;System.out.println(&quot;FOUND &quot;+eo{&quot;sys_id&quot;});&#10;&#10;return eo{&quot;sys_id&quot;};" systemAttribute="var5"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="role" systemObject="GROUP">
+    <property name="loadMethod" value="GET"/>
+    <property name="loadPath" value="sys_user_group?sysparm_exclude_reference_link=true&amp;sysparm_fields=parent,manager,active,description,name,email,sys_id"/>
+    <property name="loadResults" value="result"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="sys_user_group?sysparm_exclude_reference_link=true&amp;sysparm_fields=parent,manager,active,description,name,email,sys_id&amp;sysparm_query=name=${name}"/>
+    <property name="selectResults" value="result"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="name" systemAttribute="name"/>
+    <attributeMapping direction="INPUT" soffidAttribute="description" systemAttribute="if (description==null || description.trim().isEmpty()) {&#10;  return name;&#10;} else {&#10;  return description;&#10;}"/>
+    <attributeMapping direction="INPUT" soffidAttribute="category" systemAttribute="&quot;sys_user_group&quot;"/>
+    <attributeMapping direction="INPUT" soffidAttribute="ownedRoles" systemAttribute="list = dispatcherService.invoke (&quot;GET&quot;, &#10;  &quot;https://arxusdev.service-now.com/api/now/table/sys_group_has_role?sysparm_exclude_reference_link=true&amp;sysparm_display_value=all&amp;sysparm_fields=role%2Cgroup&amp;sysparm_query=group=&quot;+sys_id,&#10;  null). &#10;  get(0).get(&quot;result&quot;);&#10;&#10;r = new java.util.LinkedList();&#10;for ( d: list)&#10;{&#10;  if (serviceLocator.getApplicationService().findRoleByNameAndSystem(d.get(&quot;role&quot;).get(&quot;display_value&quot;),&quot;ServiceNow&quot;) != null)&#10;  {&#10;  grant = new java.util.HashMap();&#10;  grant{&quot;grantedRole&quot;} = d.get(&quot;role&quot;).get(&quot;display_value&quot;);&#10;  grant{&quot;grantedRoleSystem&quot;} = &quot;ServiceNow&quot;;&#10;  grant{&quot;ownerRoleName&quot;} = name;&#10;  grant{&quot;ownerSystem&quot;} = &quot;ServiceNow&quot;;&#10;  r.add  (grant);&#10;  }&#10;}&#10;return r;&#10;"/>
+  </objectMapping>
+  <objectMapping condition="" soffidObject="user" systemObject="USER">
+    <property name="deleteEncoding" value="application/json"/>
+    <property name="deleteMethod" value="DELETE"/>
+    <property name="deletePath" value="sys_user/${var4}"/>
+    <property name="insertEncoding" value="application/json"/>
+    <property name="insertMethod" value="POST"/>
+    <property name="insertParams" value="user_name,last_name,first_name,company,email"/>
+    <property name="insertPath" value="sys_user?"/>
+    <property name="selectMethod" value="GET"/>
+    <property name="selectParams" value="-"/>
+    <property name="selectPath" value="sys_user?sysparm_exclude_reference_link=true&amp;sysparm_fields=name,country,active,phone,name,user_name,sys_id,company,sys_domain,email&amp;sysparm_query=user_name=${user_name}"/>
+    <property name="selectResults" value="result"/>
+    <property name="updateEncoding" value="application/json"/>
+    <property name="updateMethod" value="PUT"/>
+    <property name="updateParams" value="user_name,last_name,first_name,company,email"/>
+    <property name="updatePath" value="sys_user/${var4}"/>
+    <attributeMapping direction="INPUTOUTPUT" soffidAttribute="accountName" systemAttribute="user_name"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="System.out.println(&quot;Searching id for &quot;+accountName);&#10;com.soffid.iam.sync.intf.ExtensibleObject eo = new com.soffid.iam.sync.intf.ExtensibleObject();&#10;&#10;&#10;eo.setObjectType  (&quot;USER&quot;);&#10;eo{&quot;user_name&quot;} = accountName;&#10;eo = dispatcherService.search(eo);&#10;if(eo == null){&#10;&#9;return null;&#10;}&#10;System.out.println(&quot;FOUND &quot;+eo{&quot;sys_id&quot;});&#10;&#10;return eo{&quot;sys_id&quot;};" systemAttribute="var4"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="firstName" systemAttribute="first_name"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="lastName" systemAttribute="last_name"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="customer = dispatcherService.invoke (&quot;GET&quot;, &#10;  &quot;https://arxusdev.service-now.com/api/now/table/core_company?sysparm_query=u_customer_code=&quot; + primaryGroup + &quot;&amp;sysparm_fields=name,sys_id,u_customer_code&amp;sysparm_limit=1&quot;,&#10;  null).get(0).get(&quot;result&quot;);&#10;&#10;String sys_id = &quot;&quot;;&#10;&#10; for ( d: customer)  {&#10;  &#9;&#9;&#9;&#9;&#9;System.out.println(&quot;Returning company as: &quot; + d.get(&quot;sys_id&quot;));&#10;  &#9;&#9;&#9;&#9;&#9;sys_id = d.get(&quot;sys_id&quot;);&#10;                    }&#10;&#10;return sys_id;" systemAttribute="company"/>
+    <attributeMapping direction="OUTPUT" soffidAttribute="accountName" systemAttribute="email"/>
+  </objectMapping>
+</agent-config>

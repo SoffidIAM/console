@@ -433,7 +433,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					q = new MatchAllDocsQuery();
 
 				// Verifiquem el format de les dates
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmm"); //$NON-NLS-1$
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd"); //$NON-NLS-1$
 				String dataInici0 = null, dataFi = null;
 
 				TopDocs hits;

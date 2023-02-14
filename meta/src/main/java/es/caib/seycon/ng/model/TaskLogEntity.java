@@ -115,7 +115,7 @@ public abstract class TaskLogEntity {
 		return null;
 	}
 	
-	@DaoFinder("select system.name, count(*) from \n"
+	@DaoFinder("select system.name, count(distinct task.id) from \n"
 			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
 			+ "where task.tenant.id = :tenantId and completed='S'  \n"
 			+ "group by system.name \n"
@@ -124,7 +124,7 @@ public abstract class TaskLogEntity {
 		return null;
 	}
 
-	@DaoFinder("select system.name, count(*) from \n"
+	@DaoFinder("select system.name, count(distinct task.id) from \n"
 			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
 			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server and \n"
 			+ "(task.systemName is null or task.systemName = system.name) "
@@ -134,7 +134,7 @@ public abstract class TaskLogEntity {
 		return null;
 	}
 
-	@DaoFinder("select system.name, count(*) from \n"
+	@DaoFinder("select system.name, count(distinct task.id) from \n"
 			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
 			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server and task.serverInstance=:serverInstance and \n"
 			+ "(task.systemName is null or task.systemName = system.name) "

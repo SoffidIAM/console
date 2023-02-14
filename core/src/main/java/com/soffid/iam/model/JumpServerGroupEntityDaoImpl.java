@@ -17,4 +17,14 @@ public class JumpServerGroupEntityDaoImpl extends JumpServerGroupEntityDaoBase {
 		}
 	}
 
+	@Override
+	public void remove(JumpServerGroupEntity entity) {
+		getSession().createQuery("update com.soffid.iam.model.AccountEntityImpl "
+				+ "set jumpServerGroup = null "
+				+ "where jumpServerGroup.id = :id")
+			.setParameter("id", entity.getId())
+			.executeUpdate();
+		super.remove(entity);
+	}
+
 }

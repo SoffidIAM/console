@@ -4,7 +4,9 @@
 <?component name="input_password" macro-uri="/comu/input_password.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" title="${c:l('pam_config.title')}"
-	 id="frame" width="100%" use="com.soffid.iam.web.pam.ServerHandler" >
+	 id="frame" width="100%" 
+	 help="https://bookstack.soffid.com/books/pam-install-config/page/configure-pam-session-servers"
+	 use="com.soffid.iam.web.pam.ServerHandler" >
 	<datamodel id="model" rootNode="root" src="pamDescriptor.xml" />
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
@@ -43,7 +45,7 @@
 
 		<div sclass="card__face card__face--back">
 			<div use="com.soffid.iam.web.component.NavigationBar"
-				frame="frame" lastAction="ref:frame.hideDetails">
+				frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox" />
 
 				<menu2>

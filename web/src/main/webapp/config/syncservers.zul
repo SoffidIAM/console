@@ -10,6 +10,7 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div"
 	style="position: relative" use="com.soffid.iam.web.agent.SyncServerHandler"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/synchronization-servers"
 	id="frame">
 
 	<datamodel id="model" rootNode="agents" src="descriptorAgent.xml" />
@@ -43,7 +44,7 @@
 
 		<div sclass="card__face card__face--back">
 			<div use="com.soffid.iam.web.component.NavigationBar"
-				frame="frame" lastAction="ref:frame.hideDetails">
+				frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox" />
 
 				<menu2>
@@ -78,7 +79,7 @@
 							<label value="${c:l('servers.zul.JavaOptions')} :"/>
 							<textbox bind="@javaOptions" maxlength="256" multiline="true"
 									rows="1"
-									style="width:100%; resize: vertical" constraint="no empty"/>
+									style="width:100%; resize: vertical"/>
 						</row>
 					</rows>
 				</grid>

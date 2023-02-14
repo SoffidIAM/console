@@ -421,19 +421,6 @@ public class ApplicationBootServiceImpl extends
 			createInitialData();
 			configureDocumentManager();
 			
-			String externalURL = ConfigurationCache.getMasterProperty("AutoSSOURL");
-			{
-				if (externalURL != null && ! tenantName.equals("master"))
-				try {
-					URL u = new URL(externalURL);
-					URL u2 = new URL (u.getProtocol(), tenantName+"."+u.getHost(), u.getPort(), u.getFile());
-					cfg  = new Configuration ("AutoSSOURL", u2.toExternalForm());
-					configSvc.create(cfg);
-				} catch (Exception e) {
-					log.warn("Error parsing url "+externalURL, e);
-				}
-			}
-			
 			cfg = new Configuration("tenantVersionLevel", "101"); //$NON-NLS-1$ //$NON-NLS-2$
 			configSvc.create(cfg);
 		} 
@@ -483,6 +470,13 @@ public class ApplicationBootServiceImpl extends
 		{
 			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
 			cfg.setValue("109");
+			configSvc.update(cfg);
+		}
+		if (cfg.getValue().equals("109"))
+		{
+			getAdditionalDataService().registerStandardObject("com/soffid/iam/bpm/api/ProcessInstance.ui.json", 
+					null, false);
+			cfg.setValue("110");
 			configSvc.update(cfg);
 		}
 	}
@@ -1115,6 +1109,16 @@ public class ApplicationBootServiceImpl extends
 			du = dominiSvc.create(du);
 		}
 
+		UserDomain du2 = dominiSvc.findUserDomainByName("EMAIL"); //$NON-NLS-1$
+		if (du2 == null) {
+			du2 = new UserDomain();
+			du2.setCode("EMAIL"); //$NON-NLS-1$
+			du2.setDescription("Email address"); //$NON-NLS-1$
+			du2.setType(TipusDominiUsuariEnumeration.SHELL);
+			du2.setBshExpr("user.emailAddress");
+			du2 = dominiSvc.create(du);
+		}
+
 		PasswordDomain dc = dominiSvc.findPasswordDomainByName("DEFAULT"); //$NON-NLS-1$
 		if (dc == null) {
 			dc = new PasswordDomain();
@@ -1384,18 +1388,38 @@ public class ApplicationBootServiceImpl extends
 			configSvc.create(cfg);
 		}
 
-		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOSystem", null); //$NON-NLS-1$
-		if (cfg == null)
-			configSvc.create( new Configuration("AutoSSOSystem", disSso.getName()) ); //$NON-NLS-1$
-
+			cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOSystem", null); //$NON-NLS-1$
+			if (cfg == null)
+				configSvc.create( new Configuration("AutoSSOSystem", disSso.getName()) ); //$NON-NLS-1$
 		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOPolicy", null); //$NON-NLS-1$
 		if (cfg == null)
 			configSvc.create( new Configuration("AutoSSOPolicy", "S" )); //$NON-NLS-1$
 
-		cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOURL", null); //$NON-NLS-1$
-		if (cfg == null && System.getProperty("hostName") != null)
-			configSvc.create( new Configuration("AutoSSOURL", 
-					"http://"+System.getProperty("hostName") + ":8080/" )); //$NON-NLS-1$
+		if (Security.isMasterTenant()) {
+			cfg = configSvc.findParameterByNameAndNetworkName("AutoSSOURL", null); //$NON-NLS-1$
+			if (cfg == null && System.getProperty("hostName") != null)
+				configSvc.create( new Configuration("AutoSSOURL", 
+						"http://"+System.getProperty("hostName") + ":8080/" )); //$NON-NLS-1$
+		} else {
+			String externalURL = ConfigurationCache.getMasterProperty("AutoSSOURL");
+			{
+				if (externalURL != null)
+				try {
+					URL u = new URL(externalURL);
+					URL u2 = new URL (u.getProtocol(), Security.getCurrentTenantName()+"."+u.getHost(), u.getPort(), u.getFile());
+					cfg  = new Configuration ("AutoSSOURL", u2.toExternalForm());
+					configSvc.create(cfg);
+				} catch (Exception e) {
+					log.warn("Error parsing url "+externalURL, e);
+				}
+			}
+			
+			
+		}
+
+		cfg = configSvc.findParameterByNameAndNetworkName("soffid.interpreter", null); //$NON-NLS-1$
+		if (cfg == null)
+			configSvc.create( new Configuration("soffid.interpreter", "javascript")); //$NON-NLS-1$
 
 
 		Configuration cfg2 = configSvc.findParameterByNameAndNetworkName(

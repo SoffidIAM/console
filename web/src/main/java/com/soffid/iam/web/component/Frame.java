@@ -21,6 +21,7 @@ public class Frame extends Div implements AfterCompose, Frameable {
 	String permissions[];
 	public boolean saveContent;
 	public boolean canClose = true;
+	public String help;
 	
 	public Frame() {
 	}
@@ -91,6 +92,16 @@ public class Frame extends Div implements AfterCompose, Frameable {
 	}
 	public void setSaveContent(boolean saveContent) {
 		this.saveContent = saveContent;
+	}
+
+	
+	public String getHelp() {
+		return help;
+	}
+
+	
+	public void setHelp(String help) {
+		this.help = help;
 	}
 
 }

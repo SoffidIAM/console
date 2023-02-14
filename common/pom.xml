@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.3.77-SNAPSHOT</version>
+		<version>3.4-M1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>iam-common</artifactId>
@@ -271,6 +271,11 @@
 		<dependency>
 			<groupId>com.soffid.iam</groupId>
 			<artifactId>nashorn-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>dbtools</artifactId>
+			<version>1.17</version>
 		</dependency>
 	</dependencies>
   <reporting>

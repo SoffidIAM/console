@@ -39,7 +39,7 @@ import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -91,7 +91,7 @@ public class AccessLogServiceImpl extends
 		
 		/*/ Restringimos los parámetros para evitar consulta muy compleja
 		if (nomServidor == null && nomClient == null && codiUsuari == null) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					"Cal especificar almenys un d'aquests paràmetres de cerca: usuari, client o servidor");
 		}*/
 
@@ -104,7 +104,7 @@ public class AccessLogServiceImpl extends
 		}
 		if (registresAcces != null) {
 			if (registresAcces.size() >= 201) {
-				throw new SeyconException(
+				throw new InternalErrorException(
 						Messages.getString("AccessEntryServiceImpl.8")); //$NON-NLS-1$
 			}
 			return getAccessLogEntityDao().toAccessLogList(registresAcces);
@@ -150,7 +150,7 @@ public class AccessLogServiceImpl extends
 		
 		/*
 		if (nomServidor == null && nomClient == null && codiUsuari == null) {
-			throw new SeyconException(
+			throw new InternalErrorException(
 					"Cal especificar almenys un d'aquests paràmetres de cerca: usuari, client o servidor");
 		}
 		*/		
@@ -167,7 +167,7 @@ public class AccessLogServiceImpl extends
 
 		if (registresAcces != null) { // Restringit en la cerca a <=201 (com a molt serà 201)
 			if (registresAcces.size() >= 201) {
-				throw new SeyconException(
+				throw new InternalErrorException(
 						Messages.getString("AccessEntryServiceImpl.19")); //$NON-NLS-1$
 			}
 			return getAccessLogEntityDao().toAccessLogList(registresAcces);
@@ -189,7 +189,7 @@ public class AccessLogServiceImpl extends
 			try {
 				Integer.parseInt(numRegistres);
 			} catch (Exception ex ) {
-				throw new SeyconException (Messages.getString("AccessEntryServiceImpl.23")); //$NON-NLS-1$
+				throw new InternalErrorException (Messages.getString("AccessEntryServiceImpl.23")); //$NON-NLS-1$
 			}
 		}
 		if (nomServidor!=null && !"".equals(nomServidor.trim()) && !("%").equals(nomServidor.trim()) ) { //$NON-NLS-1$ //$NON-NLS-2$
@@ -221,11 +221,11 @@ public class AccessLogServiceImpl extends
 			try {
 				numRegs = Integer.parseInt(numRegistres);
 			} catch (Exception ex ) {
-				throw new SeyconException (Messages.getString("AccessEntryServiceImpl.29")); //$NON-NLS-1$
+				throw new InternalErrorException (Messages.getString("AccessEntryServiceImpl.29")); //$NON-NLS-1$
 			}
 		}
 		if (d_dataIni == null && numRegs == -1)
-			throw new SeyconException(//TODO la fecha siempre será nula(está deshabilitada en el zul): Cambiar comentario si se habilita d nuevo
+			throw new InternalErrorException(//TODO la fecha siempre será nula(está deshabilitada en el zul): Cambiar comentario si se habilita d nuevo
 					Messages.getString("AccessEntryServiceImpl.30"));  //$NON-NLS-1$
 		if (nomServidor!=null && !"".equals(nomServidor.trim()) && !("%").equals(nomServidor.trim()) ) { //$NON-NLS-1$ //$NON-NLS-2$
 			Date fechaIni = d_dataIni != null ? d_dataIni : DateUtils.nullDate;
@@ -258,7 +258,7 @@ public class AccessLogServiceImpl extends
 			try {
 				numRegs = Integer.parseInt(numRegistres);
 			} catch (Exception ex ) {
-				throw new SeyconException (Messages.getString("AccessEntryServiceImpl.37")); //$NON-NLS-1$
+				throw new InternalErrorException (Messages.getString("AccessEntryServiceImpl.37")); //$NON-NLS-1$
 			}
 		}
 		
@@ -269,7 +269,7 @@ public class AccessLogServiceImpl extends
 			registresAcces = getAccessLogEntityDao().findAccessLogByStartDateAndUserName(DateUtils.nullDate, fechaIni, codiUsuari);
 			if (registresAcces != null) { 
 				if (registresAcces.size() >= 201) {
-					throw new SeyconException(
+					throw new InternalErrorException(
 						Messages.getString("AccessEntryServiceImpl.38")); //$NON-NLS-1$
 				}
 				return getAccessLogEntityDao().toAccessLogList(registresAcces);
@@ -288,7 +288,7 @@ public class AccessLogServiceImpl extends
 			} else res = registresAcces;
 			return getAccessLogEntityDao().toAccessLogList(res); //Convertim a VO
 		} else 
-			throw new SeyconException (Messages.getString("AccessEntryServiceImpl.40")); //$NON-NLS-1$
+			throw new InternalErrorException (Messages.getString("AccessEntryServiceImpl.40")); //$NON-NLS-1$
 		
 		return new LinkedList<AccessLog>();	
 	}

@@ -27,6 +27,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.System;
@@ -164,18 +165,7 @@ public class AccountDetailsHandler extends Window implements AfterCompose {
 	}
 	
 	public void onStart(Event event) {
-		Component b = getFellow("detailsButton");
-		
-		String system = (String) dataSource.getJXPathContext().getValue("@system");
-		boolean visible = false;
-		try {
-			System s = EJBLocator.getDispatcherService().findDispatcherByName(system);
-			if (s != null && s.getUrl() != null)
-				visible = true;
-		} catch (Exception e ) {
-			// Probably lack of permissions
-		}
-		b.setVisible( visible );
+		hideOrDisplay(event);
 		doHighlighted();
 		
 	}
@@ -198,4 +188,21 @@ public class AccountDetailsHandler extends Window implements AfterCompose {
 				});
 	}
 
+	public void hideOrDisplay(Event ev) {
+		boolean visible = false;
+		Component b = getFellow("detailsButton");
+		try {
+			Object o = dataSource.getJXPathContext().getValue("/");
+			setVisible (o instanceof Account);
+	
+			
+			String system = (String) dataSource.getJXPathContext().getValue("@system");
+			System s = EJBLocator.getDispatcherService().findDispatcherByName(system);
+			if (s != null && s.getUrl() != null)
+				visible = true;
+		} catch (Exception e ) {
+			// Probably lack of permissions
+		}
+		b.setVisible( visible );
+}
 }

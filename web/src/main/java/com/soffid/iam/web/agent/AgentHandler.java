@@ -19,6 +19,7 @@ import java.util.TimeZone;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -352,7 +353,10 @@ public class AgentHandler extends FrameHandler {
 			{
 				Missatgebox.avis("Warning: There is no connector loaded. Please load them from the plugins management page");
 			}
-
+			HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+			String wizard = req.getParameter("wizard");
+			if (wizard != null)
+				Executions.createComponents("/config/agent/wizard-"+wizard+".zul", this, new HashMap<>());
 		}
 	}
 
@@ -917,11 +921,15 @@ public class AgentHandler extends FrameHandler {
 		es.caib.zkib.jxpath.JXPathContext ctx = getModel().getJXPathContext ();
 		DataNode dn = (DataNode) ctx.getValue("/plugin[className='"+value+"']");
 		DataModelCollection coll = dn.getListModel("pluginWorkflow");
-		if (coll == null || coll.getSize() == 0) {
+		try {
+			if (coll == null || coll.getSize() == 0) {
+				setVisibleWorkflows(false);
+			} else {
+				setVisibleWorkflows(true);
+				fillWorkflowsTable (coll);
+			}
+		} catch (Exception e) {
 			setVisibleWorkflows(false);
-		} else {
-			setVisibleWorkflows(true);
-			fillWorkflowsTable (coll);
 		}
 	}
 	

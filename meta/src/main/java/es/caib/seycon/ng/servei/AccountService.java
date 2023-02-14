@@ -428,6 +428,15 @@ public abstract class AccountService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
 	}
 	
+	///
+	@Description("Sends the current account password back to the target system")
+	@Operation ( grantees={roles.Tothom.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void sendAccountPassword(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException, BadPasswordException {
+	}
+	
 	@Description("Sets the account temporary password")
 	@Operation ( grantees={roles.Tothom.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})

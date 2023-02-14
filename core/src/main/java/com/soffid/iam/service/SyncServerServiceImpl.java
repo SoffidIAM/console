@@ -63,7 +63,7 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
 
 /**
@@ -264,7 +264,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 
         } catch (Throwable th) {
         	LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
-            throw new SeyconException(String.format(
+            throw new InternalErrorException(String.format(
                     Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
         }
 
@@ -653,18 +653,20 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 	@Override
 	protected void handleBoostTask(long taskId) throws Exception {
 		TaskEntity task = getTaskEntityDao().load(taskId);
-		
-		String server = task.getServer();
-		
-		if (server == null)
-		{
-			throw new InternalErrorException(String.format("Task %d is not scheduled yet", taskId));
-		} else {
-	        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server, task.getServerInstance());
-	        
-	        SyncStatusService status = rsl.getSyncStatusService();
-
-	        status.boostTask(taskId);
+	
+		if (task != null) {
+			String server = task.getServer();
+			
+			if (server == null)
+			{
+				throw new InternalErrorException(String.format("Task %d is not scheduled yet", taskId));
+			} else {
+		        RemoteServiceLocator rsl = createServerRemoteServiceLocator(server, task.getServerInstance());
+		        
+		        SyncStatusService status = rsl.getSyncStatusService();
+	
+		        status.boostTask(taskId);
+			}
 		}
 	}
 
@@ -781,7 +783,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             return stats.getStats(metric, seconds, step);
         } catch (Throwable th) {
         	LogFactory.getLog(getClass()).info("Unable to connecto to "+server, th);
-            throw new SeyconException(String.format(
+            throw new InternalErrorException(String.format(
                     Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
         }
 	}

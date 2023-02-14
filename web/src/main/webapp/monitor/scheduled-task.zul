@@ -5,6 +5,7 @@
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:h="http://www.w3.org/1999/xhtml" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk" 
 	id="frame" title="${c:l('main.lblAdminJobs')}"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/scheduled-tasks"
 	use="com.soffid.iam.web.task.ScheduledTaskHandler" 
 	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
 	
@@ -71,7 +72,7 @@
 			</datatable>
 		</div>
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox"/>
 			</div>
 			<form2 dataPath="/listbox:/" width="100%" onChangeXPath="ref:frame.onChangeForm" id="form">
@@ -111,11 +112,16 @@
 				</div>
 				<div sclass="section" id="logsSection">
 					<customfield3 label="${c:l('scheduledTask.proviousExecution') }" dataType="SEPARATOR"/>
-					<datatable dataPath="logs" id="logs" onDownloadLog="ref:frame.downloadOtherLog" enablefilter="false">
+					<datatable dataPath="logs" id="logs" onDownloadLog="ref:frame.downloadOtherLog" enablefilter="false"
+									incrementalrefresh="true">
 					<attribute name="columns"><![CDATA[
 - name: ${c:l('llistaRegistreAccesUsuari.zul.Datainici') }
   value: time
   template: #{time_datetime}
+  className: datatimeColumn
+- name: ${c:l('llistaRegistreAccesUsuari.zul.Datafi') }
+  value: end
+  template: #{end_datetime}
   className: datatimeColumn
 - name: ${c:l('jobadmin.status') }
   template: <img class="small-icon" src="${execution.contextPath }/img/#{error ? 'warning.svg': 'ok.svg'}">

@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.soffid.iam.console</groupId>
 		<artifactId>root</artifactId>
-		<version>3.3.77-SNAPSHOT</version>
+		<version>3.4-M1-SNAPSHOT</version>
 	</parent>
 	<artifactId>iam-webservice</artifactId>
 	<packaging>war</packaging>
@@ -142,6 +142,12 @@
 			<groupId>com.soffid.iam.console</groupId>
 			<artifactId>iam-core</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils-core</artifactId>
+			<version>1.8.3</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

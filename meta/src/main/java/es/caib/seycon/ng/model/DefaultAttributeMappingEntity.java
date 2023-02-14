@@ -16,10 +16,10 @@ public abstract class DefaultAttributeMappingEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="DAM_SOFATR", length=250)
+	@Column (name="DAM_SOFATR", length=1000)
 	public java.lang.String soffidAttribute;
 
-	@Column (name="DAM_SYSATR", length=250)
+	@Column (name="DAM_SYSATR", length=1000)
 	public java.lang.String systemAttribute;
 
 	@Column (name="DAM_DIRECT", length=2)

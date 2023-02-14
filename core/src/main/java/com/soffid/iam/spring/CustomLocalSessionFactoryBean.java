@@ -1,6 +1,8 @@
 package com.soffid.iam.spring;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.hibernate.HibernateException;
@@ -11,8 +13,12 @@ import org.hibernate.event.FlushEventListener;
 import org.hibernate.event.PostDeleteEventListener;
 import org.hibernate.event.PostInsertEventListener;
 import org.hibernate.event.PostUpdateEventListener;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.MetaAttribute;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
 import org.hibernate.mapping.RootClass;
+import org.hibernate.mapping.Table;
 import org.mortbay.log.Log;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +26,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 import com.soffid.iam.model.AccountEntityImpl;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntityImpl;
 import com.soffid.iam.model.RoleAccountEntityImpl;
 import com.soffid.iam.model.RoleEntityImpl;
@@ -27,6 +34,9 @@ import com.soffid.iam.model.RoleGroupEntityImpl;
 import com.soffid.iam.model.UserAccountEntityImpl;
 import com.soffid.iam.model.UserEntityImpl;
 import com.soffid.iam.model.UserGroupEntityImpl;
+import com.soffid.iam.utils.ExceptionTranslator;
+
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 
 public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean implements ApplicationContextAware
 {
@@ -74,6 +84,7 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 			}
 		}
 
+		analyzeMappings(config);
 		
 		// Replace default flush listener
 		if (! "false".equals(System.getProperty("hibernate-boost")))
@@ -119,6 +130,35 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 			}		
 			configureCollectionsCache(config);
 		}
+	}
+
+	private void analyzeMappings(Configuration config) {
+		Map<String,String> tableToEntity = new HashMap();
+		Map<String,String> columnToAttribute = new HashMap();
+		for (Iterator md = config.getClassMappings(); md.hasNext(); ) {
+			PersistentClass entity = (PersistentClass) md.next();
+			for (Iterator<Property> propIt = entity.getPropertyIterator(); propIt.hasNext();) {
+				Property prop = propIt.next();
+				for (Iterator<Column> colIt = prop.getColumnIterator(); colIt.hasNext();) {
+					Column col = colIt.next();
+					columnToAttribute.put(entity.getTable().getName()+"."+col.getName(), prop.getName());
+					
+				}
+			}
+			if (entity instanceof RootClass) {
+				String name = entity.getClassName();
+				tableToEntity.put(entity.getTable().getName(), name);
+			}
+		}
+		SoffidStackTrace.setTableToEntityMap(tableToEntity);
+		SoffidStackTrace.setColumnToAttributeMap(columnToAttribute);
+		new CustomDialect();
+		if (CustomDialect.isMysql())
+			SoffidStackTrace.setDialect("mysql");
+		else if (CustomDialect.isOracle())
+			SoffidStackTrace.setDialect("oracle");
+		else if (CustomDialect.isSqlServer())
+			SoffidStackTrace.setDialect("sqlserver");
 	}
 
 	private void configureCollectionsCache(Configuration config) {

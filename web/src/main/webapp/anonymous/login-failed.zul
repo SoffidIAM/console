@@ -22,7 +22,7 @@
 		
    		
 		<div class="login">
-        		<p><img src="/anonymous/logo.png" alt="Soffid logo" /> </p> 
+        		<p><img src="/soffid/anonymous/logo.png" alt="Soffid logo" /> </p> 
 			<div class="loginbox"> 
 			<p>${c:l('configure.header')}</p>
 			<form method="post" action="/j_security_check" accept-charset="UTF-8">

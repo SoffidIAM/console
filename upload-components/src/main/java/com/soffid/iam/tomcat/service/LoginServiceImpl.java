@@ -102,6 +102,8 @@ public class LoginServiceImpl implements LoginService {
 			Object state = enterWebapp();
 			try {
 				Security.nestedLogin(tenant.getName(), "$$INTERNAL$$", new String[] {
+						Security.AUTO_APPLICATION_QUERY + Security.AUTO_ALL,
+						Security.AUTO_GROUP_QUERY + Security.AUTO_ALL,
 						Security.AUTO_USER_QUERY + Security.AUTO_ALL,
 						Security.AUTO_ACCOUNT_QUERY + Security.AUTO_ALL });
 				try {
@@ -174,6 +176,15 @@ public class LoginServiceImpl implements LoginService {
 						return null;
 					}
 					
+					
+					if ("true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||
+						"true".equals(System.getProperty("soffid.auth.maintenance"))) {
+						if (!principal.hasRole("authorization:all")) {
+							log.info(masterMessage = username + " login rejected. System in maintenance mode");
+							return null;
+						}
+					}
+					
 					if ( ! tenants.contains(tenant.getName()))
 					{
 			            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
@@ -187,7 +198,6 @@ public class LoginServiceImpl implements LoginService {
 			            }
 			            tenants.add(tenant.getName());
 					}
-					
 					return principal;
 				} finally {
 					Security.nestedLogoff();

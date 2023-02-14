@@ -1,6 +1,7 @@
 package com.soffid.iam.web.component;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ public class AttributeSearchBox extends XulElement {
 	private static final long serialVersionUID = -1434804713564643330L;
 	private static final String[] INT_TEXTBOXES = new String[] {"ib1", "ib2", "ib3"};
 	private static final String[] STRING_TEXTBOXES = new String[] {"tb1", "tb2", "tb3", "tb4"};
-	private static final String[] DATE_DATEBOXES = new String[] {"db1", "db2"};
+	private static final String[] DATE_DATEBOXES = new String[] {"db1", "db2", "db3"};
 	private static final String REMOVE_EVENT = "onRemove";
 	private static final String CLICK_EVENT = "onClick";
 	SearchAttributeDefinition attributeDef;
@@ -296,6 +297,16 @@ public class AttributeSearchBox extends XulElement {
 		textBox.setSelectionRange(0, textBox.getText().length());
 	}
 
+	private void enableDateBoxes(Radiogroup target) {
+		int i = target.getSelectedIndex();
+		target.getFellow("db1").setVisible(i == 0);
+		target.getFellow("db2").setVisible(i == 0);
+		target.getFellow("db3").setVisible(i == 1);
+		CustomField3 textBox = (CustomField3)target.getFellow(i == 0 ? "db1": "db3");
+		textBox.focus();
+	}
+
+
 	private void doTextSearch(Window w, Div bg, Radiogroup rg) {
 		textOperation = rg.getSelectedIndex();
 		textValue = null;
@@ -483,11 +494,18 @@ public class AttributeSearchBox extends XulElement {
 	}
 
 	private void doDateSearch(Window w, Div bg) {
-		Databox db1 = (Databox)w.getFellow("db1");
-		since = (Date) db1.getValue();
-		Databox db2 = (Databox)w.getFellow("db2");
-		until = (Date) db2.getValue();
-		setDateSearchInterval(since, until);
+		Radiogroup rg = (Radiogroup) w.getFellowIfAny("rg");
+		if (rg != null && rg.getSelectedIndex() == 1) {
+			Databox db3 = (Databox)w.getFellow("db3");
+			until = since = (Date) db3.getValue();
+			setDateSearchInterval(since, until);
+		} else {
+			Databox db1 = (Databox)w.getFellow("db1");
+			since = (Date) db1.getValue();
+			Databox db2 = (Databox)w.getFellow("db2");
+			until = (Date) db2.getValue();
+			setDateSearchInterval(since, until);
+		}			
 		w.detach();
 		bg.detach();
 		notifyParent();
@@ -496,7 +514,9 @@ public class AttributeSearchBox extends XulElement {
 	public void setDateSearchInterval(Date since, Date until) {
 		this.since = since;
 		this.until = until;
-		DateFormat df = DateFormats.getDateTimeFormat(); 
+		DateFormat df = attributeDef.getType() == TypeEnumeration.DATE_TIME_TYPE ?
+				DateFormats.getDateTimeFormat() :
+				DateFormats.getDateFormat(); 
 		
 		if (since == null && until == null)
 		{
@@ -506,7 +526,7 @@ public class AttributeSearchBox extends XulElement {
 		else if (since == null)
 		{
 			queryExpression = attributeDef.getName()+" le \""+
-					ISODateTimeFormat.dateTime().print(until.getTime())+
+					formatDate(until.getTime())+
 					"\"";
 			humanExpression = Labels.getLabel("attributeQuery.Until")+" \""+
 					df.format(until)+"\"";
@@ -514,44 +534,83 @@ public class AttributeSearchBox extends XulElement {
 		else if (until == null)
 		{
 			queryExpression = attributeDef.getName()+" ge \""+
-					ISODateTimeFormat.dateTime().print(since.getTime())+
+					formatDate(since.getTime())+
 					"\"";
 			humanExpression = Labels.getLabel("attributeQuery.Since")+" \""+
 					df.format(since)+"\"";
+		}
+		else if (since.equals(until)) {
+			String s = Labels.getLabel("attributeQuery.Equals");
+			queryExpression = attributeDef.getName()+" eq \""+
+					formatDate(since.getTime())+
+					"\"";
+			humanExpression = s+" "+df.format(since);
 		}
 		else
 		{
 			String s = Labels.getLabel("attributeQuery.Between");
 			queryExpression = attributeDef.getName()+" ge \""+
-					ISODateTimeFormat.dateTime().print(since.getTime())+
+					formatDate(since.getTime())+
 					"\""+
 					" and "+
 					attributeDef.getName()+" le \""+
-					ISODateTimeFormat.dateTime().print(until.getTime())+
+					formatDate(until.getTime())+
 					"\"";
 			humanExpression = String.format(s,"\""+df.format(since)+"\"", "\""+df.format(until)+"\"");
 		}
 		invalidate();
 	}
 
+	private String formatDate(long time) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		return df.format(new Date(time));
+	}
+
 	private void createDateSearch(final Window w, final Div bg) {
-		Executions.createComponents("~./com/soffid/iam/web/search/date-search.zul",
-				w, new HashMap<String, String>());
-		((Databox)w.getFellow("db1")).setValue( since );
-		((Databox)w.getFellow("db2")).setValue( until );
+
+		if (attributeDef.getType() == TypeEnumeration.DATE_TIME_TYPE) {
+			Executions.createComponents("~./com/soffid/iam/web/search/datetime-search.zul",
+					w, new HashMap<String, String>());
+			final Databox db1 = (Databox)w.getFellow("db1");
+			db1.setValue( since );
+			final Databox db2 = (Databox)w.getFellow("db2");
+			db2.setValue( until );
+		} else {
+			Executions.createComponents("~./com/soffid/iam/web/search/date-search.zul",
+					w, new HashMap<String, String>());
+			final Radiogroup rg = ((Radiogroup) w.getFellow("rg"));
+			rg.setSelectedIndex(textOperation);
+			enableDateBoxes(rg);
+			
+			rg.addEventListener("onCheck", new SerializableEventListener() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					Component target = event.getTarget();
+					if (target instanceof Radiogroup)
+						enableDateBoxes((Radiogroup) target);
+					else if (target instanceof Radio)
+						enableDateBoxes(((Radio) target).getRadiogroup());
+				}
+
+			});
+
+			final Databox db3 = (Databox)w.getFellow("db3");
+			db3.setValue( since );
+
+			final Databox db1 = (Databox)w.getFellow("db1");
+			db1.setValue( since );
+			final Databox db2 = (Databox)w.getFellow("db2");
+			db2.setValue( until );
+		}
 		
 		for (String id: DATE_DATEBOXES)
 		{
-			w.getFellow(id).addEventListener("onOK", new SerializableEventListener() {
-				@Override
-				public void onEvent(Event event) throws Exception {
-					doDateSearch(w, bg);
-				}
-		
-			});
-			w.getFellow(id).addEventListener("onCancel", new SerializableEventListener() {
-				@Override
-				public void onEvent(Event event) throws Exception {
+			final Component fellow = w.getFellowIfAny(id);
+			if (fellow != null) {
+				fellow.addEventListener("onOK", (ev) -> {
+						doDateSearch(w, bg);
+				});
+				fellow.addEventListener("onCancel", (ev) -> {
 					textOperation = 0;
 					since = null;
 					until = null;
@@ -561,9 +620,8 @@ public class AttributeSearchBox extends XulElement {
 					bg.detach();
 					invalidate();
 					notifyParent();
-				}
-		
-			});
+				});
+			}
 		}
 		w.getFellow("okbutton").addEventListener(CLICK_EVENT, new SerializableEventListener() {
 			public void onEvent(Event event) throws Exception {

@@ -61,7 +61,7 @@ public class PrinterGroupEntityDaoImpl extends
 			auditarGrupImpressora("U", grupImpressora.getGroup().getName(), grupImpressora.getPrinter().getName());
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.0"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.0"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message), e);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class PrinterGroupEntityDaoImpl extends
                         getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.1"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.1"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message), e);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class PrinterGroupEntityDaoImpl extends
 			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.2"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("PrinterGroupEntityDaoImpl.2"), grupImpressora.getPrinter().getName(), grupImpressora.getGroup().getName(), message), e);
 		}
 	}
 

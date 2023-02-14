@@ -54,7 +54,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-
+import com.soffid.iam.model.impl.SchemaTools;
 import com.soffid.iam.bpm.api.BPMUser;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.sync.engine.TaskHandler;
@@ -122,7 +122,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorCreating"), usuari.getUserName(), message));
+            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorCreating"), usuari.getUserName(), message),
+            		e);
         }
     }
 
@@ -207,7 +208,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
-            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorUpdating"), usuari.getUserName(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorUpdating"), usuari.getUserName(), message), e); //$NON-NLS-1$
         }
     }
 
@@ -251,12 +252,14 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             getUserPreferenceEntityDao().remove(usuari.getPreferences());
             getUserPrinterEntityDao().remove(usuari.getPrinters());
             
+            new SchemaTools().deleteDependencies(getSession(), "SC_USUARI", usuari.getId());
+            
             super.remove(usuari);
 
             auditarUsuari("D", codiUsuari, usuari.getPrimaryGroup()); //$NON-NLS-1$
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorDeleting"), usuari.getUserName(), message)); //$NON-NLS-1$
+            throw new SeyconException(String.format(Messages.getString("UserEntityDaoImpl.errorDeleting"), usuari.getUserName(), message), e); //$NON-NLS-1$
         }
     }
 

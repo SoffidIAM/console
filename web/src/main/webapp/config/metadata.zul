@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/metadata"
 	use="com.soffid.iam.web.config.MetadataHandler" id="frame">
 	<style>
 		tr.dropping td {
@@ -50,7 +51,7 @@
 
 		<div sclass="card__face card__face--back">
 			<div id="dades">
-				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+				<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 					<pager datatable="listbox"/>
 					
 					<menu2>
@@ -73,8 +74,8 @@
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.userRoles')}" required="false" dataType="ROLE" bind="@userRoles" id="userRoles" multiValue="true"/>
 					</div>
 					<style>
-						div.datatable.hideFirstCol div.tbodydiv table.tbody tr td:first-child,
-						div.datatable.hideFirstCol table.thead tr td:first-child  {
+						div.datatable.hideFirstCol div.tbodydiv table.tbody tr td:nth-child(2),
+						div.datatable.hideFirstCol table.thead tr td:nth-child(2)  {
 							display:none;
 							width: 0px;
 						}

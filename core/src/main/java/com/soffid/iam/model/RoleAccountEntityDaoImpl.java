@@ -244,7 +244,7 @@ public class RoleAccountEntityDaoImpl
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.1"), rolsUsuaris
 					.getRole().getName(), rolsUsuaris.getAccount().getName(),
-					message));
+					message), e);
 		}
 	}
 
@@ -368,7 +368,7 @@ public class RoleAccountEntityDaoImpl
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.4"), rolsUsuaris
 					.getRole().getName(), rolsUsuaris.getAccount().getName(),
-					message));
+					message), e);
 		}
 	}
 
@@ -456,7 +456,7 @@ public class RoleAccountEntityDaoImpl
 			throw new SeyconException(String.format(Messages
 					.getString("RolsUsuarisEntityDaoImpl.6"), rolsUsuaris
 					.getRole().getName(), rolsUsuaris.getAccount().getName(),
-					message));
+					message), e);
 		}
 	}
 
@@ -537,6 +537,7 @@ public class RoleAccountEntityDaoImpl
 
 		targetVO.setRoleName(sourceEntity.getRole().getName());
 		targetVO.setRoleCategory(sourceEntity.getRole().getCategory());
+		targetVO.setRoleId(sourceEntity.getRole().getId());
 		String nom;
 		if (usuariEntity != null) {
 			nom = usuariEntity.getFirstName();
@@ -679,10 +680,12 @@ public class RoleAccountEntityDaoImpl
 		String codiAplicacioRol = sourceVO.getInformationSystemName();
 		String codiBBDD = sourceVO.getSystem();
 		RoleEntity rol = null;
-		if (nomRolDomini != null) {
+		if (rol == null && nomRolDomini != null) {
 			rol = findRolByNomAndCodiApliacio(nomRolDomini, codiAplicacioRol,
 					codiBBDD);
 		}
+		if (rol == null && sourceVO.getRoleId() != null)
+			rol = getRoleEntityDao().load(sourceVO.getRoleId());
 		if (rol == null) {
 			throw new SeyconException(
 					String.format(

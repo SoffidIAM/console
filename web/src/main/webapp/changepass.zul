@@ -13,8 +13,9 @@
 		}
 	</style>
 	<div class="login">
-		<h:p><image src="/anonymous/logo.png" style="max-width: 250px; max-height: 125px;"  /> </h:p> 
-        <h:p><image src="/anonymous/logo - iam-orig.svg" style="width: 250px; height: 125px;" /> </h:p> 
+		<div class="loginimage">
+			<image src="/anonymous/logo.png" style="max-width: 280px; max-height: 125px;" />
+		</div>
 		<div class="loginbox">
 
 			<div class="atencio" if="${!canviVoluntari}">
@@ -47,4 +48,8 @@
 			</div>
 		</div>
 	</div>
+	<html><![CDATA[
+       	<div class="soffid-logo-corner"><a href="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
+	]]>
+	</html>
 </frame>

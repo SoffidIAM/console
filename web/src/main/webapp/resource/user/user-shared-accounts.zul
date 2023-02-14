@@ -29,6 +29,15 @@
 		- name: ${c:l('usuaris.zul.DataCaducitat')}
 		  width: 150px
 		  value: passwordExpiration_datetime
+		- name: ${c:l('com.soffid.iam.api.Account.accessLevel')}
+		  width: 150px
+		  value: accessLevel
+		  template: >-
+		    #{accessLevel.value == 'N' ? "${c:l('es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_NAVIGATE')}":
+		    accessLevel.value == 'U' ? "${c:l('es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_USER')}":	
+		    accessLevel.value == 'M' ? "${c:l('es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_MANAGER')}":	
+		    accessLevel.value == 'O' ? "${c:l('es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_OWNER')}":	
+		    "${c:l('es.caib.seycon.ng.comu.AccountAccessLevelEnum.ACCESS_NONE')}"}
 		]]>
 		</attribute>
 	</datatable>

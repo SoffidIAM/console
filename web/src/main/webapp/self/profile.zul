@@ -63,6 +63,7 @@
 								id="sampletimeformat" type="STRING"  />
 	
 							<div style="width: 100%; text-align: right">
+								<databutton image="/img/undo-r.svg" label="${c:l('common.undo') }" onClick="ref:frame.undo"/>
 								<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" onClick="ref:frame.apply"/>
 							</div>
 	

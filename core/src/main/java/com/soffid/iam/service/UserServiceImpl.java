@@ -90,6 +90,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SecretEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
+import com.soffid.iam.model.ServerInstanceEntity;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.TaskEntity;
@@ -105,8 +106,10 @@ import com.soffid.iam.model.UserProcessEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.impl.CertificateParser;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
@@ -121,13 +124,12 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.exception.UnknownUserException;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.ng.sync.servei.SyncStatusService;
 import es.caib.signatura.api.ParsedCertificate;
 import es.caib.signatura.api.Signature;
 import es.caib.signatura.cliente.ValidadorCertificados;
@@ -522,7 +524,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			}
 		} catch (Exception e) {
 			log.warn(Messages.getString("UserServiceImpl.Error"), e); //$NON-NLS-1$
-			throw new SeyconException(e.getMessage());
+			throw new SeyconException(e.getMessage(), e);
 		}
 	}
 
@@ -868,7 +870,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			String segonLlinatge, String multiSessio, String comentari,
 			String tipusUsuari, String servidorPerfil, String servidorHome,
 			String servidorCorreu, String codiGrupPrimari, String dni,
-			String dominiCorreu, String grupSecundari, Boolean restringeixCerca) {
+			String dominiCorreu, String grupSecundari, Boolean restringeixCerca) throws InternalErrorException {
 		String query = "select usuari " //$NON-NLS-1$
 				+ "from com.soffid.iam.model.UserEntity usuari " //$NON-NLS-1$
 				+ "left join usuari.profileServer as servidorPerfil " //$NON-NLS-1$
@@ -2729,7 +2731,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 	private void addDateRange(String value, String hqlAttribute,
 			String joinArray[], List<String> joins, List<String> queries,
-			List<Parameter> params) {
+			List<Parameter> params) throws InternalErrorException {
 		if (value != null && value.trim().compareTo("") != 0 //$NON-NLS-1$
 				&& value.trim().compareTo("%") != 0) { //$NON-NLS-1$
 			value = value.trim();
@@ -3095,7 +3097,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	String generateQuickSearchQuery (String text) {
 		if (text == null )
 			return  "";
-		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByObjectTypeAndName(User.class.getName(), null);
 		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");
@@ -3284,7 +3286,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 			fetchUserAttributes(attributes, entity.getUserData(), false);
 			
-			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+			Collection<MetaDataEntity> md = getMetaDataEntityDao().findByObjectTypeAndName(User.class.getName(), null);
 			for ( MetaDataEntity m: md) if ( m.getBuiltin() == null || ! m.getBuiltin().booleanValue() )
 			{
 				Object o = attributes.get(m.getName());
@@ -3566,5 +3568,50 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
         }
         return r;
 	}
+
+	@Override
+	protected void handleSendPassword(String userName, String passwordDomain) throws Exception {
+		UserEntity user = getUserEntityDao().findByUserName(userName);
+		
+		Password result = null;
+		
+		if ( "S".equals(user.getActive()))
+		{
+			for (ServerEntity se : getServerEntityDao().loadAll()) {
+	            if (se.getType().equals(ServerType.MASTERSERVER)) {
+	            	if (se.getInstances().isEmpty()) {
+	            		if (resendPasswordNow(user, passwordDomain, se.getUrl(), se.getAuth())) 
+	            			return;
+	            	} else {
+	            		for (ServerInstanceEntity si: se.getInstances()) {
+		            		if (resendPasswordNow(user, passwordDomain, si.getUrl(), si.getAuth())) 
+		            			return;
+	            			
+	            		}
+	            	}
+	            }
+	        }
+		}
+	}
+
+	private boolean resendPasswordNow(UserEntity user, String passwordDomain, String url, String auth)
+			throws InternalErrorException {
+		com.soffid.iam.sync.service.SyncStatusService sss = null;
+		try {
+		    RemoteServiceLocator rsl = new RemoteServiceLocator(url);
+		    rsl.setAuthToken(auth);
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		    sss = rsl.getSyncStatusService();
+		} catch (Exception e) {
+			log.warn("Error sending password", e);
+		}
+		if (sss != null)
+		{
+			sss.resendUserPassword(user.getUserName(), passwordDomain);
+			return true;
+		} else
+			return false;
+	}
+	
 
 }

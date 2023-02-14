@@ -9,7 +9,11 @@
 		<vbox style="padding:7px;">
 			<div style="margin-left:0px;margin-top:3px;">
 				<label class="etiqueta" id="missatge" multiline="true"
-					value="" style="font-size:120%; color:#cd6155;" />
+					value="" style="font-size:120%; color:#cd6155; word-break: break-word;" />
+			</div>
+			<div style="margin-left:0px;margin-top:3px;" id="categoryDiv">
+				<label class="etiqueta" value="${c:l('error.zul.category') }: "/>
+				<label class="etiqueta" id="category"/>
 			</div>
 			<div style="margin-left:-2px;margin-top:10px;" id = "techDataDiv">
 				<div sclass="collapser" onClick="ref:showStack" id="collapser" style="vertical-align: bottom">
@@ -19,7 +23,7 @@
 					value="${c:l('error.zul.Causatper')}" onClick="ref:showStack();" />
 			</div>
 			<textbox id="exception" visible="false" readonly="true"
-				rows="10" width="675px" />
+				rows="10" width="675px" style="word-break: break-all;white-space: pre;font-family: monospace;"/>
 		</vbox>
 	</div>
 	<zscript><![CDATA[

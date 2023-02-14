@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.soffid.iam.api.ScheduledTask;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.sync.engine.intf.DebugTaskResults;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.mda.annotation.*;
@@ -19,6 +20,8 @@ import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.PasswordValidation;
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.DominiContrasenyaEntity;
+import es.caib.seycon.ng.model.TasqueEntity;
 import es.caib.seycon.ng.servei.DispatcherService;
 import roles.agent_create;
 import roles.agent_update;
@@ -40,6 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.UsuariEntity.class,
 	es.caib.seycon.ng.model.AccountEntity.class,
 	DispatcherService.class,
+	TasqueEntity.class,
+	TenantEntity.class,
+	DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.sync.servei.ServerService.class})
 public abstract class SyncStatusService {
 
@@ -198,4 +204,14 @@ public abstract class SyncStatusService {
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public void setAccountSshPrivateKey(java.lang.String accountName, String serverName, Password privateKey)
 			throws es.caib.seycon.ng.exception.InternalErrorException {	}
+	
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void resendAccountPassword(java.lang.Long accountId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void resendUserPassword(String user, String passwordDomain)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
 }

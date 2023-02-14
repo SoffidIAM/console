@@ -2,6 +2,7 @@
 <?page id="UserDomains" title="Gestió dels dominis d'usuari"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <frame  saveContent="true" xmlns:h="http://www.w3.org/1999/xhtml"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/account-naming-rules"
 	use="com.soffid.iam.web.domain.UserDomainHandler" >
 
 	<script src='~./js/codemirror/java-classes.js'/>
@@ -36,7 +37,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox"/>
 				
 				<menu2>
@@ -83,7 +84,6 @@
 						<row>
 							<div>
 								<label value="${c:l('dominiUsuaris.zul.scriptCreate')} :"/>
-								<imageclic src="/img/info.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="vertical-align: middle; margin-right: 8px"/>
 							</div>
 							<codemirror bind="@bshExprCreate" id="du_script1" 
 								readonly="${!canModifyUserDomain}"
@@ -96,7 +96,6 @@
 						<row>
 							<div>
 								<label value="${c:l('dominiUsuaris.zul.script')} :"/>
-								<imageclic src="/img/info.svg" onClick="ref:frame.scriptHelp" title="${c:l('seu.ajuda') }" style="vertical-align: middle; margin-right: 8px"/>
 							</div>
 							<codemirror bind="@bshExpr" id="du_script2"
 								linenumbers="true" 
@@ -104,6 +103,27 @@
 								language="java" 
 								width="99%" height="8em">
 							</codemirror>
+						</row>
+						<row>
+							<label/>
+							<div>
+								<html><![CDATA[
+								   Available variables:<br>
+								   <b>user</b>: <a href="https://download.soffid.com/doc/console/latest/uml/com/soffid/iam/api/User.html" target="_blank">User object</a><br>
+								   <b>groupsList</b>: Names of the groups assigned to the user<br>
+								   <b>userDomain</b>: The name of this rule<br>
+								   <b>system</b>: The name of the target system<br>
+								   <b>serviceLocator</b>: service Locator<br>
+								   return the <b>suggested user name</b>
+								]]></html>
+								<div>
+									<h:a href="http://www.soffid.org/doc/console/latest/uml/" target="_blank">Service model</h:a>
+								</div>
+							
+								<div>
+									<h:a href="http://www.soffid.org/doc/console/latest/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</h:a>
+								</div>	
+							</div>
 						</row>
 					</rows>
 				</grid>

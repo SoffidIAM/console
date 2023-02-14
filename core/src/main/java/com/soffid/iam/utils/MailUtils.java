@@ -93,6 +93,12 @@ public class MailUtils {
 		String auth = getConfigValue("mail.auth", "false");
 		if ("true".equals(auth))
 		{
+			final String sasl = ConfigurationCache.getProperty("mail.smtp.sasl.enable");
+			if (sasl != null ) {
+				props.put("mail.smtp.sasl.enable", sasl);
+				final String realm = ConfigurationCache.getProperty("mail.smtp.sasl.auth");
+				props.put("mail.smtp.sasl.auth", realm);
+			}
 			props.put("mail.smtp.auth", "true");
 			props.put("mail.smtps.auth", "true");
 			final String user = getConfigValue("mail.user", null);

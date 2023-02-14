@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -166,7 +167,7 @@ public class Search extends FrameHandler
 					JSONObject o = new JSONObject();
 					o.put("id", proc.getId());
 					o.put("description", proc.getDescription() );
-					o.put("task", proc.getCurrentTask());
+					o.put("currentTask", proc.getCurrentTask());
 					if (proc.getStart() != null) {
 						o.put("start", proc.getStart().getTime());
 						o.put("start_datetime", df.format(proc.getStart()));
@@ -175,6 +176,16 @@ public class Search extends FrameHandler
 						o.put("end", proc.getEnd().getTime());
 						o.put("end_datetime", df.format(proc.getEnd()));
 					}
+					
+					JSONObject atts = new JSONObject();
+					for (Entry<String, Object> att: proc.getVariables().entrySet()) {
+						Object value = att.getValue();
+						if (value != null) {
+							resultadoBusqueda.wrapClientValue(atts, att.getKey(), value);
+						}
+					}
+					o.put("attributes", atts);
+					
 					if (sb.length() > 1) sb.append(",");
 					sb.append(o.toString());
 				}

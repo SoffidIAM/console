@@ -527,7 +527,7 @@ public class AttributeMappingHandler extends DataGrid {
 		Set<String> filter = (Set<String>) getVariable("propertiesFilter", false);
 		if (filter != null) {
 			String name = (String) XPathUtils.eval(r, "property");
-			if ( ! filter.contains(name))
+			if (name != null && !name.isEmpty() && ! filter.contains(name))
 				r.setVisible(false);
 		}
 

@@ -9,6 +9,7 @@
 	id="frame" title="${c:l('selfService.MyProcess')}"
 	mold="div"
 	nomenu="true"
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/my-tasks"
 	use="com.soffid.iam.web.bpm.process.MyRequestsHandler">
 		
 
@@ -23,26 +24,14 @@
 			</div>
 	
 			<datatable enablefilter="true" id="listbox" 
+				use="com.soffid.iam.web.bpm.process.ProcessDatatable" 
+				preference="processInstance"
 				onSelect="ref:frame.openProcess">
-			<attribute name="columns"><![CDATA[
-- name: ${c:l('observacion.lblIdProceso')}
-  value: id
-- name: ${c:l('observacion.lblProceso')}
-  value: name
-- name: ${c:l('observacion.lblTarea')}
-  value: task
-- name: ${c:l('observacion.lblFechaInicio')}
-  value: startDate
-  template: #{startDate_datetime }
-- name: ${c:l('observacion.lblFechaFinalizacion')}
-  value: endDate
-  template: #{endDate_datetime}
-			]]></attribute>
 			</datatable>
 		</div>
 		
 		<div sclass="card__face card__face--back">
-			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.hideDetails">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatable="listbox"/>								
 			</div>
  			<process id="process"/>

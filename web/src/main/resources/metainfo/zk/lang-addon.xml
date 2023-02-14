@@ -235,6 +235,14 @@
 			<mold-name>default</mold-name>
 			<mold-uri>~./zul/html/uploader.dsp</mold-uri>
 		</mold>
+		<mold>
+			<mold-name>addbutton</mold-name>
+			<mold-uri>~./zul/html/uploader-addbutton.dsp</mold-uri>
+		</mold>
+		<mold>
+			<mold-name>simple</mold-name>
+			<mold-uri>~./zul/html/uploader-simple.dsp</mold-uri>
+		</mold>
 	</component>
 		
 </language-addon>

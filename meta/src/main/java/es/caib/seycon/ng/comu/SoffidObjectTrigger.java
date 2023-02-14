@@ -22,4 +22,7 @@ public class SoffidObjectTrigger {
 
 	public java.lang.String POST_DELETE="postDelete";
 
+	public java.lang.String PRE_SET_PASSWORD="preSetPassword";
+
+	public java.lang.String POST_SET_PASSWORD="postSetPassword";
 }

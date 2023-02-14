@@ -21,6 +21,7 @@ import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 
 import java.sql.Timestamp;
@@ -142,7 +143,7 @@ public class AccessControlEntityDaoImpl
 		SystemEntity agent = null;
 		// Obtenim el dispatcher (agent)
 		if (source.getAgentName() == null)
-			throw new SeyconException (Messages.getString("AccessControlEntityDaoImpl.0"));  //$NON-NLS-1$
+			throw new SeyconException(Messages.getString("AccessControlEntityDaoImpl.0"));  //$NON-NLS-1$
 		else {
 			agent = getSystemEntityDao().findByName(source.getAgentName());
 			if (agent!=null)

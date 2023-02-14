@@ -66,7 +66,9 @@ public class LoginPage extends Html {
 			setVariable("showTenant", showTenant? "true": "false", false);
 			setVariable("tenantStyle", showTenant? "": "display:none", false);
 			setVariable("tenant", tenant, false);
-			if (saml)
+			boolean maintenance = "true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||
+					"true".equals(System.getProperty("soffid.auth.maintenance"));
+			if (saml && !maintenance)
 			{
 				String user = "";
 				String password = "";
@@ -94,7 +96,8 @@ public class LoginPage extends Html {
 			} else {
 				setVariable("autoLogin", false, false);
 			}
-			setVariable("saml", saml, false);
+			setVariable("saml", saml && !maintenance, false);
+			setVariable("maintenance", maintenance, false);
 		} catch (InternalErrorException e) {
 			throw new UiException(e);
 		}

@@ -15,9 +15,11 @@ package com.soffid.iam.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,6 +58,7 @@ import com.soffid.iam.api.ReconcileTrigger;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.api.ServerRegistrationToken;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.SystemGroup;
@@ -86,6 +89,7 @@ import com.soffid.iam.model.RuleEntity;
 import com.soffid.iam.model.ServerCertificateEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.ServerEntityDao;
+import com.soffid.iam.model.ServerRegistrationTokenEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.SystemEntityDao;
 import com.soffid.iam.model.SystemGroupEntity;
@@ -119,7 +123,7 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
-import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SoffidStackTrace;
 
 /**
@@ -172,7 +176,7 @@ public class DispatcherServiceImpl extends
 			SystemEntity dispatchersSameCode = getSystemEntityDao().findByName(
 					dispatcher.getName());
 			if (dispatchersSameCode != null)
-				throw new SeyconException(String.format(Messages
+				throw new InternalErrorException(String.format(Messages
 						.getString("DipatcherServiceImpl.CodeDispatcherExists"),
 						dispatcher.getName()));
 	
@@ -604,11 +608,11 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
 		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
 		if (agent == null || agent.getUrl() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
 		
@@ -639,7 +643,7 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
 
 		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
@@ -647,7 +651,7 @@ public class DispatcherServiceImpl extends
 
 		SystemEntity system = getSystemEntityDao().findByName(codiAgent);
 		if (system == null || system.getUrl() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
 		
@@ -1283,11 +1287,11 @@ public class DispatcherServiceImpl extends
 			throw new InternalErrorException ("Task configuration setting is in read only mode");
 		// Verifiquem que l'agent siga actiu
 		if (codiAgent == null || "".equals(codiAgent.trim())) //$NON-NLS-1$
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.4")); //$NON-NLS-1$
 		com.soffid.iam.api.System agent = findDispatcherByName(codiAgent);
 		if (agent == null || agent.getUrl() == null)
-			throw new SeyconException(
+			throw new InternalErrorException(
 					Messages.getString("DispatcherServiceImpl.5")); //$NON-NLS-1$
 
 		// Obtenim tots els rols de l'agent:
@@ -2184,6 +2188,39 @@ public class DispatcherServiceImpl extends
 	@Override
 	protected AsyncProcessTracker handleQueryProcessStatus(AsyncProcessTracker process) throws Exception {
 		return proc.get(process.getId());
+	}
+
+	@Override
+	protected ServerRegistrationToken handleConsumeRegistrationToken(String token) throws Exception {
+		getServerRegistrationTokenEntityDao().removeExpiredTokens();
+		ServerRegistrationTokenEntity t = getServerRegistrationTokenEntityDao().findByToken(token);
+		if (t == null)
+			return null;
+		else {
+			ServerRegistrationToken srt = getServerRegistrationTokenEntityDao().toServerRegistrationToken(t);
+			getServerRegistrationTokenEntityDao().remove(t);
+			return srt;
+		}
+	}
+
+	@Override
+	protected String handlePreRegisterServer(ServerRegistrationToken register) throws Exception {
+		ServerRegistrationTokenEntity entity = getServerRegistrationTokenEntityDao().serverRegistrationTokenToEntity(register);
+		do {
+			byte b[] = new byte[63];
+			new SecureRandom().nextBytes(b);
+			entity.setToken(Base64.getUrlEncoder().encodeToString(b));
+		} while (getServerRegistrationTokenEntityDao().findByToken(entity.getToken()) != null);
+		entity.setExpiration(new Date(java.lang.System.currentTimeMillis() + 24 * 60 * 60 * 1000));
+		getServerRegistrationTokenEntityDao().create(entity);
+		return entity.getToken();
+	}
+
+	@Override
+	protected boolean handleIsRegistrationTokenAlive(String token) throws Exception {
+		getServerRegistrationTokenEntityDao().removeExpiredTokens();
+		ServerRegistrationTokenEntity t = getServerRegistrationTokenEntityDao().findByToken(token);
+		return t != null;
 	}
 
 }

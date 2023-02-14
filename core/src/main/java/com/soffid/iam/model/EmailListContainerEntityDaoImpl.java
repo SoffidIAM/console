@@ -73,7 +73,7 @@ public class EmailListContainerEntityDaoImpl extends
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.2"), relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getPertains().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.2"), relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getPertains().getName(), message), e);
         }
     }
 
@@ -99,7 +99,7 @@ public class EmailListContainerEntityDaoImpl extends
                     nomLlistaPertany, dominiLlistaPertany);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.3"), relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getPertains().getName(), message));
+			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.3"), relacioLlistaCorreu.getContains().getName(), relacioLlistaCorreu.getPertains().getName(), message), e);
         }
     }
 
@@ -255,7 +255,7 @@ public class EmailListContainerEntityDaoImpl extends
                     nomLlistaPertany, dominiLlistaPertany);
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.6"), nomLListaConte, nomLlistaPertany, message)); //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("EmailListContainerEntityDaoImpl.6"), nomLListaConte, nomLlistaPertany, message), e); //$NON-NLS-1$
         }
 
     }

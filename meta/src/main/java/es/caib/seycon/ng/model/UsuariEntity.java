@@ -55,10 +55,10 @@ public abstract class UsuariEntity {
 	@Column(name = "USU_CODI", length = 150, translated = "userName")
 	public java.lang.String codi;
 
-	@Column(name = "USU_NOM", length = 50, translated = "firstName")
+	@Column(name = "USU_NOM", length = 100, translated = "firstName")
 	public java.lang.String nom;
 
-	@Column(name = "USU_PRILLI", length = 50, translated = "lastName")
+	@Column(name = "USU_PRILLI", length = 100, translated = "lastName")
 	public java.lang.String primerLlinatge;
 
 	@Column(name = "USU_NOMCUR", length = 100, translated = "shortName")
@@ -83,7 +83,7 @@ public abstract class UsuariEntity {
 	@Column(name = "USU_ACTIU", length = 1, translated = "active")
 	public java.lang.String actiu;
 
-	@Column(name = "USU_SEGLLI", length = 50, translated = "middleName")
+	@Column(name = "USU_SEGLLI", length = 100, translated = "middleName")
 	@Nullable
 	public java.lang.String segonLlinatge;
 

@@ -15,7 +15,7 @@
 	</datanode>
 
 	<datanode name="policy">
-		<finder name="action" type="action">
+		<finder name="action" type="action" refreshAfterCommit="true">
 			<ejb-finder jndi="java:/module/PamPolicyService-v2" method="findPolicyActions">
 				<parameter value="${instance}"/>
 			</ejb-finder>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+
+
+<window id="pam04_w" position="top-center" closable="false" sizable="false"
+	title="${c:l('wizard-pam-otp.title') }"
+	use="com.soffid.iam.web.wheel.Pam04Handler"
+	style="width: 80%; height: 450px max-width: 800px; top: 200px !important;">
+	<div style="height: 300px">
+		<label multiline="true" value="${c:l('wizard-pam-otp.explanation') }" />
+	</div>
+	<div style="text-align: right; width: 100%">
+		<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:pam04_w.back" />
+		<button image="/img/ok-r.svg" label="${c:l('rules.apply')}" onClick="ref:pam04_w.apply" id="step2Button"/>
+	</div>
+</window>

@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -154,15 +155,20 @@ public class Search extends FrameHandler
 				while (bookmarks.getChildren().size()>1) bookmarks.getLastChild().detach();
 				final SimpleDateFormat timeFormat = new SimpleDateFormat(DateFormats.getTimeFormatString());
 				timeFormat.setTimeZone(TimeZones.getCurrent());
+				Long last = null;
 				for ( Long bookmark: session.getBookmarks()) {
-					Date d = new Date(bookmark.longValue()*1000L);
-					String s = timeFormat.format(d);
-					AbstractTag l = new A();
-					l.appendChild(new Text(s));
-					l.setDynamicProperty("href", "#");
-					l.setDynamicProperty("onclick", "doJumpVideoTo("+bookmark+"000, true);");
-					l.setSclass("bookmark");
-					bookmarks.appendChild(l);
+					if (last == null || last.longValue() / 60 < bookmark.longValue() / 60)
+					{
+						last = bookmark;
+						Date d = new Date(bookmark.longValue()*1000L);
+						String s = timeFormat.format(d);
+						AbstractTag l = new A();
+						l.appendChild(new Text(s));
+						l.setDynamicProperty("href", "#");
+						l.setDynamicProperty("onclick", "doJumpVideoTo("+bookmark+"000, true);");
+						l.setSclass("bookmark");
+						bookmarks.appendChild(l);
+					}
 				}
 			}
 		}

@@ -52,13 +52,13 @@
 .g_pam {  }
 .g_irc {  }
 .g_iga {  }
-.cls-1,.cls-2,.cls-3,.cls-4 { font-family:Mukta-SemiBold, Mukta;font-size:30.39px; }
+.cls-1,.cls-2,.cls-3,.cls-4 { font-family:soffid, Mukta-SemiBold, Mukta;font-size:30.39px; }
 .cls-1,.cls-5,.cls-6,.cls-7 { fill:#c67981; }
 .cls-2,.cls-8,.cls-9,.cls-10 { fill:#799929; }
 .cls-3,.cls-11,.cls-12,.cls-13 { fill:#637784; }
 .cls-4,.cls-14,.cls-15,.cls-16 { fill:#2a889e; }
 .cls-5,.cls-8,.cls-14,.cls-11 { font-size:12px; }
-.cls-5,.cls-8,.cls-14,.cls-11,.cls-17 { font-family:Mukta-Bold, Mukta; }
+.cls-5,.cls-8,.cls-14,.cls-11,.cls-17 { font-family:soffid, Mukta-Bold, Mukta; }
 .cls-18 { letter-spacing:-.01em; }
 .cls-19 { letter-spacing:-.01em; }
 .cls-20 { letter-spacing:-.04em; }
@@ -81,7 +81,7 @@
 .cls-37 { letter-spacing:-.06em; }
 .cls-38 { letter-spacing:-.06em; }
 .cls-39 { letter-spacing:-.02em; }
-.cls-40,.cls-41,.cls-13,.cls-16,.cls-10,.cls-7 { font-family:Mukta-Regular, Mukta; }
+.cls-40,.cls-41,.cls-13,.cls-16,.cls-10,.cls-7 { font-family:soffid, Mukta-Regular, Mukta; }
 .cls-40,.cls-17 { font-size:15px; }
 .cls-42 { letter-spacing:-.03em; }
 .cls-43 { letter-spacing:-.02em; }

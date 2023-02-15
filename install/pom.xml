@@ -182,6 +182,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+          <!--
 					<execution>
 						<id>build-msi</id>
 						<phase>package</phase>
@@ -196,6 +197,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+          -->
 					<execution>
 						<id>docker</id>
 						<phase>package</phase>
@@ -287,12 +289,14 @@
 									</file>
 									<type>rpm</type>
 								</artifact>
+                <!--
 								<artifact>
 									<file>
 										target/wix/console.msi
 									</file>
 									<type>msi</type>
 								</artifact>
+                -->
 							</artifacts>
 						</configuration>
 					</execution>

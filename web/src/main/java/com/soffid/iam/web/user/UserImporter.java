@@ -34,6 +34,7 @@ public class UserImporter extends CsvImporter< User > {
 	@Override
 	protected User newObject() throws InternalErrorException, NamingException, CreateException {
 		User o = new User();
+		o.setActive(true);
 		return o;
 	}
 

@@ -17,6 +17,7 @@ import com.soffid.iam.web.component.FrameHandler;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datasource.CommitException;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class RoleHandler extends FrameHandler {
 
@@ -29,6 +30,8 @@ public class RoleHandler extends FrameHandler {
 		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
 			BulkAction ba = new BulkAction( Role.class.getName() ); 
 			ba.start(listbox ) ;
+		} else {
+			Missatgebox.avis("bulk.selectOneObject");
 		}
 	}
 	

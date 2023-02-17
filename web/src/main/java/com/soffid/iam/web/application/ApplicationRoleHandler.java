@@ -692,6 +692,8 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
 			BulkAction ba = new BulkAction( Role.class.getName() ); 
 			ba.start(listbox ) ;
+		} else {
+			Missatgebox.avis("bulk.selectOneObject");
 		}
 	}
 

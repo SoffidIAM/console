@@ -104,6 +104,8 @@ public class UserHandler extends FrameHandler {
 		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
 			UserBulkAction ba = new UserBulkAction( ); 
 			ba.start(listbox ) ;
+		} else {
+			Missatgebox.avis("bulk.selectOneObject");
 		}
 	}
 

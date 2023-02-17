@@ -475,6 +475,8 @@ public class AccountHandler extends FrameHandler {
 			BulkAction ba = new AccountBulkAction( ) ; 
 			ba.setSearchBox ( (SearchBox) getFellow("searchBox") );
 			ba.start(listbox ) ;
+		} else {
+			Missatgebox.avis("bulk.selectOneObject");
 		}
 	}
 

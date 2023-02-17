@@ -23,8 +23,10 @@ public class Irc03Sector extends Sector {
 	@Override
 	public boolean isDone() {
 		try {
-			if (actualSector == null)
-				return true;
+			if (actualSector == null) {
+				dim(getHandler());
+				return false;
+			}
 			else
 				return ((Boolean)actualSector.getClass().getMethod("isDone").invoke(actualSector)).booleanValue();
 		}

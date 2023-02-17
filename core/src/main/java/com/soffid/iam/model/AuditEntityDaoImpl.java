@@ -19,6 +19,7 @@ import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.service.PasswordService;
+import com.soffid.iam.ssl.AlwaysTrustManager;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 
@@ -26,6 +27,7 @@ import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.Auditoria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.seycon.ng.model.*;
 import es.caib.seycon.ng.utils.Security;
 
@@ -35,6 +37,11 @@ import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -47,6 +54,11 @@ import java.util.LinkedList;
 import java.util.MissingResourceException;
 import java.util.TimeZone;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,7 +69,6 @@ public class AuditEntityDaoImpl extends
 		com.soffid.iam.model.AuditEntityDaoBase {
 	private static final String BUNDLE_NAME = "com.soffid.iam.model.audit.messages"; //$NON-NLS-1$
 	private static final String BUNDLE_NAME2 = "es.caib.seycon.ng.model.audit.messages"; //$NON-NLS-1$
-
 	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
 
 	@Override
@@ -114,10 +125,8 @@ public class AuditEntityDaoImpl extends
 		}
 	}
 
-	private void sendSysLog(InetAddress syslogServer, Audit audobj) throws IOException {
-        DatagramSocket s = new DatagramSocket();
-        s.connect(syslogServer, 514);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	private void sendSysLog(InetAddress syslogServer, Audit audobj) throws IOException, NoSuchAlgorithmException, KeyManagementException, KeyStoreException, CertificateException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream p = new PrintStream(out, true, "UTF-8");
         p.print("<134>"); // PRI
         p.print("1"); // VERSION
@@ -147,11 +156,45 @@ public class AuditEntityDaoImpl extends
         		(audobj.getSourceIp() == null? "": audobj.getSourceIp())+ 
         		"]" + audobj.getMessage());// MSG     
         p.flush ();
-        
         byte buf [] = out.toByteArray();
-        DatagramPacket packet = new DatagramPacket(buf, buf.length);
-        s.send (packet);
-        s.close();
+        
+		String protocol = ConfigurationCache.getProperty ("soffid.syslog.protocol");
+		if ("ssl".equals(protocol)) {
+			new Thread(() -> {
+				try {
+			        SSLContext ctx;
+			        ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
+			        ctx.init(new KeyManager[0], new TrustManager[] { new AlwaysTrustManager() }, null);
+					SSLSocket s = (SSLSocket) ctx.getSocketFactory().createSocket(syslogServer, 514);
+					s.getOutputStream().write(buf);
+					s.getOutputStream().write(10);
+					s.close();
+				} catch (Exception e) {
+					log.warn("Error sending syslog message: "+SoffidStackTrace.generateShortDescription(e));
+				}
+			}).start();
+			
+		}
+		else if ("tcp".equals(protocol)) {
+			new Thread(() -> {
+				try {
+					Socket s =  new Socket(syslogServer, 514);
+					s.getOutputStream().write(buf);
+					s.getOutputStream().write(10);
+					s.close();
+				} catch (Exception e) {
+					log.warn("Error sending syslog message: "+SoffidStackTrace.generateShortDescription(e));
+				}
+			}).start();
+		}
+		else {
+			DatagramSocket s = new DatagramSocket();
+			s.connect(syslogServer, 514);
+			DatagramPacket packet = new DatagramPacket(buf, buf.length);
+			s.send (packet);
+			s.close();
+			
+		}
 	}
 
 	public void remove(com.soffid.iam.model.AuditEntity auditoria) throws RuntimeException {

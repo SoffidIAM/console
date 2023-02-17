@@ -65,6 +65,7 @@ maven_release:
     - mvn scm:checkout -DscmVersion="$CI_COMMIT_BRANCH" -DscmVersionType=branch -DcheckoutDirectory=../clone
     - cd ../clone
     - 'git remote add gitlab "ssh://git@gitlab.internal.soffid.com:2224/${CI_PROJECT_PATH}.git"' 
+    - git config pull.rebase false
     - git pull gitlab "$CI_COMMIT_PATH" --no-edit
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"

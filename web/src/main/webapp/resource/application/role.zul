@@ -33,7 +33,7 @@
 				use="com.soffid.iam.web.application.RoleDatatable"
 				multiselect="true"
 				onMultiSelect="ref:frame.multiSelect"
-				preference="user"
+				preference="role"
 				dataPath="/model:/role" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>

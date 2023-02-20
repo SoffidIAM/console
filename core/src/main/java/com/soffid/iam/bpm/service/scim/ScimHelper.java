@@ -1,6 +1,8 @@
 package com.soffid.iam.bpm.service.scim;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -37,6 +39,10 @@ public class ScimHelper {
 	private HQLQuery hql;
 	Integer count = null;
 	Session session;
+	String extraJoin = null;
+	String extraWhere = null;
+	private String returnValue;
+	private int pageSize;
 	
 	public ScimHelper (Class objectClass) {
 		this.objectClass = objectClass;
@@ -44,6 +50,103 @@ public class ScimHelper {
 	
 	
 	public void search (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
+		AbstractExpression expr = evaluateQuery(textFilter, jsonQuery);
+
+		if (session == null) {
+			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+			session = sf.getCurrentSession();
+		}
+					
+		String q = hql.toString();
+		if (returnValue != null) {
+			int i = q.indexOf(" from ");
+			q = q.substring(0, i) + ", "+returnValue+q.substring(i);
+		}
+		if (order != null && hql.getOrderByString().length() == 0)
+			q = q + " order by "+ order;
+		
+		org.hibernate.Query queryObject = session.createQuery( q );
+		int i = 0;
+		Map<String, Object> params = hql.getParameters();
+		for (String s : params.keySet())
+		{
+			Object v = params.get(s);
+			if (v == null)
+				queryObject.setParameter(s, v, 
+						org.hibernate.Hibernate.STRING);
+			else
+				queryObject.setParameter(s, v);
+		}
+		if (tenantFilter != null)
+			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+		TimeOutUtils tou = new TimeOutUtils();
+
+		
+		if (config != null)
+		{
+			if (config.getMaximumResultSize() != null)
+				queryObject.setMaxResults(config.getMaximumResultSize());
+			if (config.getFirstResult() != null)
+				queryObject.setFirstResult(config.getFirstResult());
+			if (config.getFetchSize() != null)
+				queryObject.setFetchSize(config.getFetchSize());
+		}
+
+		AsyncList asyncList = null;
+		if (result instanceof AsyncList)
+			asyncList = (AsyncList) result;
+		count = null;
+		if (pageSize > 0 ) {
+			int page = 0;
+			do {
+				queryObject.setFirstResult(page);
+				queryObject.setMaxResults(pageSize);
+				if (!fetchObjects(result, expr, queryObject, tou))
+					break;
+				page += pageSize;
+				session.flush();
+			} while(true);
+			
+		}
+		else
+		{
+	        fetchObjects(result, expr, queryObject, tou);
+			
+		}
+		if (config.getMaximumResultSize() == null && config.getFetchSize() == null &&
+				(asyncList == null || ! asyncList.isCancelled()))
+			count = new Integer(result.size());
+	}
+
+
+	private boolean fetchObjects(Collection<Object> result, AbstractExpression expr, org.hibernate.Query queryObject,
+			TimeOutUtils tou) throws InternalErrorException, EvalException {
+		java.util.List l = queryObject.list();
+		
+		for (Object e : l) {
+			if (result instanceof AsyncList)
+			{
+				if (((AsyncList) result).isCancelled())
+					return false;
+			}
+			else
+			{
+				tou.checkTimeOut();
+			}
+			
+			Object vo = generator.toValueObject(e);
+			if (vo != null) {
+				Object v = vo.getClass().isArray() ? Array.get(vo, 0): vo;
+				if (! hql.isNonHQLAttributeUsed() || expr.evaluate(v))
+					result.add(vo);
+			}
+		}
+		return !l.isEmpty();
+	}
+
+
+	private AbstractExpression evaluateQuery(String textFilter, String jsonQuery) throws InternalErrorException,
+			ParseException, TokenMgrError, EvalException, UnsupportedEncodingException, ClassNotFoundException {
 		String qs = "";
 
 		String q2 = generateQuickSearchQuery(textFilter);
@@ -68,65 +171,20 @@ public class ScimHelper {
 			hql.setWhereString(new StringBuffer(qs));
 		}
 		
-		if (session == null) {
-			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
-			session = sf.getCurrentSession();
-		}
-					
-		String q = hql.toString();
-		if (order != null && hql.getOrderByString().length() == 0)
-			q = q + " order by "+ order;
-		
-		org.hibernate.Query queryObject = session.createQuery( q );
-		int i = 0;
-		Map<String, Object> params = hql.getParameters();
-		for (String s : params.keySet())
-		{
-			Object v = params.get(s);
-			if (v == null)
-				queryObject.setParameter(s, v, 
-						org.hibernate.Hibernate.STRING);
+		if (extraWhere != null) {
+			if (qs.isEmpty())
+				qs = extraWhere;
 			else
-				queryObject.setParameter(s, v);
-		}
-		if (tenantFilter != null)
-			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
-		TimeOutUtils tou = new TimeOutUtils();
-
-		if (config != null)
-		{
-			if (config.getMaximumResultSize() != null)
-				queryObject.setMaxResults(config.getMaximumResultSize());
-			if (config.getFirstResult() != null)
-				queryObject.setFirstResult(config.getFirstResult());
-			if (config.getFetchSize() != null)
-				queryObject.setFetchSize(config.getFetchSize());
-		}
-
-		
-        java.util.List l = queryObject.list();
-        count = null;
-        
-		for (Object e : l) {
-			if (result instanceof AsyncList)
-			{
-				if (((AsyncList) result).isCancelled())
-					return;
-			}
-			else
-			{
-				tou.checkTimeOut();
-			}
-			
-			Object vo = generator.toValueObject(e);
-			if (vo != null) {
-				if (! hql.isNonHQLAttributeUsed() || expr.evaluate(vo))
-					result.add(vo);
-			}
+				qs = "("+qs+") and "+extraWhere;
+			hql.setWhereString(new StringBuffer(qs));
 		}
 		
-		if (config.getMaximumResultSize() == null && config.getFetchSize() == null)
-			count = new Integer(result.size());
+		if (extraJoin != null) {
+			StringBuffer join = hql.getJoinString();
+			join.append(" ").append(extraJoin);
+			hql.setJoinString(join);
+		}
+		return expr;
 	}
 
 	static Boolean oracle = null;
@@ -172,10 +230,16 @@ public class ScimHelper {
 		}
 		return sb.toString();
 	}
+
+	public int count (String textFilter, String jsonQuery) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
+		evaluateQuery(textFilter, jsonQuery);
+		return count();
+	}
 	
 	public int count() {
-		if (hql == null)
+		if (hql == null) {
 			return 0;
+		}
 
 		if (count != null)
 			return count.intValue();
@@ -185,6 +249,8 @@ public class ScimHelper {
 			session = sf.getCurrentSession();
 		}
 		
+		String qs = hql.getWhereString().toString();
+
 		org.hibernate.Query queryObject = session.createQuery( hql.toCountString() );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
@@ -262,5 +328,41 @@ public class ScimHelper {
 			return new String[] {text.substring(1, text.length()-1)};
 		else
 			return text.trim().split("[ ,./-]+");
+	}
+
+
+	public String getExtraJoin() {
+		return extraJoin;
+	}
+
+
+	public void setExtraJoin(String extraJoin) {
+		this.extraJoin = extraJoin;
+	}
+
+
+	public String getExtraWhere() {
+		return extraWhere;
+	}
+
+
+	public void setExtraWhere(String extraWhere) {
+		this.extraWhere = extraWhere;
+	}
+
+
+
+	public String getReturnValue() {
+		return returnValue;
+	}
+
+
+	public void setReturnValue(String returnValue) {
+		this.returnValue = returnValue;
+	}
+
+
+	public void setPageSize(int i) {
+		pageSize = i;
 	}
 }

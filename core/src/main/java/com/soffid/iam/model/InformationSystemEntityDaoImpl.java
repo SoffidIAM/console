@@ -207,7 +207,8 @@ public class InformationSystemEntityDaoImpl
      * @see es.caib.seycon.ng.model.AplicacioEntityDao#aplicacioToEntity(es.caib.seycon.ng.comu.Aplicacio, es.caib.seycon.ng.model.AplicacioEntity)
      */
     public void applicationToEntity(com.soffid.iam.api.Application sourceVO, com.soffid.iam.model.InformationSystemEntity targetEntity, boolean copyIfNull) {
-        // @todo verify behavior of aplicacioToEntity
+    	while (sourceVO.getName().startsWith("/"))
+    		sourceVO.setName(sourceVO.getName().substring(1));
         super.applicationToEntity(sourceVO, targetEntity, copyIfNull);
         String codiPersonaContacte = sourceVO.getOwner();
         if(codiPersonaContacte != null){

@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
@@ -900,5 +901,14 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+	
+	@Operation(grantees = { roles.user_role_query.class })
+	public AsyncList<RolAccount> findRedundantRoles(@Nullable String query) {
+		return null;
+	}
 
+	@Operation(grantees = { roles.user_role_query.class })
+	public  AsyncProcessTracker removeRedundantRoles(@Nullable String query) {
+		return null;
+	}
 }

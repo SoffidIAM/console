@@ -674,7 +674,7 @@ public class InputField3 extends Databox
 				}
 				if (dataType.isRequired() ) {
 					if (value == null || collectionValue.isEmpty()) {
-						setWarning(0, "Please, enter a value" );
+						setWarning(0, Labels.getLabel("common.enterValue") );
 						ok = false;
 					}
 				}
@@ -691,13 +691,13 @@ public class InputField3 extends Databox
 		if (dataType.isRequired() && (currentValue == null || currentValue.toString().trim().isEmpty())) {
 			if (dataType.isMultiValued() ) {
 				if (collectionValue.isEmpty()) {
-					setWarning(position, "Please, enter a value" );
+					setWarning(position, Labels.getLabel("common.enterValue") );
 					return false;
 				}
 			}
 			else
 			{
-				setWarning(position, "Please, enter a value" );
+				setWarning(position, Labels.getLabel("common.enterValue") );
 				return false;
 			}
 		}

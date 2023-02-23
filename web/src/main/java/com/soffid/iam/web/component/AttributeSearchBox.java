@@ -2,6 +2,7 @@ package com.soffid.iam.web.component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.joda.time.format.ISODateTimeFormat;
+import org.zkoss.mesg.Messages;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
@@ -27,6 +29,7 @@ import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.XulElement;
+import org.zkoss.zul.mesg.MZul;
 
 import com.soffid.iam.web.SearchAttributeDefinition;
 
@@ -268,6 +271,13 @@ public class AttributeSearchBox extends XulElement {
 			  	 Double.class.isAssignableFrom(attributeDef.getJavaType())))
 		{
 			createIntSearch(w, bg);
+		}
+		else if (attributeDef.getType() == TypeEnumeration.BOOLEAN_TYPE)
+		{
+			attributeDef.setLabels (  Arrays.asList( Messages.get(MZul.YES),  Messages.get(MZul.NO)) );
+			attributeDef.setValues ( Arrays.asList("true", "false"));
+
+			createSelectSearch(w, bg);
 		}
 		else
 		{

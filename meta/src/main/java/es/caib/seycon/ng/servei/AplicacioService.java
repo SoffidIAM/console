@@ -860,6 +860,14 @@ public abstract class AplicacioService {
 	 return null;
 	}
 
+	@Operation (grantees={roles.application_update.class})
+	@Description("Synchronize any user with ")
+	@Transactional(readOnly=true, noRollbackFor={java.lang.Exception.class})
+	public void synchronizeRole(Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+
 	@Operation
 	@Transactional(readOnly=true)
 	protected Collection<String> findRoleNames(String systemName) throws Exception { return null; }

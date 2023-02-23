@@ -3896,12 +3896,7 @@ public class ApplicationServiceImpl extends
 			role.getGranteeGroups().add(grant);
 			getRoleEntityDao().update(role, false);
 		}
-		TaskEntity t = getTaskEntityDao().newTaskEntity();
-		t.setTransaction("UpdateRole");
-		t.setRole(roleEntity.getName());
-		t.setSystemName(roleEntity.getSystem().getName());
-		t.setDb(roleEntity.getSystem().getName());
-		getTaskEntityDao().create(t);
+		handleSynchronizeRole(getRoleEntityDao().toRole(roleEntity));
 		return grant;
 	}
 	
@@ -3913,6 +3908,7 @@ public class ApplicationServiceImpl extends
 			if (rge == null)
 				return ;
 			roleEntity = rge.getGrantedRole();
+			synchronizeRole(getRoleEntityDao().toRole(roleEntity));
 			GroupEntity groupEntity = rge.getGroup();
 
 			TaskEntity t = getTaskEntityDao().newTaskEntity();
@@ -3937,6 +3933,7 @@ public class ApplicationServiceImpl extends
 				return ;
 			
 			Role role = getRoleEntityDao().toRole(rde.getContainer());
+			synchronizeRole(role);
 			for (Iterator<RoleGrant> it = role.getOwnedRoles().iterator(); it.hasNext();) {
 				RoleGrant grant2 = it.next();
 				if (grant2.getId().equals(grant.getId())) it.remove();
@@ -4377,6 +4374,34 @@ public class ApplicationServiceImpl extends
 		h.setExtraWhere(sb2.toString());
 		h.setReturnValue(sb3.toString());
 		return h;
+	}
+	
+	@Override
+	protected void handleSynchronizeRole(Role role) throws Exception {
+		TaskEntity t = getTaskEntityDao().newTaskEntity();
+		t.setTransaction("UpdateRole");
+		t.setRole(role.getName());
+		t.setSystemName(role.getSystem());
+		t.setDb(role.getSystem());
+		getTaskEntityDao().create(t);
+
+    	for ( RoleGrant user: handleFindEffectiveRoleGrantsByRoleId(role.getId()))
+    	{
+    		t = getTaskEntityDao().newTaskEntity();
+    		if (user.getUser() != null)
+    		{
+    			t.setTransaction("UpdateUser");
+    			t.setUser(user.getUser());
+    		}
+    		else
+    		{
+    			t.setTransaction("UpdateAccount");
+    			t.setUser(user.getOwnerAccountName());
+    		}
+    		t.setSystemName(role.getSystem());
+    		t.setDb(role.getSystem());
+    		getTaskEntityDao().create(t);
+    	}
 	}
 
 

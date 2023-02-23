@@ -847,17 +847,27 @@ public class ProcessUI extends FrameHandler {
         return (DataTable) getFellow("tablaArchivos"); //$NON-NLS-1$
     }
     
-    public void cancel( ) throws IOException, DocumentException, ClassNotFoundException, SQLException, NamingException, CreateException, BPMException, InternalErrorException {
-			Missatgebox.confirmaYES_NO(Labels.getLabel("process.confirmCancel"), //$NON-NLS-1$
-					Labels.getLabel("process.warning"), //$NON-NLS-1$
-					(event) -> {
-						if (event.getName().equals("onYes")) {
-							setCurrentProcess(getEngine().cancel(getCurrentProcess()));
-							refresh();
-						}
-					},
-					Messagebox.EXCLAMATION);
+    public void cancel( ) {
+    	Window w = (Window) getFellow("cancelprocess");
+    	w.doHighlighted();
+    	CustomField3 cf = (CustomField3) w.getFellow("comment");
+    	cf.focus();
+    }
 
+	public void closeCancel( ) {
+    	Window w = (Window) getFellow("cancelprocess");
+    	w.setVisible(false);
+	}
+
+	public void cancelProcess2( ) throws IOException, DocumentException, ClassNotFoundException, SQLException, NamingException, CreateException, BPMException, InternalErrorException {
+    	Window w = (Window) getFellow("cancelprocess");
+    	w.setVisible(false);
+    	CustomField3 cf = (CustomField3) w.getFellow("comment");
+    	String comment = (String) cf.getValue();
+    	if (comment != null && ! comment.trim().isEmpty())
+    		getEngine().addComment(getCurrentProcess(), comment);
+		setCurrentProcess(getEngine().cancel(getCurrentProcess()));
+		refresh();
     }
 
     public void upgrade( ) throws IOException, DocumentException, ClassNotFoundException, SQLException, NamingException, CreateException, BPMException, InternalErrorException {

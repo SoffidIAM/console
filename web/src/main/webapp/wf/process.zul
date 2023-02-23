@@ -119,4 +119,17 @@
 		    <button id="retrybutton" label="${c:l('job.button.retry')}" onClick="ref:frame.retry"/>
 		</div>
 	</window>
+	
+	<window id="cancelprocess" visible="false"
+		position="center, center" sizable="false"
+		title="${c:l('job.title')}" 
+		style="width: 80%; max-width: 800px" closable="false">
+		<customfield3 label="${c:l('task.addcomentari')}" readonly="false" id="comment"
+			multiline="true" dataType="STRING" maxlength="255"/>
+		<div style="text-align: right; width: 100%">
+		    <button label="${c:l('common.undo')}" onClick="ref:frame.closeCancel" image="/img/undo-r.svg"/>
+		    <button label="${c:l('process.btnCancel')}" onClick="ref:frame.cancelProcess2" />
+		</div>
+	</window>
+	
 </frame>

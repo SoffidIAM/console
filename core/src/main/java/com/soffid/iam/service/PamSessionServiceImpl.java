@@ -193,7 +193,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throw new InternalErrorException("Account is disabled");
 			
 		Account account = getAccountEntityDao().toAccount(entity);
-		if ( account.getType() != AccountType.IGNORED) {
+		if ( account.getType() != AccountType.IGNORED && sshKey == null) {
 			PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
 			if (status != null && ! PasswordValidation.PASSWORD_GOOD.equals(status))
 				throw new InternalErrorException("The password stored is not accepted by the target system");

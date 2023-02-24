@@ -65,8 +65,6 @@ public class MetaDataEntityDaoImpl extends
 
 	public void toDataType(com.soffid.iam.model.MetaDataEntity sourceEntity, com.soffid.iam.api.DataType targetVO) {
 		super.toDataType(sourceEntity, targetVO);
-		if (sourceEntity.getScope() == null)
-			targetVO.setScope(MetadataScope.USER);
 		if (sourceEntity.getLabel() == null || sourceEntity.getLabel().trim().isEmpty())
 			targetVO.setLabel(sourceEntity.getNlsLabel() == null || sourceEntity.getNlsLabel().trim().isEmpty()?
 					sourceEntity.getName():

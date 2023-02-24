@@ -944,6 +944,7 @@ public class InputField3 extends Databox
 		if ( dataHandler != null && ! noPermissions) {
 			try {
 				currentList = dataHandler.search(text, dataType.getFilterExpression());
+				currentList.setMaxSize(200);
 			} catch (Exception e) {
 				log.info("Error searching for "+text, e);
 			}

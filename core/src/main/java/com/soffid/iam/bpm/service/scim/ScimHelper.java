@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.logging.LogFactory;
@@ -121,9 +122,13 @@ public class ScimHelper {
 
 	private boolean fetchObjects(Collection<Object> result, AbstractExpression expr, org.hibernate.Query queryObject,
 			TimeOutUtils tou) throws InternalErrorException, EvalException {
-		java.util.List l = queryObject.list();
-		
-		for (Object e : l) {
+	    Iterator it = queryObject.iterate();
+	    count = null;
+        
+	    boolean any = false;
+		while (it.hasNext()) {
+			Object e = it.next();
+			any = true;
 			if (result instanceof AsyncList)
 			{
 				if (((AsyncList) result).isCancelled())
@@ -141,7 +146,7 @@ public class ScimHelper {
 					result.add(vo);
 			}
 		}
-		return !l.isEmpty();
+		return any;
 	}
 
 

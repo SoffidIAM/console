@@ -879,7 +879,7 @@ public class InputField3 extends Databox
 					}
 				}
 				String link = dataHandler.followLink(name.toString());
-				if (link != null) {
+				if (link != null && ! hideUserName) {
 					d = "<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>";
 				} else if (d == null) {
 					return "";

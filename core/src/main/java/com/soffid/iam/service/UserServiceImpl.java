@@ -52,6 +52,7 @@ import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.ExtranetCard;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
@@ -3005,69 +3006,35 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
-		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( CustomDialect.isOracle());
-		HQLQuery hql = expr.generateHSQLString(User.class);
-		String qs = hql.getWhereString().toString();
-		if (qs.isEmpty())
-			qs = "o.tenant.id = :tenantId";
-		else
-			qs = "("+qs+") and o.tenant.id = :tenantId";
+		final UserEntityDao dao = getUserEntityDao();
+		ScimHelper h = new ScimHelper(User.class);
+		h.setPrimaryAttributes(new String[] { "userName"} );
 		
-		if (hql.getOrderByString().length() == 0) {
-			LinkedList<String> l = new LinkedList<>();
-			l.add("o.userName");
-			hql.setOrderBy(l);
-		}
-
-		hql.setWhereString(new StringBuffer(qs));
-		Map<String, Object> params = hql.getParameters();
-		Parameter paramArray[] = new Parameter[params.size()+1];
-		int i = 0;
-		for (String s : params.keySet())
-			paramArray[i++] = new Parameter(s, params.get(s));
-		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		TimeOutUtils tou = new TimeOutUtils();
-		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
-		cfg.setFirstResult(start);
-		cfg.setMaximumResultSize(pageSize);
-		int totalResults = 0;
-		for (UserEntity ue : getUserEntityDao().query(hql.toString(),
-				paramArray, cfg)) {
-			if (result instanceof AsyncList)
-			{
-				if (((AsyncList) result).isCancelled())
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			UserEntity ue = (UserEntity) entity;
+			try {
+				if (getAuthorizationService().hasPermission(Security.AUTO_USER_QUERY, ue))
+					return getUserEntityDao().toUser(ue);
+				else
 					return null;
+			} catch (InternalErrorException e) {
+				throw new RuntimeException(e);
 			}
-			else
-			{
-				tou.checkTimeOut();
-			}
-			User u = getUserEntityDao().toUser(ue);
-			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
-				if (getAuthorizationService().hasPermission(
-						Security.AUTO_USER_QUERY, ue)) {
-					totalResults ++;
-					result.add(u);
-				}
-			}
-		}
-		PagedResult<User> pagedResult = new PagedResult<>();
-		pagedResult.setResources(result);
-		pagedResult.setStartIndex( start != null ? start: 0);
-		pagedResult.setItemsPerPage( pageSize );
-		if ( pageSize  != null) {
-			@SuppressWarnings("unchecked")
-			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( hql.toCountString(), 
-							paramArray);
-			for ( Long l: ll ) {
-				pagedResult.setTotalResults( new Integer(l.intValue()) );
-			}
-		} else {
-			pagedResult.setTotalResults(totalResults);
-		}
-		return pagedResult;
+		});
+		
+		h.search(null, query, (Collection) result); 
+
+		PagedResult<User> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 	@Override

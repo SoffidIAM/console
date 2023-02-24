@@ -3,17 +3,19 @@
 <window xmlns:h="http://www.w3.org/1999/xhtml" border="normal"
 	closable="true" mode="highlighted"
 	position="center,center"
-	title="${c:l('error.Titol')} (${c:l('error.Codi')} ${requestScope['javax.servlet.error.status_code']})"
 	width="720px" use="com.soffid.iam.web.error.ErrorHandler">
 	<div style="overflow:auto;width:695px;">
-		<vbox style="padding:7px;">
-			<div style="margin-left:0px;margin-top:3px;">
-				<label class="etiqueta" id="missatge" multiline="true"
-					value="" style="font-size:120%; color:#cd6155; word-break: break-word;" />
-			</div>
-			<div style="margin-left:0px;margin-top:3px;" id="categoryDiv">
-				<label class="etiqueta" value="${c:l('error.zul.category') }: "/>
-				<label class="etiqueta" id="category"/>
+		<div style="width:100%	">
+			<image src="/img/warning.svg" style="width: 48px"/>
+			<div style='display: inline-block; width:calc(100% - 48px); padding-left: 16px'>
+				<div style="margin-left:0px margin-top:3px; width:100%">
+					<label class="etiqueta" id="missatge" multiline="true"
+						value="" style="font-size:120%; color:#cd6155; word-break: break-word;" />
+				</div>
+				<div style="margin-left:0px;margin-top:3px;" id="categoryDiv">
+					<label class="etiqueta" value="${c:l('error.zul.category') }: "/>
+					<label class="etiqueta" id="category"/>
+				</div>
 			</div>
 			<div style="margin-left:-2px;margin-top:10px;" id = "techDataDiv">
 				<div sclass="collapser" onClick="ref:showStack" id="collapser" style="vertical-align: bottom">
@@ -24,7 +26,7 @@
 			</div>
 			<textbox id="exception" visible="false" readonly="true"
 				rows="10" width="675px" style="word-break: break-all;white-space: pre;font-family: monospace;"/>
-		</vbox>
+		</div>
 	</div>
 	<zscript><![CDATA[
 		]]></zscript>

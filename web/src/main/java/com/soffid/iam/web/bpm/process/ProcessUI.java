@@ -219,7 +219,8 @@ public class ProcessUI extends FrameHandler {
     private static final long serialVersionUID = 1L;
 
     public void refresh() throws IOException, DocumentException, ClassNotFoundException, SQLException, NamingException, CreateException, BPMException, InternalErrorException {
-    	openProcessInstance(getCurrentProcess(), false);
+    	ProcessInstance proc = getEngine().getProcess(getCurrentProcess().getId());
+    	openProcessInstance(proc, false);
 		if (currentJobWindow != null)
 			currentJobWindow.setParent(null);
 		currentJobWindow = null;

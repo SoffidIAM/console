@@ -601,8 +601,13 @@
 		    <version>1.9</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+		    <version>1.22</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
+			<artifactId>poi-ooxml-lite</artifactId>
 			<version>5.2.3</version>
 		</dependency>
 		<dependency>

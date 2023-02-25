@@ -29,6 +29,7 @@ import com.soffid.iam.doc.nas.NASManager;
 import com.soffid.iam.model.BlobConfigurationEntity;
 import com.soffid.iam.model.BlobConfigurationEntityDao;
 import com.soffid.iam.model.ConfigEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
@@ -185,7 +186,9 @@ public class ConfigurationServiceImpl
 	}
 
 	protected Configuration handleFindParameterByNameAndNetworkName(String codiParametre, String codiXarxa) throws Exception {
-		ConfigEntity configuracioEntity = getConfigEntityDao().findByCodeAndNetworkCode(codiParametre, codiXarxa);
+		CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+		criteria.setMaximumResultSize(1);
+		ConfigEntity configuracioEntity = getConfigEntityDao().findByCodeAndNetworkCode(criteria, codiParametre, codiXarxa);
 		if(configuracioEntity != null){
 			Configuration configuracio = getConfigEntityDao().toConfiguration(configuracioEntity);
 			return configuracio;

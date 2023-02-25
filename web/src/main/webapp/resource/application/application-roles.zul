@@ -168,7 +168,7 @@
 						dataPath="../listbox:/granteeGroups" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
 					<attribute name="columns"><![CDATA[
-- name: ${c:l('aplica_rolinfo.zul.Rol')}
+- name: ${c:l('accounts.group')}
   value: ownerGroup
 - name: ""
   width: 24px

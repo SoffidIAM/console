@@ -2,6 +2,7 @@ package com.soffid.iam.bpm.service.scim;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.logging.LogFactory;
@@ -104,10 +105,11 @@ public class ScimHelper {
 		}
 
 		
-        java.util.List l = queryObject.list();
+        Iterator it = queryObject.iterate();
         count = null;
         
-		for (Object e : l) {
+		while (it.hasNext()) {
+			Object e = it.next();
 			if (result instanceof AsyncList)
 			{
 				if (((AsyncList) result).isCancelled())

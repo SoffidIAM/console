@@ -1,6 +1,7 @@
 package com.soffid.iam.model;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -100,6 +101,29 @@ public class QueryBuilder {
             queryObject.setFetchSize(conf.getFetchSize());
         java.util.List results = queryObject.list();
         return results;
+
+    }
+
+    public Iterator queryIterator(SessionFactory sessionFactory,
+            String queryString, Parameter[] parameters, CriteriaSearchConfiguration conf) throws HibernateException {
+        org.hibernate.Query queryObject = sessionFactory.getCurrentSession()
+                .createQuery(queryString);
+        for (int i = 0; parameters != null && i < parameters.length; i++) {
+        	if (parameters[i].getValue() == null)
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue(), 
+            		org.hibernate.Hibernate.STRING);
+        	else if (parameters[i].getValue() instanceof Collection) 
+        		queryObject.setParameterList(parameters[i].getName(), (Collection) parameters[i].getValue());
+        	else
+        		queryObject.setParameter(parameters[i].getName(), parameters[i].getValue());
+        }
+        if (conf.getMaximumResultSize() != null)
+        	queryObject.setMaxResults(conf.getMaximumResultSize());
+        if (conf.getFirstResult() != null)
+            queryObject.setFirstResult(conf.getFirstResult());
+        if (conf.getFetchSize() != null)
+            queryObject.setFetchSize(conf.getFetchSize());
+        return queryObject.iterate();
 
     }
 

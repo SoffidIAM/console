@@ -945,7 +945,7 @@ public class InputField3 extends Databox
 			try {
 				currentList = dataHandler.search(text, dataType.getFilterExpression());
 			} catch (Exception e) {
-				log.info("Error searchinf for "+text, e);
+				log.info("Error searching for "+text, e);
 			}
 			currentPosition = 0;
 			return fetchObjects();

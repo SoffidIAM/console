@@ -8,7 +8,7 @@
 	<timer id="timer" delay="1000" repeats="true" onTimer="ref:sql_source.onTimer" running="false"/>
 	<wizard id="wizard">
 			<attribute name="steps">
-	- ${c:l("wizard-ad-source.connectivity")}
+	- ${c:l("wizard-sql-source.connectivity")}
 	- ${c:l('wizard-ad-source.loadUsers') }
 	- ${c:l("wizard-ad-source.loadPermissions")}
 	- ${c:l("user_createaccount.Finish")}

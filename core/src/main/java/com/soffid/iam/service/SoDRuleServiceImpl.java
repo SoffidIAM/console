@@ -165,6 +165,8 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	protected void handleRemove (SoDRole role) throws Exception
 	{
 		SoDRoleEntity entity  = getSoDRoleEntityDao().load (role.getId());
+		getSoDRuleMatrixEntityDao().remove(entity.getColumns());
+		getSoDRuleMatrixEntityDao().remove(entity.getRows());
 		getSoDRoleEntityDao().remove(entity);
 	}
 

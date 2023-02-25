@@ -426,7 +426,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>mariadb-plugin</artifactId>
-			<version>1.0.2</version>
+			<version>1.0.3</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
@@ -458,7 +458,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>shell-plugin</artifactId>
-			<version>1.4.2</version>
+			<version>1.4.4</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>

@@ -133,8 +133,10 @@ public abstract class BaseWizardHandler extends Window implements AfterCompose{
 							"Any column or attribute from the target system is available as a standard variable<br>"+
 							"return the user name of the account's owner. Return null in case no owner can be found",
 							(ev2) -> {
-								wizard.next();
-								startTask(currentSystem);
+								if (script.getValue() != null && !script.getValue().trim().isEmpty()) {
+									wizard.next();
+									startTask(currentSystem);
+								}
 							});
 				} else {
 					wizard.next();

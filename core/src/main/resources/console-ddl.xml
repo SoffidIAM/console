@@ -222,7 +222,6 @@
 		<column name='ACTORID_' type='VARCHAR' length='255'/>
 		<column name='TIME_' type='TIMESTAMP'/>
 		<column name='MESSAGE_' type='VARCHAR' length='4000'/>
-		<column name='NODE_' type='VARCHAR' length='255'/>
 		<column name='TOKEN_' notNull='true' type='BIGINT'/>
 		<column name='TASKINSTANCE_' type='BIGINT'/>
 		<column name='TOKENINDEX_' type='BIGINT'/>

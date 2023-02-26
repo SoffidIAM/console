@@ -6,6 +6,8 @@
   value: actor
 - name: ${c:l('task.data')}
   value: time_datetime
+- name: ${c:l('inbox.lblTarea')}
+  value: node
 - name: ${c:l('task.comentari')}
   value: message
   multiline: true

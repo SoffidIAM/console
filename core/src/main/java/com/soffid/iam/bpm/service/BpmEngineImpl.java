@@ -129,7 +129,6 @@ import com.soffid.iam.bpm.model.UserInterface;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
 import com.soffid.iam.bpm.service.impl.UserContextCache;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
-import com.soffid.iam.bpm.task.BPMComment;
 import com.soffid.iam.bpm.utils.ColeccionesUtils;
 import com.soffid.iam.bpm.utils.FechaUtils;
 import com.soffid.iam.common.security.SoffidPrincipal;
@@ -1419,7 +1418,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			{
 				org.jbpm.graph.exe.ProcessInstance proc = jbpmContext.getProcessInstance(task.getProcessId());
 				org.jbpm.graph.exe.Token token = proc.getRootToken();
-				BPMComment c = new BPMComment(getUserName(), comment);
+				Comment c = new Comment(getUserName(), comment);
 				token.addComment(c);
 				jbpmContext.save(proc);
 				return task;
@@ -1428,8 +1427,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			{
 				org.jbpm.taskmgmt.exe.TaskInstance ti = jbpmContext
 						.getTaskInstanceForUpdate(task.getId());
-				BPMComment c = new BPMComment(getUserName(), comment);
-				c.setNode(ti.getName());
+				Comment c = new Comment(getUserName(), comment);
 				ti.addComment(c);
 				jbpmContext.save(ti);
 				return VOFactory.newTaskInstance(ti);

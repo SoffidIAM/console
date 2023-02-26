@@ -111,9 +111,12 @@ public class Pam02Handler extends Window {
 			Account acc = (Account) accNode.getInstance();
 			acc.setVaultFolderId(folder.getId());
 			acc.setInheritNewPermissions(true);
-			acc.getOwnerRoles().add(owner.getName()+"@"+owner.getSystem());
-			acc.getManagerRoles().add(manager.getName()+"@"+manager.getSystem());
-			acc.getGrantedRoles().add(user.getName()+"@"+user.getSystem());
+			if (!acc.getOwnerRoles().contains(owner.getName()+"@"+owner.getSystem()))
+				acc.getOwnerRoles().add(owner.getName()+"@"+owner.getSystem());
+			if (!acc.getManagerRoles().contains(manager.getName()+"@"+manager.getSystem()))
+				acc.getManagerRoles().add(manager.getName()+"@"+manager.getSystem());
+			if (!acc.getGrantedRoles().contains(user.getName()+"@"+user.getSystem())) 
+				acc.getGrantedRoles().add(user.getName()+"@"+user.getSystem());
 			EJBLocator.getAccountService().updateAccount2(acc);
 		}
 	}

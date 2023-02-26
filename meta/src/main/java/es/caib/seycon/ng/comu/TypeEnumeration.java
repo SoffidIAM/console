@@ -32,4 +32,5 @@ public class TypeEnumeration {
 	public String osType = "1T";
 	public String printerType = "PR";
 	public String attachmentType = "AT";
+	public String systemType="SY";
 }

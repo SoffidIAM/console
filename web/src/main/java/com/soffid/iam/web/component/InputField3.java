@@ -84,6 +84,7 @@ import com.soffid.iam.web.component.inputField.NetworkDataHandler;
 import com.soffid.iam.web.component.inputField.OUTypeDataHandler;
 import com.soffid.iam.web.component.inputField.PrinterDataHandler;
 import com.soffid.iam.web.component.inputField.RoleDataHandler;
+import com.soffid.iam.web.component.inputField.SystemDataHandler;
 import com.soffid.iam.web.component.inputField.UserDataHandler;
 import com.soffid.iam.web.popup.Editor;
 import com.soffid.iam.web.popup.FileUpload2;
@@ -231,6 +232,7 @@ public class InputField3 extends Databox
 								dataType.getType().equals(TypeEnumeration.GROUP_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.GROUP_TYPE_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.USER_TYPE_TYPE) ||
+								dataType.getType().equals(TypeEnumeration.SYSTEM_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.ACCOUNT_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.USER_TYPE) ||
 								dataType.getType().equals(TypeEnumeration.ROLE_TYPE) ||
@@ -258,6 +260,13 @@ public class InputField3 extends Databox
 				{
 					dataHandler = new PrinterDataHandler(dataType);
 					setSelectIcon("/img/printer.svg");
+					setHyperlink(true);
+					noPermissions = ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
+				}
+				else if ( dataType.getType().equals(TypeEnumeration.SYSTEM_TYPE))
+				{
+					dataHandler = new SystemDataHandler(dataType);
+					setSelectIcon("/img/system.svg");
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
 				}

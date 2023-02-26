@@ -45,6 +45,7 @@ import com.soffid.iam.bpm.api.Comment;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
+import com.soffid.iam.bpm.task.BPMComment;
 import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.iam.model.ProcessHierarchyEntityDao;
 
@@ -57,7 +58,7 @@ public class VOFactory {
 	
 	static Log log = LogFactory.getLog(VOFactory.class);
 	
-	public static Comment newComment(org.jbpm.graph.exe.Comment instance) {
+	public static Comment newComment(BPMComment instance) {
 		Comment c = new Comment();
 		String actorId = instance.getActorId();
 		Security.nestedLogin(Security.getCurrentAccount(), new String[] {Security.AUTO_USER_QUERY+Security.AUTO_ALL});
@@ -74,6 +75,7 @@ public class VOFactory {
 		c.setActor(actorId);
 		c.setMessage(instance.getMessage());
 		c.setTime(instance.getTime());
+		c.setNode(instance.getNode());
 		return c;
 	}
 
@@ -200,7 +202,7 @@ public class VOFactory {
 		{
 			for (Iterator it = token.getComments().iterator(); it
 					.hasNext();) {
-				comments.add(newComment((org.jbpm.graph.exe.Comment) it.next()));
+				comments.add(newComment((BPMComment) it.next()));
 			}
 		}
 		if (token != null && token.getChildren() != null)

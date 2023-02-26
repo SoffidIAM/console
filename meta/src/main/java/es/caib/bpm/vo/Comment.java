@@ -12,5 +12,7 @@ public class Comment {
 	@Nullable
     String actor;
 	@Nullable
+    String node;
+	@Nullable
     Date time;
 }

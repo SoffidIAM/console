@@ -38,8 +38,9 @@ public class Irc02Sector extends Sector {
 	@Override
 	protected void activate() {
 		if (actualSector == null)
-			Missatgebox.avis(Labels.getLabel("wheel.missingReportAddon"), (ev) -> {
-				Executions.getCurrent().sendRedirect("https://download.soffid.com/download/", "_blank");
+			Missatgebox.confirmaOK(Labels.getLabel("wheel.missingReportAddon"), (ev) -> {
+				if (ev.getName().equals("onOK"))
+					Executions.getCurrent().sendRedirect("https://download.soffid.com/download/", "_blank");
 			});
 		else {
 			try {

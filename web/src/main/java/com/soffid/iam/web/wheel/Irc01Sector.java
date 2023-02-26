@@ -28,8 +28,9 @@ public class Irc01Sector extends Sector {
 
 	@Override
 	protected void activate() {
-		Missatgebox.avis(Labels.getLabel("wizard-sod.explanation"), e -> {
-			Application.jumpTo("/resource/application/sod.zul?wizard=add");
+		Missatgebox.confirmaOK_CANCEL(Labels.getLabel("wizard-sod.explanation"), e -> {
+			if (e.getName().equals("onOK"))
+				Application.jumpTo("/resource/application/sod.zul?wizard=add");
 		});
 	}
 

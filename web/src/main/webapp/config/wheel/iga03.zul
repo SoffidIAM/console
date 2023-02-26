@@ -4,12 +4,11 @@
 
 
 <window id="iga03_w" position="top-center" closable="false" sizable="false"
-		title="${c:l('wheel.users.title') }"
+		title="${c:l('wheel.system.addApplication') }"
 		use="com.soffid.iam.web.wheel.Iga03Handler"
 		style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
 	<div id="step1">
 		<div style="height: 320px; overflow: auto">
-			<label multiline="true" value="${c:l('wheel.system.addApplication') }" style="display: block"/>
 			<div sclass="options options-tiny" style="display: inline-block; text-align: left">
 				<div sclass="menuoption" onClick="ref:iga03_w.addActiveDirectory">
 					<image src="/img/other/windows.svg"/>

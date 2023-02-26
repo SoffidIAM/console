@@ -48,6 +48,7 @@ import com.soffid.iam.api.Application;
 import com.soffid.iam.api.ApplicationAdministration;
 import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.ContainerRole;
@@ -68,6 +69,7 @@ import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.AuthorizationEntity;
@@ -125,6 +127,7 @@ import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
@@ -3893,12 +3896,7 @@ public class ApplicationServiceImpl extends
 			role.getGranteeGroups().add(grant);
 			getRoleEntityDao().update(role, false);
 		}
-		TaskEntity t = getTaskEntityDao().newTaskEntity();
-		t.setTransaction("UpdateRole");
-		t.setRole(roleEntity.getName());
-		t.setSystemName(roleEntity.getSystem().getName());
-		t.setDb(roleEntity.getSystem().getName());
-		getTaskEntityDao().create(t);
+		handleSynchronizeRole(getRoleEntityDao().toRole(roleEntity));
 		return grant;
 	}
 	
@@ -3910,6 +3908,7 @@ public class ApplicationServiceImpl extends
 			if (rge == null)
 				return ;
 			roleEntity = rge.getGrantedRole();
+			synchronizeRole(getRoleEntityDao().toRole(roleEntity));
 			GroupEntity groupEntity = rge.getGroup();
 
 			TaskEntity t = getTaskEntityDao().newTaskEntity();
@@ -3934,6 +3933,7 @@ public class ApplicationServiceImpl extends
 				return ;
 			
 			Role role = getRoleEntityDao().toRole(rde.getContainer());
+			synchronizeRole(role);
 			for (Iterator<RoleGrant> it = role.getOwnedRoles().iterator(); it.hasNext();) {
 				RoleGrant grant2 = it.next();
 				if (grant2.getId().equals(grant.getId())) it.remove();
@@ -4174,6 +4174,234 @@ public class ApplicationServiceImpl extends
             rg.add(grant);
         }
 		return rg;
+	}
+	@Override
+	protected AsyncList<RoleAccount> handleFindRedundantRoles(String query) throws Exception {
+		final AsyncList<RoleAccount> result = new AsyncList<RoleAccount>();
+		getAsyncRunnerService().run(new Runnable() {
+			public void run() {
+				try {
+					findRedundantRoles(result, query);
+				} catch (Exception e) {
+					result.cancel(e);
+				}
+			}
+		}, result);
+		return result;
+	}
+	
+	protected AsyncProcessTracker handleRemoveRedundantRoles(String query) throws Exception {
+		AsyncProcessTracker tracker = new AsyncProcessTracker();
+		tracker.setStart(new Date());
+		SoffidPrincipal principal = Security.getSoffidPrincipal();
+		new Thread (() -> {
+			try {
+				getAsyncRunnerService().runNewTransaction( () -> {
+					try {
+						Security.nestedLogin(principal);
+						removeRedundantRoles(query, tracker);
+					} catch (Exception e) {
+						log.warn("Error removing roles", e);
+						tracker.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
+					} finally {
+						Security.nestedLogoff();
+						tracker.setFinished(true);
+						tracker.setEnd(new Date());
+					}
+					return null;
+				});
+			} catch (Throwable th) {
+				log.warn("Error removing roles", th);
+			}
+		}).start();
+		return tracker;
+	}
+
+	protected void removeRedundantRoles(String query, AsyncProcessTracker tracker) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
+		int total = 0;
+		int count = 0;
+		for (int i = 1; i < 10; i++) {
+			for (int type = 0; type < 3; type ++) {
+				ScimHelper h = generateRedundantRolesQuery(i, type);
+				total += h.count(null, query);
+			}
+		}
+		HashSet<Long> ids = new HashSet<>();
+		final RoleAccountEntityDao dao = getRoleAccountEntityDao();
+		final int counters[] = new int[]{count, total};
+		for (int i = 1; i < 10; i++) {
+			for (int type = 0; type < 3; type ++) {
+				ScimHelper h = generateRedundantRolesQuery(i, type);
+				h.setPageSize(500);
+				h.setGenerator((Object entity) -> {
+					Object[] array = (Object[]) entity;
+					RoleAccountEntity o1 = (RoleAccountEntity) array[0];
+					if (!ids.contains(o1.getId()) && applyRedundancy (array))
+					{
+						ids.add(o1.getId());
+						dao.remove(o1);
+					}
+					counters[0] ++;
+					if (counters[0] >= counters[1])
+						tracker.setProgress((float)1.0);
+					else
+						tracker.setProgress((float)counters[0] / (float)counters[1]);
+					return null;
+				}); 
+				
+				h.search(null, query, new LinkedList<>()); 
+			}
+		}
+
+	}
+	
+	protected void findRedundantRoles(AsyncList<RoleAccount> result, String query) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
+		final RoleAccountEntityDao dao = getRoleAccountEntityDao();
+		HashSet<Long> ids = new HashSet<>();
+		for (int i = 1; i < 8; i++) {
+			for (int type = 0; type < 3; type ++) {
+				ScimHelper h = generateRedundantRolesQuery(i, type);
+				h.setGenerator((entity) -> {
+					Object[] array = (Object[]) entity;
+					final RoleAccountEntity ra = (RoleAccountEntity) array[0];
+					if (!ids.contains(ra.getId()) && applyRedundancy (array)) {
+						ids.add(ra.getId());
+						return dao.toRoleAccount(ra);
+					} else
+						return null;
+				}); 
+				
+				h.search(null, query, (Collection) result); 
+				
+			}
+		}
+
+	}
+	
+	private boolean applyRedundancy(Object[] array) {
+		RoleAccountEntity target = (RoleAccountEntity) array[0];
+		Object source = array[array.length-1];
+		GroupEntity scopeGroup = null;
+		InformationSystemEntity scopeApp = null;
+		DomainValueEntity scopeValue = null;
+		if (source instanceof RoleAccountEntity) {
+			RoleAccountEntity ra1 = (RoleAccountEntity) source;
+			scopeGroup = ra1.getGroup();
+			scopeApp = ra1.getInformationSystem();
+			scopeValue = ra1.getDomainValue();
+		} else {
+			RoleGroupEntity rg = (RoleGroupEntity) source;
+			scopeGroup = rg.getGrantedGroupDomain();
+			scopeApp = rg.getGrantedApplicationDomain();
+			scopeValue = rg.getGrantedDomainValue();
+		}
+		
+		for (int i = array.length - 2 ; i >= 1; i--) {
+			RoleDependencyEntity rr = (RoleDependencyEntity) array[i];
+			if (rr.getStatus() != RoleDependencyStatus.STATUS_ACTIVE)
+				return false;
+			
+			/// Check source dependency
+			if (rr.getGranteeApplicationDomain() != null && rr.getGranteeApplicationDomain() != scopeApp)
+				return false;
+			if (rr.getGranteeDomainValue() != null && rr.getGranteeDomainValue() != scopeValue)
+				return false;
+			if (rr.getGranteeGroupDomain() != null && rr.getGranteeGroupDomain() != scopeGroup)
+				return false;
+			if (rr.getDomainApplication() != null)  {
+				scopeApp = rr.getDomainApplication();
+				scopeGroup = null;
+				scopeValue = null;
+			}
+			if (rr.getDomainGroup() != null) {
+				scopeApp = null;
+				scopeGroup = rr.getDomainGroup();
+				scopeValue = null;
+			}
+			if (rr.getDomainApplicationValue() != null) {
+				scopeApp = null;
+				scopeGroup = null;
+				scopeValue = rr.getDomainApplicationValue();
+			}
+		}
+		return scopeApp == target.getInformationSystem() &&
+				scopeValue == target.getDomainValue() &&
+				scopeGroup == target.getGroup();
+	}
+	
+	private ScimHelper generateRedundantRolesQuery(int i, int type) {
+		ScimHelper h = new ScimHelper(RoleAccount.class);
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		h.setConfig(config);
+		h.setTenantFilter("account.system.tenant.id");
+		StringBuffer sb = new StringBuffer() ;
+		StringBuffer sb2 = new StringBuffer() ;
+		StringBuffer sb3 = new StringBuffer() ;
+		sb.append("join o.role as role0 ");
+		if (type > 0) i--;
+		for (int j = 0; j < i; j++) {
+			sb.append("join role"+j+".containerRoles as rolerole"+j+" ");
+			sb.append("join rolerole"+j+".container as role"+(j+1)+" ");
+			sb3.append("rolerole"+j+", ");
+		}
+		switch (type) {
+		case 0:
+			sb.append("join role"+i+".accounts as accounts ")
+				.append("join accounts.account.users as useraccounts1 ")
+				.append("join o.account.users as useraccounts2 ");
+			
+			sb2.append("useraccounts1.user.id = useraccounts2.user.id");
+			
+			sb3.append("useraccounts2");
+			break;
+		case 1:
+			sb.append("join role"+i+".containerGroups as groups ")
+				.append("join groups.group.primaryGroupUsers as user ")
+				.append("join o.account.users as useraccounts2 ");
+			sb2.append("useraccounts2.user.id = user.id");
+			sb3.append("groups");
+			break;
+		case 2:
+			sb.append("join role"+i+".containerGroups as groups ")
+				.append("join groups.group.secondaryGroupUsers as userGroup ")
+				.append("join o.account.users as useraccounts2 ");
+			sb2.append("useraccounts2.user.id = userGroup.user.id");
+			sb3.append("groups");
+			break;
+		}
+		sb2.append(" and o.enabled = true and o.rule is null");
+		h.setExtraJoin(sb.toString());
+		h.setExtraWhere(sb2.toString());
+		h.setReturnValue(sb3.toString());
+		return h;
+	}
+	
+	@Override
+	protected void handleSynchronizeRole(Role role) throws Exception {
+		TaskEntity t = getTaskEntityDao().newTaskEntity();
+		t.setTransaction("UpdateRole");
+		t.setRole(role.getName());
+		t.setSystemName(role.getSystem());
+		t.setDb(role.getSystem());
+		getTaskEntityDao().create(t);
+
+    	for ( RoleGrant user: handleFindEffectiveRoleGrantsByRoleId(role.getId()))
+    	{
+    		t = getTaskEntityDao().newTaskEntity();
+    		if (user.getUser() != null)
+    		{
+    			t.setTransaction("UpdateUser");
+    			t.setUser(user.getUser());
+    		}
+    		else
+    		{
+    			t.setTransaction("UpdateAccount");
+    			t.setUser(user.getOwnerAccountName());
+    		}
+    		t.setSystemName(role.getSystem());
+    		t.setDb(role.getSystem());
+    		getTaskEntityDao().create(t);
+    	}
 	}
 
 

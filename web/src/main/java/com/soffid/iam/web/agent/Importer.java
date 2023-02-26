@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.zkoss.util.media.Media;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AttributeMapping;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
@@ -28,6 +29,7 @@ import es.caib.seycon.ng.comu.SoffidObjectTrigger;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.datamodel.DataModelNode;
+import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -85,9 +87,27 @@ public class Importer {
 		for (int i = 0; i < nodes.getLength(); i++)
 		{
 			Element n = (Element) nodes.item(i);
-			DataType dt = new DataType();
-			
+			DataType dt = new DataType();			
 			dt.setName(n.getAttribute("name"));
+
+			boolean update = false;
+			DataNodeCollection c = (DataNodeCollection) XPathUtils.eval(ds, "/metadata");
+			DataModelNode dn2 = null;
+			long nextOrder = 1;
+			for (int j = 0; j < c.size(); j ++) {
+				dn2 = c.getDataModel(j);
+				if (dn2 != null && ! dn2.isDeleted()) {
+					DataType dt2 = (DataType) ((DataNode) dn2).getInstance();
+					if (dt2 != null && dt2.getName().equals(dt.getName())) {
+						dt = dt2;
+						update = true;
+						nextOrder = dt.getOrder().longValue();
+						break;
+					}
+					if (dt2.getOrder().longValue() >= nextOrder)
+						nextOrder = dt2.getOrder().longValue() + 1;
+				}
+			}
 			dt.setCustomObjectType( n.getAttribute("customObjectType") );
 			dt.setDataObjectType( n.getAttribute("dataObjectType") );
 			dt.setFilterExpression( n.getAttribute("filterExpression") );
@@ -109,7 +129,7 @@ public class Importer {
 				dt.setMultiValuedRows( Integer.parseInt(n.getAttribute("multiValuedRows")));
 			dt.setMultiValued(Boolean.getBoolean(n.getAttribute("multiValued")));
 			dt.setRequired(Boolean.getBoolean(n.getAttribute("required")));
-			dt.setOrder(Long.parseLong(n.getAttribute("order")));
+			dt.setOrder(nextOrder);
 			if (n.hasAttribute("size"))
 				dt.setSize( Integer.parseInt(n.getAttribute("size")));
 			if (n.hasAttribute("type"))
@@ -123,10 +143,13 @@ public class Importer {
 			{
 				if (l == null) l = new LinkedList<String>();
 				l.add( nodes2.item(i).getTextContent() );
-			}
+			}; 
 			dt.setValues(l);
 
-			createMetadata(ds, dt);
+			if (update)
+				dn2.update();
+			else
+				createMetadata(ds, dt);
 			
 		}
 	}

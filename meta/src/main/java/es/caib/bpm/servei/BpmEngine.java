@@ -177,6 +177,12 @@ public abstract class BpmEngine {
 	 return null;
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void addComment(
+		es.caib.bpm.vo.ProcessInstance process, 
+		java.lang.String comment)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.bpm.vo.TaskInstance executeTask(
 		es.caib.bpm.vo.TaskInstance task, 
 		java.lang.String transitionName)

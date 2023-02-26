@@ -285,6 +285,7 @@ public abstract class AbstractExpression implements Serializable {
 					" where "+ctx.objectName+"."+
 					attConfig.getParentEntity() + "=" + pp+" and "+
 					ctx.objectName+"aux."+s[1]+"=:"+param+" and ";
+			ctx.closeCondition = ")";
 			ctx.partialPath = null;
 			ctx.objectName = ctx.objectName+"."+attConfig.getVirtualAttributeValue();
 		} else {
@@ -312,7 +313,6 @@ public abstract class AbstractExpression implements Serializable {
 			String obj2 = obj+"aux";
 			String s[] = attConfig.getVirtualAttributeName().split("\\.");
 			ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
-			ctx.closeCondition = ")";
 			ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 		}
 	}

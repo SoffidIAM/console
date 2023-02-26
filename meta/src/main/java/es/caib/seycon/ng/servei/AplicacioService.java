@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
@@ -859,6 +860,14 @@ public abstract class AplicacioService {
 	 return null;
 	}
 
+	@Operation (grantees={roles.application_update.class})
+	@Description("Synchronize any user with ")
+	@Transactional(readOnly=true, noRollbackFor={java.lang.Exception.class})
+	public void synchronizeRole(Rol rol)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
+
 	@Operation
 	@Transactional(readOnly=true)
 	protected Collection<String> findRoleNames(String systemName) throws Exception { return null; }
@@ -900,5 +909,14 @@ public abstract class AplicacioService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+	
+	@Operation(grantees = { roles.user_role_query.class })
+	public AsyncList<RolAccount> findRedundantRoles(@Nullable String query) {
+		return null;
+	}
 
+	@Operation(grantees = { roles.user_role_query.class })
+	public  AsyncProcessTracker removeRedundantRoles(@Nullable String query) {
+		return null;
+	}
 }

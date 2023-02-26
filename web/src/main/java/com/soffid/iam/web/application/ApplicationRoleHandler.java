@@ -611,8 +611,11 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		previewWindow.setVisible(false);
 	}
 
-	public void applyPreview(Event event) {
+	public void applyPreview(Event event) throws InternalErrorException, NamingException, CreateException {
+		Role r = (Role) ((DataNode) getListbox().getJXPathContext().getValue("/")).getInstance();
+		EJBLocator.getApplicationService().synchronizeRole(r);
 		getListbox().commit();
+		EJBLocator.getApplicationService().synchronizeRole(r);
 		Window previewWindow = (Window) getFellow("previewWindow");
 		previewWindow.setVisible(false);
 		getWindowModify().setVisible(false);
@@ -692,6 +695,8 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length > 0) {
 			BulkAction ba = new BulkAction( Role.class.getName() ); 
 			ba.start(listbox ) ;
+		} else {
+			Missatgebox.avis("bulk.selectOneObject");
 		}
 	}
 

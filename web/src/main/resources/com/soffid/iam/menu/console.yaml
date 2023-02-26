@@ -90,6 +90,22 @@
           handler: com.soffid.iam.web.custom.CustomObjectMenuHandler
           permissions: ["seu:customObject:show"]
           img: /img/menu/custom-object.svg
+      - name: seu.tools
+        permissions: ["seu:tools:show"]
+        img: /img/menu/tools.svg
+        options:
+        - name: seu.tools.redundant
+          url: /resource/tools/redundant.zul
+          permissions: ["seu:tools:show"]
+          img: /img/menu/tools-role.svg
+        - name: seu.tools.disableUsers
+          url: /resource/tools/disable-users.zul
+          permissions: ["seu:tools:show"]
+          img: /img/menu/tools-user.svg
+        - name: seu.tools.disableAccounts
+          url: /resource/tools/disable-accounts.zul
+          permissions: ["seu:tools:show"]
+          img: /img/menu/tools-account.svg
       - name: seu.configuration
         img_old: /img/menu/system-settings.png
         img: /img/menu/toolbox.svg

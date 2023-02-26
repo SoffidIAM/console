@@ -3884,7 +3884,8 @@ div.wizard-bar {
     height: 52px;
     width: 1000%;
     background: #f0f0f0;
-    border-bottom: solid black 1px;
+    border-top: solid 1px #c0c0c0;
+    border-bottom: solid 1px #c0c0c0;
     overflow: hidden;
     position: relative;
 }

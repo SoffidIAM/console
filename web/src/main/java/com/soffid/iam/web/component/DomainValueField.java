@@ -9,6 +9,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -267,7 +268,7 @@ public class DomainValueField extends Databox
 				}
 				if (isRequired() ) {
 					if (value == null || collectionValue.isEmpty()) {
-						setWarning(0, "Please, enter a value" );
+						setWarning(0, Labels.getLabel("common.enterValue") );
 						ok = false;
 					}
 				}
@@ -284,13 +285,13 @@ public class DomainValueField extends Databox
 		if (isRequired() && (currentValue == null || currentValue.toString().trim().isEmpty())) {
 			if (isMultiValue() ) {
 				if (collectionValue.isEmpty()) {
-					setWarning(position, "Please, enter a value" );
+					setWarning(position, Labels.getLabel("common.enterValue") );
 					return false;
 				}
 			}
 			else
 			{
-				setWarning(position, "Please, enter a value" );
+				setWarning(position, Labels.getLabel("common.enterValue") );
 				return false;
 			}
 		}

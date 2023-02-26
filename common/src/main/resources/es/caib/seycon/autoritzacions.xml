@@ -1281,6 +1281,18 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>seu:agents:show</codi>
+		<descripcio>Access to agents page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:tools:show</codi>
+		<descripcio>Access to tools page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>seu:networks:show</codi>
 		<descripcio>Access to networks page</descripcio>
 		<ambit>Soffid</ambit>

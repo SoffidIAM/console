@@ -470,7 +470,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>windows-plugin</artifactId>
-			<version>5.3.3</version>
+			<version>5.3.7</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>

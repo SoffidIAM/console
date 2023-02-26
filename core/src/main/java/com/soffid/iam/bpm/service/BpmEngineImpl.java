@@ -1443,6 +1443,28 @@ public class BpmEngineImpl extends BpmEngineBase {
 	}
 
 	@Override
+	protected void handleAddComment(ProcessInstance process, String comment)
+			throws Exception {
+		JbpmContext jbpmContext = null;
+		Session session = null;
+
+		jbpmContext = getContext();
+		try {
+			session = jbpmContext.getSession();
+			org.jbpm.graph.exe.ProcessInstance proc = jbpmContext.getProcessInstance(process.getId());
+			org.jbpm.graph.exe.Token token = proc.getRootToken();
+			Comment c = new Comment(getUserName(), comment);
+			token.addComment(c);
+			jbpmContext.save(proc);
+		} catch (RuntimeException ex) {
+			throw ex;
+		} finally {
+			flushContext(jbpmContext);
+		}
+
+	}
+
+	@Override
 	protected TaskInstance handleExecuteTask(TaskInstance task,
 			String transitionName) throws Exception {
 		JbpmContext context = getContext();

@@ -62,6 +62,22 @@ public class DynamicColumnsDatatable extends DataTable {
 	private void setDefaultColumns() throws Exception {
 		String pref = EJBLocator.getPreferencesService().findMyPreference("cols-"+preference);
 		if (pref != null && ! pref.trim().isEmpty()) {
+			JSONObject sortColumn = null;
+			int sc = getSortColumn();
+			if (sc >= 0) {
+				for (int i = 0; i < allColumns.length(); i++) {
+					JSONObject c = allColumns.getJSONObject(i);
+					if (c.optBoolean("default")) {
+						if (sc == 0) {
+							sortColumn = c;
+							break;
+						}
+						else
+							sc --;
+					}
+				}
+			}
+			
 			JSONArray a = new JSONArray();
 			
 			String customColumns = getCustomColumns();
@@ -103,6 +119,12 @@ public class DynamicColumnsDatatable extends DataTable {
 			}
 			if (!a.isEmpty()) {
 				setColumns(a.toString());
+				if (sortColumn != null) {
+					setSortColumn(-1);
+					for (int i = 0; i < a.length(); i++)
+						if (a.getJSONObject(i) == sortColumn)
+							setSortColumn(i);
+				}
 				return;
 			}
 		}

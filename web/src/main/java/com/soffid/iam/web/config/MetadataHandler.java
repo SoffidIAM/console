@@ -61,6 +61,7 @@ import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.ReorderEvent;
 import es.caib.zkib.datamodel.DataModelCollection;
+import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
@@ -162,8 +163,8 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 				String name = m.get("name");
 				if (name != null && ! name.trim().isEmpty())
 				{
-					
-					DataType dt = findDataType (coll, name);
+					DataNode dataNode = findDataType (coll, name);
+					DataType dt = (DataType) dataNode.getInstance();
 					if ( dt.getName() == null)
 						inserts++;
 					else
@@ -175,7 +176,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 							value = null;
 						if (s.equals("values") && value != null) {
 							String[] array = value.split("[ ,]+");
-							PropertyUtils.setProperty(dt, s, Lists.newArrayList(array));
+							dt.setValues(Arrays.asList(array));
 						} else if (s.equals("type") && value != null) {
 							dt.setType(TypeEnumeration.fromString(value));
 						} else if (s.equals("adminVisibility") && value != null) {
@@ -190,6 +191,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 							BeanUtils.setProperty(dt, s, value);
 						}
 					}
+					dataNode.update();
 					names.add(name);
 				}
 			}
@@ -216,17 +218,16 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 
 	}
 	
-    private DataType findDataType(DataNodeCollection coll, String name) {
+    private DataNode findDataType(DataNodeCollection coll, String name) throws Exception {
     	for (DataNode dataNode: (Collection<DataNode>)coll) {
     		if ( !dataNode.isDeleted()) {
     			DataType dt = (DataType) dataNode.getInstance();
     			if (dt.getName().equals(name))
-    				return dt;
+    				return dataNode;
     		}
     	}
     	DataType dt = new DataType();
-    	coll.add(dt);
-    	return dt;
+    	return (DataNode) coll.newInstance();
 	}
 
 	public void displayRestrictions ()

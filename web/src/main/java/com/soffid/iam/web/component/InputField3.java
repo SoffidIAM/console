@@ -29,6 +29,7 @@ import javax.naming.NamingException;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.LogFactory;
+import org.zkoss.util.Locales;
 import org.zkoss.util.TimeZones;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
@@ -61,8 +62,11 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.BinaryData;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.OsType;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.Printer;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
@@ -177,6 +181,12 @@ public class InputField3 extends Databox
 	}
 	
 	protected void onItemChange(Object value, Integer pos) {
+		if (dataType != null && dataType.getLetterCase() != null && value != null && value instanceof String) {
+			if (dataType.getLetterCase() == LetterCaseEnum.UPPERCASE)
+				value = value.toString().toUpperCase(Locales.getCurrent());
+			if (dataType.getLetterCase() == LetterCaseEnum.LOWERCASE)
+				value = value.toString().toLowerCase(Locales.getCurrent());
+		}
 		super.onItemChange(value, pos);
 		attributeValidate( pos , value);
 		Component c = this;
@@ -255,6 +265,7 @@ public class InputField3 extends Databox
 					setSelectIcon("/img/user.svg");
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole(Security.AUTO_USER_QUERY);
+					copyProperties(User.class, "userName");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.PRINTER_TYPE))
 				{
@@ -262,6 +273,7 @@ public class InputField3 extends Databox
 					setSelectIcon("/img/printer.svg");
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
+					copyProperties(Printer.class, "name");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.SYSTEM_TYPE))
 				{
@@ -275,11 +287,13 @@ public class InputField3 extends Databox
 					dataHandler = new ApplicationDataHandler(dataType);
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole(Security.AUTO_APPLICATION_QUERY);
+					copyProperties(Application.class.getName(), "relativeName");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE)) {
 					dataHandler = new CustomObjectDataHandler(dataType);
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole("customObject:query");
+					copyProperties(dataType.getCustomObjectType(), "name");
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new OUTypeDataHandler(dataType);
@@ -290,12 +304,14 @@ public class InputField3 extends Databox
 					dataHandler = new GroupDataHandler(dataType);
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole(Security.AUTO_GROUP_QUERY);
+					copyProperties(Group.class, "name");
 				} else if ( dataType.getType().equals(TypeEnumeration.HOST_TYPE)) {
 					setSelectIcon("/img/host.svg");
 					dataHandler = new HostDataHandler(dataType);
 					setHyperlink(true);
 					noPermissions = ! Security.isUserInRole(Security.AUTO_HOST_ALL_QUERY) &&
 							! Security.isUserInRole(Security.AUTO_HOST_ALL_SUPPORT_VNC);
+					copyProperties(Host.class, "name");
 				} else if ( dataType.getType().equals(TypeEnumeration.ROLE_TYPE)) {
 					dataHandler = new RoleDataHandler(dataType);
 					setSelectIcon("/img/role.svg");
@@ -443,6 +459,7 @@ public class InputField3 extends Databox
 						setPlaceholder(dataType.getLabel());
 				}
 			}
+			assignLetterCaseStyle();
 			if (dataType.getHint() != null && ! dataType.getHint().isEmpty())
 				setPlaceholder(dataType.getHint());
 			if (dataType.getSize() != null)
@@ -469,6 +486,46 @@ public class InputField3 extends Databox
 		
 	}
 
+
+	private void copyProperties(String customObjectType, String attribute) {
+		try {
+			Collection<DataType> dt;
+			dt = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(customObjectType, attribute);
+			if (dt != null) for (DataType d: dt) {
+				dataType.setLetterCase(d.getLetterCase());
+			}
+		} catch (Exception e) {
+			// Ignore
+		}
+	}
+
+	private void copyProperties(Class<?> class1, String attribute) {
+		copyProperties(class1.getName(), attribute);
+	}
+
+	private void assignLetterCaseStyle() {
+		String cl = getSclass();
+		if (cl == null) cl = "";
+		else {
+			// Remove upper / lower
+			String cl2 = "";
+			for (String s: cl.split(" +") ) {
+				if (!s.equals("databox_uppercase") &&
+					!s.equals("databox_lowercase")) {
+					if (! cl2.isEmpty() ) cl2 += " ";
+					cl2 += s;
+				}
+			}
+			cl = cl2;
+		}
+		if (dataType.getLetterCase() == LetterCaseEnum.UPPERCASE) 
+			cl += " databox_uppercase";
+		
+		if (dataType.getLetterCase() == LetterCaseEnum.LOWERCASE) 
+			cl += " databox_lowercase";
+		
+		setSclass(cl);
+	}
 
 	private void calculateVisibility() throws Exception {
 		if (XPathUtils.getComponentContext(this) != null)

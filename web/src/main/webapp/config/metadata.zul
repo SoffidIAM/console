@@ -126,7 +126,7 @@
 		id="objectAttributeWindow"
 		closable="false">
 		
-		<form2 dataPath="../metadataGrid:/" id="form">
+		<form2 dataPath="../metadataGrid:/" id="form" onChangeXPath="ref:frame.onChangeAttribute">
 			<div sclass='navigation-bar'>
 				${c:l('dadesAddicionals.zul.attribute') } <pager datatable="../metadataGrid" />
 				<menu2>
@@ -148,6 +148,12 @@
 							disabled="${!canModifyMetadata}"
 							onSelect='ref:frame.onChangeDataType(self)' />
 				</div>
+				<customfield3 label="${c:l('dadesAddicionals.zul.letterCase') }" dataType="STRING"
+					id="letterCase"
+					bind="letterCase"
+					required="true"
+					enumeration="com.soffid.iam.api.LetterCaseEnum"/>
+					
 				<customfield3 label="${c:l('dadesAddicionals.zul.Hint')}" dataType="STRING"
 							maxlength="128"
 							bind="hint"

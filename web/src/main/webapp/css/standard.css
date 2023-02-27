@@ -934,6 +934,16 @@ div.container.datebox input.dateboxinp.readonly {
 	background-image: none;
 }
 
+div.databox.databox_uppercase div.container input,
+div.databox.databox_uppercase div.container textarea {
+	text-transform: uppercase;
+}
+
+div.databox.databox_lowercase div.container input,
+div.databox.databox_lowercase div.container textarea {
+	text-transform: lowercase;
+}
+
 .dateboxinp  {
 	font-family: inherit;
 	font-size: inherit;

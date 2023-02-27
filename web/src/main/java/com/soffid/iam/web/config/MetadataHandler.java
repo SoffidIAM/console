@@ -367,6 +367,7 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
     	TypeEnumeration type = (TypeEnumeration) XPathUtils.getValue(lb,"type");
     	objectAttributeWindow.getFellow("visibility6").setVisible( type == es.caib.seycon.ng.comu.TypeEnumeration.GROUP_TYPE ||
     			type == es.caib.seycon.ng.comu.TypeEnumeration.USER_TYPE);
+		objectAttributeWindow.getFellow("letterCase").setVisible(type == TypeEnumeration.STRING_TYPE);
 	}
 	
 	public void addValue(Event event) throws Exception {
@@ -619,6 +620,14 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 				}
 			}
 		}
+	}
+	
+	public void onChangeAttribute (Event ev) {
+		Component form = ev.getTarget().getFellow("form");
+		try {
+			TypeEnumeration type = (TypeEnumeration) XPathUtils.eval(form, "type");
+			form.getFellow("letterCase").setVisible(type == TypeEnumeration.STRING_TYPE);
+		} catch (Exception e) {}
 	}
 }
 

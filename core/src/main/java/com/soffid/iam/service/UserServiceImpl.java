@@ -3062,7 +3062,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	String generateQuickSearchQuery (String text) {
 		if (text == null )
 			return  "";
-		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByObjectTypeAndName(User.class.getName(), null);
 		String[] split = ScimHelper.split(text);
 		
 		StringBuffer sb = new StringBuffer("");

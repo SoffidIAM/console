@@ -194,3 +194,4 @@ pom.xml~
 /juli/target
 web/deploy
 web/src/test/bin/syncweb.sh
+web/src/test

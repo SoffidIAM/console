@@ -15,6 +15,8 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Application;
+import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.api.AuthorizationRole;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.VaultFolder;
@@ -123,6 +125,16 @@ public class Pam02Handler extends Window {
 
 	private Role createRole(String name, String description) throws InternalErrorException, NamingException, CreateException {
 		final String soffidSystem = EJBLocator.getDispatcherService().findSoffidDispatcher().getName();
+		Application app = EJBLocator.getApplicationService().findApplicationByApplicationName("SOFFID");
+		if (app == null) {
+			app = new Application();
+			app.setName("SOFFID");
+			app.setDescription("Soffid IAM");
+			app.setBpmEnabled(false);
+			app.setSingleRole(false);
+			app.setType(ApplicationType.APPLICATION);
+			EJBLocator.getApplicationService().create(app);
+		}
 		Role role = EJBLocator.getApplicationService().findRoleByNameAndSystem(name, soffidSystem);
 		if (role == null) {
 			role = new Role();

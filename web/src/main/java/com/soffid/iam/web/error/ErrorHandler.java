@@ -132,7 +132,7 @@ public class ErrorHandler extends Window implements AfterCompose {
 				}
 				else if (e instanceof SecurityException)
 					messageLabel.setValue( Labels.getLabel("error.securityException")+ ": "+  msg );
-				else if (e instanceof Exception)
+				else if (original instanceof Exception)
 					messageLabel.setValue( SoffidStackTrace.generateEndUserDescription((Exception) original) );
 				else
 					messageLabel.setValue(msg);

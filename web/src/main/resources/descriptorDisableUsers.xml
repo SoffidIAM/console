@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="applications">
+		<finder name="user" type="user" >
+			<ejb-finder jndi="java:/module/UserService-v2" method="findUserByJsonQueryAsync" 
+				if = "${query != null}">
+				<parameter value="${query}"/>
+			</ejb-finder>
+		</finder>
+	</datanode>
+
+	<datanode name="user" transient="true"/>
+</zkib-model>

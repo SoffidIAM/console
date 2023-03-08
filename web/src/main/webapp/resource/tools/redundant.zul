@@ -9,15 +9,6 @@
 	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/roles"
 	use="com.soffid.iam.web.tools.RedundantRoleHandler" id="frame">
 	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" visible="${!embed}">
-		<menu2>
-			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
-			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('role:create')}"  onClick="ref:frame.addNew"/>
-			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" 
-				if="${soffid:isUserInRole('role:create') &amp;&amp; soffid:isUserInRole('role:update') &amp;&amp; soffid:isUserInRole('role:delete')}" 
-				onClick="ref:frame.importCsv"/>
-			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
-			<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:frame.bulkAction" />
-		</menu2>
 	</div>
 	<datamodel id="model" rootNode="applications" src="descriptorRedundantRoles.xml"/>
 	<timer id="timer" onTimer="ref:frame.onTimer"/>
@@ -40,7 +31,7 @@
 				jsonObject="com.soffid.iam.api.Role" 
 				defaultAttributes="name, description, system, informationSystemName"
 				preference="com.soffid.iam.api.Role"
-				dataPath="/model:/role" variableName="query" variableNameText="queryText"></searchbox>
+				dataPath="/model:/role" variableName="query"></searchbox>
 
 			<datatable id="roleslistbox" autocommit="true" 
 				maxheight="calc( 100vh - 450px )"

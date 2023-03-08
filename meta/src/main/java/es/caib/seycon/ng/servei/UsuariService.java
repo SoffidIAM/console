@@ -7,16 +7,20 @@
 package es.caib.seycon.ng.servei;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
+import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.UserPreferenceEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.MailService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -80,7 +84,8 @@ import es.caib.seycon.ng.model.UserAccountEntity;
 	AttributeValidationService.class,
 	VaultFolderEntity.class,
 	AuditoriaService.class,
-	VaultFolderAccessEntity.class})
+	VaultFolderAccessEntity.class,
+	MailService.class})
 public abstract class UsuariService {
 
 	@Operation(translated = "createUser")
@@ -738,5 +743,14 @@ public abstract class UsuariService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+	
+	@Operation( grantees = {roles.user_update.class} )
+	public AsyncProcessTracker disableUsers( @Nullable String scimQuery, List<DisableObjectRule> rules) {
+		return null;
+	}
 
+	@Operation( grantees = {roles.user_update.class} )
+	public AsyncProcessTracker disableUsersPreview( @Nullable String scimQuery, List<DisableObjectRule> rules, List<Object[]> actions) {
+		return null;
+	}
 }

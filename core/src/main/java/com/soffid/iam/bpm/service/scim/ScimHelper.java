@@ -4,8 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
@@ -44,6 +46,7 @@ public class ScimHelper {
 	String extraWhere = null;
 	private String returnValue;
 	private int pageSize;
+	HashMap <String,Object> extraParameters = null;
 	
 	public ScimHelper (Class objectClass) {
 		this.objectClass = objectClass;
@@ -80,6 +83,12 @@ public class ScimHelper {
 		}
 		if (tenantFilter != null)
 			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+		if (extraParameters != null) {
+			for (Entry<String, Object> entry: extraParameters.entrySet()) {
+				queryObject.setParameter(entry.getKey(), entry.getValue());
+			}
+			
+		}
 		TimeOutUtils tou = new TimeOutUtils();
 
 		
@@ -114,7 +123,7 @@ public class ScimHelper {
 	        fetchObjects(result, expr, queryObject, tou);
 			
 		}
-		if (config.getMaximumResultSize() == null && config.getFetchSize() == null &&
+		if ((config == null || config.getMaximumResultSize() == null && config.getFetchSize() == null) &&
 				(asyncList == null || ! asyncList.isCancelled()))
 			count = new Integer(result.size());
 	}
@@ -369,5 +378,15 @@ public class ScimHelper {
 
 	public void setPageSize(int i) {
 		pageSize = i;
+	}
+
+
+	public HashMap<String, Object> getExtraParameters() {
+		return extraParameters;
+	}
+
+
+	public void setExtraParameters(HashMap<String, Object> extraParameters) {
+		this.extraParameters = extraParameters;
 	}
 }

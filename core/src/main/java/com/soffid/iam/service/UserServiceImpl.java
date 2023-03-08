@@ -36,6 +36,9 @@ import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.jbpm.jpdl.el.FunctionMapper;
+import org.jbpm.jpdl.el.VariableResolver;
+import org.jbpm.jpdl.el.impl.ExpressionEvaluatorImpl;
 import org.jbpm.taskmgmt.exe.TaskInstance;
 import org.json.JSONException;
 import org.w3c.dom.Node;
@@ -43,13 +46,16 @@ import org.w3c.dom.NodeList;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.BpmProcess;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.ExtranetCard;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
@@ -67,11 +73,13 @@ import com.soffid.iam.api.Session;
 import com.soffid.iam.api.SyncAgentTaskLog;
 import com.soffid.iam.api.SyncServerInfo;
 import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.UserCriteria;
 import com.soffid.iam.api.UserData;
 import com.soffid.iam.api.UserMailList;
 import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
@@ -109,6 +117,7 @@ import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.impl.CertificateParser;
+import com.soffid.iam.service.impl.ObjectVariableResolver;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -130,6 +139,7 @@ import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.SeyconException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.signatura.api.ParsedCertificate;
 import es.caib.signatura.api.Signature;
@@ -3578,6 +3588,167 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			return true;
 		} else
 			return false;
+	}
+
+	@Override
+	protected AsyncProcessTracker handleDisableUsers(String scimQuery, List<DisableObjectRule> rules) throws Exception {
+		AsyncProcessTracker t = new AsyncProcessTracker();
+		t.setStart(new Date());
+		t.setProgress((float)0.0);
+		SoffidPrincipal principal = Security.getSoffidPrincipal();
+		new Thread( () -> {
+			Security.nestedLogin(principal);
+			try {
+				getAsyncRunnerService().runNewTransaction(() -> {
+					HashSet<Long> processedUsers = new HashSet<>();
+					int steps = 0;
+					for (DisableObjectRule rule: rules) {
+						if (rule.getCriteria() != null && rule.getAction() != null)
+							applyRule (t, scimQuery, rule, processedUsers, null);
+						steps ++ ;
+						t.setProgress((float)steps / rules.size());
+					}
+					return null;
+				});
+			} catch (InternalErrorException e) {
+				log.warn("Error processing task", e);
+				t.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
+			} finally {
+				Security.nestedLogoff();				
+				t.setEnd(new Date());
+				t.setFinished(true);
+			}
+		}).start();
+		return t;
+	}
+
+	@Override
+	protected AsyncProcessTracker handleDisableUsersPreview(String scimQuery, List<DisableObjectRule> rules, List<Object[]> actions) throws Exception {
+		AsyncProcessTracker t = new AsyncProcessTracker();
+		t.setStart(new Date());
+		t.setProgress((float)0.0);
+		getAsyncRunnerService().run(() -> {
+			try {
+				HashSet<Long> processedUsers = new HashSet<>();
+				int steps = 0;
+				for (DisableObjectRule rule: rules) {
+					try {
+						if (rule.getCriteria() != null)
+							applyRule (t, scimQuery, rule, processedUsers, actions);
+						steps ++ ;
+						t.setProgress((float)steps / rules.size());
+					} catch (Exception e) {
+						log.warn("Error processing task", e);
+						t.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
+					}
+				}
+			} finally {
+				t.setEnd(new Date());
+				t.setFinished(true);
+			}
+		}, new AsyncList<>());
+		return t;
+	}
+
+	private void applyRule(AsyncProcessTracker t, String scimQuery, DisableObjectRule rule, HashSet<Long> processedUsers, List<Object[]> actions) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
+		String query;
+		ScimHelper h = new ScimHelper(User.class);
+		h.setTenantFilter("tenant.id");
+		if ("P".equals(rule.getCriteria())) {
+			HashMap m = new HashMap<>();
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DATE, - rule.getParameter());
+			m.put("limit", c.getTime());
+			h.setExtraWhere("(select max(pass.expirationDate) from com.soffid.iam.model.PasswordEntityImpl as pass where pass.user.id=o.id) < :limit");
+			h.setExtraParameters(m);
+		}
+		else if ("L".equals(rule.getCriteria())) {
+			HashMap m = new HashMap<>();
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DATE, - rule.getParameter());
+			m.put("limit", c.getTime());
+			h.setExtraWhere("(select max(acc.lastLogin) from com.soffid.iam.model.UserAccountEntityImpl as ua join ua.account as acc where ua.user.id=o.id) < :limit");
+			h.setExtraParameters(m);
+		} else {
+			return;
+		}
+		
+		
+		h.setOrder("o.id");
+		h.setPageSize(100);
+		AsyncList<Object> list = new AsyncList<>();
+		h.setGenerator((data) -> {
+			if (t.isCancelled())
+				list.cancel();
+			UserEntity user = (UserEntity) data;
+			if (! processedUsers.contains(user.getId())) {
+				processedUsers.add(user.getId());
+				if (actions != null) {
+					synchronized(actions) {
+						actions.add(new Object[] {user.getUserName(), user.getFullName(), rule.getAction()});
+					}
+				} else {
+					try {
+						processAction (user, rule);
+					} catch (Exception e) {
+						throw new SeyconException("Error processing user "+user.getUserName(), e);
+					}
+				}
+			}
+			return null;
+		});
+		h.search(null, scimQuery, list);
+	}
+
+	private void processAction(UserEntity user, DisableObjectRule rule) throws Exception {
+		User userObject = getUserEntityDao().toUser(user);
+		if (rule.getAction().equals("E")) {
+			List<String> actors = new LinkedList<>();
+			
+			try {
+				if (rule.getEmailCopy() != null && ! rule.getEmailCopy().trim().isEmpty()) {
+					String actorsString = replace(rule.getEmailCopy(), userObject);
+					if (actorsString.startsWith("[") && actorsString.endsWith("]"))
+						actorsString = actorsString.substring(1, actorsString.length()-1);
+					for (String actor: actorsString.split("[ ,]+")) {
+						actors.add(actor);
+					}
+				}
+				else
+					actors.add(user.getUserName());
+			
+				getMailService().sendHtmlMailToActors(actors.toArray(new String[actors.size()]),
+						replace(rule.getEmailSubject(), userObject),
+						replace(rule.getEmailBody(), userObject));
+			} catch (InternalErrorException e) {
+				log.warn("Error sending notification email to "+user.getUserName(), e);
+			}
+		}
+		if (rule.getAction().equals("D")) {
+			if (userObject.getActive().booleanValue() ) {
+				userObject.setActive(false);
+				handleUpdate(userObject);
+			}
+		}
+		if (rule.getAction().equals("R")) {
+			for (UserAccount acc: getAccountService().getUserAccounts(getCurrentUser())) {
+				if ( acc.getStatus() != AccountStatus.REMOVED) {
+					acc.setStatus(AccountStatus.REMOVED);
+					getAccountService().updateAccount2(acc);
+				}
+			}
+		}
+	}
+
+	private String replace(String text, User user) {
+		
+		text = text.replace("#{", "${");
+		
+		VariableResolver pResolver = new ObjectVariableResolver (user);
+		ExpressionEvaluatorImpl ee = new ExpressionEvaluatorImpl();
+		FunctionMapper functions  = null;
+		return (String) ee.evaluate(text, String.class, pResolver , functions);
+		
 	}
 	
 

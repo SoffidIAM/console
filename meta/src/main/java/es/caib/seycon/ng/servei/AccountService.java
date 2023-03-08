@@ -12,6 +12,8 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.AsyncProcessTracker;
+import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
@@ -21,6 +23,7 @@ import com.soffid.iam.model.HostServiceEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.MailService;
 import com.soffid.iam.service.PamSecurityHandlerService;
 import com.soffid.iam.service.VaultService;
 import com.soffid.iam.service.impl.AttributeValidationService;
@@ -75,7 +78,8 @@ import roles.account_query;
 	JumpServerGroupEntity.class,
 	PamSecurityHandlerService.class,
 	HostServiceEntity.class,
-	AccountSnapshotEntity.class})
+	AccountSnapshotEntity.class,
+	MailService.class})
 public abstract class AccountService {
 
 	/// listUserAccounts
@@ -701,4 +705,16 @@ public abstract class AccountService {
 
 	@Operation(grantees= {roles.account_update.class} )
 	public Account removeAccountSnapshot(Account account) { return null; }
+	
+	
+	@Operation( grantees = {roles.account_update.class} )
+	public AsyncProcessTracker disableAccounts( @Nullable String scimQuery, List<DisableObjectRule> rules) {
+		return null;
+	}
+
+	@Operation( grantees = {roles.account_update.class} )
+	public AsyncProcessTracker disableAccountsPreview( @Nullable String scimQuery, List<DisableObjectRule> rules, List<Object[]> actions) {
+		return null;
+	}
+
 }

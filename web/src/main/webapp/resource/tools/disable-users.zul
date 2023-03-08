@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?page id="application"?>
+
+<?component name="role_users" macro-uri="role-users.zul"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/roles"
+	use="com.soffid.iam.web.tools.DisableUserHandler" id="frame">
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" visible="${!embed}">
+	</div>
+	<datamodel id="model" rootNode="applications" src="descriptorDisableUsers.xml"/>
+	<timer id="timer" onTimer="ref:frame.onTimer"/>
+	<wizard id="wizard">
+			<attribute name="steps">
+	- ${c:l("tools.redundant.preparation")}
+	- ${c:l('tools.disable-users.filter') }
+	- ${c:l('tools.disable-users.criteria') }
+	- ${c:l("tools.redundant.preview")}
+	- ${c:l("user_createaccount.Finish")}
+			</attribute>
+		<div >
+			<label style="margin: 64px; display: block" value="${c:l('tools.disable-users.introduction') }" multiline="true"/>
+			<div style="text-align: right; width: 100%">
+				<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onClick="ref:frame.next" id="step2Button"/>
+			</div>
+		</div>
+		<div>
+			<label style="margin-bottom: 16px; display: block" value="${c:l('tools.redundant.introduction2') }" multiline="true"/>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.User" 
+				defaultAttributes="userName, fullName, userType, primaryGroup"
+				enforcedFilter="active eq 'true'"
+				preference="disable-users"
+				dataPath="/model:/user" variableName="query"></searchbox>
+
+			<datatable id="userlistbox" autocommit="true" 
+				maxheight="calc( 100vh - 450px )"
+				use="com.soffid.iam.web.user.UserDatatable"
+				multiselect="false"
+				enablefilter='false' hidefilter='true'
+				preference="disable-users"
+				dataPath="/model:/user" sortColumn="0">
+			</datatable>
+
+			<div style="text-align: right; width: 100%">
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.back" />
+				<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onClick="ref:frame.next"/>
+			</div>
+		</div>
+		<div>
+			<grid fixedLayout="true" id="rulesGrid">
+				<columns>	
+					<column width="40%" label="${c:l('tools.disable-users.criteria') }"></column>
+					<column width="20%" label="${c:l('tools.disable-users.parameter') }"/>
+					<column width="40%" label="${c:l('aplicacionsIntranet.zul.Accia') }"/>
+				</columns>
+				<rows/>
+			</grid>
+			<div style="text-align: right; width: 100%">
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.back" />
+				<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" id="step2next" onClick="ref:frame.next"/>
+			</div>
+		</div>
+		<div>
+			<div id="progressImage2" style="text-align: center">
+				<image src="/anonymous/wait.gif" style="height: 24px"/>
+				<label value="${c:l('mesg:org.zkoss.zul.mesg.MZul:PLEASE_WAIT')}"/>
+			</div>
+			<datatable id="previewlistbox" autocommit="true" 
+				maxheight="calc( 100vh - 450px )"
+				multiselect="false"
+				enablefilter='true'
+				sortColumn="0">
+				<attribute name="columns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.User.userName') }
+  value: userName
+- name: ${c:l('com.soffid.iam.api.User.fullName') }
+  value: fullName
+- name: ${c:l('aplicacionsIntranet.zul.Accia') }
+  value: action
+				]]></attribute>
+			</datatable>
+
+			<div style="text-align: right; width: 100%">
+				<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:frame.back" />
+				<button image="/img/next-r.svg" label="${c:l('aplicaIntranet_autoritzacio.Next')}" onClick="ref:frame.next" id="step3next"/>
+			</div>
+		</div>
+		<div style="padding: 64px">
+			<div id="progressImage3" style="text-align: center">
+				<image src="/anonymous/wait.gif" style="height: 24px"/>
+				<label value="${c:l('mesg:org.zkoss.zul.mesg.MZul:PLEASE_WAIT')}"/>
+				<progressmeter id="progressPct" style="width: 100%"/>
+			</div>
+			<div id="progressImage4" style="text-align: center">
+				<label value="${c:l('token.lblFinished')}"/>
+			</div>
+		</div>
+	</wizard>
+</frame>

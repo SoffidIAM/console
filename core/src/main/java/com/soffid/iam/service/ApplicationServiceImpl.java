@@ -4289,7 +4289,7 @@ public class ApplicationServiceImpl extends
 			scopeGroup = ra1.getGroup();
 			scopeApp = ra1.getInformationSystem();
 			scopeValue = ra1.getDomainValue();
-		} else {
+		} else if (source instanceof RoleGroupEntity){
 			RoleGroupEntity rg = (RoleGroupEntity) source;
 			scopeGroup = rg.getGrantedGroupDomain();
 			scopeApp = rg.getGrantedApplicationDomain();

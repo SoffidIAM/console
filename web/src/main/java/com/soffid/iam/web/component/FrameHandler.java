@@ -101,6 +101,10 @@ public class FrameHandler extends Frame {
 			
 			setUrl(getPage().getRequestPath());
 			
+			addEventListener("onReturn", (ev) -> { 
+				setUrl(getPage().getRequestPath());
+			});
+			
 			Application.registerPage(this);
 			
 		}

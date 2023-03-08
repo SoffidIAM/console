@@ -89,7 +89,8 @@ public class NetworkWizardHandler extends Window implements AfterCompose{
 		Network n = createNetwork();
 
 		final NetworkDiscoveryService networkDiscoveryService = EJBLocator.getNetworkDiscoveryService();
-		networkDiscoveryService.enableNetworkDiscoveryScheduledTask(n);
+		if ( Boolean.FALSE.equals(n.getDiscovery()))
+			networkDiscoveryService.enableNetworkDiscoveryScheduledTask(n);
 
 		ScheduledTask st = networkDiscoveryService.findNetworkDiscoveryScheduledTask(n);
 		EJBLocator.getScheduledTaskService().startNow(st);

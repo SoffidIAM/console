@@ -149,6 +149,7 @@ public class Account {
 	
 	@Nullable
 	@Attribute(customUiHandler = "com.soffid.iam.web.account.JumpServerGroupFieldHandler" )
+	@JsonAttribute(hibernateAttribute = "jumpServerGroup.name")
 	String jumpServerGroup;
 
 	@Description("Creation date")

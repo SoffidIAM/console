@@ -773,7 +773,7 @@ public class TaskUI extends FrameHandler implements EventListener {
 	    List<TaskInstance> tasks = engine.getPendingTasks(currentProcess);
 
 	    getDataModel().commit();
-	    if (tasks != null)
+	    if (tasks != null && !tasks.isEmpty())
 	    {
 	    	for (TaskInstance ti: tasks)
 	    	{
@@ -785,9 +785,9 @@ public class TaskUI extends FrameHandler implements EventListener {
 	    			
 	    		}
 	    	}
+	    	Application.jumpTo(BPMApplication.getTaskURL(tasks.get(0)));
 	    }
-	    
-		if (newProcess && getCurrentProcess().getEnd() == null) {
+	    else if (newProcess && getCurrentProcess().getEnd() == null) {
 			Missatgebox.avis(String.format( Labels.getLabel("task.newProcessMessage"), currentProcess.getId()),
 					(event) -> {
 						cerrarTarea();

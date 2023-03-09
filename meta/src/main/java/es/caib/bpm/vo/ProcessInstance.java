@@ -15,7 +15,6 @@ import es.caib.seycon.ng.model.ConfiguracioEntity;
 @ValueObject(translatedName="ProcessInstance", translatedPackage="com.soffid.iam.bpm.api")
 @JsonObject(hibernateClass = ConfiguracioEntity.class)
 public class ProcessInstance {
-	@Attribute(hidden= true)
 	long id = 0;
 	@Nullable
 	@Attribute(hidden = true)

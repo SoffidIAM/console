@@ -47,7 +47,7 @@ public abstract class SessioEntity {
 	@Nullable
 	public java.util.Date dataKeepAlive;
 
-	@Column (name="SES_EXCLIP", length=30)
+	@Column (name="SES_EXCLIP", length=60)
 	@Nullable
 	public java.lang.String externalClientIp;
 

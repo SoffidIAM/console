@@ -33,7 +33,7 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public java.lang.String oldSistemaOperatiu;
 
-	@Column (name="MAQ_ADRIP", length=50, translated="hostIP")
+	@Column (name="MAQ_ADRIP", length=60, translated="hostIP")
 	@Nullable
 	public java.lang.String adreca;
 

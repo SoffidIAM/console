@@ -92,19 +92,23 @@ public class ScheduledTaskHandler extends FrameHandler {
 				logField.setVisible(false);
 			} else {
 				logField.setVisible(true);
-				com.soffid.iam.doc.service.ejb.DocumentService doc = es.caib.seycon.ng.EJBLocator.getDocumentService();
-				doc.openDocument(new com.soffid.iam.doc.api.DocumentReference(ref));
-				java.io.InputStream in = new com.soffid.iam.doc.api.DocumentInputStream(doc);
-				InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-				int lines = 0;
-				int ch;
+				int ch = -1;
 				StringBuffer sb = new StringBuffer();
-				for (ch = reader.read(); ch >= 0 && lines < 10; ch = reader.read()) {
-					sb.append((char) ch);
-					if (ch == '\n') lines ++;
+				try {
+					com.soffid.iam.doc.service.ejb.DocumentService doc = es.caib.seycon.ng.EJBLocator.getDocumentService();
+					doc.openDocument(new com.soffid.iam.doc.api.DocumentReference(ref));
+					java.io.InputStream in = new com.soffid.iam.doc.api.DocumentInputStream(doc);
+					InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+					int lines = 0;
+					for (ch = reader.read(); ch >= 0 && lines < 10; ch = reader.read()) {
+						sb.append((char) ch);
+						if (ch == '\n') lines ++;
+					}
+					reader.close();
+					in.close();
+				} catch (DocumentBeanException e) {
+					// Document has been erased
 				}
-				reader.close();
-				in.close();
 				if (ch >= 0) {
 					logField.setSelectIcon("/img/download.svg");
 					logField.setSelectIcon2("/img/download-white.svg");

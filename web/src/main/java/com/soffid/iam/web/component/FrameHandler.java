@@ -487,4 +487,17 @@ public class FrameHandler extends Frame {
 					});
 		}
 	}
+	
+	
+	public void confirmApply (Event e) throws CommitException {
+		if (getModel() == null || ! getModel().isCommitPending()) {
+			hideDetails();
+		} else {
+			Missatgebox.confirmaYES_NO(Labels.getLabel("aplica_usuarisRolllista.zul.Confirm"), (event) -> {
+				if (event.getName().equals("onYes")) {
+					apply(e);
+				}
+			});
+		}
+	}
 }

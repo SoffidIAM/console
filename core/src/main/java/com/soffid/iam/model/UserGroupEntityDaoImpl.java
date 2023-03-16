@@ -318,7 +318,7 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
         GroupEntity grup = null;
         if (sourceVO.getGroup() != null)
         	grup = getGroupEntityDao().findByName(sourceVO.getGroup());
-        if (grup != null && sourceVO.getGroupId() != null)
+        if (grup == null && sourceVO.getGroupId() != null)
         	grup = getGroupEntityDao().load(sourceVO.getGroupId());
         if (grup == null) {
             throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.9"), sourceVO.getGroup()));

@@ -156,21 +156,21 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         	meClient = findMaquina(nomMaquinaClient);
             if (meClient == null)
             {
-                sessio.setExternalClientIp (nomMaquinaClient);
                 sessio.setClientHostName(nomMaquinaClient);
+                try
+                {
+                	InetAddress addr = InetAddress.getByName(sessio.getClientHostName());
+                	sessio.setClientAddress(addr.getHostAddress());
+                } catch (Exception e )
+                {
+                }
             }
             else
             {
                 sessio.setClientHost(meClient);
                 sessio.setClientHostName(meClient.getName());
+                sessio.setClientAddress(meClient.getHostIP());
             }
-        	try
-        	{
-           		InetAddress addr = InetAddress.getByName(sessio.getClientHostName());
-          		sessio.setClientAddress(addr.getHostAddress());
-        	} catch (Exception e )
-        	{
-        	}
         }
         sessio.setWebHandler(url);
         

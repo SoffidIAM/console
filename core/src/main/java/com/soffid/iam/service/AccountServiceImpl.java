@@ -3455,7 +3455,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					actors.addAll(userObject.getOwnerGroups());
 				}
 				
-				getMailService().sendHtmlMailToActors(actors.toArray(new String[actors.size()]),
+				if (rule.getEmailBody() != null && !rule.getEmailBody().trim().isEmpty() &&
+						rule.getEmailSubject() != null && !rule.getEmailSubject().trim().isEmpty())
+					getMailService().sendHtmlMailToActors(actors.toArray(new String[actors.size()]),
 						replace(rule.getEmailSubject(), userObject),
 						replace(rule.getEmailBody(), userObject));
 			} catch (InternalErrorException e) {

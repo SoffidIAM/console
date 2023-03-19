@@ -43,7 +43,7 @@ public class EmailEditor extends Window implements AfterCompose {
 			editorWindow.doHighlighted();
 			editorWindow.actualBody.setValue( body.getText() );
 			editorWindow.actualSendTo.setValue( sendTo.getText());
-			editorWindow.actualSubject.setAction( subject.getText() );
+			editorWindow.actualSubject.setValue( subject.getText() );
 		}
 	}
 	

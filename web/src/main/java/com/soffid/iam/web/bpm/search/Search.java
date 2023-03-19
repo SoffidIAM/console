@@ -160,8 +160,9 @@ public class Search extends FrameHandler
 			StringBuffer sb = new StringBuffer();
 			sb.append("[");
 			DateFormat df = DateFormats.getDateTimeFormat();
-			for(ProcessInstance proc: currentProcess)
+			for(Iterator<ProcessInstance> it = currentProcess.iterator(); it.hasNext();)
 			{
+				ProcessInstance proc = it.next();
 				if (Boolean.TRUE.equals( chkFinalizada.getValue()) || proc.getEnd() == null)
 				{
 					JSONObject o = new JSONObject();
@@ -189,6 +190,8 @@ public class Search extends FrameHandler
 					if (sb.length() > 1) sb.append(",");
 					sb.append(o.toString());
 				}
+				else
+					it.remove();
 			}
 			sb.append("]");
 			resultadoBusqueda.setData(sb.toString());

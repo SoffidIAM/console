@@ -223,7 +223,8 @@ public class FrameHandler extends Frame {
 	}
 	
 	protected HtmlBasedComponent getCard() {
-		return (HtmlBasedComponent) getFellow("card");
+		final HtmlBasedComponent card = (HtmlBasedComponent) getPage().getFellow("card");
+		return card;
 	}
 
 	public void hideDetails() throws CommitException {

@@ -219,11 +219,12 @@ public class FrameHandler extends Frame {
 	}
 
 	public boolean isSingleFaceCard() {
-		return getCard().getSclass().equals("single-face-card");
+		final HtmlBasedComponent card = getCard();
+		return card == null || card.getSclass().equals("single-face-card");
 	}
 	
 	protected HtmlBasedComponent getCard() {
-		final HtmlBasedComponent card = (HtmlBasedComponent) getPage().getFellow("card");
+		final HtmlBasedComponent card = (HtmlBasedComponent) getPage().getFellowIfAny("card");
 		return card;
 	}
 

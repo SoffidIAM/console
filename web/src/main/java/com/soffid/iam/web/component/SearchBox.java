@@ -364,7 +364,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 				{
 					JSONObject j = new JSONObject(p);
 					int option = j.getInt("type");
-					if (option == TEXT)
+					if (option == TEXT && getVariableNameText() != null)
 						setTextMode();
 					else if (option == ADVANCED)
 						setAdvancedMode();

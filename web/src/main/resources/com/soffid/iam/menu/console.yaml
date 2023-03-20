@@ -78,10 +78,6 @@
           url: /resource/menu/menu.zul
           img: /img/menu/launcher-editor.svg
           permissions: ["seu:menusIntranet:show"]
-        - name: seu.networkDiscovery
-          url: /resource/network/discovery.zul
-          permissions: ["seu:networkDiscovery:show"]
-          img: /img/menu/network-discovery.svg
         - name: seu.vault
           url: /resource/account/vault.zul
           permissions: ["sso:manageAccounts"]
@@ -168,6 +164,10 @@
             url: /config/attribute-translation.zul
             permissions: ["seu:attributeTranslation:show"]
             img: /img/menu/translation-tables.svg
+          - name: seu.networkDiscovery
+            url: /resource/network/discovery.zul
+            permissions: ["seu:networkDiscovery:show"]
+            img: /img/menu/network-discovery.svg
         - name: seu.workflow-settings
           img: /img/menu/workflow.svg
           options:

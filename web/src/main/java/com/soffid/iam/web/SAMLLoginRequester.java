@@ -144,8 +144,6 @@ public class SAMLLoginRequester extends HttpServlet {
 
 	private String getRedirectPage(HttpServletRequest req) {
 		String context = req.getContextPath();
-		if (context.isEmpty())
-			context = "/index.zul";
-		return context;
+		return context + "/index.zul";
 	}
 }

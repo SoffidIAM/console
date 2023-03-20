@@ -503,7 +503,7 @@ public class FrameHandler extends Frame {
 		}
 	}
 	
-	public void confirmApply (Event e) throws CommitException {
+  public void confirmApply (Event e) throws CommitException {
 		if (getModel() == null || ! getModel().isCommitPending()) {
 			hideDetails();
 		} else {

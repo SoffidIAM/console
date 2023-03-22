@@ -24,7 +24,10 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		</div>
 
 		<div sclass="col_cen">
-			<textbox id="searchTextbox" class="searchBox" placeholder="${c:l('adminPersonalConfigs.zul.Cercar') }" onChanging="ref:searchBox.onChanging(event)"/>
+			<textbox id="searchTextbox" class="searchBox" placeholder="${c:l('adminPersonalConfigs.zul.Cercar') }" 
+				onChanging="ref:searchBox.onChanging"
+				onChange="ref:searchBox.onChange"
+				action="onKeyDown: if (event.keyCode==13) {zkau.send ({uuid: this.id, cmd: 'onChange', data : [this.value, false, this.value.length]}, 5); event.stopPropagation(); }"/>
 			<label class="maintitle" id="title" visible="false"/>
 		</div>
 	</div>

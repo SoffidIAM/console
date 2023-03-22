@@ -1,5 +1,6 @@
 package com.soffid.iam.web.main;
 
+import org.w3c.dom.html.HTMLInputElement;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -10,6 +11,7 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
+import org.zkoss.zul.impl.InputElement;
 
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
@@ -39,19 +41,30 @@ public class SearchBoxWindow extends Popup implements AfterCompose {
 		}
 	}
 
+	public void onChange(Event inputEvent) throws Exception {
+		InputElement e = (InputElement) inputEvent.getTarget();
+		startSearch(inputEvent, (String) e.getRawValue());
+	}
+	
+	private void startSearch(Event inputEvent, String value) throws Exception {
+		for (SearchHandler handler: handlers) {
+			handler.cancelSarch();
+			handler.startSearch(value);
+		}
+		timer.start();
+		if (waiting != null) waiting.setVisible(true);
+		onTimer(inputEvent);
+		if (!isVisible()) {
+			open (inputEvent.getTarget());
+		}
+		for (SearchHandler handler: handlers) {
+			handler.update();
+		}
+	}
+
 	public void onChanging(InputEvent inputEvent) throws Exception {
 		if (inputEvent.getValue().length() > 2) {
-			for (SearchHandler handler: handlers) {
-				handler.cancelSarch();
-				handler.startSearch(inputEvent.getValue());
-			}
-			timer.start();
-			if (waiting != null) waiting.setVisible(true);
-			onTimer(inputEvent);
-			open (inputEvent.getTarget());
-			for (SearchHandler handler: handlers) {
-				handler.update();
-			}
+			startSearch(inputEvent, inputEvent.getValue());
 		}
 	}
 	

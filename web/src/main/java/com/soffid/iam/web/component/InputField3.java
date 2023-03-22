@@ -71,6 +71,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserType;
+import com.soffid.iam.api.exception.ListFullException;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.bpm.api.TaskInstance;
 import com.soffid.iam.interp.Evaluator;
@@ -115,6 +116,8 @@ import es.caib.zkib.jxpath.JXPathException;
 
 public class InputField3 extends Databox
 {
+	private static final int MAX_DROPDOWN_ROWS = 100;
+
 	org.apache.commons.logging.Log log = LogFactory.getLog(getClass());
 	
 	private static final long serialVersionUID = 1L;
@@ -1010,7 +1013,8 @@ public class InputField3 extends Databox
 		if ( dataHandler != null && ! noPermissions) {
 			try {
 				currentList = dataHandler.search(text, dataType.getFilterExpression());
-				currentList.setMaxSize(200);
+				currentList.setMaxSize(MAX_DROPDOWN_ROWS);
+			} catch (ListFullException e) { // Ignore
 			} catch (Exception e) {
 				log.info("Error searching for "+text, e);
 			}
@@ -1032,18 +1036,18 @@ public class InputField3 extends Databox
 		List<String[]> result = null;
 		if (currentList != null) {
 			Iterator<?> it = currentList.iterator();
-			if ( (currentList.isDone() &&  currentPosition == currentList.size()) || currentList.isCancelled())
+			if ( (currentList.isDone()  || currentList.isCancelled() ) &&  (currentPosition == currentList.size() || currentPosition >= 100))
 			{
 				Throwable th = currentList.getExceptionToThrow();
 				currentList.clearExceptionToThrow();
-				if (th != null)
+				if (th != null && ! ( th  instanceof ListFullException))
 				{
 					throw th; 
 				}
 			} else if (currentList.size() > currentPosition) {
 				int i = 0;
 				result = new LinkedList();
-				while (it.hasNext() && currentPosition < 100)
+				while (it.hasNext() && currentPosition < MAX_DROPDOWN_ROWS)
 				{
 				    Object o = it.next();
 					if (i++ >= currentPosition)

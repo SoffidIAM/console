@@ -2294,7 +2294,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for ( Entry<AccountEntity, AccountAccessLevelEnum> entry: accounts.entrySet())
 		{
 			AccountEntity accEntity = entry.getKey();
-			if (!accEntity.isDisabled())
+			if (accEntity.getStatus() != AccountStatus.REMOVED)
 			{
 				Account acc = getAccountEntityDao().toAccount(accEntity);
 				if (accEntity.getType().equals(AccountType.USER)) {

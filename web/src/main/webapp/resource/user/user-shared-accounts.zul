@@ -9,6 +9,7 @@
 	<datatable dataPath="${arg.listbox}:/sharedAccount" 
 		id="listbox"
 		onSelect="ref:handler.openAccount"
+		use="com.soffid.iam.web.account.AccountDatatable"
 		enablefilter="true">
 		<attribute name="columns"><![CDATA[
 		- name: ${c:l('com.soffid.iam.api.Account.system')}

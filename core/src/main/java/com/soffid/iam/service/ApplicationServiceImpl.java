@@ -4032,6 +4032,9 @@ public class ApplicationServiceImpl extends
 	            if (rg != null) {
 	            	rad.hierarchy = new RoleGrantHierarchy();
 	            	PropertyUtils.copyProperties(rad.hierarchy, rg);
+	            	if (rad.account != null && rad.hierarchy.getOwnerAccountName() == null) {
+	            		rad.hierarchy.setOwnerAccountName(rad.account.getName());
+	            	}
 	            }
             }
             

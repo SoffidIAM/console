@@ -115,13 +115,6 @@
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>
-		<validator>
-			<attribute-validator expr="${instance.firstName}" notNull="true" friendlyName="usuaris.NameValidation"/>
-			<attribute-validator expr="${instance.userName}" notNull="true" friendlyName="usuaris.CodeValidation"/>
-			<attribute-validator expr="${instance.lastName}" notNull="true" friendlyName="usuaris.SurnameValidation"/>
-			<attribute-validator expr="${instance.userType}" notNull="true" friendlyName="usuaris.UserTypeValidation"/>
-			<attribute-validator expr="${instance.primaryGroup}" notNull="true" friendlyName="usuaris.PrimaryGroupValidation"/>
-		</validator>
 	</datanode>
 
 	<datanode name="effectiveRole" transient="true"/>

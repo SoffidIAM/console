@@ -15,6 +15,8 @@
 		<attribute name="columns"><![CDATA[
 		- name: ${c:l('accounts.dispatcher')}
 		  width: 200px
+		- name: ${c:l('aplica_usuarisRolllista.zul.Codi')}
+		  width: 200px
 		- name: ${c:l('com.soffid.iam.api.Role.description')}
 		]]>
 		</attribute>
@@ -32,6 +34,7 @@
              #{roleName != null ? c:cat4("${c:l('accounts.role')} ", roleName, " @ ",system): ""}
           columns:
           - value: system
+          - value: ownerAccountName
           - template: >-
                 #{accountName != null ? accountDescription: ""}
                 #{groupName != null ? groupDescription: ""}
@@ -51,6 +54,7 @@
              #{domainValue != null ? c:cat3(" / <b>", domainValue, " </b> "): ""}
           columns:
           - value: system
+          - value: ownerAccountName
           - template: >-
                 #{accountName != null ? accountDescription: ""}
                 #{groupName != null ? groupDescription: ""}

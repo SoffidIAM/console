@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import org.hibernate.Hibernate;
 
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RuleEntity;
@@ -78,7 +79,7 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 
 
 	@Override
-	public void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue)
+	public void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue, AccountEntity account)
 			throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
 		if (!user.getId().equals( currentUser) )
 		{

@@ -9,59 +9,8 @@
  */
 package com.soffid.iam.service;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.ParseException;
-import bsh.TargetError;
-
-import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.AsyncProcessTracker;
-import com.soffid.iam.api.AsyncProcessTracker;
-import com.soffid.iam.api.AttributeVisibilityEnum;
-import com.soffid.iam.api.DelegationStatus;
-import com.soffid.iam.api.DomainValue;
-import com.soffid.iam.api.Group;
-import com.soffid.iam.api.Role;
-import com.soffid.iam.api.RoleAccount;
-import com.soffid.iam.api.Rule;
-import com.soffid.iam.api.Task;
-import com.soffid.iam.api.User;
-import com.soffid.iam.api.UserAccount;
-import com.soffid.iam.api.UserData;
-import com.soffid.iam.common.security.SoffidPrincipal;
-import com.soffid.iam.interp.Evaluator;
-import com.soffid.iam.model.AccountEntity;
-import com.soffid.iam.model.DomainValueEntity;
-import com.soffid.iam.model.GroupEntity;
-import com.soffid.iam.model.Parameter;
-import com.soffid.iam.model.RoleAccountEntity;
-import com.soffid.iam.model.RoleAccountEntityDao;
-import com.soffid.iam.model.RoleEntity;
-import com.soffid.iam.model.RuleAssignedRoleEntity;
-import com.soffid.iam.model.RuleEntity;
-import com.soffid.iam.model.TaskEntity;
-import com.soffid.iam.model.UserAccountEntity;
-import com.soffid.iam.model.UserDataEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.model.UserGroupEntity;
-import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import com.soffid.iam.service.impl.RuleDryRunMethod;
-import com.soffid.iam.service.impl.RuleEvaluatorGrantRevokeMethod;
-import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.utils.ConfigurationCache;
-import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.comu.AccountType;
-import es.caib.seycon.ng.comu.TipusDomini;
-import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.NeedsAccountNameException;
-import es.caib.seycon.ng.exception.SoffidStackTrace;
-
 import java.io.File;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,11 +23,46 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.jbpm.graph.node.ProcessState;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
+
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.AsyncProcessTracker;
+import com.soffid.iam.api.DelegationStatus;
+import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserAccount;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.interp.Evaluator;
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.DomainValueEntity;
+import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.RoleAccountEntity;
+import com.soffid.iam.model.RoleAccountEntityDao;
+import com.soffid.iam.model.RoleEntity;
+import com.soffid.iam.model.RuleAssignedRoleEntity;
+import com.soffid.iam.model.RuleEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserGroupEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.service.impl.RuleDryRunMethod;
+import com.soffid.iam.service.impl.RuleEvaluatorGrantRevokeMethod;
+import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.NeedsAccountNameException;
+import es.caib.seycon.ng.exception.SoffidStackTrace;
 
 /**
  * @author bubu
@@ -124,15 +108,20 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				roles.addAll( raDao.findDelegatedRolAccounts(user.getUserName()));
 			}
 			HashSet<Long> rolesToRemove = new HashSet<Long>();
-			for (RoleAccountEntity role: roles) {
-                if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
-                	if (role.isEnabled() && ( 
-                			role.getEndDate() == null ||
-                			role.getEndDate().after(new Date())))
-                	{
+			for (Iterator<RoleAccountEntity> iterator = roles.iterator(); iterator.hasNext();) {
+				RoleAccountEntity role = iterator.next();
+				if (role.isEnabled() && ( 
+						role.getEndDate() == null ||
+						role.getEndDate().after(new Date())))
+				{
+					if (role.getRule() != null && role.getRule().getId().equals(rule.getId())) {
                 		rolesToRemove.add(role.getId());
                 	}
                 }
+				else
+				{
+					iterator.remove();
+				}
 			}
 			// Add role if needed
 			if (result != null && ((Boolean) result).booleanValue())
@@ -236,30 +225,60 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	 */
 	private void assignRole(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user, 
 			RoleEntity role, String stringValue, RuleEvaluatorGrantRevokeMethod method) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+		LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
+		LinkedList<AccountEntity> disabledAccounts = new LinkedList<AccountEntity>();
+		for (UserAccountEntity uac: user.getAccounts()) {
+			if (uac.getAccount().getSystem() == role.getSystem()) {
+				if (uac.getAccount().isDisabled())
+					disabledAccounts.add(uac.getAccount());
+				else
+					accounts.add(uac.getAccount());
+			}
+		}
+		
+		if (accounts.isEmpty()) {
+			if (disabledAccounts.isEmpty())
+				assignRoleAccount(rule, roles, user, role, stringValue, method, null);
+			else for (AccountEntity account: disabledAccounts) {
+				assignRoleAccount(rule, roles, user, role, stringValue, method, account);
+			}
+		}
+		else for (AccountEntity account: accounts) {
+			assignRoleAccount(rule, roles, user, role, stringValue, method, account);
+		}
+		
+	}
+
+	private void assignRoleAccount(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user, RoleEntity role,
+			String stringValue, RuleEvaluatorGrantRevokeMethod method, AccountEntity account)
+			throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
 		// First. Test if role is already assigned
-		for (Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext(); ) {
-            RoleAccountEntity ra = it.next();
-            boolean match = false;
-            if (ra.getRole().getId().equals(role.getId())) {
-                if (ra.getDomainValue() != null) {
-                    if (ra.getDomainValue().getValue().equals(stringValue)) match = true;
-                } else if (ra.getGroup() != null) {
-                    if (ra.getGroup().getName().equals(stringValue)) match = true;
-                } else if (ra.getInformationSystem() != null) {
-                    if (ra.getInformationSystem().getName().equals(stringValue)) match = true;
-                } else {
-                    if (stringValue == null) match = true;
-                }
-            }
-            if (match) {
-                it.remove();
-                return;
-            }
-        }
 		
+		if (account != null) {
+			for (Iterator<RoleAccountEntity> it = roles.iterator(); it.hasNext(); ) {
+				RoleAccountEntity ra = it.next();
+				boolean match = false;
+				if (ra.getRole().getId().equals(role.getId()) && account == ra.getAccount()) {
+					if (ra.getDomainValue() != null) {
+						if (ra.getDomainValue().getValue().equals(stringValue)) match = true;
+					} else if (ra.getGroup() != null) {
+						if (ra.getGroup().getName().equals(stringValue)) match = true;
+					} else if (ra.getInformationSystem() != null) {
+						if (ra.getInformationSystem().getName().equals(stringValue)) match = true;
+					} else {
+						if (stringValue == null) match = true;
+					}
+				}
+				if (match) {
+					it.remove();
+					return;
+				}
+			}
+			
+			
+		}
 		// Second. Assign now
-		method.grant(rule, user, role, stringValue);
-		
+		method.grant(rule, user, role, stringValue, account);
 	}
 
 
@@ -449,27 +468,22 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		}
 		
 		@Override
-		public void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue)
+		public void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue, AccountEntity account)
 				throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
-			List<AccountEntity> accounts = getAccountsForRole(user, role);
 			RoleAccount ra = generateRolAccount(rule, role, domainValue);
-			if (accounts.isEmpty())
-			{
-				UserAccount account = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
+			if (account == null) {
+				UserAccount ua = getAccountService().createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()), null);
+				ra.setAccountId(ua.getId());
+				ra.setAccountName(ua.getName());
+			} else {
 				ra.setAccountId(account.getId());
 				ra.setAccountName(account.getName());
-				Security.nestedLogin(Security.getCurrentAccount (), Security.ALL_PERMISSIONS);
-				try {
-					getApplicationService().create(ra);
-				} finally {
-					Security.nestedLogoff();
-				}
-			} else {
-				for (AccountEntity account : accounts) {
-	                ra.setAccountId(account.getId());
-	                ra.setAccountName(account.getName());
-	                getApplicationService().create(ra);
-	            }
+			}
+			Security.nestedLogin(Security.getCurrentAccount (), Security.ALL_PERMISSIONS);
+			try {
+				getApplicationService().create(ra);
+			} finally {
+				Security.nestedLogoff();
 			}
 		}
 	}

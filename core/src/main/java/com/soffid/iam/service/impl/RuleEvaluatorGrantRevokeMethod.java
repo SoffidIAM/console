@@ -1,5 +1,6 @@
 package com.soffid.iam.service.impl;
 
+import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RuleEntity;
@@ -11,7 +12,7 @@ import es.caib.seycon.ng.exception.NeedsAccountNameException;
 
 public interface RuleEvaluatorGrantRevokeMethod
 {
-	void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue)
+	void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue, AccountEntity account)
 			throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException ;
 	void revoke(UserEntity user, RoleAccountEntity role) throws InternalErrorException;
 }

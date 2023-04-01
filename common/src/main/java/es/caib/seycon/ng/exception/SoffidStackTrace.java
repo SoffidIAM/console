@@ -430,7 +430,7 @@ public class SoffidStackTrace
 				}
 			}
 		}
-		if (cause.getErrorCode() == 1062) { // Unique key
+		if (cause.getErrorCode() == 1) { // Unique key
 			return String.format(Messages.getString("exception.duplicate"),
 						objectName);
 		}
@@ -477,7 +477,7 @@ public class SoffidStackTrace
 				}
 			}
 		}
-		if (cause.getErrorCode() == 1062) { // Unique key
+		if (cause.getErrorCode() == 2627) { // Unique key
 			return String.format(Messages.getString("exception.duplicate"),
 						objectName);
 		}

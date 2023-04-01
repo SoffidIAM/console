@@ -56,6 +56,7 @@ public class ErrorServlet extends HttpServlet {
 		if (th == null)
 			log.warn("Error on " + uri + ": " + reason + " - " + message);
 		else {
+			log.warn("Error on " + uri + ": " , th);
 			Throwable root = th;
 			do {
 				if (root instanceof javax.ejb.EJBException) {

@@ -1903,7 +1903,7 @@ public class ApplicationServiceImpl extends
 					populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy,
 							accounts.get(ra.getAccount().getId()), ra);
 			} else {
-				if (!ra.getAccount().isDisabled() || ra.getAccount().getSystem().getRoleBased().equals("S")) 
+				if (!ra.getAccount().isDisabled() || "S".equals(ra.getAccount().getSystem().getRoleBased())) 
 					populateRoleAccount(rad, type, ra.getAccount(), user, holderGroup, hierarchy, null, ra);
 			}
 

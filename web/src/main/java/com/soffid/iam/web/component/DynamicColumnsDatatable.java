@@ -21,6 +21,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.web.menu.YamlParser;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkdb.yaml.Yaml2Json;
 import es.caib.zkib.component.DataTable;
 
 public class DynamicColumnsDatatable extends DataTable {
@@ -43,7 +44,7 @@ public class DynamicColumnsDatatable extends DataTable {
 	}
 	
 	public void setAllColumns(String allColumns) throws Exception {
-		JSONArray array = (JSONArray) new YamlParser().parse(allColumns);
+		JSONArray array = new JSONArray(new Yaml2Json().transform(allColumns));
 		setAllColumns(array);
 	}
 	
@@ -82,7 +83,7 @@ public class DynamicColumnsDatatable extends DataTable {
 			
 			String customColumns = getCustomColumns();
 			if (customColumns != null && !customColumns.trim().isEmpty())
-				a = (JSONArray) new YamlParser().parse(customColumns);
+				a = new JSONArray( new Yaml2Json().transform(customColumns));
 			
 			String[] mandatory = getMandatoryColumns();
 			List<String> enabledColumns = new LinkedList<>();

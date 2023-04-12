@@ -106,7 +106,7 @@ public class ScheduledTaskHandler extends FrameHandler {
 					}
 					reader.close();
 					in.close();
-				} catch (DocumentBeanException e) {
+				} catch (Exception e) {
 					// Document has been erased
 				}
 				if (ch >= 0) {

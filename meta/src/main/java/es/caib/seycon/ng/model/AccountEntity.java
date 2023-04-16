@@ -73,6 +73,10 @@ public abstract class AccountEntity {
 	@Nullable
 	public java.util.Date created;
 
+	@Column(name = "ACC_LASCHG")
+	@Nullable
+	public java.util.Date lastChange;
+
 	@Column(name = "ACC_LASUPD")
 	@Nullable
 	public java.util.Date lastUpdated;
@@ -112,12 +116,7 @@ public abstract class AccountEntity {
 	@Column (name="ACC_INHPER", defaultValue="false")
 	@Nullable
 	Boolean inheritNewPermissions;
-/*
-	@Column(name="ACC_SVCTYP", length = 50)
-	@Nullable
-	@Description("Known values are Windows, Linux and Database")
-	String serviceType;
-*/	
+
 	@Column (name="ACC_URL")
 	@Nullable
 	String loginUrl;

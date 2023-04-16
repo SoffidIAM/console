@@ -142,8 +142,16 @@
 				as.updateAccount2(instance);
 			</insert-script>
 		</script-handler>
+		<finder name="events" type="event" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/AuditService-v2"
+				method="findAuditByJsonQueryAsync" >
+				<parameter value="searchIndex eq 'ACC#${instance.id}'"/>
+			</ejb-finder>
+		</finder>
 	</datanode>
 
+	<datanode name="event" transient="true" />
+	
 	<datanode name="sessio" />
 	
 	<datanode name="processosUsuari" transient="true">

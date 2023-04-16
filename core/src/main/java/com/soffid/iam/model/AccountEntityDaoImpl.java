@@ -322,6 +322,7 @@ public class AccountEntityDaoImpl extends
 		target.setLastPasswordSet(entry.account.getLastPasswordSet());
 		target.setLastLogin(entry.account.getLastLogin());
 		target.setLastUpdated(entry.account.getLastUpdated());
+		target.setLastChange(entry.account.getLastChange());
 		target.setLoginUrl(entry.account.getLoginUrl());
 		target.setManagerGroups(entry.account.getManagerGroups());
 		target.setManagerRoles(entry.account.getManagerRoles());

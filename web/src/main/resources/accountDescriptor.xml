@@ -41,6 +41,12 @@
 			<new-instance-bean className="com.soffid.iam.api.HostService"> 
 			</new-instance-bean>
 		</finder>
+		<finder name="events" type="event" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/AuditService-v2"
+				method="findAuditByJsonQueryAsync" >
+				<parameter value="searchIndex eq 'ACC#${instance.id}'"/>
+			</ejb-finder>
+		</finder>
 		<script-handler>
 			<update-script>
 				as = com.soffid.iam.EJBLocator.getAccountService();
@@ -61,6 +67,7 @@
 		</script-handler>
 	</datanode>
 
+	<datanode name="event" transient="true" />
 	
 	<datanode name="effectiveRole" transient="true"/>
 

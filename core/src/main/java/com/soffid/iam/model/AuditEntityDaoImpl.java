@@ -46,6 +46,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -98,6 +99,7 @@ public class AuditEntityDaoImpl extends
 					
 				}
 			}
+			
 			super.create(auditoria);
 			getSession(false).flush();
 			

@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.service.TenantService;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.CrudRegistryService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Operation;
@@ -41,7 +42,8 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	CustomObjectTypeEntity.class,
 	com.soffid.iam.service.ScheduledTaskService.class,
 	AgentDescriptorEntity.class,
-	CrudRegistryService.class})
+	CrudRegistryService.class,
+	AsyncRunnerService.class})
 public abstract class ApplicationBootService {
 
 	@Operation(translated="syncServerBoot")

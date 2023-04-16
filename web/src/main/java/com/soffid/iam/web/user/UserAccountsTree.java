@@ -1,21 +1,17 @@
 package com.soffid.iam.web.user;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-
-import org.json.JSONWriter;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.System;
+import com.soffid.iam.web.component.DynamicColumnsDatatree2;
 
-import es.caib.zkib.binder.tree.FullTreeModelProxy;
 import es.caib.zkib.binder.tree.TreeModelProxyNode;
-import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 
 
-public class UserAccountsTree extends DataTree2 {
+public class UserAccountsTree extends DynamicColumnsDatatree2 {
 	HashMap<String, System> systems = new HashMap<>();
 	
 	protected String getRowClass(TreeModelProxyNode node) {

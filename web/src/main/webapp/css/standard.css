@@ -686,11 +686,35 @@ select {
 
 
 /* imageclic: enlloc de imagemap */
-img.imageclic, img.search-icon, span.combobox span.rbtnbk img {
+img.imageclic, img.search-icon, span.combobox span.rbtnbk img, div.fold div.foldheader img.foldicon {
 	padding: 4px;
 	width: 32px;
 	cursor: pointer;	
 	vertical-align: top;
+}
+
+div.fold div.foldbody {
+	padding-left: 32px;
+}
+
+div.fold div.foldheader img.foldicon {
+	vertical-align: middle;
+	transition: transform 0.5s;
+}
+
+div.fold div.foldbody {
+	visibility: collapse;
+	opacity: 0;
+	transition: visibility 0.5s, opacity 0.5s;
+}
+
+div.fold.unfold div.foldbody {
+	visibility: visible;
+	opacity: 1;
+}
+
+div.fold.unfold div.foldheader img.foldicon {
+	transform: rotate(90deg);
 }
 
 img.imageclic:hover, img.search-icon:hover, span.combobox span.rbtnbk img:hover {

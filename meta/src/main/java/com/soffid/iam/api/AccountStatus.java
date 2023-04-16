@@ -10,4 +10,5 @@ public class AccountStatus {
 	public static String DISABLED = "d";
 	public static String FORCED_DISABLED = "FD";
 	public static String REMOVED = "r";
+	public static String ARCHIVED = "x";
 }

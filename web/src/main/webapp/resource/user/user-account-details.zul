@@ -38,6 +38,19 @@
 				hidebuiltin="true"
 				objectType="com.soffid.iam.api.Account" dataPath="/."
 				id="accountAttributes" />
+			<fold label="${c:l('com.soffid.iam.api.Account._auditHistory') }" id="auditFold"
+				onFold="ref:window.onTimer" onUnfold="ref:window.onTimer">
+				<datatable dataPath="events" sortColumn="0" enablefilter="false">
+				<attribute name="columns"><![CDATA[
+				- name: ${c:l('com.soffid.iam.api.Audit.calendar') }
+				  value: calendar
+				  className: datetimeColumn
+				  template: #{calendar_datetime}
+				- name: ${c:l('com.soffid.iam.api.Audit.message') }
+				  value: message 
+				]]></attribute>
+				</datatable>
+			</fold> 
 		</form>
 		<separator spacing="5px" />
 		<div style="text-align: right; width: 100%">
@@ -48,6 +61,7 @@
 				datamodel="//user/model" 
 				onClick="ref:window.onChange"/>
 		</div>
+		<timer id="updateEventsTimer" repeats="true" delay="1000" onTimer="ref:window.onTimer"/>
 	</window>
 	<include src="/popup/agent_objectAttributes.zul" />
 

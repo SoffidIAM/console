@@ -9,6 +9,7 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Nullable;
@@ -94,9 +95,18 @@ public abstract class AuditoriaService {
 
 	@Operation(grantees = { roles.audit_query.class })
 	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public PagedResult<es.caib.seycon.ng.comu.Auditoria> findAuditByJsonQuery(
+			@Nullable String query, @Nullable Integer first, @Nullable Integer last)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.audit_query.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public AsyncList<es.caib.seycon.ng.comu.Auditoria> findAuditByJsonQueryAsync(
 			@Nullable String query)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
 }

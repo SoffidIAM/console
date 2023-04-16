@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DomainValue;
@@ -25,6 +26,7 @@ import com.soffid.iam.api.UserType;
 import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.crud.CrudAccountHandler;
 import com.soffid.iam.service.crud.CrudApplicationHandler;
+import com.soffid.iam.service.crud.CrudAuditHandler;
 import com.soffid.iam.service.crud.CrudCustomObjectHandler;
 import com.soffid.iam.service.crud.CrudDomainValueHandler;
 import com.soffid.iam.service.crud.CrudGroupHandler;
@@ -80,6 +82,7 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(RoleAccount.class.getName(), new CrudRoleAccountHandler());
 		registry.put(Printer.class.getName(), new CrudPrinterHandler());
 		registry.put(PrinterUser.class.getName(), new CrudPrinterUserHandler());
+		registry.put(Audit.class.getName(), new CrudAuditHandler());
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -207,9 +208,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	    		com.soffid.iam.api.System dispatcher = getDispatcherService().findDispatcherByName(de.getName());
 	    		if (getDispatcherService().isUserAllowed(dispatcher, ue.getUserName()))
 	    		{
+	    			if (acc.isDisabled())
+	    				audit("E", acc);
 	    			acc.setDisabled( false );
 	    			acc.setStatus(AccountStatus.ACTIVE);
 	    		} else {
+	    			if (! acc.isDisabled())
+	    				audit("e", acc);
 	    			acc.setDisabled( true );
 	    			if (acc.getStatus() == AccountStatus.ACTIVE)
 	    				acc.setStatus(AccountStatus.DISABLED);
@@ -238,7 +243,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     		}
     		getAccountEntityDao().create(acc);
     		uae = bindAccountToUser(ue, acc);
-			audit("C", acc);
+    		if (! acc.isDisabled())
+    			audit("C", acc);
 		}
 
 
@@ -565,6 +571,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			aae.setObjectValue(value);
 			getAccountAttributeEntityDao().create(aae);
 			entity.getAttributes().add(aae);
+			entity.setLastChange(new Date());
 		}
 		else
 			attributes.remove(aae);
@@ -783,7 +790,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			audit("D", ae);
 		}
-		else if (! ae.isDisabled() && account.isDisabled())
+		else if ( ! AccountStatus.ARCHIVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.ARCHIVED))
+		{
+			audit("I", ae);
+		}
+		else if ((! ae.isDisabled() || AccountStatus.ARCHIVED == ae.getStatus()) && account.isDisabled())
 		{
 			anyChange = true;
 			audit("e", ae);
@@ -902,6 +913,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			anyChange = true;
 		}
 			
+		if (anyChange)
+			ae.setLastChange(new Date());
 		
 		getAccountEntityDao().update(ae);
 
@@ -1982,6 +1995,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 
+	final static Collection<String> traceableAccountActions = Arrays.asList("E", "M", "I", "C", "D", "e"); 
 	private void audit(String action, AccountEntity account) throws Exception {
 
         String codiUsuariCanvi = Security.getCurrentAccount();
@@ -1999,6 +2013,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         	for (UserAccountEntity ua : account.getUsers()) auditoria.setUser(ua.getUser().getUserName());
         }
 
+    	if (auditoria.getObject().equals("SC_ACCOUN") && traceableAccountActions.contains(auditoria.getAction())) {
+    		auditoria.setSearchIndex("ACC#"+account.getId());
+    	}
         getAuditService().create(auditoria);
     }
 

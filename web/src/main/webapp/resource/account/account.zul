@@ -72,6 +72,19 @@
 								<div use="com.soffid.iam.web.component.ObjectAttributesDiv" 
 									objectType="com.soffid.iam.api.Account"
 									dataPath="/." id="userAttributes"/>
+								<div sclass="section">
+									<customfield3 sclass="databox separator" type="SEPARATOR" label="${c:l('com.soffid.iam.api.Account._auditHistory') }" />									
+									<datatable dataPath="events" sortColumn="0" enablefilter="false">
+									<attribute name="columns"><![CDATA[
+									- name: ${c:l('com.soffid.iam.api.Audit.calendar') }
+									  value: calendar
+									  className: datetimeColumn
+									  template: #{calendar_datetime}
+									- name: ${c:l('com.soffid.iam.api.Audit.message') }
+									  value: message 
+									]]></attribute>
+									</datatable>
+								</div>
 								<div sclass="section" id="servicesSection" >
 									<customfield3 sclass="databox separator" type="SEPARATOR" label="${c:l('seu.serveis') }" />
 									<datatable dataPath="services" enablefilter="false" style="margin-left: 200px" onSelect="ref:frame.openService" id="servicesList">

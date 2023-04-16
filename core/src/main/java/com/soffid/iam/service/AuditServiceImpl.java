@@ -17,10 +17,15 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Network;
+import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.AuditEntityDao;
 import com.soffid.iam.model.CustomDialect;
+import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
@@ -46,6 +51,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Vector;
@@ -276,57 +282,37 @@ public class AuditServiceImpl extends
 
 		LinkedList<Audit> result = new LinkedList<Audit>();
 
-		internalSearchAuditsByJson(query, result);
+		internalSearchAuditsByJson(query, result, null, null);
 		
 		return result;
 	}
 
-	private void internalSearchAuditsByJson(String query, Collection<Audit> result)
+	private PagedResult<Audit> internalSearchAuditsByJson(String query, List<Audit> result, 
+			Integer first, Integer pageSize)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
 
-		AbstractExpression expr = ExpressionParser.parse(query);
-		expr.setOracleWorkaround( CustomDialect.isOracle());
-		HQLQuery hql = expr.generateHSQLString(Audit.class);
-		String qs = hql.getWhereString().toString();
-		if (qs.isEmpty())
-			qs = "o.tenant.id = :tenantId";
-		else
-			qs = "("+qs+") and o.tenant.id = :tenantId";
+		ScimHelper h = new ScimHelper(Audit.class);
+		h.setPrimaryAttributes(new String[0]);
+		CriteriaSearchConfiguration conf = new CriteriaSearchConfiguration();
+		conf.setFirstResult(first);
+		conf.setMaximumResultSize(pageSize);
+		h.setConfig(conf);
+		h.setTenantFilter("tenant.id");
+		h.setOrder("o.date, o.id");
+		
+		final AuditEntityDao dao = getAuditEntityDao();
+		h.setGenerator((entity) -> {
+			return dao.toAudit((AuditEntity) entity);
+		}); 
+		h.search(null, query, (Collection) result); 
 
-		if (hql.getOrderByString().length() == 0) {
-			if (hql.getOrderByString().length() == 0) {
-				LinkedList<String> l = new LinkedList<>();
-				l.add("o.date");
-				hql.setOrderBy(l);
-			}
-
-		}
-
-		hql.setWhereString(new StringBuffer(qs));
-		Map<String, Object> params = hql.getParameters();
-		Parameter paramArray[] = new Parameter[params.size()+1];
-		int i = 0;
-		for (String s : params.keySet())
-			paramArray[i++] = new Parameter(s, params.get(s));
-		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-		TimeOutUtils tou = new TimeOutUtils();
-		for (AuditEntity ue : getAuditEntityDao().query(hql.toString(),
-				paramArray)) {
-			if (result instanceof AsyncList)
-			{
-				if (((AsyncList) result).isCancelled())
-					return;
-			}
-			else
-			{
-				tou.checkTimeOut();
-			}
-			Audit u = getAuditEntityDao().toAudit(ue);
-			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
-				result.add(u);
-			}
-		}
+		PagedResult<Audit> pr = new PagedResult<>();
+		pr.setStartIndex(first);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 	@Override
@@ -341,7 +327,7 @@ public class AuditServiceImpl extends
 			@Override
 			public void run() {
 				try {
-					internalSearchAuditsByJson(query, result);
+					internalSearchAuditsByJson(query, result, null, null);
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				
@@ -350,6 +336,15 @@ public class AuditServiceImpl extends
 		}, result);
 
 		return result;
+	}
+
+	@Override
+	protected PagedResult<Audit> handleFindAuditByJsonQuery(String query, Integer first, Integer last)
+			throws Exception {
+		auditaQuery(query);
+		LinkedList<Audit> result = new LinkedList<Audit>();
+
+		return internalSearchAuditsByJson(query, result, first, last);
 	}
 
 }

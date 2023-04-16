@@ -5,10 +5,15 @@
 	<timer onTimer="ref:handler.updateStatus" running="true" delay="5000" repeats="true" />
 	<div class="navigation-bar dummy">
 		<label bind="//user/listbox:/@userName"></label> - <label bind="//user/listbox:/@fullName"/>
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:update')}"  onClick="ref:frame.addNew"/>
+		</menu2>
 	</div>
 	<datatree2 dataPath="${arg.listbox}:/" 
 	    style="min-width: 950px"
 		id="tree"
+		preference="user-accounts"
 		header="${c:l('usuaris.zul.Dominidecontrasenyes')} /  ${c:l('accounts.dispatcher')} "
 		use="com.soffid.iam.web.user.UserAccountsTree" 
 		onSetPassword="ref:handler.openPasswordWindow"
@@ -17,14 +22,23 @@
 		enablefilter="true">
 		<attribute name="columns"><![CDATA[
 		- name: ${c:l('usuaris.zul.Account')}
+		  default: true
+		- name: ${c:l('com.soffid.iam.api.Account.created')}
+		  width: 150px
+		- name: ${c:l('com.soffid.iam.api.Account.lastChange')}
+		  width: 150px
 		- name: ${c:l('usuaris.zul.DataUpdate')}
 		  width: 150px
+		  default: true
 		- name: ${c:l('accounts.lastLogin')}
 		  width: 150px
+		  default: true
 		- name: ${c:l('usuaris.zul.DataAssignacia')}
 		  width: 150px
+		  default: true
 		- name: ${c:l('usuaris.zul.DataCaducitat')}
 		  width: 150px
+		  default: true
 		]]>
 		</attribute>
 		<attribute name="finders"><![CDATA[
@@ -40,6 +54,8 @@
 		  leaf: true
 		  columns:
 		  - value: name
+		  - value: created
+		  - value: lastChange
 		  - value: lastUpdated
 		  - value: lastLogin
 		  - value: lastPasswordSet

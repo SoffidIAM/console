@@ -14,16 +14,19 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
+import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
@@ -37,12 +40,14 @@ import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.Fold;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -204,5 +209,40 @@ public class AccountDetailsHandler extends Window implements AfterCompose {
 			// Probably lack of permissions
 		}
 		b.setVisible( visible );
-}
+		
+		onTimer(ev);
+	}
+	
+	public void onTimer(Event ev) {
+		Timer t = (Timer) getFellow("updateEventsTimer");
+		Component form = getFellow("form");
+		Fold f = (Fold) getFellow("auditFold");
+		if (! f.isFolded()) {
+			try {
+				DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(form, "events");
+				if (coll.isInProgress()) {
+					try {
+						coll.updateProgressStatus();
+					} catch (Exception e) {
+						t.stop();
+						throw new UiException(e);
+					}
+					t.start();
+				}
+			} catch (Exception e) { // Window is closed
+				t.stop();
+			}
+		}
+		else
+			t.stop();
+	}
+	
+	boolean showAudit = false;
+	public void showAudit(Event ev) {
+		Component header = getFellow("window").getFellow("auditHeader");
+		Component body = getFellow("window").getFellow("auditBody");
+		showAudit = ! showAudit;
+		Image img = (Image) header.getFirstChild();
+		img.setSclass(showAudit? "foldimg unfold": "foldimg");
+	}
 }

@@ -384,8 +384,44 @@ public class ApplicationBootServiceImpl extends
 				configSvc.update(cfg);
 			}
 
+			if (version < 105) { //$NON-NLS-1$
+				final Configuration cfg2 = cfg;
+				new Thread( () -> {
+					try {
+						getAsyncRunnerService().runNewTransaction(() -> {
+							cfg2.setValue("104"); //$NON-NLS-1$
+							updateAuditLogs();
+							configSvc.update(cfg2);
+							return null;
+						});
+					} catch (InternalErrorException e) {
+						log.warn("Error updating audit tables");
+					}
+				}).start();
+			}
+
 		} finally {
 			Security.nestedLogoff();
+		}
+	}
+
+	private void updateAuditLogs() throws SQLException {
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_AUDITO \n"
+					+ "SET AUD_INDEX=concat('ACC#', \n"
+					+ "	(SELECT ACC_ID FROM SC_ACCOUN, SC_DISPAT \n"
+					+ "	WHERE ACC_NAME=AUD_ACCOUN AND ACC_DIS_ID=DIS_ID AND \n"
+					+ "	      DIS_CODI=AUD_DIS AND DIS_TEN_ID=AUD_TEN_ID))\n"
+					+ "WHERE AUD_INFO='SC_ACCOUN' AND AUD_ACCIO IN ('C', 'e', 'E', 'I', 'M', 'D')", 
+					new Object[0]);
+		}
+		finally
+		{
+			conn.close();
 		}
 	}
 

@@ -23,6 +23,7 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
+import com.soffid.iam.web.component.DynamicColumnsDatatree2;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
@@ -118,6 +119,7 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 					data.put(o);
 				}
 			}
+			
 		}
 		listbox.setData(data);
 		
@@ -226,6 +228,8 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 				}
 			}
 			src.setColumns(cols.toString());
+			if (src instanceof DynamicColumnsDatatree2)
+				((DynamicColumnsDatatree2) src).storePreferredColumns();
 		}
 		setVisible(false);
 	}

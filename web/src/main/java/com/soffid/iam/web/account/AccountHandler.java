@@ -441,6 +441,20 @@ public class AccountHandler extends FrameHandler {
 			} catch (Exception e) {
 				i.setVisible(false);
 			}
+			if (id != null) {
+				try {
+					DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "events");
+					if (coll.isInProgress()) {
+						try {
+							coll.updateProgressStatus();
+						} catch (Exception e) {
+							throw new UiException(e);
+						}
+					}
+				} catch (Exception e) { // Window is closed
+					e.printStackTrace();
+				}
+			}
 		} else if ( lb instanceof DataTree2 && ((DataTree2) lb).getSelectedItemXPath() != null ) {
 			Long id = (Long) XPathUtils.eval(getForm(), "id");
 			getFellow("tabroles").setVisible(id != null);
@@ -460,6 +474,8 @@ public class AccountHandler extends FrameHandler {
 		} else {
 			i.setVisible(false);
 		}
+		
+		
 	}
 
 	@Override

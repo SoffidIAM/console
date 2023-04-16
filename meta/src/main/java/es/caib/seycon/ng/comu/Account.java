@@ -162,6 +162,11 @@ public class Account {
 	@Attribute(type = "DATE_TIME", readonly = true)
 	public java.util.Calendar lastLogin;
 
+	@Description("Last change in soffid database")
+	@Nullable
+	@Attribute(type = "DATE_TIME", readonly = true)
+	public java.util.Date lastChange;
+
 	@Description("Time stamp when the account was last updated on target system")
 	@Nullable
 	@Attribute(type = "DATE_TIME", readonly = true)

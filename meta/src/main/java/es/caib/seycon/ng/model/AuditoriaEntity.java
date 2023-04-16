@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -161,11 +163,14 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public String jumpServerGroup;
 
-
 	@Column (name="AUD_PAMSES")
 	@Nullable
 	public String pamSessionId;
 
+	@Description("Column to perfom fast searches")
+	@Column (name="AUD_INDEX")
+	@Nullable
+	public String searchIndex;
 
 	@DaoFinder
 	public es.caib.seycon.ng.model.AuditoriaEntity findById(
@@ -299,11 +304,30 @@ public abstract class AuditoriaEntity {
 	@Description("Unlinks audit logs from account that is going to be removed")
 	@DaoOperation
 	public void unlinkAccounts(AccountEntity account) {}
+	
+	@DaoFinder("select a from com.soffid.iam.model.AuditEntity as a "
+			+ "where searchIndex=:searchIndex and tenant.id=:tenantId "
+			+ "order by date asc")
+	public Collection<AuditoriaEntity> findByIndex(String searchIndex) {
+		return null;
+	}
 }
 
 @Index (name="SC_AUDITO_BORRAR",	unique=false,
 entity=es.caib.seycon.ng.model.AuditoriaEntity.class,
 columns={"AUD_DATA"})
 abstract class AuditoriaDataIndex {
+}
+
+@Index (name="SC_AUDITO_USER",	unique=false,
+entity=es.caib.seycon.ng.model.AuditoriaEntity.class,
+columns={"AUD_USUAUD, AUD_TEN_ID, AUD_DATA"})
+abstract class AuditoriaUserIndex {
+}
+
+@Index (name="SC_AUDITO_ACC",	unique=false,
+entity=es.caib.seycon.ng.model.AuditoriaEntity.class,
+columns={"AUD_INDEX"})
+abstract class AuditoriaIndexIndex {
 }
 

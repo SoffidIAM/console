@@ -191,6 +191,12 @@
 				<parameter value="${instance}"/>
 			</ejb-finder>
 		</finder>
+		<finder name="events" type="event" refreshAfterCommit="true"> <!-- user:role:query -->
+			<ejb-finder jndi="java:/module/AuditService-v2"
+				method="findAuditByJsonQueryAsync" >
+				<parameter value="searchIndex eq 'ACC#${instance.id}'"/>
+			</ejb-finder>
+		</finder>
 		
 		<validator>
 			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="accounts.nameValidation"/>
@@ -198,6 +204,8 @@
 			<attribute-validator expr="${instance.passwordPolicy}" notNull="true" friendlyName="accounts.passwordPolicyValidation"/>
 		</validator>
 	</datanode>
+
+	<datanode name="event" transient="true" />
 	
 	<datanode name="service" transient="true">
 	</datanode>

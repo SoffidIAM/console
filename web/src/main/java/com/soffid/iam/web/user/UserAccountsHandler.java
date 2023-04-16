@@ -1,5 +1,7 @@
 package com.soffid.iam.web.user;
 
+import java.io.IOException;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
@@ -21,6 +23,8 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.DynamicColumnsDatatable;
+import com.soffid.iam.web.popup.SelectColumnsHandler;
 
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -230,4 +234,9 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 				.getFellow("window");
 		Events.postEvent(new Event("onStart", w));
 	}
+
+	public void changeColumns(Event event) throws IOException {
+		SelectColumnsHandler.startWizard((DataTree2) getFellow("tree"));
+	}
+
 }

@@ -23,6 +23,8 @@
 		<attribute name="columns"><![CDATA[
 		- name: ${c:l('usuaris.zul.Account')}
 		  default: true
+		- name: ${c:l('accounts.status')}
+		  width: 150px
 		- name: ${c:l('com.soffid.iam.api.Account.created')}
 		  width: 150px
 		- name: ${c:l('com.soffid.iam.api.Account.lastChange')}
@@ -54,6 +56,7 @@
 		  leaf: true
 		  columns:
 		  - value: name
+		  - template: #{c:l(c:cat('com.soffid.iam.api.AccountStatus.',status))}
 		  - value: created
 		  - value: lastChange
 		  - value: lastUpdated

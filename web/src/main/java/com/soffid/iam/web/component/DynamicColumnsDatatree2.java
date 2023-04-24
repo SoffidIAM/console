@@ -29,6 +29,7 @@ import es.caib.zkib.component.DataTree2;
 public class DynamicColumnsDatatree2 extends DataTree2 {
 	String preference;
 	private boolean initialized;
+	private String defaultColumns;
 
 	public String getCustomColumns() throws Exception {return null;}
 	public String[] getMandatoryColumns() throws Exception {return null;}
@@ -39,7 +40,6 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 	}
 
 	public void afterCompose() {
-		super.afterCompose();
 		initialized = true;
 		if (preference != null) {
 			try {
@@ -48,6 +48,7 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 				throw new UiException(e);
 			}
 		}
+		super.afterCompose();
 	}
 	
 	public void setPreference(String preference) throws Exception {
@@ -59,6 +60,9 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 
 	private void setDefaultColumns() throws Exception {
 		String pref = EJBLocator.getPreferencesService().findMyPreference("cols-"+preference);
+		
+		
+		
 		if (pref != null && ! pref.trim().isEmpty()) {
 			JSONArray a = new JSONArray();
 			
@@ -87,7 +91,7 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 				}
 			}
 
-			JSONArray columns = getColumns();
+			JSONArray columns = new JSONArray(defaultColumns);
 			for (int i = 0; i < columns.length(); i++) {
 				JSONObject o = columns.getJSONObject(i);
 				String value = o.optString("name");
@@ -112,7 +116,7 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 		}
 
 		// No preference saved yet
-		JSONArray columns = getColumns();
+		JSONArray columns = new JSONArray(defaultColumns);
 		for (int i = 0; i < columns.length(); i++) {
 			JSONObject o = columns.getJSONObject(i);
 			String value = o.optString("name");
@@ -122,12 +126,11 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 				o.put("hidden", true);
 		}
 
-		setColumns(columns.toString());
+		super.setColumns(columns.toString());
 	}
-	
-	public void storePreferredColumns() throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+		
+	public void storePreferredColumns(JSONArray cols) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		StringBuffer sb = new StringBuffer();
-		JSONArray cols = getColumns();
 		for (int i = 0; i < cols.length(); i++) {
 			JSONObject col = cols.getJSONObject(i);
 			if ( ! col.optBoolean("hidden"))
@@ -138,5 +141,14 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 		}
 		if (preference != null)	
 			EJBLocator.getPreferencesService().updateMyPreference("cols-"+preference, sb.toString());
+		super.setColumns(cols.toString());
+	}
+	@Override
+	public void setColumns(String columns) {
+		try {
+			this.defaultColumns = new Yaml2Json().transform(columns);
+		} catch (IOException e) {
+			throw new UiException(e);
+		}
 	}
 }

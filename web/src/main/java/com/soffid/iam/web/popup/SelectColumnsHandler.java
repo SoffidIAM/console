@@ -227,9 +227,11 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 					colDef.put("hidden", true);
 				}
 			}
-			src.setColumns(cols.toString());
-			if (src instanceof DynamicColumnsDatatree2)
-				((DynamicColumnsDatatree2) src).storePreferredColumns();
+			if (src instanceof DynamicColumnsDatatree2) {
+				((DynamicColumnsDatatree2) src).storePreferredColumns(cols);
+			} else {
+				src.setColumns(cols.toString());
+			}
 		}
 		setVisible(false);
 	}

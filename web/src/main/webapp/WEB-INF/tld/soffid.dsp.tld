@@ -60,6 +60,15 @@
 	</function>
 
 	<function>
+		<name>enumerationLabel</name>
+		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
+		<function-signature>java.lang.String getEnumerationLabel(java.lang.Object enumValue)</function-signature>
+		<description>
+		Gets the label for an enumeration value
+		</description>
+	</function>
+
+	<function>
 		<name>dateformat</name>
 		<function-class>com.soffid.iam.web.dsp.ZulFns</function-class>
 		<function-signature>java.lang.String getDateFormat()</function-signature>

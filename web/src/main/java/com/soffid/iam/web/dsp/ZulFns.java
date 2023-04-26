@@ -1,10 +1,14 @@
 package com.soffid.iam.web.dsp;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.net.URLEncoder;
 import java.util.Date;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.xel.fn.CommonFns;
 
 import com.soffid.iam.EJBLocator;
@@ -86,5 +90,22 @@ public class ZulFns {
 		}
 		return "NTS".equals(h.getOs()) ? "/img/windows-black.svg" : "LIN".equals(h.getOs()) ? "/img/linux-black.svg" : "/img/host-black.svg";
 	}
-	
+
+	public static final String getEnumerationLabel(Object o) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+		if (o == null) return "";
+		String className = o.getClass().getName();
+		Class<?> cl = Class.forName(className);
+		for (Field field: cl.getFields()) {
+			if ( (field.getModifiers() & Modifier.STATIC) != 0) {
+				if (field.getType() == cl) {
+					String name = field.getName();
+					Object value = field.get(null);
+					if (value == o) {
+						return Labels.getLabel(cl.getName()+"."+name);
+					}
+				}
+			}
+		}
+		return o.toString();
+	}
 }

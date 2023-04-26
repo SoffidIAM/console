@@ -56,7 +56,7 @@
 		  leaf: true
 		  columns:
 		  - value: name
-		  - template: #{c:l(c:cat('com.soffid.iam.api.AccountStatus.',status))}
+		  - template: #{soffid:enumerationLabel(status)}
 		  - value: created
 		  - value: lastChange
 		  - value: lastUpdated

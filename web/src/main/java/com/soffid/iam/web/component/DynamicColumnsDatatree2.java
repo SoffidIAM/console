@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 	String preference;
 	private boolean initialized;
 	private String defaultColumns;
+	private String findersBuffer;
 
 	public String getCustomColumns() throws Exception {return null;}
 	public String[] getMandatoryColumns() throws Exception {return null;}
@@ -41,12 +43,18 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 
 	public void afterCompose() {
 		initialized = true;
+		
 		if (preference != null) {
 			try {
 				setDefaultColumns();
 			} catch (Exception e) {
 				throw new UiException(e);
 			}
+		}
+		try {
+			super.setFinders(findersBuffer);
+		} catch (Exception e1) {
+			throw new UiException(e1);
 		}
 		super.afterCompose();
 	}
@@ -74,7 +82,7 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 			HashSet<String> enabledColumns = new HashSet<>();
 			for (String columnName:  pref.split(" ")) {
 				if (!columnName.trim().isEmpty() && ! enabledColumns.contains(columnName))
-					enabledColumns.add(columnName);
+					enabledColumns.add(URLDecoder.decode( columnName, StandardCharsets.UTF_8.name()));
 			}
 			if (mandatory != null) {
 				for (String m: mandatory) {
@@ -91,19 +99,23 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 				}
 			}
 
+			boolean anyVisible = false;
 			JSONArray columns = new JSONArray(defaultColumns);
 			for (int i = 0; i < columns.length(); i++) {
 				JSONObject o = columns.getJSONObject(i);
 				String value = o.optString("name");
 				if (columns.isEmpty())
 				{
-					if (o.optBoolean("default"))
+					if (o.optBoolean("default")) {
 						o.remove("hidden");
+						anyVisible = true;
+					}
 					else
 						o.put("hidden", true);
 				}
 				else if ( enabledColumns.contains(value))
 				{
+					anyVisible = true;
 					o.remove("hidden");
 				}
 				else {
@@ -111,8 +123,10 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 				}
 			}
 
-			setColumns(columns.toString());
-			return;
+			if (anyVisible) {
+				super.setColumns(columns.toString());
+				return;
+			}
 		}
 
 		// No preference saved yet
@@ -136,7 +150,7 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 			if ( ! col.optBoolean("hidden"))
 			{
 				if (sb.length() > 0) sb.append(" ");
-				sb.append( URLEncoder.encode( col.optString("value"), "UTF-8" ) ) ;
+				sb.append( URLEncoder.encode( col.optString("name"), "UTF-8" ) ) ;
 			}
 		}
 		if (preference != null)	
@@ -150,5 +164,11 @@ public class DynamicColumnsDatatree2 extends DataTree2 {
 		} catch (IOException e) {
 			throw new UiException(e);
 		}
+	}
+	@Override
+	public void setFinders(String finders) throws Exception {
+		this.findersBuffer = finders;
+		if (initialized)
+			super.setFinders(finders);
 	}
 }

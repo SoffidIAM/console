@@ -38,6 +38,7 @@ import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.exception.ListFullException;
@@ -88,6 +89,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	boolean enableQuick = true;
 	boolean enableBasic = true;
 	boolean enableAdvanced = true;
+	private CustomObjectType customObjectType;
 	
 	public String getJsonObject() {
 		return jsonObject;
@@ -476,6 +478,12 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		
 		if (jsonObject != null && dictionary == null)
 			dictionary = SearchDictionaryBuilder.build(jsonObject);
+		
+		if (jsonObject != null) {
+			try {
+				customObjectType = EJBLocator.getAdditionalDataService().findCustomObjectTypeByName(jsonObject);
+			} catch (Exception e) {}
+		}
 	
 		if (defaultAttributes != null) {
 			for (String att: defaultAttributes.split("[ ,]+"))
@@ -662,7 +670,7 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 	public String getQueryString ()
 	{
 		if (mode == TEXT)
-			return textSearchBox.getText();
+			return translateToLucene( textSearchBox.getText() );
 		else if (mode == ADVANCED)
 			return advancedSearch.getText();
 		else
@@ -687,6 +695,27 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 		}
 	}
 
+
+	private String translateToLucene(String text) {
+		if (customObjectType != null && customObjectType.isTextIndex()) {
+			StringBuffer sb = new StringBuffer();
+			final String[] parts = text.split(" +");
+			for (int i = 0; i < parts.length; i++) {
+				if (parts[i].length() > 0) {
+					if (sb.length() > 0)
+						sb.append("AND ");
+					sb.append("(")
+						.append(parts[i])
+						.append("* OR ")
+						.append(parts[i])
+						.append("~ ) ");
+				}
+			}
+			return sb.toString();
+		}
+		else
+			return text;
+	}
 
 	private void selectAttributeToAdd() {
 		menu.getChildren().clear();

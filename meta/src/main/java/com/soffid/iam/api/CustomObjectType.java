@@ -26,6 +26,8 @@ public class CustomObjectType {
 
 	public boolean builtin;
 	
+	public boolean textIndex;
+
 	@Nullable
 	@Attribute(defaultValue = "true")
 	public Boolean publicAccess;

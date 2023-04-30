@@ -14,11 +14,10 @@ import org.json.JSONTokener;
 public class Configuration {
 	
 	static Map<String, ClassConfig> currentConfig = new HashMap<String, ClassConfig>();
-	private static ClassConfig cc;
 	
 	public static ClassConfig getClassConfig (Class<?> clazz) throws UnsupportedEncodingException, JSONException, ClassNotFoundException
 	{
-		cc = getClassConfig(clazz.getCanonicalName());
+		ClassConfig cc = getClassConfig(clazz.getCanonicalName());
 		if (cc != null)
 			cc.setBeanClass(clazz);
 		return cc;

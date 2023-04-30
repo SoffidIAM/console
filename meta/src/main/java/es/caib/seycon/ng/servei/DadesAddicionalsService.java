@@ -17,6 +17,9 @@ import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectRoleEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
+import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.CrudRegistryService;
+import com.soffid.iam.service.LuceneIndexService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -43,7 +46,11 @@ import roles.customObjectType_update;
 		CustomObjectTypeEntity.class,
 		CustomObjectEntity.class,
 		CustomObjectRoleEntity.class,
-		RolEntity.class})
+		RolEntity.class,
+		LuceneIndexService.class,
+		AsyncRunnerService.class,
+		DispatcherService.class,
+		CrudRegistryService.class})
 public abstract class DadesAddicionalsService {
 
 	@Operation(translated = "getDataTypes", grantees={Tothom.class})

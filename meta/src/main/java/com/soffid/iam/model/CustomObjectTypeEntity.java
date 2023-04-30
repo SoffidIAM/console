@@ -33,6 +33,9 @@ public class CustomObjectTypeEntity {
 	@Column(name="COT_BUILTIN")
 	public boolean builtin;
 
+	@Column(name="COT_TXTIND")
+	public boolean textIndex;
+
 	@Column(name="COT_TEN_ID")
 	public TenantEntity tenant;
 

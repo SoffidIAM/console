@@ -16,6 +16,7 @@ import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.service.ejb.VaultService;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.FinderHandler;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -97,4 +98,8 @@ public class VaultFolderDataHandler extends InputFieldDataHandler<VaultFolder> {
 		return vf;
 	}
 
+	@Override
+	protected String getClassName() {
+		return VaultFolder.class.getName();
+	}
 }

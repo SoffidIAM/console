@@ -69,6 +69,7 @@
 					<div>
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.name')}" required="true" dataType="STRING" maxlength="50" bind="@name" id="objectTypeName"/>
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.description')}" required="true" dataType="STRING" maxlength="150" bind="@description" id="objectTypeDescription"/>
+						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.textIndex')}" dataType="BOOLEAN" bind="@textIndex"/>
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.publicAccess')}" dataType="BOOLEAN" bind="@publicAccess" id="publicAccess" onChange="ref:frame.onChangePublicAccess"/>
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.ownerRoles')}" required="false" dataType="ROLE" bind="@managerRoles" id="ownerRoles" multiValue="true"/>
 						<customfield3 label="${c:l('com.soffid.iam.api.CustomObjectType.userRoles')}" required="false" dataType="ROLE" bind="@userRoles" id="userRoles" multiValue="true"/>

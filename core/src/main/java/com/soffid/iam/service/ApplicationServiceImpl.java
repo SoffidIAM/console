@@ -4333,7 +4333,7 @@ public class ApplicationServiceImpl extends
 				scopeGroup == target.getGroup();
 	}
 	
-	private ScimHelper generateRedundantRolesQuery(int i, int type) {
+	private ScimHelper generateRedundantRolesQuery(int i, int type) throws InternalErrorException {
 		ScimHelper h = new ScimHelper(RoleAccount.class);
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		h.setConfig(config);

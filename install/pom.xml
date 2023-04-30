@@ -101,6 +101,7 @@
 									<fileset dir="${basedir}/target/lib" includes="*.par" />
 								</copy>
 								<copy todir="${basedir}/target/dist/opt/soffid/iam-console-3/soffid/plugins">
+									<fileset dir="${basedir}/target/lib" includes="default-plugin.jar" />
 									<fileset dir="${basedir}/target/lib" includes="sso-plugin.jar" />
 									<fileset dir="${basedir}/target/lib" includes="oracle-plugin.jar" />
 									<fileset dir="${basedir}/target/lib" includes="sqlserver-plugin.jar" />
@@ -494,6 +495,13 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency> 
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>default-plugin</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<reporting>
 		<plugins>

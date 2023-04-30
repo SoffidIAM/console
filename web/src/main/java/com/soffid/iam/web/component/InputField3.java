@@ -1012,7 +1012,7 @@ public class InputField3 extends Databox
 			currentList.cancel();
 		if ( dataHandler != null && ! noPermissions) {
 			try {
-				currentList = dataHandler.search(text, dataType.getFilterExpression());
+				currentList = dataHandler.searchLucene(text, dataType.getFilterExpression());
 				currentList.setMaxSize(MAX_DROPDOWN_ROWS);
 			} catch (ListFullException e) { // Ignore
 			} catch (Exception e) {

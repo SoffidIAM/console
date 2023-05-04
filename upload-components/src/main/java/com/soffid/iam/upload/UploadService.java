@@ -187,11 +187,10 @@ public class UploadService {
 
 			uploadComponentVersion("json", "20190722", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-			uploadComponentVersion("lucene-core", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("lucene-queries", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("lucene-analyzers-common", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("lucene-queryparser", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			uploadComponentVersion("lucene-sandbox", "4.5.1", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-core", "9.5.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-queries", "9.5.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-queryparser", "9.5.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			uploadComponentVersion("lucene-sandbox", "9.5.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			uploadComponentVersion("opensaml-core", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			uploadComponentVersion("opensaml-xmlsec-api", "3.3.0", "jar"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -25,10 +25,12 @@ import java.util.Map;
 import java.util.Set;
 
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Group;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MailListRoleMember;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
@@ -424,13 +426,25 @@ public class EmailListEntityDaoImpl extends
 
 	@Override
     protected void handleGenerateUpdateTasks(EmailListEntity entity) throws Exception {
-        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-        tasque.setAlias(entity.getName());
-        if (entity.getDomain() != null)
-            tasque.setMailDomain(entity.getDomain().getName());
-        getTaskEntityDao().create(tasque);
+		String status = ConfigurationCache.getProperty("soffid.task.mode");
+		if ("readonly".equals( status ) || "manual".equals( status )) {
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+	        tasque.setCustomObjectType(MailList.class.getName());
+	        tasque.setPrimaryKeyValue(entity.getId());
+	        getTaskEntityDao().create(tasque);
+		}
+		else
+		{
+	        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
+	        tasque.setAlias(entity.getName());
+	        if (entity.getDomain() != null)
+	            tasque.setMailDomain(entity.getDomain().getName());
+	        getTaskEntityDao().create(tasque);
+		}
 	}
 
 }

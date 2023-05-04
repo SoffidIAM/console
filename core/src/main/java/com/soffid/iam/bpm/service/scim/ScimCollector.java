@@ -7,23 +7,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.Scorer;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.ScoreMode;
+import org.apache.lucene.search.SimpleCollector;
 import org.hibernate.Session;
 
 import com.soffid.iam.api.AsyncList;
-import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
-import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 
-public class ScimCollector extends Collector {
-	private AtomicReaderContext ctx;
-	private Scorer scorer;
+public class ScimCollector extends SimpleCollector {
 	private Collection<Object> result;
 	private String hqlQuery;
 	private Session session;
@@ -36,31 +33,28 @@ public class ScimCollector extends Collector {
 	private ValueObjectGenerator generator;
 	private HQLQuery hql;
 	private AbstractExpression expr;
-	
+	private LeafReaderContext context;
+	Set<String> fields = Set.of("_id");
+			
 	public ScimCollector(Collection<Object> result) {
 		this.result = result;
 	}
 
-	@Override
-	public void setScorer(Scorer scorer) throws IOException {
-		this.scorer = scorer;
+	protected void doSetNextReader(LeafReaderContext context) throws IOException {
+		this.context = context;
 	}
+	
 
 	public void setResult(List resultado) {
 		this.result = resultado;
 	}
 
 	@Override
-	public void setNextReader(AtomicReaderContext ctx) throws IOException {
-		this.ctx = ctx;
-	}
-
-	@Override
 	public void collect(int id) throws IOException {
 		if (cancelled) return;
 		
-		org.apache.lucene.document.Document d = ctx.reader().document(id);
-		IndexableField f = d.getField("id"); //$NON-NLS-1$
+		org.apache.lucene.document.Document d = context.reader().document(id, fields);
+		IndexableField f = d.getField("_id"); //$NON-NLS-1$
 		if (f != null) {
 			if (end) {
 				count++;
@@ -120,11 +114,6 @@ public class ScimCollector extends Collector {
 		return true;
 	}
 
-	@Override
-	public boolean acceptsDocsOutOfOrder() {
-		return false;
-	}
-
 	public void setConfig(CriteriaSearchConfiguration config) {
 		this.config = config;
 	}
@@ -157,6 +146,11 @@ public class ScimCollector extends Collector {
 
 	public void setHql(HQLQuery hql) {
 		this.hql = hql;
+	}
+
+	@Override
+	public ScoreMode scoreMode() {
+		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
 }

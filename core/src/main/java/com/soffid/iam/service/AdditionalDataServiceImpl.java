@@ -42,6 +42,7 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.ExtensibleObjectRegister;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
@@ -89,6 +90,8 @@ public class AdditionalDataServiceImpl extends
 	Map<String, MetadataScope> scopeForType = new HashMap<>();
 	Map<MetadataScope, String> typeForScope = new HashMap<>();
 	MetadataCache cache = null;
+
+	private List<ExtensibleObjectRegister> extensibleObjectRegisterList = new LinkedList<>();
 	
 	private MetadataCache getMetadataCache() {
 		if (cache == null) {
@@ -527,7 +530,7 @@ public class AdditionalDataServiceImpl extends
 		}
 		
 		reindex (obj);
-		cache.clear();
+		getMetadataCache().clear();
 
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}
@@ -570,7 +573,7 @@ public class AdditionalDataServiceImpl extends
 		getCustomObjectTypeEntityDao().remove(t);
 		
 		getLuceneIndexService().resetIndex(obj.getName());
-		cache.clear();
+		getMetadataCache().clear();
 	}
 
 	@Override
@@ -630,7 +633,7 @@ public class AdditionalDataServiceImpl extends
 		updateRoles(entity, obj);
 		if (currentIndex != obj.isTextIndex())
 			reindex (obj);
-		cache.clear();
+		getMetadataCache().clear();
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}
 
@@ -644,6 +647,7 @@ public class AdditionalDataServiceImpl extends
 						Security.nestedLogin(principal);
 						try {
 							LuceneIndexService svc = getLuceneIndexService();
+							svc.resetIndex(obj.getName());
 							CrudHandler<Object> crud = getCrudRegistryService().getHandler(obj.getName());
 							int step = 0;
 							do {
@@ -668,6 +672,7 @@ public class AdditionalDataServiceImpl extends
 			if (d.getUrl() == null) {
 				d.setUrl("local");
 				d.setClassName("com.soffid.iam.sync.agent.SoffidAgent");
+				getDispatcherService().update(d);
 			}
 		} else {
 			getLuceneIndexService().resetIndex(obj.getName());
@@ -676,7 +681,7 @@ public class AdditionalDataServiceImpl extends
 
 	@Override
 	protected CustomObjectType handleFindCustomObjectTypeByName(String name) throws Exception {
-		for (CustomObjectType co: cache.getCustomObjectTypes()) {
+		for (CustomObjectType co: getMetadataCache().getCustomObjectTypes()) {
 			if (co.getName().equals(name))
 				return co;
 		}
@@ -860,8 +865,8 @@ public class AdditionalDataServiceImpl extends
 			
 		}
 		
-		cache.clear();
-		cache.clear(cot.getName());
+		getMetadataCache().clear();
+		getMetadataCache().clear(cot.getName());
 	}
 
 	private long upgradeMetadata(CustomObjectTypeEntity cot, MetadataScope scope) {
@@ -927,5 +932,26 @@ public class AdditionalDataServiceImpl extends
 			return e != AccountAccessLevelEnum.ACCESS_OWNER && e != AccountAccessLevelEnum.ACCESS_MANAGER && e != AccountAccessLevelEnum.ACCESS_USER;
 		else
 			return false;
+	}
+
+	@Override
+	protected List<ExtensibleObjectRegister> handleFindExtensibleObjectRegisters() throws Exception {
+		LinkedList l = new LinkedList<>();
+		for (ExtensibleObjectRegister eor: extensibleObjectRegisterList ) 
+			l.add(new ExtensibleObjectRegister(eor));
+		return l;
+	}
+
+	@Override
+	protected void handleRegisterExtensibleObject(ExtensibleObjectRegister register) throws Exception {
+		extensibleObjectRegisterList.add(register);
+	}
+
+	@Override
+	protected ExtensibleObjectRegister handleFindExtensibleObjectRegister(String name) throws Exception {
+		for (ExtensibleObjectRegister eor: extensibleObjectRegisterList ) 
+			if (eor.getName().equals(name))
+				return new ExtensibleObjectRegister(eor);
+		return null;
 	}
 }

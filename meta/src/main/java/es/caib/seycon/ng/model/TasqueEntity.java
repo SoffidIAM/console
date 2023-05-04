@@ -137,6 +137,10 @@ public abstract class TasqueEntity {
 	@Nullable
 	public String customObjectName;
 	
+	@Column(name = "TAS_CUTANA", length = 50)
+	@Nullable
+	public java.lang.String customTaskName;
+
 	@Column(name = "TAS_SOURCE", length = 50)
 	@Nullable
 	public String sourceTransaction;

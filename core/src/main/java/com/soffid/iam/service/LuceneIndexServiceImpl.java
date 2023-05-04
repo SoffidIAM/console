@@ -6,54 +6,35 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.queries.BooleanFilter;
-import org.apache.lucene.queries.FilterClause;
-import org.apache.lucene.queries.TermsFilter;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.document.LongField;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.TermRangeFilter;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.BytesRef;
-import org.apache.lucene.util.Version;
-import org.jbpm.graph.exe.ProcessInstance;
-import org.springframework.beans.BeansException;
+import org.apache.lucene.search.Query;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.DataType;
-import com.soffid.iam.bpm.index.DirectoryFactory;
-import com.soffid.iam.bpm.index.Messages;
 import com.soffid.iam.model.CustomObjectTypeEntity;
-import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.impl.LuceneIndexStatus;
 import com.soffid.iam.utils.Security;
 
@@ -64,9 +45,8 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 	Log log = LogFactory.getLog(getClass());
 	public static final FieldType INDEXED_STRING = new FieldType();
 	static {
-		INDEXED_STRING.setIndexed(true);
 		INDEXED_STRING.setOmitNorms(true);
-		INDEXED_STRING.setIndexOptions(IndexOptions.DOCS_ONLY);
+		INDEXED_STRING.setIndexOptions(org.apache.lucene.index.IndexOptions.DOCS_AND_FREQS);
 		INDEXED_STRING.setStored(false);
 		INDEXED_STRING.setTokenized(true);
 		INDEXED_STRING.freeze();
@@ -80,21 +60,22 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 	protected void handleAddDocument(String index, Document doc) throws Exception {
 		LuceneIndexStatus s = getStatus(index);
 		
-		s.fetchIfNeeded();
-		
-		IndexWriter w;
-		final Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_CURRENT,
-				new CharArraySet(Version.LUCENE_CURRENT, 0, true));
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
-		iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-		w = new IndexWriter (s.getDirectory(), iwc);
-		try { 
-			// Delete pre-existing document
-			w.deleteDocuments(new Term ("id", doc.get("id"))); //$NON-NLS-1$ //$NON-NLS-2$
-			w.addDocument(doc);
-			s.setDirty();
-		} finally {
-			w.close();
+		synchronized (s) {
+			s.fetchforWriting();
+	
+			IndexWriter w;
+			final Analyzer analyzer = new StandardAnalyzer();
+			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+			iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
+			w = new IndexWriter (s.getDirectory(), iwc);
+			try { 
+				// Delete pre-existing document
+				w.deleteDocuments(new Term ("_id", doc.get("_id"))); //$NON-NLS-1$ //$NON-NLS-2$
+				w.addDocument(doc);
+				s.setDirty();
+			} finally {
+				w.close();
+			}
 		}
 	}
 
@@ -117,7 +98,9 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 			return null;
 		
 		Document doc = new Document();
-		doc.add(new LongField("id", (Long) PropertyUtils.getProperty(o, "id"), Store.YES ));
+		final Long id = (Long) PropertyUtils.getProperty(o, "id");
+		doc.add(new LongField("id", id ));
+		doc.add(new StringField("_id", id.toString(), Store.YES ));
 		StringBuffer contents = new StringBuffer();
 		for (DataType att: getAdditionalDataService().findDataTypesByObjectTypeAndName2(type.getName(), null)) {
 			if (Boolean.TRUE.equals(att.getSearchCriteria())) {
@@ -148,6 +131,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 				}
 			}
 		}
+		log.info("Indexing "+contents.toString());
 		doc.add(new Field("$contents", contents.toString(), INDEXED_STRING));
 		return doc;
 	}
@@ -161,15 +145,16 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 		IndexReader reader = DirectoryReader.open(s.getDirectory());
 		IndexSearcher is;
 		is = new IndexSearcher(reader);
-		QueryParser qp = new QueryParser(Version.LUCENE_CURRENT,
+		QueryParser qp = new QueryParser(
 				"$contents", //$NON-NLS-1$
-				DirectoryFactory.getAnalyzer());
+				new StandardAnalyzer());
 		org.apache.lucene.search.Query q = null;
 		if (query != null && query.trim().length() > 0)
 			q = qp.parse(query);
 		else
 			q = new MatchAllDocsQuery();
 		is.search(q, collector); // Sense cap filtre
+		reader.close();
 	}
 	
 	private LuceneIndexStatus getStatus(String index) throws FileNotFoundException, IOException, InternalErrorException {
@@ -178,7 +163,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 		if (s == null)
 		{
 			s = new LuceneIndexStatus(getLuceneIndexEntityDao(), getLuceneIndexPartEntityDao(), realName );
-			status.put(index, s);
+			status.put(realName, s);
 			s.fetchFromDatabase( );
 		}
 		else
@@ -190,13 +175,27 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		Thread t = new Thread( () ->  {
-			while (true) {
+		Thread t = new IndexSaverThread();
+		t.setName("index-saver");
+		t.setDaemon(true);
+		t.start();
+	}
+	
+	class IndexSaverThread extends Thread {
+		boolean exit = false;
+		@Override
+		public void run () {
+			while (! exit) {
 				try {
 					for (LuceneIndexStatus s: new java.util.LinkedList<LuceneIndexStatus>( status.values() )) {
 						try {
 							getAsyncRunnerService().runNewTransaction(() -> {
-								s.saveIfNeeded();
+								try {
+									s.saveIfNeeded();
+								} catch (Error e) {
+									log.warn("Error indexing data ", e);
+									exit = true;
+								}
 								return null;
 							});
 						} catch (Exception e) {
@@ -207,21 +206,32 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 					log.warn("Error indexing data ", e);
 				}
 				try {
-					Thread.sleep(60000);
+					Thread.sleep(20_000); // Upload every 20 seconds
 				} catch (Exception e) {}
 			}
-		});
-		t.setName("index-saver");
-		t.setDaemon(true);
-		t.start();
+		}
 	}
 
 	@Override
 	protected void handleResetIndex(String index) throws Exception {
-		LuceneIndexStatus s = status.get(index);
+		String realName = Security.getCurrentTenantName()+"/"+index;
+		LuceneIndexStatus s = status.get(realName);
 		if (s != null) {
 			s.reset();
 		}
+	}
+
+	@Override
+	protected void handleSearch(String index, Query query, Collector collector) throws Exception {
+		LuceneIndexStatus s = getStatus(index);
+		
+		s.fetchIfNeeded();
+		
+		IndexReader reader = DirectoryReader.open(s.getDirectory());
+		IndexSearcher is;
+		is = new IndexSearcher(reader);
+		is.search(query, collector); // Sense cap filtre
+		reader.close();
 	}
 
 }

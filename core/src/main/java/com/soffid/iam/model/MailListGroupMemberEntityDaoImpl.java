@@ -8,6 +8,9 @@ package com.soffid.iam.model;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.sync.engine.TaskHandler;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.SeyconException;
+
 import java.sql.Timestamp;
 
 /**
@@ -16,14 +19,10 @@ import java.sql.Timestamp;
 public class MailListGroupMemberEntityDaoImpl extends MailListGroupMemberEntityDaoBase
 {
 	private void createUpdateTask(MailListGroupMemberEntity entity) {
-		if (entity.getMailList() != null && entity.getMailList().getDomain() != null && entity.getMailList().getName() != null)
-		{
-	        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-	        tasque.setAlias(entity.getMailList().getName());
-            tasque.setMailDomain(entity.getMailList().getDomain().getName());
-	        getTaskEntityDao().create(tasque);
+		try {
+			getEmailListEntityDao().generateUpdateTasks(entity.getMailList());
+		} catch (InternalErrorException e) {
+			throw new SeyconException("Error generating task", e);
 		}
 	}
 

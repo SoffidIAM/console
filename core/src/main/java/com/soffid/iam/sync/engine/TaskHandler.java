@@ -100,6 +100,8 @@ public class TaskHandler
     public static final String UPDATE_OBJECT = "UpdateObject"; //$NON-NLS-1$
     public static final String DELETE_OBJECT = "DeleteObject"; //$NON-NLS-1$
     public static final String UPDATE_SERVICE_PASSWORD = "UpdateServicePassword"; //$NON-NLS-1$
+    public static final String UPDATE_EXT_OBJECT = "UpdateExtendedObject"; //$NON-NLS-1$
+    public static final String INDEX_OBJECT = "IndexObject"; //$NON-NLS-1$
     
 	public Group getGroup() {
 		return grup;
@@ -373,6 +375,12 @@ public class TaskHandler
 			hash = "RC_R " + task.getHost(); //$NON-NLS-1$
 		else if (UPDATE_OBJECT.equals(transactionCode))
 			hash = "UO " + task.getPrimaryKeyValue(); //$NON-NLS-1$
+		else if (DELETE_OBJECT.equals(transactionCode))
+			hash = "UO " + task.getPrimaryKeyValue(); //$NON-NLS-1$
+		else if (INDEX_OBJECT.equals(transactionCode))
+			hash = "INDEX " + task.getCustomObjectType()+"#"+task.getPrimaryKeyValue(); //$NON-NLS-1$
+		else if (UPDATE_EXT_OBJECT.equals(transactionCode))
+			hash = "UEO "  + task.getCustomObjectType()+"#"+ task.getPrimaryKeyValue(); //$NON-NLS-1$
 		else if (DELETE_OBJECT.equals(transactionCode))
 			hash = "UO " + task.getPrimaryKeyValue(); //$NON-NLS-1$
 		else

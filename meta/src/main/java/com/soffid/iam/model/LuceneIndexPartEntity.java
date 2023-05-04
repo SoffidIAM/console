@@ -28,6 +28,10 @@ public class LuceneIndexPartEntity {
 	@Column(name = "LIP_DATA", length = 256000)
 	@Nullable byte[] data;
 	
+	@Column(name = "LIP_TIMSTA")
+	@Nullable Long timestamp;
+	
+
 	@DaoFinder("select p from com.soffid.iam.model.LuceneIndexPartEntity as p "
 			+ "where p.index.id = :index "
 			+ "order by name, order")

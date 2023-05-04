@@ -2,6 +2,7 @@ package com.soffid.iam.service;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.Query;
 
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.LuceneIndexEntity;
@@ -22,6 +23,8 @@ public class LuceneIndexService {
 	
 	public void search (String index, @Nullable String query, Collector collector) {}
 	
+	public void search (String index, @Nullable Query query, Collector collector) {}
+
 	public void indexObject(String index, Object o) {}
 	
 	public void resetIndex(String index) {}

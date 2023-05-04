@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.CustomObjectType;
+import com.soffid.iam.api.ExtensibleObjectRegister;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectEntity;
@@ -217,5 +218,9 @@ public abstract class DadesAddicionalsService {
 	@Operation(grantees = { Tothom.class })
 	public AccountAccessLevelEnum getAccessLevel(CustomObjectType type) { return null; }
 	
+	public void registerExtensibleObject(ExtensibleObjectRegister register) { }
+	
+	public List<ExtensibleObjectRegister> findExtensibleObjectRegisters() { return null; }
 
+	public ExtensibleObjectRegister findExtensibleObjectRegister(String name) { return null; }
 }

@@ -7,18 +7,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 
-import com.soffid.iam.api.DataType;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.LuceneIndexEntity;
 import com.soffid.iam.model.LuceneIndexEntityDao;
 import com.soffid.iam.model.LuceneIndexPartEntity;
 import com.soffid.iam.model.LuceneIndexPartEntityDao;
 import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class LuceneIndexStatus {
 	long timestamp;
@@ -27,6 +29,7 @@ public class LuceneIndexStatus {
 	private LuceneIndexEntityDao luceneIndexEntityDao;
 	private LuceneIndexPartEntityDao luceneIndexPartEntityDao;
 	private boolean dirty;
+	private boolean indexOwner;
 	
 	public LuceneIndexStatus(LuceneIndexEntityDao luceneIndexEntityDao,
 			LuceneIndexPartEntityDao luceneIndexPartEntityDao,
@@ -42,10 +45,11 @@ public class LuceneIndexStatus {
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
+	
 	public Directory getDirectory() throws IOException {
 		if (directory == null) {
 			fetchFromDatabase();
-			directory = new NIOFSDirectory(getIndexDir());
+			directory = new NIOFSDirectory(getIndexDir().toPath());
 		}
 		return directory;
 	}
@@ -64,7 +68,8 @@ public class LuceneIndexStatus {
 	
 	public synchronized void fetchFromDatabase() throws FileNotFoundException, IOException {
 		File dir = getIndexDir();
-
+		Long lastTimeStamp = null;
+		File lastFile = null;
 		dir.mkdirs();
 		
 		LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
@@ -77,13 +82,23 @@ public class LuceneIndexStatus {
 			for (LuceneIndexPartEntity part: luceneIndexPartEntityDao.findByIndex(current.getId())) {
 				if (! part.getName().equals(partName)) {
 					partName = part.getName();
-					if (out != null) out.close();
-					out = new FileOutputStream(new File(dir, partName));
+					if (out != null) {
+						out.close();
+						if (lastTimeStamp != null)
+								lastFile.setLastModified(lastTimeStamp);
+					}
+					lastFile = new File(dir, partName);
+					out = new FileOutputStream(lastFile);
+					lastTimeStamp = part.getTimestamp();
 				}
 				out.write(part.getData());
 			}
-			out.close();
-			timestamp = current.getTimestamp().getTime();
+			if (out != null) {
+				out.close();
+				if (lastTimeStamp != null)
+					lastFile.setLastModified(lastTimeStamp);
+				timestamp = current.getTimestamp();
+			}
 		}
 	}
 	public File getIndexDir() throws FileNotFoundException, IOException {
@@ -93,34 +108,66 @@ public class LuceneIndexStatus {
 	}
 
 	public synchronized void fetchIfNeeded() throws FileNotFoundException, IOException {
-		File dir = getIndexDir();
-
-		dir.mkdirs();
-		
 		LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
-		if (current != null && current.getTimestamp().getTime() > timestamp) {
+		if (current != null && current.getTimestamp() > timestamp) {
 			fetchFromDatabase();
 		}
 	}
 
-	public synchronized void save() throws FileNotFoundException, IOException {
+	public void save() throws FileNotFoundException, IOException, InternalErrorException {
 		File dir = getIndexDir();
 
 		dir.mkdirs();
 		
 		LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
-		if (current != null) {
-			luceneIndexPartEntityDao.remove(current.getParts());
-		}
-		else {
+		if (current == null) {
 			current = luceneIndexEntityDao.newLuceneIndexEntity();
 			current.setName(name);
-			current.setTimestamp(new Date());
+			current.setTimestamp(System.currentTimeMillis());
 			luceneIndexEntityDao.create(current);
+		} else {
+			luceneIndexEntityDao.lock(current);
 		}
 
-		dirty = false;
-		for (File f: dir.listFiles()) {
+		synchronizedSave(dir, current);
+	}
+	
+	private synchronized void synchronizedSave(File dir, LuceneIndexEntity current) throws FileNotFoundException, IOException {
+		// Keep files not modified. Remove others from database
+		List<File> files = new LinkedList<>( Arrays.asList( dir.listFiles() ) );
+		String partName = null;
+		boolean remove = false;
+		for (LuceneIndexPartEntity part: luceneIndexPartEntityDao.findByIndex(current.getId())) {
+			if (! part.getName().equals(partName)) {
+				partName = part.getName();
+				boolean found = false;
+				for (File f: files) {
+					if (f.getName().equals(part.getName())) {
+						found = true;
+						if (part.getTimestamp() == null || 
+							part.getTimestamp().longValue() < f.lastModified()) {
+							luceneIndexPartEntityDao.remove(part);
+							remove = true;
+						}
+						else 
+						{
+							files.remove(f);
+						}
+						break;
+					}
+				}
+				if (!found) {
+					luceneIndexPartEntityDao.remove(part);
+					remove = true;
+				}
+			} else if (remove) {
+				luceneIndexPartEntityDao.remove(part);
+			}
+		}
+		
+		
+		// Add new or modified files
+		for (File f: files) {
 			FileInputStream in = new FileInputStream(f);
 			int order = 0;
 			byte [] b = new byte[64000];
@@ -129,6 +176,7 @@ public class LuceneIndexStatus {
 				part.setName(f.getName());
 				part.setIndex(current);
 				part.setOrder(order ++);
+				part.setTimestamp(f.lastModified());
 				if (read == b.length)
 					part.setData(b);
 				else
@@ -138,19 +186,22 @@ public class LuceneIndexStatus {
 			in.close();
 		}
 		
-		current.setTimestamp(new Date());
+		dirty = false;		
+		timestamp = System.currentTimeMillis();
+		current.setTimestamp(timestamp);
 		luceneIndexEntityDao.update(current);
+		indexOwner = true;
 	}
 	
 	public void setDirty() {
 		dirty = true;
 	}
 	
-	public void saveIfNeeded() throws FileNotFoundException, IOException {
+	public void saveIfNeeded() throws FileNotFoundException, IOException, InternalErrorException {
 		if (dirty)
 			save();
 	}
-	public synchronized void reset() throws FileNotFoundException, IOException {
+	public synchronized void reset() throws FileNotFoundException, IOException, InternalErrorException {
 		dirty = false;
 		File dir = getIndexDir();
 			
@@ -165,6 +216,43 @@ public class LuceneIndexStatus {
 				f.delete();
 			}
 		}		
-		dirty = false;
+		dirty = true;
+		indexOwner = true;
+		directory.close();
+		directory = new NIOFSDirectory(getIndexDir().toPath());
+		save();
+	}
+	
+	public void fetchforWriting() throws InterruptedException, FileNotFoundException, IOException, InternalErrorException {
+		if (dirty )
+			return;
+		do {
+			LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
+			if (current == null) {
+				File dir = getIndexDir();
+				if (dir.exists()) {
+					for (File f: dir.listFiles()) {
+						f.delete();
+					}
+				}		
+				dir.mkdirs();
+				save();
+				return;
+			} else {
+				luceneIndexEntityDao.refresh(current);
+			}
+			Long l = 75000 - (System.currentTimeMillis() - current.getTimestamp() );
+			if (current.getTimestamp() == timestamp) {
+				return;
+			}
+			indexOwner = false;
+			if (l < 0 ) { 
+				fetchIfNeeded();
+				indexOwner = true;
+				return;
+			}
+			else
+				Thread.sleep(l);
+		} while (true);
 	}
 }

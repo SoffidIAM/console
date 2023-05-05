@@ -207,8 +207,9 @@ public class AuthorizationServiceImpl extends
     private Collection getCodiGrupsParesGrup(String codiGrup) {
 
         GroupEntity grupAnalitzar = getGroupEntityDao().findByName(codiGrup);
-
         Collection totsPares = new HashSet();
+        if (grupAnalitzar == null)
+        	return totsPares;
         GroupEntity pare = grupAnalitzar.getParent();
         while (pare != null) {
             totsPares.add(pare.getName());

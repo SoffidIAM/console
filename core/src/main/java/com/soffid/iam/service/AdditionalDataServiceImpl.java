@@ -199,6 +199,12 @@ public class AdditionalDataServiceImpl extends
 				tipusDada.setId(tipusDadaEntity.getId());
 				return getMetaDataEntityDao().toDataType(tipusDadaEntity);
 			}
+			
+			if (Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
+					tipusDadaEntity.getObjectType().isTextIndex()) {
+				reindex (getCustomObjectTypeEntityDao().toCustomObjectType(tipusDadaEntity.getObjectType()));
+			}
+
 		}
 		return null;
 	}
@@ -211,6 +217,10 @@ public class AdditionalDataServiceImpl extends
 		{
 			getMetadataCache().clear(tipusDada.getObjectType());
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
+			if (Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
+					tipusDadaEntity.getObjectType().isTextIndex()) {
+				reindex (getCustomObjectTypeEntityDao().toCustomObjectType(tipusDadaEntity.getObjectType()));
+			}
 			getMetaDataEntityDao().remove(tipusDadaEntity);
 		} else {
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().load(tipusDada.getId());
@@ -225,7 +235,12 @@ public class AdditionalDataServiceImpl extends
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().trim().length() == 0)
 		{
 			getMetadataCache().clear(tipusDada.getObjectType());
-			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
+			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
+			if (Boolean.TRUE.equals(tipusDada.getSearchCriteria()) != Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
+					tipusDadaEntity.getObjectType().isTextIndex()) {
+				reindex (getCustomObjectTypeEntityDao().toCustomObjectType(tipusDadaEntity.getObjectType()));
+			}
+			getMetaDataEntityDao().dataTypeToEntity(tipusDada, tipusDadaEntity, true);
 		
 			if (tipusDadaEntity.getAdminVisibility() == null)
 				tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);

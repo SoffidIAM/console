@@ -54,6 +54,12 @@ public class TaskEntityImpl extends com.soffid.iam.model.TaskEntity {
         if (transactionCode.equals(TaskHandler.UPDATE_OBJECT)) //$NON-NLS-1$
             result = result + " " + getCustomObjectType() + " " + getCustomObjectName(); //$NON-NLS-1$ //$NON-NLS-2$
 
+        if (transactionCode.equals(TaskHandler.UPDATE_EXT_OBJECT)) //$NON-NLS-1$
+            result = result + " " + getCustomObjectType() + " " + getCustomObjectName(); //$NON-NLS-1$ //$NON-NLS-2$
+
+        if (transactionCode.equals(TaskHandler.INDEX_OBJECT)) //$NON-NLS-1$
+            result = result + " " + getCustomObjectType() + " " + getPrimaryKeyValue(); //$NON-NLS-1$ //$NON-NLS-2$
+
         return result;
 
     }

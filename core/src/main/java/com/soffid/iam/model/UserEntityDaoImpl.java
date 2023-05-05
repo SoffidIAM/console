@@ -170,39 +170,35 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     
     private void createTask(com.soffid.iam.model.UserEntity usuari) throws InternalErrorException {
 		String status = ConfigurationCache.getProperty("soffid.task.mode");
-		if ("readonly".equals( status ) || "manual".equals( status )) {
-			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-	        tasque.setCustomObjectType(User.class.getName());
-	        tasque.setPrimaryKeyValue(usuari.getId());
-	        getTaskEntityDao().create(tasque);
-		}
-		else
-		{
-			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.UPDATE_USER);
-	        tasque.setUser(usuari.getUserName());
+		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+        tasque.setCustomObjectType(User.class.getName());
+        tasque.setPrimaryKeyValue(usuari.getId());
+        getTaskEntityDao().create(tasque);
+
+        tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransaction(TaskHandler.UPDATE_USER);
+        tasque.setUser(usuari.getUserName());
+        getTaskEntityDao().createForce(tasque);
+        tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+        if (usuari.getPrimaryGroup() != null)
+        {
+	        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+	        tasque.setGroup(usuari.getPrimaryGroup().getName());
 	        getTaskEntityDao().createForce(tasque);
-	        tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-	        if (usuari.getPrimaryGroup() != null)
-	        {
-		        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-		        tasque.setGroup(usuari.getPrimaryGroup().getName());
-		        getTaskEntityDao().createForce(tasque);
-	        }
-	        if (usuari.getShortName() != null)
-	        {
-	            tasque = getTaskEntityDao().newTaskEntity();
-	            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-	            tasque.setTransaction(TaskHandler.UPDATE_USER_ALIAS);
-	            tasque.setUser(usuari.getUserName());
-	            getTaskEntityDao().createForce(tasque);
-	
-	        }
-		}
+        }
+        if (usuari.getShortName() != null)
+        {
+            tasque = getTaskEntityDao().newTaskEntity();
+            tasque.setDate(new Timestamp(System.currentTimeMillis()));
+            tasque.setTransaction(TaskHandler.UPDATE_USER_ALIAS);
+            tasque.setUser(usuari.getUserName());
+            getTaskEntityDao().createForce(tasque);
+
+        }
     }
 
     public void update(com.soffid.iam.model.UserEntity usuari) throws RuntimeException {
@@ -212,22 +208,18 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             auditarUsuari("U", usuari.getUserName(), usuari.getPrimaryGroup()); //$NON-NLS-1$
 
     		String status = ConfigurationCache.getProperty("soffid.task.mode");
-    		if ("readonly".equals( status ) || "manual".equals( status )) {
-    			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-    	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-    	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-    	        tasque.setCustomObjectType(User.class.getName());
-    	        tasque.setPrimaryKeyValue(usuari.getId());
-    	        getTaskEntityDao().create(tasque);
-    		}
-    		else
-    		{
-				TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-				tasque.setDate(new Timestamp(System.currentTimeMillis()));
-				tasque.setTransaction(TaskHandler.UPDATE_USER);
-				tasque.setUser(usuari.getUserName());
-				getTaskEntityDao().create(tasque);
-    		}
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+	        tasque.setCustomObjectType(User.class.getName());
+	        tasque.setPrimaryKeyValue(usuari.getId());
+	        getTaskEntityDao().create(tasque);
+
+			tasque = getTaskEntityDao().newTaskEntity();
+			tasque.setDate(new Timestamp(System.currentTimeMillis()));
+			tasque.setTransaction(TaskHandler.UPDATE_USER);
+			tasque.setUser(usuari.getUserName());
+			getTaskEntityDao().create(tasque);
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);

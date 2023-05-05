@@ -292,6 +292,7 @@ public class SearchDictionaryBuilder {
 
 	private static void addApplicationJoins(SearchDictionary sd) {
 		addJoin(sd, "roles.name", "auditoria.zul.rol", TypeEnumeration.STRING_TYPE);
+		addJoin(sd, "roles.system.name", "com.soffid.iam.api.Audit.database", TypeEnumeration.STRING_TYPE);
 	}
 
 	private static void addGroupJoins(SearchDictionary sd) {

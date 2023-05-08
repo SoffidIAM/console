@@ -107,12 +107,12 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
-		h.setTenantFilter("tenant.id");
+		h.setTenantFilter("type.tenant.id");
 		if (objectType != null) {
 			if (query == null || query.trim().isEmpty())
-				query = "o.type.name eq '"+encode(objectType)+"'";
+				query = "type.name eq '"+encode(objectType)+"'";
 			else
-				query = "(" + query + ") and o.type.name eq '"+encode(objectType)+"'";
+				query = "(" + query + ") and type.name eq '"+encode(objectType)+"'";
 		}
 		CustomObjectEntityDao dao = getCustomObjectEntityDao();
 		h.setGenerator((e) -> {

@@ -17,6 +17,7 @@ import org.json.JSONException;
 
 import com.graphbuilder.struc.LinkedList;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.model.CustomDialect;
@@ -66,7 +67,7 @@ public class ScimHelper {
 	
 	public ScimHelper (String objectClass) throws InternalErrorException {
 		this.objectClassName = objectClass;
-		this.objectClass = CustomObjectType.class;
+		this.objectClass = CustomObject.class;
 		CustomObjectType dt = svc.findCustomObjectTypeByName(objectClass);
 		if (dt != null && dt.isTextIndex())
 			textIndex  = true;

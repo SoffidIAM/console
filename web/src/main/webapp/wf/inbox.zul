@@ -4,7 +4,6 @@
 <?component name="task" macroURI="task.zul"?>
 
 <frame xmlns="http://www.zkoss.org/2005/zul" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="frame" 
-	title="${c:l('inbox.lblFiltroTareas1')}" 
 	use="com.soffid.iam.web.inbox.InboxHandler" width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
 	
 	<div sclass="card" id="card">

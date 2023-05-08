@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 
@@ -111,6 +112,8 @@ import com.soffid.iam.utils.SoffidAuthorization;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.ClassConfig;
+import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
@@ -4225,8 +4228,8 @@ public class ApplicationServiceImpl extends
 		int count = 0;
 		for (int i = 1; i < 10; i++) {
 			for (int type = 0; type < 3; type ++) {
-				ScimHelper h = generateRedundantRolesQuery(i, type);
-				total += h.count(null, query);
+				ScimHelper h = generateRedundantRolesQuery(i, type, query);
+				total += h.count(null, "");
 			}
 		}
 		if (total > 0) {
@@ -4235,7 +4238,7 @@ public class ApplicationServiceImpl extends
 			final int counters[] = new int[]{count, total};
 			for (int i = 1; i < 10; i++) {
 				for (int type = 0; type < 3; type ++) {
-					ScimHelper h = generateRedundantRolesQuery(i, type);
+					ScimHelper h = generateRedundantRolesQuery(i, type, query);
 					h.setPageSize(500);
 					h.setGenerator((Object entity) -> {
 						Object[] array = (Object[]) entity;
@@ -4264,7 +4267,7 @@ public class ApplicationServiceImpl extends
 		HashSet<Long> ids = new HashSet<>();
 		for (int i = 1; i < 8; i++) {
 			for (int type = 0; type < 3; type ++) {
-				ScimHelper h = generateRedundantRolesQuery(i, type);
+				ScimHelper h = generateRedundantRolesQuery(i, type, query);
 				h.setGenerator((entity) -> {
 					Object[] array = (Object[]) entity;
 					final RoleAccountEntity ra = (RoleAccountEntity) array[0];
@@ -4275,7 +4278,7 @@ public class ApplicationServiceImpl extends
 						return null;
 				}); 
 				
-				h.search(null, query, (Collection) result); 
+				h.search(null, "", (Collection) result); 
 				
 			}
 		}
@@ -4333,7 +4336,7 @@ public class ApplicationServiceImpl extends
 				scopeGroup == target.getGroup();
 	}
 	
-	private ScimHelper generateRedundantRolesQuery(int i, int type) {
+	private ScimHelper generateRedundantRolesQuery(int i, int type, String query) throws InternalErrorException, ParseException, TokenMgrError, UnsupportedEncodingException, ClassNotFoundException, JSONException, EvalException {
 		ScimHelper h = new ScimHelper(RoleAccount.class);
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		h.setConfig(config);
@@ -4374,6 +4377,22 @@ public class ApplicationServiceImpl extends
 			break;
 		}
 		sb2.append(" and o.enabled = true and o.rule is null");
+		if (query != null && !query.trim().isEmpty()) {
+			ClassConfig cc = Configuration.getClassConfig(Role.class);
+			if (cc == null)
+				throw new EvalException("No configuration found for "+Role.class.getCanonicalName(), null);
+			
+			String hibernateClass = cc.getHibernateClass();
+			
+			HQLQuery hql = new HQLQuery(cc);
+			hql.setRootObject("rr");
+			AbstractExpression expr = ExpressionParser.parse(query);
+			expr.generateHSQLString(hql);
+			sb2.append(" and  role0.id in (select rr.id from com.soffid.iam.model.RoleEntity as rr "+
+					hql.getJoinString()+
+					" where "+ hql.getWhereString()+")");
+			h.setExtraParameters(new HashMap<>( hql.getParameters() ) );
+		}
 		h.setExtraJoin(sb.toString());
 		h.setExtraWhere(sb2.toString());
 		h.setReturnValue(sb3.toString());

@@ -799,12 +799,16 @@ public class InputField3 extends Databox
 				! currentValue.toString().trim().isEmpty() &&
 				(getType().equals(Databox.Type.NAME_DESCRIPTION.toString()) ||
 				 getType().equals(Databox.Type.DESCRIPTION.toString()))) {
-			String d;
+			String d[];
 			try {
-				d = getDescription(currentValue);
+				d = getNameDescription(currentValue);
 				if (d == null) {
 					setWarning(position, "Invalid value");
 					return false;
+				}
+				if (! d[0].equals(currentValue.toString())) {
+					currentValue = d[0];
+					setValue(position, currentValue);
 				}
 			} catch (Exception e) {
 				setWarning(position, e.getMessage());
@@ -931,7 +935,7 @@ public class InputField3 extends Databox
 	}
 
 	@Override
-	public String getDescription(Object name) throws Exception {
+	public String[] getNameDescription(Object name) throws Exception {
 		if (dataHandler == null || name == null || name.toString().trim().isEmpty())
 			return null;
 		else {
@@ -939,37 +943,45 @@ public class InputField3 extends Databox
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				String d = null;
+				Object o = dataHandler.getObject(name.toString(), dataType.getFilterExpression());
+				if (o == null)
+					return null;
+				String s[] = dataHandler.objectToNameDescription(o);
+				name = s[0];
+				
 				if (descriptionExpression == null)
-					d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
+					d = s[1];
 				else {
-					Object o = dataHandler.getObject(name.toString(), dataType.getFilterExpression());
 					if ( o != null ) {
 						d = evaluateDescriptionExpression(o);
 					}
 				}
+				
 				String link = dataHandler.followLink(name.toString());
 				if (link != null && ! hideUserName) {
-					d = "<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>";
+					return new String[] {s[0],
+							"<a href='"+  XMLs.encodeAttribute(link)+"' target='_blank' class='shylink'>"+XMLs.escapeXML(d)+"</a>"};
 				} else if (d == null) {
-					return "";
+					return new String[] {s[0], ""};
 				} else {
-					d = XMLs.encodeAttribute(d);
+					return new String[] {s[0], XMLs.encodeAttribute(d)};
 				}
-				return d;
 			} catch (Exception e) {
 				noPermissions = true;
 				Security.nestedLogin(Security.ALL_PERMISSIONS);
 				try {
 					String d = null;
+					Object o = dataHandler.getObject(name.toString(), dataType.getFilterExpression());
+					if (o == null)
+						return null;
+					String s[] = dataHandler.objectToNameDescription(o);
+
 					if (descriptionExpression == null)
-						d = dataHandler.getDescription(name.toString(), dataType.getFilterExpression());
-					else {
-						Object o = dataHandler.getObject(name.toString(), dataType.getFilterExpression());
-						if ( o != null ) {
-							d = evaluateDescriptionExpression(o);
-						}
-					}
-					return  d == null ? "" : XMLs.encodeAttribute(d);
+						d = s[1];
+					else 
+						d = evaluateDescriptionExpression(o);
+
+					return new String[] { s[0],  d == null ? d : XMLs.encodeAttribute(d) };
 				} finally {
 					Security.nestedLogoff();
 				}

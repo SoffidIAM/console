@@ -61,6 +61,10 @@ public abstract class InputFieldDataHandler<E> {
 				.replaceAll("\"", "\\\\\"");
 	}
 
+	public String[] objectToNameDescription(Object o) {
+		return toNameDescription((E) o);
+	}
+
 	public abstract String[] toNameDescription(E o);
 	
 

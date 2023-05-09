@@ -63,6 +63,14 @@
 					</dataitem>
 				</listbox>
 			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('console.saml.principalAttribute')}: "/>
+				<textbox bind="principalAttribute" width="30em"/>
+			</div>
+			<div>
+				<switch bind="samlDebug" /> 
+				<label value="${c:l('console.saml.debug') }" style="margin-left: 16px" /> 
+			</div>
 		</div>
 		<label  sclass="separator" value="${c:l('parametres.zul.linotpIntegration')}"/>
 		<div style="margin-left: 150px">

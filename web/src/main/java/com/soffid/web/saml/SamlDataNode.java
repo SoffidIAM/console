@@ -31,6 +31,8 @@ public class SamlDataNode extends SimpleDataNode {
 		updateParam ("soffid.saml.metadata.url", c.metadata);
 		updateParam ("soffid.saml.idp", c.idp);
 		updateParam ("soffid.saml.metadata.cache", Integer.toString(c.cache));
+		updateParam("soffid.saml.debug", c.samlDebug ? "true": "false");
+		updateParam("soffid.saml.principalAttribute", c.principalAttribute);
 		updateParam("soffid.externalURL", c.hostName);
 		updateParam("soffid.auth.maintenance", c.maintenanceMode ? "true": "false");
 		

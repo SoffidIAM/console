@@ -27,7 +27,7 @@ import es.caib.zkib.datamodel.DataNode;
 
 public class GroupUserDatatable extends DatatypeColumnsDatatable {
 	static String[] mandatoryColumns = {
-			"user", "fullName", "info"
+			"user", "user_.fullName", "info"
 	};
 	
 	static String[] hiddenColumns = {
@@ -46,15 +46,6 @@ public class GroupUserDatatable extends DatatypeColumnsDatatable {
 				l.remove(pos);
 			else {
 				pos ++;
-				if (dt.getName().equals("user")) 
-				{
-					DataType dt2 = new DataType();
-					dt2.setName("fullName");
-					dt2.setBuiltin(true);
-					dt2.setNlsLabel("com.soffid.iam.api.User.fullName");
-					dt2.setType(TypeEnumeration.STRING_TYPE);
-					l.add(pos++, dt2);
-				}
 			}
 		}
 		
@@ -65,6 +56,17 @@ public class GroupUserDatatable extends DatatypeColumnsDatatable {
 		dt2.setType(TypeEnumeration.STRING_TYPE);
 		l.add(dt2);
 
+		LinkedList<DataType> ll = new LinkedList<DataType>( 
+				EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(User.class.getName(), null));
+		for (DataType dt: ll) {
+			DataType dt3 = new DataType(dt);
+			if (Boolean.TRUE.equals(dt3.getBuiltin()))
+				dt3.setName("user_."+dt3.getName());
+			else
+				dt3.setName("user_s.attributes."+dt3.getName());
+			dt3.setBuiltin(true);
+			l.add(dt3);
+		}
 		return l;
 	}
 
@@ -76,9 +78,16 @@ public class GroupUserDatatable extends DatatypeColumnsDatatable {
 	@Override
 	protected JSONObject getClientValue(Object element) throws JSONException {
 		JSONObject s = super.getClientValue(element);
-//		User u = (User) ((DataNode)element).getInstance();
-//		if (Boolean.FALSE.equals(u.getActive()))
-//			s.put("$class", "dashed");
+		GroupUser gu = (GroupUser) ((DataNode)element).getInstance();
+		try {
+			User u = EJBLocator.getUserService().findUserByUserName(gu.getUser());
+			if (u != null)
+				s.put("user_", wrap(u));
+			if (u == null || Boolean.FALSE.equals(u.getActive()))
+				s.put("$class", "dashed");
+		} catch (Exception e) {
+			
+		}
 		return s;
 	}
 

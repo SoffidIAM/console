@@ -18,6 +18,8 @@ public class SAMLConfig {
 	protected String optionalToken;
 	protected Long tokenTimeout;
 	public boolean maintenanceMode;
+	protected String principalAttribute;
+	protected boolean samlDebug;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -144,5 +146,21 @@ public class SAMLConfig {
 	
 	public void setMaintenanceMode(boolean maintenanceMode) {
 		this.maintenanceMode = maintenanceMode;
+	}
+	
+	public String getPrincipalAttribute() {
+		return principalAttribute;
+	}
+	
+	public void setPrincipalAttribute(String principalAttribute) {
+		this.principalAttribute = principalAttribute;
+	}
+	
+	public boolean isSamlDebug() {
+		return samlDebug;
+	}
+	
+	public void setSamlDebug(boolean samlDebug) {
+		this.samlDebug = samlDebug;
 	}
 }

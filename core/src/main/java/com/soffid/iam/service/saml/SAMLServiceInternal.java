@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -93,6 +94,9 @@ import org.opensaml.saml.saml2.assertion.StatementValidator;
 import org.opensaml.saml.saml2.assertion.SubjectConfirmationValidator;
 import org.opensaml.saml.saml2.assertion.impl.AudienceRestrictionConditionValidator;
 import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
+import org.opensaml.saml.saml2.core.AttributeValue;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Issuer;
@@ -205,6 +209,10 @@ public class SAMLServiceInternal {
 		builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
 	}
 	
+	boolean debug () {
+		return "true".equals(ConfigurationCache.getProperty("soffid.saml.debug"));
+	}
+	
 	public String[] authenticate(String hostName, String path, String protocol, Map<String, String> response) throws Exception {
 		String samlResponse = response.get("SAMLResponse");
 		
@@ -227,6 +235,13 @@ public class SAMLServiceInternal {
 		log.info("Processing authentication response from "+saml2Response.getIssuer().getValue());
 
 		boolean responseSigned = saml2Response.isSigned();
+		if (debug()) {
+			log.info("Response:\n"+ marshall(saml2Response));
+			if (responseSigned)
+				log.info("Response is signed");
+			else
+				log.info("Response is not signed");
+		}
 		if (responseSigned && ! validateResponse(hostName, saml2Response))
 			return null;
 
@@ -246,8 +261,12 @@ public class SAMLServiceInternal {
 		for ( EncryptedAssertion encryptedAssertion: saml2Response.getEncryptedAssertions())
 		{
 			Assertion assertion = decrypt (encryptedAssertion);
+			if (debug()) {
+				log.info("Encrypted assertion:\n" + marshall(assertion));
+			}
 			if (validateAssertion(hostName, assertion, responseSigned))
 			{
+				log.info("Encrypted assertion is valid");
 				return createAuthenticationRecord(hostName, requestEntity, assertion);
 			}
 		}
@@ -255,6 +274,7 @@ public class SAMLServiceInternal {
 		{
 			if (validateAssertion(hostName, assertion, responseSigned))
 			{
+				log.info("Encrypted assertion is valid");
 				return createAuthenticationRecord(hostName, requestEntity, assertion);
 			}
 		}
@@ -264,6 +284,20 @@ public class SAMLServiceInternal {
 	}
 
 	
+	private String marshall(XMLObject entity) {
+		try {
+			Transformer t = TransformerFactory.newDefaultInstance().newTransformer();
+			t.setOutputProperty(OutputKeys.INDENT, "yes");
+			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			t.transform(new DOMSource(entity.getDOM()), new StreamResult(out ));
+			return out.toString();
+		} catch (Exception e) {
+			return e.toString();
+		}
+
+	}
+
 	private Assertion decrypt(EncryptedAssertion encryptedAssertion) throws Exception {		
 		KeyStore ks = getKeyStore();
 		X509Certificate cert = (X509Certificate) ks.getCertificate(SAML_KEY);
@@ -294,21 +328,32 @@ public class SAMLServiceInternal {
 			log.info("Assertion does not contain subject information");
 			return null;
 		}
-		
-		NameID nameID = subject.getNameID();
-		if (nameID == null)
-		{
-			log.info("Assertion does not contain nameID information");
-			return null;
+
+		String user = null;
+		String att = ConfigurationCache.getProperty("soffid.saml.principalAttribute");
+		if (att != null && ! att.trim().isEmpty()) {
+			user = getAttribute(assertion, att);
+		} else {
+			NameID nameID = subject.getNameID();
+			if (nameID == null)
+			{
+				log.info("Assertion does not contain nameID information");
+				return null;
+			}
+			
+			if (nameID.getFormat() == null ||
+					nameID.getFormat().equals(NameID.PERSISTENT) ||
+					nameID.getFormat().equals(NameID.TRANSIENT) ||
+					nameID.getFormat().equals(NameID.UNSPECIFIED) ||
+					nameID.getFormat().equals(NameID.EMAIL))
+			{
+				user = nameID.getValue();
+			}
+			else {
+				log.info("Cannot get user name. Format "+nameID.getFormat()+" not supported");
+			}
 		}
-		
-		if (nameID.getFormat() == null ||
-				nameID.getFormat().equals(NameID.PERSISTENT) ||
-				nameID.getFormat().equals(NameID.TRANSIENT) ||
-				nameID.getFormat().equals(NameID.UNSPECIFIED) ||
-				nameID.getFormat().equals(NameID.EMAIL))
-		{
-			String user = nameID.getValue();
+		if (user != null) {
 			StringBuffer sb = new StringBuffer();
 			SecureRandom sr = new SecureRandom();
 			for (int i = 0; i < 180; i++)
@@ -331,9 +376,22 @@ public class SAMLServiceInternal {
 			requestDao.update(requestEntity);
 			log.info("Authenticated user "+user);
 			return new String[]{ requestEntity.getHostName() + "\\"+ requestEntity.getExternalId(), sb.toString()};
+		} 
+		else
+			return null;
+	}
+
+	private String getAttribute(Assertion assertion,String att) {
+		for (AttributeStatement attStatement: assertion.getAttributeStatements()) {
+			for (Attribute attribute: attStatement.getAttributes()) {
+				if (attribute.getName().equals(att) || attribute.getFriendlyName().equals(att))
+				{
+					for (XMLObject value: attribute.getAttributeValues()) {
+						return value.getDOM().getTextContent();
+					}
+				}
+			}
 		}
-		log.info("Cannot get user name. Format "+nameID.getFormat()+" not supported");
-		
 		return null;
 	}
 

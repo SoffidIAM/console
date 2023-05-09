@@ -98,7 +98,7 @@ public class MainWindow extends Window {
 		if (Arrays.binarySearch(p.getSoffidRoles(),"SOFFID_ADMIN") >= 0) {
 			Application.jumpTo("/config/wheel.zul");
 		} else {
-			Application.jumpTo("/index.zul");
+			Application.jumpTo("/main/menu.zul");
 		}
 	}
 }

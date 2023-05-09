@@ -29,11 +29,11 @@ public class Sector {
 	}
 	
 	public void dim(WheelHandler handler) {
-		handler.response(null, new AuScript(handler, "document.getElementById('g_"+tag+"').classList.add('dim');"));
+		handler.response(null, new AuScript(handler, "{var e=document.getElementById('g_"+tag+"'); if (e) {e.classList.add('dim');}}"));
 	}
 
 	public void done(WheelHandler handler) {
-		handler.response(null, new AuScript(handler, "document.getElementById('g_"+tag+"').classList.remove('dim');document.getElementById('g_"+tag+"').classList.add('done');"));
+		handler.response(null, new AuScript(handler, "{var e=document.getElementById('g_"+tag+"'); if (e) {e.classList.remove('dim');e.classList.add('done');}}"));
 	}
 
 	public void onClick(String tag2) {

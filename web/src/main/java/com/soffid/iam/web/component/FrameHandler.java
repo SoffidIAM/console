@@ -258,7 +258,10 @@ public class FrameHandler extends Frame {
 	}
 
 	protected DataModel getModel() {
-		return (DataModel) getFellowIfAny("model");
+		DataModel model = (DataModel) getFellowIfAny("model");
+		if (model == null)
+			model = (DataModel) getPage().getFellowIfAny("model");
+		return model;
 	}
 
 	protected BindContext getForm() {

@@ -20,7 +20,7 @@ public class Application extends AbstractApplication {
 	public void setParent(String parent) {
 		if (parent == null ?  getParent() != null: ! parent.equals(getParent())) {
 			super.setParent(parent);
-			super.setName(parent == null? getRelativeName(): parent+"/"+getRelativeName());
+			super.setName(parent == null || parent.isEmpty()? getRelativeName(): parent+"/"+getRelativeName());
 		}
 	}
 

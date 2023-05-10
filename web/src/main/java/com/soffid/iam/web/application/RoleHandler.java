@@ -44,5 +44,8 @@ public class RoleHandler extends FrameHandler {
 		getNamespace().setVariable("embed", embed, true);
 	}
 	
+	public void importCsv (Event ev) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		new RoleImporter().importCsv(this);
+	}
 
 }

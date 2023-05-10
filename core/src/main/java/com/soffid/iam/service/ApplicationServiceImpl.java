@@ -4337,7 +4337,6 @@ public class ApplicationServiceImpl extends
 	}
 	
 	private ScimHelper generateRedundantRolesQuery(int i, int type, String query) throws InternalErrorException, ParseException, TokenMgrError, UnsupportedEncodingException, ClassNotFoundException, JSONException, EvalException {
-		
 		ScimHelper h = new ScimHelper(RoleAccount.class);
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		h.setConfig(config);

@@ -18,16 +18,21 @@ import com.soffid.iam.web.component.CsvImporter;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class RoleImporter extends CsvImporter< Role > {
-	private String type;
 	private ApplicationService svc;
 	private CrudHandler<Role> handler;
+	private String applicationName;
 
 	public RoleImporter() throws NamingException, CreateException, InternalErrorException {
-		this.type = type;
 		svc = EJBLocator.getApplicationService();
 		handler = EJBLocator.getCrudRegistryService().getHandler(Role.class);
 	}
 	
+	public RoleImporter(String app) throws NamingException, CreateException, InternalErrorException {
+		svc = EJBLocator.getApplicationService();
+		handler = EJBLocator.getCrudRegistryService().getHandler(Role.class);
+		applicationName = app;
+	}
+
 	@Override
 	protected Collection<DataType> getMetadata() throws InternalErrorException, NamingException, CreateException {
 		return EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(Role.class.getName(), null);
@@ -36,6 +41,7 @@ public class RoleImporter extends CsvImporter< Role > {
 	@Override
 	protected Role newObject() throws InternalErrorException, NamingException, CreateException {
 		Role o = new Role();
+		o.setInformationSystemName(applicationName);
 		return o;
 	}
 

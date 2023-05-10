@@ -68,16 +68,6 @@
 		<servlet-name>error400</servlet-name>
 		<servlet-class>com.soffid.iam.ui.bpm.Error400Servlet</servlet-class>
 	</servlet>
-	<servlet>
-		<description>DocumentDownload</description>
-		<servlet-name>download-servlet</servlet-name>
-		<servlet-class>com.soffid.iam.ui.bpm.DownloadServlet</servlet-class>
-	</servlet>
-	<servlet>
-		<description>DocumentUpload</description>
-		<servlet-name>upload-servlet</servlet-name>
-		<servlet-class>com.soffid.iam.ui.bpm.UploadServlet</servlet-class>
-	</servlet>
 
 
 	<!-- servlet per obtindre logs del seycon-server -->
@@ -139,15 +129,6 @@
 	<servlet-mapping>
 		<servlet-name>samlServlet</servlet-name>
 		<url-pattern>/saml/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>download-servlet</servlet-name>
-		<url-pattern>/download/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>upload-servlet</servlet-name>
-		<url-pattern>/upload/*</url-pattern>
 	</servlet-mapping>
 
 

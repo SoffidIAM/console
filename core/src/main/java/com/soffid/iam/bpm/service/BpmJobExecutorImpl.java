@@ -74,6 +74,7 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 			Security.nestedLogin(tenant, "Process "+pi.getId(), Security.ALL_PERMISSIONS);
 			try
 			{
+				jbpmContext.getSession().lock(job, LockMode.UPGRADE);
 				boolean success = job.execute(jbpmContext);
 				if (success)
 					jobSession.deleteJob(job);

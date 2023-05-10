@@ -157,6 +157,7 @@
 								<chmod dir="${basedir}/target/deb/opt/soffid/iam-console-3/bin" perm="750" includes="**" />
 								<exec executable="fakeroot" failonerror="true">
 									<arg value="dpkg-deb" />
+									<arg value="-Zxz" />
 									<arg value="-b" />
 									<arg value="${basedir}/target/deb" />
 									<arg value="target/soffid-iamconsole-${project.version}.deb" />

@@ -46,6 +46,7 @@ public abstract class CsvImporter<E> {
 	protected abstract E load(E object) throws InternalErrorException;
 
 	private DataModel model;
+	private DynamicColumnsDatatable dataTable;
 
 	public void importCsv (FrameHandler frame) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
 		model = frame.getModel();
@@ -63,8 +64,9 @@ public abstract class CsvImporter<E> {
 	}
 
 	public void importCsv (ApplicationRoleHandler frame) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
-		DataTable dt = frame.getListbox();
-		dt.commit();
+		dataTable = frame.getListbox();
+		dataTable.commit();
+		model = null;
 		List<String[]> def = new LinkedList<>();
 		for ( DataType data: getMetadata())
 		{
@@ -125,7 +127,14 @@ public abstract class CsvImporter<E> {
 				throw new UiException("Error loading object "+m, e);
 		}
 		
-		model.refresh();
+		if (model != null)
+			model.refresh();
+		if (dataTable != null) {
+			try {
+				dataTable.refresh();
+			} catch (Exception e) {
+			}
+		}
 		Missatgebox.avis(Labels.getLabel("parametres.zul.import", new Object[] { updates, inserts, removed, unchanged }));
 	}
 

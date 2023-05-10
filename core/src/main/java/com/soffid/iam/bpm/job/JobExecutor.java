@@ -9,10 +9,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import es.caib.seycon.util.Base64;
 
 
 public class JobExecutor {
@@ -120,6 +123,9 @@ public class JobExecutor {
 			} catch (UnknownHostException e) {
 				hostName = "127.0.0.1"; //$NON-NLS-1$
 			}
+			byte data[] = new byte[6]; 
+			new Random().nextBytes(data);
+			hostName += "-"+Base64.encodeBytes(data);
 		}
 		return hostName;
 	}

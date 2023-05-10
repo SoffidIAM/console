@@ -701,7 +701,13 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	}
 
 	public void importCsv (Event ev) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
-		new RoleImporter().importCsv(this);
+		DataSource dt = (DataSource) Path.getComponent(listboxPath);
+		String app = (String) XPathUtils.eval(dt, "name");
+		new RoleImporter(app).importCsv(this);
+	}
+
+	public DataModel getModel() {
+		return (DataModel) getPage().getFellowIfAny("model");
 	}
 
 }

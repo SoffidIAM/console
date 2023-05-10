@@ -8,6 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -23,13 +25,16 @@ import javax.ejb.EJBException;
 import javax.ejb.RemoveException;
 import javax.imageio.ImageIO;
 import javax.naming.NamingException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 import org.zkoss.image.AImage;
+import org.zkoss.util.media.AMedia;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zhtml.impl.AbstractTag;
@@ -47,6 +52,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Datebox;
 import org.zkoss.zul.Div;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Fileupload;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Image;
@@ -270,6 +276,7 @@ public class TaskUI extends FrameHandler implements EventListener {
 	private String definitionName;
 	private List<String> attachmentTags;
 	private InboxHandler inboxHandler;
+	private File tempFile;
 
     public void openTaskInstance(TaskInstance task) throws IOException,
             Exception, ClassNotFoundException, SQLException,
@@ -962,7 +969,7 @@ public class TaskUI extends FrameHandler implements EventListener {
             }
     }
 
-    public void descargarArchivo() throws IOException, DocumentBeanException, BPMException, InterruptedException
+    public void descargarArchivo() throws IOException, DocumentBeanException, BPMException, InterruptedException, InternalErrorException, NamingException, CreateException
     {
             TaskAttachmentManager business= new TaskAttachmentManager(getCurrentTask());
             
@@ -975,7 +982,22 @@ public class TaskUI extends FrameHandler implements EventListener {
                     if( i >= 0)
                     {
                             String tag = attachmentTags.get(i);
-                            Executions.getCurrent().sendRedirect(business.getDownloadURL(tag), "_new"); //$NON-NLS-1$
+                			DocumentService d = business.getDocument(tag);
+                			if (tempFile != null)
+                				tempFile.delete();
+                			tempFile = File.createTempFile("soffid", "-"+d.getExternalName());
+                			FileOutputStream out = new FileOutputStream(tempFile);
+                			d.openDownloadTransfer();
+                			byte[] b;
+                			b = d.nextDownloadPackage(8192);
+                			while (b != null) {
+                				out.write(b);
+                				b = d.nextDownloadPackage(8192);
+                			}
+                			d.endDownloadTransfer();
+                			out.close();
+                			Filedownload.save( new AMedia(d.getExternalName(), null, "application/octet-stream", tempFile, true));
+                			d.closeDocument();
                     }
                     else
                     {
@@ -1008,6 +1030,13 @@ public class TaskUI extends FrameHandler implements EventListener {
 	
 	public void closeProcessViewer (Event event) {
 		event.getTarget().getFellow("visorProcesoWnd").setVisible(false);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		if (tempFile != null)
+			tempFile.delete();
 	}
 
 }

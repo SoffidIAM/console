@@ -8,6 +8,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
@@ -30,6 +32,7 @@ import org.dom4j.DocumentException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.image.AImage;
+import org.zkoss.util.media.AMedia;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
@@ -41,6 +44,7 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.metainfo.PageDefinition;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listbox;
@@ -791,6 +795,8 @@ public class ProcessUI extends FrameHandler {
 
 	private JSONObject currentTasks;
 
+	private File tempFile;
+
     public ClassLoader cargarClasesUI(ProcessInstance proc)
             throws ClassNotFoundException, SQLException, IOException,
             CreateException, NamingException, InternalErrorException {
@@ -816,7 +822,7 @@ public class ProcessUI extends FrameHandler {
         return EJBLocator.getBpmEngine();
     }
 
-    public void descargarArchivo() throws IOException, DocumentBeanException, BPMException, InterruptedException
+    public void descargarArchivo() throws IOException, DocumentBeanException, BPMException, InterruptedException, NamingException, CreateException, InternalErrorException
     {
             ProcessAttachmentManager business= new ProcessAttachmentManager(getCurrentProcess());
             
@@ -828,8 +834,24 @@ public class ProcessUI extends FrameHandler {
                     
                     if( i >= 0)
                     {
-                            String tag = attachmentTags.get(i);
-                            Executions.getCurrent().sendRedirect(business.getDownloadURL(tag), "_new"); //$NON-NLS-1$
+                        String tag = attachmentTags.get(i);
+            			DocumentService d = business.getDocument(tag);
+            			if (tempFile != null)
+            				tempFile.delete();
+            			tempFile = File.createTempFile("soffid", "-"+d.getExternalName());
+            			FileOutputStream out = new FileOutputStream(tempFile);
+            			d.openDownloadTransfer();
+            			byte[] b;
+            			b = d.nextDownloadPackage(8192);
+            			while (b != null) {
+            				out.write(b);
+            				b = d.nextDownloadPackage(8192);
+            			}
+            			d.endDownloadTransfer();
+            			out.close();
+            			
+            			Filedownload.save( new AMedia(d.getExternalName(), null, "application/octet-stream", tempFile, true));
+            			d.closeDocument();
                     }
                     else
                     {
@@ -968,4 +990,9 @@ public class ProcessUI extends FrameHandler {
 		dt.setSelectedIndex(new int[0]);
 	}
 
+	@Override
+	protected void finalize() throws Throwable {
+		if (tempFile != null)
+			tempFile.delete();
+	}
 }

@@ -80,7 +80,7 @@ public class JobExecutorThread extends NotLoggedThread {
 				} else { // no jobs acquired
 					if (isActive) {
 						log.info(Messages.getString("JobExecutorThread.NoJobToExecute")); //$NON-NLS-1$
-						Date expire = new Date ( System.currentTimeMillis() - 12 * 60 * 60 * 1000); // Twelve hours
+						Date expire = new Date ( System.currentTimeMillis() - 2 * 60 * 60 * 1000); // Two hours
 						exec.unlockOverdueJobs(expire);
 						long waitPeriod = getWaitPeriod();
 						if (waitPeriod > 0) {

@@ -100,7 +100,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
-		ScimHelper h = new ScimHelper(objectType);
+		ScimHelper h = new ScimHelper(objectType == null ? CustomObject.class.getName(): objectType);
 		
 		h.setPrimaryAttributes(new String[] { "name", "description"});
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();

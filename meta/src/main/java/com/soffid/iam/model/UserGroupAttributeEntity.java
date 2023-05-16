@@ -28,7 +28,7 @@ public class UserGroupAttributeEntity {
 	@Nullable
 	public java.lang.String value;
 
-	@Column(name = "UGA_UGR_ID", reverseAttribute = "attributes", composition = true)
+	@Column(name = "UGA_UGR_ID", reverseAttribute = "attributes", composition = false)
 	public UsuariGrupEntity userGroup;
 
 	@Column(name = "UGA_TDA_ID")

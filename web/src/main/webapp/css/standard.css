@@ -3098,7 +3098,7 @@ div.options {
 	margin-top: 43px; 
 }
 /*********************** MENU RESPONSIVE **********/
-@media only screen and (max-width: 900px) {
+@media only screen and (max-width: 1080px) {
 	.options .menuoption {
 		width: 250px; 
 		padding: 20px;
@@ -3154,13 +3154,13 @@ div.options {
 	
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 750px) {
 	.options .menuoption,
 	.options.options-small .menuoption {
 		width: 100px;
 		padding: 10px;
 	}
-	
+
 	.options.options .menuoption img,
 	.options.options-small .menuoption img {
 		object-fit: contain;

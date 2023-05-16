@@ -1,0 +1,210 @@
+- name: global-failed-login
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - auto-ack
+  - start-workflow
+  manual-actions:
+  - send-email
+- name: login-different-country
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  - lock-host
+  - register-host
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: robot-login
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  - lock-host
+  - register-host
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: login-from-new-device
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  - lock-host
+  - register-host
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: login-not-recognized
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - auto-ack
+  - start-workflow
+  - lock-account
+  - lock-host
+  - register-host
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: locked-account
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: integration-errors
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - auto-ack
+  - start-workflow
+  manual-actions:
+  - send-email
+- name: disconnected-system
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - auto-ack
+  - start-workflow
+  manual-actions:
+  - send-email
+- name: otp-failures
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: security-exception
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: permissions-granted
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+- name: risk-increase
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+- name: pam-violation
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+- name: duplicated-user
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - lock-host
+  - unlock-host
+  - merge-users

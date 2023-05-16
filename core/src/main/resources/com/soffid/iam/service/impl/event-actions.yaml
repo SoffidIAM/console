@@ -1,0 +1,31 @@
+- name: notify-user
+  handler: com.soffid.iam.service.impl.events.NotifyUser
+  parameters:
+  - body
+  - subject
+- name: register-host
+  handler: com.soffid.iam.service.impl.events.RegisterHost
+- name: send-email
+  handler: com.soffid.iam.service.impl.events.SendEmail
+  parameters:
+  - body
+  - subject
+  - emailAddress
+- name: run-script
+  handler: com.soffid.iam.service.impl.events.RunScript
+  paramaters:
+  - script
+- name: lock-account
+  handler: com.soffid.iam.service.impl.events.LockAccount
+- name: lock-host
+  handler: com.soffid.iam.service.impl.events.LockHost
+- name: notify-admin
+  handler: com.soffid.iam.service.impl.events.NotifyAdmin
+- name: auto-ack
+  handler: com.soffid.iam.service.impl.events.AutoAck
+- name: start-workflow
+  handler: com.soffid.iam.service.impl.events.StartWorkflow
+  parameters:
+  - processDefinition
+
+

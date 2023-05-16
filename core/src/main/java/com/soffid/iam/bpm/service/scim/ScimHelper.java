@@ -151,7 +151,11 @@ public class ScimHelper {
 			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
 		if (extraParameters != null) {
 			for (Entry<String, Object> entry: extraParameters.entrySet()) {
-				queryObject.setParameter(entry.getKey(), entry.getValue());
+				final Object value = entry.getValue();
+				if (value != null && value instanceof Collection)
+					queryObject.setParameterList(entry.getKey(), (Collection) value);
+				else
+					queryObject.setParameter(entry.getKey(), value);
 			}
 			
 		}

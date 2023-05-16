@@ -1680,6 +1680,7 @@ public class ApplicationBootServiceImpl extends
 		Security.nestedLogin(tenant.getName(),  "Anonymous", Security.ALL_PERMISSIONS);
 		try {
 			configureTenantDatabase(tenant.getName());
+			getIssuePolicyService().createPolicies();
 		} finally {
 			Security.nestedLogoff();
 		}

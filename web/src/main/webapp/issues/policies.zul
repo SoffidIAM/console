@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+<?component name="network_acl" macro-uri="network-acl.zul"?>
+<?page id="network"?>
+
+<frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
+	use="com.soffid.iam.web.issue.IssuePolicyHandler" id="frame">
+	<datamodel id="model" rootNode="root" src="issuePolicyDescriptor.xml"/>
+	<div sclass="card" id="card">
+		<div sclass="card__face card__face--front">
+	
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+				<menu2>
+					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('issuePolicy:create')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('issuePolicy:create') &amp;&amp; soffid:isUserInRole('issuePolicy:update')}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+				</menu2>
+			</div>
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.IssuePolicy" 
+				defaultAttributes="type, description"
+				preference="issuePolicy"
+				dataPath="/model:/policy" variableName="query" variableNameText="textQuery"></searchbox>
+
+			<datatable id="listbox" autocommit="true" 
+				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
+				preference="issuePolicy"
+				dataPath="/model:/policy" sortColumn="0"
+				onSelect="ref:frame.showDetails" enablefilter="true">
+			<attribute name="allColumns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.IssuePolicy.type') }
+  value: type
+  default: true
+- name: ${c:l('com.soffid.iam.api.IssuePolicy.description')}
+  value: description
+  default: true
+- name: ${c:l('com.soffid.iam.api.IssuePolicy.actor')}
+  value: actor
+  default: true
+]]></attribute>
+			</datatable>
+		</div>
+		
+		<div sclass="card__face card__face--back">
+			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
+				<pager datatable="listbox"/>
+								
+				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"
+					use="com.soffid.iam.web.component.DatasourceButton3"/>
+			</div>
+			<div class="navigation-bar">
+				<menu2>
+					<menu2item  image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"
+						if="${soffid:isUserInRole('issuePolicy:delete')}" />
+				</menu2>
+			</div>
+			<div id="dades"> 
+				<form id="form" onChangeXPath="ref:frame.onChangeForm"
+					dataPath="/listbox:/." width="100%">
+					<customfield3
+						label="${c:l('com.soffid.iam.api.IssuePolicy.type') }"
+						dataType="string"
+						readonly="true"
+						disabled="true"
+						bind="type"
+						maxlength="100"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.IssuePolicy.description') }"
+						dataType="string"
+						required="false"
+						readonly="${! soffid:isUserInRole('issuePolicy:create') &amp;&amp; !soffid:isUserInRole('issuePolicy:update')}"
+						bind="description"
+						maxlength="100"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.IssuePolicy.actor') }"
+						dataType="role"
+						multiline="false"
+						readonly="${! soffid:isUserInRole('issuePolicy:create') &amp;&amp; !soffid:isUserInRole('issuePolicy:update')}"
+						required="true"
+						bind="actor"/>
+					<datatable dataPath="actions" enablefilter="true"
+						onSelect="ref:frame.selectAction">
+						<attribute name="columns"><![CDATA[
+- name: ${c:l('com.soffid.iam.api.IssuePolicyAction.action') }
+  value: action
+- name: ${c:l('com.soffid.iam.api.IssuePolicyAction.description')}
+  value: description
+]]></attribute>
+					</datatable>
+					<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('issuePolicy:update')}" >
+						<div class="deleteButton" onClick="ref:frame.deleteAction" visible="false">-</div>
+						<div class="addButton" onClick="ref:frame.addAction">+</div>
+					</div>
+				</form>
+			</div>
+			<div style="text-align: right; width: 100%">
+				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+				</databutton>
+				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply" />
+			</div>
+		</div>
+	</div>
+
+	<window 
+	    closable="false"
+		id="action_window"
+		position="center, center" sizable="true"
+		title="${c:l('com.soffid.iam.api.IssuePolicyAction.action')}" visible="false"
+		style="width: 80%; max-width: 800px" onClose="ref:handler.closeAction()">
+
+		<form id="form" width="100%" dataPath="../listbox:/">
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.action') }" dataType="STRING"
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+				bind="action"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.description') }" dataType="STRING" 
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+				bind="description" required="true"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.emailAddress') }" dataType="EMAIL" required="true"
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+				bind="emailAddress" />
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.subject') }" dataType="STRING" required="true"
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+				bind="subject"/>
+			<ckeditor id="body" value=""
+				height="400px"
+				width="100%"
+				/>
+			<codemirror value="" linenumbers="true" visible="true" 
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+			    bind="script" id="script"
+				height="20em"
+				language="java"
+				width="100%">
+			</codemirror>
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.processDefinition') }" dataType="STRING"
+				bind="processDefinition" id="processDefnition" readonly="true"/>
+		</form>
+		<div style="text-align: right; width: 100%">
+			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
+				onClick="ref:frame.closeDetails">
+			</button>
+		</div>
+	</window>
+</frame>

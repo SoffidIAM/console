@@ -862,7 +862,7 @@ public abstract class AplicacioService {
 
 	@Operation (grantees={roles.application_update.class})
 	@Description("Synchronize any user with ")
-	@Transactional(readOnly=true, noRollbackFor={java.lang.Exception.class})
+	@Transactional(readOnly=false, noRollbackFor={java.lang.Exception.class})
 	public void synchronizeRole(Rol rol)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}

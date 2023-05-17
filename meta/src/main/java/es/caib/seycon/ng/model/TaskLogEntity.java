@@ -115,31 +115,31 @@ public abstract class TaskLogEntity {
 		return null;
 	}
 	
-	@DaoFinder("select system.name, count(distinct task.id) from \n"
-			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
-			+ "where task.tenant.id = :tenantId and completed='S'  \n"
-			+ "group by system.name \n"
-			+ "order by system.name")
+	@DaoFinder("select s.name, count(distinct tlo.task.id) from \n"
+			+ "com.soffid.iam.model.TaskLogEntity tlo left outer join tlo.system as s \n"
+			+ "where tlo.task.tenant.id = :tenantId and tlo.completed='S'  \n"
+			+ "group by s.name \n"
+			+ "order by s.name")
 	public Collection<Object[]> countTasksBySystem() {
 		return null;
 	}
 
-	@DaoFinder("select system.name, count(distinct task.id) from \n"
-			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
-			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server and \n"
-			+ "(task.systemName is null or task.systemName = system.name) "
-			+ "group by system.name \n"
-			+ "order by system.name")
+	@DaoFinder("select s.name, count(distinct tlo.task.id) from \n"
+			+ "com.soffid.iam.model.TaskLogEntity tlo left outer join tlo.system as s \n"
+			+ "where tlo.task.tenant.id = :tenantId and tlo.completed='S' and tlo.task.server=:server and \n"
+			+ "(tlo.task.systemName is null or tlo.task.systemName = s.name) "
+			+ "group by s.name \n"
+			+ "order by s.name")
 	public Collection<Object[]> countTasksByServerAndSystem(String server) {
 		return null;
 	}
 
-	@DaoFinder("select system.name, count(distinct task.id) from \n"
-			+ "com.soffid.iam.model.TaskLogEntity tlo\n"
-			+ "where task.tenant.id = :tenantId and completed='S' and task.server=:server and task.serverInstance=:serverInstance and \n"
-			+ "(task.systemName is null or task.systemName = system.name) "
-			+ "group by system.name \n"
-			+ "order by system.name")
+	@DaoFinder("select s.name, count(distinct tlo.task.id) from \n"
+			+ "com.soffid.iam.model.TaskLogEntity tlo left outer join tlo.system as s \n"
+			+ "where tlo.task.tenant.id = :tenantId and tlo.completed='S' and tlo.task.server=:server and tlo.task.serverInstance=:serverInstance and \n"
+			+ "(tlo.task.systemName is null or tlo.task.systemName = s.name) "
+			+ "group by s.name \n"
+			+ "order by s.name")
 	public Collection<Object[]> countTasksByServerAndSystem(String server, String serverInstance) {
 		return null;
 	}

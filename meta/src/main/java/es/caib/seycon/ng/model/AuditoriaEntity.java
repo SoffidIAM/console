@@ -321,7 +321,7 @@ abstract class AuditoriaDataIndex {
 
 @Index (name="SC_AUDITO_USER",	unique=false,
 entity=es.caib.seycon.ng.model.AuditoriaEntity.class,
-columns={"AUD_USUAUD, AUD_TEN_ID, AUD_DATA"})
+columns={"AUD_USUAUD", "AUD_TEN_ID", "AUD_DATA"})
 abstract class AuditoriaUserIndex {
 }
 

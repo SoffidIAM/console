@@ -15,7 +15,7 @@
 
 	<datanode name="policy">
 		<ejb-handler jndi="java:/module/IssuePolicyService-v2">
-			<update-method method="updateRule" returnBean="true">
+			<update-method method="update" returnBean="true">
 				<parameter value="${instance}"/>
 			</update-method>
 		</ejb-handler>

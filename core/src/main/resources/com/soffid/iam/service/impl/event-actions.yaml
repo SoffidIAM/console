@@ -13,7 +13,7 @@
   - emailAddress
 - name: run-script
   handler: com.soffid.iam.service.impl.events.RunScript
-  paramaters:
+  parameters:
   - script
 - name: lock-account
   handler: com.soffid.iam.service.impl.events.LockAccount

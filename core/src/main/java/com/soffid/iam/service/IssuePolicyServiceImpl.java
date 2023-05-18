@@ -150,10 +150,10 @@ public class IssuePolicyServiceImpl extends IssuePolicyServiceBase {
 			def.setLabel(o.optString("nlsLabel", "com.soffid.iam.api.IssueActionDefinition." +  def.getName()));
 			LinkedList<DataType> att = new LinkedList<DataType>();
 			def.setParameters(att);
-			JSONArray parameters = o.getJSONArray("parameters");
+			JSONArray parameters = o.optJSONArray("parameters");
 			if (parameters != null) {
 				for (int j = 0; j < parameters.length(); j++) {
-					String name = parameters.getString(i);
+					String name = parameters.getString(j);
 					DataType dt = getMetadata(name);
 					if (dt != null)
 						att.add(dt);
@@ -165,7 +165,7 @@ public class IssuePolicyServiceImpl extends IssuePolicyServiceBase {
 	}
 
 	private DataType getMetadata(String name) throws InternalErrorException {
-		for (DataType dt: getAdditionalDataService().findDataTypesByObjectTypeAndName2(Issue.class.getName(), name)) {
+		for (DataType dt: getAdditionalDataService().findDataTypesByObjectTypeAndName2(IssuePolicyAction.class.getName(), name)) {
 			return dt;
 		}
 		return null;

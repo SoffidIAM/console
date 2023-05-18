@@ -80,6 +80,7 @@
 						required="true"
 						bind="actor"/>
 					<datatable dataPath="actions" enablefilter="true"
+						id="actions"
 						onSelect="ref:frame.selectAction">
 						<attribute name="columns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.IssuePolicyAction.action') }
@@ -105,36 +106,40 @@
 	<window 
 	    closable="false"
 		id="action_window"
-		position="center, center" sizable="true"
+		position="top center" sizable="true"
 		title="${c:l('com.soffid.iam.api.IssuePolicyAction.action')}" visible="false"
-		style="width: 80%; max-width: 800px" onClose="ref:handler.closeAction()">
+		style="width: 80%; min-width: 700px" onClose="ref:handler.closeDetails()">
 
-		<form id="form" width="100%" dataPath="../listbox:/">
+		<form id="form" width="100%" dataPath="../actions:/.">
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.action') }" dataType="STRING"
+				onChange="ref:frame.changeAction"
+				required="true"
 				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="action"/>
+				bind="action" id="action"/>
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.description') }" dataType="STRING" 
 				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
 				bind="description" required="true"/>
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.emailAddress') }" dataType="EMAIL" required="true"
 				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="emailAddress" />
+				bind="emailAddress" id="emailAddress" />
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.subject') }" dataType="STRING" required="true"
 				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="subject"/>
-			<ckeditor id="body" value=""
-				height="400px"
-				width="100%"
-				/>
-			<codemirror value="" linenumbers="true" visible="true" 
+				bind="subject" id="subject"/>
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.body') }" dataType="HTML" required="true"
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+				bind="body" id="body"/>
+			<customfield3 
 				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
 			    bind="script" id="script"
+			    javascript='{"issue": "com.soffid.iam.api.Issue"}'
+			    multiline="true"
+			    dataType="STRING"
 				height="20em"
-				language="java"
-				width="100%">
-			</codemirror>
+				label="${c:l('com.soffid.iam.api.IssuePolicyAction.script') }"
+				selectIcon="/img/pencil.svg"
+				/>
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.processDefinition') }" dataType="STRING"
-				bind="processDefinition" id="processDefnition" readonly="true"/>
+				bind="processDefinition" id="processDefinition" readonly="true"/>
 		</form>
 		<div style="text-align: right; width: 100%">
 			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 

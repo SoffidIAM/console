@@ -25,6 +25,8 @@ import roles.IssueCreate;
 import roles.IssueDelete;
 import roles.IssueQuery;
 import roles.IssueUpdate;
+import roles.Tothom;
+import roles.anonymous;
 
 @Service()
 @Depends( { IssueEntity.class, IssuePolicyEntity.class, IssueUserEntity.class, IssueHostEntity.class, IssuePolicyActionEntity.class,
@@ -32,6 +34,12 @@ import roles.IssueUpdate;
 	AsyncRunnerService.class,
 	IssuePolicyService.class})
 public class IssueService {
+	@Operation(grantees = { Tothom.class })
+	AsyncList<Issue> findMyIssuesByJsonQueryAsync (@Nullable String query) { return null; }
+
+	@Operation(grantees = { Tothom.class })
+	PagedResult<Issue> findMyIssuesByJsonQuery (@Nullable String query, @Nullable Integer first, @Nullable Integer pageSize) { return null; }
+
 	@Operation(grantees = { IssueQuery.class })
 	AsyncList<Issue> findIssuesByJsonQueryAsync (@Nullable String query) { return null; }
 

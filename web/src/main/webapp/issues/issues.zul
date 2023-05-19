@@ -5,7 +5,7 @@
 <?page id="network"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
-	use="com.soffid.iam.web.issue.IssuePolicyHandler" id="frame">
+	use="com.soffid.iam.web.issue.IssueHandler" id="frame">
 	<datamodel id="model" rootNode="root" src="issuePolicyDescriptor.xml"/>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
@@ -22,21 +22,10 @@
 				dataPath="/model:/policy" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 
-				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
-				preference="issuePolicy"
-				dataPath="/model:/policy" sortColumn="0"
+				use="com.soffid.iam.web.issue.IssueDatatable"
+				preference="issue"
+				dataPath="/model:/issue" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
-			<attribute name="allColumns"><![CDATA[
-- name: ${c:l('com.soffid.iam.api.IssuePolicy.type') }
-  value: type
-  default: true
-- name: ${c:l('com.soffid.iam.api.IssuePolicy.description')}
-  value: description
-  default: true
-- name: ${c:l('com.soffid.iam.api.IssuePolicy.actor')}
-  value: actor
-  default: true
-]]></attribute>
 			</datatable>
 		</div>
 		

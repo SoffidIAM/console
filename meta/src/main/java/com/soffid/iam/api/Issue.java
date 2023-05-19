@@ -25,6 +25,8 @@ public class Issue {
 	Long id;
 	
 	String type;
+	
+	@Nullable String description;
 
 	IssueStatus status;
 	

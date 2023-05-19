@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zkib-model>
+
+	<datanode name="root">
+		<finder name="policy" type="policy">
+			<ejb-finder jndi="java:/module/IssuePolicyService-v2" method="findIssuePoliciesByJsonQueryAsync">
+				<parameter value="${query}"/>
+			</ejb-finder>
+			<new-instance-bean
+				className="com.soffid.iam.api.IssuePolicy">
+			</new-instance-bean>
+		</finder>
+	</datanode>
+
+	<datanode name="policy">
+		<ejb-handler jndi="java:/module/IssuePolicyService-v2">
+			<update-method method="update" returnBean="true">
+				<parameter value="${instance}"/>
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+</zkib-model>

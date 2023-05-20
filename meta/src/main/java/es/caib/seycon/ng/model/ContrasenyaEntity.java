@@ -48,6 +48,16 @@ public abstract class ContrasenyaEntity {
 
 	@Column (name="CTR_IDUSU", translated="user")
 	public es.caib.seycon.ng.model.UsuariEntity usuari;
+	
+	@Column (name="CTR_FAILS")
+	@Nullable
+	public Integer fails;
+
+	@Column (name="CTR_UNLOCK")
+	@Nullable
+	public java.util.Date unlockDate;
+
+
 
 	@Operation(translated="findByUserDomain")
 	@DaoFinder("from com.soffid.iam.model.PasswordEntity as contrasenyaEntity \n"

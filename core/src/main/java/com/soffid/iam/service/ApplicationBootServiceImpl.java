@@ -1205,6 +1205,8 @@ public class ApplicationBootServiceImpl extends
 				pol.setMaximumPeriodExpired(new Long(365));
 				pol.setType("M"); //$NON-NLS-1$
 				pol.setUserType(tu.getCode());
+				pol.setMaxFailures(3);
+				pol.setUnlockAfterSeconds(600);
 				dominiSvc.create(pol);
 			}
 		}

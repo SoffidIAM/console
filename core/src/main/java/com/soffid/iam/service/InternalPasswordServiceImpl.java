@@ -41,6 +41,9 @@ import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
 
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
@@ -831,7 +834,13 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	protected PasswordValidation handleCheckPassword(com.soffid.iam.model.UserEntity user,
 			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password,
 			boolean checkTrusted, boolean checkExpired) throws java.lang.Exception {
-		
+		return checkUserPassword(user, null, passwordDomain, password, checkTrusted, checkExpired);
+	}
+	
+	protected PasswordValidation checkUserPassword(com.soffid.iam.model.UserEntity user,
+			AccountEntity account,
+			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password,
+			boolean checkTrusted, boolean checkExpired) throws java.lang.Exception {
 		log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName());
 		
 		if (user.getActive().equals("N")) { //$NON-NLS-1$
@@ -840,9 +849,20 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			return PasswordValidation.PASSWORD_WRONG;
 		}
 		
+		PasswordPolicyEntity ppe = getPasswordPolicyEntityDao().findByPasswordDomainAndUserType(passwordDomain.getName(), user.getUserType().getName());
+		if (ppe == null)
+			return PasswordValidation.PASSWORD_WRONG;
+		
+		PasswordEntity lastContra = null;
 		for (PasswordEntity contra : getPasswordEntityDao().findLastByUserDomain(user, passwordDomain)) {
 			if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") //$NON-NLS-1$
 					|| contra.getActive().equals("E"))) {
+				lastContra = contra;
+				if ( isLocked (contra, ppe)) {
+					log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Password is temporarily locked");
+					updateFailures (contra, account, ppe);
+					return PasswordValidation.PASSWORD_WRONG;
+				}
 				if ( isRightPassword(password, contra) ) {
 					if (debugPasswords()) {
 		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password matches");
@@ -850,11 +870,18 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 					if (new Date().before(contra.getExpirationDate())) {
 						if (debugPasswords()) 
 			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD");
-						updateAccountLastLogin(user, passwordDomain);
+						if (account == null)
+							updateAccountLastLogin(user, passwordDomain);
+						else { 
+							account.setLastLogin(new Date());
+							getAccountEntityDao().update(account);
+						}
+						resetFailures (contra, ppe);
 						return PasswordValidation.PASSWORD_GOOD;
 					} else if (checkExpired) {
 						if (debugPasswords()) 
 			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : EXPIRED");
+						resetFailures (contra, ppe);
 						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
 					} else {
 						if (debugPasswords()) 
@@ -893,8 +920,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							handleStoreAndForwardPassword(user, passwordDomain, password, false);
 							return PasswordValidation.PASSWORD_GOOD;
 						}
-						else
+						else {
+							if (lastContra != null) updateFailures (lastContra, account, ppe);
 							return PasswordValidation.PASSWORD_WRONG;
+						}
 					} finally {
 						currentValidationRequests.remove(hash);
 					}
@@ -903,6 +932,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		} catch (NoSuchBeanDefinitionException e) {
 
 		}
+		
 		if (checkTrusted && !taskQueue && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
 			log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
 			for (UserAccountEntity userAccount : user.getAccounts()) {
@@ -918,6 +948,64 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 
 		return PasswordValidation.PASSWORD_WRONG;
+	}
+
+	private void resetFailures(PasswordEntity contra, PasswordPolicyEntity ppe) {
+		if (contra.getFails() != null) {
+			contra.setFails(null);
+			contra.setUnlockDate(null);
+			getPasswordEntityDao().update(contra);
+		}
+	}
+
+	private void updateFailures(PasswordEntity contra, AccountEntity account2, PasswordPolicyEntity ppe) throws Exception {
+		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
+		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
+			if (ppe.getUnlockAfterSeconds() != null) {
+				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
+				if (account2 != null) {
+					auditLockAccount(contra.getUser().getUserName(), account2);
+				}
+				else {
+					for (AccountEntity account: getAccountEntityDao().findByUserAndSystem(contra.getUser().getUserName(), 
+							handleGetDefaultDispatcher())) {
+						auditLockAccount(contra.getUser().getUserName(), account);
+					}
+				}
+			} else {
+				contra.setUnlockDate(null);
+				if (account2 != null) {
+					account2.setStatus(AccountStatus.LOCKED);
+					getAccountEntityDao().update(account2);
+					auditLockAccount(contra.getUser().getUserName(), account2);
+				}
+				else {
+					for (AccountEntity account: getAccountEntityDao().findByUserAndSystem(contra.getUser().getUserName(), 
+							handleGetDefaultDispatcher())) {
+						account.setStatus(AccountStatus.LOCKED);
+						getAccountEntityDao().update(account);
+						auditLockAccount(contra.getUser().getUserName(), account);
+					}
+				}
+			}
+		}
+		getPasswordEntityDao().update(contra);
+	}
+
+	private boolean isLocked(PasswordEntity contra, PasswordPolicyEntity ppe) {
+		if (ppe.getMaxFailures() == null)
+			return false;
+		if (contra.getFails() == null ||
+				contra.getFails().intValue() < ppe.getMaxFailures().intValue()) {
+			return false;
+		}
+		else {
+			if (contra.getUnlockDate() == null || contra.getUnlockDate().before(new Date()))
+				return false;
+			else
+				return true;
+			
+		}
 	}
 
 	class ThreadInfo {
@@ -1419,22 +1507,35 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		if (account.getType().equals(AccountType.USER)) {
 			UserEntity user = getUsuari(account);
 			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
-			return handleCheckPassword(user, passwordDomain, password, checkTrusted, checkExpired);
+			return checkUserPassword(user, account, passwordDomain, password, checkTrusted, checkExpired);
 		} else {
+			PasswordPolicyEntity ppe = getPasswordPolicyEntityDao()
+					.findByPasswordDomainAndUserType(account.getSystem().getPasswordDomain().getName(), 
+							account.getPasswordPolicy().getName());
+			if (ppe == null)
+				return PasswordValidation.PASSWORD_WRONG;
+
 			AccountPasswordEntity contra = getAccountPasswordEntityDao().findLastByAccount(account.getId());
 			if (contra != null && (contra.getActive().equals("S") || //$NON-NLS-1$
 					contra.getActive().equals("N") || contra //$NON-NLS-1$ //$NON-NLS-2$
 							.getActive().equals("E"))) { //$NON-NLS-1$
+				if (isLocked(contra, ppe) ) {
+					log.info("CheckAccountPassword " +account.getName()+" @ "+account.getSystem().getName() + " : Password is temporarily locked");
+					updateFailures (contra, ppe);
+					return PasswordValidation.PASSWORD_WRONG;
+				}
 				if (isRightPassword(password, contra)) 
 				{
 					if (debugPasswords()) {
 		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : Current password matches");
 		            }				
 					if (new Date().before(contra.getExpirationDate())) {
+						resetFailures (contra, ppe);
 						if (debugPasswords()) 
 			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : GOOD");
 						return PasswordValidation.PASSWORD_GOOD;
 					} else if (checkExpired) {
+						resetFailures (contra, ppe);
 						if (debugPasswords()) 
 			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : EXPIRED");
 						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
@@ -1475,8 +1576,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 								handleStoreAccountPassword(account, password, false, null);
 								return PasswordValidation.PASSWORD_GOOD;
 							}
-							else
+							else {
+								updateFailures (contra, ppe);
 								return PasswordValidation.PASSWORD_WRONG;
+							}
 						} finally {
 							currentAccountValidationRequests.remove(hash);
 						}
@@ -1494,6 +1597,43 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 			return PasswordValidation.PASSWORD_WRONG;
 		}
+	}
+
+	private void resetFailures(AccountPasswordEntity contra, PasswordPolicyEntity ppe) {
+		if (contra.getFails() != null) {
+			contra.setFails(null);
+			contra.setUnlockDate(null);
+			getAccountPasswordEntityDao().update(contra);
+		}
+	}
+
+	private void updateFailures(AccountPasswordEntity contra, PasswordPolicyEntity ppe) throws Exception {
+		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
+		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
+			auditLockAccount(null, contra.getAccount());
+			if (ppe.getUnlockAfterSeconds() != null) {
+				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
+			} else {
+				contra.setUnlockDate(null);
+				contra.getAccount().setStatus(AccountStatus.LOCKED);
+				getAccountEntityDao().update(contra.getAccount());
+			}
+		}
+		getAccountPasswordEntityDao().update(contra);
+	}
+
+	private boolean isLocked(AccountPasswordEntity contra, PasswordPolicyEntity ppe) {
+		if (ppe.getMaxFailures() == null)
+			return false;
+		if (contra.getFails() == null ||
+				contra.getFails().intValue() < ppe.getMaxFailures().intValue()) {
+			if (contra.getUnlockDate() == null || contra.getUnlockDate().before(new Date()))
+				return false;
+			else
+				return false;
+		}
+		else
+			return true;
 	}
 
 	public boolean debugPasswords() {
@@ -1999,4 +2139,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		return null;
 	}
 
+    private void auditLockAccount(String user, AccountEntity account) throws InternalErrorException {
+
+    	Audit auditoria = new Audit();
+        auditoria.setAction("Y"); //$NON-NLS-1$
+        auditoria.setUser(user);
+        auditoria.setAccount(account.getName());
+        auditoria.setDatabase(account.getSystem().getName());
+        auditoria.setAuthor(null);
+        auditoria.setCalendar(Calendar.getInstance());
+        auditoria.setObject("SC_ACCOUN"); //$NON-NLS-1$
+        
+        ServiceLocator.instance().getAuditService().create(auditoria);
+    }
 }

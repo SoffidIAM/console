@@ -39,6 +39,14 @@ public abstract class AccountPasswordEntity {
 	@Column (name="APW_ACC_ID")
 	public es.caib.seycon.ng.model.AccountEntity account;
 
+	@Column (name="APW_FAILS")
+	@Nullable
+	public Integer fails;
+
+	@Column (name="APW_UNLOCK")
+	@Nullable
+	public java.util.Date unlockDate;
+
 	@DaoFinder("select pwd\n"
 			+ "from com.soffid.iam.model.AccountPasswordEntity as pwd\n"
 			+ "where pwd.account.id = :accountId\n"

@@ -916,7 +916,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (anyChange)
 			ae.setLastChange(new Date());
 		
-		getAccountEntityDao().update(ae);
+		getAccountEntityDao().update(ae, anyChange ? "U": null);
 
 		account = getVaultService().addToFolder(account);
 

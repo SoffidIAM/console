@@ -1,6 +1,7 @@
 package com.soffid.iam.web.main;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +13,7 @@ import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zul.Html;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.zk.BPMLabelLocator;
@@ -63,9 +65,19 @@ public class LoginPage extends Html {
 			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
 			boolean saml = "true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml"));
 			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
+			byte[] motd = ServiceLocator.instance().getConfigurationService().getBlob("soffid.auth.motd");
+			String motdString = motd == null ? null: new String(motd, StandardCharsets.UTF_8);
+			if (error.isEmpty() && motdString != null && ! motdString.trim().isBlank() ) {
+				setVariable("showMotd", true, false);
+				setVariable("motd", motdString, false);
+			} else {
+				setVariable("showMotd", false, false);
+				setVariable("motd", "", false);
+			}
 			setVariable("showTenant", showTenant? "true": "false", false);
 			setVariable("tenantStyle", showTenant? "": "display:none", false);
 			setVariable("tenant", tenant, false);
+			setVariable("redirect", null, false);
 			boolean maintenance = "true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||
 					"true".equals(System.getProperty("soffid.auth.maintenance"));
 			if (saml && !maintenance)
@@ -83,14 +95,14 @@ public class LoginPage extends Html {
 				if (!autoLogin)
 				{
 					boolean classic = ! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic"));
-					if (!classic)
+					if (!classic )
 					{
-						response("hide-loginbox", new org.zkoss.zk.au.out.AuScript(this, "document.getElementById('loginbox').setAttribute(\"style\",\"display: none\");"));
-						currentExecution.sendRedirect( "/saml");
+						setVariable("redirect", Executions.getCurrent().getContextPath()+"/saml", false);
 					}
 				} else {
 					setVariable("user", user, false);
 					setVariable("password", password, false);
+					setVariable("showMotd", false, false);
 				}
 				setVariable("autoLogin", autoLogin, false);
 			} else {

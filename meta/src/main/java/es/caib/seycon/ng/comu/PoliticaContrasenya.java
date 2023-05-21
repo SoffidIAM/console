@@ -102,6 +102,11 @@ public class PoliticaContrasenya {
 	@Attribute(translated = "passwordDomainCode" )
 	public java.lang.String codiDominiContrasenya;
 
+	@Nullable
+	Integer maxFailures;
+	
+	@Nullable
+	Integer unlockAfterSeconds;
 
 	@Description("Enables users to query password value")
 	public boolean allowPasswordQuery;

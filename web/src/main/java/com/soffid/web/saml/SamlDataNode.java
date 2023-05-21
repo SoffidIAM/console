@@ -1,5 +1,7 @@
 package com.soffid.web.saml;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
@@ -35,6 +37,7 @@ public class SamlDataNode extends SimpleDataNode {
 		updateParam("soffid.saml.principalAttribute", c.principalAttribute);
 		updateParam("soffid.externalURL", c.hostName);
 		updateParam("soffid.auth.maintenance", c.maintenanceMode ? "true": "false");
+		EJBLocator.getConfigurationService().updateBlob("soffid.auth.motd", c.motd == null ? null: c.motd.getBytes(StandardCharsets.UTF_8));
 		
 
 		if (c.enableLinotp)

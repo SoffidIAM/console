@@ -20,6 +20,7 @@ public class SAMLConfig {
 	public boolean maintenanceMode;
 	protected String principalAttribute;
 	protected boolean samlDebug;
+	String motd;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -162,5 +163,13 @@ public class SAMLConfig {
 	
 	public void setSamlDebug(boolean samlDebug) {
 		this.samlDebug = samlDebug;
+	}
+	
+	public String getMotd() {
+		return motd;
+	}
+	
+	public void setMotd(String motd) {
+		this.motd = motd;
 	}
 }

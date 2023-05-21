@@ -115,6 +115,15 @@ public abstract class PoliticaContrasenyaEntity {
 	@Column (name="PCD_COMPLEX", defaultValue="false")
 	public Boolean complexPasswords;
 
+	@Nullable
+	@Description("Maximum number of failures before locking")
+	@Column(name = "PCD_MAXFAI")
+	Integer maxFailures;
+	
+	@Nullable
+	@Description("Automatically unlock after X seconds. Null locks permanently")
+	Integer unlockAfterSeconds;
+
 	@Operation(translated="findByPasswordDomain")
 	@DaoFinder("select pol from \n"
 			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"

@@ -2,6 +2,7 @@ package com.soffid.iam.tomcat.service;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import org.apache.tomee.catalina.TomcatSecurityService;
 
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.OUType;
@@ -27,6 +29,7 @@ import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
@@ -42,6 +45,7 @@ import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownUserException;
 
@@ -160,7 +164,10 @@ public class LoginServiceImpl implements LoginService {
 
 						if (userName != null) {
 							prefsSvc.setUserPreference(userName,"last_login", "" + System.currentTimeMillis());
+							auditLoginAction(userName, "S");
 						}
+						acc.setLastLogin(Calendar.getInstance());
+						as.updateAccount(acc);
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
 						roles.add("PASSWORD:EXPIRED");
@@ -171,7 +178,11 @@ public class LoginServiceImpl implements LoginService {
 								groups, soffidRoles,
 								holder);
 						log.info(masterMessage = principal.getName() + " login accepted with expired password");
+						acc.setLastLogin(Calendar.getInstance());
+						as.updateAccount(acc);
+						auditLoginAction(userName, "S");
 					} else {
+						auditLoginAction(userName, "P");
 						log.info(masterMessage = username + " login rejected. Invalid password");
 						return null;
 					}
@@ -205,6 +216,8 @@ public class LoginServiceImpl implements LoginService {
 			} finally {
 				exitWebapp(state);
 			}
+		} catch (AccountAlreadyExistsException e) {
+			throw new SecurityException ("Error during login process", e);
 		} catch (UnknownUserException e) {
 			throw new SecurityException ("Error during login process", e);
 		} catch (InternalErrorException e) {
@@ -373,4 +386,17 @@ public class LoginServiceImpl implements LoginService {
 			return new LinkedList<String>(Arrays.asList(rolesArray));
 		}
 	}
+	
+    private void auditLoginAction(String user, String action) throws InternalErrorException {
+
+    	Audit auditoria = new Audit();
+        auditoria.setAction(action); //$NON-NLS-1$
+        auditoria.setUser(user);
+        auditoria.setAuthor(null);
+        auditoria.setCalendar(Calendar.getInstance());
+        auditoria.setObject("LOGIN"); //$NON-NLS-1$
+        
+        ServiceLocator.instance().getAuditService().create(auditoria);
+    }
+
 }

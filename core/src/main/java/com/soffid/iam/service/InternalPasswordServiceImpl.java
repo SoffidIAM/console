@@ -17,6 +17,7 @@ import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.Task;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
@@ -860,7 +861,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				lastContra = contra;
 				if ( isLocked (contra, ppe)) {
 					log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Password is temporarily locked");
-					updateFailures (contra, account, ppe);
+					if (checkTrusted) updateFailures (contra, account, ppe);
 					return PasswordValidation.PASSWORD_WRONG;
 				}
 				if ( isRightPassword(password, contra) ) {
@@ -921,7 +922,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							return PasswordValidation.PASSWORD_GOOD;
 						}
 						else {
-							if (lastContra != null) updateFailures (lastContra, account, ppe);
+							if (lastContra != null && checkTrusted) 
+								updateFailures (lastContra, account, ppe);
 							return PasswordValidation.PASSWORD_WRONG;
 						}
 					} finally {
@@ -933,17 +935,31 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		}
 		
-		if (checkTrusted && !taskQueue && "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
-			log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
-			for (UserAccountEntity userAccount : user.getAccounts()) {
-				AccountEntity ae = userAccount.getAccount();
-				if (!ae.isDisabled() && ae.getSystem().getPasswordDomain().getId().equals(passwordDomain.getId())) {
-					PasswordValidation status = validatePasswordOnServer(ae, password);
-					if (status.equals(PasswordValidation.PASSWORD_GOOD)) {
-						updateAccountLastLogin(user, passwordDomain);
-						return status;
+		if (checkTrusted) {
+			if (!taskQueue) {
+				// Console
+				if ("true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
+					log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
+					for (UserAccountEntity userAccount : user.getAccounts()) {
+						AccountEntity ae = userAccount.getAccount();
+						if (!ae.isDisabled() && ae.getSystem().getPasswordDomain().getId().equals(passwordDomain.getId()) &&
+								"S".equals(ae.getSystem().getTrusted())) {
+							PasswordValidation status = validatePasswordOnServer(ae, password);
+							if (status.equals(PasswordValidation.PASSWORD_GOOD)) {
+								return status;
+							}
+						}
 					}
 				}
+				updateFailures (lastContra, account, ppe);
+			} else {
+				// Sync server
+				SoffidPrincipal p = Security.getSoffidPrincipal();
+				// Do not lock twice. The console will lock it
+				if (p == null ||
+					p.getName() ==null ||
+					!p.getName().endsWith("\\$$INTERNAL$$"))
+						updateFailures (lastContra, account, ppe);
 			}
 		}
 
@@ -959,6 +975,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private void updateFailures(PasswordEntity contra, AccountEntity account2, PasswordPolicyEntity ppe) throws Exception {
+		if (contra == null)
+			return;
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
 			if (ppe.getUnlockAfterSeconds() != null) {

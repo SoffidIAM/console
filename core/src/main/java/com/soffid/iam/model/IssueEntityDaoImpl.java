@@ -1,5 +1,7 @@
 package com.soffid.iam.model;
 
+import java.util.LinkedList;
+
 import com.soffid.iam.api.Issue;
 
 public class IssueEntityDaoImpl extends IssueEntityDaoBase {
@@ -20,6 +22,8 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 		target.setRoleAccount(source.getRoleAccount() == null? null: getRoleAccountEntityDao().toRoleAccount(source.getRoleAccount()));
 		target.setRule(source.getRule() == null ? null: getPamRuleEntityDao().toPamRule(source.getRule()));
 		target.setAccount(source.getAccount() == null ? null: getAccountEntityDao().toAccount(source.getAccount()));
+		target.setUsers(getIssueUserEntityDao().toIssueUserList(source.getUsers()));
+		target.setHosts(getIssueHostEntityDao().toIssueHostList(source.getHosts()));
 	}
 
 }

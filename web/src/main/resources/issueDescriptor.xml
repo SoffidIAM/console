@@ -3,18 +3,15 @@
 <zkib-model>
 
 	<datanode name="root">
-		<finder name="policy" type="policy">
-			<ejb-finder jndi="java:/module/IssuePolicyService-v2" method="findIssuePoliciesByJsonQueryAsync">
+		<finder name="issue" type="issue">
+			<ejb-finder jndi="java:/module/IssueService-v2" method="findIssuesByJsonQueryAsync">
 				<parameter value="${query}"/>
 			</ejb-finder>
-			<new-instance-bean
-				className="com.soffid.iam.api.IssuePolicy">
-			</new-instance-bean>
 		</finder>
 	</datanode>
 
-	<datanode name="policy">
-		<ejb-handler jndi="java:/module/IssuePolicyService-v2">
+	<datanode name="issue">
+		<ejb-handler jndi="java:/module/IssueService-v2">
 			<update-method method="update" returnBean="true">
 				<parameter value="${instance}"/>
 			</update-method>

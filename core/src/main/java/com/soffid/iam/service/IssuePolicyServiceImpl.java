@@ -107,7 +107,7 @@ public class IssuePolicyServiceImpl extends IssuePolicyServiceBase {
 				if (action.getId().equals(action2.getId())) {
 					getIssuePolicyActionEntityDao().issuePolicyActionToEntity(action2, action, true);
 					getIssuePolicyActionEntityDao().update(action);
-					it.next();
+					it.remove();
 					it2.remove();
 					break;
 				}

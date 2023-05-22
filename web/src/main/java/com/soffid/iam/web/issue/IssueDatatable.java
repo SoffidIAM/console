@@ -29,7 +29,7 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 	HashMap<String, System> systems = new HashMap<>();
 
 	static String[] defaultColumns = {
-			"type", "created", "status", "acknwoledged", "solved"
+			"type", "description", "created", "status"
 	};
 	
 	public IssueDatatable() throws Exception {
@@ -38,7 +38,7 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 	public Collection<DataType> getDataTypes() throws Exception {
 		HashSet<String> names = new HashSet<>();
 		LinkedList<DataType> l = new LinkedList<DataType>( 
-				EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(Account.class.getName(), null));
+				EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(Issue.class.getName(), null));
 		for (Iterator<DataType> it = l.iterator(); it.hasNext();) {
 			DataType dt = it.next();
 			names.add(dt.getName());
@@ -63,17 +63,19 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 			s.put("$class", "grayed");
 		
 		StringBuffer sb = new StringBuffer();
-		for (IssueUser user: a.getUsers()) {
-			if (sb.length() > 0) sb.append(" ");
-			sb.append(user.getUserName());
-		}
+		if (a.getUsers() != null)
+			for (IssueUser user: a.getUsers()) {
+				if (sb.length() > 0) sb.append(" ");
+				sb.append(user.getUserName());
+			}
 		s.put("users", sb.toString());
 
 		sb = new StringBuffer();
-		for (IssueHost host: a.getHosts()) {
-			if (sb.length() > 0) sb.append(" ");
-			sb.append(host.getHostName());
-		}
+		if (a.getHosts() != null)
+			for (IssueHost host: a.getHosts()) {
+				if (sb.length() > 0) sb.append(" ");
+				sb.append(host.getHostName());
+			}
 		s.put("hosts", sb.toString());
 		return s;
 	}

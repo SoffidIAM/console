@@ -44,6 +44,9 @@ import es.caib.seycon.ng.comu.AccountType;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueStatus;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
@@ -60,6 +63,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -961,6 +965,19 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private void updateFailures(PasswordEntity contra, AccountEntity account2, PasswordPolicyEntity ppe) throws Exception {
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
+			if (ppe.getMaxFailures() + 1 == contra.getFails()) {
+				Issue issue = new Issue();
+				if (account2 != null)
+					issue.setAccount(getAccountEntityDao().toAccount(account2));
+				IssueUser iu = new IssueUser();
+				iu.setUserName(contra.getUser().getUserName());
+				iu.setUserId(contra.getUser().getId());
+				issue.setUsers(Arrays.asList(iu));
+				issue.setCreated(new Date());
+				issue.setStatus(IssueStatus.NEW);
+				issue.setType("locked-account");
+				getIssueService().createInternalIssue(issue);
+			}
 			if (ppe.getUnlockAfterSeconds() != null) {
 				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
 				if (account2 != null) {
@@ -1610,8 +1627,16 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private void updateFailures(AccountPasswordEntity contra, PasswordPolicyEntity ppe) throws Exception {
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
-			auditLockAccount(null, contra.getAccount());
-			if (ppe.getUnlockAfterSeconds() != null) {
+			if (ppe.getMaxFailures() + 1 == contra.getFails()) {
+				auditLockAccount(null, contra.getAccount());
+				Issue issue = new Issue();
+				issue.setAccount(getAccountEntityDao().toAccount(contra.getAccount()));
+				issue.setCreated(new Date());
+				issue.setStatus(IssueStatus.NEW);
+				issue.setType("locked-account");
+				getIssueService().createInternalIssue(issue);
+			}
+			if (ppe.getMaxFailures().intValue() == contra.getFails().intValue()) {
 				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
 			} else {
 				contra.setUnlockDate(null);

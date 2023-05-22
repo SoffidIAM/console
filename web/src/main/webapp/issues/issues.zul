@@ -6,20 +6,21 @@
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	use="com.soffid.iam.web.issue.IssueHandler" id="frame">
-	<datamodel id="model" rootNode="root" src="issuePolicyDescriptor.xml"/>
+	<datamodel id="model" rootNode="root" src="issueDescriptor.xml"/>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 	
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.IssuePolicy" 
 				defaultAttributes="type, description"
 				preference="issuePolicy"
-				dataPath="/model:/policy" variableName="query" variableNameText="textQuery"></searchbox>
+				dataPath="/model:/issue" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.issue.IssueDatatable"

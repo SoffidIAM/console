@@ -20,7 +20,7 @@ public class IssueUserEntityDaoImpl extends IssueUserEntityDaoBase {
 	@Override
 	public void issueUserToEntity(IssueUser source, IssueUserEntity target, boolean copyIfNull) {
 		super.issueUserToEntity(source, target, copyIfNull);
-		if (source.getUserId() == null)
+		if (source.getUserId() != null)
 			target.setUser(getUserEntityDao().load(source.getUserId()));
 		else
 			target.setUser(null);

@@ -57,11 +57,11 @@ public class IssueServiceImpl extends IssueServiceBase {
 	Log log = LogFactory.getLog(getClass());
 	
 	@Override
-	protected AsyncList<Issue> handleFindIssuesByJsonQueryAsync(String query) throws Exception {
+	protected AsyncList<Issue> handleFindMyIssuesByJsonQueryAsync(String query) throws Exception {
 		AsyncList<Issue> l = new AsyncList<>();
 		getAsyncRunnerService().run(() -> {
 			try {
-				findIssues(query, null, null, l);
+				findMyIssues(query, null, null, l);
 			} catch (Exception e) {
 				l.cancel(e);
 			}
@@ -69,7 +69,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 		return l;
 	}
 
-	private PagedResult<Issue> findIssues(String query, Integer start, Integer pageSize, List<Issue> l) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
+	private PagedResult<Issue> findMyIssues(String query, Integer start, Integer pageSize, List<Issue> l) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
 		final SoffidPrincipal soffidPrincipal = Security.getSoffidPrincipal();
 		String[] roles = soffidPrincipal.getSoffidRoles();
 		int rolesStep = 100;
@@ -86,7 +86,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 			if (newRoles.size() < rolesStep && soffidPrincipal.getUserName() != null)
 				newRoles.add(soffidPrincipal.getUserName());
 			
-			ScimHelper h = new ScimHelper(User.class);
+			ScimHelper h = new ScimHelper(Issue.class);
 			CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 			config.setFirstResult(start);
 			config.setMaximumResultSize(pageSize);
@@ -198,10 +198,10 @@ public class IssueServiceImpl extends IssueServiceBase {
 	}
 
 	@Override
-	protected PagedResult<Issue> handleFindIssuesByJsonQuery(String query, Integer first, Integer pageSize)
+	protected PagedResult<Issue> handleFindMyIssuesByJsonQuery(String query, Integer first, Integer pageSize)
 			throws Exception {
 		LinkedList<Issue> l = new LinkedList<>();
-		return findIssues(query, first, pageSize, l);
+		return findMyIssues(query, first, pageSize, l);
 	}
 
 	@Override
@@ -282,4 +282,47 @@ public class IssueServiceImpl extends IssueServiceBase {
 			getIssueEntityDao().remove(entity);
 	}
 
+	@Override
+	protected AsyncList<Issue> handleFindIssuesByJsonQueryAsync(String query) throws Exception {
+		AsyncList<Issue> l = new AsyncList<>();
+		getAsyncRunnerService().run(() -> {
+			try {
+				findIssues(query, null, null, l);
+			} catch (Exception e) {
+				l.cancel(e);
+			}
+		}, l);
+		return l;
+	}
+
+	@Override
+	protected PagedResult<Issue> handleFindIssuesByJsonQuery(String query, Integer first, Integer pageSize)
+			throws Exception {
+		LinkedList<Issue> l = new LinkedList<>();
+		return findIssues(query, first, pageSize, l);
+	}
+
+
+	private PagedResult<Issue> findIssues(String query, Integer start, Integer pageSize, List<Issue> l) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
+		final IssueEntityDao dao = getIssueEntityDao();
+		PagedResult<Issue> pr = new PagedResult<>();
+		pr.setStartIndex(start);
+		pr.setItemsPerPage(pageSize);
+
+		ScimHelper h = new ScimHelper(Issue.class);
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			IssueEntity ue = (IssueEntity) entity;
+			return dao.toIssue(ue);
+		});
+			
+		h.search(null, query, (Collection) l); 
+		pr.setTotalResults(h.count());
+
+		return pr;
+	}
 }

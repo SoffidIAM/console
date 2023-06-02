@@ -33,6 +33,9 @@
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.description')}
   value: description
   default: true
+- name: ${c:l('com.soffid.iam.api.IssuePolicy.status')}
+  value: status
+  default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.actor')}
   value: actor
   default: true
@@ -70,6 +73,13 @@
 						readonly="${! soffid:isUserInRole('issuePolicy:create') &amp;&amp; !soffid:isUserInRole('issuePolicy:update')}"
 						bind="description"
 						maxlength="100"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.IssuePolicy.status') }"
+						dataType="string"
+						enumeration="com.soffid.iam.api.IssuePolicyStatus"
+						required="false"
+						readonly="${! soffid:isUserInRole('issuePolicy:create') &amp;&amp; !soffid:isUserInRole('issuePolicy:update')}"
+						bind="status"/>
 					<customfield3
 						label="${c:l('com.soffid.iam.api.IssuePolicy.actor') }"
 						dataType="role"

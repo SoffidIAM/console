@@ -3,6 +3,8 @@ package com.soffid.iam.model;
 import java.util.Collection;
 
 import com.soffid.iam.api.IssuePolicy;
+import com.soffid.iam.api.IssuePolicyAction;
+import com.soffid.iam.api.IssuePolicyStatus;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.DaoFinder;
 import com.soffid.mda.annotation.Depends;
@@ -18,6 +20,9 @@ public class IssuePolicyEntity {
 	
 	@Column(name = "EVP_TYPE")
 	String type;
+
+	@Nullable @Column(name = "EVP_STATUS")
+	IssuePolicyStatus status;
 
 	@Nullable @Column(name = "EVP_DESCRI", length = 250)
 	String description;

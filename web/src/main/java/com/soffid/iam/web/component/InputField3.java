@@ -1436,6 +1436,12 @@ public class InputField3 extends Databox
 		else if (dataType != null  && dataType.getType() == TypeEnumeration.BINARY_TYPE && o != null) {
 			return Labels.getLabel("inbox.lblAttachment");
 		}
+		else if (uiHandler != null)
+			try {
+				return uiHandler.translateToUserInterface(this, o);
+			} catch (Exception e) {
+				throw new UiException(e);
+			}
 		else
 			return super.translateToUserInterface(o);
 	}

@@ -17,16 +17,19 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
 import org.zkoss.zk.ui.metainfo.EventHandler;
 import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zk.ui.util.Configuration;
+import org.zkoss.zul.Column;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Grid;
 import org.zkoss.zul.Include;
@@ -42,6 +45,7 @@ import com.soffid.iam.api.DataType;
 import com.soffid.iam.common.TransactionalTask;
 import com.soffid.iam.web.WebDataType;
 import com.soffid.iam.web.component.BulkAction;
+import com.soffid.iam.web.component.Columns;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.MergeAction;
 
@@ -52,6 +56,7 @@ import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.Databox.Type;
 import es.caib.zkib.component.Select;
+import es.caib.zkib.component.Switch;
 import es.caib.zkib.component.Wizard;
 
 
@@ -59,109 +64,172 @@ public class MergeActionHandler extends Window implements AfterCompose {
 	List<Integer> selectedActions; 
 	List<Object> selectedValues;
 	private MergeAction mergeAction;
-	private DataTable invoker;
-	private String name2;
-	private String name1;
-	private Object object1;
-	private Object object2;
+	private Component invoker;
+	private List<String> names;
+	private List<Object> objects;
 	private List<DataType> dataTypes;
 	Map<String, String> values;
 	public MergeActionHandler() {
 		Map args = Executions.getCurrent().getAttributes();
 		if (args != null) {
 			mergeAction = (MergeAction) args.get("mergeAction");
-			invoker = (DataTable) args.get("invoker");
-			object1 = args.get("object1");
-			object2 = args.get("object2");
-			name1 = (String) args.get("name1");
-			name2 = (String) args.get("name2");
+			invoker = (Component) args.get("invoker");
+			objects = (List<Object>) args.get("objects");
+			names = (List<String>) args.get("names");
 			dataTypes = (List<DataType>) args.get("dataTypes");
 		}
 	}
 
 	public void start() throws NamingException, CreateException, InternalErrorException, IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		doHighlighted();
-		Div actions1 = getActions1Grid();
+		Grid actions1 = getActions1Grid();
 		actions1.getChildren().clear();
 		createActions (actions1);
 	}
 
-	private void createActions(Div actions1) throws NamingException, CreateException, InternalErrorException, IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		values = new HashMap<>();
-		String msgSelect = Labels.getLabel("merge.action.select");
-		String msgMerge = Labels.getLabel("merge.action.merge");
-		List<String> listSelect = Arrays.asList(
-				"1: "+String.format(msgSelect, name1),
-				"2: "+String.format(msgSelect, name2));
-		List<String> listMerge = Arrays.asList(
-				"1: "+String.format(msgSelect, name1),
-				"2: "+String.format(msgSelect, name2),
-				"3: "+String.format(msgMerge));
+	boolean isEnabled(int i) {
+		if (objects.size() <= 2) return true;
+		Grid actions1 = getActions1Grid();
+		Row row = (Row) actions1.getRows().getFirstChild();
+		Switch s = (Switch) row.getChildren().get(i+1);
+		return s.isChecked();
+	}
+	
+	private void createActions(Grid actions1) throws NamingException, CreateException, InternalErrorException, IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		actions1.appendChild(new Columns());
+		actions1.getColumns().appendChild(new Column(""));
+		for ( String name: names ) {
+			actions1.getColumns().appendChild(new Column(name));
+		}
+		
+		Rows rows = new Rows();
+		actions1.appendChild(rows);
+		
+		if (names.size() > 2) {
+			Row header = new Row();
+			rows.appendChild(header);
+			header.appendChild(new Label(Labels.getLabel("common.merge")));
+			int pos = 0;
+			for ( String name: names ) {
+				Switch s = new Switch();
+				s.setChecked(true);
+				s.addEventListener("onCheck", onUserSwitch);
+				header.appendChild(s);
+				s.setAttribute("position", pos++);
+			}
+		}
+		
 		for (DataType attribute: dataTypes) {
 			if (attribute.getType() != TypeEnumeration.SEPARATOR &&
 					! attribute.isReadOnly()) {
-				Div d = new Div();
-				d.setStyle("width: 100%; vertical-align: top; border-bottom: solid 1px #808080; margin-top: 3px; margin-bottom: 3px; overflow: hidden");
-				actions1.appendChild(d);
-				Div d1 = new Div();
-				d.appendChild(d1);
-				d1.setStyle("display: inline-block; width: 50%; vertical-align: top; overflow: hidden");
-				Databox input = new Databox();
-				input.setRequired(true);
-				input.setLabel(attribute.getLabel());
-				if (! attribute.isMultiValued()) {
-					input.setValues(listSelect);
-					input.setValue("1");
-				} else {
-					input.setValues(listMerge);
-					input.setValue("3");
+				Row row = new Row();
+				row.setAttribute("attribute", attribute);
+				rows.appendChild(row);
+				Label l = new Label(attribute.getLabel());
+				row.appendChild(l);
+				boolean allNull = true;
+				for (Object object: objects) {
+					Div d = new Div();
+					d.setStyle("height: 30px");
+					d.addEventListener("onClick", onSelectValue);
+					row.appendChild(d);
+					InputField3 output = new InputField3();
+					DataType dt2 = new DataType(attribute);
+					dt2.setLabel(null);
+					output.setDataType(dt2);
+					output.setReadonly(true);
+					output.setLabel(null);
+					d.appendChild(output);
+					output.createField();
+					output.afterCompose();
+					Object v = getObjectValue(object, attribute);
+					if (v != null && ! v.equals("")) {
+						output.setValue(v);
+						allNull = false;
+					}
+					else
+						output.setValue("");
+					if (dt2.isMultiValued() || row.getChildren().size() == 2)
+						d.setSclass("merge reverse");
+					else
+						d.setSclass("merge");
 				}
-				input.setType(Type.LIST);
-				input.setAttribute("dataType", attribute);
-				input.addEventHandler("onChange", new EventHandler(ZScript.parseContent("ref:window.onChangeAttribute"), null));
-				input.afterCompose();
-				d1.appendChild(input);
-				Div d2 = new Div();
-				d2.setStyle("display: inline-block; width: 50%; vertical-align: top; overflow: hidden");
-				d.appendChild(d2);
-				InputField3 output = new InputField3();
-				DataType dt2 = new DataType(attribute);
-				dt2.setLabel(null);
-				output.setDataType(dt2);
-				output.setReadonly(true);
-				output.setLabel(null);
-				d2.appendChild(output);
-				output.createField();
-				output.afterCompose();
-				refreshValue(input, output);
+				if (allNull) row.setVisible(false);
 			}
 		}
 	}
 
-	private void refreshValue(Databox input, InputField3 output) throws WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		String value = (String) input.getValue();
-		DataType dt = output.getDataType();
-		values.put(dt.getName(), value);
-		if ("1".equals(value)) {
-			Object v = getObjectValue(object1, dt);
-			output.setValue(v);
+	EventListener onUserSwitch = new EventListener() {
+		@Override
+		public void onEvent(Event arg0) throws Exception {
+			Switch s = (Switch) arg0.getTarget();
+			Integer pos = (Integer) s.getAttribute("position");
+			Grid actions1 = getActions1Grid();
+			// Verify at least two are checked
+			if (!s.isChecked()) {
+				int count = 0;
+				for ( Component cell = actions1.getRows().getFirstChild().getFirstChild().getNextSibling(); 
+						cell != null;
+						cell = cell.getNextSibling()) {
+					Switch sw = (Switch) cell;
+					if (sw.isChecked()) count++;
+				}
+				if (count <= 1) {
+					s.setChecked(true);
+					return;
+				}
+			}
+			int rownum = 0;
+			for ( Component row = actions1.getRows().getFirstChild().getNextSibling(); 
+					row != null;
+					row = row.getNextSibling(), rownum ++) {
+				Div div = (Div) row.getChildren().get(pos+1);
+				if (s.isChecked()) {
+					if (div.getSclass().equals("merge hidden"))
+						div.setSclass("merge");
+				}
+				else {
+					DataType dt = dataTypes.get(rownum);
+					String oldClass = div.getSclass();
+					div.setClass("merge hidden");
+					if (oldClass.equals("merge reverse") && !dt.isMultiValued()) {
+						for (Component div2 = row.getFirstChild().getNextSibling(); 
+								div2 != null;
+								div2 = div2.getNextSibling()) {
+							if (((Div)div2).getSclass().equals("merge")) {
+								((Div)div2).setSclass("merge reverse");
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
-		else if ("2".equals(value)) {
-			Object v = getObjectValue(object2, dt);
-			output.setValue(getObjectValue(object2, dt));
+	};
+	
+	EventListener onSelectValue = new EventListener() {
+		@Override
+		public void onEvent(Event ev) throws Exception {
+			Component row = ev.getTarget().getParent();
+			Div div = (Div) ev.getTarget();
+			DataType dt = (DataType) row.getAttribute("attribute");
+			if (dt.isMultiValued()) {
+				InputField3 input = (InputField3) ev.getTarget().getFirstChild();
+				if (div.getSclass().equals("merge"))
+					div.setSclass("merge reverse");
+				else
+					div.setSclass("merge");
+			} else {
+				for (Component child = row.getFirstChild().getNextSibling(); child != null; child = child.getNextSibling()) {
+					InputField3 input = (InputField3) child.getFirstChild();
+					if (child == ev.getTarget()) 
+						((Div)child).setSclass("merge reverse");
+					else if (((Div)child).getSclass().equals("merge reverse"))
+						((Div)child).setSclass("merge");
+				}
+			}
 		}
-		else if ("3".equals(value)) {
-			List<Object> l1 = new LinkedList<>();
-			Collection<Object> c1 = (Collection<Object>) getObjectValue(object1, dt);
-			if (c1 != null)
-				l1.addAll(c1);
-			Collection<Object> c2 = (Collection<Object>) getObjectValue(object2, dt);
-			if (c2 != null)
-				l1.addAll(c2);
-			output.setValue(l1);
-		}
-	}
-
+	};
 	private Object getObjectValue(Object object12, DataType dt) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (Boolean.TRUE.equals(dt.getBuiltin())) {
 			return PropertyUtils.getProperty(object12, dt.getName());
@@ -173,38 +241,32 @@ public class MergeActionHandler extends Window implements AfterCompose {
 	public void onChangeAttribute(Event event) throws WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		Databox src = (Databox) event.getTarget();
 		InputField3 target = (InputField3) src.getParent().getNextSibling().getFirstChild();
-		refreshValue(src, target);
+//		refreshValue(src, target);
 	}
 
-	public Div getActions1Grid() {
-		return (Div) getFellow("actions1");
+	public Grid getActions1Grid() {
+		return (Grid) getFellow("actions1");
 	}
 	
-	public static void startWizard (DataTable invoker,
-			Object object1,
-			Object object2,
-			String name1,
-			String name2, 
+	public static void startWizard (Component invoker,
+			List<Object> objects,
+			List<String> names,
 			List<DataType> dataTypes,
 			MergeAction action) throws IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NamingException, CreateException, InternalErrorException {
 		Page p = invoker.getDesktop().getPageIfAny("mergeAction");
 		if ( p == null) {
 			Include i = new Include("/popup/mergeAction.zul");
 			i.setDynamicProperty("mergeAction", action);
-			i.setDynamicProperty("object1", object1);
-			i.setDynamicProperty("object2", object2);
-			i.setDynamicProperty("name1", name1);
-			i.setDynamicProperty("name2", name2);
+			i.setDynamicProperty("objects", objects);
+			i.setDynamicProperty("names", names);
 			i.setDynamicProperty("invoker", invoker);
 			i.setDynamicProperty("dataTypes", dataTypes);
 		i.setPage(invoker.getPage());
 		} else {
 			MergeActionHandler h = (MergeActionHandler) p.getFellow("window");
 			h.invoker = invoker;
-			h.object1 = object1;
-			h.object2 = object2;
-			h.name1 = name1;
-			h.name2 = name2;
+			h.objects = objects;
+			h.names = names;
 			h.dataTypes = dataTypes;
 			h.mergeAction = action;
 			h.start();

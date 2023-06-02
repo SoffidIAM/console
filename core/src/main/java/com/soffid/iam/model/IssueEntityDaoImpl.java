@@ -2,7 +2,13 @@ package com.soffid.iam.model;
 
 import java.util.LinkedList;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import com.soffid.iam.api.Issue;
+import com.soffid.iam.lang.MessageFactory;
+import com.soffid.iam.service.impl.events.IssueTextFormatter;
+
+import es.caib.seycon.ng.comu.Auditoria;
 
 public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 
@@ -24,6 +30,17 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 		target.setAccount(source.getAccount() == null ? null: getAccountEntityDao().toAccount(source.getAccount()));
 		target.setUsers(getIssueUserEntityDao().toIssueUserList(source.getUsers()));
 		target.setHosts(getIssueHostEntityDao().toIssueHostList(source.getHosts()));
+		calculateDescription(source, target);
+
+	}
+
+	private void calculateDescription(IssueEntity source, Issue target) {
+		String msg = MessageFactory.getString("com.soffid.iam.model.issues.messages", 
+				"issue."+source.getType());
+		if (msg != null) {
+			String s = new IssueTextFormatter().format(msg, target, source);
+			target.setDescription(s);
+		}
 	}
 
 }

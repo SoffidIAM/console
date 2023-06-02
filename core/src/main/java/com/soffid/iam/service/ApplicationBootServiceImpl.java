@@ -400,6 +400,12 @@ public class ApplicationBootServiceImpl extends
 				}).start();
 			}
 
+			if (version < 106) { //$NON-NLS-1$
+				cfg.setValue("106"); //$NON-NLS-1$
+				updateTextIndexColumn();
+				configSvc.update(cfg);
+			}
+
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -513,6 +519,13 @@ public class ApplicationBootServiceImpl extends
 			getAdditionalDataService().registerStandardObject("com/soffid/iam/bpm/api/ProcessInstance.ui.json", 
 					null, false);
 			cfg.setValue("110");
+			configSvc.update(cfg);
+		}
+		if (cfg.getValue().equals("110"))
+		{
+			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Issue.ui.json", 
+					null, false);
+			cfg.setValue("111");
 			configSvc.update(cfg);
 		}
 	}
@@ -772,6 +785,27 @@ public class ApplicationBootServiceImpl extends
 					conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ?
 							"UPDATE SC_USULCO SET ULC_DISABLED=false WHERE ULC_DISABLED IS NULL":
 							"UPDATE SC_USULCO SET ULC_DISABLED=0 WHERE ULC_DISABLED IS NULL");
+			stmt.execute();
+			stmt.close();
+
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	private void updateTextIndexColumn() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			PreparedStatement stmt = conn.prepareStatement(
+					conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ?
+							"UPDATE SC_CUOBTY SET COT_TXTIND=false WHERE COT_TXTIND IS NULL":
+							"UPDATE SC_CUOBTY SET COT_TXTIND=0 WHERE COT_TXTIND IS NULL");
 			stmt.execute();
 			stmt.close();
 

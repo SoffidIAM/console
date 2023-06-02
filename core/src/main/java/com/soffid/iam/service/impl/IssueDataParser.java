@@ -20,7 +20,7 @@ public class IssueDataParser {
 		if (instance == null) {
 			JSONArray actions = loadResource("com/soffid/iam/service/impl/event-actions.yaml");
 			JSONArray events = loadResource("com/soffid/iam/service/impl/events.yaml");
-			JSONArray manualActions = loadResource("com/soffid/iam/service/impl/manual-actions.yaml");
+			JSONArray manualActions = loadResource("com/soffid/iam/service/impl/event-manual-actions.yaml");
 			instance = new IssueDataParser(actions, events, manualActions);
 		}
 		return instance;

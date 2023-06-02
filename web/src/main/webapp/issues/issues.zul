@@ -37,56 +37,20 @@
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"
 					use="com.soffid.iam.web.component.DatasourceButton3"/>
 			</div>
-			<div class="navigation-bar">
-				<menu2>
-					<menu2item  image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"
-						if="${soffid:isUserInRole('issuePolicy:delete')}" />
-				</menu2>
-			</div>
 			<div id="dades"> 
 				<form id="form" onChangeXPath="ref:frame.onChangeForm"
 					dataPath="/listbox:/." width="100%">
-					<customfield3
-						label="${c:l('com.soffid.iam.api.IssuePolicy.type') }"
-						dataType="string"
-						readonly="true"
-						disabled="true"
-						bind="type"
-						maxlength="100"/>
-					<customfield3
-						label="${c:l('com.soffid.iam.api.IssuePolicy.description') }"
-						dataType="string"
-						required="false"
-						readonly="${! soffid:isUserInRole('issuePolicy:create') &amp;&amp; !soffid:isUserInRole('issuePolicy:update')}"
-						bind="description"
-						maxlength="100"/>
-					<customfield3
-						label="${c:l('com.soffid.iam.api.IssuePolicy.actor') }"
-						dataType="role"
-						multiline="false"
-						readonly="${! soffid:isUserInRole('issuePolicy:create') &amp;&amp; !soffid:isUserInRole('issuePolicy:update')}"
-						required="true"
-						bind="actor"/>
-					<datatable dataPath="actions" enablefilter="true"
-						id="actions"
-						onSelect="ref:frame.selectAction">
-						<attribute name="columns"><![CDATA[
-- name: ${c:l('com.soffid.iam.api.IssuePolicyAction.action') }
-  value: action
-- name: ${c:l('com.soffid.iam.api.IssuePolicyAction.description')}
-  value: description
-]]></attribute>
-					</datatable>
-					<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('issuePolicy:update')}" >
-						<div class="deleteButton" onClick="ref:frame.deleteAction" visible="false">-</div>
-						<div class="addButton" onClick="ref:frame.addAction">+</div>
-					</div>
+					<div use="com.soffid.iam.web.issue.IssueForm" dataPath="/." id="issueform"/>
 				</form>
 			</div>
 			<div style="text-align: right; width: 100%">
-				<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
-				</databutton>
-				<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply" />
+				<div id="buttons" style="float:left; width: calc(100% - 150px); text-align: left" >
+					<button image="/img/ok-r.svg" label="${c:l('com.soffid.iam.api.IssueActionDefinition.solve')}"
+						onClick="ref:frame.solve" id="solve_button"/> 
+					<button image="/img/ok-r.svg" label="${c:l('com.soffid.iam.api.IssueActionDefinition.auto-ack')}"
+						onClick="ref:frame.ack" id="ack_button"/> 
+				</div>
+				<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" onClick="ref:frame.hideDetails"/> 
 			</div>
 		</div>
 	</div>
@@ -96,42 +60,17 @@
 		id="action_window"
 		position="top center" sizable="true"
 		title="${c:l('com.soffid.iam.api.IssuePolicyAction.action')}" visible="false"
-		style="width: 80%; min-width: 700px" onClose="ref:handler.closeDetails()">
+		style="width: 80%; min-width: 700px" onClose="ref:handler.closeAction()">
 
-		<form id="form" width="100%" dataPath="../actions:/.">
-			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.action') }" dataType="STRING"
-				onChange="ref:frame.changeAction"
-				required="true"
-				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="action" id="action"/>
-			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.description') }" dataType="STRING" 
-				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="description" required="true"/>
-			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.emailAddress') }" dataType="EMAIL" required="true"
-				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="emailAddress" id="emailAddress" />
-			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.subject') }" dataType="STRING" required="true"
-				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="subject" id="subject"/>
-			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.body') }" dataType="HTML" required="true"
-				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-				bind="body" id="body"/>
-			<customfield3 
-				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
-			    bind="script" id="script"
-			    javascript='{"issue": "com.soffid.iam.api.Issue"}'
-			    multiline="true"
-			    dataType="STRING"
-				height="20em"
-				label="${c:l('com.soffid.iam.api.IssuePolicyAction.script') }"
-				selectIcon="/img/pencil.svg"
-				/>
-			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.processDefinition') }" dataType="STRING"
-				bind="processDefinition" id="processDefinition" readonly="true"/>
-		</form>
+		<label id="action"/>
+		<div id="fields" style="width: 100%">
+		</div>
 		<div style="text-align: right; width: 100%">
-			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
-				onClick="ref:frame.closeDetails">
+			<button image="/img/undo-r.svg" label="${c:l('accounts.setPassword.Cancel')}" 
+				onClick="ref:frame.closeAction">
+			</button>
+			<button image="/img/ok-r.svg" label="${c:l('rules.apply')}" 
+				onClick="ref:frame.applyAction">
 			</button>
 		</div>
 	</window>

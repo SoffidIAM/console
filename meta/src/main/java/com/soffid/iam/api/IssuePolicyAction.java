@@ -18,9 +18,11 @@ public class IssuePolicyAction {
 	String description;
 
 	@Nullable
+	@Attribute(defaultValue = "\"Soffid issue ${id}\"")
 	String subject;
 	
 	@Nullable
+	@Attribute(defaultValue = "\"${description}\"")
 	String body;
 	
 	@Nullable

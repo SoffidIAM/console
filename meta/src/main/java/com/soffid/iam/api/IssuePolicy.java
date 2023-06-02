@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.soffid.iam.model.IssuePolicyEntity;
 import com.soffid.mda.annotation.Attribute;
+import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
@@ -22,6 +23,9 @@ public class IssuePolicy {
 	@Nullable
 	String actor;
 	
+	@Nullable
+	IssuePolicyStatus status;
+
 	@Nullable
 	List<IssuePolicyAction> actions;
 }

@@ -10,6 +10,7 @@ import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.Nullable;
 
+import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
@@ -50,6 +51,9 @@ public class IssueEntity {
 	@Nullable @Column(name="EVE_EXCEPT", length = 64000)
 	String exception;
 	
+	@Nullable @Column(name = "EVE_COUNTR", length = 64000)
+	String country;
+
 	@Nullable @Column(name = "EVE_RAC_ID", reverseAttribute = "events")
 	RolAccountEntity roleAccount;
 	
@@ -65,6 +69,9 @@ public class IssueEntity {
 	@Nullable @Column(name = "EVE_ACTOR")
 	String actor;
 	
+	@Nullable @Column(name = "EVE_RISK")
+	SoDRisk risk;
+
 	@Column(name = "EVE_TEN_ID")
 	TenantEntity tenant;
 }

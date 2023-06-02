@@ -32,7 +32,8 @@ import roles.anonymous;
 @Depends( { IssueEntity.class, IssuePolicyEntity.class, IssueUserEntity.class, IssueHostEntity.class, IssuePolicyActionEntity.class,
 	UsuariEntity.class, MaquinaEntity.class, PamRuleEntity.class,
 	AsyncRunnerService.class,
-	IssuePolicyService.class})
+	IssuePolicyService.class,
+	MailService.class})
 public class IssueService {
 	@Operation(grantees = { Tothom.class })
 	AsyncList<Issue> findMyIssuesByJsonQueryAsync (@Nullable String query) { return null; }
@@ -57,9 +58,12 @@ public class IssueService {
 	@Operation(grantees = { IssueDelete.class})
 	void delete(Issue event) {}
 	
-	@Operation(grantees = { IssueDelete.class})
-	Issue applyManualAction(Issue event, String action, Map<String, Object> parameters) {return null;}
-
 	@Operation(grantees = { IssueQuery.class})
 	List<IssueActionDefinition> listManualActions() {return null;}
+	
+	@Operation(grantees = { IssueQuery.class})
+	Issue notify(Issue issue, String address, String subject, String body) {return null;}
+
+	@Operation(grantees = { IssueQuery.class})
+	Issue registerAction(Issue issue, String action) {return null;}
 }

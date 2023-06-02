@@ -114,8 +114,11 @@ public abstract class UsuariEntity {
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grupPrimari;
 
-	@ForeignKey(foreignColumn = "DUS_IDUSU", translated = "userData")
+	@ForeignKey(foreignColumn = "DUS_IDUSU", translated = "attributes")
 	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> dadaUsuari;
+
+	@Operation
+	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> getUserData() {return null;};
 
 	@ForeignKey(foreignColumn = "UGR_IDUSU", translated = "secondaryGroups")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariGrupEntity> grupsSecundaris;
@@ -184,7 +187,7 @@ public abstract class UsuariEntity {
 
 	@Operation(translated = "findByNationalID")
 	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
-			+ "join usuari.userData as dadaUsuari "
+			+ "join usuari.attributes as dadaUsuari "
 			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif and usuari.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UsuariEntity findByNIF(java.lang.String nif) {
 		return null;
@@ -223,7 +226,7 @@ public abstract class UsuariEntity {
 	@Operation(translated = "findUserByDataValue")
 	@DaoFinder("SELECT distinct usu \n"
 			+ "FROM com.soffid.iam.model.UserEntity usu "
-			+ "join usu.userData as dada \n" 
+			+ "join usu.attributes as dada \n" 
 			+ "WHERE \n"
 			+ "   dada.dataType.name = :dataType  and \n"
 			+ "   dada.value = :value and "
@@ -252,7 +255,7 @@ public abstract class UsuariEntity {
 
 	@Operation(translated = "findUsersByNationalID")
 	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
-			+ "join usuari.userData as dadaUsuari "
+			+ "join usuari.attributes as dadaUsuari "
 			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif and "
 			+ "usuari.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuarisByNIF(

@@ -68,7 +68,7 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 				if (sb.length() > 0) sb.append(" ");
 				sb.append(user.getUserName());
 			}
-		s.put("users", sb.toString());
+		s.put("hosts", sb.toString());
 
 		sb = new StringBuffer();
 		if (a.getHosts() != null)

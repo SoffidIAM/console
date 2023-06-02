@@ -17,6 +17,7 @@ import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.IssueActionDefinition;
 import com.soffid.iam.api.IssuePolicy;
 import com.soffid.iam.api.IssuePolicyAction;
+import com.soffid.iam.api.IssuePolicyStatus;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
@@ -192,6 +193,7 @@ public class IssuePolicyServiceImpl extends IssuePolicyServiceBase {
 				entity.setDescription("");
 				entity.setType(name);
 				entity.setActor("SOFFID_ADMIN@soffid");
+				entity.setStatus(IssuePolicyStatus.IGNORE);
 				getIssuePolicyEntityDao().create(entity);
 			}
 		}

@@ -26,6 +26,7 @@ import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.IssueActionDefinition;
 import com.soffid.iam.api.IssueHost;
 import com.soffid.iam.api.IssuePolicyAction;
+import com.soffid.iam.api.IssuePolicyStatus;
 import com.soffid.iam.api.IssueStatus;
 import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.PagedResult;
@@ -121,34 +122,47 @@ public class IssueServiceImpl extends IssueServiceBase {
 
 	@Override
 	protected Issue handleCreateInternalIssue(Issue issue) throws Exception {
-		IssueEntity entity = getIssueEntityDao().newIssueEntity();
-		getIssueEntityDao().issueToEntity(issue, entity, true);
-		entity.setStatus(IssueStatus.NEW);
-		entity.setCreated(new Date());
-		addHistory(entity, "Created");
-		getIssueEntityDao().create(entity);
-		if (issue.getUsers() != null) 
-			for (IssueUser user: issue.getUsers()) {
-				IssueUserEntity userEntity = getIssueUserEntityDao().issueUserToEntity(user);
-				userEntity.setIssue(entity);
-				getIssueUserEntityDao().create(userEntity);
-				entity.getUsers().add(userEntity);
-			}
-		if (issue.getHosts() != null) 
-			for (IssueHost host: issue.getHosts()) {
-				IssueHostEntity hostEntity = getIssueHostEntityDao().issueHostToEntity(host);
-				hostEntity.setIssue(entity);
-				getIssueHostEntityDao().create(hostEntity);
-				entity.getHosts().add(hostEntity);
-			}
+		Collection<IssuePolicyEntity> policies = getIssuePolicyEntityDao().findByType(issue.getType());
 		
-		processAutomaticIssues(entity);
-		return getIssueEntityDao().toIssue(entity);
+		IssuePolicyStatus max = IssuePolicyStatus.IGNORE;
+		for (IssuePolicyEntity policy: policies) {
+			if (policy.getStatus() != null &&
+					policy.getStatus().getValue().compareTo(max.getValue()) > 0)
+				max = policy.getStatus();
+		}
+		
+		if (max != IssuePolicyStatus.IGNORE) {
+			IssueEntity entity = getIssueEntityDao().newIssueEntity();
+			getIssueEntityDao().issueToEntity(issue, entity, true);
+			entity.setStatus(IssueStatus.NEW);
+			entity.setCreated(new Date());
+			addHistory(entity, "Created");
+			getIssueEntityDao().create(entity);
+			if (issue.getUsers() != null) 
+				for (IssueUser user: issue.getUsers()) {
+					IssueUserEntity userEntity = getIssueUserEntityDao().issueUserToEntity(user);
+					userEntity.setIssue(entity);
+					getIssueUserEntityDao().create(userEntity);
+					entity.getUsers().add(userEntity);
+				}
+			if (issue.getHosts() != null) 
+				for (IssueHost host: issue.getHosts()) {
+					IssueHostEntity hostEntity = getIssueHostEntityDao().issueHostToEntity(host);
+					hostEntity.setIssue(entity);
+					getIssueHostEntityDao().create(hostEntity);
+					entity.getHosts().add(hostEntity);
+				}
+			
+			processAutomaticIssues(entity, policies);
+			return getIssueEntityDao().toIssue(entity);
+		}
+		else
+			return issue;
 	}
 
-	private void processAutomaticIssues(IssueEntity Issue) throws IOException {
+	private void processAutomaticIssues(IssueEntity Issue, Collection<IssuePolicyEntity> policies) throws IOException {
 		JSONArray actions = IssueDataParser.instance().getActions();
-		for (IssuePolicyEntity policy: getIssuePolicyEntityDao().findByType(Issue.getType())) {
+		for (IssuePolicyEntity policy: policies) {
 			if ( policy.getActor() != null && ! policy.getActor().trim().isEmpty())
 				Issue.setActor(policy.getActor());
 			for (IssuePolicyActionEntity actionEntity: policy.getActions()) {
@@ -165,14 +179,14 @@ public class IssueServiceImpl extends IssueServiceBase {
 		}
 	}
 
-	private void processRule(IssueEntity Issue, IssuePolicyActionEntity actionEntity, JSONArray actions) throws Exception {
+	private void processRule(IssueEntity issue, IssuePolicyActionEntity actionEntity, JSONArray actions) throws Exception {
 		for (int i = 0; i < actions.length(); i++) {
 			final JSONObject jsonObject = actions.getJSONObject(i);
 			String name = jsonObject.optString("name", null);
 			String handler = jsonObject.optString("handler", null); 
 			if (name != null && handler != null && name.equals(actionEntity.getAction())) {
 				AutomaticActionHandler h = (AutomaticActionHandler) Class.forName(handler).getConstructor().newInstance();
-				h.process (Issue, actionEntity);
+				h.process(getIssueEntityDao().toIssue(issue), issue, actionEntity);
 			}
 		}
 	}
@@ -191,7 +205,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				entity.getStatus() != IssueStatus.SOLVED) {
 			entity.setStatus(IssueStatus.SOLVED);
 			entity.setSolved(new Date());
-			addHistory(entity, "Salved");
+			addHistory(entity, "Solved");
 			getIssueEntityDao().update(entity);
 		}
 		return getIssueEntityDao().toIssue(entity);
@@ -207,15 +221,17 @@ public class IssueServiceImpl extends IssueServiceBase {
 	@Override
 	protected List<IssueActionDefinition> handleListManualActions() throws Exception {
 		List<IssueActionDefinition> list = new LinkedList<>();
+		JSONArray issues = IssueDataParser.instance().getIssues();
 		JSONArray actions = IssueDataParser.instance().getManualActions();
 		for (int i = 0; i < actions.length(); i++) {
 			JSONObject o = actions.getJSONObject(i);
 			IssueActionDefinition def  = new IssueActionDefinition();
 			def.setName(o.optString("name", null));
+			def.setHandler(o.getString("handler"));
 			def.setLabel(o.optString("nlsLabel", "com.soffid.iam.api.IssueActionDefinition." +  def.getName()));
 			LinkedList<DataType> att = new LinkedList<DataType>();
 			def.setParameters(att);
-			JSONArray parameters = o.getJSONArray("parameters");
+			JSONArray parameters = o.optJSONArray("parameters");
 			if (parameters != null) {
 				for (int j = 0; j < parameters.length(); j++) {
 					JSONObject parameter = parameters.getJSONObject(j);
@@ -226,6 +242,18 @@ public class IssueServiceImpl extends IssueServiceBase {
 					att.add(dt);
 				}
 			}
+			
+			def.setIssueTypes(new LinkedList<>());
+			for (int j = 0; j < issues.length(); j++) {
+				JSONArray manualActions = issues.getJSONObject(j).optJSONArray("manual-actions");
+				for (int k = 0; k < manualActions.length(); k++) 
+					if (manualActions.getString(k).equals(def.getName()))
+					{
+						def.getIssueTypes().add(issues.getJSONObject(j).getString("name"));
+						break;
+					}
+			}
+			
 			list.add(def);
 		}
 		return list;
@@ -244,23 +272,6 @@ public class IssueServiceImpl extends IssueServiceBase {
 			} 
 		}
 		return TypeEnumeration.STRING_TYPE;
-	}
-
-	@Override
-	protected Issue handleApplyManualAction(Issue Issue, String action, Map<String, Object> parameters)
-			throws Exception {
-		IssueEntity entity = getIssueEntityDao().load(Issue.getId());
-		JSONArray actions = IssueDataParser.instance().getManualActions();
-		for (int i = 0; i < actions.length(); i++) {
-			JSONObject o = actions.getJSONObject(i);
-			if (o.optString("name", "").equals(action)) {
-				String handler = o.getString("handler");
-				ManualActionHandler h = (ManualActionHandler) Class.forName(handler).getConstructor().newInstance();
-				h.process (entity, action, parameters);
-				addHistory (entity, "Executed manual action "+action);
-			}
-		}
-		return getIssueEntityDao().toIssue(entity);
 	}
 
 	private void addHistory(IssueEntity Issue, String msg) throws FileNotFoundException, IOException {
@@ -321,8 +332,28 @@ public class IssueServiceImpl extends IssueServiceBase {
 		});
 			
 		h.search(null, query, (Collection) l); 
+		pr.setResources(l);
 		pr.setTotalResults(h.count());
 
 		return pr;
+	}
+
+	@Override
+	protected Issue handleNotify(Issue issue, String address, String subject, String body) throws Exception {
+		IssueEntity entity = getIssueEntityDao().load(issue.getId());
+		addHistory(entity, "Notify "+address);
+		getIssueEntityDao().update(entity);
+		getMailService().sendHtmlMail(address, "Issue #"+issue.getId()+": "+subject,
+				body);
+		return getIssueEntityDao().toIssue(entity);
+		
+	}
+
+	@Override
+	protected Issue handleRegisterAction(Issue issue, String action) throws Exception {
+		IssueEntity entity = getIssueEntityDao().load(issue.getId());
+		addHistory(entity, action);
+		getIssueEntityDao().update(entity);
+		return getIssueEntityDao().toIssue(entity);
 	}
 }

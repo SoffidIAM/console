@@ -220,7 +220,7 @@ public class SearchDictionaryBuilder {
 	}
 
 	private static SearchDictionary addUserAttributes(SearchDictionary sd1, MetadataScope scope) throws InternalErrorException, NamingException, CreateException {
-		return addAttributes(sd1, scope, "userData");
+		return addAttributes(sd1, scope, "attributes");
 	}
 
 	private static SearchDictionary addAttributes(SearchDictionary sd1, MetadataScope scope, String attributesPath) throws InternalErrorException, NamingException, CreateException {
@@ -304,7 +304,7 @@ public class SearchDictionaryBuilder {
 		addJoin(sd, "acl.group.name", "acl.group.name", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "acl.user.userName", "acl.user.userName", TypeEnumeration.STRING_TYPE);
 		addJoin(sd, "roles.role.name", "roles.role.name", TypeEnumeration.STRING_TYPE);
-		addJoin(sd, "users.user.userName", "users.user.userName", TypeEnumeration.STRING_TYPE);
+		addJoin(sd, "hosts.user.userName", "hosts.user.userName", TypeEnumeration.STRING_TYPE);
 	}
 
 	private static SearchDictionary addCustomAttributes(SearchDictionary sd1, MetadataScope scope, String objectType) throws InternalErrorException, NamingException, CreateException {

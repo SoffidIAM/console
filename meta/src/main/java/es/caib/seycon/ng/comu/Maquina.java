@@ -74,6 +74,10 @@ public class Maquina {
 	@Attribute(readonly = true)
 	public java.util.Calendar lastSeen;
 
+	@Column (name="MAQ_LOCKED")
+	@Nullable
+	public java.lang.Boolean locked;
+
 	@Description ("Host custom attributes")
 	@Nullable
 	@JsonAttribute(hibernateJoin="attributes")

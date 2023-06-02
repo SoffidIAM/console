@@ -13,4 +13,8 @@ public class IssueActionDefinition {
 	String label;
 	
 	List<TipusDada> parameters;
+	
+	List<String> issueTypes;
+	
+	String handler;
 }

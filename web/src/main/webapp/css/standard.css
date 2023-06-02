@@ -1531,7 +1531,8 @@ div.databox img.dataimage {
 	object-fit: contain;
 }
 
-div.databox div.container input.name {
+div.databox div.container input.name,
+div.databox div.container span.name {
 	width: 30%;
 	min-width: 250px;
 }
@@ -4131,6 +4132,40 @@ div.tutorialMessage button{
 	
 }
 
+div.merge div.databox {
+	word-break: break-all;		
+}
+
+div.merge div.databox {
+	height: 30px;
+}
 
 
+div.merge {
+	width: 100%;
+}
+div.merge.reverse,
+div.merge.reverse div.databox,
+div.merge.reverse div.databox input ,
+div.merge.reverse div.databox span.name,
+div.merge.reverse div.databox select {
+	background-color: {SKY};
+	color: {SKYTEXT}  !important; 
+}
+div.merge.hidden {
+	visibility: hidden;
+}
+div.databox span.name {
+	margin: 2px;
+	padding: 4px;
+    display: inline-block;
+    background: inherit;
+    min-width: 100px;
+}
 
+div.merge,
+div.merge div.databox ,
+div.merge div.databox select,
+div.merge div.databox input {
+	cursor: pointer;
+}

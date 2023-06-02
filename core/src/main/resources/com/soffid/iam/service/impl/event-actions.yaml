@@ -3,8 +3,6 @@
   parameters:
   - body
   - subject
-- name: register-host
-  handler: com.soffid.iam.service.impl.events.RegisterHost
 - name: send-email
   handler: com.soffid.iam.service.impl.events.SendEmail
   parameters:
@@ -21,6 +19,9 @@
   handler: com.soffid.iam.service.impl.events.LockHost
 - name: notify-admin
   handler: com.soffid.iam.service.impl.events.NotifyAdmin
+  parameters:
+  - body
+  - subject
 - name: auto-ack
   handler: com.soffid.iam.service.impl.events.AutoAck
 - name: start-workflow

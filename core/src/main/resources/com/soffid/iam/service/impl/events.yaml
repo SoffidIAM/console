@@ -17,7 +17,6 @@
   - start-workflow
   - lock-account
   - lock-host
-  - register-host
   manual-actions:
   - send-email
   - unlock-account
@@ -35,7 +34,6 @@
   - start-workflow
   - lock-account
   - lock-host
-  - register-host
   manual-actions:
   - send-email
   - unlock-account
@@ -53,7 +51,6 @@
   - start-workflow
   - lock-account
   - lock-host
-  - register-host
   manual-actions:
   - send-email
   - unlock-account
@@ -70,7 +67,6 @@
   - start-workflow
   - lock-account
   - lock-host
-  - register-host
   manual-actions:
   - send-email
   - unlock-account

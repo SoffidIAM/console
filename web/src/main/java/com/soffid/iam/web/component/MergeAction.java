@@ -2,6 +2,7 @@ package com.soffid.iam.web.component;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,11 +55,16 @@ public abstract class MergeAction {
 				return o1.getOrder().compareTo(o2.getOrder());
 			}
 		});
+		
+		LinkedList<String> l1 = new LinkedList<>();
+		LinkedList<Object> l2 = new LinkedList<>();
+		for ( int i = 0; i < positions.length; i++) {
+			l2.add(fetchObject(positions[i]));
+			l1.add(fetchObjectName(positions[i]));
+		}
 
-		MergeActionHandler.startWizard(dt, fetchObject(positions[0]), fetchObject(positions[1]),
-				fetchObjectName(positions[0]), fetchObjectName(positions[1]),
-				data,
-				this); 
+		MergeActionHandler.startWizard(dt, l2,
+				l1, data, this); 
 	}
 
 	private Object fetchObject(int position) {

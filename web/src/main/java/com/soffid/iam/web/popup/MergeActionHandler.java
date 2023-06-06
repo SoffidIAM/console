@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,7 +43,12 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueStatus;
+import com.soffid.iam.api.IssueUser;
+import com.soffid.iam.api.User;
 import com.soffid.iam.common.TransactionalTask;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.WebDataType;
 import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.Columns;
@@ -58,17 +64,16 @@ import es.caib.zkib.component.Databox.Type;
 import es.caib.zkib.component.Select;
 import es.caib.zkib.component.Switch;
 import es.caib.zkib.component.Wizard;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 
 public class MergeActionHandler extends Window implements AfterCompose {
-	List<Integer> selectedActions; 
-	List<Object> selectedValues;
 	private MergeAction mergeAction;
 	private Component invoker;
 	private List<String> names;
 	private List<Object> objects;
 	private List<DataType> dataTypes;
-	Map<String, String> values;
+	Map<String, int[]> actions = new HashMap<>();
 	public MergeActionHandler() {
 		Map args = Executions.getCurrent().getAttributes();
 		if (args != null) {
@@ -77,16 +82,51 @@ public class MergeActionHandler extends Window implements AfterCompose {
 			objects = (List<Object>) args.get("objects");
 			names = (List<String>) args.get("names");
 			dataTypes = (List<DataType>) args.get("dataTypes");
+			newIssue = ((Boolean) args.get("newIssue")).booleanValue();
+			currentIssue = (Issue) args.get("currentIssue");
 		}
 	}
 
 	public void start() throws NamingException, CreateException, InternalErrorException, IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		doHighlighted();
+		getFellow("step0").setVisible(newIssue);
+		getFellow("step1").setVisible(!newIssue);
+		getFellow("step2").setVisible(false);
 		Grid actions1 = getActions1Grid();
 		actions1.getChildren().clear();
 		createActions (actions1);
 	}
+	
+	public void solveNow(Event ev) {
+		getFellow("step0").setVisible(false);
+		getFellow("step1").setVisible(true);
+	}
 
+	public void solveLater(Event ev) throws InternalErrorException, NamingException, CreateException {
+		Issue i = new Issue();
+		i.setType("duplicated-user");
+		i.setCreated(new Date());
+		i.setStatus(IssueStatus.NEW);
+		List<IssueUser> users = new LinkedList<>();
+		for (Object o: objects) {
+			if (o instanceof User) {
+				User user = (User) o;
+				IssueUser iu = new IssueUser();
+				iu.setUserName(((User) o).getUserName());
+				String field = ConfigurationCache.getProperty("soffid.user.externalId");
+				if (field != null) {
+					final Object externalId = user.getAttributes().get(field);
+					iu.setExternalId(externalId == null ? null: externalId.toString());
+				}
+				users.add(iu);
+			}
+		}
+		i.setUsers(users );
+		i = EJBLocator.getIssueService().create(i);
+		Missatgebox.avis(Labels.getLabel("merge.newIssueCreated"));
+		setVisible(false);
+	}
+	
 	boolean isEnabled(int i) {
 		if (objects.size() <= 2) return true;
 		Grid actions1 = getActions1Grid();
@@ -122,6 +162,7 @@ public class MergeActionHandler extends Window implements AfterCompose {
 		for (DataType attribute: dataTypes) {
 			if (attribute.getType() != TypeEnumeration.SEPARATOR &&
 					! attribute.isReadOnly()) {
+				attribute = new WebDataType(attribute);
 				Row row = new Row();
 				row.setAttribute("attribute", attribute);
 				rows.appendChild(row);
@@ -147,6 +188,8 @@ public class MergeActionHandler extends Window implements AfterCompose {
 						output.setValue(v);
 						allNull = false;
 					}
+					else if (attribute.isMultiValued())
+						output.setValue(new LinkedList<>());
 					else
 						output.setValue("");
 					if (dt2.isMultiValued() || row.getChildren().size() == 2)
@@ -179,17 +222,16 @@ public class MergeActionHandler extends Window implements AfterCompose {
 					return;
 				}
 			}
-			int rownum = 0;
 			for ( Component row = actions1.getRows().getFirstChild().getNextSibling(); 
 					row != null;
-					row = row.getNextSibling(), rownum ++) {
+					row = row.getNextSibling()) {
 				Div div = (Div) row.getChildren().get(pos+1);
 				if (s.isChecked()) {
 					if (div.getSclass().equals("merge hidden"))
 						div.setSclass("merge");
 				}
 				else {
-					DataType dt = dataTypes.get(rownum);
+					DataType dt = (DataType) row.getAttribute("attribute");
 					String oldClass = div.getSclass();
 					div.setClass("merge hidden");
 					if (oldClass.equals("merge reverse") && !dt.isMultiValued()) {
@@ -230,6 +272,9 @@ public class MergeActionHandler extends Window implements AfterCompose {
 			}
 		}
 	};
+	private Issue currentIssue;
+	private boolean newIssue;
+	
 	private Object getObjectValue(Object object12, DataType dt) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (Boolean.TRUE.equals(dt.getBuiltin())) {
 			return PropertyUtils.getProperty(object12, dt.getName());
@@ -238,21 +283,18 @@ public class MergeActionHandler extends Window implements AfterCompose {
 		}
 	}
 
-	public void onChangeAttribute(Event event) throws WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		Databox src = (Databox) event.getTarget();
-		InputField3 target = (InputField3) src.getParent().getNextSibling().getFirstChild();
-//		refreshValue(src, target);
-	}
-
 	public Grid getActions1Grid() {
 		return (Grid) getFellow("actions1");
 	}
 	
 	public static void startWizard (Component invoker,
+			List<String> xpaths,
 			List<Object> objects,
 			List<String> names,
 			List<DataType> dataTypes,
-			MergeAction action) throws IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NamingException, CreateException, InternalErrorException {
+			MergeAction action,
+			boolean newIssue,
+			Issue currentIssue) throws IOException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, NamingException, CreateException, InternalErrorException {
 		Page p = invoker.getDesktop().getPageIfAny("mergeAction");
 		if ( p == null) {
 			Include i = new Include("/popup/mergeAction.zul");
@@ -261,7 +303,9 @@ public class MergeActionHandler extends Window implements AfterCompose {
 			i.setDynamicProperty("names", names);
 			i.setDynamicProperty("invoker", invoker);
 			i.setDynamicProperty("dataTypes", dataTypes);
-		i.setPage(invoker.getPage());
+			i.setDynamicProperty("newIssue", newIssue);
+			i.setDynamicProperty("currentIssue", currentIssue);
+			i.setPage(invoker.getPage());
 		} else {
 			MergeActionHandler h = (MergeActionHandler) p.getFellow("window");
 			h.invoker = invoker;
@@ -269,6 +313,8 @@ public class MergeActionHandler extends Window implements AfterCompose {
 			h.names = names;
 			h.dataTypes = dataTypes;
 			h.mergeAction = action;
+			h.newIssue = newIssue;
+			h.currentIssue = currentIssue;
 			h.start();
 		}
 	}
@@ -290,13 +336,81 @@ public class MergeActionHandler extends Window implements AfterCompose {
 		setVisible(false);
 	}
 
-	public void step1next ( Event event) throws InternalErrorException, NamingException, CreateException {
-		EJBLocator.getAsyncRunnerService().runTransaction(() -> {mergeAction.apply(values); return 0;}	);
+	public void step1next (Event event) throws NamingException, CreateException, InternalErrorException, IOException {
+		Div actions2 = (Div) getFellow("actions2");
+		actions2.getChildren().clear();
+		actions = new HashMap<>();
+		
+		for (Row row = (Row) getActions1Grid().getRows().getFirstChild().getNextSibling();
+				row != null;
+				row = (Row) row.getNextSibling()) {
+			if (row.isVisible()) {
+				DataType attribute = (DataType) row.getAttribute("attribute");
+				InputField3 field = new InputField3();
+				field.setDataType(attribute);
+				field.setReadonly(true);
+				
+				List<Object> values = new LinkedList<>();
+				int[] cols = new int[objects.size()];
+				int usedcols = 0;
+				int col = 0;
+				for (Div cell = (Div) row.getFirstChild().getNextSibling(); cell != null; cell = (Div) cell.getNextSibling()) {
+					if (cell.getSclass().equals("merge reverse")) {
+						cols[usedcols++] = col;
+						InputField3 field2 = (InputField3) cell.getFirstChild();
+						if (attribute.isMultiValued())  {
+							values.addAll((List)field2.getValue());
+						}
+						else {
+							field.setValue(field2.getValue());
+							break;
+						}
+					}
+					col ++;
+				}
+				actions.put(attribute.getName(), Arrays.copyOf(cols, usedcols));
+				if (attribute.isMultiValued())
+					field.setValue(values);
+				actions2.appendChild(field);
+				field.createField();
+				field.afterCompose();
+			}
+		}
+
+		getFellow("step1").setVisible(false);
+		getFellow("step2").setVisible(true);
+		
+	}
+	
+	
+	public void step2next ( Event event) throws Exception {
+		List<Integer> pos = new LinkedList<>();
+		if (objects.size() <= 2) {
+			for (int i = 0; i < objects.size(); i++)
+				pos.add(i);
+		} 
+		else {
+			for (int i = 0; i < objects.size(); i++) {
+				if (isEnabled(i))
+					pos.add(i);
+			}
+		}
+		int[] selectedOptions = new int[pos.size()];
+		for (int i = 0; i < pos.size(); i++)
+			selectedOptions[i] = pos.get(i).intValue();
+			
+		EJBLocator.getAsyncRunnerService().runTransaction(() -> {
+			mergeAction.apply(actions, selectedOptions); return 0;
+		}	);
+		
+		if (mergeAction.getOnApply() != null)
+			mergeAction.getOnApply().onEvent(new Event("onApply", this));
 		setVisible(false);
 	}
 	
 	public void step2back (Event event) {
-		getWizard().previous();
+		getFellow("step1").setVisible(true);
+		getFellow("step2").setVisible(false);
 	}
 	
 	public void close (Event event) {

@@ -37,7 +37,9 @@ public class Maquina {
 	public java.lang.String dhcp;
 	
 	@Nullable
-	@Attribute(translated = "ip", searchCriteria = true, customUiHandler = "com.soffid.iam.web.host.IPHandler" )
+	@Attribute(translated = "ip", searchCriteria = true, 
+		customUiHandler = "com.soffid.iam.web.host.IPHandler")
+	@JsonAttribute(hibernateAttribute = "hostIP")
 	public java.lang.String adreca;
 	
 	@Attribute(translated = "os", type = "OS" )

@@ -68,4 +68,5 @@ public abstract class ApplicationBootService {
 	public void consoleBoot()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
 }

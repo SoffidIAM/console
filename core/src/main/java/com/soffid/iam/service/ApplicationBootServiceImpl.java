@@ -62,6 +62,7 @@ import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.impl.ConsoleTrustedCertificateLoader;
 import com.soffid.iam.service.impl.DatabaseParser;
+import com.soffid.iam.service.impl.DatabaseReader;
 import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -611,12 +612,7 @@ public class ApplicationBootServiceImpl extends
 	
 				Long tenantId = tenantService.getMasterTenant().getId();
 				
-		    	Database db = new Database();
-		    	XmlReader reader = new XmlReader();
-		    	PathMatchingResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
-				parseResources(rpr, db, reader, "console-ddl.xml");
-		    	parseResources(rpr, db, reader, "core-ddl.xml");
-		    	parseResources(rpr, db, reader, "plugin-ddl.xml");
+		    	Database db = new DatabaseReader().readDatabaseDefinition();
 	
 		    	
 		    	for (ForeignKey fk: db.foreignKeys)
@@ -814,15 +810,6 @@ public class ApplicationBootServiceImpl extends
 		{
 			conn.close();
 		}
-	}
-
-	private void parseResources(ResourcePatternResolver rpr, Database db,
-			XmlReader reader, String path) throws IOException, Exception {
-		Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(path);
-    	while (resources.hasMoreElements())
-    	{
-    		reader.parse(db, resources.nextElement().openStream());
-    	}
 	}
 
 	/**

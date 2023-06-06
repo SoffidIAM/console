@@ -117,6 +117,7 @@ import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.impl.CertificateParser;
+import com.soffid.iam.service.impl.DatabaseReader;
 import com.soffid.iam.service.impl.ObjectVariableResolver;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncStatusService;
@@ -132,6 +133,8 @@ import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
+import com.soffid.tools.db.schema.Database;
+import com.soffid.tools.db.schema.ForeignKey;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.ServerType;
@@ -3705,6 +3708,24 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		FunctionMapper functions  = null;
 		return (String) ee.evaluate(text, String.class, pResolver , functions);
 		
+	}
+
+	@Override
+	protected void handleMerge(Long srcId, Long targetId) throws Exception {
+		UserEntity su = getUserEntityDao().load(srcId);
+		UserEntity tu = getUserEntityDao().load(targetId);
+		String codiUsuari = Security.getCurrentAccount();
+		Audit auditoria = new Audit();
+		auditoria.setAction("M"); //$NON-NLS-1$
+		auditoria.setUser(tu.getUserName());
+		auditoria.setAuthor(codiUsuari);
+		auditoria.setObject("SC_USUARI"); //$NON-NLS-1$
+		auditoria.setComment(su.getUserName());
+
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
+				auditoria);
+		getAuditEntityDao().create(auditoriaEntity);
+		getUserEntityDao().merge(srcId, targetId);
 	}
 	
 

@@ -1,6 +1,7 @@
 package com.soffid.web.saml;
 
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,6 +73,8 @@ public class SamlDataModel extends SimpleDataNode {
 				String tokenTimeoutString = ConfigurationCache.getProperty("soffid.otp.timeout");
 				c.tokenTimeout = tokenTimeoutString == null || tokenTimeoutString.isEmpty() ? null: Long.valueOf( tokenTimeoutString );
 
+				byte[] motd = EJBLocator.getConfigurationService().getBlob("soffid.auth.motd");
+				c.motd = motd == null ? null: new String(motd, StandardCharsets.UTF_8);
 				return Collections.singleton(c);
 			}
 		}, SamlDataNode.class);

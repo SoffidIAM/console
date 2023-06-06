@@ -48,13 +48,13 @@
 			<p>${c:l('login.connecting') }</p>
 			<img src="${execution.contextPath }/anonymous/wait.gif" />
 		</div>
-		<div class="login" id='login'>
-		<p>
-			<div class="loginimage">
-				<img src="/soffid/anonymous/logo.png" style="max-width: 280px; max-height: 125px;"  alt="" />
-			</div>
-		</p>
-			<div class="loginbox" id="loginbox"> 
+		<div class="login" id='login'  style="${showMotd || redirect != null ? 'display:none': '' }" >
+  			<p>
+				<div class="loginimage">
+					<img src="/soffid/anonymous/logo.png" style="max-width: 280px; max-height: 125px;"  alt="" />
+				</div>
+			</p>
+			<div class="loginbox" id="loginbox" style="${autologin ? 'display:none': '' }"> 
 				<p>${c:l('configure.header')}</p>
 				<form method="post" action="j_security_check" id='loginForm' accept-charset="utf-8" onsubmit="preparesubmit(event)" >
 				<input name="j_method"  id="j_method_usu-pas" type="hidden" value="U"/>
@@ -85,14 +85,56 @@
 			</form>
 			</div>
 		</div>
-       	<div class="soffid-logo-corner"><a href="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
+       	<div class="soffid-logo-corner"><a hrloginboxef="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
 		]]></html>
+		<html id="motd" if="${showMotd }"><![CDATA[
+		   <div class="login" id="motdbox"> 
+	 			<p>
+					<div class="loginimage">
+						<img src="/soffid/anonymous/logo.png" style="max-width: 280px; max-height: 125px;"  alt="" />
+					</div>
+				</p>
+			   <div style="margin-bottom: 40px; margin-top: 20px;" >${motd}</div>
+			   
+				<input name="formUCboton" type="button"  value="${c:l('finestra_valorGeneric.zul.Accepta')}" onclick="showLogin();">
+		   </div>
+        ]]></html>       
 		<html if="${autoLogin}"><![CDATA[
 			<script type="text/javascript">
 			// <!--
 			if (document.getElementById('loginbox'))
 				document.getElementById('loginbox').setAttribute("style","display: none");
 			preparesubmit();
+			// -->
+			</script>
+   		]]></html>
+   		<!-- Redirect to SAML after acknowledging message of the day -->
+		<html if="${redirect != null &amp;&amp; showMotd}"><![CDATA[
+			<script type="text/javascript">
+			// <!--
+			function showLogin() {
+				document.location.href = '${redirect }';
+				document.getElementById("motdbox").remove();
+			}
+			// -->
+			</script>
+   		]]></html>
+   		<!-- Redirect to SAML immediately -->
+		<html if="${redirect != null &amp;&amp; ! showMotd}"><![CDATA[
+			<script type="text/javascript">
+			// <!--
+			document.location.href = '${redirect }';
+			// -->
+			</script>
+   		]]></html>
+   		<!-- Show login box after acknowledging message of the day -->
+		<html if="${redirect == null}"><![CDATA[
+			<script type="text/javascript">
+			// <!--
+			function showLogin() {
+				document.getElementById("motdbox").remove();
+				document.getElementById('login').style.display = "";
+			}
 			// -->
 			</script>
    		]]></html>

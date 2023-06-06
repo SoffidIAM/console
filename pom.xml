@@ -19,7 +19,6 @@
   <url>http://www.soffid.com/doc/console/${project.version}</url>
   <scm>
         <connection>scm:git:ssh://git@github.com/SoffidIAM/console.git</connection>
-        <tag>HEAD</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>

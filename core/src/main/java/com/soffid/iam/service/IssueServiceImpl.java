@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.DataType;
+import com.soffid.iam.api.EventUserAction;
 import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.IssueActionDefinition;
 import com.soffid.iam.api.IssueHost;
@@ -46,6 +47,7 @@ import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.IssueDataParser;
 import com.soffid.iam.service.impl.issues.AutomaticActionHandler;
 import com.soffid.iam.service.impl.issues.ManualActionHandler;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.parser.ParseException;
@@ -113,15 +115,19 @@ public class IssueServiceImpl extends IssueServiceBase {
 	}
 
 	@Override
-	protected Issue handleCreate(Issue Issue) throws Exception {
-		if (Issue.getType().equals("duplicated-user"))
-			return handleCreateInternalIssue(Issue);
+	protected Issue handleCreate(Issue issue) throws Exception {
+		if (issue.getType().equals("duplicated-user"))
+			return createIssue(issue, true);
 		else
 			throw new SecurityException("Not authorized to create manual Issues");
 	}
 
 	@Override
 	protected Issue handleCreateInternalIssue(Issue issue) throws Exception {
+		return createIssue(issue, false);
+	}
+
+	protected Issue createIssue(Issue issue, boolean manual) throws FileNotFoundException, IOException {
 		Collection<IssuePolicyEntity> policies = getIssuePolicyEntityDao().findByType(issue.getType());
 		
 		IssuePolicyStatus max = IssuePolicyStatus.IGNORE;
@@ -131,7 +137,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				max = policy.getStatus();
 		}
 		
-		if (max != IssuePolicyStatus.IGNORE) {
+		if (max != IssuePolicyStatus.IGNORE || manual) {
 			IssueEntity entity = getIssueEntityDao().newIssueEntity();
 			getIssueEntityDao().issueToEntity(issue, entity, true);
 			entity.setStatus(IssueStatus.NEW);
@@ -140,10 +146,13 @@ public class IssueServiceImpl extends IssueServiceBase {
 			getIssueEntityDao().create(entity);
 			if (issue.getUsers() != null) 
 				for (IssueUser user: issue.getUsers()) {
-					IssueUserEntity userEntity = getIssueUserEntityDao().issueUserToEntity(user);
-					userEntity.setIssue(entity);
-					getIssueUserEntityDao().create(userEntity);
-					entity.getUsers().add(userEntity);
+					IssueUserEntity issueUserEntity = getIssueUserEntityDao().issueUserToEntity(user);
+					UserEntity userEntity = getUserEntityDao().findByUserName(user.getUserName());
+					issueUserEntity.setIssue(entity);
+					issueUserEntity.setUser(userEntity);
+					issueUserEntity.setExternalId(user.getExternalId());
+					getIssueUserEntityDao().create(issueUserEntity);
+					entity.getUsers().add(issueUserEntity);
 				}
 			if (issue.getHosts() != null) 
 				for (IssueHost host: issue.getHosts()) {
@@ -192,21 +201,36 @@ public class IssueServiceImpl extends IssueServiceBase {
 	}
 
 	@Override
-	protected Issue handleUpdate(Issue Issue) throws Exception {
-		IssueEntity entity = getIssueEntityDao().load(Issue.getId());
-		if (Issue.getStatus() == IssueStatus.ACKNOWLEDGED &&
+	protected Issue handleUpdate(Issue issue) throws Exception {
+		IssueEntity entity = getIssueEntityDao().load(issue.getId());
+		if (issue.getStatus() == IssueStatus.ACKNOWLEDGED &&
 				entity.getStatus() == IssueStatus.NEW) {
 			entity.setStatus(IssueStatus.ACKNOWLEDGED);
 			entity.setAcknowledged(new Date());
 			addHistory(entity, "Acknowledged");
 			getIssueEntityDao().update(entity);
 		}
-		if (Issue.getStatus() == IssueStatus.SOLVED &&
+		if (issue.getStatus() == IssueStatus.SOLVED &&
 				entity.getStatus() != IssueStatus.SOLVED) {
 			entity.setStatus(IssueStatus.SOLVED);
 			entity.setSolved(new Date());
 			addHistory(entity, "Solved");
 			getIssueEntityDao().update(entity);
+		}
+		
+		LinkedList l = new LinkedList<>(entity.getUsers());
+		for (IssueUserEntity iuEntity: entity.getUsers()) {
+			for (IssueUser iu: issue.getUsers()) {
+				if (iu.getUserName().equals(iuEntity.getUserName()) ) {
+					if (iu.getAction() != iuEntity.getAction()) {
+						iuEntity.setAction(iu.getAction());
+						if (iu.getAction() == EventUserAction.DUPLICATED)
+							iuEntity.setUser(null);
+						getIssueUserEntityDao().update(iuEntity);
+					}
+					break;
+				}
+			}
 		}
 		return getIssueEntityDao().toIssue(entity);
 	}

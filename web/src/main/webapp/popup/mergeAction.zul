@@ -11,10 +11,27 @@
 	onClose="ref:window.close" 
 	style="min-width: 40em; width: 80%">
 
-	<grid id="actions1" />
-	<div style="text-align: right; width: 100%">
-		<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step1back" />
-		<button label="${c:l('rules.apply')}" image="/img/save-r.svg" onClick="ref:window.step1next" />
+	<div id="step0">
+		<label value="${c:l('merge.options') }" style="dispaly: block"/>
+		<div style="text-align: right; width: 100%">
+			<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step1back" />
+			<button label="${c:l('merge.solveNow')}" image="/img/next-r.svg" onClick="ref:window.solveNow" />
+			<button label="${c:l('merge.solveLater')}" image="/img/next-r.svg" onClick="ref:window.solveLater" />
+		</div>
+	</div>
+	<div id="step1">
+		<grid id="actions1" />
+		<div style="text-align: right; width: 100%">
+			<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step1back" />
+			<button label="${c:l('aplicaIntranet_autoritzacio.Next')}" image="/img/next-r.svg" onClick="ref:window.step1next" />
+		</div>
+	</div>
+	<div id="step2" visible="false">
+		<div id="actions2" />
+		<div style="text-align: right; width: 100%">
+			<button label="${c:l('user_createaccount.Back')}" image="/img/undo-r.svg" onClick="ref:window.step2back" />
+			<button label="${c:l('rules.apply')}" image="/img/save-r.svg" onClick="ref:window.step2next" />
+		</div>
 	</div>
 </window>
 

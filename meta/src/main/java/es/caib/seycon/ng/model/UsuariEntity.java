@@ -311,7 +311,9 @@ public abstract class UsuariEntity {
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 	
-}
+	@DaoOperation
+	public void merge (Long src, Long target ) {}
+ }
 
 @Index (name="USU_UK_CODI",	unique=true,
 entity=es.caib.seycon.ng.model.UsuariEntity.class,

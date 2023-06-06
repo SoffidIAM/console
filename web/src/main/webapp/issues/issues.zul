@@ -17,7 +17,7 @@
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"
-				jsonObject="com.soffid.iam.api.IssuePolicy" 
+				jsonObject="com.soffid.iam.api.Issue" 
 				defaultAttributes="type, description"
 				preference="issuePolicy"
 				dataPath="/model:/issue" variableName="query" variableNameText="textQuery"></searchbox>

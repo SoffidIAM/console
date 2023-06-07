@@ -195,4 +195,4 @@ pom.xml~
 web/deploy
 web/src/test/bin/syncweb.sh
 web/src/test
-default-plugin/target
+default-plugin/target/

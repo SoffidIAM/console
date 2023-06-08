@@ -35,11 +35,13 @@
 				<filtering>true</filtering>
 				<targetPath>../deb</targetPath>
 			</resource>
+			<!--
 			<resource>
 				<directory>src/main/wix</directory>
 				<filtering>true</filtering>
 				<targetPath>../wix</targetPath>
 			</resource>
+			-->
 			<resource>
 				<directory>src/main/rpm</directory>
 				<filtering>true</filtering>
@@ -187,11 +189,13 @@
 						<id>build-msi</id>
 						<phase>package</phase>
 						<configuration>
+							<!--
 							<tasks>
 								<exec executable="${basedir}/src/main/wix/generateWix.sh" failonerror="true">
 									<arg value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}" />
 								</exec>
 							</tasks>
+							-->
 						</configuration>
 						<goals>
 							<goal>run</goal>
@@ -288,12 +292,14 @@
 									</file>
 									<type>rpm</type>
 								</artifact>
+								<!--
 								<artifact>
 									<file>
 										target/wix/console.msi
 									</file>
 									<type>msi</type>
 								</artifact>
+								-->
 							</artifacts>
 						</configuration>
 					</execution>

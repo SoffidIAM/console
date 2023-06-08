@@ -2092,7 +2092,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					org.jbpm.taskmgmt.exe.TaskInstance task = (org.jbpm.taskmgmt.exe.TaskInstance) it
 							.next();
 					if (!task.hasEnded()
-							&& business.canAccess(getUserGroups(), task)) {
+							&& (business.canAccess(getUserGroups(), task) || isInternalService())) {
 						try {
 							v.add(VOFactory.newTaskInstance(task));
 						} catch (RuntimeException e) {
@@ -2884,7 +2884,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 			boolean canObserve = business.isUserAuthorized(OBSERVER_ROLE,
 					getUserGroups(), instance)
 					|| business.isUserAuthorized(SUPERVISOR_ROLE,
-							getUserGroups(), instance);
+							getUserGroups(), instance)
+					|| isInternalService();
 			if (instance.getTaskMgmtInstance() != null
 					&& instance.getTaskMgmtInstance().getTaskInstances() != null) {
 				for (Iterator it = instance.getTaskMgmtInstance()

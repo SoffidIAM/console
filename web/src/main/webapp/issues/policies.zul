@@ -35,6 +35,7 @@
   default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.status')}
   value: status
+  template: #{status.value=='0' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.IGNORE')}" ? status.value=='1' : "${c:l('com.soffid.iam.api.IssuePolicyStatus.MANAGE')}" : status.value=='2' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.RECORD')}" : status.value  }
   default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.actor')}
   value: actor

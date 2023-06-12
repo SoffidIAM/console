@@ -19,7 +19,7 @@
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Issue" 
 				defaultAttributes="type, description"
-				preference="issuePolicy"
+				preference="issue"
 				dataPath="/model:/issue" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 

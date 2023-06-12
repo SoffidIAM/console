@@ -96,12 +96,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				result = evaluate (rule.getBshExpression(), rule.getName(), env);
 			if (result != null &&  !(result instanceof Boolean) && !(result instanceof String[]) && !(result instanceof Collection) )
 			{
-//				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
 				throw new InternalErrorException ("The output type "+result.getClass().toString()+" is not valid. The return type must be boolean, array string or collection"); //$NON-NLS-1$
 
 			}else if(result instanceof String[])
 			{
-				log.info("EL resultado es un array de strings");
 				result = Arrays.asList( (String[]) result);
 			}else if(result instanceof ScriptObjectMirror) {
 				if(((ScriptObjectMirror) result).isArray()) {
@@ -208,7 +206,6 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			}
 			else if(result != null && result instanceof Collection)
 			{
-				log.info("Entrando en caso de ser Collection o String[]");
 				for (RuleAssignedRoleEntity rar : rule.getRoles()) {
                     DomainValueEntity valor = null;
                     String stringValue = null;
@@ -223,11 +220,10 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
                     
                     assignRoletoAccounts(rule, roles, user, rar.getRole(), stringValue, method,(Collection)result);
                 }
-				log.info("Roles estáticos asignados.");
+				
 				
 				if ( rule.getBshRoles() != null)
 				{
-					log.info("GEstion de Roles dinámicos asignados.");
 					Object o = evaluate(rule.getBshRoles(), rule.getName(), env);
 					if (o != null) {
 						if (! (o instanceof Collection))
@@ -692,8 +688,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	protected AsyncProcessTracker handleQueryProcessStatus(AsyncProcessTracker process) throws Exception {
 		return proc.get(process.getId());
 	}
-	
-	private boolean isAnySystemShared(Collection<String> accs,RoleEntity rol) throws InternalErrorException {
+	private boolean isAnySystemSharedOrAccoutSystemExists(Collection<String> accs,RoleEntity rol) throws InternalErrorException {
 		boolean out = false;
 		Iterator<String> iter = accs.iterator();
 		String sys="";
@@ -701,8 +696,6 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		while(iter.hasNext()) {
 			elm = iter.next();
 			sys = elm.substring(elm.lastIndexOf("@") + 1 , elm.length()) ;
-			log.info("isAnySystemShared: Sistema "+sys);
-			log.info("Nombre del sistema del rol: "+ rol.getSystem().getName() );
 			com.soffid.iam.api.System chSys = getDispatcherService().findDispatcherByName(sys);
 			if(sys.equals(elm)) throw new InternalErrorException("The String returned does not fit into 'ACCOUNT@SYSTEM' expected structure.");
 			if (chSys == null ) throw new InternalErrorException("The System "+sys+" doesn't exists.");
@@ -719,7 +712,6 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	}
 	
 	private List<String> getResultsWithSameRoleSystemOrExistingSystems(RoleEntity role, Collection<String> result) throws InternalErrorException{
-		log.info("Dentro de getResultsWithSameRoleSystem");
 		List<String> out = new ArrayList<String>();
 		String elm="";
 		String roleSysName = role.getSystem().getName().toUpperCase();
@@ -728,29 +720,23 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		while(it.hasNext()) {
 			elm = (String) it.next();
 			sys = elm.substring( elm.lastIndexOf("@") +1, elm.length()).toUpperCase();
-			log.info("getResultsWithSameRoleSystem"+sys);
 			if ( sys.equals(roleSysName) || existsSystem(sys) ) out.add( elm );
-			
 		}
 		return out;
 	}
 	private String[] evaluateAccountAndSystem(String accSys) throws InternalErrorException { //ARRAY
 		HashMap<String,String> hm = new HashMap<String,String>();
 		if(accSys.length() - accSys.replace("@", "").length() == 0) {
-			
 			throw new InternalErrorException("The String returned does not fit into 'ACCOUNT@SYSTEM' expected structure.");
 		}
 		int arroba = accSys.lastIndexOf("@");
 		String system = accSys.substring(arroba + 1,accSys.length());
-		log.info("Sistema "+system);
 		String account = accSys.substring(0,arroba);
-		log.info("Cuenta "+account);
 		if( system.isBlank() || account == null || account.isBlank() )
 		{
 			throw new InternalErrorException("ACCOUNT and SYSTEM from 'ACCOUNT@SYSTEM' returned String structure can't be null.");
 		} 
 		com.soffid.iam.api.System sys = getDispatcherService().findDispatcherByName(system);
-		log.info("System "+sys);
 		if(sys == null)
 		{
 			throw new InternalErrorException("The SYSTEM from 'ACCOUNT@SYSTEM' returned String structure doesn't exists.");
@@ -759,19 +745,24 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		return new String[] {account,system};
 	}
 	
-	/*Método que dada una lista de Strings de formato ACCOUNT@SYSTEM 
-	* otorga los permisos a las cuentas que cumplan con los siguinetes requisitos:
-	* - La cuenta no puede pertenecer a otro usuario distinto a 'user'
-	* - Si existen cuentas del sistema del rol, se asinan los permisos a dichas cuentas. 
-	*   Si no existe ninguna cuenta del sistema en la lista se asigna el rol a todas las cuentas.
-	*
-	* roles: ROles del usuario en evaluación
-	* 
-	*/
+	private boolean isSomeAccountWithRoleSystem(String roleSystem, Collection<String>  accountsSys) {
+		boolean out = false;
+		Iterator it = accountsSys.iterator();
+		String elm = "";
+		String sys;
+		roleSystem=roleSystem.toUpperCase();
+		while(it.hasNext()) {
+			elm = (String) it.next();
+			sys = elm.substring( elm.lastIndexOf("@") +1, elm.length()).toUpperCase();
+			if (roleSystem.equals(sys.toUpperCase())) out=true;			
+		}
+		return out;		
+	}
+	
 	
 	private void assignRoletoAccounts(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user,
 					RoleEntity role, String stringValue, RuleEvaluatorGrantRevokeMethod method, Collection<String> accountsSys) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
-		log.info("Las cuentas son: "+accountsSys);
+	
 		LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
 		LinkedList<AccountEntity> disabledAccounts = new LinkedList<AccountEntity>();
 		String[] accountAndSystem;
@@ -781,48 +772,38 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 		UserAccount ua;
 		List<String> targetAccounts = new ArrayList<>();
 		Collection<String> owners = new ArrayList<>();
-		//Comprobamos si en la lista existe alguna cuenta que coincida con el rol evaluado
-		boolean sysShared = isAnySystemShared(accountsSys,role);
+		boolean sysShared = isAnySystemSharedOrAccoutSystemExists(accountsSys,role);
 		boolean existsAccount = false;
 		if(sysShared) {
-			//Obtenemos una lista de cuentas a tratar 
 			targetAccounts = getResultsWithSameRoleSystemOrExistingSystems(role,accountsSys);
-		} else {
-			log.info("No se comparte el sistema con ningún rol.");
-			assignRole(rule, roles, user, role, stringValue, method);//MOD
-		}
-		log.info("TargetAccounts: "+targetAccounts);
+		} 
 			for (String accsys: targetAccounts) {
 				accountAndSystem = evaluateAccountAndSystem(accsys);
-				log.info(accountAndSystem);
 				account = as.findAccount(accountAndSystem[0],accountAndSystem[1]);
 				
 				existsAccount = account != null;
 				if(existsAccount) {
 					owners = account.getOwnerUsers();
-					log.info("La cuenta existe.");
 				}
-				if( !(accountAndSystem[1].toUpperCase()).equals(role.getSystem().getName().toUpperCase()) && existsSystem(accountAndSystem[1]) ) { 
-					log.info("La cuenta es de un sistema diferente al del rol, se creará la cuenta y se mantendrán los roles de las cuentas existentes en el sistema del rol.");
+				if( !(accountAndSystem[1].toUpperCase()).equals(role.getSystem().getName().toUpperCase()) && existsSystem(accountAndSystem[1])) { 
 					if(!existsAccount) {
 						UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getDispatcherService().findDispatcherByName​(accountAndSystem[1]),accountAndSystem[0]);	
 					}
-					assignRole(rule, roles, user, role, stringValue, method);
+					if(!isSomeAccountWithRoleSystem(role.getSystem().getName(),targetAccounts)) {
+						assignRole(rule, roles, user, role, stringValue, method);
+					}
 					continue;
 				}
-				if(existsAccount && owners.contains( user.getUserName() ) && account.getType()==AccountType.USER) { //owners
+				if(existsAccount && owners.contains( user.getUserName() ) && account.getType()==AccountType.USER) { 
 					assignRoleAccount(rule, roles, user, role, stringValue, method, aeDao.accountToEntity(account));
-					log.info("La cuenta "+accountAndSystem[0]+" ya existe y es del usuario.");
 				} else if(owners.size() != 0 && !owners.contains( user.getUserName() ) ) {
 					throw new InternalErrorException(
 									String.format("The account %s its owned by an other user different than %s",accountAndSystem[0],accountAndSystem[1] ) );
 				}else if (!existsAccount) {
 					UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()),accountAndSystem[0]);
-					log.info("1.-Cuenta " + usrAcc);
 					assignRoleAccount(rule, roles, user, role, stringValue, method, aeDao.accountToEntity(usrAcc));
 				} else {
 					UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getDispatcherService().findDispatcherByName(accountAndSystem[1]), accountAndSystem[0]);
-					log.info("2.-Cuenta " + usrAcc);
 					assignRoleAccount(rule, roles, user, role, stringValue, method, aeDao.accountToEntity(usrAcc));
 
 				}

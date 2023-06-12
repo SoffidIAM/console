@@ -18,6 +18,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.service.AdditionalDataJSONConfiguration;
 import com.soffid.iam.service.AdditionalDataService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
@@ -54,6 +55,8 @@ public class ScimHelper {
 	
 	
 	public void search (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+
 		AbstractExpression expr = evaluateQuery(textFilter, jsonQuery);
 
 		if (session == null) {

@@ -8,6 +8,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
+import com.soffid.iam.model.HostAttributeEntity;
 import com.soffid.iam.model.MailListAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntityImpl;
@@ -46,5 +47,6 @@ public class AdditionalDataJSONConfiguration {
 		registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value", "customObject");
 		registerVirtualAttribute(MailListAttributeEntity.class, "metadata.name", "value", "mailList");
 		registerVirtualAttribute(UserGroupAttributeEntity.class, "metadata.name", "value", "userGroup");
+		registerVirtualAttribute(HostAttributeEntity.class, "metadata.name", "value", "host");
 	}
 }

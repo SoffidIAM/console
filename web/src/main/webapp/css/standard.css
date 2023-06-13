@@ -4169,3 +4169,24 @@ div.merge div.databox select,
 div.merge div.databox input {
 	cursor: pointer;
 }
+
+div.notice {
+	position: fixed;
+    z-index: 10;
+    top: 40px;
+    right: 0px;
+    width: 350px;
+    background-color: {BLUE};
+    height: 150px;
+    padding: 60px;
+    border-radius: 14px;
+    box-shadow: -10px 10px {BLUEDARK};
+    color: {BLUETEXT}
+}
+
+div.merge,
+div.merge div.databox ,
+div.merge div.databox select,
+div.merge div.databox input {
+	cursor: pointer;
+}

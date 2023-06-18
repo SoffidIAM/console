@@ -116,7 +116,7 @@ public class LuceneIndexStatus {
 
 	public void save() throws FileNotFoundException, IOException, InternalErrorException {
 		File dir = getIndexDir();
-
+		
 		dir.mkdirs();
 		
 		LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
@@ -139,6 +139,7 @@ public class LuceneIndexStatus {
 		boolean remove = false;
 		for (LuceneIndexPartEntity part: luceneIndexPartEntityDao.findByIndex(current.getId())) {
 			if (! part.getName().equals(partName)) {
+				remove = false;
 				partName = part.getName();
 				boolean found = false;
 				for (File f: files) {

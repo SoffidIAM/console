@@ -17,7 +17,7 @@ public class IndexerThread extends NotLoggedThread {
 	}
 
 	boolean finish = false;
-	int delay = 300000; // 5 minutos
+	int delay = 30000; // 30 segundos
 	private Log logger = LogFactory.getLog(IndexerThread.class);
 	
 	public int getDelay() {

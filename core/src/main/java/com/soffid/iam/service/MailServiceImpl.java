@@ -170,19 +170,25 @@ public class MailServiceImpl extends MailServiceBase {
 			Address[] address = getAddress(actors);
 			if (address.length > 0)
 			{
+				StringBuffer sb = new StringBuffer();
+				for (Address a: address) {
+					if (sb.length() > 0) sb.append(", ");
+					sb.append(a.toString());
+				}
 				msg.setFrom(new InternetAddress(getFrom()));
-				msg.setRecipients(Message.RecipientType.TO, address);
+				msg.setRecipients(Message.RecipientType.TO, sb.toString());
+				msg.setHeader("To", sb.toString());
 				if (cc != null && ! cc.trim().isEmpty())
 					msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 				// -- Set the subject and body text --
 				msg.setSubject(subject, "UTF-8");
-	
+				
 				// enviem en mime - utf-8, que és com ho tenim al repositori
 				msg.setContent(body, "text/html; charset=utf-8"); //$NON-NLS-1$
 				// -- Set some other header information --
 				msg.setHeader("X-Mailer", "SoffidMailer"); //$NON-NLS-1$ //$NON-NLS-2$
 				msg.setSentDate(new Date());
-	
+				
 				// -- Send the message --
 				Transport.send(msg);
 			}
@@ -222,7 +228,13 @@ public class MailServiceImpl extends MailServiceBase {
 			if (address.length > 0)
 			{
 				msg.setFrom(new InternetAddress(getFrom()));
+				StringBuffer sb = new StringBuffer();
+				for (Address a: address) {
+					if (sb.length() > 0) sb.append(", ");
+					sb.append(a.toString());
+				}
 				msg.setRecipients(Message.RecipientType.TO, address);
+				msg.setHeader("To", sb.toString());
 				if (cc != null && ! cc.trim().isEmpty())
 					msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 				// -- Set the subject and body text --

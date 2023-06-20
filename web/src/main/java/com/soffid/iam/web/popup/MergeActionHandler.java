@@ -145,18 +145,19 @@ public class MergeActionHandler extends Window implements AfterCompose {
 		Rows rows = new Rows();
 		actions1.appendChild(rows);
 		
+		Row header = new Row();
+		rows.appendChild(header);
+		header.appendChild(new Label(Labels.getLabel("common.merge")));
+		int pos = 0;
+		for ( String name: names ) {
+			Switch s = new Switch();
+			s.setChecked(true);
+			s.addEventListener("onCheck", onUserSwitch);
+			header.appendChild(s);
+			s.setAttribute("position", pos++);
+		}
 		if (names.size() > 2) {
-			Row header = new Row();
-			rows.appendChild(header);
-			header.appendChild(new Label(Labels.getLabel("common.merge")));
-			int pos = 0;
-			for ( String name: names ) {
-				Switch s = new Switch();
-				s.setChecked(true);
-				s.addEventListener("onCheck", onUserSwitch);
-				header.appendChild(s);
-				s.setAttribute("position", pos++);
-			}
+			header.setVisible(false);
 		}
 		
 		for (DataType attribute: dataTypes) {

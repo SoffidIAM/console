@@ -25,7 +25,7 @@ public class CrudIssueHandler implements CrudHandler<Issue> {
 	
 	@Override
 	public Issue create(Issue object) throws InternalErrorException, NamingException, CreateException {
-		throw new InternalErrorException("Method not supported");
+		return getService().create(object);
 	}
 
 	@Override
@@ -40,7 +40,7 @@ public class CrudIssueHandler implements CrudHandler<Issue> {
 
 	@Override
 	public Issue update(Issue object) throws InternalErrorException, NamingException, CreateException {
-		throw new InternalErrorException("Method not supported");
+		return getService().update(object);
 	}
 
 	@Override

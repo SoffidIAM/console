@@ -41,7 +41,8 @@ public class UserMergeAction extends MergeAction {
 				Long srcId = (Long) XPathUtils.eval(dataSource, xpath+"/@id");
 				String name = (String) XPathUtils.eval(dataSource, xpath+"/@userName");
 				userService.merge(srcId, targetId);
-				EJBLocator.getIssueService().registerAction(currentIssue, "Merge user "+name+" into "+targetName);
+				if (currentIssue != null)
+					EJBLocator.getIssueService().registerAction(currentIssue, "Merge user "+name+" into "+targetName);
 			}
 		}
 		

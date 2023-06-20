@@ -61,34 +61,20 @@ public class IssuePolicyServiceImpl extends IssuePolicyServiceBase {
 		pr.setStartIndex(start);
 		pr.setItemsPerPage(pageSize);
 		int total = 0;
-		for (int roleIndex = 0; roleIndex <= roles.length; roleIndex += rolesStep) {
-			List<String> newRoles = new LinkedList<>();
-			for (int i = roleIndex; i < roleIndex + rolesStep && i < roles.length; i++) 
-				newRoles.add(roles[i]);
-			if (newRoles.size() < rolesStep && soffidPrincipal.getUserName() != null)
-				newRoles.add(soffidPrincipal.getUserName());
-			
-			ScimHelper h = new ScimHelper(IssuePolicy.class);
-			CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
-			config.setFirstResult(start);
-			config.setMaximumResultSize(pageSize);
-			h.setConfig(config);
-			h.setTenantFilter("tenant.id");
-			h.setGenerator((entity) -> {
-				IssuePolicyEntity ue = (IssuePolicyEntity) entity;
-				return dao.toIssuePolicy(ue);
-			});
-			
-			h.setExtraWhere("o.actor in (:list)");
-			HashMap<String,Object> parameters = new HashMap<>();
-			parameters.put("list", newRoles);
-			h.setExtraParameters(parameters);
-			h.search(null, query, (Collection) l); 
-			total += h.count();
-			pr.setTotalResults(total);
-			if ( pageSize != null && l.size() >= pageSize.intValue())
-				return pr;
-		}
+		ScimHelper h = new ScimHelper(IssuePolicy.class);
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(start);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			IssuePolicyEntity ue = (IssuePolicyEntity) entity;
+			return dao.toIssuePolicy(ue);
+		});
+		
+		h.search(null, query, (Collection) l); 
+		total += h.count();
+		pr.setTotalResults(total);
 
 		return pr;
 	}

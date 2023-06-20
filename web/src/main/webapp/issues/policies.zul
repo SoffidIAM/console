@@ -52,10 +52,6 @@
 					use="com.soffid.iam.web.component.DatasourceButton3"/>
 			</div>
 			<div class="navigation-bar">
-				<menu2>
-					<menu2item  image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"
-						if="${soffid:isUserInRole('issuePolicy:delete')}" />
-				</menu2>
 			</div>
 			<div id="dades"> 
 				<form id="form" onChangeXPath="ref:frame.onChangeForm"

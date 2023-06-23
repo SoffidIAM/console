@@ -87,4 +87,7 @@ public class Issue {
 	@Nullable
 	@Attribute(multiline = true)
 	String performedActions;
+
+	@Nullable @Attribute(readonly = true, type = "ACCOUNT_TYPE")
+	String requester;
 }

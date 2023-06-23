@@ -61,7 +61,7 @@ public class IssueHandler extends FrameHandler {
 				Button b = (Button) iterator.next();
 				IssueActionDefinition a = (IssueActionDefinition) b.getAttribute("action");
 				if (a != null) {
-					b.setVisible(a.getIssueTypes().contains(i.getType()));
+					b.setVisible(a.getIssueTypes().contains(i.getType()) && i.getStatus() != IssueStatus.SOLVED);
 				}
 			}
 			getFellow("ack_button").setVisible(i.getStatus() == IssueStatus.NEW);

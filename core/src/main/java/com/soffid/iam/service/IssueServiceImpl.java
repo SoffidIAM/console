@@ -151,6 +151,9 @@ public class IssueServiceImpl extends IssueServiceBase {
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
 					issueUserEntity.setExternalId(user.getExternalId());
+					if (userEntity != null)
+						issueUserEntity.setUserName(userEntity.getUserName());
+					issueUserEntity.setAction(EventUserAction.UNKNOWN);
 					getIssueUserEntityDao().create(issueUserEntity);
 					entity.getUsers().add(issueUserEntity);
 				}
@@ -216,6 +219,14 @@ public class IssueServiceImpl extends IssueServiceBase {
 			entity.setSolved(new Date());
 			addHistory(entity, "Solved");
 			getIssueEntityDao().update(entity);
+			if (issue.getType().equals("duplicated-user")) {
+				for (IssueUserEntity ue: entity.getUsers()) {
+					if (ue.getAction() == null || ue.getAction() == EventUserAction.UNKNOWN ) {
+						ue.setAction(EventUserAction.DIFFERENT_USER);
+						getIssueUserEntityDao().update(ue);
+					}
+				}
+			}
 		}
 		
 		LinkedList l = new LinkedList<>(entity.getUsers());
@@ -379,5 +390,11 @@ public class IssueServiceImpl extends IssueServiceBase {
 		addHistory(entity, action);
 		getIssueEntityDao().update(entity);
 		return getIssueEntityDao().toIssue(entity);
+	}
+
+	@Override
+	protected List<Issue> handleFindIssuesByUser(String user) throws Exception {
+		Collection<IssueEntity> l = getIssueEntityDao().findByUserName(user);
+		return getIssueEntityDao().toIssueList(l);
 	}
 }

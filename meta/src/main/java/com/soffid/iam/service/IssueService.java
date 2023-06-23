@@ -47,6 +47,9 @@ public class IssueService {
 	@Operation(grantees = { IssueQuery.class })
 	PagedResult<Issue> findIssuesByJsonQuery (@Nullable String query, @Nullable Integer first, @Nullable Integer pageSize) { return null; }
 
+	@Operation(grantees = { IssueQuery.class })
+	List<Issue> findIssuesByUser (@Nullable String user) { return null; }
+
 	Issue createInternalIssue(Issue event) { return null;}
 	
 	@Operation(grantees = { IssueCreate.class})

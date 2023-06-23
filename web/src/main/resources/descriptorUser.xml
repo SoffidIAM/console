@@ -61,6 +61,12 @@
 			<new-instance-bean className="com.soffid.iam.api.Session"> 
 			</new-instance-bean>
 		</finder>
+		<finder name="issue" type="issue"> <!-- user:session:query -->
+			<ejb-finder jndi="java:/module/IssueService-v2"
+				method="findIssuesByUser">
+				<parameter value="${instance.userName}" />
+			</ejb-finder>
+		</finder>
 		<finder name="role" type="rol" refreshAfterCommit="true"> <!-- user:role:query -->
 			<ejb-finder jndi="java:/module/ApplicationService-v2"
 				method="findUserRolesByUserNameNoRules" if="${canQueryUserRole}">
@@ -119,6 +125,7 @@
 
 	<datanode name="effectiveRole" transient="true"/>
 	<datanode name="tipusDada" transient="true" />
+	<datanode name="issue" transient="true" />
 		
 	<datanode name="account">
 		<script-handler>

@@ -7,6 +7,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import com.soffid.iam.api.Issue;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.impl.events.IssueTextFormatter;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.Auditoria;
 
@@ -19,6 +20,9 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 		target.setRoleAccount(source.getRoleAccount() == null ? null: getRoleAccountEntityDao().load(source.getRoleAccount().getId()));
 		target.setRule(source.getRule() == null ? null: getPamRuleEntityDao().load(source.getRule().getId()));
 		target.setAccount(source.getAccount() == null? null: getAccountEntityDao().load(source.getAccount().getId()));
+		SystemEntity mainDispatcher = getSystemEntityDao().findSoffidSystem();
+		target.setRequester(getAccountEntityDao().findByNameAndSystem(Security.getCurrentAccount(),
+				mainDispatcher.getName()));
 	}
 
 	@Override
@@ -30,6 +34,7 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 		target.setAccount(source.getAccount() == null ? null: getAccountEntityDao().toAccount(source.getAccount()));
 		target.setUsers(getIssueUserEntityDao().toIssueUserList(source.getUsers()));
 		target.setHosts(getIssueHostEntityDao().toIssueHostList(source.getHosts()));
+		target.setRequester(source.getRequester() == null ? null:  source.getRequester().getName()+"@"+source.getRequester().getSystem().getName());
 		calculateDescription(source, target);
 
 	}

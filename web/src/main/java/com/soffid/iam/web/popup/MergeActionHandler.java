@@ -156,7 +156,7 @@ public class MergeActionHandler extends Window implements AfterCompose {
 			header.appendChild(s);
 			s.setAttribute("position", pos++);
 		}
-		if (names.size() > 2) {
+		if (names.size() <= 2) {
 			header.setVisible(false);
 		}
 		

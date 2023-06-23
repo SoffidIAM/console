@@ -1,10 +1,12 @@
 package com.soffid.iam.model;
 
+import java.util.Collection;
 import java.util.Date;
 
 import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.IssueStatus;
 import com.soffid.mda.annotation.Column;
+import com.soffid.mda.annotation.DaoFinder;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
@@ -14,9 +16,10 @@ import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
+import es.caib.seycon.ng.model.UsuariEntity;
 
 @Entity(table = "SC_ISSUE")
-@Depends({Issue.class})
+@Depends({Issue.class, DispatcherEntity.class})
 public class IssueEntity {
 	@Nullable @Identifier @Column(name = "EVE_ID")
 	Long id;
@@ -69,9 +72,18 @@ public class IssueEntity {
 	@Nullable @Column(name = "EVE_ACTOR")
 	String actor;
 	
+	@Nullable @Column(name = "EVE_REQ_ID")
+	AccountEntity requester;
+	
 	@Nullable @Column(name = "EVE_RISK")
 	SoDRisk risk;
 
 	@Column(name = "EVE_TEN_ID")
 	TenantEntity tenant;
+	
+	@DaoFinder("select i from com.soffid.iam.model.IssueEntity as i "
+			+ "join i.users as users "
+			+ "join users.user as user "
+			+ "where user.userName = :user and user.tenant.id=:tenantId")
+	Collection<IssueEntity> findByUserName(String user) { return null;}
 }

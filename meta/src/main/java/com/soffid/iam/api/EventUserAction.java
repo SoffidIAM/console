@@ -8,6 +8,7 @@ public class EventUserAction {
 	public String DUPLICATED = "D";
 	public String DIFFERENT_USER = "U";
 	public String LOCK = "L";
-	public String UNLOCK = "U";
+	public String UNLOCK = "O";
 	public String DISABLE = "D";
+	public String UNKNOWN = "K";
 }

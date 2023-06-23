@@ -10,6 +10,7 @@
 <?component name="user_process" macro-uri="user-process.zul"?>
 <?component name="user_session" macro-uri="user-session.zul"?>
 <?component name="user_printers" macro-uri="user-printers.zul"?>
+<?component name="user_issues" macro-uri="user-issues.zul"?>
 
 <?page id="user"?>
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
@@ -69,6 +70,7 @@
 					<tab label="${c:l('usuaris.zul.SharedAccounts')}" id="tabsharedaccount"/>
 					<tab label="${c:l('usuaris.zul.Sessions')}" id="tabsession"/>
 					<tab label="${c:l('usuaris.zul.Processosdusuari')}" id="tabprocess"/>
+					<tab label="${c:l('seu.events')}" id="tabissues" if="${soffid:isUserInRole('issue:query') }"/>
 				</tabs>
 				<tabpanels>
 					<tabpanel id="datatab">
@@ -116,6 +118,9 @@
 					</tabpanel>
 					<tabpanel fulfill="tabprocess.onSelect" >
 						<user_process listbox="//user/listbox" id="user_process"/>
+					</tabpanel>
+					<tabpanel fulfill="tabissues.onSelect"  if="${soffid:isUserInRole('issue:query') }">
+						<user_issues listbox="//user/listbox" id="user_issues"/>
 					</tabpanel>
 				</tabpanels>
 			</tabbox>

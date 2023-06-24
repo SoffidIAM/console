@@ -10,6 +10,9 @@ import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.script.Bindings;
@@ -18,6 +21,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.openjdk.nashorn.api.scripting.AbstractJSObject;
 import org.openjdk.nashorn.api.scripting.ClassFilter;
 import org.openjdk.nashorn.api.scripting.JSObject;
 import org.openjdk.nashorn.api.scripting.NashornException;
@@ -38,7 +42,7 @@ public class JavascriptEvaluator extends Evaluator {
 		Bindings bindings = new DynamicBindings(vars);
 		engine.setBindings(bindings , ScriptContext.ENGINE_SCOPE);
 		try {
-			return secureRun(engine, script);
+			return unwrap(secureRun(engine, script));
         } catch (ScriptException se) {
             // get the original cause
             Throwable cause = se.getCause();
@@ -58,6 +62,31 @@ public class JavascriptEvaluator extends Evaluator {
             throw se;
         }
 	}
+	private Object unwrap(Object r) {
+		if (r == null)
+			return null;
+		if (r instanceof org.openjdk.nashorn.api.scripting.AbstractJSObject) {
+			org.openjdk.nashorn.api.scripting.AbstractJSObject js = (AbstractJSObject) r;
+			if (js.isArray()) {
+				List<Object> l = new LinkedList<>();
+				Number length = (Number) js.getMember("length");
+				for (int i = 0; i < length.intValue(); i++)
+					l.add(unwrap(js.getSlot(i)));
+				return l;
+			}
+			else 
+			{
+				HashMap m = new HashMap<>();
+				for (Object value: js.keySet()) {
+					m.put(value, unwrap(js.getMember(value.toString())));
+				}
+				return m;
+			}
+		}
+
+		return r;
+	}
+	
 	@Override
 	public boolean isSecure() {
 		return true;

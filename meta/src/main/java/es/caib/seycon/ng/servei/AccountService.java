@@ -353,6 +353,15 @@ public abstract class AccountService {
 	 return null;
 	}
 
+	@Description("Gets the users than currently can use the account from console")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<Long> getUserGrantedAccountIds(
+		es.caib.seycon.ng.comu.Usuari usuari)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
+
 	///////////////////
 	@Description("Updates the accounts last update property")
 	@Operation (translated="updateAccountLastUpdate")

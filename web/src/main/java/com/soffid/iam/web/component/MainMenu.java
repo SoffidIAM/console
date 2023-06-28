@@ -57,7 +57,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		try {
 			options = new MenuParser().getMenus(menu);
 			currentOptions = options;
-			if (option != null) 
+			if (option != null && !option.trim().isEmpty()) 
 				searchOption(options, option);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

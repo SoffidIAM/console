@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jcs.access.behavior.ICacheAccess;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.Account;
@@ -109,13 +111,16 @@ public class AccountEntityDaoImpl extends
 	public void toAccount(com.soffid.iam.model.AccountEntity source,
 			Account target) {
 		try {
+			Log log = LogFactory.getLog(getClass());
 			AccountCacheEntry entry = (AccountCacheEntry) getCache().get(source.getId());
 			if ( entry != null)
 			{
 				fetchFromCache(target, entry);
 				return ;
 			}
+			log.info("serialize 0");
 			super.toAccount(source, target);
+			log.info("serialize 1");
 			// Incompatible types source.dispatcher and target.dispatcher
 			// Missing attribute grantedGroups on entity
 			// Missing attribute grantedUsers on entity
@@ -181,6 +186,7 @@ public class AccountEntityDaoImpl extends
 					}
 				}
 			}
+			log.info("serialize 2");
 			target.setGrantedGroups(grups);
 			target.setGrantedRoles(roles);
 			target.setGrantedUsers(usuaris);
@@ -199,6 +205,7 @@ public class AccountEntityDaoImpl extends
 					target.setPasswordPolicy(uae.getUser().getUserType().getName());
 				}
 			}
+			log.info("serialize 3");
 			target.setAttributes(new HashMap<String, Object>());
 			Map<String, Object> attributes = target.getAttributes();
 			for (AccountAttributeEntity att : source.getAttributes()) {
@@ -275,6 +282,7 @@ public class AccountEntityDaoImpl extends
 					target.setLoginUrl( (String) target.getAttributes().get("SSO:URL") );
 			}
 
+			log.info("serialize 4");
 			storeCacheEntry(source, target);
 	
 			if (source.getType() == AccountType.PRIVILEGED) 
@@ -290,18 +298,25 @@ public class AccountEntityDaoImpl extends
 		entry.account = new Account(target);
 		entry.timeStamp = System.currentTimeMillis();
 
-		entry.ownerAcl = new HashSet<String>(
-				getACLService()
-					.expandACLAccounts(
-							generateAcl (source, AccountAccessLevelEnum.ACCESS_OWNER)));
-		entry.managerAcl = new HashSet<String>(
-				getACLService()
-					.expandACLAccounts(
-							generateAcl (source, AccountAccessLevelEnum.ACCESS_MANAGER)));
-		entry.userAcl = new HashSet<String>(
-				getACLService()
-					.expandACLAccounts(
-							generateAcl (source, AccountAccessLevelEnum.ACCESS_USER)));
+		entry.aclOwner = new AccessControlList();
+		entry.aclManager = new AccessControlList();
+		entry.aclUser = new AccessControlList();
+		
+		for (AccountAccessEntity aa: source.getAcl()) {
+			AccessControlList acl = 
+					aa.getLevel() == AccountAccessLevelEnum.ACCESS_OWNER ? entry.aclOwner :
+						aa.getLevel() == AccountAccessLevelEnum.ACCESS_MANAGER ? entry.aclManager :
+							aa.getLevel() == AccountAccessLevelEnum.ACCESS_USER ? entry.aclUser :
+								null;
+			if (acl != null) {
+				if (aa.getGroup() != null) 
+					acl.getGroups().add(aa.getGroup().getId());
+				if (aa.getRole() != null)
+					acl.getRoles().add(aa.getRole().getId());
+				if (aa.getUser() != null)
+					acl.getUsers().add(aa.getUser().getId());
+			}
+		}
 
 		entry.account.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
 		
@@ -345,11 +360,11 @@ public class AccountEntityDaoImpl extends
 		target.setServerType(entry.account.getServerType());
 		target.setHasSnapshot(entry.account.isHasSnapshot());
 		String currentUser = Security.getCurrentAccount();
-		if (entry.ownerAcl.contains(currentUser))
+		if (getACLService().isCurrentUserIncluded(entry.aclOwner))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
-		else if (entry.managerAcl.contains(currentUser))
+		else if (getACLService().isCurrentUserIncluded(entry.aclManager))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_MANAGER);
-		else if (entry.userAcl.contains(currentUser))
+		else if (getACLService().isCurrentUserIncluded(entry.aclUser))
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_USER);
 		else
 			target.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
@@ -572,7 +587,7 @@ class AccountCacheEntry implements Serializable {
 	
 	long timeStamp;
 	Account account;
-	HashSet<String> ownerAcl;
-	HashSet<String> managerAcl;
-	HashSet<String> userAcl;
+	AccessControlList aclOwner;
+	AccessControlList aclManager;
+	AccessControlList aclUser;
 }

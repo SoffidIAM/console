@@ -21,7 +21,7 @@ public interface SoffidPrincipal extends Principal {
 	public String[] getSoffidRoles() ;
 
 	public String[] getGroupsAndRoles() ;
-
+	
 	public boolean hasRole(String role);
 
 	public String getUserName();
@@ -35,4 +35,12 @@ public interface SoffidPrincipal extends Principal {
 	public List<String> getHolderGroups();
 	
 	public void setHolderGroup(String holderGroup) ;
+
+	List<Long> getAccountIds();
+
+	List<Long> getRoleIds();
+
+	Long getUserId();
+
+	List<Long> getGroupIds();
 }

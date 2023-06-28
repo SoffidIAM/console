@@ -847,24 +847,11 @@ public class EntryPointServiceImpl extends
 			} catch (UnknownUserException e) {
 			}
 
-			Collection<RoleGrant> grants;
-			if (holderGroupObj != null)
-				grants = getApplicationService().findEffectiveRoleGrantByUserAndHolderGroup(usuari.getId(), holderGroupObj.getId());
-			else
-				grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
-
-			if (grants != null)
-			{
-				for (RoleGrant grant: grants)
-				{
-					entry.getRolsUsuariPUE().add(grant.getRoleId());					
-				}
-			}
-            // Get active accounts
-            for ( Account account: getAccountService().getUserGrantedAccounts(getUserEntityDao().toUser(usuari)))
-            {
-            	entry.getAccountsPUE().add(account.getId());
-            }
+			Set<Long> rp = entry.getRolsUsuariPUE();
+			rp.addAll(p.getRoleIds());
+			
+			// Get active accounts
+			entry.getAccountsPUE().addAll(p.getAccountIds());
  			// Guardem les dades de l'usuari actual
 			getCache().put(p, entry);
 			return entry;

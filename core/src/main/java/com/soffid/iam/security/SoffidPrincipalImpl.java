@@ -25,6 +25,10 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private String userName;
 	List<Obligation> obligations = new LinkedList<>();
 	private Map<String, SoffidPrincipal> holderGroupMap;
+	private List<Long> roleIds;
+	private List<Long> accountIds;
+	private List<Long> groupIds;
+	private Long userId;
 	
 	public SoffidPrincipalImpl(String name,
 			String userName,
@@ -32,7 +36,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			String holderGroup,
 			List<String> permissions,
 			List<String> groups,
-			List<String> soffidRoles) {
+			List<String> soffidRoles,
+			List<Long> roleIds,
+			List<Long> accountIds,
+			List<Long> groupIds,
+			Long userId) {
 		super(name, "*", permissions);
 		init (name, 
 				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
@@ -40,6 +48,10 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.holderGroup = holderGroup;
 		this.fullName = fullName;
 		this.userName = userName;
+		this.roleIds = roleIds == null ? new LinkedList<>(): new LinkedList<>(roleIds);
+		this.accountIds = accountIds == null ? new LinkedList<>(): new LinkedList<>(accountIds);
+		this.groupIds = groupIds == null ? new LinkedList<>() : new LinkedList<>(groupIds);
+		this.userId = userId;
 	}
 
 	public SoffidPrincipalImpl(String name,
@@ -49,7 +61,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			List<String> permissions,
 			List<String> groups,
 			List<String> soffidRoles,
-			Map<String, SoffidPrincipal> holderGroupMap) {
+			Map<String, SoffidPrincipal> holderGroupMap,
+			List<Long> roleIds,
+			List<Long> accountIds,
+			List<Long> groupIds,
+			Long userId) {
 		super(name, "*", permissions);
 		init (name, 
 				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
@@ -58,6 +74,10 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.fullName = fullName;
 		this.userName = userName;
 		this.holderGroupMap = holderGroupMap;
+		this.roleIds = roleIds == null ? new LinkedList<>(): new LinkedList<>(roleIds);
+		this.accountIds = accountIds == null ? new LinkedList<>(): new LinkedList<>(accountIds);
+		this.groupIds = groupIds == null ? new LinkedList<>() : new LinkedList<>(groupIds);
+		this.userId = userId;
 	}
 
 	public SoffidPrincipalImpl(String name,  
@@ -200,7 +220,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 				p.getHolderGroup(),
 				Arrays.asList(p.getRoles()),
 				Arrays.asList(p.getGroups()),
-				Arrays.asList(p.getSoffidRoles()));
+				Arrays.asList(p.getSoffidRoles()),
+				p.getRoleIds(), 
+				p.getAccountIds(),
+				p.getGroupIds(),
+				p.getUserId());
 	}
 
 	@Override
@@ -236,5 +260,31 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		else
 			return super.hasRole(role);
 	}
+
+	@Override
+	public List<Long> getRoleIds() {
+		if (roleIds == null)
+			return Collections.emptyList();
+		return Collections.unmodifiableList(roleIds);
+	}
+
+	@Override
+	public List<Long> getAccountIds() {
+		if (accountIds == null)
+			return Collections.emptyList();
+		return Collections.unmodifiableList(accountIds);
+	}
 	
+	@Override
+	public List<Long> getGroupIds() {
+		if (groupIds == null)
+			return Collections.emptyList();
+		return Collections.unmodifiableList(groupIds);
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+	
+
 }

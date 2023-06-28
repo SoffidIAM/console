@@ -290,18 +290,23 @@ public class VaultServiceImpl extends VaultServiceBase {
 	protected List<Account> handleList(VaultFolder folder) throws Exception {
 		VaultFolderEntity entity = getVaultFolderEntityDao().load (folder.getId());
 		folder = getVaultFolderEntityDao().toVaultFolder(entity);
-		List<Account> accounts = getAccountEntityDao().toAccountList(entity.getAccounts());
+		List<Account> accounts = new LinkedList<>();
 		if (folder.getAccessLevel().equals( AccountAccessLevelEnum.ACCESS_NONE ))
 		{
 			return accounts;
 		}
 		
-		for (Iterator<Account> it = accounts.iterator(); it.hasNext();)
-		{
-			Account account = it.next();
-			if (account.getAccessLevel().equals (AccountAccessLevelEnum.ACCESS_NONE))
-				it.remove();
+		
+		List<Long> acc = Security.getSoffidPrincipal().getAccountIds();
+		for (AccountEntity ae: entity.getAccounts()) {
+			if (acc.contains(ae.getId())) {
+				Account account = getAccountEntityDao().toAccount(ae);
+				if (! account.getAccessLevel().equals (AccountAccessLevelEnum.ACCESS_NONE)) {
+					accounts.add(account);
+				}
+			}
 		}
+		
 		Collections.sort(accounts, new Comparator<Account>() {
 			public int compare(Account o1, Account o2) {
 				if (o1.getDescription() == null && o2.getDescription() == null) return 0;

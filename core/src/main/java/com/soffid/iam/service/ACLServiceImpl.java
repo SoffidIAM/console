@@ -11,10 +11,12 @@ import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.RoleGrant;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.spring.JCSCacheProvider;
+import com.soffid.iam.utils.Security;
 
 public class ACLServiceImpl extends ACLServiceBase  {
 	
@@ -221,6 +223,32 @@ public class ACLServiceImpl extends ACLServiceBase  {
 		if (cache == null)
 			cache = JCSCacheProvider.buildCache(PermissionCache.class.getName());
 		return cache;
+	}
+
+	@Override
+	protected boolean handleIsCurrentUserIncluded(AccessControlList acl) throws Exception {
+		SoffidPrincipal p = Security.getSoffidPrincipal();
+		if (p == null)
+			return false;
+		if (p.getUserId() != null) {
+			if (acl.getUsers().contains(p.getUserId()))
+				return true;
+		}
+		if (p.getSoffidRoles() != null) {
+			for ( Long roleId: p.getRoleIds())
+			{
+				if (acl.getRoles().contains(roleId))
+					return true;
+			}
+		}
+		if (p.getGroupIds() != null) {
+			for ( Long id: p.getGroupIds())
+			{
+				if (acl.getGroups().contains(id))
+					return true;
+			}
+		}
+		return false;
 	}
 
 }

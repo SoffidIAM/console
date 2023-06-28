@@ -57,6 +57,7 @@ public class LoginServiceImpl implements LoginService {
 	static Set<String> tenants = new HashSet<String>();
 	
 	public LoginServiceImpl() {
+		
 	}
 
 	public SoffidPrincipal authenticate(String username, String credentials) {
@@ -137,18 +138,23 @@ public class LoginServiceImpl implements LoginService {
 	
 					SoffidPrincipal principal;
 					String passwordDomain = ps.getDefaultDispatcher();
-					List<String> groups = getUserGroups (acc, null);
-					List<String> soffidRoles = getUserRoles(acc, null);
+					List<Long> groupIds = new LinkedList<Long>();
+					List<String> groups = getUserGroups (acc, null, groupIds);
+					List<Long> roleIds = new LinkedList<Long>();
+					List<String> soffidRoles = getUserRoles(acc, null, roleIds);
 					List<String> roles = getRoles(acc, null);
 					Map<String, SoffidPrincipal> holder =  new HashMap<String, SoffidPrincipal>();
 					
 					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next() : null;
 					String fullName = acc.getDescription();
+					List<Long> accountIds = new LinkedList<Long>();
 					User userData = null;
 					if (userName != null) {
 						userData = us.findUserByUserName(userName);
-						if (userData != null)
+						if (userData != null) {
 							fullName = userData.getFullName();
+							accountIds = getAccounts(acc, userData);
+						}
 					}
 					
 					if (samlAuthorized ||
@@ -159,7 +165,10 @@ public class LoginServiceImpl implements LoginService {
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account,
 								userName, fullName, holderGroup,
 								roles, groups, soffidRoles,
-								holder);
+								holder, 
+								roleIds, accountIds,
+								groupIds,
+								userData == null? null: userData.getId());
 						log.info(masterMessage = principal.getName() + " login accepted");
 
 						if (userName != null) {
@@ -176,7 +185,10 @@ public class LoginServiceImpl implements LoginService {
 								userName, fullName, holderGroup,
 								roles,
 								groups, soffidRoles,
-								holder);
+								holder,
+								roleIds, accountIds,
+								groupIds,
+								userData == null ? null: userData.getId());
 						log.info(masterMessage = principal.getName() + " login accepted with expired password");
 						acc.setLastLogin(Calendar.getInstance());
 						as.updateAccount(acc);
@@ -229,7 +241,11 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	
-    private String getHolderGroups(Account acc, User user, Map<String, SoffidPrincipal> r, String passwordRole) throws InternalErrorException, UnknownUserException {
+    private List<Long> getAccounts(Account acc, User userData) throws InternalErrorException {
+    	return new LinkedList<Long>(ServiceLocator.instance().getAccountService().getUserGrantedAccountIds(userData));
+	}
+
+	private String getHolderGroups(Account acc, User user, Map<String, SoffidPrincipal> r, String passwordRole) throws InternalErrorException, UnknownUserException {
     	if (acc.getType() != AccountType.USER || user == null)
     		return null;
     	
@@ -240,8 +256,11 @@ public class LoginServiceImpl implements LoginService {
     	
     	if (isHolderGroup(user.getPrimaryGroup())) {
     		holderGroup = user.getPrimaryGroup();
-			List<String> groups = getUserGroups (acc, user.getPrimaryGroup());
-			List<String> soffidRoles = getUserRoles(acc, user.getPrimaryGroup());
+			List<Long> groupIds = new LinkedList<Long>();
+			List<String> groups = getUserGroups (acc, user.getPrimaryGroup(), groupIds);
+			List<Long> accountIds = getAccounts(acc, user);
+			List<Long> roleids = new LinkedList<Long>();
+			List<String> soffidRoles = getUserRoles(acc, user.getPrimaryGroup(), roleids );
 			List<String> roles = getRoles(acc, user.getPrimaryGroup());
 			roles.add(passwordRole);
 			String userName = user.getUserName();
@@ -249,7 +268,9 @@ public class LoginServiceImpl implements LoginService {
 
 			SoffidPrincipalImpl principal = new SoffidPrincipalImpl(Security.getCurrentTenantName() + "\\" + acc.getName(),
 						userName, fullName, user.getPrimaryGroup(),
-						roles, groups, soffidRoles);
+						roles, groups, soffidRoles,
+						roleids, accountIds,
+						groupIds, user == null? null: user.getId());
 
 			r.put(user.getPrimaryGroup(), principal); 
     	}
@@ -257,8 +278,11 @@ public class LoginServiceImpl implements LoginService {
 		for (GroupUser ug: ServiceLocator.instance().getGroupService().findUsersGroupByUserName(user.getUserName())) {
     		if (!r.containsKey(ug.getGroup()) && isHolderGroup(ug.getGroup())) {
     			if (holderGroup == null) holderGroup = ug.getGroup();
-    			List<String> groups = getUserGroups (acc, ug.getGroup());
-    			List<String> soffidRoles = getUserRoles(acc, ug.getGroup());
+    			List<Long> groupIds = new LinkedList<Long>();
+    			List<String> groups = getUserGroups (acc, ug.getGroup(), groupIds);
+    			List<Long> accountIds = getAccounts(acc, user);
+    			List<Long> roleids = new LinkedList<Long>();
+    			List<String> soffidRoles = getUserRoles(acc, ug.getGroup(), roleids);
     			List<String> roles = getRoles(acc, ug.getGroup());
     			roles.add(passwordRole);
     			String userName = user.getUserName();
@@ -266,7 +290,8 @@ public class LoginServiceImpl implements LoginService {
 
     			SoffidPrincipalImpl principal = new SoffidPrincipalImpl(Security.getCurrentTenantName() + "\\" + acc.getName(),
     						userName, fullName, ug.getGroup(),
-    						roles, groups, soffidRoles);
+    						roles, groups, soffidRoles, roleids, accountIds,
+    						groupIds, user == null ? null: user.getId());
 
     			r.put(ug.getGroup(), principal); 
     			
@@ -284,7 +309,7 @@ public class LoginServiceImpl implements LoginService {
 		return gc != null && gc.isRoleHolder();
 	}
 
-	private List<String> getUserGroups(Account acc, String holderGroup) throws InternalErrorException, UnknownUserException {
+	private List<String> getUserGroups(Account acc, String holderGroup, List<Long> groupIds) throws InternalErrorException, UnknownUserException {
     	List<String> result = new LinkedList<String>();
     	if (acc.getType().equals(AccountType.USER))
     	{
@@ -294,14 +319,17 @@ public class LoginServiceImpl implements LoginService {
     			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId());
     		else
     			groups = ServiceLocator.instance().getUserService().getUserGroupsHierarchy(u.getId(), holderGroup );
-			for ( Group g: groups)
+			for ( Group g: groups) {
+				if (groupIds != null) 
+					groupIds.add(g.getId());
 				result.add(g.getName());
+			}
     	}
     	return result;
 	}
 
 
-    private List<String> getUserRoles(Account acc, String holderGroup) throws InternalErrorException {
+    private List<String> getUserRoles(Account acc, String holderGroup, List<Long> roleIds) throws InternalErrorException {
     	List<String> result = new LinkedList<String>();
     	Collection<RoleGrant> groups;
     	if (acc.getType().equals(AccountType.USER) && acc.getOwnerUsers().size() == 1)
@@ -327,6 +355,8 @@ public class LoginServiceImpl implements LoginService {
     		if (soffidSystem.getName().equals( grant.getSystem() ) && acc.getName().equals(grant.getOwnerAccountName()))
     			result.add(grant.getRoleName());
     		result.add(grant.getRoleName()+"@"+grant.getSystem());
+    		if (roleIds != null)
+    			roleIds.add(grant.getRoleId());
     		if (grant.getDomainValue() != null)
     		{
     			if (grant.getSystem().equals(soffidSystem.getName()))
@@ -338,7 +368,9 @@ public class LoginServiceImpl implements LoginService {
 	}
 
     Realm dummyRealm = new SoffidRealm();
-    Principal dummyPrincipal = new SoffidPrincipalImpl("master\\$$ANONYMUOS", null, "Anonymous", null, new LinkedList<String>(), null, null);
+    Principal dummyPrincipal = new SoffidPrincipalImpl("master\\$$ANONYMUOS", null, "Anonymous", null, 
+    		new LinkedList<String>(), null, null, null, null,
+    		null, null);
 
     private Object enterWebapp ()
 	{

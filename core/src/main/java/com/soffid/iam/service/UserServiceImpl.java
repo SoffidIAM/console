@@ -2628,8 +2628,18 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			return u;
 
 		
+		SoffidPrincipal p = Security.getSoffidPrincipal();
+		if (p != null && p.getUserId() != null) {
+			UserEntity ue = getUserEntityDao().load(p.getUserId());
+			if (ue != null)
+			{
+				u = getUserEntityDao().toUser(ue);
+				getSessionCacheService().putObject("currentUser", u);
+				return u;
+			}
+		}
+		
 		String userName = Security.getCurrentUser();
-
 		if (userName != null)
 		{
 			UserEntity ue = getUserEntityDao().findByUserName(userName);

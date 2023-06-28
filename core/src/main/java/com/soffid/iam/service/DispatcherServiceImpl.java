@@ -2092,93 +2092,96 @@ public class DispatcherServiceImpl extends
 		
 		new Thread ( () -> {
 			
-			Session session = SessionFactoryUtils.getSession(sessionFactory, true) ;
-			final Number count = (Number) session
-					.createQuery( "select count(*) from com.soffid.iam.model.UserEntity as us "
-								+ "where us.tenant.id=:tenantId ")
-					.setParameter("tenantId", Security.getCurrentTenantId())
-					.list()
-					.iterator()
-					.next();
-			
-			int pos = 0; 
-			int step = 100;
-			Object end = Boolean.FALSE;
-			final HashSet<String> groups = new HashSet<String>();
-			if (dispatcher.getGroups() != null && ! dispatcher.getGroups().isEmpty())
-			{
-				for (String s: dispatcher.getGroups().split("[, ]+"))
-				{
-					groups.add(s);
-				}
-			}
-			
-			final HashSet<String> types = new HashSet<String>();
-			if (dispatcher.getUserTypes() != null && ! dispatcher.getUserTypes().isEmpty())
-			{
-				for (String s: dispatcher.getUserTypes().split("[, ]+"))
-				{
-					types.add(s);
-				}
-			}
 			Security.nestedLogin(principal);
 			try {
-				p.setProgress(0);
-				final CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
-				criteria.setFirstResult(0);
-				criteria.setFetchSize(step);
-				criteria.setMaximumResultSize(step);
-				while (! Boolean.TRUE.equals(end) && ! p.isCancelled()) {
-					end = getAsyncRunnerService().runNewTransaction(
-						() -> {
-							UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
-							if (ud == null)
-								throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
-							
-							AccountDiffReport report = new AccountDiffReport();
-							report.setSystem(dispatcher);
-							report.setApply(true);
-							report.setAccountEntityDao(getAccountEntityDao());
-							report.setUserEntityDao(getUserEntityDao());
-							report.setAccountService(getAccountService());
-							report.generateHeader ();
-
-							List<UserEntity> list = getUserEntityDao().query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId order by us.id", 
-									new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())},
-									criteria );
-							if (list.isEmpty())
-								return Boolean.TRUE;
-							int i = 0;
-							for (UserEntity user: list) {
-								if (p.isCancelled())
-									return Boolean.TRUE;
-								p.setCurrent(user.getUserName());
-								analyze (user, dispatcher, groups, types, ud, report);
-								i++;
-								p.setProgress( (float) ( criteria.getFirstResult() + i ) / count.floatValue());
-							}
-							report.close();
-							report.getFile().delete();
-							
-							session.flush();
-							session.clear();
-							criteria.setFirstResult(criteria.getFirstResult().intValue() + list.size());
-							return Boolean.FALSE;
+				Session session = SessionFactoryUtils.getSession(sessionFactory, true) ;
+				try {
+					final Number count = (Number) session
+							.createQuery( "select count(*) from com.soffid.iam.model.UserEntity as us "
+										+ "where us.tenant.id=:tenantId ")
+							.setParameter("tenantId", Security.getCurrentTenantId())
+							.list()
+							.iterator()
+							.next();
+					
+					int pos = 0; 
+					int step = 100;
+					Object end = Boolean.FALSE;
+					final HashSet<String> groups = new HashSet<String>();
+					if (dispatcher.getGroups() != null && ! dispatcher.getGroups().isEmpty())
+					{
+						for (String s: dispatcher.getGroups().split("[, ]+"))
+						{
+							groups.add(s);
 						}
-					);
+					}
+					
+					final HashSet<String> types = new HashSet<String>();
+					if (dispatcher.getUserTypes() != null && ! dispatcher.getUserTypes().isEmpty())
+					{
+						for (String s: dispatcher.getUserTypes().split("[, ]+"))
+						{
+							types.add(s);
+						}
+					}
+					p.setProgress(0);
+					final CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+					criteria.setFirstResult(0);
+					criteria.setFetchSize(step);
+					criteria.setMaximumResultSize(step);
+					while (! Boolean.TRUE.equals(end) && ! p.isCancelled()) {
+						end = getAsyncRunnerService().runNewTransaction(
+							() -> {
+								UserDomainEntity ud = getUserDomainEntityDao().findByName(dispatcher.getUsersDomain());
+								if (ud == null)
+									throw new InternalErrorException("Invalid user domain "+dispatcher.getUsersDomain());
+								
+								AccountDiffReport report = new AccountDiffReport();
+								report.setSystem(dispatcher);
+								report.setApply(true);
+								report.setAccountEntityDao(getAccountEntityDao());
+								report.setUserEntityDao(getUserEntityDao());
+								report.setAccountService(getAccountService());
+								report.generateHeader ();
+	
+								List<UserEntity> list = getUserEntityDao().query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId order by us.id", 
+										new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())},
+										criteria );
+								if (list.isEmpty())
+									return Boolean.TRUE;
+								int i = 0;
+								for (UserEntity user: list) {
+									if (p.isCancelled())
+										return Boolean.TRUE;
+									p.setCurrent(user.getUserName());
+									analyze (user, dispatcher, groups, types, ud, report);
+									i++;
+									p.setProgress( (float) ( criteria.getFirstResult() + i ) / count.floatValue());
+								}
+								report.close();
+								report.getFile().delete();
+								
+								session.flush();
+								session.clear();
+								criteria.setFirstResult(criteria.getFirstResult().intValue() + list.size());
+								return Boolean.FALSE;
+							}
+						);
+					}
+					p.setCurrent(null);
+					p.setStart(new Date());
+					p.setErrorMessage(null);
+					p.setFinished(true);
+				} catch (Exception e) {
+					log.warn("Error evaluating rules", e);
+					p.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
+					p.setStart(new Date());
+					p.setFinished(true);
+				} finally {
+					session.close();
 				}
-				p.setCurrent(null);
-				p.setStart(new Date());
-				p.setErrorMessage(null);
-				p.setFinished(true);
-			} catch (Exception e) {
-				log.warn("Error evaluating rules", e);
-				p.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
-				p.setStart(new Date());
-				p.setFinished(true);
 			} finally {
 				Security.nestedLogoff();
-				session.close();
 			}
 		} ).start();
 		

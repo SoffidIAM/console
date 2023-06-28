@@ -157,7 +157,7 @@ public class VaultFolderEntityDaoImpl extends VaultFolderEntityDaoBase
 					})
 			{
 				AccessControlList acl = generateAcl (source, al);
-				if ( getACLService().isUserIncluded(u.getId(), acl))
+				if ( getACLService().isCurrentUserIncluded(acl))
 					return al;
 			}
 		}

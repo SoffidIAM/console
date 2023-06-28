@@ -22,6 +22,8 @@ import es.caib.seycon.ng.servei.DispatcherService;
 	AplicacioService.class
 })
 public class ACLService extends Object {
+	boolean isCurrentUserIncluded (AccessControlList acl) { return false; }
+
 	boolean isUserIncluded (long userId, AccessControlList acl) { return false; }
 	
 	boolean isAccountIncluded (long userId, AccessControlList acl) { return false; }

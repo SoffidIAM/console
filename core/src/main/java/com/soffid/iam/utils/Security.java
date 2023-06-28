@@ -416,7 +416,8 @@ public class Security {
             }
             return new SoffidPrincipalImpl(Security.getMasterTenantName()+"\\"+host, 
             		null, null, null,
-            		Collections.singletonList(AUTO_AUTHORIZATION_ALL), null, null );
+            		Collections.singletonList(AUTO_AUTHORIZATION_ALL), null, null,
+            		null, null, null, null);
         } else {
        		return null;
         }
@@ -441,7 +442,7 @@ public class Security {
     	try {
     		if (getTenantService() == null) // For proxy servers
     		{
-		        p = new SoffidPrincipalImpl(tenant+"\\"+user, null, null, null, Arrays.asList(roles), null, null);
+		        p = new SoffidPrincipalImpl(tenant+"\\"+user, null, null, null, Arrays.asList(roles), null, null, null, null, null, null);
     		} else {
     			SoffidPrincipal currentPrincipal = Security.getSoffidPrincipal();
     			if (debugNestedLogin()) {

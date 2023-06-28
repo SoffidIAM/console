@@ -1417,23 +1417,74 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return handleGetUserGrantedAccounts(usuari, AccountAccessLevelEnum.ACCESS_USER);
 	}
 
+	@Override
+    protected Collection<Long> handleGetUserGrantedAccountIds(User usuari) throws Exception {
+		Set<Long> vos = new HashSet<Long>();
+		AccountAccessLevelEnum level = AccountAccessLevelEnum.ACCESS_USER;
+		
+		if (!AutoritzacionsUsuari.hasQueryAccount())
+		{
+			User caller = getUserService().getCurrentUser();
+			if (caller != null && ! caller.getId().equals( usuari.getId()) )
+				throw new SecurityException(Messages.getString("AccountServiceImpl.PermissionDenied")); //$NON-NLS-1$
+		}
+		Collection<RoleGrant> grants = getApplicationService().findEffectiveRoleGrantByUser(usuari.getId());
+		for (RoleGrant rg : grants) {
+            RoleEntity r = getRoleEntityDao().load(rg.getRoleId());
+            for (AccountAccessEntity aae : r.getAccountAccess()) {
+                if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))  {
+                	vos.add(aae.getAccount().getId());
+                }
+            }
+        }
+		
+		
+		UserEntity ue = getUserEntityDao().load(usuari.getId());
+		addGrantedAccounts(ue.getPrimaryGroup(), null, vos, level);
+		for (UserGroupEntity ug : ue.getSecondaryGroups()) {
+			if (! Boolean.TRUE.equals(ug.getDisabled()))
+				addGrantedAccounts(ug.getGroup(), null, vos, level);
+        }
+		
+		for (AccountAccessEntity aae: ue.getAccountAccess())
+		{
+			if (! Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
+			{
+				vos.add(aae.getAccount().getId());
+			}
+		}
+		
+		for (UserAccountEntity uae: ue.getAccounts())
+		{
+			if (uae.getAccount().getType().equals (AccountType.USER)) {
+				vos.add(uae.getAccount().getId());
+			}
+		}
+		return vos;
+	}
+
 	/**
 	 * @param grupPrimari
 	 * @param accounts
+	 * @param vos 
 	 */
-	private void addGrantedAccounts(GroupEntity grup, Map<AccountEntity, AccountAccessLevelEnum> accounts, AccountAccessLevelEnum level) {
+	private void addGrantedAccounts(GroupEntity grup, Map<AccountEntity, AccountAccessLevelEnum> accounts, Set<Long> ids, AccountAccessLevelEnum level) {
 		for (AccountAccessEntity aae: grup.getAccountAccess())
 		{
 			if (!Boolean.TRUE.equals(aae.getDisabled()) && isGreaterOrIqualThan(aae.getLevel(), level))
 			{
-            	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
-            	if (current == null ||
-            			isGreaterOrIqualThan(aae.getLevel(), current))
-           			accounts.put(aae.getAccount(), aae.getLevel());
+				if (accounts != null) {
+	            	AccountAccessLevelEnum current = accounts.get(aae.getAccount());
+	            	if (current == null ||
+	            			isGreaterOrIqualThan(aae.getLevel(), current))
+	           			accounts.put(aae.getAccount(), aae.getLevel());
+				} 
+				if (ids != null)
+					ids.add(aae.getAccount().getId());
 			}
 		}
 		if (grup.getParent() != null)
-			addGrantedAccounts(grup.getParent(), accounts, level);
+			addGrantedAccounts(grup.getParent(), accounts, ids, level);
 	}
 
 	/* (non-Javadoc)
@@ -2283,10 +2334,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		
 		UserEntity ue = getUserEntityDao().load(usuari.getId());
-		addGrantedAccounts(ue.getPrimaryGroup(), accounts, level);
+		addGrantedAccounts(ue.getPrimaryGroup(), accounts, null, level);
 		for (UserGroupEntity ug : ue.getSecondaryGroups()) {
 			if (! Boolean.TRUE.equals(ug.getDisabled()))
-				addGrantedAccounts(ug.getGroup(), accounts, level);
+				addGrantedAccounts(ug.getGroup(), accounts, null, level);
         }
 		
 		for (AccountAccessEntity aae: ue.getAccountAccess())

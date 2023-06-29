@@ -10,6 +10,8 @@
 package com.soffid.iam.service;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,12 +25,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.DelegationStatus;
 import com.soffid.iam.api.DomainValue;
@@ -40,6 +44,7 @@ import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.Parameter;
@@ -89,9 +94,17 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			Object result = null;
 			if ("S".equals(user.getActive())) //$NON-NLS-1$
 				result = evaluate (rule.getBshExpression(), rule.getName(), env);
-			if (result != null && ! (result instanceof Boolean))
+			if (result != null &&  !(result instanceof Boolean) && !(result instanceof String[]) && !(result instanceof Collection) )
 			{
-				throw new InternalErrorException (String.format(Messages.getString("RuleEvaluatorServiceImpl.NotBooleanReturn"), result.toString())); //$NON-NLS-1$
+				throw new InternalErrorException ("The output type "+result.getClass().toString()+" is not valid. The return type must be boolean, array string or collection"); //$NON-NLS-1$
+
+			}else if(result instanceof String[])
+			{
+				result = Arrays.asList( (String[]) result);
+			}else if(result instanceof ScriptObjectMirror) {
+				if(((ScriptObjectMirror) result).isArray()) {
+					
+				}
 			}
 			List<RoleAccountEntity> roles = new LinkedList<RoleAccountEntity>( raDao.findAllByUserName(user.getUserName()));
 			if (! "true".equals(ConfigurationCache.getProperty("soffid.delegation.disable")))
@@ -124,7 +137,7 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				}
 			}
 			// Add role if needed
-			if (result != null && ((Boolean) result).booleanValue())
+			if (result != null && result instanceof Boolean && ((Boolean) result).booleanValue())
 			{
 				for (RuleAssignedRoleEntity rar : rule.getRoles()) {
                     DomainValueEntity valor = null;
@@ -186,6 +199,75 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 											String.format("Rule %s has a roles expression, but it has returned an unknown role",
 													rule.getName()));
 			                    assignRole(rule, roles, user, r, domainValue, method);
+							}
+						}
+					}
+				}
+			}
+			else if(result != null && result instanceof Collection)
+			{
+				for (RuleAssignedRoleEntity rar : rule.getRoles()) {
+                    DomainValueEntity valor = null;
+                    String stringValue = null;
+                    if (rar.getRole().getDomainType() != null && !rar.getRole().getDomainType().equals(TipusDomini.SENSE_DOMINI)) {
+                        if (rar.getDomainValue() != null && rar.getDomainValue().length() > 0) {
+                            stringValue = rar.getDomainValue();
+                        } else if (rar.getBshDomainValueExpression() != null && rar.getBshDomainValueExpression().length() > 0) {
+                            Object obj = evaluate(rar.getBshDomainValueExpression(), rule.getName(), env);
+                            if (obj != null) stringValue = obj.toString();
+                        }
+                    }
+                    
+                    assignRoletoAccounts(rule, roles, user, rar.getRole(), stringValue, method,(Collection)result);
+                }
+				
+				
+				if ( rule.getBshRoles() != null)
+				{
+					Object o = evaluate(rule.getBshRoles(), rule.getName(), env);
+					if (o != null) {
+						if (! (o instanceof Collection))
+							throw new InternalErrorException(
+									String.format("Rule %s has a roles expression, but it has returned an object of class %s when it should be a Collection",
+											rule.getName(), o.getClass().toString()));
+						for (Object grant: (Collection)o) {
+							RoleEntity r;
+							String domainValue = null;
+							if (grant != null) {
+								if (grant instanceof RoleAccount) {
+									if (((RoleAccount) grant).getId() != null)
+										r = getRoleEntityDao().load(((RoleAccount) grant).getId());
+									else
+										r = getRoleEntityDao().findByNameAndSystem(((RoleAccount) grant).getRoleName(), ((RoleAccount) grant).getSystem());
+									if (((RoleAccount) grant).getDomainValue() != null)
+										domainValue = ((RoleAccount) grant).getDomainValue().getValue();
+								}
+								else if (grant instanceof Role) {
+									if (((Role) grant).getId() != null)
+										r = getRoleEntityDao().load(((RoleAccount) grant).getId());
+									else
+										r = getRoleEntityDao().findByNameAndSystem(((Role) grant).getName(), ((Role) grant).getSystem());
+								}
+								else if (grant instanceof String) {
+									String grantString = (String) grant;
+									int at = grantString.lastIndexOf('@');
+									int slash = at >= 0 ? grantString.indexOf('/', at) :
+										grantString.lastIndexOf('/');
+									if (slash > 0) {
+										domainValue = grantString.substring(slash + 1);
+										grantString = grantString.substring(0, slash);
+									}
+									r = getRoleEntityDao().findByShortName(grantString);
+								} else {
+									throw new InternalErrorException(
+											String.format("Rule %s has a roles expression, but it has returned a collection with an object of class %s when it should be one out of Role, RoleAccount or String",
+													rule.getName(), grant.getClass().toString()));
+								}
+								if (r == null)
+									throw new InternalErrorException(
+											String.format("Rule %s has a roles expression, but it has returned an unknown role",
+													rule.getName()));
+								assignRoletoAccounts(rule, roles, user, r, domainValue, method,(Collection)result);
 							}
 						}
 					}
@@ -606,6 +688,128 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 	protected AsyncProcessTracker handleQueryProcessStatus(AsyncProcessTracker process) throws Exception {
 		return proc.get(process.getId());
 	}
+	private boolean isAnySystemSharedOrAccoutSystemExists(Collection<String> accs,RoleEntity rol) throws InternalErrorException {
+		boolean out = false;
+		Iterator<String> iter = accs.iterator();
+		String sys="";
+		String elm="";
+		while(iter.hasNext()) {
+			elm = iter.next();
+			sys = elm.substring(elm.lastIndexOf("@") + 1 , elm.length()) ;
+			com.soffid.iam.api.System chSys = getDispatcherService().findDispatcherByName(sys);
+			if(sys.equals(elm)) throw new InternalErrorException("The String returned does not fit into 'ACCOUNT@SYSTEM' expected structure.");
+			if (chSys == null ) throw new InternalErrorException("The System "+sys+" doesn't exists.");
+			if( (sys.toUpperCase()).equals( rol.getSystem().getName().toUpperCase() ) || chSys != null )  out = true;
+		}
+		return out;
+	}
+	
+	private boolean existsSystem(String system) throws InternalErrorException{
+		boolean out = false;
+		com.soffid.iam.api.System chSys = getDispatcherService().findDispatcherByName(system);
+		if(chSys != null) out = true;
+		return out;
+	}
+	
+	private List<String> getResultsWithSameRoleSystemOrExistingSystems(RoleEntity role, Collection<String> result) throws InternalErrorException{
+		List<String> out = new ArrayList<String>();
+		String elm="";
+		String roleSysName = role.getSystem().getName().toUpperCase();
+		String sys="";
+		Iterator it = result.iterator();
+		while(it.hasNext()) {
+			elm = (String) it.next();
+			sys = elm.substring( elm.lastIndexOf("@") +1, elm.length()).toUpperCase();
+			if ( sys.equals(roleSysName) || existsSystem(sys) ) out.add( elm );
+		}
+		return out;
+	}
+	private String[] evaluateAccountAndSystem(String accSys) throws InternalErrorException { //ARRAY
+		HashMap<String,String> hm = new HashMap<String,String>();
+		if(accSys.length() - accSys.replace("@", "").length() == 0) {
+			throw new InternalErrorException("The String returned does not fit into 'ACCOUNT@SYSTEM' expected structure.");
+		}
+		int arroba = accSys.lastIndexOf("@");
+		String system = accSys.substring(arroba + 1,accSys.length());
+		String account = accSys.substring(0,arroba);
+		if( system.isBlank() || account == null || account.isBlank() )
+		{
+			throw new InternalErrorException("ACCOUNT and SYSTEM from 'ACCOUNT@SYSTEM' returned String structure can't be null.");
+		} 
+		com.soffid.iam.api.System sys = getDispatcherService().findDispatcherByName(system);
+		if(sys == null)
+		{
+			throw new InternalErrorException("The SYSTEM from 'ACCOUNT@SYSTEM' returned String structure doesn't exists.");
+		} 
+		
+		return new String[] {account,system};
+	}
+	
+	private boolean isSomeAccountWithRoleSystem(String roleSystem, Collection<String>  accountsSys) {
+		boolean out = false;
+		Iterator it = accountsSys.iterator();
+		String elm = "";
+		String sys;
+		roleSystem=roleSystem.toUpperCase();
+		while(it.hasNext()) {
+			elm = (String) it.next();
+			sys = elm.substring( elm.lastIndexOf("@") +1, elm.length()).toUpperCase();
+			if (roleSystem.equals(sys.toUpperCase())) out=true;			
+		}
+		return out;		
+	}
+	
+	
+	private void assignRoletoAccounts(RuleEntity rule, List<RoleAccountEntity> roles, UserEntity user,
+					RoleEntity role, String stringValue, RuleEvaluatorGrantRevokeMethod method, Collection<String> accountsSys) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
+	
+		LinkedList<AccountEntity> accounts = new LinkedList<AccountEntity>();
+		LinkedList<AccountEntity> disabledAccounts = new LinkedList<AccountEntity>();
+		String[] accountAndSystem;
+		com.soffid.iam.service.AccountService as = getAccountService();
+		AccountEntityDao aeDao = getAccountEntityDao();
+		Account account;
+		UserAccount ua;
+		List<String> targetAccounts = new ArrayList<>();
+		Collection<String> owners = new ArrayList<>();
+		boolean sysShared = isAnySystemSharedOrAccoutSystemExists(accountsSys,role);
+		boolean existsAccount = false;
+		if(sysShared) {
+			targetAccounts = getResultsWithSameRoleSystemOrExistingSystems(role,accountsSys);
+		} 
+			for (String accsys: targetAccounts) {
+				accountAndSystem = evaluateAccountAndSystem(accsys);
+				account = as.findAccount(accountAndSystem[0],accountAndSystem[1]);
+				
+				existsAccount = account != null;
+				if(existsAccount) {
+					owners = account.getOwnerUsers();
+				}
+				if( !(accountAndSystem[1].toUpperCase()).equals(role.getSystem().getName().toUpperCase()) && existsSystem(accountAndSystem[1])) { 
+					if(!existsAccount) {
+						UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getDispatcherService().findDispatcherByName​(accountAndSystem[1]),accountAndSystem[0]);	
+					}
+					if(!isSomeAccountWithRoleSystem(role.getSystem().getName(),targetAccounts)) {
+						assignRole(rule, roles, user, role, stringValue, method);
+					}
+					continue;
+				}
+				if(existsAccount && owners.contains( user.getUserName() ) && account.getType()==AccountType.USER) { 
+					assignRoleAccount(rule, roles, user, role, stringValue, method, aeDao.accountToEntity(account));
+				} else if(owners.size() != 0 && !owners.contains( user.getUserName() ) ) {
+					throw new InternalErrorException(
+									String.format("The account %s its owned by an other user different than %s",accountAndSystem[0],accountAndSystem[1] ) );
+				}else if (!existsAccount) {
+					UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getSystemEntityDao().toSystem(role.getSystem()),accountAndSystem[0]);
+					assignRoleAccount(rule, roles, user, role, stringValue, method, aeDao.accountToEntity(usrAcc));
+				} else {
+					UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getDispatcherService().findDispatcherByName(accountAndSystem[1]), accountAndSystem[0]);
+					assignRoleAccount(rule, roles, user, role, stringValue, method, aeDao.accountToEntity(usrAcc));
 
+				}
+			}
+		
+	}
+	
 
 }

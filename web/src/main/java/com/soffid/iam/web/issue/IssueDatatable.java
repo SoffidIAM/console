@@ -59,7 +59,8 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 		Issue a = (Issue) ((DataNode)element).getInstance();
 		if (a.getStatus() == IssueStatus.NEW)
 			s.put("$class", "bold");
-		else if (a.getStatus() == IssueStatus.SOLVED)
+		else if (a.getStatus() == IssueStatus.SOLVED ||
+				a.getStatus() == IssueStatus.SOLVED_NOTADUPLICATE)
 			s.put("$class", "grayed");
 		
 		StringBuffer sb = new StringBuffer();

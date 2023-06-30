@@ -172,20 +172,23 @@ public class IssueServiceImpl extends IssueServiceBase {
 			return issue;
 	}
 
-	private void processAutomaticIssues(IssueEntity Issue, Collection<IssuePolicyEntity> policies) throws IOException {
+	private void processAutomaticIssues(IssueEntity issue, Collection<IssuePolicyEntity> policies) throws IOException {
 		JSONArray actions = IssueDataParser.instance().getActions();
 		for (IssuePolicyEntity policy: policies) {
 			if ( policy.getActor() != null && ! policy.getActor().trim().isEmpty())
-				Issue.setActor(policy.getActor());
+				issue.setActor(policy.getActor());
 			for (IssuePolicyActionEntity actionEntity: policy.getActions()) {
-				try {
-					addHistory(Issue, "Executed automatic task "+actionEntity.getAction());
-					getAsyncRunnerService().runNewTransaction(() -> {
-						processRule(Issue, actionEntity, actions);
-						return null;
-					});
-				} catch (Exception e) {
-					log.warn ("Error processing rule "+policy.getDescription(), e);
+				if (actionEntity.getStatus() == issue.getStatus() ||
+						actionEntity.getAction() == null && issue.getStatus() == IssueStatus.NEW) {
+					try {
+						addHistory(issue, "Executed automatic task "+actionEntity.getAction());
+						getAsyncRunnerService().runNewTransaction(() -> {
+							processRule(issue, actionEntity, actions);
+							return null;
+						});
+					} catch (Exception e) {
+						log.warn ("Error processing rule "+policy.getDescription(), e);
+					}
 				}
 			}
 		}
@@ -206,27 +209,13 @@ public class IssueServiceImpl extends IssueServiceBase {
 	@Override
 	protected Issue handleUpdate(Issue issue) throws Exception {
 		IssueEntity entity = getIssueEntityDao().load(issue.getId());
+		IssueStatus oldStatus = entity.getStatus();
 		if (issue.getStatus() == IssueStatus.ACKNOWLEDGED &&
 				entity.getStatus() == IssueStatus.NEW) {
 			entity.setStatus(IssueStatus.ACKNOWLEDGED);
 			entity.setAcknowledged(new Date());
 			addHistory(entity, "Acknowledged");
 			getIssueEntityDao().update(entity);
-		}
-		if (issue.getStatus() == IssueStatus.SOLVED &&
-				entity.getStatus() != IssueStatus.SOLVED) {
-			entity.setStatus(IssueStatus.SOLVED);
-			entity.setSolved(new Date());
-			addHistory(entity, "Solved");
-			getIssueEntityDao().update(entity);
-			if (issue.getType().equals("duplicated-user")) {
-				for (IssueUserEntity ue: entity.getUsers()) {
-					if (ue.getAction() == null || ue.getAction() == EventUserAction.UNKNOWN ) {
-						ue.setAction(EventUserAction.DIFFERENT_USER);
-						getIssueUserEntityDao().update(ue);
-					}
-				}
-			}
 		}
 		
 		LinkedList l = new LinkedList<>(entity.getUsers());
@@ -242,6 +231,34 @@ public class IssueServiceImpl extends IssueServiceBase {
 					break;
 				}
 			}
+		}
+		
+		if (issue.getStatus() == IssueStatus.SOLVED &&
+				entity.getStatus() != IssueStatus.SOLVED) {
+			entity.setStatus(IssueStatus.SOLVED);
+			entity.setSolved(new Date());
+			addHistory(entity, "Solved");
+			if (issue.getType().equals("duplicated-user")) {
+				boolean anyMerge = false;
+				for (IssueUserEntity ue: entity.getUsers()) {
+					if (ue.getAction() == null || ue.getAction() == EventUserAction.UNKNOWN ) {
+						ue.setAction(EventUserAction.DIFFERENT_USER);
+						getIssueUserEntityDao().update(ue);
+					} else if (ue.getAction() != EventUserAction.DIFFERENT_USER) {
+						anyMerge = true;
+					}
+				}
+				if (!anyMerge) {
+					entity.setStatus(IssueStatus.SOLVED_NOTADUPLICATE);
+				}
+			}
+			getIssueEntityDao().update(entity);
+		}
+		
+		
+		if (entity.getStatus() != oldStatus) {
+			Collection<IssuePolicyEntity> policies = getIssuePolicyEntityDao().findByType(issue.getType());
+			processAutomaticIssues(entity, policies);
 		}
 		return getIssueEntityDao().toIssue(entity);
 	}

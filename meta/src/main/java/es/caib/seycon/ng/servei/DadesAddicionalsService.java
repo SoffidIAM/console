@@ -220,6 +220,7 @@ public abstract class DadesAddicionalsService {
 	
 	public void registerExtensibleObject(ExtensibleObjectRegister register) { }
 	
+	@Operation(grantees={Tothom.class})
 	public List<ExtensibleObjectRegister> findExtensibleObjectRegisters() { return null; }
 
 	public ExtensibleObjectRegister findExtensibleObjectRegister(String name) { return null; }

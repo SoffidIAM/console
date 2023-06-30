@@ -25,3 +25,10 @@
   handler: com.soffid.iam.web.issue.UnlockHost
 - name: merge-users
   handler: com.soffid.iam.web.issue.MergeUsers
+- name: add-comment
+  handler: com.soffid.iam.web.issue.AddComment
+  parameters:
+  - name: subject
+    nlsLabel: tools.disable-users.subject
+    dataType: STRING
+    required: true

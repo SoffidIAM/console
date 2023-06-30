@@ -61,7 +61,9 @@ public class IssueHandler extends FrameHandler {
 				Button b = (Button) iterator.next();
 				IssueActionDefinition a = (IssueActionDefinition) b.getAttribute("action");
 				if (a != null) {
-					b.setVisible(a.getIssueTypes().contains(i.getType()) && i.getStatus() != IssueStatus.SOLVED);
+					b.setVisible(a.getIssueTypes().contains(i.getType()) 
+							 && i.getStatus() != IssueStatus.SOLVED_NOTADUPLICATE
+							 && i.getStatus() != IssueStatus.SOLVED);
 				}
 			}
 			getFellow("ack_button").setVisible(i.getStatus() == IssueStatus.NEW);
@@ -168,6 +170,9 @@ public class IssueHandler extends FrameHandler {
 		for (Issue issue2: EJBLocator.getIssueService()
 				.findIssuesByJsonQuery("id eq "+issue.getId(), null, null)
 				.getResources()) {
+			XPathUtils.setValue(getForm(), "status", issue2.getStatus());
+			XPathUtils.setValue(getForm(), "description", issue2.getDescription());
+			XPathUtils.setValue(getForm(), "users", issue2.getUsers());
 			XPathUtils.setValue(getForm(), "performedActions", issue2.getPerformedActions());
 		}
 	}

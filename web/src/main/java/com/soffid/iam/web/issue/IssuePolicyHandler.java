@@ -80,6 +80,7 @@ public class IssuePolicyHandler extends FrameHandler {
 		
 		DataTable actions = (DataTable) getFellow("actions");
 		actions.updateClientRow(actions.getSelectedIndex());
+		actions.setSelectedIndex(-1);
 	}
 
 	public void changeAction(Event event) throws InternalErrorException, NamingException, CreateException {

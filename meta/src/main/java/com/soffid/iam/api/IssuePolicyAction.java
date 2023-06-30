@@ -12,6 +12,8 @@ public class IssuePolicyAction {
 	@Nullable @Attribute(hidden = true)
 	Long id;
 	
+	IssueStatus status;
+	
 	String action;
 	
 	@Nullable

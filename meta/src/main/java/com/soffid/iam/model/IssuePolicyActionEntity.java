@@ -1,6 +1,7 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.api.IssuePolicyAction;
+import com.soffid.iam.api.IssueStatus;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Entity;
@@ -16,6 +17,9 @@ public class IssuePolicyActionEntity {
 	@Column(name = "EPA_EVP_ID", reverseAttribute = "actions")
 	IssuePolicyEntity issuePolicy;
 	
+	@Column(name = "EPA_STATUS")
+	IssueStatus status;
+
 	@Column(name = "EPA_ACTION", length=50)
 	String action;
 	

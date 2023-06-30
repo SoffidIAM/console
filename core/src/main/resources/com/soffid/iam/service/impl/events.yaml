@@ -7,6 +7,7 @@
   - start-workflow
   manual-actions:
   - send-email
+  - add-comment
 - name: login-different-country
   actions:
   - send-email
@@ -24,6 +25,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: robot-login
   actions:
   - send-email
@@ -41,6 +43,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: login-from-new-device
   actions:
   - send-email
@@ -58,6 +61,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: login-not-recognized
   actions:
   - send-email
@@ -74,6 +78,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: locked-account
   actions:
   - send-email
@@ -90,6 +95,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: integration-errors
   actions:
   - send-email
@@ -99,6 +105,7 @@
   - start-workflow
   manual-actions:
   - send-email
+  - add-comment
 - name: disconnected-system
   actions:
   - send-email
@@ -108,6 +115,7 @@
   - start-workflow
   manual-actions:
   - send-email
+  - add-comment
 - name: otp-failures
   actions:
   - send-email
@@ -125,6 +133,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: security-exception
   actions:
   - send-email
@@ -142,6 +151,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: permissions-granted
   actions:
   - send-email
@@ -156,6 +166,7 @@
   - unlock-account
   - lock-account
   - disable-user
+  - add-comment
 - name: risk-increase
   actions:
   - send-email
@@ -170,6 +181,7 @@
   - unlock-account
   - lock-account
   - disable-user
+  - add-comment
 - name: pam-violation
   actions:
   - send-email
@@ -187,6 +199,7 @@
   - disable-user
   - lock-host
   - unlock-host
+  - add-comment
 - name: duplicated-user
   actions:
   - send-email
@@ -199,3 +212,4 @@
   manual-actions:
   - send-email
   - merge-users
+  - add-comment

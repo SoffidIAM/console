@@ -86,6 +86,8 @@
 						bind="actor"/>
 					<datatable dataPath="actions" enablefilter="true"
 						id="actions"
+						multiselect="true"
+						onMultiSelect="ref:frame.multiSelect"
 						onSelect="ref:frame.selectAction">
 						<attribute name="columns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.IssuePolicyAction.action') }
@@ -95,7 +97,7 @@
 ]]></attribute>
 					</datatable>
 					<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('issuePolicy:update')}" >
-						<div class="deleteButton" onClick="ref:frame.deleteAction" visible="false">-</div>
+						<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 						<div class="addButton" onClick="ref:frame.addAction">+</div>
 					</div>
 				</form>
@@ -116,6 +118,11 @@
 		style="width: 80%; min-width: 700px" onClose="ref:handler.closeDetails()">
 
 		<form id="form" width="100%" dataPath="../actions:/.">
+			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.status') }" dataType="STRING"
+				enumeration="com.soffid.iam.api.IssueStatus"
+				required="true"
+				readonly="${! soffid:isUserInRole('issuePolicy:update') }"
+				bind="status" id="status"/>
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.action') }" dataType="STRING"
 				onChange="ref:frame.changeAction"
 				required="true"

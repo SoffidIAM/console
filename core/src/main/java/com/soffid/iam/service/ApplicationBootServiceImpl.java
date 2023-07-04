@@ -529,6 +529,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("111");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("111"))
+		{
+      updateIssuePolicies();
+			cfg.setValue("112");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void fixAgentDescriptor() {
@@ -660,6 +666,23 @@ public class ApplicationBootServiceImpl extends
 			}
 			rset.close();
 			stmt.close();
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	private void updateIssuePolicies() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_EVPOAC SET EPA_STATUS='N' "
+					+ "WHERE EPA_STATUS IS NULL OR EPA_STATUS=''",
+								new Object[] {});
 		}
 		finally
 		{

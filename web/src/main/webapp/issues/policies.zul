@@ -23,7 +23,6 @@
 
 			<datatable id="listbox" autocommit="true" 
 				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
-				preference="issuePolicy"
 				dataPath="/model:/policy" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
 			<attribute name="allColumns"><![CDATA[
@@ -35,7 +34,7 @@
   default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.status')}
   value: status
-  template: #{status.value=='0' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.IGNORE')}" ? status.value=='1' : "${c:l('com.soffid.iam.api.IssuePolicyStatus.MANAGE')}" : status.value=='2' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.RECORD')}" : status.value  }
+  template: #{status.value=='0' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.IGNORE')}" ? status.value=='1' : "${c:l('com.soffid.iam.api.IssuePolicyStatus.MANAGE')}" : status.value=='2' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.RECORD')}" : ""  }
   default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.actor')}
   value: actor

@@ -61,7 +61,12 @@ public class MailServiceImpl extends MailServiceBase {
 	
 
 	@Override
-	protected void handleSendHtmlMail(String to, String subject, String body)
+	protected void handleSendHtmlMail(String to, String subject, String body) throws Exception {
+		handleSendHtmlMail(to, null, subject, body);
+	}
+	
+	@Override
+	protected void handleSendHtmlMail(String to, String cc, String subject, String body)
 			throws Exception {
 		Session session = MailUtils.getSession(null);
 
@@ -73,6 +78,8 @@ public class MailServiceImpl extends MailServiceBase {
 		{
 			msg.setFrom(new InternetAddress(getFrom()));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+			if (cc != null && ! cc.trim().isEmpty())
+				msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 			// -- Set the subject and body text --
 			msg.setSubject(subject, "UTF-8");
 
@@ -101,6 +108,12 @@ public class MailServiceImpl extends MailServiceBase {
 	@Override
 	protected void handleSendTextMail(String to, String subject, String body)
 			throws Exception {
+		handleSendTextMail(to, null, subject, body);
+	}
+	
+	@Override
+	protected void handleSendTextMail(String to, String cc, String subject, String body)
+			throws Exception {
 		Session session = MailUtils.getSession(null);
 
 		MimeMessage msg = null;
@@ -113,6 +126,8 @@ public class MailServiceImpl extends MailServiceBase {
 			msg.setFrom(new InternetAddress(getFrom()));
 			msg.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(to, false));
+			if (cc != null && ! cc.trim().isEmpty())
+				msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 			// -- Set the subject and body text --
 			msg.setSubject(subject, "UTF-8");
 
@@ -138,7 +153,13 @@ public class MailServiceImpl extends MailServiceBase {
 
 
 	@Override
-	protected void handleSendHtmlMailToActors(String[] actors, String subject,
+	protected void handleSendHtmlMailToActors(String[] actors,  String subject,
+			String body) throws Exception {
+		handleSendHtmlMailToActors(actors, null, subject, body);
+	}
+	
+	@Override
+	protected void handleSendHtmlMailToActors(String[] actors, String cc, String subject,
 			String body) throws Exception {
 		Session session = MailUtils.getSession(null);
 
@@ -155,8 +176,10 @@ public class MailServiceImpl extends MailServiceBase {
 					sb.append(a.toString());
 				}
 				msg.setFrom(new InternetAddress(getFrom()));
-				msg.setRecipients(Message.RecipientType.TO, address);
+				msg.setRecipients(Message.RecipientType.TO, sb.toString());
 				msg.setHeader("To", sb.toString());
+				if (cc != null && ! cc.trim().isEmpty())
+					msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 				// -- Set the subject and body text --
 				msg.setSubject(subject, "UTF-8");
 				
@@ -188,6 +211,13 @@ public class MailServiceImpl extends MailServiceBase {
 	protected void handleSendTextMailToActors(String[] actors, String subject,
 			String body) throws Exception 
 	{
+		handleSendTextMailToActors(actors, null, subject, body);
+	}
+	
+	@Override
+	protected void handleSendTextMailToActors(String[] actors, String cc, String subject,
+			String body) throws Exception 
+	{
 		Session session = MailUtils.getSession(null);
 
 		MimeMessage msg = new MimeMessage(session);
@@ -205,6 +235,8 @@ public class MailServiceImpl extends MailServiceBase {
 				}
 				msg.setRecipients(Message.RecipientType.TO, address);
 				msg.setHeader("To", sb.toString());
+				if (cc != null && ! cc.trim().isEmpty())
+					msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 				// -- Set the subject and body text --
 				msg.setSubject(subject, "UTF-8");
 	
@@ -389,6 +421,12 @@ public class MailServiceImpl extends MailServiceBase {
 	@Override
 	protected void handleSendHtmlMail(String to, String subject, String body, Collection mimeBodyParts)
 			throws Exception {
+		handleSendHtmlMail(to, null, subject, body);
+	}
+	
+	@Override
+	protected void handleSendHtmlMail(String to,  String cc, String subject, String body, Collection mimeBodyParts)
+			throws Exception {
 		Session session = MailUtils.getSession(null);
 
 		MimeMessage msg = new MimeMessage(session);
@@ -399,6 +437,8 @@ public class MailServiceImpl extends MailServiceBase {
 		{
 			msg.setFrom(new InternetAddress(getFrom()));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+			if (cc != null && ! cc.trim().isEmpty())
+				msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 			// -- Set the subject and body text --
 			msg.setSubject(subject, "UTF-8");
 
@@ -434,6 +474,12 @@ public class MailServiceImpl extends MailServiceBase {
 	@Override
 	protected void handleSendTextMailToActors(String[] actors, String subject, String body, Collection mimeBodyParts)
 			throws Exception {
+		handleSendTextMailToActors(actors, null, subject, body, mimeBodyParts);
+	}
+	
+	@Override
+	protected void handleSendTextMailToActors(String[] actors, String cc, String subject, String body, Collection mimeBodyParts)
+			throws Exception {
 		Session session = MailUtils.getSession(null);
 
 		MimeMessage msg = new MimeMessage(session);
@@ -445,6 +491,8 @@ public class MailServiceImpl extends MailServiceBase {
 			{
 				msg.setFrom(new InternetAddress(getFrom()));
 				msg.setRecipients(Message.RecipientType.TO, address);
+				if (cc != null && ! cc.trim().isEmpty())
+					msg.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(cc, false));
 				// -- Set the subject and body text --
 				msg.setSubject(subject, "UTF-8");
 	

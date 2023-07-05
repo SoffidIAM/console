@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<seuServerPlugin xmlns="http://seu.sourceforge.net/schema/serverplugin"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://seu.sourceforge.net/schema/ServerPlugin.xsd">
+	<name>Default plugin</name>
+	<version>${pom.version}</version>
+	<agent>
+		<name>Default plugin</name>
+		<javaClass>com.soffid.iam.sync.agent.SoffidAgent</javaClass>
+		<javaClassV2>com.soffid.iam.sync.agent.SoffidAgent</javaClassV2>
+		<userInterface>DefaultAgent.zul</userInterface>
+		<enableAccessControl>false</enableAccessControl>
+		<authoritativeSource>false</authoritativeSource>
+		<enableAttributeMapping>true</enableAttributeMapping>
+		<enableObjectTriggers>true</enableObjectTriggers>
+
+		<objectMapping condition="" soffidObject="account"
+			systemObject="user">
+			<attributeMapping direction="INPUTOUTPUT"
+				soffidAttribute="accountName" systemAttribute="accountName" />
+		</objectMapping>
+
+	</agent>
+</seuServerPlugin>

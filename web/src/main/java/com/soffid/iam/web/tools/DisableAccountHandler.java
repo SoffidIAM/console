@@ -132,18 +132,18 @@ public class DisableAccountHandler extends FrameHandler {
 			if ("P".equals(rule.getCriteria()) &&
 					("D".equals(rule.getAction()) || "R".equals(rule.getAction()))) {
 				if (rule.getParameter().intValue() < 0) {
-					Missatgebox.avis(Labels.getLabel("tools.disable-users.warning.1"));
+					Missatgebox.avis(Labels.getLabel("tools.disable-hosts.warning.1"));
 				}
 			}
 			if ("L".equals(rule.getCriteria())) {
 				if (rule.getParameter().intValue() < 1) {
-					Missatgebox.avis(Labels.getLabel("tools.disable-users.warning.2"));
+					Missatgebox.avis(Labels.getLabel("tools.disable-hosts.warning.2"));
 					return false;
 				}
 			}
 		}
 		if (!anyOK) {
-			Missatgebox.avis(Labels.getLabel("tools.disable-users.selectaction"));
+			Missatgebox.avis(Labels.getLabel("tools.disable-hosts.selectaction"));
 		}
 		return anyOK;
 	}
@@ -158,8 +158,8 @@ public class DisableAccountHandler extends FrameHandler {
 		final Select s = new Select();
 		String[] criteria = new String[] {
 				"-", Labels.getLabel("descriptorAgent.Select"),
-				"L", Labels.getLabel("tools.disable-users.criteria0"),
-				"P", Labels.getLabel("tools.disable-users.criteria1")
+				"L", Labels.getLabel("tools.disable-hosts.criteria0"),
+				"P", Labels.getLabel("tools.disable-hosts.criteria1")
 		};
 		s.setOptions(optionsToJson(criteria).toString());
 		s.setSelectedValue("-");
@@ -199,10 +199,10 @@ public class DisableAccountHandler extends FrameHandler {
 		});
 		pencil.setVisible(false);
 		String[] actions = new String[] {
-				"-", Labels.getLabel("tools.disable-users.action0"),
-				"E", Labels.getLabel("tools.disable-users.action1"),
-				"D", Labels.getLabel("tools.disable-users.action2"),
-				"R", Labels.getLabel("tools.disable-users.action3")
+				"-", Labels.getLabel("tools.disable-hosts.action0"),
+				"E", Labels.getLabel("tools.disable-hosts.action1"),
+				"D", Labels.getLabel("tools.disable-hosts.action2"),
+				"R", Labels.getLabel("tools.disable-hosts.action3")
 		};
 		s2.setOptions(optionsToJson(actions).toString());
 		s2.setSelectedValue("-");
@@ -250,9 +250,9 @@ public class DisableAccountHandler extends FrameHandler {
 					o.put("name", action[0]);
 					o.put("system", action[1]);
 					o.put("description", action[2]);
-					o.put("action", "E".equals(action[3]) ? Labels.getLabel("tools.disable-users.action1"):
-						"D".equals(action[3]) ? Labels.getLabel("tools.disable-users.action2"):
-						"R".equals(action[3]) ? Labels.getLabel("tools.disable-users.action3"): "");
+					o.put("action", "E".equals(action[3]) ? Labels.getLabel("tools.disable-hosts.action1"):
+						"D".equals(action[3]) ? Labels.getLabel("tools.disable-hosts.action2"):
+						"R".equals(action[3]) ? Labels.getLabel("tools.disable-hosts.action3"): "");
 					previewlistbox.response("add_"+rows, new AuInvoke(previewlistbox, "addRow", Integer.toString(rows),o.toString()));
 					rows ++;
 				}

@@ -14,6 +14,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.FinderHandler;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -78,4 +79,8 @@ public class NetworkDataHandler extends InputFieldDataHandler<Network> {
 			return null;
 	}
 
+	@Override
+	protected String getClassName() {
+		return Network.class.getName();
+	}
 }

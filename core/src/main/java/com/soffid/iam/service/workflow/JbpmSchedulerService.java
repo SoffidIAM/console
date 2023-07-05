@@ -31,8 +31,6 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	int maxScheduledInterval = 30000;
 	int schedulerThreads = 1;
 
-	private IndexerThread indexerThread;
-
 	public void start() {
 		start(true);
 	}
@@ -51,15 +49,11 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 			scheduler.setIdleInterval(scheduledInterval * 2);
 			scheduler.setNbrOfThreads(schedulerThreads);
 
-			indexerThread = new IndexerThread();
-			indexerThread.setDelay(scheduledInterval);
-
 			if (delayed)
 			{
 				new DelayedThread().start();
 			} else {
 				scheduler.start();
-				indexerThread.start();
 			}
 			log.info("Started");
 		} catch (Throwable e) {
@@ -74,15 +68,9 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 	
 	public void stop() throws InterruptedException 
 	{
-		if (indexerThread != null)
-			indexerThread.setFinish(true);
 		if (scheduler != null) {
 			scheduler.stopAndJoin();
 			scheduler = null;
-		}
-		if (indexerThread != null) {
-			indexerThread.join();
-			indexerThread = null;
 		}
 	}
 
@@ -149,7 +137,6 @@ public class JbpmSchedulerService implements JbpmSchedulerServiceInterface {
 				e.printStackTrace();
 			}
 			scheduler.start();
-			indexerThread.start();
 		}
 	}
 }

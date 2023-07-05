@@ -7,6 +7,7 @@
 package es.caib.bpm.servei;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ProcessHierarchyEntity;
+import com.soffid.iam.service.LuceneIndexService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.vo.Job;
@@ -30,7 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.DispatcherEntity.class,
 	es.caib.seycon.ng.servei.SessionCacheService.class,
 	ProcessHierarchyEntity.class, 
-	AuditoriaEntity.class})
+	AuditoriaEntity.class,
+	LuceneIndexService.class})
 public abstract class BpmEngine {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

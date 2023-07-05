@@ -14,6 +14,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.FinderHandler;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -84,4 +85,8 @@ public class MailListDataHandler extends InputFieldDataHandler<MailList> {
 			return null;
 	}
 
+	@Override
+	protected String getClassName() {
+		return MailList.class.getName();
+	}
 }

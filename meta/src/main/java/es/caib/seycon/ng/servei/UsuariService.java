@@ -753,4 +753,7 @@ public abstract class UsuariService {
 	public AsyncProcessTracker disableUsersPreview( @Nullable String scimQuery, List<DisableObjectRule> rules, List<Object[]> actions) {
 		return null;
 	}
+	
+	@Operation( grantees = {roles.user_update.class} )
+	public void merge(Long srcId, Long targetId) {}
 }

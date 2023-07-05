@@ -37,7 +37,9 @@ public class Maquina {
 	public java.lang.String dhcp;
 	
 	@Nullable
-	@Attribute(translated = "ip", searchCriteria = true, customUiHandler = "com.soffid.iam.web.host.IPHandler" )
+	@Attribute(translated = "ip", searchCriteria = true, 
+		customUiHandler = "com.soffid.iam.web.host.IPHandler")
+	@JsonAttribute(hibernateAttribute = "hostIP")
 	public java.lang.String adreca;
 	
 	@Attribute(translated = "os", type = "OS" )
@@ -73,6 +75,10 @@ public class Maquina {
 	@Nullable
 	@Attribute(readonly = true)
 	public java.util.Calendar lastSeen;
+
+	@Column (name="MAQ_LOCKED")
+	@Nullable
+	public java.lang.Boolean locked;
 
 	@Description ("Host custom attributes")
 	@Nullable

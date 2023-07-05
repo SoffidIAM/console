@@ -119,7 +119,7 @@ public class AccountWindow extends Window implements AfterCompose {
 
 		displayAccountAcl();
 
-		// Add folder users
+		// Add folder hosts
 		String parentPath = path.substring(0, path.lastIndexOf('/'));
 		for (String pathToCopy : new String[] { "grantedUsers", "grantedGroups", "grantedRoles", "managerUsers",
 				"managerGroups", "managerRoles", "ownerUsers", "ownerGroups", "ownerRoles" }) {

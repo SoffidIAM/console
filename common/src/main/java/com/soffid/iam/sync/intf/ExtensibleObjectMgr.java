@@ -60,5 +60,9 @@ public interface ExtensibleObjectMgr extends java.rmi.Remote {
 
   public Collection<Map<String, Object>> invoke(String verb, String command,
 			Map<String, Object> params) throws RemoteException, InternalErrorException ;
+
+  public void updateExtensibleObject (ExtensibleObject obj) throws RemoteException, InternalErrorException;
+
+  public void removeExtensibleObject (ExtensibleObject obj) throws RemoteException, InternalErrorException;
 }
 

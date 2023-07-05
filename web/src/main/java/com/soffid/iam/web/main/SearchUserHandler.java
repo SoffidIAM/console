@@ -10,6 +10,7 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.User;
 import com.soffid.iam.web.menu.MenuOption;
 import com.soffid.iam.web.menu.MenuParser;
@@ -19,7 +20,29 @@ public class SearchUserHandler extends SearchHandler<User> {
 	public void startSearch(String term) throws Exception {
 		super.startSearch(term);
 		try {
-			list = EJBLocator.getUserService().findUserByTextAsync(term);
+			CustomObjectType cot = EJBLocator.getAdditionalDataService().findCustomObjectTypeByName(User.class.getName());
+			if (cot != null && cot.isTextIndex()) {
+				StringBuffer sb = new StringBuffer();
+				final String[] parts = term.split(" +");
+				for (int i = 0; i < parts.length; i++) {
+					if (parts[i].length() > 0) {
+						if (sb.length() > 0)
+							sb.append("AND ");
+						if ( i == parts.length - 1)
+							sb.append("(")
+								.append(parts[i])
+								.append("* OR ")
+								.append(parts[i])
+								.append("~ ) ");
+						else
+							sb.append(parts[i])
+								.append("~ ");
+					}
+				}
+				list = EJBLocator.getUserService().findUserByTextAsync(sb.toString());
+			}
+			else
+				list = EJBLocator.getUserService().findUserByTextAsync(term);
 		} catch (Exception e) {}
 	}
 	

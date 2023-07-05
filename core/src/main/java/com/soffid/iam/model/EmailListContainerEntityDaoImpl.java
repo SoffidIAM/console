@@ -59,13 +59,7 @@ public class EmailListContainerEntityDaoImpl extends
             }
 
             super.create(relacioLlistaCorreu);
-            TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlias(relacioLlistaCorreu.getContains().getName());
-            if (relacioLlistaCorreu.getContains().getDomain() != null)
-                tasque.setMailDomain(relacioLlistaCorreu.getContains().getDomain().getName());
-            getTaskEntityDao().create(tasque);
+            getEmailListEntityDao().generateUpdateTasks(relacioLlistaCorreu.getContains());
             getSession(false).flush();
 
             // Creem auditoria
@@ -84,14 +78,8 @@ public class EmailListContainerEntityDaoImpl extends
             String nomLlistaPertany = relacioLlistaCorreu.getPertains().getName();
             String dominiLlistaPertany = relacioLlistaCorreu.getPertains().getDomain() != null ? relacioLlistaCorreu.getPertains().getDomain().getName() : ""; //$NON-NLS-1$
 
+            getEmailListEntityDao().generateUpdateTasks(relacioLlistaCorreu.getContains());
             super.remove(relacioLlistaCorreu);
-            TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlias(relacioLlistaCorreu.getContains().getName());
-            if (relacioLlistaCorreu.getContains().getDomain() != null)
-                tasque.setMailDomain(relacioLlistaCorreu.getContains().getDomain().getName());
-            getTaskEntityDao().create(tasque);
             getSession(false).flush();
 
             // Creem auditoria

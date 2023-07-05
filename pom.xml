@@ -5,7 +5,7 @@
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>3.4.24-SNAPSHOT</version>
+  <version>3.5.0-beta-2-SNAPSHOT</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>
@@ -476,7 +476,8 @@
     		<module>webservice</module>
     		<module>upload-components</module>
     		<module>ear</module>
-                <module>juli</module>
+            <module>default-plugin</module>
+            <module>juli</module>
     		<module>install</module>
   		</modules>
 	 </profile>

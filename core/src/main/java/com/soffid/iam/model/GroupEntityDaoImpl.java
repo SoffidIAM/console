@@ -18,6 +18,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Identity;
 import com.soffid.iam.api.Task;
+import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -33,6 +34,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
@@ -62,8 +64,7 @@ import org.hibernate.HibernateException;
 /**
  * @see es.caib.seycon.ng.model.GrupEntity
  */
-public class GroupEntityDaoImpl extends
-		com.soffid.iam.model.GroupEntityDaoBase {
+public class GroupEntityDaoImpl extends com.soffid.iam.model.GroupEntityDaoBase {
 
 	private void auditarGrup(String accio, String codiGrup) {
 		String codiUsuari = Security.getCurrentAccount();
@@ -80,76 +81,103 @@ public class GroupEntityDaoImpl extends
 		try {
 			super.create(grup);
 			getSession(false).flush();
-			
-			// PROPAGAMOS LOS ROLES OTORGADOS A LOS GRUPOS PADRE 
-			//  el grupo todavía no existe: no tiene roles otorgados
+
+			// PROPAGAMOS LOS ROLES OTORGADOS A LOS GRUPOS PADRE
+			// el grupo todavía no existe: no tiene roles otorgados
 			if (grup.getParent() != null) {
-				// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus padres)
-				HashSet rolsAPropagar =new HashSet();
+				// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus
+				// padres)
+				HashSet rolsAPropagar = new HashSet();
 				Collection rolsAtorgatsGrupIPares = getRolsAtorgatsGrupIParesGrup(grup);
-				if (rolsAtorgatsGrupIPares!=null) rolsAPropagar.addAll(rolsAtorgatsGrupIPares);
+				if (rolsAtorgatsGrupIPares != null)
+					rolsAPropagar.addAll(rolsAtorgatsGrupIPares);
 				// Propagamos los roles: (creamos las tareas)
-				propagarRolsAtorgatsGrups(rolsAPropagar);						
+				propagarRolsAtorgatsGrups(rolsAPropagar);
 			}
-			
-			
-                        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-                        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-                        tasque.setGroup(grup.getName());
-                        getTaskEntityDao().create(tasque);
-                        if (grup.getDriveServer() != null) {
-                            tasque = getTaskEntityDao().newTaskEntity();
-                            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                            tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                            tasque.setFolder(grup.getName());
-                            tasque.setFolderType("G"); //$NON-NLS-1$
-                            getTaskEntityDao().create(tasque);
-                        }
+
+			String status = ConfigurationCache.getProperty("soffid.task.mode");
+			if ("readonly".equals( status ) || "manual".equals( status )) {
+				TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+		        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+		        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+		        tasque.setCustomObjectType(Group.class.getName());
+		        tasque.setPrimaryKeyValue(grup.getId());
+		        getTaskEntityDao().create(tasque);
+			}
+			else
+			{
+				TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+				tasque.setDate(new Timestamp(System.currentTimeMillis()));
+				tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+				tasque.setGroup(grup.getName());
+				getTaskEntityDao().create(tasque);
+				if (grup.getDriveServer() != null) {
+					tasque = getTaskEntityDao().newTaskEntity();
+					tasque.setDate(new Timestamp(System.currentTimeMillis()));
+					tasque.setTransaction(TaskHandler.CREATE_FOLDER);
+					tasque.setFolder(grup.getName());
+					tasque.setFolderType("G"); //$NON-NLS-1$
+					getTaskEntityDao().create(tasque);
+				}
+			}
 			auditarGrup("C", grup.getName()); //$NON-NLS-1$
-                        getSession().flush();
+			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.0"), grup.getName(), message), e);
+			throw new SeyconException(
+					String.format(Messages.getString("GroupEntityDaoImpl.0"), grup.getName(), message), e);
 		}
 	}
 
-	public void remove(com.soffid.iam.model.GroupEntity grup) throws RuntimeException { //En principi NO ES FA MAI
+	public void remove(com.soffid.iam.model.GroupEntity grup) throws RuntimeException { // En principi NO ES FA MAI
 		try {
 			String codiGrup = grup.getName();
-			
-			// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus padres)
-			HashSet rolsAPropagar =new HashSet();
-			Collection rolsAtorgatsGrupIPares = getRolsAtorgatsGrupIParesGrup(grup);
-			if (rolsAtorgatsGrupIPares!=null) rolsAPropagar.addAll(rolsAtorgatsGrupIPares);
-			// Propagamos los roles: (creamos las tareas)
-			propagarRolsAtorgatsGrups(rolsAPropagar);						
 
-            TaskEntity tasque;
-            tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-            tasque.setGroup(grup.getName());
-            getTaskEntityDao().create(tasque);
-            if (grup.getDriveServer() != null) {
-                tasque = getTaskEntityDao().newTaskEntity();
-                tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                tasque.setFolder(grup.getName());
-                tasque.setFolderType("G"); //$NON-NLS-1$
-                getTaskEntityDao().create(tasque);
-            }
+			// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus
+			// padres)
+			HashSet rolsAPropagar = new HashSet();
+			Collection rolsAtorgatsGrupIPares = getRolsAtorgatsGrupIParesGrup(grup);
+			if (rolsAtorgatsGrupIPares != null)
+				rolsAPropagar.addAll(rolsAtorgatsGrupIPares);
+			// Propagamos los roles: (creamos las tareas)
+			propagarRolsAtorgatsGrups(rolsAPropagar);
+
+			TaskEntity tasque;
+			String status = ConfigurationCache.getProperty("soffid.task.mode");
+			if ("readonly".equals( status ) || "manual".equals( status )) {
+				tasque = getTaskEntityDao().newTaskEntity();
+		        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+		        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+		        tasque.setCustomObjectType(Group.class.getName());
+		        tasque.setPrimaryKeyValue(grup.getId());
+		        getTaskEntityDao().create(tasque);
+			}
+			else 
+			{
+				tasque = getTaskEntityDao().newTaskEntity();
+				tasque.setDate(new Timestamp(System.currentTimeMillis()));
+				tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+				tasque.setGroup(grup.getName());
+				getTaskEntityDao().create(tasque);
+				if (grup.getDriveServer() != null) {
+					tasque = getTaskEntityDao().newTaskEntity();
+					tasque.setDate(new Timestamp(System.currentTimeMillis()));
+					tasque.setTransaction(TaskHandler.CREATE_FOLDER);
+					tasque.setFolder(grup.getName());
+					tasque.setFolderType("G"); //$NON-NLS-1$
+					getTaskEntityDao().create(tasque);
+				}
+			}
 			auditarGrup("D", codiGrup); //$NON-NLS-1$
 
-			getUserGroupEntityDao().remove( grup.getSecondaryGroupUsers());
-			getRoleGroupEntityDao().remove( grup.getGrantedRoles());
+			getUserGroupEntityDao().remove(grup.getSecondaryGroupUsers());
+			getRoleGroupEntityDao().remove(grup.getGrantedRoles());
 			getGroupAttributeEntityDao().remove(new LinkedList<>(grup.getAttributes()));
 			grup.getAttributes().clear();
 			getMailListGroupMemberEntityDao().remove(grup.getMailLists());
 			getMailListRoleMemberEntityDao().remove(grup.getRoleScopeMailLists());
 			getRoleAccountEntityDao().remove(grup.getUsersRoles());
-			for (AuditEntity aud: grup.getAudit())
-			{
+			for (AuditEntity aud : grup.getAudit()) {
 				aud.setGroup(null);
 				getAuditEntityDao().update(aud);
 			}
@@ -158,7 +186,8 @@ public class GroupEntityDaoImpl extends
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.1"), grup.getName(), message), e);
+			throw new SeyconException(
+					String.format(Messages.getString("GroupEntityDaoImpl.1"), grup.getName(), message), e);
 		}
 	}
 
@@ -170,55 +199,73 @@ public class GroupEntityDaoImpl extends
 			Collection pares = new HashSet();
 			pares.add(pareGrupAbansUpdate);
 			pares.add(grup.getParent());
-			
+
 			// Actualizamos al grupo
 			super.update(grup);
 			getSession(false).flush();
-			
+
 			// PROPAGAMOS LOS ROLES OTORGADOS A LOS PADRES DEL GRUPO
 			// Si n'hi ha més d'un pare: ha canviat
 			// O si només hi ha un pare (i és nou o ha desaparegut)
-			if (pares.size() > 1 || (pareGrupAbansUpdate == null && grup.getParent() != null) || (pareGrupAbansUpdate != null && grup.getParent() == null)) {
+			if (pares.size() > 1 || (pareGrupAbansUpdate == null && grup.getParent() != null)
+					|| (pareGrupAbansUpdate != null && grup.getParent() == null)) {
 
-				// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus padres)
-				HashSet rolsAPropagar =new HashSet();
-				for (Iterator it = pares.iterator(); it.hasNext(); ) {
-                    Object obj = it.next();
-                    if (obj != null) {
-                        GroupEntity g = (GroupEntity) obj;
-                        Collection rolsAtorgatsGrupIPares = getRolsAtorgatsGrupIParesGrup(g);
-                        if (rolsAtorgatsGrupIPares != null) rolsAPropagar.addAll(rolsAtorgatsGrupIPares);
-                    }
-                }
+				// Herencia de Roles: propagamos los roles heredados por el grupo (y de sus
+				// padres)
+				HashSet rolsAPropagar = new HashSet();
+				for (Iterator it = pares.iterator(); it.hasNext();) {
+					Object obj = it.next();
+					if (obj != null) {
+						GroupEntity g = (GroupEntity) obj;
+						Collection rolsAtorgatsGrupIPares = getRolsAtorgatsGrupIParesGrup(g);
+						if (rolsAtorgatsGrupIPares != null)
+							rolsAPropagar.addAll(rolsAtorgatsGrupIPares);
+					}
+				}
 				// Propagamos los ROLES (del grupo padre antiguo y nuevo): (creamos las tareas)
 				propagarRolsAtorgatsGrups(rolsAPropagar);
 				// Propagamos LOS USUARIOS: de este grupo
 				Collection usuarisPropagar = getUsuarisPertanyenGrup(grup.getName());
-				if (usuarisPropagar!=null) {
+				if (usuarisPropagar != null) {
 					propagarUsuarisGrup(usuarisPropagar);
 				}
-				
-				
+
 			}
-            TaskEntity tasque;
-            tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_GROUP);
-            tasque.setGroup(grup.getName());
-            getTaskEntityDao().create(tasque);
-            if (grup.getDriveServer() != null ? old.getDriveServer() == null || !old.getDriveServer().getId().equals(grup.getDriveServer().getId()) : old.getDriveServer() != null) {
-                tasque = getTaskEntityDao().newTaskEntity();
-                tasque.setDate(new Timestamp(System.currentTimeMillis()));
-                tasque.setTransaction(TaskHandler.CREATE_FOLDER);
-                tasque.setFolder(grup.getName());
-                tasque.setFolderType("G"); //$NON-NLS-1$
-                getTaskEntityDao().create(tasque);
-            }
-			auditarGrup("S".equals(grup.getObsolete()) ? "D": "U", grup.getName()); //$NON-NLS-1$
+			TaskEntity tasque;
+			String status = ConfigurationCache.getProperty("soffid.task.mode");
+			if ("readonly".equals( status ) || "manual".equals( status )) {
+				tasque = getTaskEntityDao().newTaskEntity();
+		        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+		        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+		        tasque.setCustomObjectType(Group.class.getName());
+		        tasque.setPrimaryKeyValue(grup.getId());
+		        getTaskEntityDao().create(tasque);
+			}
+			else 
+			{
+				tasque = getTaskEntityDao().newTaskEntity();
+				tasque.setDate(new Timestamp(System.currentTimeMillis()));
+				tasque.setTransaction(TaskHandler.UPDATE_GROUP);
+				tasque.setGroup(grup.getName());
+				getTaskEntityDao().create(tasque);
+				if (grup.getDriveServer() != null
+						? old.getDriveServer() == null
+								|| !old.getDriveServer().getId().equals(grup.getDriveServer().getId())
+						: old.getDriveServer() != null) {
+					tasque = getTaskEntityDao().newTaskEntity();
+					tasque.setDate(new Timestamp(System.currentTimeMillis()));
+					tasque.setTransaction(TaskHandler.CREATE_FOLDER);
+					tasque.setFolder(grup.getName());
+					tasque.setFolderType("G"); //$NON-NLS-1$
+					getTaskEntityDao().create(tasque);
+				}
+			}
+			auditarGrup("S".equals(grup.getObsolete()) ? "D" : "U", grup.getName()); //$NON-NLS-1$
 			getSession().flush();
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.2"), grup.getName(), message), e);
+			throw new SeyconException(
+					String.format(Messages.getString("GroupEntityDaoImpl.2"), grup.getName(), message), e);
 		}
 	}
 
@@ -246,9 +293,8 @@ public class GroupEntityDaoImpl extends
 			String nomServidorOfimatic = servidorOfimatic.getName();
 			grup.setDriveServerName(nomServidorOfimatic);
 		}
-		
 
-		GroupEntity grupEntity = entity; //findByCodi(entity.getCodi()); //¿para qué lo cargamos si lo tenemos?
+		GroupEntity grupEntity = entity; // findByCodi(entity.getCodi()); //¿para qué lo cargamos si lo tenemos?
 		GroupTypeEntity tipusUnitatOrganitzativa = grupEntity.getUnitType();
 		if (tipusUnitatOrganitzativa != null) {
 			String codiTipus = tipusUnitatOrganitzativa.getName();
@@ -272,24 +318,20 @@ public class GroupEntityDaoImpl extends
 		grup.setAttributes(new HashMap<String, Object>());
 		Map<String, Object> attributes = grup.getAttributes();
 		for (GroupAttributeEntity att : grupEntity.getAttributes()) {
-			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
-			{
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue()) {
 				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
-				if (r == null)
-				{
+				if (r == null) {
 					r = new LinkedList<Object>();
 					attributes.put(att.getMetadata().getName(), r);
 				}
 				r.add(att.getObjectValue());
-			}
-			else
-			{
-				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			} else {
+				attributes.put(att.getMetadata().getName(), att.getObjectValue());
 			}
 		}
-		for (Object o: attributes.values())
-		{
-			if (o != null && o instanceof List) Collections.sort((List) o);
+		for (Object o : attributes.values()) {
+			if (o != null && o instanceof List)
+				Collections.sort((List) o);
 		}
 
 	}
@@ -305,8 +347,8 @@ public class GroupEntityDaoImpl extends
 
 	/**
 	 * Retrieves the entity object that is associated with the specified value
-	 * object from the object store. If no such entity object exists in the
-	 * object store, a new, blank entity is created
+	 * object from the object store. If no such entity object exists in the object
+	 * store, a new, blank entity is created
 	 */
 	private com.soffid.iam.model.GroupEntity loadGrupEntityFromGrup(com.soffid.iam.api.Group grup) {
 		com.soffid.iam.model.GroupEntity grupEntity = null;
@@ -332,24 +374,23 @@ public class GroupEntityDaoImpl extends
 		Boolean organitzatiu = sourceVO.getOrganizational();
 		if (organitzatiu != null) {
 			targetEntity.setOrganizational(organitzatiu.booleanValue() ? "S" : "N"); //$NON-NLS-1$
-		}else{
+		} else {
 			targetEntity.setOrganizational("N"); //$NON-NLS-1$
 		}
 
 		String codiPare = sourceVO.getParentGroup();
 		if (codiPare != null && codiPare.trim().compareTo("") != 0) { //$NON-NLS-1$
 			GroupEntity grupPare = findByName(sourceVO.getParentGroup());
-			if (grupPare == null && Boolean.TRUE.equals(sourceVO.getObsolete()) && sourceVO.getEndDate() != null) 
-				grupPare = findByNameAndDate(codiPare, new Date (sourceVO.getEndDate().getTime()-1000));
-			if (grupPare == null && Boolean.TRUE.equals(sourceVO.getObsolete()) && sourceVO.getStartDate() != null) 
+			if (grupPare == null && Boolean.TRUE.equals(sourceVO.getObsolete()) && sourceVO.getEndDate() != null)
+				grupPare = findByNameAndDate(codiPare, new Date(sourceVO.getEndDate().getTime() - 1000));
+			if (grupPare == null && Boolean.TRUE.equals(sourceVO.getObsolete()) && sourceVO.getStartDate() != null)
 				grupPare = findByNameAndDate(codiPare, sourceVO.getStartDate());
 			if (grupPare == null) {
 				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.3"), codiPare)); //$NON-NLS-1$
 			} else {
-				if (grupPare.getObsolete() != null && grupPare.getObsolete().compareTo("S") == 0 &&
-						! Boolean.TRUE.equals(sourceVO.getObsolete())) { //$NON-NLS-1$
-					throw new SeyconException(
-							Messages.getString("GroupEntityDaoImpl.4")); //$NON-NLS-1$
+				if (grupPare.getObsolete() != null && grupPare.getObsolete().compareTo("S") == 0
+						&& !Boolean.TRUE.equals(sourceVO.getObsolete())) { // $NON-NLS-1$
+					throw new SeyconException(Messages.getString("GroupEntityDaoImpl.4")); //$NON-NLS-1$
 				} else {
 					targetEntity.setParent(grupPare);
 				}
@@ -359,13 +400,12 @@ public class GroupEntityDaoImpl extends
 		}
 
 		String nomServidorOfimatic = sourceVO.getDriveServerName();
-		if (nomServidorOfimatic != null
-				&& nomServidorOfimatic.trim().compareTo("") != 0) { //$NON-NLS-1$
+		if (nomServidorOfimatic != null && nomServidorOfimatic.trim().compareTo("") != 0) { //$NON-NLS-1$
 			HostEntity servidorOfimatic = getHostEntityDao().findByName(nomServidorOfimatic);
 			if (servidorOfimatic != null) {
 				targetEntity.setDriveServer(servidorOfimatic);
 			} else {
-				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.5"),  //$NON-NLS-1$
+				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.5"), //$NON-NLS-1$
 						nomServidorOfimatic));
 			}
 		} else {
@@ -378,7 +418,7 @@ public class GroupEntityDaoImpl extends
 			if (tipusEntity != null) {
 				targetEntity.setUnitType(tipusEntity);
 			} else {
-				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.6"),  //$NON-NLS-1$
+				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.6"), //$NON-NLS-1$
 						codiTipus));
 			}
 		} else {
@@ -392,14 +432,13 @@ public class GroupEntityDaoImpl extends
 		}
 
 		try {
-			if (sourceVO.getQuota() != null
-					&& sourceVO.getQuota().compareTo("") != 0) { //$NON-NLS-1$
+			if (sourceVO.getQuota() != null && sourceVO.getQuota().compareTo("") != 0) { //$NON-NLS-1$
 				targetEntity.setQuotaGroup(Long.valueOf(sourceVO.getQuota()));
 			} else {
 				targetEntity.setQuotaGroup(new Long(0));
 			}
 		} catch (Exception e) {
-			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.7"),  //$NON-NLS-1$
+			throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.7"), //$NON-NLS-1$
 					sourceVO.getQuota()), e);
 		}
 	}
@@ -408,7 +447,8 @@ public class GroupEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#grupToEntity(es.caib.seycon.ng.comu.Grup,
 	 *      es.caib.seycon.ng.model.GrupEntity)
 	 */
-	public void groupToEntity(com.soffid.iam.api.Group sourceVO, com.soffid.iam.model.GroupEntity targetEntity, boolean copyIfNull) {
+	public void groupToEntity(com.soffid.iam.api.Group sourceVO, com.soffid.iam.model.GroupEntity targetEntity,
+			boolean copyIfNull) {
 		super.groupToEntity(sourceVO, targetEntity, copyIfNull);
 		grupToEntityCustom(sourceVO, targetEntity);
 	}
@@ -419,12 +459,11 @@ public class GroupEntityDaoImpl extends
 		/*
 		 * No crea ciclo: desde el padre no se puede llegar al hijo
 		 */
-		GroupEntity pareGrup = superGrup; //comencem pel nou pare
+		GroupEntity pareGrup = superGrup; // comencem pel nou pare
 		while (pareGrup != null) {
 			if (pareGrup.getName().compareTo(codiSubGrup) == 0) {
-				throw new Exception(String.format(Messages.getString("GroupEntityDaoImpl.8"),  //$NON-NLS-1$
-						codiSuperGrup, 
-						codiSubGrup));
+				throw new Exception(String.format(Messages.getString("GroupEntityDaoImpl.8"), //$NON-NLS-1$
+						codiSuperGrup, codiSubGrup));
 			}
 			pareGrup = pareGrup.getParent();
 		}
@@ -461,8 +500,8 @@ public class GroupEntityDaoImpl extends
 
 	/**
 	 * Retrieves the entity object that is associated with the specified value
-	 * object from the object store. If no such entity object exists in the
-	 * object store, a new, blank entity is created
+	 * object from the object store. If no such entity object exists in the object
+	 * store, a new, blank entity is created
 	 */
 	private com.soffid.iam.model.GroupEntity loadGrupEntityFromIdentitat(com.soffid.iam.api.Identity identitat) {
 		/*
@@ -474,7 +513,7 @@ public class GroupEntityDaoImpl extends
 			if (grupEntity != null) {
 				return grupEntity;
 			} else {
-				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.9"),  //$NON-NLS-1$
+				throw new SeyconException(String.format(Messages.getString("GroupEntityDaoImpl.9"), //$NON-NLS-1$
 						codiGrup));
 			}
 		}
@@ -495,7 +534,8 @@ public class GroupEntityDaoImpl extends
 	 * @see es.caib.seycon.ng.model.GrupEntityDao#identitatToEntity(es.caib.seycon.ng.comu.Identitat,
 	 *      es.caib.seycon.ng.model.GrupEntity)
 	 */
-	public void identityToEntity(com.soffid.iam.api.Identity source, com.soffid.iam.model.GroupEntity target, boolean copyIfNull) {
+	public void identityToEntity(com.soffid.iam.api.Identity source, com.soffid.iam.model.GroupEntity target,
+			boolean copyIfNull) {
 		super.identityToEntity(source, target, copyIfNull);
 	}
 
@@ -516,10 +556,11 @@ public class GroupEntityDaoImpl extends
 		return valorDomini;
 	}
 
-	/* HERENCIA DE ROLES  */
-	
+	/* HERENCIA DE ROLES */
+
 	/**
 	 * ATORGACIO DE ROLS
+	 * 
 	 * @param grupAnalitzar
 	 * @return
 	 */
@@ -527,206 +568,208 @@ public class GroupEntityDaoImpl extends
 
 		Collection totsPares = new HashSet();
 		GroupEntity pare = grupAnalitzar.getParent();
-		while (pare !=null) {
+		while (pare != null) {
 			if (totsPares.contains(pare))
-				throw new HibernateException("Nested groups failure: "+pare.getName()+" parent is twice parent parent of "+grupAnalitzar.getName());
+				throw new HibernateException("Nested groups failure: " + pare.getName()
+						+ " parent is twice parent parent of " + grupAnalitzar.getName());
 			totsPares.add(pare);
 			pare = pare.getParent();
 		}
 
 		return totsPares;
 	}
-	
+
 	/**
 	 * ATORGACIO DE ROLS
+	 * 
 	 * @param rol
 	 * @return
 	 */
 	private Collection getRolsContingutsPerPropagar(RoleEntity rol) {
-		// Si rol té atorgats d'altres rols (és contenidor del rols) 
+		// Si rol té atorgats d'altres rols (és contenidor del rols)
 		// s'han de propagar tots els rols que conté (per assignar-lo a l'usuari)
 		HashSet rolsPropagar = new HashSet();
-		// Sólo hemos de propagar a los usuarios que tienen el rol contenedor 
+		// Sólo hemos de propagar a los usuarios que tienen el rol contenedor
 		// con valor de dominio correspondiente (o si es SENSE_DOMINI o a qualque valor)
-		// Montamos un FIFO De roles (puede haber cadena de 
+		// Montamos un FIFO De roles (puede haber cadena de
 		// herencia A atorgat B[sense domini] atorgat C ... atorgat Z[amb domini]
 		LinkedList rolsAnalitzar = new LinkedList(); // FIFO
 		rolsAnalitzar.add(rol);
 		RoleEntity rolActual = null;
 		while ((rolActual = (RoleEntity) rolsAnalitzar.poll()) != null) {
 			Collection socContenidor = rolActual.getContainedRoles();
-				
-			if (socContenidor!=null) for (Iterator it = socContenidor.iterator(); it.hasNext(); ) {
-                RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
-                RoleEntity rolContingut = associacio.getContained();
-                rolsPropagar.add(rolContingut);
-                rolsAnalitzar.add(rolContingut);
-            }
+
+			if (socContenidor != null)
+				for (Iterator it = socContenidor.iterator(); it.hasNext();) {
+					RoleDependencyEntity associacio = (RoleDependencyEntity) it.next();
+					RoleEntity rolContingut = associacio.getContained();
+					rolsPropagar.add(rolContingut);
+					rolsAnalitzar.add(rolContingut);
+				}
 		}
 		return rolsPropagar;
-	}		
-	
+	}
+
 	/**
-	 * ATORGACIÓ DE ROLS
-	 * Obtiene dado un grupo, los roles otorgados al grupo (y
-	 * los roles otorgados a los padres del grupo indicado)
+	 * ATORGACIÓ DE ROLS Obtiene dado un grupo, los roles otorgados al grupo (y los
+	 * roles otorgados a los padres del grupo indicado)
+	 * 
 	 * @param grup
 	 * @return
 	 */
 	private Collection getRolsAtorgatsGrupIParesGrup(GroupEntity grup) {
-		
-		// 1) Obtenim els grups pares del grup 
+
+		// 1) Obtenim els grups pares del grup
 		HashSet totGrup = new HashSet();
 		totGrup.add(grup);
 		Collection paresGrup = getParesGrup(grup);
 		totGrup.addAll(paresGrup);
-		
+
 		// 2) Obtenim els rols atorgats al grup i els grups pare
 		HashSet totRolAtorgatGrup = new HashSet();
-		for (Iterator it = totGrup.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj != null) {
-                GroupEntity g = (GroupEntity) obj;
-                Collection rolsAtorgatsG = g.getGrantedRoles();
-                if (rolsAtorgatsG != null) totRolAtorgatGrup.addAll(rolsAtorgatsG);
-            }
-        }
-		
+		for (Iterator it = totGrup.iterator(); it.hasNext();) {
+			Object obj = it.next();
+			if (obj != null) {
+				GroupEntity g = (GroupEntity) obj;
+				Collection rolsAtorgatsG = g.getGrantedRoles();
+				if (rolsAtorgatsG != null)
+					totRolAtorgatGrup.addAll(rolsAtorgatsG);
+			}
+		}
+
 		// 3) Obtenim els rols atorgats als rols:
 		HashSet rolsPropagar = new HashSet();
-		for (Iterator it = totRolAtorgatGrup.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj != null) {
-                RoleGroupEntity rolgrup = (RoleGroupEntity) obj;
-                rolsPropagar.add(rolgrup.getGrantedRole());
-                Collection rolsAtorgatsRol = getRolsContingutsPerPropagar(rolgrup.getGrantedRole());
-                if (rolsAtorgatsRol != null) rolsPropagar.addAll(rolsAtorgatsRol);
-            }
-        }
-		
-		return new ArrayList(rolsPropagar);		
+		for (Iterator it = totRolAtorgatGrup.iterator(); it.hasNext();) {
+			Object obj = it.next();
+			if (obj != null) {
+				RoleGroupEntity rolgrup = (RoleGroupEntity) obj;
+				rolsPropagar.add(rolgrup.getGrantedRole());
+				Collection rolsAtorgatsRol = getRolsContingutsPerPropagar(rolgrup.getGrantedRole());
+				if (rolsAtorgatsRol != null)
+					rolsPropagar.addAll(rolsAtorgatsRol);
+			}
+		}
+
+		return new ArrayList(rolsPropagar);
 	}
-	
-    private void updateMailLists(GroupEntity group) throws InternalErrorException {
-    	while (group != null)
-    	{
-	    	for (MailListGroupMemberEntity lce : group.getMailLists()) {
-                getEmailListEntityDao().generateUpdateTasks(lce.getMailList());
-            }
-	    	group = group.getParent();
-    	}
-    }
-    
+
+	private void updateMailLists(GroupEntity group) throws InternalErrorException {
+		while (group != null) {
+			for (MailListGroupMemberEntity lce : group.getMailLists()) {
+				getEmailListEntityDao().generateUpdateTasks(lce.getMailList());
+			}
+			group = group.getParent();
+		}
+	}
+
 	/**
-	 * Atorgació de rols: Propaga els rols indicats 
+	 * Atorgació de rols: Propaga els rols indicats
+	 * 
 	 * @param rolsPropagar
 	 */
 	private void propagarRolsAtorgatsGrups(Collection rolsPropagar) {
 		// Propaguem els rols
 		if (rolsPropagar != null) {
-			for (Iterator it = rolsPropagar.iterator(); it.hasNext(); ) {
-                Object obj = it.next();
-                if (obj != null) {
-                    RoleEntity role = (RoleEntity) obj;
-                    Task updateRole = new Task();
-                    updateRole.setTransaction("UpdateRole");
-                    updateRole.setTaskDate(Calendar.getInstance());
-                    updateRole.setStatus("P");
-                    updateRole.setRole(role.getName());
-                    updateRole.setDatabase(role.getSystem().getName());
-                    TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
-                    getTaskEntityDao().create(tasca);
-                }
-            }
+			for (Iterator it = rolsPropagar.iterator(); it.hasNext();) {
+				Object obj = it.next();
+				if (obj != null) {
+					RoleEntity role = (RoleEntity) obj;
+					Task updateRole = new Task();
+					updateRole.setTransaction("UpdateRole");
+					updateRole.setTaskDate(Calendar.getInstance());
+					updateRole.setStatus("P");
+					updateRole.setRole(role.getName());
+					updateRole.setDatabase(role.getSystem().getName());
+					TaskEntity tasca = getTaskEntityDao().taskToEntity(updateRole);
+					getTaskEntityDao().create(tasca);
+				}
+			}
 		}
 	}
-	
+
 	private Collection getUsuarisPertanyenGrup(String codiGrup) {
 		HashSet totsUsuaris = new HashSet();
 		// Obtenemos los grupos primarios primero
 		Collection usuarisGrupComGrupPrimari = getUserEntityDao().findByPrimaryGroup(codiGrup);
-		for (Iterator it = usuarisGrupComGrupPrimari.iterator(); it.hasNext(); ) {
-            UserEntity user = (UserEntity) it.next();
-            totsUsuaris.add(user.getUserName());
-        }
-		
+		for (Iterator it = usuarisGrupComGrupPrimari.iterator(); it.hasNext();) {
+			UserEntity user = (UserEntity) it.next();
+			totsUsuaris.add(user.getUserName());
+		}
+
 		// Esto obtiene los usuarios que tienen el grupo como secundario
 		Collection usuarisGrupComGrupSec = getUserGroupEntityDao().findByGroupName(codiGrup);
-		for (Iterator it = usuarisGrupComGrupSec.iterator(); it.hasNext(); ) {
-            UserGroupEntity usugru = (UserGroupEntity) it.next();
-            totsUsuaris.add(usugru.getUser().getUserName());
-        }
-		
+		for (Iterator it = usuarisGrupComGrupSec.iterator(); it.hasNext();) {
+			UserGroupEntity usugru = (UserGroupEntity) it.next();
+			totsUsuaris.add(usugru.getUser().getUserName());
+		}
+
 		return new ArrayList(totsUsuaris);
-		
-		
+
 	}
-	
-	private void propagarUsuarisGrup (Collection usuarisPropagar) {
+
+	private void propagarUsuarisGrup(Collection usuarisPropagar) {
 		if (usuarisPropagar != null)
-			for (Iterator it = usuarisPropagar.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj != null) {
-                String codiUsuari = (String) obj;
-                Task updateUser = new Task();
-                updateUser.setTransaction("UpdateUser");
-                updateUser.setTaskDate(Calendar.getInstance());
-                updateUser.setUser(codiUsuari);
-                updateUser.setStatus("P");
-                TaskEntity tasca = getTaskEntityDao().taskToEntity(updateUser);
-                getTaskEntityDao().create(tasca);
-            }
-        }		
+			for (Iterator it = usuarisPropagar.iterator(); it.hasNext();) {
+				Object obj = it.next();
+				if (obj != null) {
+					String codiUsuari = (String) obj;
+					Task updateUser = new Task();
+					updateUser.setTransaction("UpdateUser");
+					updateUser.setTaskDate(Calendar.getInstance());
+					updateUser.setUser(codiUsuari);
+					updateUser.setStatus("P");
+					TaskEntity tasca = getTaskEntityDao().taskToEntity(updateUser);
+					getTaskEntityDao().create(tasca);
+				}
+			}
 	}
 
 	public void create(Collection entities) {
-		if (entities!=null) for (Iterator it = entities.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj instanceof GroupEntity) {
-                GroupEntity entity = (GroupEntity) obj;
-                this.create(entity);
-            }
-        }
+		if (entities != null)
+			for (Iterator it = entities.iterator(); it.hasNext();) {
+				Object obj = it.next();
+				if (obj instanceof GroupEntity) {
+					GroupEntity entity = (GroupEntity) obj;
+					this.create(entity);
+				}
+			}
 	}
 
 	public void update(Collection entities) {
-		if (entities!=null) for (Iterator it = entities.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj instanceof GroupEntity) {
-                GroupEntity entity = (GroupEntity) obj;
-                this.update(entity);
-            }
-        }
+		if (entities != null)
+			for (Iterator it = entities.iterator(); it.hasNext();) {
+				Object obj = it.next();
+				if (obj instanceof GroupEntity) {
+					GroupEntity entity = (GroupEntity) obj;
+					this.update(entity);
+				}
+			}
 	}
 
 	public void remove(Collection entities) {
-		if (entities!=null) for (Iterator it = entities.iterator(); it.hasNext(); ) {
-            Object obj = it.next();
-            if (obj instanceof GroupEntity) {
-                GroupEntity entity = (GroupEntity) obj;
-                this.remove(entity);
-            }
-        }
+		if (entities != null)
+			for (Iterator it = entities.iterator(); it.hasNext();) {
+				Object obj = it.next();
+				if (obj instanceof GroupEntity) {
+					GroupEntity entity = (GroupEntity) obj;
+					this.remove(entity);
+				}
+			}
 	}
 
 	@Override
 	public Collection<GroupEntity> findByText(CriteriaSearchConfiguration criteria, String text) {
 		String[] split = ScimHelper.split(text);
 		Parameter[] params = new Parameter[split.length + 1];
-		
-		StringBuffer sb = new StringBuffer("select u "
-				+ "from com.soffid.iam.model.GroupEntity as u "
+
+		StringBuffer sb = new StringBuffer("select u " + "from com.soffid.iam.model.GroupEntity as u "
 				+ "where u.tenant.id = :tenantId and u.obsolete='N'");
 		params[0] = new Parameter("tenantId", Security.getCurrentTenantId());
-		for (int i = 0; i < split.length; i++)
-		{
+		for (int i = 0; i < split.length; i++) {
 			sb.append(" and ");
-			params[i+1] = new Parameter("param"+i, "%"+split[i].toUpperCase()+"%");
-			sb.append("(upper(u.name) like :param")
-				.append(i)
-				.append(" or upper(u.description) like :param")
-				.append(i)
-				.append(")");
+			params[i + 1] = new Parameter("param" + i, "%" + split[i].toUpperCase() + "%");
+			sb.append("(upper(u.name) like :param").append(i).append(" or upper(u.description) like :param").append(i)
+					.append(")");
 		}
 		return query(sb.toString(), params);
 	}

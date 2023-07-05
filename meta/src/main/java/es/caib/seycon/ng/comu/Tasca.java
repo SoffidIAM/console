@@ -113,4 +113,8 @@ public class Tasca {
 
 	@Nullable
 	public String customObjectName;
+
+	
+	@Nullable
+	public java.lang.String customTaskName;
 }

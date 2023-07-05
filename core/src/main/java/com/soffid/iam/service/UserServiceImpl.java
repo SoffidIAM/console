@@ -117,6 +117,7 @@ import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.service.impl.CertificateParser;
+import com.soffid.iam.service.impl.DatabaseReader;
 import com.soffid.iam.service.impl.ObjectVariableResolver;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.sync.service.SyncStatusService;
@@ -132,6 +133,8 @@ import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
+import com.soffid.tools.db.schema.Database;
+import com.soffid.tools.db.schema.ForeignKey;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.ServerType;
@@ -2128,8 +2131,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected ExtranetCard handleCreateExtranetCard(String codiUsuari)
 			throws Exception {
 		
-		// TODO
-
 		return null;
 	}
 
@@ -3004,7 +3005,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		LinkedList<User> result = new LinkedList<User>();
 
-		PagedResult<User>  r =  internalSearchUsersByJson(query, result, start, end);
+		PagedResult<User>  r =  internalSearchUsersByJson(null, query, result, start, end);
   
 		return r;
 	}
@@ -3015,13 +3016,13 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		LinkedList<User> result = new LinkedList<User>();
 
-		internalSearchUsersByJson(query, result, null, null);
+		internalSearchUsersByJson(null, query, result, null, null);
 		
 		return result;
 	}
 
 
-	private PagedResult<User> internalSearchUsersByJson(String query, List<User> result,
+	private PagedResult<User> internalSearchUsersByJson(String text, String filter, List<User> result,
 			Integer start, Integer pageSize)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
@@ -3049,7 +3050,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			}
 		});
 		
-		h.search(null, query, (Collection) result); 
+		h.search(text, filter, (Collection) result); 
 
 		PagedResult<User> pr = new PagedResult<>();
 		pr.setStartIndex(start);
@@ -3062,7 +3063,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	@Override
 	protected AsyncList<User> handleFindUserByJsonQueryAsync(final String query)
 			throws InternalErrorException, Exception {
-		
+		return handleFindUserByTextAndFilterAsync(null, query);
+	}
+
+	@Override
+	protected AsyncList<User> handleFindUserByTextAndFilterAsync(String text, String filter) throws Exception {
 		final AsyncList<User> result = new AsyncList<User>();
 		
 		getAsyncRunnerService().run(new Runnable() {
@@ -3070,7 +3075,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			@Override
 			public void run() {
 				try {
-					internalSearchUsersByJson(query, result, null, null);
+					internalSearchUsersByJson(text, filter, result, null, null);
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				
@@ -3081,66 +3086,18 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return result;
 	}
 
-	String generateQuickSearchQuery (String text) {
-		if (text == null )
-			return  "";
-		List<MetaDataEntity> atts = getMetaDataEntityDao().findByObjectTypeAndName(User.class.getName(), null);
-		String[] split = ScimHelper.split(text);
-		
-		StringBuffer sb = new StringBuffer("");
-		for (int i = 0; i < split.length; i++)
-		{
-			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
-			if (sb.length() > 0)
-				sb.append(" and ");
-			sb.append("(");
-			sb.append("userName co \""+t+"\"");
-			for (MetaDataEntity att: atts)
-			{
-				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue() &&
-						!att.getName().equals("userName"))
-				{
-					if ( Boolean.TRUE.equals(att.getBuiltin()))
-						sb.append(" or "+att.getName()+" co \""+t+"\"");
-					else
-						sb.append(" or userData."+att.getName()+" co \""+t+"\"");
-				}
-			}
-			sb.append(")");
-		}
-		return sb.toString();
-	}
-	
-	@Override
-	protected AsyncList<User> handleFindUserByTextAndFilterAsync(String text, String filter) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
-		return handleFindUserByJsonQueryAsync(q);
-			
-	}
-
 	@Override
 	protected List<User> handleFindUserByTextAndFilter(String text, String filter) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
-		return handleFindUserByJsonQuery(q);
+		final LinkedList<User> result = new LinkedList<User>();
+		internalSearchUsersByJson(text, filter, result, null, null);
+		return result;
 	}
 
 	@Override
 	protected PagedResult<User> handleFindUserByTextAndFilter(String text, String filter,
 			Integer start, Integer max) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = filter;
-		return handleFindUserByJsonQuery(q, start, max);
+		final LinkedList<User> result = new LinkedList<User>();
+		return internalSearchUsersByJson(text, filter, result, start, max);
 	}
 
 	@Override
@@ -3761,6 +3718,24 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		FunctionMapper functions  = null;
 		return (String) ee.evaluate(text, String.class, pResolver , functions);
 		
+	}
+
+	@Override
+	protected void handleMerge(Long srcId, Long targetId) throws Exception {
+		UserEntity su = getUserEntityDao().load(srcId);
+		UserEntity tu = getUserEntityDao().load(targetId);
+		String codiUsuari = Security.getCurrentAccount();
+		Audit auditoria = new Audit();
+		auditoria.setAction("M"); //$NON-NLS-1$
+		auditoria.setUser(tu.getUserName());
+		auditoria.setAuthor(codiUsuari);
+		auditoria.setObject("SC_USUARI"); //$NON-NLS-1$
+		auditoria.setComment(su.getUserName());
+
+		AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(
+				auditoria);
+		getAuditEntityDao().create(auditoriaEntity);
+		getUserEntityDao().merge(srcId, targetId);
 	}
 	
 

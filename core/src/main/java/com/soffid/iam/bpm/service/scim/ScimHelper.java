@@ -10,20 +10,27 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
 
+import com.graphbuilder.struc.LinkedList;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.AdditionalDataJSONConfiguration;
 import com.soffid.iam.service.AdditionalDataService;
+import com.soffid.iam.service.LuceneIndexService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.conf.AttributeConfig;
+import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
@@ -48,11 +55,24 @@ public class ScimHelper {
 	private String returnValue;
 	private int pageSize;
 	HashMap <String,Object> extraParameters = null;
+	private boolean textIndex = false;
+	private String objectClassName;
 	
-	public ScimHelper (Class objectClass) {
+	public ScimHelper (Class objectClass) throws InternalErrorException {
 		this.objectClass = objectClass;
+		objectClassName = objectClass.getName();
+		CustomObjectType dt = svc.findCustomObjectTypeByName(objectClass.getName());
+		if (dt != null && dt.isTextIndex())
+			textIndex  = true;
 	}
 	
+	public ScimHelper (String objectClass) throws InternalErrorException {
+		this.objectClassName = objectClass;
+		this.objectClass = CustomObject.class;
+		CustomObjectType dt = svc.findCustomObjectTypeByName(objectClass);
+		if (dt != null && dt.isTextIndex())
+			textIndex  = true;
+	}
 	
 	public void search (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
@@ -64,15 +84,63 @@ public class ScimHelper {
 			session = sf.getCurrentSession();
 		}
 					
-		String q = hql.toString();
+		if (! textIndex || (textFilter == null || textFilter.trim().isEmpty()))
+			searchJson(textFilter, jsonQuery, result);
+		else
+			searchMixed(textFilter, jsonQuery, result);
+	}
+
+	public void searchMixed (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
+		if (extraWhere == null)
+			extraWhere = "o.id = :id";
+		else
+			extraWhere = "("+extraWhere+") and o.id=:id";
+		AbstractExpression expr = evaluateQuery(null, jsonQuery);
+					
+		String hqlQuery = hql.toString();
 		if (returnValue != null) {
-			int i = q.indexOf(" from ");
-			q = q.substring(0, i) + ", "+returnValue+q.substring(i);
+			int i = hqlQuery.indexOf(" from ");
+			hqlQuery = hqlQuery.substring(0, i) + ", "+returnValue+hqlQuery.substring(i);
 		}
 		if (order != null && hql.getOrderByString().length() == 0)
-			q = q + " order by "+ order;
+			hqlQuery = hqlQuery + " order by "+ order;
 		
-		org.hibernate.Query queryObject = session.createQuery( q );
+		LuceneIndexService luceneSvc = ServiceLocator.instance().getLuceneIndexService();
+		
+		final ScimCollector collector = new ScimCollector(result);
+		collector.setConfig(config);
+		collector.setSession(session);
+		collector.setHqlQuery(hqlQuery);
+		collector.setGenerator(generator);
+		collector.setHql(hql);
+		collector.setExpression(expr);
+		HashMap<String,Object> params = new HashMap<>(hql.getParameters());
+		if (tenantFilter != null)
+			params.put("tenantId", Security.getCurrentTenantId());
+		if (extraParameters != null) {
+			for (Entry<String, Object> entry: extraParameters.entrySet()) {
+				params.put(entry.getKey(), entry.getValue());
+			}
+			
+		}
+		collector.setParams(params);
+		luceneSvc.search(objectClassName, textFilter, collector);
+		count = new Integer(collector.size());
+	}
+
+
+	public void searchJson (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
+		AbstractExpression expr = evaluateQuery(textFilter, jsonQuery);
+
+		String hqlQuery = hql.toString();
+		if (returnValue != null) {
+			int i = hqlQuery.indexOf(" from ");
+			hqlQuery = hqlQuery.substring(0, i) + ", "+returnValue+hqlQuery.substring(i);
+		}
+		if (order != null && hql.getOrderByString().length() == 0)
+			hqlQuery = hqlQuery + " order by "+ order;
+
+		org.hibernate.Query queryObject = session.createQuery( hqlQuery );
 		int i = 0;
 		Map<String, Object> params = hql.getParameters();
 		for (String s : params.keySet())
@@ -88,7 +156,11 @@ public class ScimHelper {
 			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
 		if (extraParameters != null) {
 			for (Entry<String, Object> entry: extraParameters.entrySet()) {
-				queryObject.setParameter(entry.getKey(), entry.getValue());
+				final Object value = entry.getValue();
+				if (value != null && value instanceof Collection)
+					queryObject.setParameterList(entry.getKey(), (Collection) value);
+				else
+					queryObject.setParameter(entry.getKey(), value);
 			}
 			
 		}
@@ -212,7 +284,7 @@ public class ScimHelper {
 		return oracle.booleanValue();
 	}
 
-	String generateQuickSearchQuery (String text) throws InternalErrorException {
+	String generateQuickSearchQuery (String text) throws InternalErrorException, UnsupportedEncodingException, JSONException, ClassNotFoundException {
 		if (text == null || text.trim().isEmpty())
 			return  "";
 		String[] split = text.trim().split("[ ,./-]+");
@@ -226,12 +298,15 @@ public class ScimHelper {
 					sb.append(" and ");
 				sb.append("(");
 				boolean first = true;
-				Collection<DataType> list = svc.findDataTypesByObjectTypeAndName2(objectClass.getName(), null);
+				Collection<DataType> list = svc.findDataTypesByObjectTypeAndName2(objectClassName, null);
 				for (DataType dt: list) {
 					if (Boolean.TRUE.equals( dt.getSearchCriteria())) {
 						if (first) first = false;
 						else sb.append(" or ");
-						sb.append(dt.getName() + " co \""+t+"\"");
+						if (Boolean.TRUE.equals(dt.getBuiltin()))
+							sb.append(dt.getName() + " co \""+t+"\"");
+						else
+							sb.append( "attributes."+dt.getName() + " co \""+t+"\"");
 					}
 				}
 				if (first) {
@@ -254,12 +329,12 @@ public class ScimHelper {
 	}
 	
 	public int count() {
+		if (count != null)
+			return count.intValue();
+
 		if (hql == null) {
 			return 0;
 		}
-
-		if (count != null)
-			return count.intValue();
 		
 		if (session == null) {
 			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
@@ -391,5 +466,12 @@ public class ScimHelper {
 
 	public void setExtraParameters(HashMap<String, Object> extraParameters) {
 		this.extraParameters = extraParameters;
+	}
+
+
+	public void setCustomObjectType(String type) throws InternalErrorException {
+		CustomObjectType dt = svc.findCustomObjectTypeByName(type);
+		if (dt != null && dt.isTextIndex())
+			textIndex  = true;
 	}
 }

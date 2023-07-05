@@ -38,13 +38,7 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
                 }
             }
             super.create(correuExtern);
-            TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlias(correuExtern.getMailList().getName());
-            if (correuExtern.getMailList().getDomain() != null)
-                tasque.setMailDomain(correuExtern.getMailList().getDomain().getName());
-            getTaskEntityDao().create(tasque);
+            getEmailListEntityDao().generateUpdateTasks(correuExtern.getMailList());
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
@@ -55,14 +49,8 @@ public class ExternEmailEntityDaoImpl extends com.soffid.iam.model.ExternEmailEn
 
     public void remove(com.soffid.iam.model.ExternEmailEntity correuExtern) throws RuntimeException {
         try {
+            getEmailListEntityDao().generateUpdateTasks(correuExtern.getMailList());
             super.remove(correuExtern);
-            TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-            tasque.setDate(new Timestamp(System.currentTimeMillis()));
-            tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
-            tasque.setAlias(correuExtern.getMailList().getName());
-            if (correuExtern.getMailList().getDomain() != null)
-                tasque.setMailDomain(correuExtern.getMailList().getDomain().getName());
-            getTaskEntityDao().create(tasque);
             getSession(false).flush();
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);

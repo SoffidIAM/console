@@ -2,6 +2,8 @@ package com.soffid.iam.model;
 
 import es.caib.seycon.ng.model.*;
 
+import java.util.Collection;
+
 import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.security.SecurityScopeEntity;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -57,5 +59,9 @@ public class UserEntityImpl extends UserEntity
 		}
 
 		return false;
+	}
+	
+	public Collection<UserDataEntity> getUserData() {
+		return getAttributes();
 	}
 }

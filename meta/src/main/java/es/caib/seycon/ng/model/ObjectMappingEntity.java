@@ -32,6 +32,10 @@ public abstract class ObjectMappingEntity {
 	@Column (name="OBM_CUSOBJ", composition=true, reverseAttribute="mappings")
 	public CustomObjectTypeEntity soffidCustomObject;
 	
+	@Column (name="OBM_SOEXOB", length=50)
+	@Nullable
+	public java.lang.String soffidExtensibleObject;
+
 
 	@Column (name="OBM_CONDIT", length=2000)
 	@Nullable

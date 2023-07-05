@@ -206,6 +206,10 @@
             url: /vault/pam_rules.zul
             img: /img/menu/pam-rules.svg
             permissions: ["seu:pam-rule:show"]
+          - name: seu.eventpolicies
+            url: /issues/policies.zul
+            img: /img/menu/event-policy.svg
+            permissions: ["seu:issuePolicy:show"]
       - name: seu.monitoritzacio
         img: /img/menu/monitor.svg
         options:
@@ -245,5 +249,9 @@
           url: /monitor/console_log.zul
           permissions: ["seu:console-log:show"]
           img: /img/menu/console-log.svg
+        - name: seu.events
+          url: /issues/issues.zul
+          img: /img/menu/issue.svg
+          permissions: ["seu:issue:show"]
         
           

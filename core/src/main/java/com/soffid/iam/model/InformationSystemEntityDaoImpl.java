@@ -13,6 +13,7 @@
  */
 package com.soffid.iam.model;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,12 +24,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.api.Application;
 import com.soffid.iam.api.ApplicationType;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DomainValue;
+import com.soffid.iam.api.Group;
 import com.soffid.iam.bpm.service.BpmEngine;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
@@ -61,6 +65,12 @@ public class InformationSystemEntityDaoImpl
 			super.create(aplicacio);
 			getSession(false).flush();
 			auditarAplicacions("C", aplicacio.getName()); //$NON-NLS-1$
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+	        tasque.setCustomObjectType(Application.class.getName());
+	        tasque.setPrimaryKeyValue(aplicacio.getId());
+	        getTaskEntityDao().create(tasque);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.0"), aplicacio.getName(), message), e);
@@ -72,6 +82,12 @@ public class InformationSystemEntityDaoImpl
 			super.update(aplicacio);
 			getSession(false).flush();
 			auditarAplicacions("U", aplicacio.getName()); //$NON-NLS-1$
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+	        tasque.setCustomObjectType(Application.class.getName());
+	        tasque.setPrimaryKeyValue(aplicacio.getId());
+	        getTaskEntityDao().create(tasque);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.1"), aplicacio.getName(), message), e);
@@ -84,6 +100,12 @@ public class InformationSystemEntityDaoImpl
 			super.remove(aplicacio);
 			getSession(false).flush();
 			auditarAplicacions("D", codiAplicacio);			 //$NON-NLS-1$
+			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+	        tasque.setCustomObjectType(Application.class.getName());
+	        tasque.setPrimaryKeyValue(aplicacio.getId());
+	        getTaskEntityDao().create(tasque);
 		} catch (Throwable e) {
 			String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("InformationSystemEntityDaoImpl.2"), aplicacio.getName(), message), e);

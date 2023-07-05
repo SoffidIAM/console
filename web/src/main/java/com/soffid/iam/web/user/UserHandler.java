@@ -112,8 +112,8 @@ public class UserHandler extends FrameHandler {
 	
 	public void mergeAction(Event event) throws IOException, CommitException, InternalErrorException, NamingException, CreateException, WrongValueException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		DataTable listbox = (DataTable) getListbox();
-		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length == 2) {
-			new UserMergeAction().start((DataTable) getListbox());
+		if (listbox.getSelectedIndexes() != null && listbox.getSelectedIndexes().length >= 2) {
+			new UserMergeAction().start((DataTable) getListbox(), true, null);
 		} else {
 			Missatgebox.avis(Labels.getLabel("merge.warning"));
 		}

@@ -4184,3 +4184,9 @@ div.notice {
     color: {BLUETEXT}
 }
 
+div.merge,
+div.merge div.databox ,
+div.merge div.databox select,
+div.merge div.databox input {
+	cursor: pointer;
+}

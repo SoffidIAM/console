@@ -102,10 +102,6 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public java.lang.Boolean deleted;
 
-	@Column (name="MAQ_LOCKED")
-	@Nullable
-	public java.lang.Boolean locked;
-
 	@Column (name="MAQ_OST_ID")
 	@Nullable
 	public es.caib.seycon.ng.model.OsTypeEntity operatingSystem;

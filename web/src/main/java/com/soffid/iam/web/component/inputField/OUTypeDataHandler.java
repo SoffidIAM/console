@@ -15,7 +15,6 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.FinderHandler;
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -79,10 +78,6 @@ public class OUTypeDataHandler extends InputFieldDataHandler<OUType> {
 			return r.iterator().next();
 		else
 			return null;
-	}
-	@Override
-	protected String getClassName() {
-		return OUType.class.getName();
 	}
 
 }

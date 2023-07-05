@@ -12,7 +12,6 @@ import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.CustomObject;
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -82,8 +81,4 @@ public class CustomObjectDataHandler extends InputFieldDataHandler<CustomObject>
 			return null;
 	}
 
-	@Override
-	protected String getClassName() {
-		return dataType.getDataObjectType();
-	}
 }

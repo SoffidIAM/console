@@ -10,7 +10,6 @@ import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.User;
 import com.soffid.iam.web.menu.MenuOption;
@@ -21,29 +20,7 @@ public class SearchGroupHandler extends SearchHandler<Group> {
 	public void startSearch(String term) throws Exception {
 		super.startSearch(term);
 		try {
-			CustomObjectType cot = EJBLocator.getAdditionalDataService().findCustomObjectTypeByName(Group.class.getName());
-			if (cot != null && cot.isTextIndex()) {
-				StringBuffer sb = new StringBuffer();
-				final String[] parts = term.split(" +");
-				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].length() > 0) {
-						if (sb.length() > 0)
-							sb.append("AND ");
-						if ( i == parts.length - 1)
-							sb.append("(")
-								.append(parts[i])
-								.append("* OR ")
-								.append(parts[i])
-								.append("~ ) ");
-						else
-							sb.append(parts[i])
-								.append("~ ");
-					}
-				}
-				list = EJBLocator.getGroupService().findGroupByTextAsync(sb.toString());
-			}
-			else
-				list = EJBLocator.getGroupService().findGroupByTextAsync(term);
+			list = EJBLocator.getGroupService().findGroupByTextAsync(term);
 		} catch (Exception e) {}
 	}
 	

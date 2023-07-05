@@ -77,11 +77,4 @@ public class CustomObjectService {
 	@Operation(grantees={customObject_query.class})
 	public AsyncList<CustomObject> findCustomObjectByTextAndJsonQueryAsync(@Nullable String text, @Nullable String filter) { return null; }
 
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	@Operation(grantees={customObject_query.class})
-	public PagedResult<CustomObject> findCustomObjectByTextAndJsonQuery(String objectType, @Nullable String text, @Nullable String filter, @Nullable Integer start, @Nullable Integer end) { return null; }
-
-	@Transactional(rollbackFor = { java.lang.Exception.class })
-	@Operation(grantees={customObject_query.class})
-	public AsyncList<CustomObject> findCustomObjectByTextAndJsonQueryAsync(String objectType, @Nullable String text, @Nullable String filter) { return null; }
 }

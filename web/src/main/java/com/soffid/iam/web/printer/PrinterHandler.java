@@ -60,7 +60,7 @@ public class PrinterHandler extends FrameHandler {
 				{"model", Labels.getLabel("com.soffid.iam.api.Printer.model")},
 				{"hostName", Labels.getLabel("com.soffid.iam.api.Printer.hostName")},
 				{"local", Labels.getLabel("com.soffid.iam.api.Printer.local")},
-				{"hosts", Labels.getLabel("impressores.zul.Usuaris")},
+				{"users", Labels.getLabel("impressores.zul.Usuaris")},
 				{"groups", Labels.getLabel("com.soffid.iam.api.System.groups")}
 		};
 		
@@ -99,10 +99,10 @@ public class PrinterHandler extends FrameHandler {
 							ut.setHostName(m.get("hostName"));
 						if (m.containsKey("local"))
 							ut.setLocal(yes.equals(m.get("local")));
-						if (m.containsKey("hosts")) {
+						if (m.containsKey("users")) {
 							ut.setUsers(new LinkedList<String>());
-							if (m.get("hosts") != null)
-								for (String u: m.get("hosts").split("[ ,]+") )
+							if (m.get("users") != null)
+								for (String u: m.get("users").split("[ ,]+") )
 									ut.getUsers().add(u);
 						}
 						if (m.containsKey("groups")) {
@@ -125,10 +125,10 @@ public class PrinterHandler extends FrameHandler {
 							ut.setLocal(yes.equals(m.get("local")));
 						if (m.containsKey("hostName"))
 							ut.setHostName(m.get("hostName"));
-						if (m.containsKey("hosts")) {
+						if (m.containsKey("users")) {
 							ut.setUsers(new LinkedList<String>());
-							if (m.get("hosts") != null)
-								for (String u: m.get("hosts").split("[ ,]+") )
+							if (m.get("users") != null)
+								for (String u: m.get("users").split("[ ,]+") )
 									ut.getUsers().add(u);
 						}
 						if (m.containsKey("groups")) {

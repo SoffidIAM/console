@@ -21,17 +21,23 @@ import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.AuditEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectEntityDao;
 import com.soffid.iam.model.CustomObjectRoleEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
+import com.soffid.scimquery.HQLQuery;
+import com.soffid.scimquery.expr.AbstractExpression;
+import com.soffid.scimquery.parser.ExpressionParser;
 import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
@@ -70,9 +76,13 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 
 	@Override
 	protected Collection<CustomObject> handleFindCustomObjectByJsonQuery(String objectType, String query) throws Exception {
-		List<CustomObject> result = new LinkedList<CustomObject>();
-		internalFindCustomObjectByJsonQuery(result, objectType, null, query, null, null);
-		return result;
+		AsyncList<CustomObject> result = new AsyncList<CustomObject>();
+		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
+		findCustomObjectByJsonQuery(result, objectType, query);
+		if (result.isCancelled())
+			TimeOutUtils.generateException();
+		result.done();
+		return result.get();
 	}
 	
 	@Override
@@ -81,7 +91,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		getAsyncRunnerService().run(new Runnable() {
 			public void run() {
 				try {
-					internalFindCustomObjectByJsonQuery(result, objectType, null, query, null, null);
+					findCustomObjectByJsonQuery(result, objectType, query);
 				} catch (Exception e) {
 					result.cancel(e);
 				}
@@ -90,45 +100,41 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		return result;
 	}
 
-	protected PagedResult<CustomObject> internalFindCustomObjectByJsonQuery(List<CustomObject> result, String objectType, 
-			String text, String query, Integer start, Integer pageSize) throws Exception {
-		if (objectType != null) {
-			CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().findByName(objectType);
-			if (! hasAccessLevel(entity, USER_LEVEL))
-				throw new SecurityException("Access denied. Not authorized to query a custom object of class "+objectType);
-		}
+	protected void findCustomObjectByJsonQuery(AsyncList<CustomObject> result, String objectType, String query) throws Exception {
+		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().findByName(objectType);
+		if (! hasAccessLevel(entity, USER_LEVEL))
+			throw new SecurityException("Access denied. Not authorized to query a custom object of class "+objectType);
+
 		// Register virtual attributes for additional data
-		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();;
 
-		ScimHelper h = new ScimHelper(objectType == null ? CustomObject.class.getName(): objectType);
+		AbstractExpression expr = ExpressionParser.parse(query);
+		expr.setOracleWorkaround( CustomDialect.isOracle());
+		HQLQuery hql = expr.generateHSQLString(CustomObject.class);
+		String qs = hql.getWhereString().toString();
+		if (qs.isEmpty())
+			qs = "o.type.tenant.id = :tenantId and o.type.name=:objectType";
+		else
+			qs = "("+qs+") and o.type.tenant.id = :tenantId and o.type.name=:objectType";
 		
-		h.setPrimaryAttributes(new String[] { "name", "description"});
-		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
-		config.setFirstResult(start);
-		config.setMaximumResultSize(pageSize);
-		h.setConfig(config);
-		h.setTenantFilter("type.tenant.id");
-		if (objectType != null) {
-			if (query == null || query.trim().isEmpty())
-				query = "type.name eq '"+encode(objectType)+"'";
-			else
-				query = "(" + query + ") and type.name eq '"+encode(objectType)+"'";
+		hql.setWhereString(new StringBuffer(qs));
+		Map<String, Object> params = hql.getParameters();
+		Parameter paramArray[] = new Parameter[params.size()+2];
+		int i = 0;
+		for (String s : params.keySet())
+			paramArray[i++] = new Parameter(s, params.get(s));
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		paramArray[i++] = new Parameter("objectType", objectType);
+		for (CustomObjectEntity ue : getCustomObjectEntityDao().query(hql.toString(),
+				paramArray)) 
+		{
+			if (result.isCancelled())
+				return;
+			CustomObject u = getCustomObjectEntityDao().toCustomObject(ue);
+			if (!hql.isNonHQLAttributeUsed() || expr.evaluate(u)) {
+				result.add(u);
+			}
 		}
-		CustomObjectEntityDao dao = getCustomObjectEntityDao();
-		h.setGenerator((e) -> {
-			return dao.toCustomObject((CustomObjectEntity) e);
-		}); 
-		h.search(text, query, (Collection) result); 
-		PagedResult<CustomObject> pr = new PagedResult<>();
-		pr.setStartIndex(start);
-		pr.setItemsPerPage(pageSize);
-		pr.setTotalResults(h.count());
-		pr.setResources(result);
-		return pr;
-	}
-
-	private String encode(String objectType) {
-		return objectType.replace("\\", "\\\\").replace("\"", "\\\"").replace("\'", "\\\'");
 	}
 
 	@Override
@@ -306,52 +312,96 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		return getCustomObjectEntityDao().findCustomObjectNames(objectType);
 	}
 
-	@Override
-	protected AsyncList<CustomObject> handleFindCustomObjectByTextAndFilterAsync(String objectType, String text, String filter) throws Exception {
-		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
-		getAsyncRunnerService().run(new Runnable() {
-			public void run() {
-				try {
-					internalFindCustomObjectByJsonQuery(result, objectType, text, filter, null, null);
-				} catch (Exception e) {
-					result.cancel(e);
+	String generateQuickSearchQuery (String text) {
+		if (text == null )
+			return  "";
+		List<MetaDataEntity> atts = getMetaDataEntityDao().findByScope(MetadataScope.USER);
+		String[] split = ScimHelper.split(text);
+		
+		StringBuffer sb = new StringBuffer("");
+		for (int i = 0; i < split.length; i++)
+		{
+			String t = split[i].replaceAll("\\\\","\\\\\\\\").replaceAll("\"", "\\\\\"");
+			if (sb.length() > 0)
+				sb.append(" and ");
+			sb.append("(");
+			sb.append("name co \""+t+"\"");
+			sb.append(" or description co \""+t+"\"");
+			for (MetaDataEntity att: atts)
+			{
+				if (att.getSearchCriteria() != null && att.getSearchCriteria().booleanValue())
+				{
+					sb.append(" or attributes."+att.getName()+" co \""+t+"\"");
 				}
 			}
-		}, result);
-		return result;
+			sb.append(")");
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	protected AsyncList<CustomObject> handleFindCustomObjectByTextAndFilterAsync(String objectType, String text, String filter) throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindCustomObjectByJsonQueryAsync(objectType, q);
+			
 	}
 
 	@Override
 	protected Collection<CustomObject> handleFindCustomObjectByTextAndFilter(String objectType, String text, String filter) throws Exception {
-		final List<CustomObject> result = new LinkedList<CustomObject>();
-		internalFindCustomObjectByJsonQuery(result, objectType, text, filter, null, null);
-		return result;
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		return handleFindCustomObjectByJsonQuery(objectType, q);
 	}
 
 	@Override
 	protected AsyncList<CustomObject> handleFindCustomObjectByTextAndJsonQueryAsync(String text, String filter)
 			throws Exception {
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+
 		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
+		
+		final String query = q;
 		getAsyncRunnerService().run(new Runnable() {
+
+			@Override
 			public void run() {
 				try {
-					internalFindCustomObjectByJsonQuery(result, null, text, filter, null, null);
-				} catch (Exception e) {
-					result.cancel(e);
-				}
+					internalSearchCustomObjectsByJson(query, result, null, null);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
 			}
+			
 		}, result);
+
 		return result;
 	}
 
 	@Override
 	protected PagedResult<CustomObject> handleFindCustomObjectByTextAndJsonQuery(String text, String filter,
 			Integer start, Integer end) throws Exception {
-		final List<CustomObject> result = new LinkedList<CustomObject>();
-		return internalFindCustomObjectByJsonQuery(result, null, text, filter, start, end);
+		String q = generateQuickSearchQuery(text);
+		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
+			q = "("+q+") and ("+filter+")";
+		else if ( filter != null && ! filter.trim().isEmpty())
+			q = filter;
+		LinkedList<CustomObject> result = new LinkedList<CustomObject>();
+
+		return internalSearchCustomObjectsByJson(q, result, start, end);
 	}
 
-	private PagedResult<CustomObject> internalSearchCustomObjectsByJson(String objectType, String query, List<CustomObject> result,
+	private PagedResult<CustomObject> internalSearchCustomObjectsByJson(String query, List<CustomObject> result,
 			Integer start, Integer end)
 			throws UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError,
 			EvalException, InternalErrorException {
@@ -360,8 +410,6 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		
 		final CustomObjectEntityDao dao = getCustomObjectEntityDao();
 		ScimHelper h = new ScimHelper(CustomObject.class);
-		if (objectType != null)
-			h.setCustomObjectType(objectType);
 		h.setPrimaryAttributes(new String[] { "name", "description"});
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		config.setFirstResult(start);
@@ -407,28 +455,5 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	protected AsyncList<CustomObject> handleFindCustomObjectByTextAndJsonQueryAsync(String objectType, String text,
-			String filter) throws Exception {
-		final AsyncList<CustomObject> result = new AsyncList<CustomObject>();
-		getAsyncRunnerService().run(new Runnable() {
-			public void run() {
-				try {
-					internalFindCustomObjectByJsonQuery(result, objectType, text, filter, null, null);
-				} catch (Exception e) {
-					result.cancel(e);
-				}
-			}
-		}, result);
-		return result;
-	}
-
-	@Override
-	protected PagedResult<CustomObject> handleFindCustomObjectByTextAndJsonQuery(String objectType, String text,
-			String filter, Integer start, Integer end) throws Exception {
-		final List<CustomObject> result = new LinkedList<CustomObject>();
-		return internalFindCustomObjectByJsonQuery(result, objectType, text, filter, start, end);
 	}
 }

@@ -1,5 +1,7 @@
 package com.soffid.iam.service.crud;
 
+import java.util.List;
+
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 

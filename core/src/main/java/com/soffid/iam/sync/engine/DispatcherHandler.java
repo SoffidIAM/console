@@ -92,5 +92,4 @@ public abstract class DispatcherHandler {
 
 	public abstract Object connect(boolean main, boolean debug) throws Exception;
 
-	public abstract String getMirroredAgent();
 }

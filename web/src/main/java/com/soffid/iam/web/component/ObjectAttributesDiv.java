@@ -53,7 +53,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 	String system; 
 	boolean hidebuiltin;
 	private static final long serialVersionUID = 1L;
-	protected List<InputField3> fields = new LinkedList<>();
+	List<InputField3> fields = new LinkedList<>();
 	String requiredPermissions ;
 	boolean noPermissions;
 	

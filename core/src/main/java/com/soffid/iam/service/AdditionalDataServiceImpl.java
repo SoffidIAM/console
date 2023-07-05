@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -39,22 +37,17 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
-import com.soffid.iam.api.ExtensibleObjectRegister;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.LetterCaseEnum;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
-import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Role;
-import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserData;
-import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectRoleEntity;
@@ -65,7 +58,6 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.service.impl.MetadataCache;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.HQLQuery;
@@ -85,20 +77,8 @@ import es.caib.seycon.ng.exception.InternalErrorException;
  */
 public class AdditionalDataServiceImpl extends
 		com.soffid.iam.service.AdditionalDataServiceBase {
-	Log log = LogFactory.getLog(getClass());
-			
 	Map<String, MetadataScope> scopeForType = new HashMap<>();
 	Map<MetadataScope, String> typeForScope = new HashMap<>();
-	MetadataCache cache = null;
-
-	private List<ExtensibleObjectRegister> extensibleObjectRegisterList = new LinkedList<>();
-	
-	private MetadataCache getMetadataCache() {
-		if (cache == null) {
-			cache = new MetadataCache(getCustomObjectTypeEntityDao(), getMetaDataEntityDao());
-		}
-		return cache;
-	}
 
 	private void registerMapping (String name, MetadataScope scope) {
 		scopeForType.put(name, scope);
@@ -199,12 +179,6 @@ public class AdditionalDataServiceImpl extends
 				tipusDada.setId(tipusDadaEntity.getId());
 				return getMetaDataEntityDao().toDataType(tipusDadaEntity);
 			}
-			
-			if (Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
-					tipusDadaEntity.getObjectType().isTextIndex()) {
-				reindex (getCustomObjectTypeEntityDao().toCustomObjectType(tipusDadaEntity.getObjectType()));
-			}
-
 		}
 		return null;
 	}
@@ -215,12 +189,7 @@ public class AdditionalDataServiceImpl extends
 	protected void handleDelete(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().length() == 0)
 		{
-			getMetadataCache().clear(tipusDada.getObjectType());
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
-			if (Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
-					tipusDadaEntity.getObjectType().isTextIndex()) {
-				reindex (getCustomObjectTypeEntityDao().toCustomObjectType(tipusDadaEntity.getObjectType()));
-			}
 			getMetaDataEntityDao().remove(tipusDadaEntity);
 		} else {
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().load(tipusDada.getId());
@@ -234,13 +203,7 @@ public class AdditionalDataServiceImpl extends
 	protected com.soffid.iam.api.DataType handleUpdate(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().trim().length() == 0)
 		{
-			getMetadataCache().clear(tipusDada.getObjectType());
-			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
-			if (Boolean.TRUE.equals(tipusDada.getSearchCriteria()) != Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
-					tipusDadaEntity.getObjectType().isTextIndex()) {
-				reindex (getCustomObjectTypeEntityDao().toCustomObjectType(tipusDadaEntity.getObjectType()));
-			}
-			getMetaDataEntityDao().dataTypeToEntity(tipusDada, tipusDadaEntity, true);
+			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().dataTypeToEntity(tipusDada);
 		
 			if (tipusDadaEntity.getAdminVisibility() == null)
 				tipusDadaEntity.setAdminVisibility(AttributeVisibilityEnum.EDITABLE);
@@ -512,8 +475,6 @@ public class AdditionalDataServiceImpl extends
 
 	@Override
 	protected CustomObjectType handleCreateCustomObjectType(CustomObjectType obj) throws Exception {
-		getMetadataCache().clear(obj.getName());
-
 		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().newCustomObjectTypeEntity();
 		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
 		getCustomObjectTypeEntityDao().create(entity);
@@ -544,9 +505,6 @@ public class AdditionalDataServiceImpl extends
 			getMetaDataEntityDao().create(description);
 		}
 		
-		reindex (obj);
-		getMetadataCache().clear();
-
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
 	}
 
@@ -579,16 +537,11 @@ public class AdditionalDataServiceImpl extends
 	}
 	@Override
 	protected void handleDeleteCustomObjectType(CustomObjectType obj) throws Exception {
-		getMetadataCache().clear(obj.getName());
-
 		CustomObjectTypeEntity t = getCustomObjectTypeEntityDao().load(obj.getId());
 				
 		getCustomObjectRoleEntityDao().remove(t.getAccessRoles());
 		
 		getCustomObjectTypeEntityDao().remove(t);
-		
-		getLuceneIndexService().resetIndex(obj.getName());
-		getMetadataCache().clear();
 	}
 
 	@Override
@@ -626,80 +579,27 @@ public class AdditionalDataServiceImpl extends
 	@Override
 	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName(String objectType, String code)
 			throws Exception {
-		if (objectType == null)
-			return null;
-		List<DataType> r1 = getMetadataCache().get(objectType);
-		List<DataType> r2 = new LinkedList<>();
-		for (DataType dt: r1) {
-			if (! Boolean.TRUE.equals(dt.getBuiltin()) && 
-					(code == null || dt.getName().equals(code)))
-				r2.add(new DataType(dt));
+		List<MetaDataEntity> col = new LinkedList<MetaDataEntity> (getMetaDataEntityDao().findByObjectTypeAndName(objectType, code));
+		for ( Iterator<MetaDataEntity> it = col.iterator(); it.hasNext(); )
+		{
+			MetaDataEntity td = it.next();
+			if (Boolean.TRUE.equals( td.getBuiltin() ) )
+				it.remove();
 		}
-		return r2;
+		return getMetaDataEntityDao().toDataTypeList(col);
 	}
 
 	@Override
 	protected CustomObjectType handleUpdateCustomObjectType(CustomObjectType obj) throws Exception {
-		getMetadataCache().clear(obj.getName());
 		CustomObjectTypeEntity entity = getCustomObjectTypeEntityDao().load(obj.getId());
-		boolean currentIndex = entity.isTextIndex();
 		getCustomObjectTypeEntityDao().customObjectTypeToEntity(obj, entity, true);
 		getCustomObjectTypeEntityDao().update(entity);
 		updateRoles(entity, obj);
-		if (currentIndex != obj.isTextIndex())
-			reindex (obj);
-		getMetadataCache().clear();
 		return getCustomObjectTypeEntityDao().toCustomObjectType(entity);
-	}
-
-	private void reindex(CustomObjectType obj) throws InternalErrorException {
-		if (obj.isTextIndex()) {
-			SoffidPrincipal principal = Security.getSoffidPrincipal();
-			new Thread( () -> {
-				try {
-					Thread.sleep(5000); // Wait for transaction to be finished
-					getAsyncRunnerService().runNewTransaction(()-> {
-						Security.nestedLogin(principal);
-						try {
-							LuceneIndexService svc = getLuceneIndexService();
-							svc.resetIndex(obj.getName());
-							CrudHandler<Object> crud = getCrudRegistryService().getHandler(obj.getName());
-							int step = 0;
-							do {
-								final PagedResult<Object> p = crud.read(null, null, step, 100);
-								if (p.getResources().isEmpty()) break;
-								for (Object o: p.getResources()) {
-									svc.indexObject(obj.getName(), o);
-									step ++;
-								}
-							} while (true);
-						} finally {
-							Security.nestedLogoff();
-						}
-						return null;
-					});
-				} catch (Exception e) {
-					log.warn("Error indexing object "+obj.getName(), e);
-				}
-			}).start();
-			// Confirm the Soffid indexer dispatcher is enabled
-			System d = getDispatcherService().findSoffidDispatcher();
-			if (d.getUrl() == null) {
-				d.setUrl("local");
-				d.setClassName("com.soffid.iam.sync.agent.SoffidAgent");
-				getDispatcherService().update(d);
-			}
-		} else {
-			getLuceneIndexService().resetIndex(obj.getName());
-		}
 	}
 
 	@Override
 	protected CustomObjectType handleFindCustomObjectTypeByName(String name) throws Exception {
-		for (CustomObjectType co: getMetadataCache().getCustomObjectTypes()) {
-			if (co.getName().equals(name))
-				return co;
-		}
 		CustomObjectTypeEntity o = getCustomObjectTypeEntityDao().findByName(name);
 		if ( o == null)
 			return null;
@@ -731,15 +631,23 @@ public class AdditionalDataServiceImpl extends
 	@Override
 	protected Collection<DataType> handleFindDataTypesByObjectTypeAndName2(String objectType, String attribute)
 			throws Exception {
+		List<MetaDataEntity> r = getMetaDataEntityDao().findByObjectTypeAndName(objectType, attribute);
+		if (! r.isEmpty())
+			return getMetaDataEntityDao().toDataTypeList(r);
 		if (objectType == null)
 			return null;
-		List<DataType> r1 = getMetadataCache().get(objectType);
-		List<DataType> r2 = new LinkedList<>();
-		for (DataType dt: r1) {
-			if (attribute == null || dt.getName().equals(attribute))
-				r2.add(new DataType(dt));
+		
+		String fileName = objectType.replace(".", "/") + ".ui.json";
+		List<DataType> d = getDescriptorMetadata(fileName);
+		if (d == null) {
+			return new LinkedList<DataType>();
 		}
-		return r2;
+		for (Iterator<DataType> it = d.iterator(); it.hasNext(); ) {
+			DataType dt = it.next();
+			if (attribute != null && ! attribute.equals(dt.getName()))
+				it.remove();
+		}
+		return d;
 	}
 
 	@Override
@@ -880,8 +788,80 @@ public class AdditionalDataServiceImpl extends
 			
 		}
 		
-		getMetadataCache().clear();
-		getMetadataCache().clear(cot.getName());
+	}
+
+	protected List<DataType> getDescriptorMetadata(String resourceName)
+			throws Exception {
+		InputStream in = getClass().getClassLoader().getResourceAsStream(resourceName);
+		if (in == null)
+			return null;
+		
+		JSONObject o = new JSONObject(new JSONTokener(in));
+		in.close();
+		
+		String className = o.getString("class");
+
+		JSONArray atts = o.getJSONArray("attributes");
+		
+		long last =  0;
+		List<DataType> result = new LinkedList<>();
+		for (int i = 0; i < atts.length(); i++) {
+			JSONObject att = atts.getJSONObject(i);
+			String name = att.optString("name");
+			String type = att.optString("type");
+			String lettercase = att.optString("lettercase");
+			boolean required = att.optBoolean("required", false);
+			if ( resourceName.equals("com/soffid/iam/api/Host.ui.json") && 
+					name.equals("networkCode"))
+				required = true;
+			boolean readonly = att.optBoolean("readonly", false);
+			boolean hidden = att.optBoolean("hidden", false);
+			boolean multiline = att.optBoolean("multiline", false);
+			boolean searchCriteria = att.optBoolean("searchCriteria", false);
+			boolean multivalue = att.optBoolean("multivalue", false);
+			String customUiHandler = att.optString("custom_ui_handler");
+			String separator = att.optString("separator");
+			String validator = att.optString("validator");
+			String length = att.optString("length");
+			String filterExpression = att.optString("filter_expression");
+			String enumeration = att.optString("enumeration");
+			if (! hidden) {
+				DataType md = new DataType();
+				md.setAdminVisibility( hidden ? AttributeVisibilityEnum.HIDDEN :
+					readonly ? AttributeVisibilityEnum.READONLY :
+						AttributeVisibilityEnum.EDITABLE);
+				md.setBuiltin(true);
+				md.setEnumeration(enumeration);
+				md.setFilterExpression(filterExpression);
+				md.setLetterCase(lettercase != null && lettercase.toLowerCase().startsWith("u") ? LetterCaseEnum.UPPERCASE :
+					lettercase != null && lettercase.toLowerCase().startsWith("l") ? LetterCaseEnum.LOWERCASE:
+						LetterCaseEnum.MIXEDCASE);
+				md.setMultiValued(multivalue);
+				md.setName(name);
+				md.setNlsLabel(className+"."+name);
+				md.setOrder(last++);
+				md.setRequired(required);
+				md.setSearchCriteria(searchCriteria);
+				md.setMultiLine(multiline);
+				if (length != null && !length.trim().isEmpty())
+					md.setSize(Integer.parseInt(length));
+				md.setType(guessType (type));
+				md.setValidator(validator);
+				md.setReadOnly(readonly);
+				md.setBuiltinHandler(customUiHandler);
+				JSONArray values = att.optJSONArray("listOfValues");
+				if (values != null) {
+					List<String> v = new LinkedList<>();
+					for (int j = 0; j < values.length(); j++) {
+						v.add(values.optString(j));
+					}
+					md.setValues(v);
+				}
+
+				result.add(md);
+			}
+		}
+		return result;
 	}
 
 	private long upgradeMetadata(CustomObjectTypeEntity cot, MetadataScope scope) {
@@ -947,26 +927,5 @@ public class AdditionalDataServiceImpl extends
 			return e != AccountAccessLevelEnum.ACCESS_OWNER && e != AccountAccessLevelEnum.ACCESS_MANAGER && e != AccountAccessLevelEnum.ACCESS_USER;
 		else
 			return false;
-	}
-
-	@Override
-	protected List<ExtensibleObjectRegister> handleFindExtensibleObjectRegisters() throws Exception {
-		LinkedList l = new LinkedList<>();
-		for (ExtensibleObjectRegister eor: extensibleObjectRegisterList ) 
-			l.add(new ExtensibleObjectRegister(eor));
-		return l;
-	}
-
-	@Override
-	protected void handleRegisterExtensibleObject(ExtensibleObjectRegister register) throws Exception {
-		extensibleObjectRegisterList.add(register);
-	}
-
-	@Override
-	protected ExtensibleObjectRegister handleFindExtensibleObjectRegister(String name) throws Exception {
-		for (ExtensibleObjectRegister eor: extensibleObjectRegisterList ) 
-			if (eor.getName().equals(name))
-				return new ExtensibleObjectRegister(eor);
-		return null;
 	}
 }

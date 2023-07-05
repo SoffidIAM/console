@@ -23,7 +23,6 @@ import es.caib.bpm.servei.BpmEngine;
 	es.caib.seycon.ng.model.RolAccountEntity.class,
 	es.caib.seycon.ng.model.NotificacioEntity.class,
 	es.caib.seycon.ng.model.SoDRuleEntity.class,
-	TasqueEntity.class,
 	BpmEngine.class })
 public abstract class AplicacioEntity {
 

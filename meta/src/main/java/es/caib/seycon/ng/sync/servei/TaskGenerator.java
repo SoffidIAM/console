@@ -71,9 +71,6 @@ public abstract class TaskGenerator {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return false;
 	}
-	
-	public boolean isMainServer() {return false;}
-	
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.Collection<com.soffid.iam.sync.engine.DispatcherHandler> getDispatchers()
 		throws es.caib.seycon.ng.exception.InternalErrorException {

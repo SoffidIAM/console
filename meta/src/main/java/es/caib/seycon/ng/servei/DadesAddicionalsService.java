@@ -12,15 +12,11 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.CustomObjectType;
-import com.soffid.iam.api.ExtensibleObjectRegister;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectRoleEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
-import com.soffid.iam.service.AsyncRunnerService;
-import com.soffid.iam.service.CrudRegistryService;
-import com.soffid.iam.service.LuceneIndexService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -47,11 +43,7 @@ import roles.customObjectType_update;
 		CustomObjectTypeEntity.class,
 		CustomObjectEntity.class,
 		CustomObjectRoleEntity.class,
-		RolEntity.class,
-		LuceneIndexService.class,
-		AsyncRunnerService.class,
-		DispatcherService.class,
-		CrudRegistryService.class})
+		RolEntity.class})
 public abstract class DadesAddicionalsService {
 
 	@Operation(translated = "getDataTypes", grantees={Tothom.class})
@@ -218,10 +210,5 @@ public abstract class DadesAddicionalsService {
 	@Operation(grantees = { Tothom.class })
 	public AccountAccessLevelEnum getAccessLevel(CustomObjectType type) { return null; }
 	
-	public void registerExtensibleObject(ExtensibleObjectRegister register) { }
-	
-	@Operation(grantees={Tothom.class})
-	public List<ExtensibleObjectRegister> findExtensibleObjectRegisters() { return null; }
 
-	public ExtensibleObjectRegister findExtensibleObjectRegister(String name) { return null; }
 }

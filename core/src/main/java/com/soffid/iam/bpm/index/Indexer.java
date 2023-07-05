@@ -1,5 +1,6 @@
 package com.soffid.iam.bpm.index;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -16,49 +18,41 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.util.Version;
+import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.jbpm.JbpmConfiguration;
 import org.jbpm.JbpmContext;
 import org.jbpm.context.exe.ContextInstance;
 import org.jbpm.context.exe.TokenVariableMap;
+import org.jbpm.context.exe.VariableContainer;
 import org.jbpm.context.exe.VariableInstance;
 import org.jbpm.context.exe.variableinstance.ByteArrayInstance;
+import org.jbpm.graph.def.ProcessDefinition;
 import org.jbpm.graph.exe.Comment;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.graph.exe.Token;
+import org.jbpm.job.Timer;
 
 import com.soffid.iam.bpm.config.Configuration;
+import com.soffid.iam.bpm.model.DBProperty;
 import com.soffid.iam.bpm.model.TenantModule;
-import com.soffid.iam.service.LuceneIndexService;
 import com.soffid.iam.utils.ConfigurationCache;
 
-import es.caib.seycon.ng.ServiceLocator;
-import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.utils.Security;
 
 public class Indexer {
 	private Log log = LogFactory.getLog(Indexer.class);
 	private static Indexer theIndexer = null;
 	int maxFieldLength = 4000;
-	LuceneIndexService luceneService = ServiceLocator.instance().getLuceneIndexService();
-	
 	boolean fullIndex = false;
-	public static final FieldType INDEXED_STRING = new FieldType();
-	static {
-		INDEXED_STRING.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
-		INDEXED_STRING.setOmitNorms(true);
-		INDEXED_STRING.setStored(false);
-		INDEXED_STRING.setTokenized(true);
-		INDEXED_STRING.freeze();
-	}
 	
 	private Indexer () {
 		try {
@@ -101,6 +95,10 @@ public class Indexer {
 					.list();
 	}
 
+	public boolean isIndexEmpty(Session session) {
+		return DirectoryFactory.isEmpty(session);
+	}
+	
 	public Long flush(Session session, long then, long now, Long nextProcessId, long max) throws IOException {
 		String skip = ConfigurationCache.getProperty("soffid.indexer.skip-attribute");
 		String skipArray[] = skip == null ? new String[0]: skip.split(" ");
@@ -108,26 +106,41 @@ public class Indexer {
 		
 		log.debug("Indexing processes since "+DateFormat.getDateTimeInstance().format(new Date(then)));
 		Collection<Long> p = new LinkedList<Long>(getProcesses (session, then, now, nextProcessId));
+		Directory dir = DirectoryFactory.getDirectory(session);
+		IndexWriter w;
+		final Analyzer analyzer = DirectoryFactory.getAnalyzer();
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT, analyzer);
+		iwc.setOpenMode(then == 0 ? OpenMode.CREATE : OpenMode.CREATE_OR_APPEND);
+		w = new IndexWriter (dir, iwc);
 		Document d;
-		int number = 0;
-		for (Long processId: p)
-		{
-			if (number >= max) {
-				number = 0;
-				session.clear();
+		try { 
+			int number = 0;
+			for (Long processId: p)
+			{
+				if (number >= max) {
+					number = 0;
+					w.commit();
+					session.clear();
+				}
+				ProcessInstance process = (ProcessInstance) session.get(ProcessInstance.class, processId);
+				number ++;
+				try {
+					log.info("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
+					d = generateDocument(process, skipArray);
+					log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+					// Delete pre-existing document
+					w.deleteDocuments(new Term ("$id", d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+					// Create new document
+					log.debug(String.format(Messages.getString("Indexer.AddingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+					w.addDocument(d);
+					log.debug(String.format(Messages.getString("Indexer.DoneDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
+				} catch (Throwable th) {
+					log.info("Error indexing process "+process.getId(), th);
+				}
+//				session.evict(process);
 			}
-			ProcessInstance process = (ProcessInstance) session.get(ProcessInstance.class, processId);
-			number ++;
-			try {
-				log.info("Indexing process "+process.getId()+" "+DateFormat.getDateTimeInstance().format(process.getStart()));
-				d = generateDocument(process, skipArray);
-				log.debug(String.format(Messages.getString("Indexer.DeletingDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
-				// Delete pre-existing document
-				luceneService.addDocument("bpm", d);
-				log.debug(String.format(Messages.getString("Indexer.DoneDocument"), d.get("$id"))); //$NON-NLS-1$ //$NON-NLS-2$
-			} catch (Throwable th) {
-				log.info("Error indexing process "+process.getId(), th);
-			}
+		} finally {
+			w.close();
 		}
 		return null;
 	}
@@ -137,11 +150,12 @@ public class Indexer {
 		Document d;
 		// Create new document
 		d = new Document ();
-		d.add(new StringField("_id",  //$NON-NLS-1$
-				id, Store.YES));
-		d.add(new StringField ("$definition",  //$NON-NLS-1$
+		d.add(new Field ("$id",  //$NON-NLS-1$
+				id,
+				Field.Store.YES, Field.Index.ANALYZED));
+		d.add(new Field ("$definition",  //$NON-NLS-1$
 				pi.getProcessDefinition().getName(),
-				Field.Store.NO));
+				Field.Store.NO, Field.Index.ANALYZED));
 		StringBuffer contents = new StringBuffer();
 		contents.append(pi.getProcessDefinition().getName());
 		ContextInstance ci = pi.getContextInstance();
@@ -149,25 +163,25 @@ public class Indexer {
 
 		d.add(new Field ("$contents",  //$NON-NLS-1$
 				contents.toString(),
-				INDEXED_STRING));
+				Field.Store.NO, Field.Index.ANALYZED));
 		d.add(new Field ("$end",  //$NON-NLS-1$
 				pi.getEnd() == null ? "false": "true", //$NON-NLS-1$ //$NON-NLS-2$
-				INDEXED_STRING));
+				Field.Store.YES, Field.Index.ANALYZED));
 		
 		TenantModule tm = (TenantModule) pi.getInstance(TenantModule.class);
 		if (tm != null && tm.getTenantId() != null)
 			d.add(new Field ("$tenant",  //$NON-NLS-1$
 				tm.getTenantId().toString(), //$NON-NLS-1$ //$NON-NLS-2$
-				INDEXED_STRING));
+				Field.Store.YES, Field.Index.ANALYZED));
 		else
 			d.add(new Field ("$tenant",  //$NON-NLS-1$
 				Long.toString( Security.getCurrentTenantId()), //$NON-NLS-1$ //$NON-NLS-2$
-				INDEXED_STRING));
+				Field.Store.YES, Field.Index.ANALYZED));
 		// Afegim data d'inici i de fi
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd"); //Formato 20100924 //$NON-NLS-1$
 		try {
-			d.add(new Field ("$startDate",sdf.format(pi.getStart()), INDEXED_STRING)); //$NON-NLS-1$
-			if (pi.getEnd()!=null) d.add(new Field ("$endDate",sdf.format(pi.getEnd()), INDEXED_STRING)); //$NON-NLS-1$
+			d.add(new Field ("$startDate",sdf.format(pi.getStart()),Field.Store.YES,Field.Index.ANALYZED)); //$NON-NLS-1$
+			if (pi.getEnd()!=null) d.add(new Field ("$endDate",sdf.format(pi.getEnd()),Field.Store.YES,Field.Index.ANALYZED)); //$NON-NLS-1$
 		} catch (Throwable th) {}
 		return d;
 	}
@@ -198,7 +212,7 @@ public class Indexer {
 		String prefix = token.isRoot()? "": token.getFullName()+"/"; //$NON-NLS-1$ //$NON-NLS-2$
 		d.add(new Field (prefix+"comments",  //$NON-NLS-1$
 				comments.toString(),
-				INDEXED_STRING));
+				Field.Store.NO, Field.Index.ANALYZED));
 		contents.append(comments);
 		Map children = token.getChildren();
 		if (children != null && children.keySet() != null)
@@ -230,7 +244,7 @@ public class Indexer {
 							if (s.length() < maxFieldLength) {
 								d.add(new Field (prefix+key, 
 										s,
-										INDEXED_STRING));
+										Field.Store.NO, Field.Index.ANALYZED));
 								if (contents.length() < maxFieldLength) {
 									contents.append(" "); //$NON-NLS-1$
 									contents.append(s);
@@ -288,11 +302,10 @@ public class Indexer {
 			return value.toString();
 	}
 	
-	public void reindexAll ( ) throws IOException, InternalErrorException {
+	public void reindexAll ( ) throws IOException {
 		Long next = null;
 		Long now = System.currentTimeMillis();
 		do {
-			ServiceLocator.instance().getLuceneIndexService().resetIndex("bpm");
 			JbpmContext ctx = Configuration.getConfig().createJbpmContext();
 			try {
 				next = flush (ctx.getSession(), 0, now, next, 10_000);

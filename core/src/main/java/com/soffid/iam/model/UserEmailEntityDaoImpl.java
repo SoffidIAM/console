@@ -24,7 +24,6 @@ import com.soffid.iam.sync.engine.TaskHandler;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconException;
 import es.caib.seycon.ng.model.*;
 
@@ -98,11 +97,13 @@ public class UserEmailEntityDaoImpl extends
     }
 
     private void createTask(com.soffid.iam.model.UserEmailEntity llistaCorreuUsuari) {
-    	try {
-    		getEmailListEntityDao().generateUpdateTasks(llistaCorreuUsuari.getMailList());
-		} catch (InternalErrorException e) {
-			throw new SeyconException("Error generating task", e);
-		}
+        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(System.currentTimeMillis()));
+        tasque.setTransaction(TaskHandler.UPDATE_LIST_ALIAS);
+        tasque.setAlias(llistaCorreuUsuari.getMailList().getName());
+        if (llistaCorreuUsuari.getMailList().getDomain() != null)
+            tasque.setMailDomain(llistaCorreuUsuari.getMailList().getDomain().getName());
+        getTaskEntityDao().create(tasque);
     }
 
     public void update(UserEmailEntity llistaCorreuUsuari) {

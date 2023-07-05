@@ -10,7 +10,6 @@ import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Role;
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -82,8 +81,4 @@ public class RoleDataHandler extends InputFieldDataHandler<Role> {
 			return null;
 	}
 
-	@Override
-	protected String getClassName() {
-		return Role.class.getName();
-	}
 }

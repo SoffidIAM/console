@@ -36,29 +36,27 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queries.BooleanFilter;
+import org.apache.lucene.queries.FilterClause;
+import org.apache.lucene.queries.TermsFilter;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.ConstantScoreQuery;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
-import org.apache.lucene.search.SimpleCollector;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.search.TermRangeFilter;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.BytesRef;
@@ -119,6 +117,7 @@ import com.soffid.iam.bpm.business.ProcessDefinitionRolesBusiness;
 import com.soffid.iam.bpm.business.UserInterfaceBusiness;
 import com.soffid.iam.bpm.business.VOFactory;
 import com.soffid.iam.bpm.config.Configuration;
+import com.soffid.iam.bpm.index.DirectoryFactory;
 import com.soffid.iam.bpm.index.Indexer;
 import com.soffid.iam.bpm.mail.Mail;
 import com.soffid.iam.bpm.model.AuthenticationLog;
@@ -146,7 +145,6 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.UserService;
 import com.soffid.iam.utils.AutoritzacionsUsuari;
-import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.expr.AbstractExpression;
@@ -420,9 +418,14 @@ public class BpmEngineImpl extends BpmEngineBase {
 					//					throw new ParseException(Messages.getString("BpmEngineImpl.VoidSearchParametersError")); //$NON-NLS-1$
 				}
 
-				QueryParser qp = new QueryParser(
+				Directory dir = DirectoryFactory.getDirectory(context
+						.getSession());
+				IndexReader reader = DirectoryReader.open(dir);
+				IndexSearcher is;
+				is = new IndexSearcher(reader);
+				QueryParser qp = new QueryParser(Version.LUCENE_CURRENT,
 						"$contents", //$NON-NLS-1$
-						new StandardAnalyzer());
+						DirectoryFactory.getAnalyzer());
 				org.apache.lucene.search.Query q = null;
 				if (query != null && query.trim().length() > 0)
 					q = qp.parse(query);
@@ -434,77 +437,91 @@ public class BpmEngineImpl extends BpmEngineBase {
 				String dataInici0 = null, dataFi = null;
 
 				TopDocs hits;
-				
-				Builder b = new BooleanQuery.Builder();
+				BooleanFilter b = new BooleanFilter();
 				boolean complexQuery = false;
 
 				// Start date
 				if (sinceStartDate != null && untilStartDate != null) { //$NON-NLS-1$
-
-					TermRangeQuery fstart = new TermRangeQuery("$startDate", //$NON-NLS-1$
+					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
 							new BytesRef(sdf.format(sinceStartDate)), 
 							new BytesRef(sdf.format(untilStartDate)), 
 							true, true); // inclusiu
-					b.add(fstart, BooleanClause.Occur.FILTER);
+					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 				else if (sinceStartDate != null) { //$NON-NLS-1$
-					TermRangeQuery fstart = new TermRangeQuery("$startDate", //$NON-NLS-1$
+					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
 							new BytesRef(sdf.format(sinceStartDate)), 
 							new BytesRef("9999"), 
 							true, true); // inclusiu
-					b.add(fstart, BooleanClause.Occur.FILTER);
+					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 				else if (untilStartDate != null) { //$NON-NLS-1$
-					TermRangeQuery fstart = new TermRangeQuery("$startDate", //$NON-NLS-1$
+					TermRangeFilter fstart = new TermRangeFilter("$startDate", //$NON-NLS-1$
 							new BytesRef("000"), 
 							new BytesRef(sdf.format(untilStartDate)),
 							true, true); // inclusiu
-					b.add(fstart, BooleanClause.Occur.FILTER);
+					b.add(new FilterClause(fstart, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 
 				// End date
 				if (sinceEndDate != null && untilEndDate != null) { //$NON-NLS-1$
-					TermRangeQuery fEnd = new TermRangeQuery("$endDate", //$NON-NLS-1$
+					TermRangeFilter fEnd = new TermRangeFilter("$endDate", //$NON-NLS-1$
 							new BytesRef(sdf.format(sinceEndDate)), 
 							new BytesRef(sdf.format(untilEndDate)), 
 							true, true); // inclusiu
-					b.add(fEnd, BooleanClause.Occur.FILTER);
+					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 				else if (sinceEndDate != null) { //$NON-NLS-1$
-					TermRangeQuery fEnd = new TermRangeQuery("$endDate", //$NON-NLS-1$
+					TermRangeFilter fEnd = new TermRangeFilter("$endDate", //$NON-NLS-1$
 							new BytesRef(sdf.format(sinceEndDate)), 
 							new BytesRef("9999"), 
 							true, true); // inclusiu
-					b.add(fEnd, BooleanClause.Occur.FILTER);
+					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 				else if (untilEndDate != null) { //$NON-NLS-1$
-					TermRangeQuery fEnd = new TermRangeQuery("$endDate", //$NON-NLS-1$
+					TermRangeFilter fEnd = new TermRangeFilter("$endDate", //$NON-NLS-1$
 							new BytesRef("000"), 
 							new BytesRef(sdf.format(untilEndDate)),
 							true, true); // inclusiu
-					b.add(fEnd, BooleanClause.Occur.FILTER);
+					b.add(new FilterClause(fEnd, BooleanClause.Occur.MUST));
 					complexQuery = true;
 				}
 
-				TermQuery fTenant = new TermQuery( new Term("$tenant", Long.toString( Security.getCurrentTenantId() )) );
-				b.add(fTenant, BooleanClause.Occur.FILTER);
+				TermsFilter fTenant = new TermsFilter( new Term("$tenant", Long.toString( Security.getCurrentTenantId() )) );
+				b.add(new FilterClause(fTenant, BooleanClause.Occur.MUST));
 				complexQuery = true;
 
+				DocumentCollector collector = new DocumentCollector();
+				collector.setResult (resultado);
     			if (!finished) {
-    				TermQuery f = new TermQuery( new Term("$end", "false") );
-    				b.add(f, BooleanClause.Occur.FILTER);
+					TermsFilter f = new TermsFilter( new Term("$end", "false") );
+    				b.add(new FilterClause(f, BooleanClause.Occur.MUST));
+    				complexQuery = true;
+    				if (complexQuery) {
+						is.search(q, b, collector);
+					} else
+    					is.search(q, f, collector); // Sense filtre de dates
+    
+    			} else {
+    				if (complexQuery)
+    					is.search(q, b, collector);
+    				else
+    					is.search(q, collector); // Sense cap filtre
     			}
-    			b.add(q, Occur.MUST);
-    			BooleanQuery finalQuery = b.build();
-    			
-    			getLuceneIndexService().search("bpm", finalQuery, new DocumentCollector(resultado));
+				reader.close();
 			}
 			return resultado;
+		} catch (CorruptIndexException e) {
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.CorruptedIndex"), e, -1); //$NON-NLS-1$
+		} catch (IOException e) {
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.CorruptedIndex"), e, -1); //$NON-NLS-1$
 		} catch (ParseException e) {
 			throw new BPMException(String.format(
 					Messages.getString("BpmEngineImpl.SearchParamError"), //$NON-NLS-1$
@@ -2092,7 +2109,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 					org.jbpm.taskmgmt.exe.TaskInstance task = (org.jbpm.taskmgmt.exe.TaskInstance) it
 							.next();
 					if (!task.hasEnded()
-							&& (business.canAccess(getUserGroups(), task) || isInternalService())) {
+							&& business.canAccess(getUserGroups(), task)) {
 						try {
 							v.add(VOFactory.newTaskInstance(task));
 						} catch (RuntimeException e) {
@@ -2884,8 +2901,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 			boolean canObserve = business.isUserAuthorized(OBSERVER_ROLE,
 					getUserGroups(), instance)
 					|| business.isUserAuthorized(SUPERVISOR_ROLE,
-							getUserGroups(), instance)
-					|| isInternalService();
+							getUserGroups(), instance);
 			if (instance.getTaskMgmtInstance() != null
 					&& instance.getTaskMgmtInstance().getTaskInstances() != null) {
 				for (Iterator it = instance.getTaskMgmtInstance()
@@ -3100,6 +3116,7 @@ public class BpmEngineImpl extends BpmEngineBase {
 				prop.setValue((String) m.get(key));
 				context.getSession().save(prop);
 			}
+			DirectoryFactory.reconfigureDirectory(context);
 		} finally {
 			flushContext(context);
 		}
@@ -3161,6 +3178,49 @@ public class BpmEngineImpl extends BpmEngineBase {
 			return definition.getFileDefinition().getInputStream(resource);
 		} finally {
 			flushContext(context);
+		}
+	}
+
+	private final class DocumentCollector extends Collector {
+		private List result;
+		private AtomicReaderContext ctx;
+		private Scorer scorer;
+
+		@Override
+		public void setScorer(Scorer scorer) throws IOException {
+			this.scorer = scorer;
+		}
+
+		public void setResult(List resultado) {
+			this.result = resultado;
+		}
+
+		@Override
+		public void setNextReader(AtomicReaderContext ctx) throws IOException {
+			this.ctx = ctx;
+		}
+
+		@Override
+		public void collect(int id) throws IOException {
+			org.apache.lucene.document.Document d = ctx.reader().document(id);
+			IndexableField f = d.getField("$id"); //$NON-NLS-1$
+			if (f != null) {
+				long processId = Long.parseLong(f.stringValue());
+				try {
+					ProcessInstance proc = handleGetProcessLightweight(processId);
+					if (proc != null) {
+						result.add(proc);
+					}
+				} catch (Exception e) {
+					// Ignorar
+				}
+			}
+			
+		}
+
+		@Override
+		public boolean acceptsDocsOutOfOrder() {
+			return false;
 		}
 	}
 
@@ -3672,18 +3732,36 @@ public class BpmEngineImpl extends BpmEngineBase {
 		LinkedList<Long> resultado = new LinkedList<>();
 		
 		try {
-			QueryParser qp = new QueryParser(
+			Directory dir = DirectoryFactory.getDirectory(context
+					.getSession());
+			IndexReader reader = DirectoryReader.open(dir);
+			IndexSearcher is;
+			is = new IndexSearcher(reader);
+			QueryParser qp = new QueryParser(Version.LUCENE_CURRENT,
 					"$contents", //$NON-NLS-1$
-					new StandardAnalyzer());
+					DirectoryFactory.getAnalyzer());
 			org.apache.lucene.search.Query q = null;
 			if (query != null && query.trim().length() > 0)
 				q = qp.parse(query);
 			else
 				q = new MatchAllDocsQuery();
 
-			getLuceneIndexService().search("bpm", q, new DocumentCollector2(resultado));
+			TermsFilter f = new TermsFilter( new Term("$end", "false") );
+			BooleanFilter b = new BooleanFilter();
+			b.add(new FilterClause(f, BooleanClause.Occur.MUST));
 
+			DocumentCollector2 collector = new DocumentCollector2();
+			collector.setResult (resultado);
+			
+			is.search(q, b, collector); // Sense cap filtre
+			reader.close();
 			return resultado;
+		} catch (CorruptIndexException e) {
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.CorruptedIndex"), e, -1); //$NON-NLS-1$
+		} catch (IOException e) {
+			throw new BPMException(
+					Messages.getString("BpmEngineImpl.CorruptedIndex"), e, -1); //$NON-NLS-1$
 		} catch (ParseException e) {
 			throw new BPMException(String.format(
 					Messages.getString("BpmEngineImpl.SearchParamError"), //$NON-NLS-1$
@@ -3699,78 +3777,45 @@ public class BpmEngineImpl extends BpmEngineBase {
 		}
 	}
 
+	private final class DocumentCollector2 extends Collector {
+		private List<Long> result;
+		private AtomicReaderContext ctx;
+		private Scorer scorer;
+	
+		@Override
+		public void setScorer(Scorer scorer) throws IOException {
+			this.scorer = scorer;
+		}
+	
+		public void setResult(List<Long> resultado) {
+			this.result = resultado;
+		}
+	
+		@Override
+		public void setNextReader(AtomicReaderContext ctx) throws IOException {
+			this.ctx = ctx;
+		}
+	
+		@Override
+		public void collect(int id) throws IOException {
+			org.apache.lucene.document.Document d = ctx.reader().document(id);
+			IndexableField f = d.getField("$id"); //$NON-NLS-1$
+			if (f != null) {
+				long processId = Long.parseLong(f.stringValue());
+				result.add(processId);
+			}
+			
+		}
+	
+		@Override
+		public boolean acceptsDocsOutOfOrder() {
+			return false;
+		}
+	}
 
 	@Override
 	protected List<ProcessDefinition> handleFindAllProcessDefinitions(boolean onlyEnabled) throws Exception {
 		return findProcessDefinitions(null, onlyEnabled);
 	}
 
-	class DocumentCollector extends SimpleCollector {
-		private LeafReaderContext ctx;
-		Set<String> fields = Set.of("_id");
-		List result;
-
-		public DocumentCollector(List result) {
-			super();
-			this.result = result;
-		}
-
-		@Override
-		public ScoreMode scoreMode() {
-			return ScoreMode.COMPLETE;
-		}
-
-		@Override
-		public void collect(int doc) throws IOException {
-			org.apache.lucene.document.Document d = ctx.reader().document(doc, fields);
-			IndexableField f = d.getField("_id"); //$NON-NLS-1$
-			if (f != null) {
-				long processId = Long.parseLong(f.stringValue());
-				try {
-					ProcessInstance proc = handleGetProcessLightweight(processId);
-					if (proc != null) {
-						result.add(proc);
-					}
-				} catch (Exception e) {
-					// Ignorar
-				}
-			}
-		}
-		
-		@Override
-		protected void doSetNextReader(LeafReaderContext context) throws IOException {
-			this.ctx = context;
-		}
-	}
-
-	class DocumentCollector2 extends SimpleCollector {
-		private LeafReaderContext ctx;
-		Set<String> fields = Set.of("_id");
-		List result;
-
-		public DocumentCollector2(List result) {
-			super();
-			this.result = result;
-		}
-
-		@Override
-		public ScoreMode scoreMode() {
-			return ScoreMode.COMPLETE;
-		}
-
-		@Override
-		public void collect(int doc) throws IOException {
-			org.apache.lucene.document.Document d = ctx.reader().document(doc, fields);
-			IndexableField f = d.getField("_id"); //$NON-NLS-1$
-			if (f != null) {
-				long processId = Long.parseLong(f.stringValue());
-				result.add(processId);
-			}
-		}
-		
-		@Override
-		protected void doSetNextReader(LeafReaderContext context) throws IOException {
-			this.ctx = context;
-		}
-	}
 }

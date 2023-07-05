@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.5.0-beta-2-SNAPSHOT</version>
+		<version>3.4.24-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>iam-core</artifactId>
@@ -350,12 +350,12 @@
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>9.5.0</version>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queries</artifactId>
-			<version>9.5.0</version>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-discovery</groupId>
@@ -698,8 +698,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-analyzers-common</artifactId>
+			<version>4.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queryparser</artifactId>
-			<version>9.5.0</version>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam</groupId>

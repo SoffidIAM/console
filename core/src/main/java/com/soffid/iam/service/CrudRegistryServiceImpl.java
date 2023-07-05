@@ -12,7 +12,6 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
-import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.Network;
@@ -33,7 +32,6 @@ import com.soffid.iam.service.crud.CrudDomainValueHandler;
 import com.soffid.iam.service.crud.CrudGroupHandler;
 import com.soffid.iam.service.crud.CrudGroupUserHandler;
 import com.soffid.iam.service.crud.CrudHostHandler;
-import com.soffid.iam.service.crud.CrudIssueHandler;
 import com.soffid.iam.service.crud.CrudMailDomainHandler;
 import com.soffid.iam.service.crud.CrudMailListHandler;
 import com.soffid.iam.service.crud.CrudNetworkHandler;
@@ -85,7 +83,6 @@ public class CrudRegistryServiceImpl extends CrudRegistryServiceBase {
 		registry.put(Printer.class.getName(), new CrudPrinterHandler());
 		registry.put(PrinterUser.class.getName(), new CrudPrinterUserHandler());
 		registry.put(Audit.class.getName(), new CrudAuditHandler());
-		registry.put(Issue.class.getName(), new CrudIssueHandler());
 	}
 
 	@Override

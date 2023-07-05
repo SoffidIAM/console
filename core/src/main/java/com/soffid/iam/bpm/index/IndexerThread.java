@@ -3,11 +3,10 @@ package com.soffid.iam.bpm.index;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.bpm.job.NotLoggedThread;
-import com.soffid.iam.bpm.service.BpmJobExecutor;
-import com.soffid.iam.config.Config;
-import com.soffid.iam.sync.service.TaskGenerator;
+import com.soffid.iam.bpm.service.ejb.BpmJobExecutor;
 
 public class IndexerThread extends NotLoggedThread {
 	
@@ -17,7 +16,7 @@ public class IndexerThread extends NotLoggedThread {
 	}
 
 	boolean finish = false;
-	int delay = 30000; // 30 segundos
+	int delay = 300000; // 5 minutos
 	private Log logger = LogFactory.getLog(IndexerThread.class);
 	
 	public int getDelay() {
@@ -46,11 +45,9 @@ public class IndexerThread extends NotLoggedThread {
 			BpmJobExecutor jobExecutor;
 			try
 			{
-				jobExecutor = ServiceLocator.instance().getBpmJobExecutor();
-				TaskGenerator tg = ServiceLocator.instance().getTaskGenerator();
+				jobExecutor = EJBLocator.getBpmJobExecutor();
 				try {
-					if ( tg.isMainServer() )
-						jobExecutor.indexPendingProcesses();
+					jobExecutor.indexPendingProcesses();
 				} catch (Exception e) {
 					if (!finish)
 						logger.warn(Messages.getString("IndexerThread.IndexingError"), e); //$NON-NLS-1$

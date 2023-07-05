@@ -11,7 +11,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.EventListener;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.CrudHandler;
 import com.soffid.iam.api.DataType;
@@ -79,8 +78,4 @@ public class SystemDataHandler extends InputFieldDataHandler<com.soffid.iam.api.
 			return null;
 	}
 
-	@Override
-	protected String getClassName() {
-		return System.class.getName();
-	}
 }

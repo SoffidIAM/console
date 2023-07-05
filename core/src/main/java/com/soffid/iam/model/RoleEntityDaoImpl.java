@@ -15,11 +15,9 @@ package com.soffid.iam.model;
 
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.ContainerRole;
-import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Identity;
-import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
@@ -46,7 +44,6 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusContenidorRol;
@@ -1460,15 +1457,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 					accountsPropagarAfter, rolsPropagarAfter,
 					grupsPropagarAfter);
 
-    		final CustomObjectType roleDefinition = getAdditionalDataService().findCustomObjectTypeByName(Role.class.getName());
-			if (roleDefinition != null && roleDefinition.isTextIndex()) {
-				TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-		        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-		        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-		        tasque.setCustomObjectType(Role.class.getName());
-		        tasque.setPrimaryKeyValue(entity.getId());
-		        getTaskEntityDao().create(tasque);
-    		}
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);
@@ -1477,7 +1465,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
             tasque.setDb(entity.getSystem().getName());
             getTaskEntityDao().createNoFlush(tasque);
 
-            
             getSession(false).flush();
 
             updateMailLists (entity);
@@ -1551,17 +1538,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 					accountsPropagarAfter, rolsPropagarAfter,
 					grupsPropagarAfter);
 
-    		String status = ConfigurationCache.getProperty("soffid.task.mode");
-
-    		final CustomObjectType roleDefinition = getAdditionalDataService().findCustomObjectTypeByName(Role.class.getName());
-			if (roleDefinition != null && roleDefinition.isTextIndex()) {
-				TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-		        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-		        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-		        tasque.setCustomObjectType(Role.class.getName());
-		        tasque.setPrimaryKeyValue(entity.getId());
-		        getTaskEntityDao().create(tasque);
-    		}
             TaskEntity tasque = getTaskEntityDao().newTaskEntity();
             tasque.setDate(new Timestamp(System.currentTimeMillis()));
             tasque.setTransaction(TaskHandler.UPDATE_ROLE);

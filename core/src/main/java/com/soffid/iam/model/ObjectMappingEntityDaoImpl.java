@@ -22,9 +22,10 @@ public class ObjectMappingEntityDaoImpl extends com.soffid.iam.model.ObjectMappi
     public void toObjectMapping(com.soffid.iam.model.ObjectMappingEntity source, ObjectMapping target) {
 		super.toObjectMapping(source, target);
 		target.setDispatcherId(source.getSystem() == null ? null : source.getSystem().getId());
-		target.setSoffidCustomObject( source.getSoffidCustomObject() != null ? source.getSoffidCustomObject().getName() :
-					source.getSoffidExtensibleObject() != null ? source.getSoffidExtensibleObject() :
-					null);
+		target.setSoffidCustomObject(source.getSoffidObject().equals(SoffidObjectType.OBJECT_CUSTOM) &&
+				source.getSoffidCustomObject() != null ?
+			source.getSoffidCustomObject().getName():
+			null);
 	}
 
 	@Override
@@ -35,17 +36,11 @@ public class ObjectMappingEntityDaoImpl extends com.soffid.iam.model.ObjectMappi
 		if (source.getSoffidObject() == SoffidObjectType.OBJECT_CUSTOM)
 		{
 			CustomObjectTypeEntity co = getCustomObjectTypeEntityDao().findByName(source.getSoffidCustomObject());
-			if (co == null) {
-				target.setSoffidExtensibleObject(source.getSoffidCustomObject());
-				target.setSoffidCustomObject(null);
-			} else {
-				target.setSoffidExtensibleObject(null);
-				target.setSoffidCustomObject(co);
-			}
+			if (co == null)
+				throw new IllegalArgumentException("Wrong custom object type "+source.getSoffidCustomObject());
+			target.setSoffidCustomObject(co);
 		}
-		else {
+		else
 			target.setSoffidCustomObject(null);
-			target.setSoffidExtensibleObject(null);
-		}
 	}
 }

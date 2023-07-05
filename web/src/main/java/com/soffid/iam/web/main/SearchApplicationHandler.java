@@ -8,8 +8,6 @@ import org.zkoss.zul.Label;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Application;
-import com.soffid.iam.api.CustomObjectType;
-import com.soffid.iam.api.Group;
 import com.soffid.iam.api.User;
 
 public class SearchApplicationHandler extends SearchHandler<Application> {
@@ -17,29 +15,7 @@ public class SearchApplicationHandler extends SearchHandler<Application> {
 	public void startSearch(String term) throws Exception {
 		super.startSearch(term);
 		try {
-			CustomObjectType cot = EJBLocator.getAdditionalDataService().findCustomObjectTypeByName(Group.class.getName());
-			if (cot != null && cot.isTextIndex()) {
-				StringBuffer sb = new StringBuffer();
-				final String[] parts = term.split(" +");
-				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].length() > 0) {
-						if (sb.length() > 0)
-							sb.append("AND ");
-						if ( i == parts.length - 1)
-							sb.append("(")
-								.append(parts[i])
-								.append("* OR ")
-								.append(parts[i])
-								.append("~ ) ");
-						else
-							sb.append(parts[i])
-								.append("~ ");
-					}
-				}
-				list = EJBLocator.getApplicationService().findApplicationByTextAsync(sb.toString());
-			}
-			else
-				list = EJBLocator.getApplicationService().findApplicationByTextAsync(term);
+			list = EJBLocator.getApplicationService().findApplicationByTextAsync(term);
 		} catch (Exception e) {}
 	}
 	

@@ -9,7 +9,6 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 
-import com.soffid.iam.api.ExtensibleObjectRegister;
 import com.soffid.iam.api.SoffidObjectType;
 
 import es.caib.zkib.binder.SingletonBinder;
@@ -117,8 +116,7 @@ public class CustomObjectTypeSelect extends Select implements XPathSubscriber {
 			}
 			for (com.soffid.iam.api.CustomObjectType cot : com.soffid.iam.EJBLocator.getAdditionalDataService()
 					.findCustomObjectTypeByJsonQuery(null)) {
-				if (!cot.isBuiltin() ||
-						cot.getExtensibleObjectClass() != null && !cot.getExtensibleObjectClass().trim().isEmpty()) {
+				if (!cot.isBuiltin()) {
 					o = new JSONObject();
 					o.put("label", cot.getName());
 					String value = SoffidObjectType.OBJECT_CUSTOM.getValue()+":"+cot.getName();
@@ -129,18 +127,6 @@ public class CustomObjectTypeSelect extends Select implements XPathSubscriber {
 							&& cot.getName().equals(currentCustomType))
 						selected = value;
 				}
-			}
-			for (ExtensibleObjectRegister cot : com.soffid.iam.EJBLocator.getAdditionalDataService()
-					.findExtensibleObjectRegisters()) {
-				o = new JSONObject();
-				o.put("label", cot.getName());
-				String value = SoffidObjectType.OBJECT_CUSTOM.getValue()+":"+cot.getName();
-				o.put("value", value);
-				array.put(o);
-				if (currentType != null &&
-						currentType.getValue().equals(SoffidObjectType.OBJECT_CUSTOM.getValue())
-						&& cot.getName().equals(currentCustomType))
-					selected = value;
 			}
 			setOptions(array.toString());
 			setSelectedValue(selected);

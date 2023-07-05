@@ -86,9 +86,4 @@ public class AccountDataHandler extends InputFieldDataHandler<Account> {
 			return null;
 	}
 
-	@Override
-	protected String getClassName() {
-		return Account.class.getName();
-	}
-
 }

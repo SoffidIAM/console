@@ -32,8 +32,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.soffid.iam.sync.intf.ExtensibleObject;
-
 import es.caib.seycon.ng.comu.SoffidObjectType;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -58,9 +56,5 @@ public interface ExtensibleObjectMgr extends java.rmi.Remote {
 
   public Collection<Map<String, Object>> invoke(String verb, String command,
 			Map<String, Object> params) throws RemoteException, InternalErrorException ;
-
-  public void updateExtensibleObject (ExtensibleObject obj) throws RemoteException, InternalErrorException;
-
-  public void removeExtensibleObject (ExtensibleObject obj) throws RemoteException, InternalErrorException;
 }
 

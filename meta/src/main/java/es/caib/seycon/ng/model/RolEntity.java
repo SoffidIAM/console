@@ -17,7 +17,6 @@ import com.soffid.mda.annotation.*;
 
 import es.caib.bpm.servei.BpmEngine;
 import es.caib.seycon.ng.comu.Rol;
-import es.caib.seycon.ng.servei.DadesAddicionalsService;
 
 @Entity(table = "SC_ROLES", tenantFilter="system.tenant.id",
 	translatedName = "RoleEntity", translatedPackage = "com.soffid.iam.model")
@@ -42,7 +41,6 @@ import es.caib.seycon.ng.servei.DadesAddicionalsService;
 		es.caib.seycon.ng.model.AccountAccessEntity.class,
 		com.soffid.iam.model.RuleAssignedRoleEntity.class,
 	    BpmEngine.class,
-	    DadesAddicionalsService.class,
 		es.caib.seycon.ng.model.SoDRoleEntity.class, LlistaCorreuEntity.class })
 public abstract class RolEntity {
 

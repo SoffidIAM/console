@@ -31,16 +31,4 @@ public class MailService {
 	public void sendTextMailToActors(String[] actors, String subject, String body) {}
 
 	public void sendTextMailToActors(String[] actors, String subject, String body, Collection mimeBodyParts) {}
-
-	public void sendHtmlMail(String to, String cc, String subject, String body) {}
-
-	public void sendTextMail(String to, String cc, String subject, String body) {}
-
-	public void sendHtmlMail(String to, String cc, String subject, String body, Collection mimeBodyParts) {}
-
-	public void sendHtmlMailToActors(String[] actors, String cc, String subject, String body) {}
-
-	public void sendTextMailToActors(String[] actors, String cc, String subject, String body) {}
-
-	public void sendTextMailToActors(String[] actors, String cc, String subject, String body, Collection mimeBodyParts) {}
 }

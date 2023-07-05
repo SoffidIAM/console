@@ -1531,8 +1531,7 @@ div.databox img.dataimage {
 	object-fit: contain;
 }
 
-div.databox div.container input.name,
-div.databox div.container span.name {
+div.databox div.container input.name {
 	width: 30%;
 	min-width: 250px;
 }
@@ -3099,7 +3098,7 @@ div.options {
 	margin-top: 43px; 
 }
 /*********************** MENU RESPONSIVE **********/
-@media only screen and (max-width: 1080px) {
+@media only screen and (max-width: 900px) {
 	.options .menuoption {
 		width: 250px; 
 		padding: 20px;
@@ -3155,13 +3154,13 @@ div.options {
 	
 }
 
-@media only screen and (max-width: 750px) {
+@media only screen and (max-width: 600px) {
 	.options .menuoption,
 	.options.options-small .menuoption {
 		width: 100px;
 		padding: 10px;
 	}
-
+	
 	.options.options .menuoption img,
 	.options.options-small .menuoption img {
 		object-fit: contain;
@@ -4132,61 +4131,6 @@ div.tutorialMessage button{
 	
 }
 
-div.merge div.databox {
-	word-break: break-all;		
-}
-
-div.merge div.databox {
-	height: 30px;
-}
 
 
-div.merge {
-	width: 100%;
-}
-div.merge.reverse,
-div.merge.reverse div.databox,
-div.merge.reverse div.databox input ,
-div.merge.reverse div.databox span.name,
-div.merge.reverse div.databox select {
-	background-color: {SKY};
-	color: {SKYTEXT}  !important; 
-}
-div.merge.hidden {
-	visibility: hidden;
-}
-div.databox span.name {
-	margin: 2px;
-	padding: 4px;
-    display: inline-block;
-    background: inherit;
-    min-width: 100px;
-}
 
-div.merge,
-div.merge div.databox ,
-div.merge div.databox select,
-div.merge div.databox input {
-	cursor: pointer;
-}
-
-div.notice {
-	position: fixed;
-    z-index: 10;
-    top: 40px;
-    right: 0px;
-    width: 350px;
-    background-color: {BLUE};
-    height: 150px;
-    padding: 60px;
-    border-radius: 14px;
-    box-shadow: -10px 10px {BLUEDARK};
-    color: {BLUETEXT}
-}
-
-div.merge,
-div.merge div.databox ,
-div.merge div.databox select,
-div.merge div.databox input {
-	cursor: pointer;
-}

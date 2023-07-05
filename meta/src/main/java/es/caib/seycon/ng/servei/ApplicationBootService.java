@@ -12,7 +12,6 @@ import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.CrudRegistryService;
-import com.soffid.iam.service.IssuePolicyService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
@@ -44,8 +43,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	com.soffid.iam.service.ScheduledTaskService.class,
 	AgentDescriptorEntity.class,
 	CrudRegistryService.class,
-	AsyncRunnerService.class,
-	IssuePolicyService.class})
+	AsyncRunnerService.class})
 public abstract class ApplicationBootService {
 
 	@Operation(translated="syncServerBoot")
@@ -68,5 +66,4 @@ public abstract class ApplicationBootService {
 	public void consoleBoot()
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
-	
 }

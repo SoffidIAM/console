@@ -36,7 +36,7 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
 
 		tasqueEntity.setTenant( getTenantEntityDao().load(Security.getCurrentTenantId()));
 
-		if (("readonly".equals( status ) || "manual".equals( status )) && ! tasqueEntity.getTransaction().equals(TaskHandler.INDEX_OBJECT))
+		if ("readonly".equals( status ) || "manual".equals( status ))
 			return;
 
     	if (checkDuplicate(tasqueEntity))

@@ -55,15 +55,11 @@ import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.model.impl.SchemaTools;
-import com.soffid.iam.service.impl.DatabaseReader;
 import com.soffid.iam.bpm.api.BPMUser;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.ExceptionTranslator;
 import com.soffid.iam.utils.Security;
-import com.soffid.tools.db.schema.Database;
-import com.soffid.tools.db.schema.ForeignKey;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.TipusDomini;
@@ -172,15 +168,7 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     
     
     private void createTask(com.soffid.iam.model.UserEntity usuari) throws InternalErrorException {
-		String status = ConfigurationCache.getProperty("soffid.task.mode");
-		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-        tasque.setCustomObjectType(User.class.getName());
-        tasque.setPrimaryKeyValue(usuari.getId());
-        getTaskEntityDao().create(tasque);
-
-        tasque = getTaskEntityDao().newTaskEntity();
+        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.UPDATE_USER);
         tasque.setUser(usuari.getUserName());
@@ -210,19 +198,12 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 
             auditarUsuari("U", usuari.getUserName(), usuari.getPrimaryGroup()); //$NON-NLS-1$
 
-    		String status = ConfigurationCache.getProperty("soffid.task.mode");
-			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-	        tasque.setCustomObjectType(User.class.getName());
-	        tasque.setPrimaryKeyValue(usuari.getId());
-	        getTaskEntityDao().create(tasque);
+    		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+    		tasque.setDate(new Timestamp(System.currentTimeMillis()));
+    		tasque.setTransaction(TaskHandler.UPDATE_USER);
+    		tasque.setUser(usuari.getUserName());
+    		getTaskEntityDao().create(tasque);
 
-			tasque = getTaskEntityDao().newTaskEntity();
-			tasque.setDate(new Timestamp(System.currentTimeMillis()));
-			tasque.setTransaction(TaskHandler.UPDATE_USER);
-			tasque.setUser(usuari.getUserName());
-			getTaskEntityDao().create(tasque);
 
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
@@ -1214,31 +1195,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 				.append(")");
 		}
 		return query(sb.toString(), params);
-	}
-
-	@Override
-	protected void handleMerge(Long src, Long target) throws Exception {
-		getSession().createQuery("delete from com.soffid.iam.model.PasswordEntity where user.id=:id")
-			.setLong("id", src)
-			.executeUpdate();
-		
-		getSession().createQuery("delete from com.soffid.iam.model.SecretEntity where user.id=:id")
-			.setLong("id", src)
-			.executeUpdate();
-		
-		Database db = new DatabaseReader().readDatabaseDefinition();
-		for (ForeignKey fk: db.foreignKeys) {
-			if (fk.foreignTable.equals("SC_USUARI")) {
-				String cmd = "UPDATE "+fk.tableName+" SET "+fk.columns.get(0)+"=:target WHERE "+fk.columns.get(0)+"=:source";
-				getSession().createSQLQuery(cmd)
-					.setLong("target", target)
-					.setLong("source", src)
-					.executeUpdate();
-			}
-		}
-		getSession().createQuery("delete from com.soffid.iam.model.UserEntity where id=:id")
-			.setLong("id", src)
-			.executeUpdate();
 	}
     
     

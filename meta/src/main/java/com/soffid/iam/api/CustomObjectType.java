@@ -26,11 +26,6 @@ public class CustomObjectType {
 
 	public boolean builtin;
 	
-	public boolean textIndex;
-
-	@Nullable
-	public String extensibleObjectClass;
-	
 	@Nullable
 	@Attribute(defaultValue = "true")
 	public Boolean publicAccess;

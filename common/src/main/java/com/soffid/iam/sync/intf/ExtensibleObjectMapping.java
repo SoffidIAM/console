@@ -107,10 +107,7 @@ public class ExtensibleObjectMapping extends ObjectMapping
 	{
 		if (getSoffidObject().getValue().equals(soffidObject.getObjectType()))
 			return ( ! getSoffidObject().equals(SoffidObjectType.OBJECT_CUSTOM) ||
-				getSoffidCustomObject().equals(soffidObject.get("type"))) ;
-		else if (getSoffidObject() == SoffidObjectType.OBJECT_CUSTOM && 
-				getSoffidCustomObject().equals(soffidObject.getObjectType()))
-			return true ;
+				getSoffidCustomObject().equals(soffidObject.get("type")));
 		else
 			return false;
 	}

@@ -114,11 +114,8 @@ public abstract class UsuariEntity {
 	@Nullable
 	public es.caib.seycon.ng.model.GrupEntity grupPrimari;
 
-	@ForeignKey(foreignColumn = "DUS_IDUSU", translated = "attributes")
+	@ForeignKey(foreignColumn = "DUS_IDUSU", translated = "userData")
 	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> dadaUsuari;
-
-	@Operation
-	public java.util.Collection<es.caib.seycon.ng.model.DadaUsuariEntity> getUserData() {return null;};
 
 	@ForeignKey(foreignColumn = "UGR_IDUSU", translated = "secondaryGroups")
 	public java.util.Collection<es.caib.seycon.ng.model.UsuariGrupEntity> grupsSecundaris;
@@ -187,7 +184,7 @@ public abstract class UsuariEntity {
 
 	@Operation(translated = "findByNationalID")
 	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
-			+ "join usuari.attributes as dadaUsuari "
+			+ "join usuari.userData as dadaUsuari "
 			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif and usuari.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.UsuariEntity findByNIF(java.lang.String nif) {
 		return null;
@@ -226,7 +223,7 @@ public abstract class UsuariEntity {
 	@Operation(translated = "findUserByDataValue")
 	@DaoFinder("SELECT distinct usu \n"
 			+ "FROM com.soffid.iam.model.UserEntity usu "
-			+ "join usu.attributes as dada \n" 
+			+ "join usu.userData as dada \n" 
 			+ "WHERE \n"
 			+ "   dada.dataType.name = :dataType  and \n"
 			+ "   dada.value = :value and "
@@ -255,7 +252,7 @@ public abstract class UsuariEntity {
 
 	@Operation(translated = "findUsersByNationalID")
 	@DaoFinder("select usuari from com.soffid.iam.model.UserEntity usuari "
-			+ "join usuari.attributes as dadaUsuari "
+			+ "join usuari.userData as dadaUsuari "
 			+ "where dadaUsuari.dataType.name = 'NIF' and dadaUsuari.value = :nif and "
 			+ "usuari.tenant.id = :tenantId")
 	public java.util.List<es.caib.seycon.ng.model.UsuariEntity> findUsuarisByNIF(
@@ -311,9 +308,7 @@ public abstract class UsuariEntity {
 	@Description("Returns true if the permission on this object is granted")
 	public boolean isAllowed(String permission) { return false; }
 	
-	@DaoOperation
-	public void merge (Long src, Long target ) {}
- }
+}
 
 @Index (name="USU_UK_CODI",	unique=true,
 entity=es.caib.seycon.ng.model.UsuariEntity.class,

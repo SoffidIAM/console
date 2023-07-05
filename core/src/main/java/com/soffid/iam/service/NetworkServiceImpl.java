@@ -264,7 +264,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			getAccessLogEntityDao().remove(
         					getAccessLogEntityDao().findByHostId(maq.getId()));
         			getHostEntityDao().remove(maq);
-        			createHostTask(maq);
+        			createHostTask(maq.getName());
         		}
         		else
             		throw new InternalErrorException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
@@ -338,7 +338,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 old.setDeleted(new Boolean(false));
                 getHostEntityDao().update(old);
                 updateHostAttributes(maquina, old);
-    			createHostTask(old);
+    			createHostTask(maquina.getName());
                 updateHostAlias(old, maquina.getHostAlias());
 	            return getHostEntityDao().toHost(old);                
         	} else {
@@ -348,7 +348,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	            maquina.setId(entity.getId());
 	            updateHostAttributes(maquina, entity);
 	            updateHostAlias(entity, maquina.getHostAlias());
-    			createHostTask(entity);
+    			createHostTask(maquina.getName());
 	            return getHostEntityDao().toHost(entity);
         	}
         }
@@ -361,16 +361,13 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     protected void handleUpdate(com.soffid.iam.api.Host maquina) throws java.lang.Exception {
         if (teAccesEscripturaMaquina(maquina)) {
             HostEntity hostEntity = getHostEntityDao().load(maquina.getId());
-            boolean sync = ! compareHost(maquina, hostEntity);
-            if (sync) {
-	            if (!hostEntity.getName().equals(maquina.getName()))
-	    			createHostTask(hostEntity);
-            }
+            if (!hostEntity.getName().equals(maquina.getName()))
+    			createHostTask(hostEntity.getName());
             getHostEntityDao().hostToEntity(maquina, hostEntity, true);
 			getHostEntityDao().update(hostEntity);
-            if (updateHostAttributes(maquina, hostEntity)) sync = true;
-            if (updateHostAlias(hostEntity, maquina.getHostAlias())) sync = true;
-            if (sync) createHostTask(hostEntity);
+            updateHostAttributes(maquina, hostEntity);
+			createHostTask(maquina.getName());
+            updateHostAlias(hostEntity, maquina.getHostAlias());
         } else {
             // Comprovem permís per actualitzar el SO de la màquina
             if (AutoritzacionsUsuari.canUpdateHostOS()) {
@@ -395,9 +392,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     maquinaTrobada.setPrintersServer(maquina.getPrintersServer());
                 // I les comparem
                 if (maquinesIguals(maquinaTrobada, maquina)) {
-                    final HostEntity entity = getHostEntityDao().hostToEntity(maquinaTrobada);
-					getHostEntityDao().update(entity);
-        			createHostTask(entity);
+                    getHostEntityDao().update(getHostEntityDao().hostToEntity(maquinaTrobada));
+        			createHostTask(maquina.getName());
                 } else {
                     throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.OnlyChangeSOMachine"), maquina.getName()));
                 }
@@ -407,35 +403,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
     }
 
-    private boolean compareHost(Host maquina, HostEntity hostEntity) {
-    	if (! compare(maquina.getName(), hostEntity.getName())) return false;
-    	if (! compare(maquina.getDescription(), hostEntity.getDescription())) return false;
-    	if (! compare(maquina.getDhcp(), hostEntity.getDhcp())) return false;
-    	if (! compare(maquina.getDynamicIp(), hostEntity.getDynamicIP())) return false;
-    	if (! compare(maquina.getHostAlias(), hostEntity.getHostAlias())) return false;
-    	if (! compare(maquina.getIp(), hostEntity.getHostIP())) return false;
-    	if (! compare(maquina.getMac(), hostEntity.getMac())) return false;
-    	if (! compare(maquina.getMail(), hostEntity.getMail())) return false;
-    	if (! compare(maquina.getNetworkCode(), hostEntity.getNetwork().getName())) return false;
-    	if (! compare(maquina.getOffice(), hostEntity.getFolders())) return false;
-    	if (! compare(maquina.getOs(), hostEntity.getOperatingSystem() == null ? null: hostEntity.getOperatingSystem().getName())) return false;
-    	if (! compare(maquina.getPrintersServer(), hostEntity.getPrintersServer())) return false;
-		return true;
-	}
-
-	private boolean compare(Object o1, Object o2) {
-		if (o1 == null) return o2 == null;
-		else return o1.equals(o2);
-	}
-
-	private boolean updateHostAlias(HostEntity host, List<String> hostAlias) {
-		boolean anyChange = false;
+    private void updateHostAlias(HostEntity host, List<String> hostAlias) {
     	HashSet<String> l = new HashSet<>(hostAlias);
     	for (HostAliasEntity hae: new LinkedList<HostAliasEntity>(host.getHostAlias())) {
     		if (l.contains(hae.getAlias()))
     			l.remove(hae.getAlias());
     		else {
-    			anyChange = true;
     			host.getHostAlias().remove(hae);
     			getHostAliasEntityDao().remove(hae);
     		}
@@ -446,9 +419,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     		ha.setAlias(s);
     		getHostAliasEntityDao().create(ha);
     		host.getHostAlias().add(ha);
-    		anyChange = true;
     	}
-    	return anyChange;
 	}
 
 	/**
@@ -491,7 +462,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			}
         			entity.getSystems().clear();
         			getHostEntityDao().remove(entity);
-        			createHostTask(entity);
+        			createHostTask(maquina.getName());
         		}
         		else
         		{
@@ -504,7 +475,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		HostEntity entity = getHostEntityDao().hostToEntity(maquina);
         		entity.setDeleted(true);
         		getHostEntityDao().update(entity);
-    			createHostTask(entity);
+    			createHostTask(maquina.getName());
         	}
         }
     	else
@@ -1719,23 +1690,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             return getHostEntityDao().toHost(maquina);
     }
 
-    protected void createHostTask(HostEntity host) {
-		String status = ConfigurationCache.getProperty("soffid.task.mode");
-		if ("readonly".equals( status ) || "manual".equals( status )) {
-			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-	        tasque.setCustomObjectType(Host.class.getName());
-	        tasque.setPrimaryKeyValue(host.getId());
-	        getTaskEntityDao().create(tasque);
-		}
-		else {
-	        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.UPDATE_HOST);
-	        tasque.setHost(host.getName());
-	        getTaskEntityDao().create(tasque);
-		}
+    protected void createHostTask(String host) {
+        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
+        tasque.setTransaction(TaskHandler.UPDATE_HOST);
+        tasque.setHost(host);
+        getTaskEntityDao().create(tasque);
     }
     
     @Override
@@ -1756,17 +1716,18 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             	maquina.setHostIP(ip);
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
-			createHostTask(maquina);
+			createHostTask(maquina.getName());
         } else if (serialNumber.equals(old.getSerialNumber())) {
             // Found host entry
             maquina = old;
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
+			createHostTask(maquina.getName());
         } else if (old.getDynamicIP().booleanValue() ) { // Serial number has changed => Register a new host
             // Autodelete
             old.setDeleted(true);
             getHostEntityDao().update(old);
-			createHostTask(old);
+			createHostTask(old.getName());
         } else {
             log.warn(String.format(
                     Messages.getString("NetworkServiceImpl.HostsCollisionMessage"), //$NON-NLS-1$
@@ -1806,7 +1767,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 maquina.setOperatingSystem(getOsTypeEntityDao().findOSTypeByName("ALT")); //$NON-NLS-1$
                 maquina.setNetwork(x);
                 getHostEntityDao().create(maquina);
-    			createHostTask(maquina);
+    			createHostTask(maquina.getName());
         	} catch (java.net.UnknownHostException e) {
             	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, "??"); //$NON-NLS-1$ //$NON-NLS-2$ 
             	log.warn(msg);
@@ -1844,7 +1805,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         {
         	maquina.setLastSeen(new Date());
         	getHostEntityDao().update(maquina);
-			createHostTask(maquina);
+			createHostTask(maquina.getName());
         }
 
         return getHostEntityDao().toHost(maquina);
@@ -2150,9 +2111,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         return hasNetworkAuthorizations(userEntity, maquinaEntity, new int[] { LOGIN, SUPORT });
 	}
 	
-	private boolean updateHostAttributes (Host app, HostEntity entity) throws InternalErrorException
+	private void updateHostAttributes (Host app, HostEntity entity) throws InternalErrorException
 	{
-		return new HostAttributePersister().updateAttributes(app.getAttributes(), entity);
+		new HostAttributePersister().updateAttributes(app.getAttributes(), entity);
 	}
 
 	class HostAttributePersister extends AttributePersister<HostEntity,HostAttributeEntity> {

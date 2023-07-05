@@ -62,7 +62,6 @@ import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.impl.ConsoleTrustedCertificateLoader;
 import com.soffid.iam.service.impl.DatabaseParser;
-import com.soffid.iam.service.impl.DatabaseReader;
 import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -401,12 +400,6 @@ public class ApplicationBootServiceImpl extends
 				}).start();
 			}
 
-			if (version < 106) { //$NON-NLS-1$
-				cfg.setValue("106"); //$NON-NLS-1$
-				updateTextIndexColumn();
-				configSvc.update(cfg);
-			}
-
 		} finally {
 			Security.nestedLogoff();
 		}
@@ -522,19 +515,6 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("110");
 			configSvc.update(cfg);
 		}
-		if (cfg.getValue().equals("110"))
-		{
-			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Issue.ui.json", 
-					null, false);
-			cfg.setValue("111");
-			configSvc.update(cfg);
-		}
-		if (cfg.getValue().equals("111"))
-		{
-      updateIssuePolicies();
-			cfg.setValue("112");
-			configSvc.update(cfg);
-		}
 	}
 
 	private void fixAgentDescriptor() {
@@ -618,7 +598,12 @@ public class ApplicationBootServiceImpl extends
 	
 				Long tenantId = tenantService.getMasterTenant().getId();
 				
-		    	Database db = new DatabaseReader().readDatabaseDefinition();
+		    	Database db = new Database();
+		    	XmlReader reader = new XmlReader();
+		    	PathMatchingResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(getClass().getClassLoader());
+				parseResources(rpr, db, reader, "console-ddl.xml");
+		    	parseResources(rpr, db, reader, "core-ddl.xml");
+		    	parseResources(rpr, db, reader, "plugin-ddl.xml");
 	
 		    	
 		    	for (ForeignKey fk: db.foreignKeys)
@@ -666,23 +651,6 @@ public class ApplicationBootServiceImpl extends
 			}
 			rset.close();
 			stmt.close();
-		}
-		finally
-		{
-			conn.close();
-		}
-	}
-
-	private void updateIssuePolicies() throws IOException, Exception 
-	{
-		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
-		final Connection conn = ds.getConnection();
-		
-		try
-		{
-			executeSentence(conn, "UPDATE SC_EVPOAC SET EPA_STATUS='N' "
-					+ "WHERE EPA_STATUS IS NULL OR EPA_STATUS=''",
-								new Object[] {});
 		}
 		finally
 		{
@@ -814,25 +782,13 @@ public class ApplicationBootServiceImpl extends
 		}
 	}
 
-	private void updateTextIndexColumn() throws IOException, Exception 
-	{
-		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
-		final Connection conn = ds.getConnection();
-		
-		try
-		{
-			PreparedStatement stmt = conn.prepareStatement(
-					conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ?
-							"UPDATE SC_CUOBTY SET COT_TXTIND=false WHERE COT_TXTIND IS NULL":
-							"UPDATE SC_CUOBTY SET COT_TXTIND=0 WHERE COT_TXTIND IS NULL");
-			stmt.execute();
-			stmt.close();
-
-		}
-		finally
-		{
-			conn.close();
-		}
+	private void parseResources(ResourcePatternResolver rpr, Database db,
+			XmlReader reader, String path) throws IOException, Exception {
+		Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(path);
+    	while (resources.hasMoreElements())
+    	{
+    		reader.parse(db, resources.nextElement().openStream());
+    	}
 	}
 
 	/**
@@ -1726,7 +1682,6 @@ public class ApplicationBootServiceImpl extends
 		Security.nestedLogin(tenant.getName(),  "Anonymous", Security.ALL_PERMISSIONS);
 		try {
 			configureTenantDatabase(tenant.getName());
-			getIssuePolicyService().createPolicies();
 		} finally {
 			Security.nestedLogoff();
 		}

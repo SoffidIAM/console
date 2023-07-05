@@ -22,23 +22,18 @@
 				dataPath="/model:/policy" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 
-				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 				dataPath="/model:/policy" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="true">
-			<attribute name="allColumns"><![CDATA[
+			<attribute name="columns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.type') }
   value: type
-  default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.description')}
   value: description
-  default: true
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.status')}
   value: status
-  template: #{status.value=='0' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.IGNORE')}" ? status.value=='2' : "${c:l('com.soffid.iam.api.IssuePolicyStatus.MANAGE')}" : status.value=='1' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.RECORD')}" : ""  }
-  default: true
+  template: #{status.value=='0' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.IGNORE')}" : status.value=='2' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.MANAGE')}" : status.value=='1' ? "${c:l('com.soffid.iam.api.IssuePolicyStatus.RECORD')}" : ""  }
 - name: ${c:l('com.soffid.iam.api.IssuePolicy.actor')}
   value: actor
-  default: true
 ]]></attribute>
 			</datatable>
 		</div>
@@ -91,6 +86,14 @@
 						<attribute name="columns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.IssuePolicyAction.action') }
   value: action
+- name: ${c:l('com.soffid.iam.api.IssuePolicyAction.status') }
+  value: status
+  template: >-
+    #{status.value == 'A' ? "${c:l('com.soffid.iam.api.IssueStatus.ACKNOLEDGED')}" : 
+    status.value == 'N' ? "${c:l('com.soffid.iam.api.IssueStatus.NEW')}" : 
+    status.value == 'S' ? "${c:l('com.soffid.iam.api.IssueStatus.SOLVED')}" : 
+    status.value == 'D' ? "${c:l('com.soffid.iam.api.IssueStatus.SORVED_NOTADUPLICATE')}" :
+    ''}
 - name: ${c:l('com.soffid.iam.api.IssuePolicyAction.description')}
   value: description
 ]]></attribute>

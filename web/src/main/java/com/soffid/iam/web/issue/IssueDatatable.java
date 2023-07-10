@@ -79,8 +79,8 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 			}
 		s.put("hosts", sb.toString());
 		
-		s.put("pamRule", a.getRule().getName());
-		s.put("roleAccount", a.getRoleAccount().getRoleName());
+		s.put("pamRule", a.getRule() == null ? null : a.getRule().getName());
+		s.put("roleAccount", a.getRoleAccount() == null ? null: a.getRoleAccount().getRoleName());
 		
 		return s;
 	}

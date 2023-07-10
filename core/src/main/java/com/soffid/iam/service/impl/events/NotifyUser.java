@@ -70,9 +70,7 @@ public class NotifyUser implements AutomaticActionHandler {
 				}
 				else if (variable.equals("account")) {
 					if (event.getAccount() != null)
-						result.append(event.getAccount().getName())
-							.append("@")
-							.append(event.getAccount().getSystem());
+						result.append(event.getAccount());
 				}
 				else if (variable.equals("rule")) {
 					if (event.getRule() != null)

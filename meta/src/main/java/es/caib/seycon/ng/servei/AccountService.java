@@ -216,6 +216,19 @@ public abstract class AccountService {
 	 return null;
 	}
 	
+	
+	@Description ("Finds an account by name and system")
+	@Operation ( grantees={roles.user_create.class,roles.user_query.class,
+			roles.user_update.class,roles.agent_query.class,
+			roles.agent_update.class},
+			translated="findAccount")
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Account findAccount(
+		java.lang.String accountAndDispatcher)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Description ("Finds an account by id")
 	@Operation ( grantees={roles.user_create.class,roles.user_query.class,
 			roles.user_update.class,roles.agent_query.class,

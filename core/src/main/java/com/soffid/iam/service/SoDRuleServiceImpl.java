@@ -170,7 +170,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 		getSoDRoleEntityDao().remove(entity);
 	}
 
-	private boolean isGreater (SoDRisk first, SoDRisk second)
+	protected boolean handleIsGreater (SoDRisk first, SoDRisk second)
 	{
 		if (first == second)
 			return false;
@@ -276,6 +276,16 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                 rolAccount.setSodRules(null);
             }
         }
+	}
+
+	@Override
+    protected SoDRisk handleQualifyUser(Collection<RoleAccount> ra) throws Exception {
+		SoDRisk r = null;
+		for (RoleAccount rolAccount : ra) {
+			if (isGreater(rolAccount.getSodRisk(), r))
+				r = rolAccount.getSodRisk();
+        }
+		return r;
 	}
 
 	private LinkedList<RoleGrant> generateTargetList(List<RoleAccount> ra, RoleAccount rolAccount) throws InternalErrorException {

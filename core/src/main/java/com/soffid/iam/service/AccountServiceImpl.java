@@ -1030,6 +1030,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	@Override
+	protected Account handleFindAccount(String accountAndDispatcher)
+			throws Exception
+	{
+		int i = accountAndDispatcher.lastIndexOf("@");
+		if (i < 0) return null;
+		return handleFindAccount(accountAndDispatcher.substring(0, i), accountAndDispatcher.substring(i+1));
+	}
+
+	@Override
     protected List<UserAccount> handleFindUsersAccounts(String userName, String dispatcherName) throws Exception {
 		if (!AutoritzacionsUsuari.hasQueryAccount())
 		{

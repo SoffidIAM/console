@@ -67,7 +67,7 @@ public class LoginPage extends Html {
 			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
 			byte[] motd = ServiceLocator.instance().getConfigurationService().getBlob("soffid.auth.motd");
 			String motdString = motd == null ? null: new String(motd, StandardCharsets.UTF_8);
-			if (error.isEmpty() && motdString != null && ! motdString.trim().isBlank() ) {
+			if (error.isEmpty() && motdString != null && ! motdString.trim().isEmpty() ) {
 				setVariable("showMotd", true, false);
 				setVariable("motd", motdString, false);
 			} else {

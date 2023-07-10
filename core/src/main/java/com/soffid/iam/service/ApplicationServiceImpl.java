@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,6 +59,8 @@ import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.NetworkAuthorization;
 import com.soffid.iam.api.PagedResult;
@@ -931,8 +934,7 @@ public class ApplicationServiceImpl extends
 	private RoleAccount performCreateRolAccount(RoleAccount inital,
 			RoleAccount ra,
 			List<RoleAccount> grantsToCreate, boolean first)
-			throws InternalErrorException, NeedsAccountNameException,
-			AccountAlreadyExistsException, UnknownUserException {
+			throws Exception {
     	String codiAplicacio = inital.getInformationSystemName();
         boolean skip = false;
         // Verify the user has one account
@@ -996,6 +998,7 @@ public class ApplicationServiceImpl extends
         	else
         		skip = true;
         }
+        
         if (!skip)
         {
 		    RoleAccountEntity rolsUsuarisEntity = getRoleAccountEntityDao()
@@ -1048,7 +1051,29 @@ public class ApplicationServiceImpl extends
 		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);
 		    AccountEntity account = rolsUsuarisEntity.getAccount();
 		    account.getRoles().add(rolsUsuarisEntity);
-		    
+
+	        // Raise issue if risk is increased
+	        if (rule != null && rule.getRisk() != SoDRisk.SOD_NA ) {
+	        	SoDRisk level = SoDRisk.SOD_NA;
+	        	if (account.getType() == AccountType.USER) {
+	        		for (UserAccountEntity userAccount: account.getUsers()) {
+	        			Collection<RoleAccount> roleAccounts = handleFindUserRolesByUserName(userAccount.getUser().getUserName());
+	        			level = getSoDRuleService().qualifyUser(roleAccounts); 
+	        			if (getSoDRuleService().isGreater(rule.getRisk(), level)) {
+	        				Issue i = new Issue();
+	        				i.setRoleAccount(ra);
+	        				i.setAccount(account.getName()+"@"+account.getSystem().getName());
+	        				IssueUser iu = new IssueUser();
+	        				iu.setUserId(userAccount.getUser().getId());
+	        				iu.setUserName(userAccount.getUser().getUserName());
+	        				i.setUsers(Arrays.asList(iu));
+	        				i.setRisk(rule.getRisk());
+	        				getIssueService().createInternalIssue(i);
+	        			}
+	        		}
+	        	}
+	        }
+
 		    if (first)
 		    	inital = getRoleAccountEntityDao().toRoleAccount(rolsUsuarisEntity);
 			

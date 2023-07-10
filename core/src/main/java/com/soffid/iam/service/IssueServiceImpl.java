@@ -147,7 +147,9 @@ public class IssueServiceImpl extends IssueServiceBase {
 			if (issue.getUsers() != null) 
 				for (IssueUser user: issue.getUsers()) {
 					IssueUserEntity issueUserEntity = getIssueUserEntityDao().issueUserToEntity(user);
-					UserEntity userEntity = getUserEntityDao().findByUserName(user.getUserName());
+					UserEntity userEntity = user.getUserId() == null ?
+							getUserEntityDao().findByUserName(user.getUserName() ) :
+							getUserEntityDao().load(user.getUserId());
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
 					issueUserEntity.setExternalId(user.getExternalId());

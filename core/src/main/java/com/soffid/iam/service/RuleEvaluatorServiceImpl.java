@@ -39,6 +39,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.common.security.SoffidPrincipal;
@@ -787,7 +788,8 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 				}
 				if( !(accountAndSystem[1].toUpperCase()).equals(role.getSystem().getName().toUpperCase()) && existsSystem(accountAndSystem[1])) { 
 					if(!existsAccount) {
-						UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), getDispatcherService().findDispatcherByName​(accountAndSystem[1]),accountAndSystem[0]);	
+						System s = getDispatcherService().findDispatcherByName(accountAndSystem[0]);
+						UserAccount usrAcc = as.createAccount(getUserEntityDao().toUser(user), s,accountAndSystem[0]);	
 					}
 					if(!isSomeAccountWithRoleSystem(role.getSystem().getName(),targetAccounts)) {
 						assignRole(rule, roles, user, role, stringValue, method);

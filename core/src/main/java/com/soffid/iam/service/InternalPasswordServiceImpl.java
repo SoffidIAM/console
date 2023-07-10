@@ -986,7 +986,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (ppe.getMaxFailures() + 1 == contra.getFails()) {
 				Issue issue = new Issue();
 				if (account2 != null)
-					issue.setAccount(getAccountEntityDao().toAccount(account2));
+					issue.setAccount(account2.getName()+"@"+account2.getSystem().getName());
 				IssueUser iu = new IssueUser();
 				iu.setUserName(contra.getUser().getUserName());
 				iu.setUserId(contra.getUser().getId());
@@ -1648,7 +1648,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (ppe.getMaxFailures() + 1 == contra.getFails()) {
 				auditLockAccount(null, contra.getAccount());
 				Issue issue = new Issue();
-				issue.setAccount(getAccountEntityDao().toAccount(contra.getAccount()));
+				issue.setAccount(contra.getAccount().getName()+"@"+contra.getAccount().getSystem().getName());
 				issue.setCreated(new Date());
 				issue.setStatus(IssueStatus.NEW);
 				issue.setType("locked-account");

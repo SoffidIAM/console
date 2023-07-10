@@ -32,13 +32,8 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.soffid.iam.api.CustomObject;
 import com.soffid.iam.api.SoffidObjectType;
 
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.AttributeMapping;
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 /** 

@@ -28,18 +28,17 @@ public class UnlockAccount implements ManualActionHandler {
 			Missatgebox.avis(Labels.getLabel("issues.noAccount"));
 			return;
 		}
-		Account account = EJBLocator.getAccountService().findAccountById(issue.getAccount().getId());
-		issue.setAccount(account);
-		if (issue.getAccount().getStatus() != AccountStatus.LOCKED) {
+		Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
+		if (account.getStatus() != AccountStatus.LOCKED) {
 			w.setVisible(false);
 			String msg = String.format(Labels.getLabel("issues.accountNotLocked"),
-					issue.getAccount().getLoginName());
+					account.getLoginName());
 			Missatgebox.avis(msg);
 			return;
 		}
 		
 		String msg = String.format(Labels.getLabel("issues.unlockAccount"),
-				issue.getAccount().getLoginName(), issue.getAccount().getSystem());
+				account.getLoginName(), account.getSystem());
 				
 		w.getFellow("fields").appendChild(
 				new Label(msg));
@@ -47,15 +46,16 @@ public class UnlockAccount implements ManualActionHandler {
 
 	@Override
 	public void process(Window w, Issue issue, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
-		issue.getAccount().setStatus(AccountStatus.ACTIVE);
+		Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
+		account.setStatus(AccountStatus.ACTIVE);
 		try {
-			EJBLocator.getAccountService().updateAccount(issue.getAccount());
+			EJBLocator.getAccountService().updateAccount(account);
 		} catch (AccountAlreadyExistsException e) {
 			// Cannot happen
 		}
 		w.setVisible(false);
 		String msg = String.format(Labels.getLabel("issues.accountUnlocked"),
-				issue.getAccount().getLoginName());
+				account.getLoginName());
 		EJBLocator.getIssueService().registerAction(issue, msg);
 		Missatgebox.avis(msg);
 	}

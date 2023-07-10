@@ -36,7 +36,7 @@ public class StartWorkflow implements AutomaticActionHandler {
 				ProcessInstance proc = svc.newProcess(def);
 				final Map<String, Object> atts = proc.getAttributes();
 				if (event.getAccount() != null) {
-					atts.put("account", event.getAccount().getName()+"@"+event.getAccount().getSystem());
+					atts.put("account", event.getAccount());
 				}
 				atts.put("country", event.getCountry());
 				atts.put("description", event.getDescription());

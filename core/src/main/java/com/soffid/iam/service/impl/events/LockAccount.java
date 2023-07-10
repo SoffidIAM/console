@@ -19,9 +19,9 @@ public class LockAccount implements AutomaticActionHandler {
 
 	@Override
 	public void process(Issue event, IssueEntity entity, IssuePolicyActionEntity actionEntity) throws InternalErrorException {
-		Account acc = event.getAccount();
-		if ( ! acc.isDisabled() )
+		if ( entity.getAccount() != null && ! entity.getAccount().isDisabled() )
 		{
+			Account acc = ServiceLocator.instance().getAccountService().load(entity.getAccount().getId());
 			acc.setStatus(AccountStatus.LOCKED);
 			try {
 				ServiceLocator.instance().getAccountService().updateAccount(acc);

@@ -69,7 +69,7 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 				if (sb.length() > 0) sb.append(" ");
 				sb.append(user.getUserName());
 			}
-		s.put("hosts", sb.toString());
+		s.put("users", sb.toString());
 
 		sb = new StringBuffer();
 		if (a.getHosts() != null)
@@ -78,6 +78,10 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 				sb.append(host.getHostName());
 			}
 		s.put("hosts", sb.toString());
+		
+		s.put("pamRule", a.getRule().getName());
+		s.put("roleAccount", a.getRoleAccount().getRoleName());
+		
 		return s;
 	}
 

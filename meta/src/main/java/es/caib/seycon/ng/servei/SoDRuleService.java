@@ -159,7 +159,14 @@ public abstract class SoDRuleService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 	
+	public SoDRisk qualifyUser(
+		java.util.Collection<es.caib.seycon.ng.comu.RolAccount> ra)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
 	
+	public boolean isGreater(SoDRisk first, SoDRisk second) { return false;}
+
 	@Operation ( grantees={roles.user_role_query.class,
 			roles.application_query.class},
 			translated="findAffectingRulesByRolAccount")

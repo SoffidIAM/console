@@ -1,6 +1,7 @@
 package com.soffid.iam.model;
 
 import com.soffid.iam.api.IssueHost;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
 public class IssueHostEntityDaoImpl extends IssueHostEntityDaoBase {
 
@@ -20,7 +21,11 @@ public class IssueHostEntityDaoImpl extends IssueHostEntityDaoBase {
 	@Override
 	public void issueHostToEntity(IssueHost source, IssueHostEntity target, boolean copyIfNull) {
 		super.issueHostToEntity(source, target, copyIfNull);
-		target.setHost(source.getHostId() == null ? null: getHostEntityDao().load(source.getHostId()));
+		CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+		criteria.setMaximumResultSize(1);
+		target.setHost(source.getHostId() != null ? getHostEntityDao().load(source.getHostId()) :
+				source.getHostName() != null ? getHostEntityDao().findByName(criteria , source.getHostName()) :
+				null);
 	}
 
 }

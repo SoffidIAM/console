@@ -537,14 +537,11 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 		User oldUser = getUserService().findUserByUserName(user.getUserName());
 		if (oldUser == null)
 		{
-			if (user.getPrimaryGroup() == null) user.setPrimaryGroup("World");
+			if (user.getPrimaryGroup() == null) user.setPrimaryGroup("world");
 			if (user.getFirstName() == null) user.setFirstName("?");
 			if (user.getLastName() == null) user.setLastName("?");
 			if (user.getActive() == null) user.setActive(Boolean.TRUE);
-			if (user.getMultiSession() == null) user.setMultiSession(Boolean.FALSE);
-			if (user.getMailServer() == null) user.setMailServer("null");
-			if (user.getHomeServer() == null) user.setHomeServer("null");
-			if (user.getProfileServer() == null) user.setProfileServer("null");
+			if (user.getMultiSession() == null) user.setMultiSession(Boolean.TRUE);
 			if (user.getUserType() == null) user.setUserType("I");
 			oldUser = getUserService().create(user);
 		} else {

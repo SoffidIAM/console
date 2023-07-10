@@ -118,9 +118,7 @@ public class AccountEntityDaoImpl extends
 				fetchFromCache(target, entry);
 				return ;
 			}
-			log.info("serialize 0");
 			super.toAccount(source, target);
-			log.info("serialize 1");
 			// Incompatible types source.dispatcher and target.dispatcher
 			// Missing attribute grantedGroups on entity
 			// Missing attribute grantedUsers on entity
@@ -186,7 +184,6 @@ public class AccountEntityDaoImpl extends
 					}
 				}
 			}
-			log.info("serialize 2");
 			target.setGrantedGroups(grups);
 			target.setGrantedRoles(roles);
 			target.setGrantedUsers(usuaris);
@@ -205,7 +202,6 @@ public class AccountEntityDaoImpl extends
 					target.setPasswordPolicy(uae.getUser().getUserType().getName());
 				}
 			}
-			log.info("serialize 3");
 			target.setAttributes(new HashMap<String, Object>());
 			Map<String, Object> attributes = target.getAttributes();
 			for (AccountAttributeEntity att : source.getAttributes()) {
@@ -282,7 +278,6 @@ public class AccountEntityDaoImpl extends
 					target.setLoginUrl( (String) target.getAttributes().get("SSO:URL") );
 			}
 
-			log.info("serialize 4");
 			storeCacheEntry(source, target);
 	
 			if (source.getType() == AccountType.PRIVILEGED) 

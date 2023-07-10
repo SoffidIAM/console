@@ -12,9 +12,11 @@ import java.util.Map;
 
 import com.soffid.iam.api.AttributeTranslation;
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.Issue;
 import com.soffid.iam.authoritative.service.AuthoritativeChangeService;
 import com.soffid.iam.service.AttributeTranslationService;
 import com.soffid.iam.service.CustomObjectService;
+import com.soffid.iam.service.IssueService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Account;
@@ -78,6 +80,7 @@ import org.springframework.transaction.annotation.Transactional;
 	ServerInstanceEntity.class,
 	AttributeTranslationService.class,
 	AuditoriaEntity.class,
+	IssueService.class,
 	AuthoritativeChangeService.class})
 public abstract class ServerService {
 
@@ -496,5 +499,7 @@ public abstract class ServerService {
 	public void reconcileAccount(Account account, @Nullable List<RolAccount> grants) {};
 	
 	public void addCertificate(X509Certificate cert) {};
+	
+	public Issue registerIssue(Issue e) {return null;}
 
 }

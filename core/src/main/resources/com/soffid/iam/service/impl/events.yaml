@@ -167,6 +167,21 @@
   - lock-account
   - disable-user
   - add-comment
+- name: account-created
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - add-comment
 - name: risk-increase
   actions:
   - send-email

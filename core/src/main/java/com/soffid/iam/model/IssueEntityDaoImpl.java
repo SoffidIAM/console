@@ -19,10 +19,18 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 		target.setSystem(source.getSystem() == null ? null: getSystemEntityDao().findByName(source.getSystem()));
 		target.setRoleAccount(source.getRoleAccount() == null ? null: getRoleAccountEntityDao().load(source.getRoleAccount().getId()));
 		target.setRule(source.getRule() == null ? null: getPamRuleEntityDao().load(source.getRule().getId()));
-		target.setAccount(source.getAccount() == null? null: getAccountEntityDao().load(source.getAccount().getId()));
+		target.setAccount(findAccount(source.getAccount()));
 		SystemEntity mainDispatcher = getSystemEntityDao().findSoffidSystem();
 		target.setRequester(getAccountEntityDao().findByNameAndSystem(Security.getCurrentAccount(),
 				mainDispatcher.getName()));
+	}
+
+	private AccountEntity findAccount(String account) {
+		if (account == null || account.trim().isEmpty())
+			return null;
+		int i = account.lastIndexOf("@");
+		if (i < 0) return null;
+		return getAccountEntityDao().findByNameAndSystem(account.substring(0,i), account.substring(i+1));
 	}
 
 	@Override
@@ -31,7 +39,8 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 		target.setSystem( source.getSystem() == null ? null: source.getSystem().getName());
 		target.setRoleAccount(source.getRoleAccount() == null? null: getRoleAccountEntityDao().toRoleAccount(source.getRoleAccount()));
 		target.setRule(source.getRule() == null ? null: getPamRuleEntityDao().toPamRule(source.getRule()));
-		target.setAccount(source.getAccount() == null ? null: getAccountEntityDao().toAccount(source.getAccount()));
+		target.setAccount(source.getAccount() == null ? null: 
+			source.getAccount().getName()+"@"+source.getAccount().getSystem().getName());
 		target.setUsers(getIssueUserEntityDao().toIssueUserList(source.getUsers()));
 		target.setHosts(getIssueHostEntityDao().toIssueHostList(source.getHosts()));
 		target.setRequester(source.getRequester() == null ? null:  source.getRequester().getName()+"@"+source.getRequester().getSystem().getName());

@@ -61,9 +61,11 @@ public class Issue {
 	SoDRisk risk;
 	
 	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.issue.RoleAccountFieldHandler", type = "STRING", multivalue = false)
 	RolAccount roleAccount;
 	
 	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.issue.RuleFieldHandler", type = "STRING", multivalue = false)
 	PamRule rule;
 	
 	
@@ -71,7 +73,8 @@ public class Issue {
 	String country;
 	
 	@Nullable
-	Account account;
+	@Attribute(type = "ACCOUNT")
+	String account;
 
 	@Nullable
 	String actor;

@@ -31,4 +31,7 @@ public class IssueHostEntity {
 	
 	@Nullable @Column(name = "HVE_HOSNAM")
 	String hostName;
+
+	@Nullable @Column(name = "HVE_HOSIP")
+	String hostIp;
 }

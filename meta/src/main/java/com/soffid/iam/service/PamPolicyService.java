@@ -38,7 +38,8 @@ import es.caib.seycon.ng.servei.DispatcherService;
 	AsyncRunnerService.class,
 	PamSecurityHandlerService.class,
 	AccountEntity.class,
-	DispatcherService.class, MailService.class})
+	DispatcherService.class, MailService.class,
+	IssueService.class})
 public class PamPolicyService {
 	@Operation(grantees = {PamPolicy_query.class})
 	PagedResult<PamPolicy> findPolicyByJsonQuery(@Nullable String text, @Nullable String query, @Nullable Integer first, @Nullable Integer pageSize) { return null; }

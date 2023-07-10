@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,8 @@ import org.json.JSONTokener;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.PamAction;
 import com.soffid.iam.api.PamPolicy;
@@ -436,7 +439,16 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
 				List<PamActionEntity> actions = getPamActionEntityDao().findByPolicyAndRule(policyName, ruleName);
 				for (PamActionEntity action: actions) {
 					if (action.getType() == PamActionType.ISSUE) {
-						// To do
+						Issue i = new Issue();
+						i.setAccount(account.getName()+"@"+account.getSystem());
+						i.setRule(getPamRuleEntityDao().toPamRule(action.getRule()));
+						if (session.getUser() != null) {
+							IssueUser iu = new IssueUser();
+							iu.setUserId(session.getUser().getId());
+							iu.setUserName(session.getUser().getUserName());
+							i.setUsers(Arrays.asList(iu));
+						}
+						getIssueService().createInternalIssue(i);
 					}
 					if (action.getType() == PamActionType.LOCK_ACCOUNT) {
 						account.setStatus(AccountStatus.LOCKED);

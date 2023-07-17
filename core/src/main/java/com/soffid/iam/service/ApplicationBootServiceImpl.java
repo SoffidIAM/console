@@ -524,14 +524,14 @@ public class ApplicationBootServiceImpl extends
 		}
 		if (cfg.getValue().equals("110"))
 		{
-			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Issue.ui.json", 
-					null, false);
+//			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Issue.ui.json", 
+//					null, false);
 			cfg.setValue("111");
 			configSvc.update(cfg);
 		}
 		if (cfg.getValue().equals("111"))
 		{
-      updateIssuePolicies();
+			updateIssuePolicies();
 			cfg.setValue("112");
 			configSvc.update(cfg);
 		}

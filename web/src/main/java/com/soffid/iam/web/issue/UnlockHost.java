@@ -28,15 +28,17 @@ public class UnlockHost implements ManualActionHandler {
 	List<Host> hosts = new LinkedList<>();
 	StringBuffer hostNames = new StringBuffer();
 	@Override
-	public void init(Window w, Issue issue) throws InternalErrorException, NamingException, CreateException {
-		for (IssueHost host: issue.getHosts()) {
-			if (host.getHostId() != null) {
-				Host u = EJBLocator.getNetworkService().findHostById(host.getHostId());
-				if (u != null && Boolean.TRUE.equals( u.getLocked( ))) {
-					if (hostNames.length() > 0)
-						hostNames.append(", ");
-					hostNames.append(u.getName());
-					hosts.add(u);
+	public void init(Window w, List<Issue> issues) throws InternalErrorException, NamingException, CreateException {
+		for (Issue issue: issues) {
+			for (IssueHost host: issue.getHosts()) {
+				if (host.getHostId() != null) {
+					Host u = EJBLocator.getNetworkService().findHostById(host.getHostId());
+					if (u != null && Boolean.TRUE.equals(u.getLocked( ))) {
+						if (hostNames.length() > 0)
+							hostNames.append(", ");
+						hostNames.append(u.getName());
+						hosts.add(u);
+					}
 				}
 			}
 		}
@@ -54,13 +56,17 @@ public class UnlockHost implements ManualActionHandler {
 	}
 
 	@Override
-	public void process(Window w, Issue issue, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
+	public void process(Window w, List<Issue> issues, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
 		for (Host host: hosts) {
 			host.setLocked(false);
 			EJBLocator.getNetworkService().update(host);
-			String msg = String.format(Labels.getLabel("issues.unlockedHosts"),
-					host.getName());
-			EJBLocator.getIssueService().registerAction(issue, msg);
+		}
+		for (Issue issue: issues) {
+			for (IssueHost ih: issue.getHosts()) {
+				String msg = String.format(Labels.getLabel("issues.unlockedHosts"),
+						ih.getHostName());
+				EJBLocator.getIssueService().registerAction(issue, msg);				
+			}
 		}
 		w.setVisible(false);
 		String msg = String.format(Labels.getLabel("issues.unlockedHosts"),

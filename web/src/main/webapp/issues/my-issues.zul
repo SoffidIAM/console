@@ -5,8 +5,8 @@
 <?page id="network"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
-	use="com.soffid.iam.web.issue.IssueHandler" id="frame">
-	<datamodel id="model" rootNode="root" src="issueDescriptor.xml"/>
+	use="com.soffid.iam.web.issue.MyIssueHandler" id="frame">
+	<datamodel id="model" rootNode="root" src="myIssueDescriptor.xml"/>
 	<div sclass="card" id="card">
 		<div sclass="card__face card__face--front">
 	
@@ -21,7 +21,8 @@
 				jsonObject="com.soffid.iam.api.Issue" 
 				defaultAttributes="type, description"
 				preference="issue"
-				dataPath="/model:/issue" variableName="query" variableNameText="textQuery"></searchbox>
+				dataPath="/model:/issue" variableName="query" variableNameText="textQuery"
+				enforcedFilter="status eq 'N' or status eq 'A'"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 
 				multiselect="true"

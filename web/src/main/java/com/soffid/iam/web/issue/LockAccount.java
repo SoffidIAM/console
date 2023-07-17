@@ -1,5 +1,6 @@
 package com.soffid.iam.web.issue;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -22,44 +23,58 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 public class LockAccount implements ManualActionHandler {
 
 	@Override
-	public void init(Window w, Issue issue) throws InternalErrorException, NamingException, CreateException {
-		if (issue.getAccount() == null) {
-			w.setVisible(false);
-			Missatgebox.avis(Labels.getLabel("issues.noAccount"));
-			return;
+	public void init(Window w, List<Issue> issues) throws InternalErrorException, NamingException, CreateException {
+		if (issues.size() == 1) {
+			Issue issue = issues.iterator().next();
+			if (issue.getAccount() == null) {
+				w.setVisible(false);
+				Missatgebox.avis(Labels.getLabel("issues.noAccount"));
+				return;
+			}
+			Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
+			if (account.getStatus() == AccountStatus.LOCKED ||
+					account.getStatus() == AccountStatus.DISABLED ||
+					account.getStatus() == AccountStatus.ARCHIVED ||
+					account.getStatus() == AccountStatus.REMOVED ) {
+				w.setVisible(false);
+				String msg = String.format(Labels.getLabel("issues.accountAlreadyLocked"),
+						account.getLoginName());
+				Missatgebox.avis(msg);
+				return;
+			}
 		}
-		Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
-		if (account.getStatus() == AccountStatus.LOCKED ||
-				account.getStatus() == AccountStatus.DISABLED ||
-				account.getStatus() == AccountStatus.ARCHIVED ||
-				account.getStatus() == AccountStatus.REMOVED ) {
-			w.setVisible(false);
-			String msg = String.format(Labels.getLabel("issues.accountAlreadyLocked"),
-					account.getLoginName());
-			Missatgebox.avis(msg);
-			return;
+
+		StringBuffer sb = new StringBuffer();
+		for (Issue issue: issues) {
+			Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
+			String msg = String.format(Labels.getLabel("issues.lockAccount"),
+					account.getLoginName(), account.getSystem());
+			sb.append(msg).append("\n");
 		}
-		
-		String msg = String.format(Labels.getLabel("issues.lockAccount"),
-				account.getLoginName(), account.getSystem());
 				
-		w.getFellow("fields").appendChild(
-				new Label(msg));
+		Label lb = new Label(sb.toString());
+		lb.setMultiline(true);
+		w.getFellow("fields").appendChild(lb);
 	}
 
 	@Override
-	public void process(Window w, Issue issue, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
-		Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
-		account.setStatus(AccountStatus.LOCKED);
-		try {
-			EJBLocator.getAccountService().updateAccount(account);
-		} catch (AccountAlreadyExistsException e) {
-			// Cannot happen
+	public void process(Window w, List<Issue> issues, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
+		for (Issue issue: issues) {
+			Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
+			if (account.getStatus() != AccountStatus.LOCKED) {
+				account.setStatus(AccountStatus.LOCKED);
+				try {
+					EJBLocator.getAccountService().updateAccount(account);
+				} catch (AccountAlreadyExistsException e) {
+					// Cannot happen
+				}
+				w.setVisible(false);
+				String msg = String.format(Labels.getLabel("issues.accountLocked"),
+						account.getLoginName());
+				EJBLocator.getIssueService().registerAction(issue, msg);
+				if (issues.size() == 1)
+					Missatgebox.avis(msg);
+			}
 		}
-		w.setVisible(false);
-		String msg = String.format(Labels.getLabel("issues.accountLocked"),
-				account.getLoginName());
-		EJBLocator.getIssueService().registerAction(issue, msg);
-		Missatgebox.avis(msg);
 	}
 }

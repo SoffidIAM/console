@@ -282,7 +282,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
     protected SoDRisk handleQualifyUser(Collection<RoleAccount> ra) throws Exception {
 		SoDRisk r = null;
 		for (RoleAccount rolAccount : ra) {
-			if (isGreater(rolAccount.getSodRisk(), r))
+			if (r == null || handleIsGreater(rolAccount.getSodRisk(), r))
 				r = rolAccount.getSodRisk();
         }
 		return r;
@@ -379,6 +379,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
                 if (rule.getType() == SodRuleType.MATCH_MATRIX) {
 	                for (SoDRuleMatrixEntity cell : rule.getMatrixCells()) {
 	                	boolean found = false;
+	                	// Matches row
 	                    if (cell.getRow().getId().equals(sourceSodRole.getId())) {
 	                        for (RoleGrant rolGrant : rols) {
 	                        	if (rolGrant.getRoleId() != null ?
@@ -394,6 +395,7 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	                            }
 	                        }	                    	
 	                    }
+	                    // Matches column
 	                    if (!found && cell.getColumn().getId().equals(sourceSodRole.getId())) {
 	                        for (RoleGrant rolGrant : rols) {
 	                            if (rolGrant.getRoleId() != null ?
@@ -404,6 +406,11 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 	                            	break;
 	                            }
 	                        }	                    	
+	                    }
+	                    // Matches row and column
+	                    if (!found && cell.getColumn().getId().equals(sourceSodRole.getId()) &&
+	                    		cell.getRow().getId().equals(sourceSodRole.getId())) {
+                           	rules.add(new AppliedRule(rule, cell));
 	                    }
 	                }
                 } else {

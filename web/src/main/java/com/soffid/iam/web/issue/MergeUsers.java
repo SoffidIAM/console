@@ -35,10 +35,16 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 public class MergeUsers implements ManualActionHandler {
 
 	@Override
-	public void init(Window w, Issue issue) throws InternalErrorException, NamingException, CreateException {
+	public void init(Window w, List<Issue> issues) throws InternalErrorException, NamingException, CreateException {
+		if (issues.size() > 1)
+		{
+			Missatgebox.avis(Labels.getLabel("issues.cannotMergeMultiple"));
+			return;
+		}
 		w.setVisible(false);
 		StringBuffer sb = new StringBuffer();
 		int number = 0;
+		Issue issue = issues.iterator().next();
 		for (IssueUser iu: issue.getUsers()) {
 			if (iu.getUserId() != null) {
 				if (sb.length() > 0) sb.append(" or ");
@@ -98,7 +104,7 @@ public class MergeUsers implements ManualActionHandler {
 	}
 
 	@Override
-	public void process(Window w, Issue issue, Map<String, Object> parameters)
+	public void process(Window w, List<Issue> issues, Map<String, Object> parameters)
 			throws InternalErrorException, NamingException, CreateException {
 	}
 

@@ -28,12 +28,14 @@ public class AddComment implements ManualActionHandler {
 	List<Host> hosts = new LinkedList<>();
 	StringBuffer hostNames = new StringBuffer();
 	@Override
-	public void init(Window w, Issue issue) throws InternalErrorException, NamingException, CreateException {
+	public void init(Window w, List<Issue> issues) throws InternalErrorException, NamingException, CreateException {
 	}
 
 	@Override
-	public void process(Window w, Issue issue, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
-		EJBLocator.getIssueService().registerAction(issue,
-				Labels.getLabel("task.addcomentari") + ": " + parameters.get("subject"));
+	public void process(Window w, List<Issue> issues, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
+		for (Issue issue: issues) {
+			EJBLocator.getIssueService().registerAction(issue,
+					Labels.getLabel("task.addcomentari") + ": " + parameters.get("subject"));
+		}
 	}
 }

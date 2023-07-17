@@ -27,14 +27,19 @@ public class Issue {
 	@Attribute(hidden = true)
 	Long id;
 	
+	@Attribute(defaultValue = "new java.util.Date()")
+	Date created;
+	
 	String type;
 
 	@Attribute(multiline = true)
 	@Nullable String description;
 
-	IssueStatus status;
+	@Attribute(defaultValue="0")
+	Integer times;
 	
-	Date created;
+	@Attribute(defaultValue = "com.soffid.iam.api.IssueStatus.NEW")
+	IssueStatus status;
 	
 	@Nullable
 	Date acknowledged;
@@ -55,6 +60,7 @@ public class Issue {
 	String otpDevice;
 	
 	@Nullable
+	@Attribute(multiline = true)
 	String exception;
 	
 	@Nullable
@@ -79,6 +85,13 @@ public class Issue {
 	@Nullable
 	String actor;
 	
+	@Nullable
+	String loginName;
+
+	@Nullable
+	@Attribute(hidden = true)
+	String hash;
+
 	@Nullable
 	@Attribute(customUiHandler = "com.soffid.iam.web.issue.HostFieldHandler", type = "HOST", multivalue = true)
 	List<IssueHost> hosts;

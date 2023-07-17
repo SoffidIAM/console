@@ -448,6 +448,7 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
 							iu.setUserName(session.getUser().getUserName());
 							i.setUsers(Arrays.asList(iu));
 						}
+						i.setType("pam-violation");
 						getIssueService().createInternalIssue(i);
 					}
 					if (action.getType() == PamActionType.LOCK_ACCOUNT) {

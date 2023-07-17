@@ -3,6 +3,7 @@ package com.soffid.iam.web.issue;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +18,8 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Radio;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
@@ -143,7 +146,7 @@ public class IssueHandler extends FrameHandler {
 		handler = (ManualActionHandler) Class.forName(currentAction.getHandler()).
 				getConstructor().
 				newInstance();
-		handler.init(w, issue);
+		handler.init(w, Arrays.asList(issue));
 	}
 
 	private String toHtml(Object v) {
@@ -165,7 +168,7 @@ public class IssueHandler extends FrameHandler {
 			InputField3 ifield = (InputField3) w.getFellow("_"+dt.getName());
 			attributes.put(dt.getName(), ifield.getValue());
 		}
-		handler.process(w, issue, attributes);
+		handler.process(w, Arrays.asList(issue), attributes);
 		w.setVisible(false);
 		for (Issue issue2: EJBLocator.getIssueService()
 				.findIssuesByJsonQuery("id eq "+issue.getId(), null, null)
@@ -189,4 +192,153 @@ public class IssueHandler extends FrameHandler {
 		onChangeForm(ev);
 	}
 
+	List<Issue> currentIssues;
+	public void multiAction(Event ev) throws NamingException, CreateException, InternalErrorException, IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+		LinkedList<IssueActionDefinition> enabledActions = new LinkedList<>(actions);
+		DataTable dt = (DataTable) getListbox();
+		int[] rows = dt.getSelectedIndexes();
+		if (rows.length == 0) return;
+		boolean ack = true;
+		boolean solve = true;
+		currentIssues = new LinkedList<>();
+		for (int i = 0; i < rows.length; i++) {
+			String path = dt.getItemXPath(rows[i]);
+			Issue issue = (Issue) XPathUtils.eval(getModel(), path+"/instance");
+			currentIssues.add(issue);
+			String type = issue.getType();
+			for (Iterator<IssueActionDefinition> iterator = enabledActions.iterator(); 
+					iterator.hasNext();) {
+				IssueActionDefinition ia = iterator.next();
+				if (! ia.getIssueTypes().contains(type)) {
+					iterator.remove();
+				}
+			}
+			if (issue.getStatus() == IssueStatus.ACKNOWLEDGED)
+				ack = false;
+			if (issue.getStatus() == IssueStatus.SOLVED || issue.getStatus() == IssueStatus.SOLVED_NOTADUPLICATE)
+				ack = solve = false;
+		}
+		
+		if (enabledActions.isEmpty() && !ack && !solve)
+			return;
+		
+		Window w = (Window) getFellow("multiaction_window");
+		w.getFellow("step1").setVisible(true);
+		Radiogroup rg = (Radiogroup) w.getFellow("radio");
+		rg.getChildren().clear();
+		for (IssueActionDefinition action: enabledActions) {
+			Radio r = new Radio(Labels.getLabel(action.getLabel()));
+			r.setAttribute("action", action);
+			rg.appendChild(r);
+		}
+		if (ack) {
+			Radio r = new Radio(Labels.getLabel("com.soffid.iam.api.IssueActionDefinition.auto-ack"));
+			r.setAttribute("action", "ack");
+			rg.appendChild(r);
+		}
+		if (solve) {
+			Radio r = new Radio(Labels.getLabel("com.soffid.iam.api.IssueActionDefinition.solve"));
+			r.setAttribute("action", "solve");
+			rg.appendChild(r);
+		}
+		w.getFellow("step2").setVisible(false);
+		w.doHighlighted();
+	}
+	
+	public void closeBulkAction(Event ev) {
+		Window w = (Window) getFellow("multiaction_window");
+		w.setVisible(false);
+	}
+
+	public void nextBulkAction(Event ev) throws NamingException, CreateException, InternalErrorException, IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+		DataTable table = (DataTable) getListbox();
+		int[] rows = table.getSelectedIndexes();
+
+		Window w = (Window) getFellow("multiaction_window");
+		Radiogroup rg = (Radiogroup) w.getFellow("radio");
+		final Radio radio = rg.getSelectedItem();
+		if (radio == null)
+			return;
+		Object actionAtt = radio.getAttribute("action");
+		if (actionAtt instanceof IssueActionDefinition)
+			currentAction = (IssueActionDefinition) actionAtt;
+		else
+			currentAction = null;
+		
+		Label action = (Label) w.getFellow("action");
+		action.setValue(radio.getLabel());
+		
+		Div fields = (Div) w.getFellow("fields");
+		fields.getChildren().clear();
+		
+		if (currentAction != null) {
+			for (DataType dt: currentAction.getParameters()) {
+				InputField3 ifield = new InputField3();
+				ifield.setId("_"+dt.getName());
+				ifield.setDataType( new WebDataType(dt) );
+				ifield.setParent(fields);
+				ifield.afterCompose();
+				ifield.onCreate();
+				if (dt.getName().equals("body")) {
+					StringBuffer sb = new StringBuffer();
+					
+					sb.append("Issue id: ");
+					for (int i = 0; i < rows.length; i++) {
+						String path = table.getItemXPath(rows[i]);
+						Issue issue = (Issue) XPathUtils.eval(getModel(), path+"/instance");
+						sb.append(issue.getId()).append("<br />");
+					}
+					ifield.setValue(sb.toString());
+				}
+			}
+			handler = (ManualActionHandler) Class.forName(currentAction.getHandler()).
+					getConstructor().
+					newInstance();
+			handler.init(w, currentIssues);
+		}
+		
+		w.getFellow("step1").setVisible(false);
+		w.getFellow("step2").setVisible(true);
+	}
+
+	public void backAction(Event ev) throws NamingException, CreateException, InternalErrorException, IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+		Window w = (Window) getFellow("multiaction_window");
+		w.getFellow("step1").setVisible(true);
+		w.getFellow("step2").setVisible(false);
+	}
+
+	public void applyBulkAction(Event ev) throws Exception {
+		Window w = (Window) getFellow("multiaction_window");
+		Map<String, Object> attributes = new java.util.HashMap<>();
+		Radiogroup rg = (Radiogroup) w.getFellow("radio");
+		final Radio radio = rg.getSelectedItem();
+		Object actionAtt = radio.getAttribute("action");
+		if ("ack".equals(actionAtt)) {
+			for (Issue issue: currentIssues) {
+				if (issue.getStatus() == IssueStatus.NEW) {
+					issue.setStatus(IssueStatus.ACKNOWLEDGED);
+					EJBLocator.getIssueService().update(issue);
+				}
+			}
+		}
+		else if ("solve".equals(actionAtt)) {
+			for (Issue issue: currentIssues) {
+				if (issue.getStatus() == IssueStatus.NEW || 
+						issue.getStatus() == IssueStatus.ACKNOWLEDGED ) {
+					issue.setStatus(IssueStatus.SOLVED);
+					EJBLocator.getIssueService().update(issue);
+				}
+			}
+		} else {
+			for (DataType dt: currentAction.getParameters()) {
+				InputField3 ifield = (InputField3) w.getFellow("_"+dt.getName());
+				attributes.put(dt.getName(), ifield.getValue());
+			}
+			handler.process(w, currentIssues, attributes);
+		}
+		w.setVisible(false);
+
+		SearchBox sb = (SearchBox) getFellow("searchBox");
+		sb.search(true);
+	}
 }

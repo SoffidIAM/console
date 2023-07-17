@@ -84,7 +84,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 		int total = 0;
 		for (int roleIndex = 0; roleIndex <= roles.length; roleIndex += rolesStep) {
 			List<String> newRoles = new LinkedList<>();
-			for (int i = roleIndex; i < roleIndex + rolesStep; i++) 
+			for (int i = roleIndex; i < roleIndex + rolesStep && i < roles.length; i++) 
 				newRoles.add(roles[i]);
 			if (newRoles.size() < rolesStep && soffidPrincipal.getUserName() != null)
 				newRoles.add(soffidPrincipal.getUserName());
@@ -100,7 +100,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				return dao.toIssue(ue);
 			});
 			
-			h.setExtraWhere("o.actor in :list");
+			h.setExtraWhere("o.actor in (:list)");
 			HashMap<String,Object> parameters = new HashMap<>();
 			parameters.put("list", newRoles);
 			h.setExtraParameters(parameters);
@@ -130,18 +130,37 @@ public class IssueServiceImpl extends IssueServiceBase {
 	protected Issue createIssue(Issue issue, boolean manual) throws FileNotFoundException, IOException {
 		Collection<IssuePolicyEntity> policies = getIssuePolicyEntityDao().findByType(issue.getType());
 		
+		
 		IssuePolicyStatus max = IssuePolicyStatus.IGNORE;
+		IssuePolicyEntity currentPolicy = null;
 		for (IssuePolicyEntity policy: policies) {
 			if (policy.getStatus() != null &&
-					policy.getStatus().getValue().compareTo(max.getValue()) > 0)
+					policy.getStatus().getValue().compareTo(max.getValue()) > 0) {
 				max = policy.getStatus();
+				currentPolicy = policy;
+			}
 		}
 		
 		if (max != IssuePolicyStatus.IGNORE || manual) {
+			if (issue.getHash() != null) {
+				for (IssueEntity i: getIssueEntityDao().findBySearchHash(issue.getType(), issue.getHash())) {
+					i.setTimes(Integer.valueOf(i.getTimes() == null? 2: i.getTimes().intValue()+1));
+					getIssueEntityDao().update(i);
+					return getIssueEntityDao().toIssue(i);
+				}
+			}
+			
 			IssueEntity entity = getIssueEntityDao().newIssueEntity();
 			getIssueEntityDao().issueToEntity(issue, entity, true);
-			entity.setStatus(IssueStatus.NEW);
+			if (max == IssuePolicyStatus.RECORD) {
+				entity.setStatus(IssueStatus.ACKNOWLEDGED);
+				entity.setAcknowledged(new Date());
+			}
+			else {
+				entity.setStatus(IssueStatus.NEW);
+			}
 			entity.setCreated(new Date());
+			entity.setActor(currentPolicy.getActor());
 			addHistory(entity, "Created");
 			getIssueEntityDao().create(entity);
 			if (issue.getUsers() != null) 
@@ -149,7 +168,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 					IssueUserEntity issueUserEntity = getIssueUserEntityDao().issueUserToEntity(user);
 					UserEntity userEntity = user.getUserId() == null ?
 							getUserEntityDao().findByUserName(user.getUserName() ) :
-							getUserEntityDao().load(user.getUserId());
+								getUserEntityDao().load(user.getUserId());
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
 					issueUserEntity.setExternalId(user.getExternalId());
@@ -239,6 +258,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				entity.getStatus() != IssueStatus.SOLVED) {
 			entity.setStatus(IssueStatus.SOLVED);
 			entity.setSolved(new Date());
+			entity.setHash(null);
 			addHistory(entity, "Solved");
 			if (issue.getType().equals("duplicated-user")) {
 				boolean anyMerge = false;
@@ -415,5 +435,19 @@ public class IssueServiceImpl extends IssueServiceBase {
 	protected List<Issue> handleFindIssuesByUser(String user) throws Exception {
 		Collection<IssueEntity> l = getIssueEntityDao().findByUserName(user);
 		return getIssueEntityDao().toIssueList(l);
+	}
+
+	@Override
+	protected int handleCountMyIssues() throws Exception {
+		int count = 0;
+		final SoffidPrincipal soffidPrincipal = Security.getSoffidPrincipal();
+		String[] roles = soffidPrincipal.getSoffidRoles();
+		
+		final IssueEntityDao dao = getIssueEntityDao();
+		for (String role: roles) {
+			count += dao.countPending(role);
+		}
+
+		return count;
 	}
 }

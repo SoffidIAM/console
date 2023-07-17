@@ -3,6 +3,11 @@
   url: /wf/inbox.zul
   permissions: ["selfservice:tasks"]
   handler: com.soffid.iam.web.bpm.MyTasksMenuHandler
+- name: seu.myevents
+  url: /issues/my-issues.zul
+  img: /img/menu/issue.svg
+  permissions: ["seu:my-issue:show"]
+  handler: com.soffid.iam.web.issue.MyIssuesMenuHandler
 - name: seu.startWorkflow
   img: /img/menu/start-wf.svg
   handler: com.soffid.iam.web.inbox.NewProcessMenuHandler

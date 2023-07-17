@@ -41,6 +41,9 @@ public class IssueService {
 	@Operation(grantees = { Tothom.class })
 	PagedResult<Issue> findMyIssuesByJsonQuery (@Nullable String query, @Nullable Integer first, @Nullable Integer pageSize) { return null; }
 
+	@Operation(grantees = { Tothom.class })
+	int countMyIssues() { return 0; }
+
 	@Operation(grantees = { IssueQuery.class })
 	AsyncList<Issue> findIssuesByJsonQueryAsync (@Nullable String query) { return null; }
 

@@ -231,7 +231,8 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 							}
 						});
 						boolean visible = inputField.attributeVisible();
-						if ("com.soffid.iam.api.User".equals(att.getCustomObjectType())) {
+						if ("com.soffid.iam.api.User".equals(att.getCustomObjectType()) &&
+								!att.isReadOnly()) {
 							AttributeVisibilityEnum vis = 
 								currentUser != null && currentUser.equals(userName) ? att.getUserVisibility() : 
 								Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL) ? att.getAdminVisibility() :
@@ -277,7 +278,8 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 			input.setOwnerContext(ownerContext);
 			boolean v = input.attributeVisible();
 			
-			if (v && "com.soffid.iam.api.User".equals(att.getCustomObjectType())) {
+			if (v && "com.soffid.iam.api.User".equals(att.getCustomObjectType()) && 
+					!att.isReadOnly()) {
 				String userName = null;
 				try {
 					userName = (String) PropertyUtils.getProperty(ownerObject, "userName");
@@ -331,7 +333,7 @@ public class ObjectAttributesDiv extends Div implements XPathSubscriber, BindCon
 		boolean ok = true;
 		for (InputField3 input : fields)
 		{
-			if (input.isVisible())
+			if (input.isVisible() && !input.isReadonly())
 			{
 				input.setOwnerObject(ownerObject);
 				input.setOwnerContext(ownerContext);

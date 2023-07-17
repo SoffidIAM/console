@@ -19,6 +19,7 @@ public class RoleAccountFieldHandler extends InputFieldUIHandler {
 	@Override
 	public Object translateToUserInterface(InputField3 field, Object o) throws Exception {
 		if (o == null) return null;
+		else if (o instanceof String) return o;
 		else return ((RoleAccount)o).getRoleName() + " - "+((RoleAccount)o).getRoleDescription();
 	}
 }

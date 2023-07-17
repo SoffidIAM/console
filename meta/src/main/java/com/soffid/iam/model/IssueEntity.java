@@ -10,6 +10,7 @@ import com.soffid.mda.annotation.DaoFinder;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
+import com.soffid.mda.annotation.Index;
 import com.soffid.mda.annotation.Nullable;
 
 import es.caib.seycon.ng.comu.SoDRisk;
@@ -72,6 +73,9 @@ public class IssueEntity {
 	@Nullable @Column(name = "EVE_ACTOR")
 	String actor;
 	
+	@Nullable @Column(name = "EVE_LOGNAM")
+	String loginName;
+
 	@Nullable @Column(name = "EVE_REQ_ID")
 	AccountEntity requester;
 	
@@ -81,9 +85,33 @@ public class IssueEntity {
 	@Column(name = "EVE_TEN_ID")
 	TenantEntity tenant;
 	
+	@Nullable @Column(name = "EVE_HASH")
+	String hash;
+	
+	@Column(name="EVE_TIMES")
+	Integer times;
+
+	@DaoFinder("select i from com.soffid.iam.model.IssueEntity as i "
+			+ "where (i.status = 'N' or i.status = 'A') and i.hash = :searchHash and i.type = :type and i.tenant.id=:tenantId")
+	Collection<IssueEntity> findBySearchHash(String type, String searchHash) { return null;}
+
 	@DaoFinder("select i from com.soffid.iam.model.IssueEntity as i "
 			+ "join i.users as users "
 			+ "join users.user as user "
 			+ "where user.userName = :user and user.tenant.id=:tenantId")
 	Collection<IssueEntity> findByUserName(String user) { return null;}
+
+	@DaoFinder("select count(*) from com.soffid.iam.model.IssueEntity as i "
+			+ "where i.actor = :actor and (i.status = 'N') and i.tenant.id=:tenantId")
+	Long countPending(String actor) { return null;}
+}
+
+@Index(columns = {"EVE_TEN_ID", "EVE_HASH"}, name = "SC_ISSUE_HASH_NDX", entity = IssueEntity.class)
+class IssueHashIndex {
+	
+}
+
+@Index(columns = {"EVE_TEN_ID", "EVE_STATUS", "EVE_ACTOR"}, name = "SC_ISSUE_STATUS_NDX", entity = IssueEntity.class)
+class IssueStatusIndex {
+	
 }

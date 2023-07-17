@@ -1048,30 +1048,41 @@ public class ApplicationServiceImpl extends
 	   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
 		   		}
 		   	}
+		   	
+		   	SoDRisk level = SoDRisk.SOD_NA;
+		   	UserEntity userEntity = null;
+	        if (rule != null && rule.getRisk() != SoDRisk.SOD_NA ) {
+	        	AccountEntity accEntity = ra.getAccountId() == null ? 
+	        		getAccountEntityDao().findByNameAndSystem(ra.getAccountName(), 
+	        				ra.getSystem() == null? ra.getAccountSystem(): ra.getSystem()) : 
+	        		getAccountEntityDao().load(ra.getAccountId());
+	        	if (accEntity.getType() == AccountType.USER) {
+	        		for (UserAccountEntity userAccount: accEntity.getUsers()) {
+	        			userEntity = userAccount.getUser();
+	        			Collection<RoleAccount> roleAccounts = handleFindUserRolesByUserName(userAccount.getUser().getUserName());
+	        			level = getSoDRuleService().qualifyUser(roleAccounts); 
+	        		}
+	        	}
+	        }
+	        
 		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);
 		    AccountEntity account = rolsUsuarisEntity.getAccount();
 		    account.getRoles().add(rolsUsuarisEntity);
 
 	        // Raise issue if risk is increased
-	        if (rule != null && rule.getRisk() != SoDRisk.SOD_NA ) {
-	        	SoDRisk level = SoDRisk.SOD_NA;
-	        	if (account.getType() == AccountType.USER) {
-	        		for (UserAccountEntity userAccount: account.getUsers()) {
-	        			Collection<RoleAccount> roleAccounts = handleFindUserRolesByUserName(userAccount.getUser().getUserName());
-	        			level = getSoDRuleService().qualifyUser(roleAccounts); 
-	        			if (getSoDRuleService().isGreater(rule.getRisk(), level)) {
-	        				Issue i = new Issue();
-	        				i.setRoleAccount(ra);
-	        				i.setAccount(account.getName()+"@"+account.getSystem().getName());
-	        				IssueUser iu = new IssueUser();
-	        				iu.setUserId(userAccount.getUser().getId());
-	        				iu.setUserName(userAccount.getUser().getUserName());
-	        				i.setUsers(Arrays.asList(iu));
-	        				i.setRisk(rule.getRisk());
-	        				getIssueService().createInternalIssue(i);
-	        			}
-	        		}
-	        	}
+	        if (rule != null && rule.getRisk() != SoDRisk.SOD_NA &&
+	        		userEntity != null &&
+	        		(level == null || getSoDRuleService().isGreater(rule.getRisk(), level))) {
+				Issue i = new Issue();
+				i.setRoleAccount(getRoleAccountEntityDao().toRoleAccount(rolsUsuarisEntity));
+				i.setAccount(account.getName()+"@"+account.getSystem().getName());
+				IssueUser iu = new IssueUser();
+				iu.setUserId(userEntity.getId());
+				iu.setUserName(userEntity.getUserName());
+				i.setUsers(Arrays.asList(iu));
+				i.setRisk(rule.getRisk());
+				i.setType("risk-increase");
+				getIssueService().createInternalIssue(i);
 	        }
 
 		    if (first)

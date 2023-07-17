@@ -7,6 +7,7 @@
 package es.caib.seycon.ng.sync.servei;
 import com.soffid.iam.model.ChallengeEntity;
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.service.IssueService;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.comu.Challenge;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.AccountEntity.class,
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	es.caib.seycon.ng.servei.PasswordService.class,
+	IssueService.class,
 	ChallengeEntity.class,
 	TenantEntity.class})
 public abstract class LogonService {

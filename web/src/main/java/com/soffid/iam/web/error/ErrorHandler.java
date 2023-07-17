@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.ejb.EJBException;
@@ -39,7 +40,11 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueStatus;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.common.security.ObserveObligationException;
+import com.soffid.iam.service.IssueService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.MailUtils;
 import com.soffid.iam.utils.Security;
@@ -130,8 +135,24 @@ public class ErrorHandler extends Window implements AfterCompose {
 					getFellow("categoryDiv").setVisible(false);
 					messageLabel.setValue( e.getMessage() );
 				}
-				else if (e instanceof SecurityException)
+				else if (e instanceof SecurityException) {
 					messageLabel.setValue( Labels.getLabel("error.securityException")+ ": "+  msg );
+					IssueService svc = com.soffid.iam.ServiceLocator.instance().getIssueService();
+					Issue i = new Issue();
+					i.setCreated(new Date());
+					i.setStatus(IssueStatus.NEW);
+					i.setType("security-exception");
+					if (Security.getSoffidPrincipal().getUserId() != null) {
+						IssueUser iu = new IssueUser();
+						iu.setUserId(Security.getSoffidPrincipal().getUserId());
+						i.setUsers(Arrays.asList(iu));
+					}
+					i.setException(msg);
+					try {
+						svc.createInternalIssue(i);
+					} catch (InternalErrorException e1) {
+					}
+				}
 				else if (original instanceof Exception)
 					messageLabel.setValue( SoffidStackTrace.generateEndUserDescription((Exception) original) );
 				else

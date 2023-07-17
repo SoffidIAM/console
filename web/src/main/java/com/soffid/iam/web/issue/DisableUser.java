@@ -27,15 +27,17 @@ public class DisableUser implements ManualActionHandler {
 	List<User> users = new LinkedList<>();
 	StringBuffer userNames = new StringBuffer();
 	@Override
-	public void init(Window w, Issue issue) throws InternalErrorException, NamingException, CreateException {
-		for (IssueUser user: issue.getUsers()) {
-			if (user.getUserId() != null) {
-				User u = EJBLocator.getUserService().findUserByUserId(user.getUserId());
-				if (u != null && u.getActive( ).booleanValue()) {
-					if (userNames.length() > 0)
-						userNames.append(", ");
-					userNames.append(u.getUserName());
-					users.add(u);
+	public void init(Window w, List<Issue> issues) throws InternalErrorException, NamingException, CreateException {
+		for (Issue issue: issues) {
+			for (IssueUser user: issue.getUsers()) {
+				if (user.getUserId() != null) {
+					User u = EJBLocator.getUserService().findUserByUserId(user.getUserId());
+					if (u != null && u.getActive( ).booleanValue()) {
+						if (userNames.length() > 0)
+							userNames.append(", ");
+						userNames.append(u.getUserName());
+						users.add(u);
+					}
 				}
 			}
 		}
@@ -53,13 +55,17 @@ public class DisableUser implements ManualActionHandler {
 	}
 
 	@Override
-	public void process(Window w, Issue issue, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
+	public void process(Window w, List<Issue> issues, Map<String, Object> parameters) throws InternalErrorException, NamingException, CreateException {
 		for (User user: users) {
 			user.setActive(false);
 			EJBLocator.getUserService().update(user);
-			String msg = String.format(Labels.getLabel("issues.disabledUsers"),
-					user.getUserName());
-			EJBLocator.getIssueService().registerAction(issue, msg);
+		}
+		for (Issue issue: issues) {
+			for (IssueUser iu: issue.getUsers()) {
+				String msg = String.format(Labels.getLabel("issues.disabledUsers"),
+						iu.getUserName());
+				EJBLocator.getIssueService().registerAction(issue, msg);
+			}
 		}
 		w.setVisible(false);
 		String msg = String.format(Labels.getLabel("issues.disabledUsers"),

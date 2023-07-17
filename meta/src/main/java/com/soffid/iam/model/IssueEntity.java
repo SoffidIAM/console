@@ -76,6 +76,9 @@ public class IssueEntity {
 	@Nullable @Column(name = "EVE_LOGNAM")
 	String loginName;
 
+	@Nullable @Column(name = "EVE_JOBNAM")
+	String jobName;
+	
 	@Nullable @Column(name = "EVE_REQ_ID")
 	AccountEntity requester;
 	

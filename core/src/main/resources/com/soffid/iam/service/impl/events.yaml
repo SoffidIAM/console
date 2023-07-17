@@ -106,6 +106,16 @@
   manual-actions:
   - send-email
   - add-comment
+- name: failed-job
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - auto-ack
+  - start-workflow
+  manual-actions:
+  - send-email
+  - add-comment
 - name: disconnected-system
   actions:
   - send-email

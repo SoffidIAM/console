@@ -74,6 +74,8 @@ public class Issue {
 	@Attribute(customUiHandler = "com.soffid.iam.web.issue.RuleFieldHandler", type = "STRING", multivalue = false)
 	PamRule rule;
 	
+	@Nullable
+	String jobName;
 	
 	@Nullable
 	String country;

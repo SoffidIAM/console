@@ -39,4 +39,8 @@ public class ProcessInstance {
 
 	@Attribute(hidden = true)
 	boolean dummyProcess;
+
+	@Nullable
+	@Attribute(type = "USER")
+	protected String initiator;
 }

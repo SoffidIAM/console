@@ -44,6 +44,7 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.bpm.api.Comment;
 import com.soffid.iam.bpm.api.ConfigParameterVO;
 import com.soffid.iam.bpm.mail.Mail;
+import com.soffid.iam.bpm.model.TenantModule;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionPropertyDal;
 import com.soffid.iam.model.ProcessHierarchyEntity;
 import com.soffid.iam.model.ProcessHierarchyEntityDao;
@@ -406,7 +407,11 @@ public class VOFactory {
 			process.setId(instance.getId());
 			process.setStart(instance.getStart());
 			process.setProcessClassLoader(getClassLoader(instance.getProcessDefinition()));
-	
+			
+			TenantModule m = (TenantModule) instance.getInstance(TenantModule.class);
+			if (m != null)
+				process.setInitiator(m.getInitiator());
+			
 			ClassLoader oldcl = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(process.getProcessClassLoader());
 			try {

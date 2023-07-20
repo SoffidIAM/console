@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.soffid.iam.console</groupId>
 		<artifactId>root</artifactId>
-		<version>3.4.24-SNAPSHOT</version>
+		<version>3.4.25-SNAPSHOT</version>
 	</parent>
 	<artifactId>deployer</artifactId>
 	<name>Soffid component deployer</name>

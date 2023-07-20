@@ -24,17 +24,33 @@
 <web-app>
     <display-name>Soffid web services</display-name>
 
+	<servlet>
+		<servlet-name>error401</servlet-name>
+		<description>ErrorHandler</description>
+		<servlet-class>com.soffid.iam.webservice.LoginErrorServlet</servlet-class>
+	</servlet>
     
+	<servlet-mapping>
+		<servlet-name>error401</servlet-name>
+		<url-pattern>/error401</url-pattern>
+	</servlet-mapping>
+
     <mime-mapping>
         <extension>inc</extension>
         <mime-type>text/plain</mime-type>
     </mime-mapping>
+
 
    <welcome-file-list>
       <welcome-file>index.jsp</welcome-file>
       <welcome-file>index.html</welcome-file>
     </welcome-file-list>
    
+	<error-page>
+		<error-code>401</error-code>
+		<location>/error401</location>
+	</error-page>
+	
     <security-constraint>
     	<display-name>Everything is protected</display-name>
     	<web-resource-collection>
@@ -47,6 +63,11 @@
 		</auth-constraint>
     </security-constraint>
 
+    <login-config>
+    	<auth-method>BASIC</auth-method>
+    	<realm-name>Soffid Webservice</realm-name>
+    </login-config>
+    	
 	<security-role>
 		 	<role-name>PASSWORD:VALID</role-name>
 	</security-role>	
@@ -54,9 +75,4 @@
 			<role-name>PASSWORD:EXPIRED</role-name>
 	</security-role>	
 
-    <login-config>
-    	<auth-method>BASIC</auth-method>
-    	<realm-name>Soffid Webservice</realm-name>
-    </login-config>
-    
 </web-app>

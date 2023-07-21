@@ -983,19 +983,18 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			return;
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
-			if (ppe.getMaxFailures() + 1 == contra.getFails()) {
-				Issue issue = new Issue();
-				if (account2 != null)
-					issue.setAccount(account2.getName()+"@"+account2.getSystem().getName());
-				IssueUser iu = new IssueUser();
-				iu.setUserName(contra.getUser().getUserName());
-				iu.setUserId(contra.getUser().getId());
-				issue.setUsers(Arrays.asList(iu));
-				issue.setCreated(new Date());
-				issue.setStatus(IssueStatus.NEW);
-				issue.setType("locked-account");
-				getIssueService().createInternalIssue(issue);
-			}
+			Issue issue = new Issue();
+			if (account2 != null)
+				issue.setAccount(account2.getName()+"@"+account2.getSystem().getName());
+			IssueUser iu = new IssueUser();
+			iu.setUserName(contra.getUser().getUserName());
+			iu.setUserId(contra.getUser().getId());
+			issue.setUsers(Arrays.asList(iu));
+			issue.setCreated(new Date());
+			issue.setStatus(IssueStatus.NEW);
+			issue.setType("locked-account");
+			issue.setHash(contra.getId().toString());
+			getIssueService().createInternalIssue(issue);
 			if (ppe.getUnlockAfterSeconds() != null) {
 				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
 				if (account2 != null) {
@@ -1645,15 +1644,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private void updateFailures(AccountPasswordEntity contra, PasswordPolicyEntity ppe) throws Exception {
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
-			if (ppe.getMaxFailures() + 1 == contra.getFails()) {
-				auditLockAccount(null, contra.getAccount());
-				Issue issue = new Issue();
-				issue.setAccount(contra.getAccount().getName()+"@"+contra.getAccount().getSystem().getName());
-				issue.setCreated(new Date());
-				issue.setStatus(IssueStatus.NEW);
-				issue.setType("locked-account");
-				getIssueService().createInternalIssue(issue);
-			}
+			auditLockAccount(null, contra.getAccount());
+			Issue issue = new Issue();
+			issue.setAccount(contra.getAccount().getName()+"@"+contra.getAccount().getSystem().getName());
+			issue.setCreated(new Date());
+			issue.setStatus(IssueStatus.NEW);
+			issue.setType("locked-account");
+			issue.setHash(contra.getId().toString());
+			getIssueService().createInternalIssue(issue);
 			if (ppe.getMaxFailures().intValue() == contra.getFails().intValue()) {
 				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
 			} else {

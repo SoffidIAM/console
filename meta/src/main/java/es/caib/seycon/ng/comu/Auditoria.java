@@ -92,7 +92,7 @@ public class Auditoria {
 	public java.lang.String parametreConfiguracio;
 
 	@Nullable
-	@JsonAttribute(hibernateJoin="accountAssoc.users as users", hibernateAttribute="user.primaryGroup.name")
+	@JsonAttribute(hibernateJoin="accountAssoc.users as users", hibernateAttribute="users.primaryGroup.name")
 	@Attribute(translated = "primaryGroupAuthor" )
 	public java.lang.String autorGrupPrimari;
 

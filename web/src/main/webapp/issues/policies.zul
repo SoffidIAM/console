@@ -89,7 +89,7 @@
 - name: ${c:l('com.soffid.iam.api.IssuePolicyAction.status') }
   value: status
   template: >-
-    #{status.value == 'A' ? "${c:l('com.soffid.iam.api.IssueStatus.ACKNOLEDGED')}" : 
+    #{status.value == 'A' ? "${c:l('com.soffid.iam.api.IssueStatus.ACKNOWLEDGED')}" : 
     status.value == 'N' ? "${c:l('com.soffid.iam.api.IssueStatus.NEW')}" : 
     status.value == 'S' ? "${c:l('com.soffid.iam.api.IssueStatus.SOLVED')}" : 
     status.value == 'D' ? "${c:l('com.soffid.iam.api.IssueStatus.SORVED_NOTADUPLICATE')}" :

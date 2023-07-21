@@ -204,7 +204,9 @@ public class IssueServiceImpl extends IssueServiceBase {
 					try {
 						addHistory(issue, "Executed automatic task "+actionEntity.getAction());
 						getAsyncRunnerService().runNewTransaction(() -> {
-							processRule(issue, actionEntity, actions);
+							IssuePolicyActionEntity a = getIssuePolicyActionEntityDao().load(actionEntity.getId());
+							IssueEntity i = getIssueEntityDao().load(issue.getId());
+							processRule(i, a, actions);
 							return null;
 						});
 					} catch (Exception e) {

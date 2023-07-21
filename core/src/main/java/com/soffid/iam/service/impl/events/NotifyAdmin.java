@@ -16,15 +16,10 @@ public class NotifyAdmin implements AutomaticActionHandler {
 
 	@Override
 	public void process(Issue event, IssueEntity entity, IssuePolicyActionEntity actionEntity) throws InternalErrorException {
-		
-		for (IssueUserEntity user: entity.getUsers()) {
-			if (user.getUser() != null) {
-				ServiceLocator.instance().getMailService().sendHtmlMailToActors(
-						new String[] {entity.getActor()},
-						new IssueTextFormatter().format (actionEntity.getSubject(), event, entity),
-						new IssueTextFormatter().format (actionEntity.getBody(), event, entity));
-			}
-		}
+		ServiceLocator.instance().getMailService().sendHtmlMailToActors(
+				new String[] {entity.getActor()},
+				new IssueTextFormatter().format (actionEntity.getSubject(), event, entity),
+				new IssueTextFormatter().format (actionEntity.getBody(), event, entity));
 	}
 	
 	

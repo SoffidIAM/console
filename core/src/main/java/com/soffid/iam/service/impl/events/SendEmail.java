@@ -17,15 +17,10 @@ public class SendEmail implements AutomaticActionHandler {
 
 	@Override
 	public void process(Issue event, IssueEntity entity, IssuePolicyActionEntity actionEntity) throws InternalErrorException {
-
-		for (IssueUserEntity user: entity.getUsers()) {
-			if (user.getUser() != null) {
-				ServiceLocator.instance().getMailService().sendHtmlMail(
-						new IssueTextFormatter().format (actionEntity.getEmailAddress(), event, entity),
-						new IssueTextFormatter().format (actionEntity.getSubject(), event, entity),
-						new IssueTextFormatter().format (actionEntity.getBody(), event, entity));
-			}
-		}
+		ServiceLocator.instance().getMailService().sendHtmlMail(
+				new IssueTextFormatter().format (actionEntity.getEmailAddress(), event, entity),
+				new IssueTextFormatter().format (actionEntity.getSubject(), event, entity),
+				new IssueTextFormatter().format (actionEntity.getBody(), event, entity));
 	}
 
 }

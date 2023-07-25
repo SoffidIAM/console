@@ -35,7 +35,7 @@ public class Issue {
 	@Attribute(multiline = true)
 	@Nullable String description;
 
-	@Attribute(defaultValue="0")
+	@Attribute(defaultValue="0", type = "NUMBER", readonly = true)
 	Integer times;
 	
 	@Attribute(defaultValue = "com.soffid.iam.api.IssueStatus.NEW")

@@ -80,6 +80,27 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.userId = userId;
 	}
 
+	public SoffidPrincipalImpl(String name,
+			String userName,
+			String fullName,
+			String holderGroup,
+			List<String> permissions,
+			List<String> groups,
+			List<String> soffidRoles) {
+		super(name, "*", permissions);
+		init (name, 
+				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
+				soffidRoles == null ? new String[0]: soffidRoles.toArray(new String[soffidRoles.size()]) );
+		this.holderGroup = holderGroup;
+		this.fullName = fullName;
+		this.userName = userName;
+		this.holderGroupMap = new HashMap<>();
+		this.roleIds = new LinkedList<>();
+		this.accountIds = new LinkedList<>();
+		this.groupIds = new LinkedList<>();
+		this.userId = null;
+	}
+
 	public SoffidPrincipalImpl(String name,  
 			List<String> permissions,
 			SoffidPrincipal parent) {

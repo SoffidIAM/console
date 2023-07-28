@@ -218,8 +218,13 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 			});
 			while ( l.size() >= max) {
 				ScheduledTaskLogEntity last = l.pollLast();
-				if (last.getLogReferenceID() != null)
-					getDocumentService().deleteDocument( new DocumentReference(last.getLogReferenceID()));
+				if (last.getLogReferenceID() != null) {
+					try {
+						getDocumentService().deleteDocument( new DocumentReference(last.getLogReferenceID()));
+					} catch (IllegalArgumentException e) {
+						// Document not saved
+					}
+				}
 
 				getScheduledTaskLogEntityDao().remove(last);
 				entity.getLogs().remove(last);

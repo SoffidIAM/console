@@ -1,9 +1,11 @@
 package com.soffid.iam.tomcat.service;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,6 +25,11 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueHost;
+import com.soffid.iam.api.IssueStatus;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.OUType;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.RoleGrant;
@@ -34,11 +41,13 @@ import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.PasswordService;
 import com.soffid.iam.service.PreferencesService;
 import com.soffid.iam.service.SamlService;
 import com.soffid.iam.service.TenantService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.sync.service.ServerService;
 import com.soffid.iam.tomcat.LoginService;
 import com.soffid.iam.tomcat.SoffidRealm;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -129,9 +138,11 @@ public class LoginServiceImpl implements LoginService {
 					}
 					if (acc == null) {
 						log.info(masterMessage = username + " login rejected. Unknown account");
+						wrongUser (username);
 						return null;
 					}
 					if (acc.isDisabled()) {
+						wrongUser (username);
 						log.info(masterMessage = username + " login rejected. Disabled account");
 						return null;
 					}
@@ -431,4 +442,21 @@ public class LoginServiceImpl implements LoginService {
         ServiceLocator.instance().getAuditService().create(auditoria);
     }
 
+	public static void wrongUser(String u) throws InternalErrorException {
+		IssueService server = ServiceLocator.instance().getIssueService();
+		Issue i = new Issue();
+		i.setCreated(new Date());
+		i.setStatus(IssueStatus.NEW);
+		i.setType("login-not-recognized");
+		IssueUser iu = new IssueUser();
+		iu.setUserName(u);
+		i.setUsers(Arrays.asList(iu));
+		i.setHash(u);
+//		IssueHost ih = new IssueHost();
+//		Host h;
+//		ih.setHostIp(ip);
+//		i.setHosts(Arrays.asList(ih));
+
+		server.createInternalIssue(i);
+	}
 }

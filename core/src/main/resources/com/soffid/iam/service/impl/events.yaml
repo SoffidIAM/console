@@ -156,11 +156,7 @@
   - lock-account
   manual-actions:
   - send-email
-  - unlock-account
-  - lock-account
   - disable-user
-  - lock-host
-  - unlock-host
   - add-comment
 - name: permissions-granted
   actions:

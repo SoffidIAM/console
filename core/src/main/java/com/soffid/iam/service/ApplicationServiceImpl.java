@@ -1371,7 +1371,7 @@ public class ApplicationServiceImpl extends
 			}
 			for ( RoleAccountEntity child: new LinkedList<RoleAccountEntity> (rolsUsuarisEntity.getChildren()) )
 				deleteRoleAccountEntity(child, null, true);
-			if (ConfigurationCache.isHistoryEnabled())
+			if (ConfigurationCache.isHistoryEnabled() || ! rolsUsuarisEntity.getEvents().isEmpty())
 			{
 				rolsUsuarisEntity.setEnabled(false);
 				if (rolsUsuarisEntity.getEndDate() == null ||

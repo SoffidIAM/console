@@ -160,6 +160,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				entity.setStatus(IssueStatus.NEW);
 			}
 			entity.setCreated(new Date());
+			entity.setTimes(1);
 			entity.setActor(currentPolicy.getActor());
 			addHistory(entity, "Created");
 			getIssueEntityDao().create(entity);

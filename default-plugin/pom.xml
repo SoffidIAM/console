@@ -9,4 +9,24 @@
 	<artifactId>default-plugin</artifactId>
 	<packaging>jar</packaging>
 	<name>Default plugin</name>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>META-INF/seu-plugin.xml</exclude>
+					<exclude>com/soffid/iam/sync/agent/seu-plugin.xml</exclude>
+				</excludes>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>META-INF/seu-plugin.xml</include>
+					<include>com/soffid/iam/sync/agent/seu-plugin.xml</include>
+				</includes>
+				<filtering>true</filtering>
+			</resource>
+    </resources>
+  </build>
 </project>

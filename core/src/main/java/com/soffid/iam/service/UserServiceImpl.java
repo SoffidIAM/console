@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -83,6 +84,7 @@ import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AttributeParser;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
@@ -3161,15 +3163,18 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	private void auditChange(UserDataEntity dadaUsuari) throws InternalErrorException {
-		Audit audit = new Audit();
-		audit.setObject("SC_DADUSU");
-		audit.setAction("U");
-		audit.setAuthor(Security.getCurrentAccount());
-		audit.setCalendar(Calendar.getInstance());
-		audit.setConfigurationParameter(dadaUsuari.getDataType().getName());
-		audit.setUser(dadaUsuari.getUser().getUserName());
-		getAuditService().create(audit);
+	private void auditChange(UserDataEntity dadaUsuari, Set<String> changedAttributes) throws InternalErrorException {
+		if (! changedAttributes.contains(dadaUsuari.getDataType().getName())) {
+			Audit audit = new Audit();
+			audit.setObject("SC_DADUSU");
+			audit.setAction("U");
+			audit.setAuthor(Security.getCurrentAccount());
+			audit.setCalendar(Calendar.getInstance());
+			audit.setConfigurationParameter(dadaUsuari.getDataType().getName());
+			audit.setUser(dadaUsuari.getUser().getUserName());
+			getAuditService().create(audit);
+			changedAttributes.add(dadaUsuari.getDataType().getName());
+		}
 	}
 
 	@Override
@@ -3180,6 +3185,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	public void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes, boolean updateUser)
 			throws InternalErrorException {
 		boolean anyChange = false;
+		Set<String> changedAttributes = new HashSet<>();
 		UserEntity entity = getUserEntityDao().findByUserName(codiUsuari);
 		if (entity != null)
 		{
@@ -3205,14 +3211,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					{
 						if (o != null)
 						{
-							if (updateUserAttribute(entity, entities, key, metadata, o))
+							if (updateUserAttribute(entity, entities, key, metadata, o, changedAttributes))
 								anyChange = true;
 						}
 					}
 				}
 				else
 				{
-					if (updateUserAttribute(entity, entities, key, metadata, v))
+					if (updateUserAttribute(entity, entities, key, metadata, v, changedAttributes))
 						anyChange = true;
 				}
 			}
@@ -3222,7 +3228,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				if (attribute.getAttributeVisibility() == AttributeVisibilityEnum.EDITABLE)
 				{
 					anyChange = true;
-					auditChange(attribute);
+					auditChange(attribute, changedAttributes);
 					getUserDataEntityDao().remove(attribute);
 					entity.getUserData().remove(attribute);
 				}
@@ -3261,7 +3267,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	private boolean updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
-			MetaDataEntity metadata, Object value) throws InternalErrorException {
+			MetaDataEntity metadata, Object value, Set<String> changedAttributes) throws InternalErrorException {
 		boolean anyChange = false;
 		UserDataEntity aae = findUserDataEntity(attributes, key, value);
 		if (aae == null)
@@ -3275,7 +3281,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				getUserDataEntityDao().create(aae);
 				entity.getUserData().add(aae);
-				auditChange(aae);
+				auditChange(aae, changedAttributes);
 				anyChange = true;
 			}
 		}
@@ -3290,10 +3296,14 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		{
 			if (aae.getDataType().getName().equals(key))
 			{
-				if (aae.getObjectValue() != null && (
-						aae.getObjectValue().equals(o) ||
-						aae.getObjectValue().equals(o.toString())))
-					return aae;
+				final Object objectValue = aae.getObjectValue();
+				if (objectValue != null) {
+					Object newValue = AttributeParser.getObjectValue(aae.getDataType().getType(), 
+							o == null ? null : o.toString(), 
+							o == null || ! (o instanceof byte[]) ? null: (byte[]) o);
+					if (objectValue.equals(newValue))
+						return aae;
+				}
 			}
 		}
 		return null;

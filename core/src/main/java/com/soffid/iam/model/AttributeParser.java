@@ -23,6 +23,7 @@ public class AttributeParser {
 	private static final SimpleDateFormat DATETIME_FORMAT2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"); //$NON-NLS-1$
 	private static final SimpleDateFormat DATETIME_FORMAT3 = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss"); //$NON-NLS-1$
 	private static final SimpleDateFormat DATETIME_FORMAT4 = new SimpleDateFormat("yyyy-MM-dd'T'HH.mm.ss"); //$NON-NLS-1$
+	private static final SimpleDateFormat DATETIME_FORMAT5 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 	String value;
 	byte[] blobValue;
 	
@@ -105,13 +106,16 @@ public class AttributeParser {
 					} catch (ParseException e2) { 
 						try {
 							value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT3.parse(v.toString())));
+						} catch (ParseException e3) { 
 							try {
 								value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT4.parse(v.toString())));
-							} catch (ParseException e3) { 
-								throw new RuntimeException("Bad date format for attribute "+attributeName+": "+v.toString(), e3);
+							} catch (ParseException e4) { 
+								try {
+									value = ( DATETIME_FORMAT2.format(DATETIME_FORMAT5.parse(v.toString())));
+								} catch (ParseException e5) { 
+									throw new RuntimeException("Bad date format for attribute "+attributeName+": "+v.toString(), e5);
+								}
 							}
-						} catch (ParseException e3) { 
-							throw new RuntimeException("Bad date format for attribute "+attributeName+": "+v.toString(), e3);
 						}
 					}
 				}
@@ -177,7 +181,11 @@ public class AttributeParser {
 							try {
 								return DATETIME_FORMAT4.parse(value2);
 							} catch (Exception e4) { 
-								return null;
+								try {
+									return DATETIME_FORMAT5.parse(value2);
+								} catch (Exception e5) { 
+									return null;
+								}
 							}
 						}
 					}

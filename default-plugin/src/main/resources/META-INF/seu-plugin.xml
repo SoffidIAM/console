@@ -16,10 +16,37 @@
 		<enableObjectTriggers>true</enableObjectTriggers>
 
 		<objectMapping condition="" soffidObject="account"
-			systemObject="user">
-			<attributeMapping direction="INPUTOUTPUT"
+			systemObject="account">
+			<attributeMapping direction="OUTPUT"
 				soffidAttribute="accountName" systemAttribute="accountName" />
 		</objectMapping>
 
+		<objectMapping condition="" soffidObject="user"
+			systemObject="user">
+			<attributeMapping direction="OUTPUT"
+				soffidAttribute="accountName" systemAttribute="accountName" />
+		</objectMapping>
+	</agent>
+	<agent>
+		<name>Dummy plugin</name>
+		<javaClass>com.soffid.iam.sync.agent.DummyAgent</javaClass>
+		<javaClassV2>com.soffid.iam.sync.agent.DummyAgent</javaClassV2>
+		<userInterface>DefaultAgent.zul</userInterface>
+		<enableAccessControl>false</enableAccessControl>
+		<authoritativeSource>false</authoritativeSource>
+		<enableAttributeMapping>true</enableAttributeMapping>
+		<enableObjectTriggers>true</enableObjectTriggers>
+
+		<objectMapping condition="" soffidObject="account"
+			systemObject="account">
+			<attributeMapping direction="OUTPUT"
+				soffidAttribute="accountName" systemAttribute="accountName" />
+		</objectMapping>
+
+		<objectMapping condition="" soffidObject="user"
+			systemObject="user">
+			<attributeMapping direction="OUTPUT"
+				soffidAttribute="accountName" systemAttribute="accountName" />
+		</objectMapping>
 	</agent>
 </seuServerPlugin>

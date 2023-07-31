@@ -56,7 +56,7 @@ public abstract class PoliticaContrasenyaEntity {
 	@Nullable
 	public java.lang.Long maxLongitud;
 
-	@Column (name="PCD_REGEX", length=50, translated="regularExpression")
+	@Column (name="PCD_REGEX", length=100, translated="regularExpression")
 	@Nullable
 	public java.lang.String expressioRegular;
 

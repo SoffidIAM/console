@@ -113,7 +113,7 @@ public class IssueHandler extends FrameHandler {
 			ifield.onCreate();
 			if (dt.getName().equals("body")) {
 				StringBuffer sb = new StringBuffer();
-				sb.append("Issue id: "+issue.getId()).append("<br />");
+				sb.append("Issue number: "+issue.getNumber()).append("<br />");
 				IssueForm issueForm = (IssueForm) getFellow("issueform");
 				for (Object field: issueForm.getChildren()) {
 					if (field instanceof InputField3) {
@@ -282,11 +282,11 @@ public class IssueHandler extends FrameHandler {
 				if (dt.getName().equals("body")) {
 					StringBuffer sb = new StringBuffer();
 					
-					sb.append("Issue id: ");
+					sb.append("Issue number: ");
 					for (int i = 0; i < rows.length; i++) {
 						String path = table.getItemXPath(rows[i]);
 						Issue issue = (Issue) XPathUtils.eval(getModel(), path+"/instance");
-						sb.append(issue.getId()).append("<br />");
+						sb.append(issue.getNumber()).append("<br />");
 					}
 					ifield.setValue(sb.toString());
 				}

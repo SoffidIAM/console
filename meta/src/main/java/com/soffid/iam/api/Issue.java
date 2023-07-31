@@ -27,6 +27,10 @@ public class Issue {
 	@Attribute(hidden = true)
 	Long id;
 	
+	@Attribute(readonly = true, type = "NUMBER")
+	@Nullable
+	Long number;
+
 	@Attribute(defaultValue = "new java.util.Date()")
 	Date created;
 	

@@ -25,6 +25,9 @@ public class IssueEntity {
 	@Nullable @Identifier @Column(name = "EVE_ID")
 	Long id;
 	
+	@Column(name = "EVE_NUMBER")
+	Long number;
+
 	@Column(name = "EVE_TYPE")
 	String type;
 
@@ -107,6 +110,15 @@ public class IssueEntity {
 	@DaoFinder("select count(*) from com.soffid.iam.model.IssueEntity as i "
 			+ "where i.actor = :actor and (i.status = 'N') and i.tenant.id=:tenantId")
 	Long countPending(String actor) { return null;}
+
+	@DaoFinder("select i from com.soffid.iam.model.IssueEntity as i "
+			+ "join i.users as users "
+			+ "join users.user as user "
+			+ "where user.userName = :user and user.tenant.id=:tenantId "
+			+ "and (i.status = 'N' or i.status = 'A') and i.type = :type")
+	Collection<IssueEntity> findByIssueAndUser(String type, String user) { return null;}
+
+
 }
 
 @Index(columns = {"EVE_TEN_ID", "EVE_HASH"}, name = "SC_ISSUE_HASH_NDX", entity = IssueEntity.class)
@@ -116,5 +128,10 @@ class IssueHashIndex {
 
 @Index(columns = {"EVE_TEN_ID", "EVE_STATUS", "EVE_ACTOR"}, name = "SC_ISSUE_STATUS_NDX", entity = IssueEntity.class)
 class IssueStatusIndex {
+	
+}
+
+@Index(columns = {"EVE_TEN_ID", "EVE_NUMBER"}, name = "SC_ISSUE_NUM_NDX", entity = IssueEntity.class)
+class IssueNumberIndex {
 	
 }

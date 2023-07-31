@@ -35,6 +35,7 @@ import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.model.ConfigEntity;
 import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.IssueEntityDao;
 import com.soffid.iam.model.IssueHostEntity;
@@ -94,15 +95,15 @@ public class IssueServiceImpl extends IssueServiceBase {
 			config.setFirstResult(start);
 			config.setMaximumResultSize(pageSize);
 			h.setConfig(config);
-			h.setTenantFilter("tenant.id");
+			h.setTenantFilter("tenant.id"); //$NON-NLS-1$
 			h.setGenerator((entity) -> {
 				IssueEntity ue = (IssueEntity) entity;
 				return dao.toIssue(ue);
 			});
 			
-			h.setExtraWhere("o.actor in (:list)");
+			h.setExtraWhere("o.actor in (:list)"); //$NON-NLS-1$
 			HashMap<String,Object> parameters = new HashMap<>();
-			parameters.put("list", newRoles);
+			parameters.put("list", newRoles); //$NON-NLS-1$
 			h.setExtraParameters(parameters);
 			h.search(null, query, (Collection) l); 
 			total += h.count();
@@ -116,10 +117,10 @@ public class IssueServiceImpl extends IssueServiceBase {
 
 	@Override
 	protected Issue handleCreate(Issue issue) throws Exception {
-		if (issue.getType().equals("duplicated-user"))
+		if (issue.getType().equals("duplicated-user")) //$NON-NLS-1$
 			return createIssue(issue, true);
 		else
-			throw new SecurityException("Not authorized to create manual Issues");
+			throw new SecurityException(Messages.getString("IssueServiceImpl.0")); //$NON-NLS-1$
 	}
 
 	@Override
@@ -127,7 +128,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 		return createIssue(issue, false);
 	}
 
-	protected Issue createIssue(Issue issue, boolean manual) throws FileNotFoundException, IOException {
+	protected Issue createIssue(Issue issue, boolean manual) throws FileNotFoundException, IOException, InternalErrorException {
 		Collection<IssuePolicyEntity> policies = getIssuePolicyEntityDao().findByType(issue.getType());
 		
 		
@@ -159,10 +160,11 @@ public class IssueServiceImpl extends IssueServiceBase {
 			else {
 				entity.setStatus(IssueStatus.NEW);
 			}
+			entity.setNumber(getNewIssueNumber());
 			entity.setCreated(new Date());
 			entity.setTimes(1);
 			entity.setActor(currentPolicy.getActor());
-			addHistory(entity, "Created");
+			addHistory(entity, "Created"); //$NON-NLS-1$
 			getIssueEntityDao().create(entity);
 			if (issue.getUsers() != null) 
 				for (IssueUser user: issue.getUsers()) {
@@ -170,6 +172,15 @@ public class IssueServiceImpl extends IssueServiceBase {
 					UserEntity userEntity = user.getUserId() == null ?
 							getUserEntityDao().findByUserName(user.getUserName() ) :
 								getUserEntityDao().load(user.getUserId());
+					// Check user has an active issue
+					if ("duplicated-user".equals(issue.getType())) { //$NON-NLS-1$
+						if (getIssueEntityDao().findByIssueAndUser(issue.getType(), user.getUserName()).size() > 0)
+						{
+							throw new InternalErrorException(
+									String.format(Messages.getString("IssueServiceImpl.7"), //$NON-NLS-1$
+											user.getUserName()));
+						}
+					}
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
 					issueUserEntity.setExternalId(user.getExternalId());
@@ -194,6 +205,25 @@ public class IssueServiceImpl extends IssueServiceBase {
 			return issue;
 	}
 
+	private Long getNewIssueNumber() {
+		Long next = 1L;
+		ConfigEntity config = getConfigEntityDao().findByCodeAndNetworkCode("soffid.issue.next", null);
+		if (config == null) {
+			config = getConfigEntityDao().newConfigEntity();
+			config.setName("soffid.issue.next");
+			config.setValue(Long.toString(next + 1));
+			getConfigEntityDao().create(config);
+		} else {
+			try {
+				next = Long.parseLong(config.getValue());
+			} catch (Exception e) {
+			}
+			config.setValue(Long.toString(next + 1));
+			getConfigEntityDao().update(config);
+		}
+		return next;
+	}
+
 	private void processAutomaticIssues(IssueEntity issue, Collection<IssuePolicyEntity> policies) throws IOException {
 		JSONArray actions = IssueDataParser.instance().getActions();
 		for (IssuePolicyEntity policy: policies) {
@@ -203,15 +233,10 @@ public class IssueServiceImpl extends IssueServiceBase {
 				if (actionEntity.getStatus() == issue.getStatus() ||
 						actionEntity.getAction() == null && issue.getStatus() == IssueStatus.NEW) {
 					try {
-						addHistory(issue, "Executed automatic task "+actionEntity.getAction());
-						getAsyncRunnerService().runNewTransaction(() -> {
-							IssuePolicyActionEntity a = getIssuePolicyActionEntityDao().load(actionEntity.getId());
-							IssueEntity i = getIssueEntityDao().load(issue.getId());
-							processRule(i, a, actions);
-							return null;
-						});
+						addHistory(issue, Messages.getString("IssueServiceImpl.4")+actionEntity.getAction()); //$NON-NLS-1$
+						processRule(issue, actionEntity, actions);
 					} catch (Exception e) {
-						log.warn ("Error processing rule "+policy.getDescription(), e);
+						log.warn (Messages.getString("IssueServiceImpl.3")+policy.getDescription(), e); //$NON-NLS-1$
 					}
 				}
 			}
@@ -221,8 +246,8 @@ public class IssueServiceImpl extends IssueServiceBase {
 	private void processRule(IssueEntity issue, IssuePolicyActionEntity actionEntity, JSONArray actions) throws Exception {
 		for (int i = 0; i < actions.length(); i++) {
 			final JSONObject jsonObject = actions.getJSONObject(i);
-			String name = jsonObject.optString("name", null);
-			String handler = jsonObject.optString("handler", null); 
+			String name = jsonObject.optString("name", null); //$NON-NLS-1$
+			String handler = jsonObject.optString("handler", null);  //$NON-NLS-1$
 			if (name != null && handler != null && name.equals(actionEntity.getAction())) {
 				AutomaticActionHandler h = (AutomaticActionHandler) Class.forName(handler).getConstructor().newInstance();
 				h.process(getIssueEntityDao().toIssue(issue), issue, actionEntity);
@@ -238,7 +263,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				entity.getStatus() == IssueStatus.NEW) {
 			entity.setStatus(IssueStatus.ACKNOWLEDGED);
 			entity.setAcknowledged(new Date());
-			addHistory(entity, "Acknowledged");
+			addHistory(entity, Messages.getString("IssueServiceImpl.2")); //$NON-NLS-1$
 			getIssueEntityDao().update(entity);
 		}
 		
@@ -262,8 +287,8 @@ public class IssueServiceImpl extends IssueServiceBase {
 			entity.setStatus(IssueStatus.SOLVED);
 			entity.setSolved(new Date());
 			entity.setHash(null);
-			addHistory(entity, "Solved");
-			if (issue.getType().equals("duplicated-user")) {
+			addHistory(entity, Messages.getString("IssueServiceImpl.1")); //$NON-NLS-1$
+			if (issue.getType().equals("duplicated-user")) { //$NON-NLS-1$
 				boolean anyMerge = false;
 				for (IssueUserEntity ue: entity.getUsers()) {
 					if (ue.getAction() == null || ue.getAction() == EventUserAction.UNKNOWN ) {
@@ -303,30 +328,30 @@ public class IssueServiceImpl extends IssueServiceBase {
 		for (int i = 0; i < actions.length(); i++) {
 			JSONObject o = actions.getJSONObject(i);
 			IssueActionDefinition def  = new IssueActionDefinition();
-			def.setName(o.optString("name", null));
-			def.setHandler(o.getString("handler"));
-			def.setLabel(o.optString("nlsLabel", "com.soffid.iam.api.IssueActionDefinition." +  def.getName()));
+			def.setName(o.optString("name", null)); //$NON-NLS-1$
+			def.setHandler(o.getString("handler")); //$NON-NLS-1$
+			def.setLabel(o.optString("nlsLabel", "com.soffid.iam.api.IssueActionDefinition." +  def.getName())); //$NON-NLS-1$ //$NON-NLS-2$
 			LinkedList<DataType> att = new LinkedList<DataType>();
 			def.setParameters(att);
-			JSONArray parameters = o.optJSONArray("parameters");
+			JSONArray parameters = o.optJSONArray("parameters"); //$NON-NLS-1$
 			if (parameters != null) {
 				for (int j = 0; j < parameters.length(); j++) {
 					JSONObject parameter = parameters.getJSONObject(j);
 					DataType dt = new DataType();
-					dt.setName(parameter.optString("name"));
-					dt.setNlsLabel(parameter.optString("nlsLabel"));
-					dt.setType(searchDataType (parameter.optString("dataType")));
+					dt.setName(parameter.optString("name")); //$NON-NLS-1$
+					dt.setNlsLabel(parameter.optString("nlsLabel")); //$NON-NLS-1$
+					dt.setType(searchDataType (parameter.optString("dataType"))); //$NON-NLS-1$
 					att.add(dt);
 				}
 			}
 			
 			def.setIssueTypes(new LinkedList<>());
 			for (int j = 0; j < issues.length(); j++) {
-				JSONArray manualActions = issues.getJSONObject(j).optJSONArray("manual-actions");
+				JSONArray manualActions = issues.getJSONObject(j).optJSONArray("manual-actions"); //$NON-NLS-1$
 				for (int k = 0; k < manualActions.length(); k++) 
 					if (manualActions.getString(k).equals(def.getName()))
 					{
-						def.getIssueTypes().add(issues.getJSONObject(j).getString("name"));
+						def.getIssueTypes().add(issues.getJSONObject(j).getString("name")); //$NON-NLS-1$
 						break;
 					}
 			}
@@ -344,7 +369,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 			TypeEnumeration type = TypeEnumeration.fromString( (String) TypeEnumeration.literals().get(i) );
 			if (type.toString().equals(dataTypeName) ||
 					name.equalsIgnoreCase(dataTypeName) ||
-					name.toLowerCase().equals(dataTypeName.toLowerCase()+"_type") ) {
+					name.toLowerCase().equals(dataTypeName.toLowerCase()+"_type") ) { //$NON-NLS-1$
 				return type;
 			} 
 		}
@@ -354,8 +379,8 @@ public class IssueServiceImpl extends IssueServiceBase {
 	private void addHistory(IssueEntity Issue, String msg) throws FileNotFoundException, IOException {
 		String user = Security.getCurrentUser();
 		if (user == null) user = Security.getCurrentAccount();
-		if (user == null) user = "-";
-		String line = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date())+" "+user+" "+msg+"\n";
+		if (user == null) user = "-"; //$NON-NLS-1$
+		String line = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date())+" "+user+" "+msg+"\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		String m = Issue.getPerformedActions();
 		if (m == null)
 			Issue.setPerformedActions(line);
@@ -402,7 +427,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
-		h.setTenantFilter("tenant.id");
+		h.setTenantFilter("tenant.id"); //$NON-NLS-1$
 		h.setGenerator((entity) -> {
 			IssueEntity ue = (IssueEntity) entity;
 			return dao.toIssue(ue);
@@ -418,9 +443,9 @@ public class IssueServiceImpl extends IssueServiceBase {
 	@Override
 	protected Issue handleNotify(Issue issue, String address, String subject, String body) throws Exception {
 		IssueEntity entity = getIssueEntityDao().load(issue.getId());
-		addHistory(entity, "Notify "+address);
+		addHistory(entity, Messages.getString("IssueServiceImpl.5")+address); //$NON-NLS-1$
 		getIssueEntityDao().update(entity);
-		getMailService().sendHtmlMail(address, "Issue #"+issue.getId()+": "+subject,
+		getMailService().sendHtmlMail(address, Messages.getString("IssueServiceImpl.33")+issue.getId()+": "+subject, //$NON-NLS-1$ //$NON-NLS-2$
 				body);
 		return getIssueEntityDao().toIssue(entity);
 		

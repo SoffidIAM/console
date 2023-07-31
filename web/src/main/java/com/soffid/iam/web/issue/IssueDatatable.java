@@ -29,7 +29,7 @@ public class IssueDatatable extends DatatypeColumnsDatatable {
 	HashMap<String, System> systems = new HashMap<>();
 
 	static String[] defaultColumns = {
-			"type", "description", "created", "status"
+			"number", "type", "description", "created", "status"
 	};
 	
 	public IssueDatatable() throws Exception {

@@ -19,8 +19,10 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.ConfiguracioEntity;
 import es.caib.seycon.ng.model.MaquinaEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
+import es.caib.seycon.ng.servei.ConfiguracioService;
 import roles.IssueCreate;
 import roles.IssueDelete;
 import roles.IssueQuery;
@@ -33,6 +35,7 @@ import roles.anonymous;
 	UsuariEntity.class, MaquinaEntity.class, PamRuleEntity.class,
 	AsyncRunnerService.class,
 	IssuePolicyService.class,
+	ConfiguracioEntity.class,
 	MailService.class})
 public class IssueService {
 	@Operation(grantees = { Tothom.class })

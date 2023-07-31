@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.commons.jcs.access.behavior.ICacheAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.Account;
@@ -72,9 +73,16 @@ public class AccountEntityDaoImpl extends
 				new LinkedList<com.soffid.iam.model.AccountAccessEntity>(entity
 						.getAcl()));
 		entity.getAcl().clear();
+		
+		for (UserAccountEntity ua: entity.getUsers()) {
+			if (Hibernate.isInitialized(ua.getUser()) &&
+					Hibernate.isInitialized(ua.getUser().getAccounts()))
+				ua.getUser().getAccounts().remove(ua);
+		}
 		getUserAccountEntityDao().remove(
 				new LinkedList<com.soffid.iam.model.UserAccountEntity>(entity
 						.getUsers()));
+			
 		entity.getUsers().clear();
 		getAccountPasswordEntityDao().remove(
 				new LinkedList<com.soffid.iam.model.AccountPasswordEntity>(

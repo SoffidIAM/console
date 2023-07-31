@@ -1239,6 +1239,11 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		getSession().createQuery("delete from com.soffid.iam.model.UserEntity where id=:id")
 			.setLong("id", src)
 			.executeUpdate();
+		
+		UserEntity su = load(src);
+		UserEntity tu = load(target);
+		getSession().evict(su);
+		getSession().evict(tu);
 	}
     
     

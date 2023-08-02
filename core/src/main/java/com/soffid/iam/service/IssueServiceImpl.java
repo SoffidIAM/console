@@ -140,6 +140,8 @@ public class IssueServiceImpl extends IssueServiceBase {
 				max = policy.getStatus();
 				currentPolicy = policy;
 			}
+			if (currentPolicy == null)
+				currentPolicy = policy;
 		}
 		
 		if (max != IssuePolicyStatus.IGNORE || manual) {
@@ -163,7 +165,8 @@ public class IssueServiceImpl extends IssueServiceBase {
 			entity.setNumber(getNewIssueNumber());
 			entity.setCreated(new Date());
 			entity.setTimes(1);
-			entity.setActor(currentPolicy.getActor());
+			if (currentPolicy != null)
+				entity.setActor(currentPolicy.getActor());
 			addHistory(entity, "Created"); //$NON-NLS-1$
 			getIssueEntityDao().create(entity);
 			if (issue.getUsers() != null) 

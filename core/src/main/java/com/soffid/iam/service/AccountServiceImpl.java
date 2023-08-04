@@ -72,6 +72,7 @@ import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
@@ -954,6 +955,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			getRoleAccountEntityDao().remove(ra);
 		}
 		ae.getRoles().clear();
+		for (IssueEntity issue: ae.getEvents()) {
+			issue.setAccount(null);
+			getIssueEntityDao().update(issue);
+		}
+
 		getAccountEntityDao().remove(ae);
 	}
 

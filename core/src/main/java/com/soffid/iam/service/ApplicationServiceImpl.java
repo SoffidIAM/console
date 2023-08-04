@@ -84,6 +84,7 @@ import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
@@ -836,6 +837,10 @@ public class ApplicationServiceImpl extends
         	{
         		if ( ! ra.isEnabled())
         		{
+        			for (IssueEntity issue: ra.getEvents()) {
+        				issue.setRoleAccount(null);
+        				getIssueEntityDao().update(issue);
+        			}
         			getRoleAccountEntityDao().remove(ra);
         			rolEntity.getAccounts().remove(ra);
         		}

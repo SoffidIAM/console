@@ -59,7 +59,7 @@ public class IssueTextFormatter {
 					if (event.getAccount() != null)
 						result.append(event.getAccount());
 				}
-				else if (variable.equals("rule")) {
+				else if (variable.equals("rule") || variable.equals("pamRule")) {
 					if (event.getRule() != null)
 						result.append(event.getRule().getName());
 				}

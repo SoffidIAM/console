@@ -20,6 +20,7 @@ import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.HostServiceEntity;
+import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -79,7 +80,8 @@ import roles.account_query;
 	PamSecurityHandlerService.class,
 	HostServiceEntity.class,
 	AccountSnapshotEntity.class,
-	MailService.class})
+	MailService.class,
+	IssueEntity.class})
 public abstract class AccountService {
 
 	/// listUserAccounts

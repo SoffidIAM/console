@@ -382,7 +382,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 	private void addHistory(IssueEntity Issue, String msg) throws FileNotFoundException, IOException {
 		String user = Security.getCurrentUser();
 		if (user == null) user = Security.getCurrentAccount();
-		if (user == null) user = "-"; //$NON-NLS-1$
+		if (user == null || user.equals("null")) user = "-"; //$NON-NLS-1$
 		String line = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss").format(new Date())+" "+user+" "+msg+"\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		String m = Issue.getPerformedActions();
 		if (m == null)

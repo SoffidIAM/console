@@ -178,6 +178,7 @@ public class IssueHandler extends FrameHandler {
 			XPathUtils.setValue(getForm(), "users", issue2.getUsers());
 			XPathUtils.setValue(getForm(), "performedActions", issue2.getPerformedActions());
 		}
+		getModel().commit();
 	}
 
 	public void ack(Event ev) throws Exception {
@@ -250,7 +251,7 @@ public class IssueHandler extends FrameHandler {
 		w.setVisible(false);
 	}
 
-	public void nextBulkAction(Event ev) throws NamingException, CreateException, InternalErrorException, IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+	public void nextBulkAction(Event ev) throws NamingException, CreateException, InternalErrorException, IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException, CommitException {
 		DataTable table = (DataTable) getListbox();
 		int[] rows = table.getSelectedIndexes();
 
@@ -299,6 +300,7 @@ public class IssueHandler extends FrameHandler {
 		
 		w.getFellow("step1").setVisible(false);
 		w.getFellow("step2").setVisible(true);
+		getModel().commit();
 	}
 
 	public void backAction(Event ev) throws NamingException, CreateException, InternalErrorException, IOException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {

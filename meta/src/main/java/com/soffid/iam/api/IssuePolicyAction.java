@@ -20,7 +20,7 @@ public class IssuePolicyAction {
 	String description;
 
 	@Nullable
-	@Attribute(defaultValue = "\"Soffid issue ${id}\"")
+	@Attribute(defaultValue = "\"Soffid issue ${number}\"")
 	String subject;
 	
 	@Nullable

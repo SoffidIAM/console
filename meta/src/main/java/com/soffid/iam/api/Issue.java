@@ -75,7 +75,7 @@ public class Issue {
 	RolAccount roleAccount;
 	
 	@Nullable
-	@Attribute(customUiHandler = "com.soffid.iam.web.issue.RuleFieldHandler", type = "STRING", multivalue = false)
+	@Attribute(customUiHandler = "com.soffid.iam.web.issue.PamRuleFieldHandler", type = "STRING", multivalue = false)
 	PamRule rule;
 	
 	@Nullable

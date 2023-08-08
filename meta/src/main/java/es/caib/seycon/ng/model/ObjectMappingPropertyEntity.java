@@ -20,7 +20,7 @@ public abstract class ObjectMappingPropertyEntity {
 	@Column (name="OMP_PROPER", length=50)
 	public java.lang.String property;
 
-	@Column (name="OMP_VALUE", length=1500)
+	@Column (name="OMP_VALUE", length=3500)
 	public java.lang.String value;
 
 	@Column (name="OMP_OBM_ID")

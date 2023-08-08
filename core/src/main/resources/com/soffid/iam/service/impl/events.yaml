@@ -188,6 +188,21 @@
   - lock-account
   - disable-user
   - add-comment
+- name: password-changed
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - disable-user
+  - add-comment
 - name: risk-increase
   actions:
   - send-email
@@ -233,4 +248,24 @@
   manual-actions:
   - send-email
   - merge-users
+  - add-comment
+- name: discovered-host
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - start-workflow
+  manual-actions:
+  - send-email
+  - add-comment
+- name: discovered-system
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - start-workflow
+  manual-actions:
+  - send-email
   - add-comment

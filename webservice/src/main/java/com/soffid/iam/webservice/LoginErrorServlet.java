@@ -20,6 +20,7 @@ public class LoginErrorServlet extends HttpServlet {
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String origin = ConfigurationCache.getProperty("soffid.scim.cors.origin");
+		resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		if (origin != null) {
 			resp.addHeader(
                 "Access-Control-Allow-Origin", origin);
@@ -32,8 +33,9 @@ public class LoginErrorServlet extends HttpServlet {
     		resp.addHeader(
                 "Access-Control-Allow-Methods", 
         		methods == null ? "GET, OPTIONS, HEAD": methods);
+    		if (req.getMethod().equalsIgnoreCase("OPTIONS"))
+    			resp.setStatus(HttpServletResponse.SC_OK);
 		}
-		resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		resp.setContentType("text/plain");
 		ServletOutputStream out = resp.getOutputStream();
 		out.println("Unauthorized");

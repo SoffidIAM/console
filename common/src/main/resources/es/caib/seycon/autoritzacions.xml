@@ -45,6 +45,14 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>user:merge</codi>
+		<descripcio>Merge users (without issues)</descripcio>
+		<tipusDomini>GRUPS</tipusDomini>
+		<scope>children</scope>
+		<ambit>Users</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>user:reconcile</codi>
 		<descripcio>Import user and roles from managed systems</descripcio>
 		<ambit>Users</ambit>

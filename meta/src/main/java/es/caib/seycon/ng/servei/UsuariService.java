@@ -754,6 +754,6 @@ public abstract class UsuariService {
 		return null;
 	}
 	
-	@Operation( grantees = {roles.user_update.class} )
+	@Operation( grantees = {roles.user_merge.class} )
 	public void merge(Long srcId, Long targetId) {}
 }

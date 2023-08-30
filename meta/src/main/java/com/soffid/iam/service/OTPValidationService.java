@@ -15,6 +15,9 @@ public class OTPValidationService {
 	public Challenge selectToken (Challenge challenge) {return null;}
 	
 	@Operation(grantees= {Tothom.class})
+	public Challenge resendToken (Challenge challenge, boolean alternativeMethod) {return null;}
+	
+	@Operation(grantees= {Tothom.class})
 	public boolean validatePin (Challenge challenge, String pin) {return false;}
 
 	@Operation(grantees= {Tothom.class})

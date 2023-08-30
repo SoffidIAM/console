@@ -310,4 +310,9 @@ public class LinotpHandler implements OTPHandler {
 		}
 		return false;
 	}
+
+	@Override
+	public Challenge resendToken(Challenge challenge, boolean alternativeMethod) {
+		return challenge;
+	}
 }

@@ -66,4 +66,18 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 		}
 		return false;
 	}
+
+	@Override
+	protected Challenge handleResendToken(Challenge challenge, boolean alternativeMethod) throws Exception {
+		if (challenge.getOtpHandler () == null || ! challenge.isResendAvailable())
+			return challenge;
+		for ( OTPHandler handler: handlers)
+		{
+			if (handler.getClass().getName().equals(challenge.getOtpHandler()))
+			{
+				return handler.resendToken(challenge, alternativeMethod);
+			}
+		}
+		return challenge;
+	}
 }

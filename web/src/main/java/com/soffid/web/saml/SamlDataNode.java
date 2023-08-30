@@ -37,7 +37,7 @@ public class SamlDataNode extends SimpleDataNode {
 		updateParam("soffid.saml.principalAttribute", c.principalAttribute);
 		updateParam("soffid.externalURL", c.hostName);
 		updateParam("soffid.auth.maintenance", c.maintenanceMode ? "true": "false");
-		if (c.motd == null)
+		if (c.motd == null || c.motd.trim().isEmpty())
 			EJBLocator.getConfigurationService().deleteBlob("soffid.auth.motd");
 		else
 			EJBLocator.getConfigurationService().updateBlob("soffid.auth.motd", c.motd.getBytes(StandardCharsets.UTF_8));

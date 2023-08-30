@@ -65,4 +65,6 @@ public class Challenge {
     private String domain;
     boolean closeOldSessions;
     boolean silent;
+    boolean alternativeMethodAvailable;
+    boolean resendAvailable;
 }

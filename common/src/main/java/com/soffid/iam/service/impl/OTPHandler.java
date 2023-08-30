@@ -8,4 +8,6 @@ public interface OTPHandler {
 	boolean validatePin (Challenge challenge, String pin) throws Exception;
 
 	boolean resetFailCount (String account) throws Exception;
+
+	Challenge resendToken(Challenge challenge, boolean alternativeMethod) throws Exception;
 }

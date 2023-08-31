@@ -58,8 +58,8 @@ public class ExtensibleObjectNamespace extends ExternalNameSpace3 {
 			}
 			else if ("THIS".equalsIgnoreCase(name) )
 				externalMap.put(name,  vars);
-			else if (vars.containsKey(name)){
-				if (value == null || value.getClass().getSimpleName().equals("NullSqlObjet"))
+			else if (vars.containsKey(name) && value != null){
+				if (value.getClass().getSimpleName().equals("NullSqlObjet"))
 					externalMap.put(name,  Primitive.NULL);
 				else
 					externalMap.put(name,  value);				

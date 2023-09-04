@@ -16,10 +16,13 @@ import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.AccountAttributeEntity;
+import com.soffid.iam.model.IssueEntity;
+import com.soffid.iam.model.IssueUserEntity;
 import com.soffid.iam.model.UserPreferenceEntity;
 import com.soffid.iam.model.VaultFolderAccessEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.MailService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
@@ -85,7 +88,10 @@ import es.caib.seycon.ng.model.UserAccountEntity;
 	VaultFolderEntity.class,
 	AuditoriaService.class,
 	VaultFolderAccessEntity.class,
-	MailService.class})
+	MailService.class,
+	IssueService.class,
+	IssueEntity.class,
+	IssueUserEntity.class})
 public abstract class UsuariService {
 
 	@Operation(translated = "createUser")
@@ -755,5 +761,5 @@ public abstract class UsuariService {
 	}
 	
 	@Operation( grantees = {roles.user_merge.class} )
-	public void merge(Long srcId, Long targetId) {}
+	public void merge(Long srcId, Long targetId, @Nullable Long eventId) {}
 }

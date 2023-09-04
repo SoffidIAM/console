@@ -111,14 +111,16 @@ public class MergeActionHandler extends Window implements AfterCompose {
 		for (Object o: objects) {
 			if (o instanceof User) {
 				User user = (User) o;
-				IssueUser iu = new IssueUser();
-				iu.setUserName(((User) o).getUserName());
-				String field = ConfigurationCache.getProperty("soffid.user.externalId");
-				if (field != null) {
-					final Object externalId = user.getAttributes().get(field);
-					iu.setExternalId(externalId == null ? null: externalId.toString());
+				if (user != null) {
+					IssueUser iu = new IssueUser();
+					iu.setUserName(((User) o).getUserName());
+					String field = ConfigurationCache.getProperty("soffid.user.externalId");
+					if (field != null) {
+						final Object externalId = user.getAttributes().get(field);
+						iu.setExternalId(externalId == null ? null: externalId.toString());
+					}
+					users.add(iu);
 				}
-				users.add(iu);
 			}
 		}
 		i.setUsers(users );

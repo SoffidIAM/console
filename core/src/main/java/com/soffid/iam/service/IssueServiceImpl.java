@@ -175,15 +175,6 @@ public class IssueServiceImpl extends IssueServiceBase {
 					UserEntity userEntity = user.getUserId() == null ?
 							getUserEntityDao().findByUserName(user.getUserName() ) :
 								getUserEntityDao().load(user.getUserId());
-					// Check user has an active issue
-					if ("duplicated-user".equals(issue.getType())) { //$NON-NLS-1$
-						if (getIssueEntityDao().findByIssueAndUser(issue.getType(), user.getUserName()).size() > 0)
-						{
-							throw new InternalErrorException(
-									String.format(Messages.getString("IssueServiceImpl.7"), //$NON-NLS-1$
-											user.getUserName()));
-						}
-					}
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
 					issueUserEntity.setExternalId(user.getExternalId());

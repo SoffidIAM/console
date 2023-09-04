@@ -57,10 +57,14 @@ import com.soffid.iam.api.BpmProcess;
 import com.soffid.iam.api.BpmUserProcess;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.DisableObjectRule;
+import com.soffid.iam.api.EventUserAction;
 import com.soffid.iam.api.ExtranetCard;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueStatus;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.PagedResult;
@@ -91,6 +95,9 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.InformationSystemEntity;
+import com.soffid.iam.model.IssueEntity;
+import com.soffid.iam.model.IssuePolicyEntity;
+import com.soffid.iam.model.IssueUserEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PasswordDomainEntity;
@@ -3731,8 +3738,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	@Override
-	protected void handleMerge(Long srcId, Long targetId) throws Exception {
+	protected void handleMerge(Long srcId, Long targetId, Long eventId) throws Exception {
 		UserEntity su = getUserEntityDao().load(srcId);
+		Collection<IssueUserEntity> events = new LinkedList<>( su.getEvents() );
+		
 		UserEntity tu = getUserEntityDao().load(targetId);
 		String codiUsuari = Security.getCurrentAccount();
 		Audit auditoria = new Audit();
@@ -3746,7 +3755,41 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				auditoria);
 		getAuditEntityDao().create(auditoriaEntity);
 		getUserEntityDao().merge(srcId, targetId);
+		
+		fixTransitiveIssues(events, eventId);
 	}
 	
+	private void fixTransitiveIssues(Collection<IssueUserEntity> events, Long eventId) throws IOException, InternalErrorException {
+		for (IssueUserEntity ue2: events) {
+			final IssueEntity issue2 = ue2.getIssue();
+			if (issue2 != null &&
+					! issue2.getId().equals(eventId) &&
+					issue2.getStatus() != IssueStatus.SOLVED &&
+					issue2.getStatus() != IssueStatus.SOLVED_NOTADUPLICATE &&
+					issue2.getType().equals("duplicated-user")) {
+				ue2.setUser(null);
+				ue2.setAction(EventUserAction.DIFFERENT_USER);
+				getIssueUserEntityDao().update(ue2);
+				if (noCandidateUsers(issue2)) {
+					Issue i = getIssueEntityDao().toIssue(issue2);
+					for (IssueUser iu3: i.getUsers()) {
+						iu3.setAction(EventUserAction.DIFFERENT_USER);
+					}
+					i.setStatus(IssueStatus.SOLVED);
+					getIssueService().update(i);
+				}
+			}
+		}
+	}
+	
+	private boolean noCandidateUsers(IssueEntity issue) {
+		int n = 0;
+		for (IssueUserEntity iu: issue.getUsers()) {
+			if (iu.getUser() != null)
+				n ++;
+		}
+		return n <= 1;
+	}
+
 
 }

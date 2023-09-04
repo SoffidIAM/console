@@ -1,13 +1,16 @@
 package com.soffid.iam.service;
 
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +34,7 @@ import java.util.regex.Pattern;
 import javax.naming.NamingException;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jbpm.JbpmContext;
@@ -1611,6 +1615,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		usuari.setCreatedDate(previousUser.getCreatedDate());
 		usuari.setModifiedByUser(Security.getCurrentAccount());
 		usuari.setModifiedDate(GregorianCalendar.getInstance());
+		auditUserChages(usuari, previousUser);
 		UserEntity entity = getUserEntityDao().userToEntity(usuari);
 		if (entity != null) {
 			if (usuari.getAttributes() != null)
@@ -1633,6 +1638,31 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		return null;
+	}
+
+	private void auditUserChages(User usuari, User usuariAbans) throws InternalErrorException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		for (PropertyDescriptor p: PropertyUtils.getPropertyDescriptors(usuari)) {
+			if (! "modifiedDate".equals(p.getName()) &&
+					! "modifiedByUser".equals(p.getName()) &&
+					! "modifiedBy".equals(p.getName()) &&
+					! "modifiedOn".equals(p.getName()) &&
+					! "shortName".equals(p.getName()) &&
+					! "mailDomain".equals(p.getName()) &&
+					! "attributes".equals(p.getName()) &&
+					! "createdByUser".equals(p.getName()) &&
+					! "createdBy".equals(p.getName()) &&
+					! "lastName2".equals(p.getName()) &&
+					! "fullName".equals(p.getName()) &&
+					! "createdOn".equals(p.getName()) &&
+					! "createdDate".equals(p.getName())) {
+				Object v1  = PropertyUtils.getProperty(usuariAbans, p.getName());
+				Object v2 = PropertyUtils.getProperty(usuari, p.getName());
+				if (v1 == null || v1.equals("") ? 
+						v2 != null && !v2.equals(""):
+						! v1.equals(v2))
+					auditChange(usuari.getUserName(), p.getName());
+			}
+		}
 	}
 
 	protected Group handleFindGrupPrimariByCodiUsuari(String codiUsuari)
@@ -3184,6 +3214,17 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
+	private void auditChange(String user, String attribute) throws InternalErrorException {
+		Audit audit = new Audit();
+		audit.setObject("SC_DADUSU");
+		audit.setAction("U");
+		audit.setAuthor(Security.getCurrentAccount());
+		audit.setCalendar(Calendar.getInstance());
+		audit.setConfigurationParameter(attribute);
+		audit.setUser(user);
+		getAuditService().create(audit);
+	}
+
 	@Override
 	protected void handleUpdateUserAttributes(String codiUsuari, Map<String, Object> attributes) throws Exception {
 		handleUpdateUserAttributes(codiUsuari, attributes, true);
@@ -3305,9 +3346,22 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			{
 				final Object objectValue = aae.getObjectValue();
 				if (objectValue != null) {
+					if (objectValue instanceof Date &&
+							o != null && o instanceof Date &&
+							((Date) objectValue).equals(o))
+						return aae;
+					if (objectValue instanceof Date &&
+							o != null && o instanceof Calendar &&
+							((Date) objectValue).equals(((Calendar)o).getTime()))
+						return aae;
 					Object newValue = AttributeParser.getObjectValue(aae.getDataType().getType(), 
 							o == null ? null : o.toString(), 
 							o == null || ! (o instanceof byte[]) ? null: (byte[]) o);
+					if (objectValue != null && newValue != null &&
+							objectValue instanceof byte[] &&
+							newValue instanceof byte[] &&
+							Arrays.equals((byte[]) objectValue, (byte[]) newValue))
+						return aae;
 					if (objectValue.equals(newValue))
 						return aae;
 				}

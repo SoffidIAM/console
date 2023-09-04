@@ -493,9 +493,11 @@ public class InputField3 extends Databox
 	private void copyProperties(String customObjectType, String attribute) {
 		try {
 			Collection<DataType> dt;
-			dt = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(customObjectType, attribute);
-			if (dt != null) for (DataType d: dt) {
-				dataType.setLetterCase(d.getLetterCase());
+			if (customObjectType != null && !customObjectType.trim().isEmpty()) {
+				dt = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(customObjectType, attribute);
+				if (dt != null) for (DataType d: dt) {
+					dataType.setLetterCase(d.getLetterCase());
+				}
 			}
 		} catch (Exception e) {
 			// Ignore

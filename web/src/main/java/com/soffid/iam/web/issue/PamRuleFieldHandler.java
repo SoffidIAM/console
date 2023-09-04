@@ -20,7 +20,7 @@ public class PamRuleFieldHandler extends InputFieldUIHandler {
 
 	@Override
 	public Object translateToUserInterface(InputField3 field, Object o) throws Exception {
-		if (o == null) return null;
+		if (o == null || o.toString().trim().isEmpty()) return null;
 		else return ((PamRule)o).getName() + " - "+((PamRule)o).getDescription();
 	}
 }

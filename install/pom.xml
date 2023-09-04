@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.5.2-SNAPSHOT</version>
+		<version>3.5.1-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>install</artifactId>
@@ -468,14 +468,14 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>windows-plugin</artifactId>
-			<version>5.3.7</version>
+			<version>5.4.2</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>sql-plugin</artifactId>
-			<version>1.7.8</version>
+			<version>1.7.9</version>
 			<type>jar</type>
 			<scope>provided</scope>
 			<exclusions>
@@ -492,7 +492,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>rest-plugin</artifactId>
-			<version>1.2.12</version>
+			<version>1.2.14</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency> 

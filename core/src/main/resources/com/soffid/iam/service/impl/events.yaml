@@ -96,6 +96,20 @@
   - lock-host
   - unlock-host
   - add-comment
+- name: enabled-account-on-disabled-user
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-account
+  manual-actions:
+  - send-email
+  - unlock-account
+  - lock-account
+  - add-comment
 - name: integration-errors
   actions:
   - send-email

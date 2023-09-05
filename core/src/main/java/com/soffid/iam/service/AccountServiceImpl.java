@@ -46,6 +46,8 @@ import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.HostService;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordPolicy;
@@ -864,6 +866,23 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 }
 			}
 			ae.setType(account.getType());
+		}
+
+		if (ae.getType().equals(AccountType.USER)) {
+			for (UserAccountEntity ua: ae.getUsers()) {
+				if (!"S".equals(ua.getUser().getActive())) {
+					Issue i = new Issue();
+					i.setType("enabled-account-on-disabled-user");
+					i.setCreated(new Date());
+					i.setAccount(account.getName()+"@"+account.getSystem());
+					IssueUser iu = new IssueUser();
+					iu.setUserId(ua.getUser().getId());
+					iu.setUserName(ua.getUser().getUserName());
+					i.setUsers(Arrays.asList(iu));
+					i.setHash(account.getId().toString());
+					getIssueService().createInternalIssue(i);
+				}
+			}
 		}
 
 		if (! account.getName().equals(ae.getName()))

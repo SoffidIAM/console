@@ -24,6 +24,7 @@ import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
+import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.MailService;
 import com.soffid.iam.service.PamSecurityHandlerService;
 import com.soffid.iam.service.VaultService;
@@ -81,6 +82,7 @@ import roles.account_query;
 	HostServiceEntity.class,
 	AccountSnapshotEntity.class,
 	MailService.class,
+	IssueService.class,
 	IssueEntity.class})
 public abstract class AccountService {
 

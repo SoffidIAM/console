@@ -2867,10 +2867,10 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				"grup.description", new String[] { "left outer join usuari.primaryGroup as grup" }, joins, queries, params); //$NON-NLS-1$ //$NON-NLS-2$
 		addString(
 				criteria.getNationalID(),
-				"dadaUsuari.value", new String[] { "inner join usuari.userData as dadaUsuari", "inner join dadaUsuari.dataType as tipusDada with tipusDada.name=\'NIF\'" }, joins, queries, params); //$NON-NLS-1$
+				"dadaUsuari.value", new String[] { "inner join usuari.attributes as dadaUsuari", "inner join dadaUsuari.dataType as tipusDada with tipusDada.name=\'NIF\'" }, joins, queries, params); //$NON-NLS-1$
 		addString(
 				criteria.getPhoneNumber(),
-				"dadaUsuari2.valorDada", new String[] { "inner join usuari.userData as dadaUsuari2", "inner join dadaUsuari2.dataType as tipusDada2 with tipusDada2.name=\'PHONE\'" }, joins, queries, params); //$NON-NLS-1$
+				"dadaUsuari2.valorDada", new String[] { "inner join usuari.attributes as dadaUsuari2", "inner join dadaUsuari2.dataType as tipusDada2 with tipusDada2.name=\'PHONE\'" }, joins, queries, params); //$NON-NLS-1$
 
 		addString(criteria.getShortName(),
 				"usuari.shortName", null, joins, queries, params); //$NON-NLS-1$
@@ -2929,12 +2929,12 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			addString(
 					criteria.getAttributeName(),
 					"tipusDada2.name", //$NON-NLS-1$
-					new String[] { "inner join usuari.userData as dadaUsuari2", //$NON-NLS-1$
+					new String[] { "inner join usuari.attributes as dadaUsuari2", //$NON-NLS-1$
 							"inner join dadaUsuari2.dataType as tipusDada2" }, joins, queries, params); //$NON-NLS-1$
 
 			addString(criteria.getAttributeValue(),
 					"dadaUsuari2.value", new String[] { //$NON-NLS-1$
-					"inner join usuari.userData as dadaUsuari2" //$NON-NLS-1$
+					"inner join usuari.attributes as dadaUsuari2" //$NON-NLS-1$
 					}, joins, queries, params);
 		}
 

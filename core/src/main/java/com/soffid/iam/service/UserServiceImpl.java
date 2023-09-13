@@ -1657,7 +1657,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 					! "createdDate".equals(p.getName())) {
 				Object v1  = PropertyUtils.getProperty(usuariAbans, p.getName());
 				Object v2 = PropertyUtils.getProperty(usuari, p.getName());
-				if (v1 == null || v1.equals("") ? 
+				if ((v1 == null || v1.equals("")) ? 
 						v2 != null && !v2.equals(""):
 						! v1.equals(v2))
 					auditChange(usuari.getUserName(), p.getName());
@@ -3317,7 +3317,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	private boolean updateUserAttribute(UserEntity entity, LinkedList<UserDataEntity> attributes, String key,
 			MetaDataEntity metadata, Object value, Set<String> changedAttributes) throws InternalErrorException {
 		boolean anyChange = false;
-		UserDataEntity aae = findUserDataEntity(attributes, key, value);
+		UserDataEntity aae = findUserDataEntity(attributes, key, value, metadata);
 		if (aae == null)
 		{
 			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
@@ -3339,31 +3339,21 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	}
 
 	private UserDataEntity findUserDataEntity(LinkedList<UserDataEntity> entities, String key,
-			Object o) {
+			Object o, MetaDataEntity metadata) {
+		AttributeParser ap = new AttributeParser (metadata.getName(), metadata.getType(), o);
 		for (UserDataEntity aae: entities)
 		{
 			if (aae.getDataType().getName().equals(key))
 			{
-				final Object objectValue = aae.getObjectValue();
-				if (objectValue != null) {
-					if (objectValue instanceof Date &&
-							o != null && o instanceof Date &&
-							((Date) objectValue).equals(o))
-						return aae;
-					if (objectValue instanceof Date &&
-							o != null && o instanceof Calendar &&
-							((Date) objectValue).equals(((Calendar)o).getTime()))
-						return aae;
-					Object newValue = AttributeParser.getObjectValue(aae.getDataType().getType(), 
-							o == null ? null : o.toString(), 
-							o == null || ! (o instanceof byte[]) ? null: (byte[]) o);
-					if (objectValue != null && newValue != null &&
-							objectValue instanceof byte[] &&
-							newValue instanceof byte[] &&
-							Arrays.equals((byte[]) objectValue, (byte[]) newValue))
-						return aae;
-					if (objectValue.equals(newValue))
-						return aae;
+				if (aae.getBlobDataValue() == null) {
+					if (ap.getBlobValue() == null) 
+						if (aae.getValue() == null ? ap.getValue() == null :
+							aae.getValue().equals(ap.getValue()))
+							return aae;
+				} else {
+					if (ap.getBlobValue() != null)
+						if (Arrays.equals(aae.getBlobDataValue(), ap.getBlobValue()))
+							return aae;
 				}
 			}
 		}

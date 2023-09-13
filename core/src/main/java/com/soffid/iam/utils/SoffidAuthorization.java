@@ -91,9 +91,11 @@ public class SoffidAuthorization {
 		if (lstNmElmnt != null) { // existeix l'atribut
 			NodeList lstNm = lstNmElmnt.getChildNodes();
 			//return ((org.w3c.dom.Node) lstNm.item(0)).getTextContent(); // sense espais, saltos, etc.
-			String valorAtributXML = ((Node) lstNm.item(0)).getNodeValue();
-			if (valorAtributXML!=null) return valorAtributXML.replaceAll("\\n", "").replaceAll("\\t","").replaceAll("\\r","").trim(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
-			return valorAtributXML;
+			if (lstNm.getLength() > 0) {
+				String valorAtributXML = ((Node) lstNm.item(0)).getNodeValue();
+				if (valorAtributXML!=null) return valorAtributXML.replaceAll("\\n", "").replaceAll("\\t","").replaceAll("\\r","").trim(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+				return valorAtributXML;
+			}
 		} 
 		} catch (Throwable th) {
 			// log.error (String.format(Messages.getString("AutoritzacioSEU.ObtainAttributeAutoritationsFileError"), nomAtribut,th));   //$NON-NLS-1$

@@ -170,11 +170,12 @@ public class MergeActionHandler extends Window implements AfterCompose {
 				row.setAttribute("attribute", attribute);
 				rows.appendChild(row);
 				Label l = new Label(attribute.getLabel());
+				l.setStyle("display: inline-block; margin-top: 6px");
 				row.appendChild(l);
 				boolean allNull = true;
 				for (Object object: objects) {
 					Div d = new Div();
-					d.setStyle("height: 30px");
+					d.setStyle("min-height: 30px");
 					d.addEventListener("onClick", onSelectValue);
 					row.appendChild(d);
 					InputField3 output = new InputField3();

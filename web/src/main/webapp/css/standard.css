@@ -3753,6 +3753,14 @@ div.databox div.container {
     width: calc(100% - 200px);
 }
 
+div.merge div.databox div.container {
+    margin-bottom: 0px;
+}
+
+div.databox div.container.container-nolabel {
+    width: 100%;
+}
+
 div.databox.longlabel div.container {
     width: calc(100% - 300px);
 }
@@ -4137,7 +4145,7 @@ div.merge div.databox {
 }
 
 div.merge div.databox {
-	height: 30px;
+	min-height: 30px;
 }
 
 

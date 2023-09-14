@@ -8,6 +8,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -26,6 +27,7 @@ import com.soffid.iam.web.popup.IdentityHandler;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
+import es.caib.zkib.zkiblaf.Missatgebox;
 
 
 public class ApplicationManagersHandler extends Div implements AfterCompose {
@@ -74,5 +76,49 @@ public class ApplicationManagersHandler extends Div implements AfterCompose {
 	
 	public void setListboxPath(String listboxPath) {
 		this.listboxPath = listboxPath;
+	}
+	
+	public void onSelect(Event ev) {
+		Component button = getFellowIfAny("deleteButton");
+		if (button == null)
+			return;
+		
+		DataTree2 tree = (DataTree2) getFellow("listbox");
+		Object current = (Object) XPathUtils.eval(tree, "/.");
+		
+		
+		if (current == null)
+			button.setVisible(false);
+		else {
+			current = (Object) XPathUtils.eval(tree, "instance");
+			button.setVisible(current instanceof RoleAccount);
+		}
+	}
+
+	public void deleteSelected(Event ev) {
+		Component button = getFellowIfAny("deleteButton");
+		if (button == null)
+			return;
+		
+		DataTree2 tree = (DataTree2) getFellow("listbox");
+		Object current = (Object) XPathUtils.eval(tree, "/.");
+		
+		
+		if (current == null)
+			button.setVisible(false);
+		else {
+			current = (Object) XPathUtils.eval(tree, "instance");
+			if (current instanceof RoleAccount) {
+				String msg = Labels.getLabel("common.delete") ;
+					
+				Missatgebox.confirmaOK_CANCEL(msg, 
+						(event) -> {
+							if (event.getName().equals("onOK")) {
+								tree.delete();
+								button.setVisible(false);
+							}
+						});
+			}
+		}
 	}
 }

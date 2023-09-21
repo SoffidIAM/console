@@ -1226,6 +1226,10 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 			.setLong("id", src)
 			.executeUpdate();
 		
+		getSession().createQuery("delete from com.soffid.iam.model.UserDataEntity where user.id=:id")
+			.setLong("id", src)
+			.executeUpdate();
+
 		Database db = new DatabaseReader().readDatabaseDefinition();
 		for (ForeignKey fk: db.foreignKeys) {
 			if (fk.foreignTable.equals("SC_USUARI")) {
@@ -1236,6 +1240,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 					.executeUpdate();
 			}
 		}
+		
+
 		getSession().createQuery("delete from com.soffid.iam.model.UserEntity where id=:id")
 			.setLong("id", src)
 			.executeUpdate();

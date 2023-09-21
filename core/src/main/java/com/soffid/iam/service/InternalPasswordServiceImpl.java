@@ -262,7 +262,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		if (politica.getForbiddenWords() != null) {
 			for (Iterator it = politica.getForbiddenWords().iterator(); it.hasNext();) {
 				PolicyForbiddenWordEntity ppce = (PolicyForbiddenWordEntity) it.next();
-				if (uncrypted.contains(ppce.getForbiddenWord().getForbiddenWord())) {
+				if (uncrypted.toLowerCase().contains(ppce.getForbiddenWord().getForbiddenWord().toLowerCase())) {
 					return new PolicyCheckResult(PolicyCheckResult.FORBIDDEN_WORD.getReasonCode(),
 							ppce.getForbiddenWord().getForbiddenWord());
 				}

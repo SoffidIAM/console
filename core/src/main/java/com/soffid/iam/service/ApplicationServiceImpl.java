@@ -845,6 +845,7 @@ public class ApplicationServiceImpl extends
         			rolEntity.getAccounts().remove(ra);
         		}
         	}
+        	getNoticeEntityDao().remove(rolEntity.getNotificationEntities());
             getRoleEntityDao().remove(rolEntity);
         } else {
             throw new SeyconAccessLocalException(

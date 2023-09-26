@@ -110,6 +110,7 @@ public class Issue {
 	@Attribute(multiline = true)
 	String performedActions;
 
+	@JsonAttribute(hibernateAttribute = "requester.name")
 	@Nullable @Attribute(readonly = true, type = "ACCOUNT_TYPE")
 	String requester;
 }

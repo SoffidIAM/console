@@ -1234,6 +1234,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			}
 			usuariEntity.getSecrets().clear();
 
+			for (IssueUserEntity iu: usuariEntity.getEvents()) {
+				iu.setUser(null);
+				getIssueUserEntityDao().update(iu);
+			}
+			
 			getSessionEntityDao().remove(usuariEntity.getSessions());
 			
 			for (AccessLogEntity al: getAccessLogEntityDao().findLastAccessLogByUserName(usuariEntity.getUserName(),null))

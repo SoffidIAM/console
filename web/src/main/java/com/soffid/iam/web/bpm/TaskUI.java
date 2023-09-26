@@ -71,6 +71,7 @@ import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.api.ProcessDefinition;
 import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.bpm.api.TaskInstance;
@@ -326,15 +327,21 @@ public class TaskUI extends FrameHandler implements EventListener {
         fechaInicioProceso.setValue(instanciaProceso.getStart());
         if (task.getActorId() == null) {
             String users = null;
+            String us = null;
+            User u = null;
             for (Iterator it = task.getPooledActors().iterator(); it.hasNext();) {
+            	us =   (String) it.next();
+            	u = EJBLocator.getUserService().findUserByUserName( us);
                 if (users == null)
-                    users = (String) it.next();
+                	
+                    users = u.getUserName() + " " + u.getFullName();
                 else
-                    users = users + ", " + (String) it.next(); //$NON-NLS-1$
+                    users = users + ", " + u.getUserName() + " " + u.getFullName(); //$NON-NLS-1$
             }
             asignadoA.setValue(users);
         } else {
-            asignadoA.setValue(task.getActorId());
+        	User u = EJBLocator.getUserService().findUserByUserName( task.getActorId() );
+            asignadoA.setValue(u.getUserName() + " " + u.getFullName());
             if (task.isOpen() && task.getStart() == null && task.getActorId().equals(Security.getCurrentUser()))
             {
             	task = engine.startTask(task);

@@ -6,6 +6,7 @@ import javax.naming.NamingException;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.service.ejb.AccountService;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.InputFieldContainer;
 import com.soffid.iam.web.component.InputFieldUIHandler;
@@ -24,9 +25,13 @@ public class LoginNameHandler extends InputFieldUIHandler {
 			if (ssoSystem != null && ssoSystem.equals(system)) {
 				Long id = (Long) XPathUtils.eval(field, "id");
 				if (id == null) {
-					long l = findLastAccount(ssoSystem) + 1;
 					InputField3 desc = d.getInputFieldsMap().get("name");
-					desc.setValue(""+l);
+					if (Security.isUserInRole("account:query")) {
+						long l = findLastAccount(ssoSystem) + 1;
+						desc.setValue(""+l);
+					} else {
+						desc.setValue("?");
+					}
 					desc.invalidate();
 				}
 			}

@@ -10,6 +10,7 @@ import org.zkoss.zk.ui.Component;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.System;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.InputFieldUIHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
@@ -22,7 +23,8 @@ public class SystemFieldHandler extends InputFieldUIHandler {
 	public boolean isVisible(InputField3 field) throws Exception {
 		try {
 			Long id = (Long) XPathUtils.getValue(field, "id");
-			field.setReadonly (id != null);
+			field.setReadonly (id != null ||
+					!Security.isUserInRole("account:create"));
 		} catch (Exception e) {
 			field.setReadonly (true);
 		}

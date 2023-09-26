@@ -1,5 +1,6 @@
 package com.soffid.iam.web.account;
 
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.InputFieldContainer;
 import com.soffid.iam.web.component.InputFieldUIHandler;
@@ -34,7 +35,8 @@ public class AccountNameHandler extends InputFieldUIHandler {
 				field.createField();
 			}
 			return ssoSystem == null || ! ssoSystem.equals(system) || 
-					(field.getValue() != null && ! field.getValue().toString().trim().isEmpty());
+					(field.getValue() != null && ! field.getValue().toString().trim().isEmpty() &&
+					 Security.isUserInRole("account:query"));
 		}
 		else
 			return true;

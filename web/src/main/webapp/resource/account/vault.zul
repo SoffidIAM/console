@@ -109,7 +109,8 @@
 							</tabs>
 							<tabpanels>
 								<tabpanel>
-									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.name" />
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.name" 
+										if="${soffid:isUserInRole('account:query') }"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.description" />
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.system" />
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginName" />

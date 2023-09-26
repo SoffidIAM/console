@@ -1111,11 +1111,18 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected VaultElement handleCreate(VaultElement folder) throws Exception {
 		if ("account".equals(folder.getType())) {
+			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
+			String permission = folder.getAccount().getSystem().equals(ssoSystem) ?
+					"sso:manageAccounts" : "account:create";
+			if (! Security.isUserInRole(permission))
+				throw new SecurityException("Not authorized");
 			folder.setAccount( getAccountService().createAccount2(folder.getAccount()) );
 			folder.setId(folder.getAccount().getId());
 			folder.setParentId(folder.getAccount().getVaultFolderId());
 		}
 		if ("folder".equals(folder.getType())) {
+			if (! Security.isUserInRole("sso:manageAccounts"))
+				throw new SecurityException("Not authorized");
 			folder.setFolder( handleCreate(folder.getFolder()) );
 			folder.setId(folder.getFolder().getId());
 			folder.setParentId(folder.getFolder().getParentId());

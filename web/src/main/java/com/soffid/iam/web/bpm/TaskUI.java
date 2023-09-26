@@ -332,17 +332,13 @@ public class TaskUI extends FrameHandler implements EventListener {
             User u = null;
             for (Iterator it = task.getPooledActors().iterator(); it.hasNext();) {
             	us =   (String) it.next();
-            	log.info("us = "+us);
             	u = EJBLocator.getUserService().findUserByUserName(us);
-            	log.info(" u = "+ u);
             	if(u == null) {
             		if (users == "")
             			users = us;
             		else
             			users = users + ", " + us; //$NON-NLS-1$
             	} else {
-            		log.info("u = "+u);
-            		log.info("users = " + users);
             		if (users == "")
             			users = u.getUserName() + " " + u.getFullName();
             		else

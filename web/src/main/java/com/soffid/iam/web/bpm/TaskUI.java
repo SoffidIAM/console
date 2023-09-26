@@ -327,25 +327,26 @@ public class TaskUI extends FrameHandler implements EventListener {
         tarea.setValue(task.getName());
         fechaInicioProceso.setValue(instanciaProceso.getStart());
         if (task.getActorId() == null) {
-            String users = "";
+            //String users = "";
+            StringBuffer users = new StringBuffer();
             String us = null;
             User u = null;
             for (Iterator it = task.getPooledActors().iterator(); it.hasNext();) {
             	us =   (String) it.next();
             	u = EJBLocator.getUserService().findUserByUserName(us);
             	if(u == null) {
-            		if (users == "")
-            			users = us;
+            		if (users.length() > 0)
+            			users.append(us);
             		else
-            			users = users + ", " + us; //$NON-NLS-1$
+            			users.append(", " + us); //$NON-NLS-1$
             	} else {
-            		if (users == "")
-            			users = u.getUserName() + " " + u.getFullName();
+            		if (users.length() > 0)
+            			users.append( u.getUserName() + " " + u.getFullName() );
             		else
-            			users = users + ", " + u.getUserName() + " " + u.getFullName(); //$NON-NLS-1$
+            			users.append(", " + u.getUserName() + " " + u.getFullName()); //$NON-NLS-1$
             	}
             }
-            asignadoA.setValue(users);
+            asignadoA.setValue(users.toString());
         } else {
         	User u = EJBLocator.getUserService().findUserByUserName( task.getActorId() );
         	if(u == null)

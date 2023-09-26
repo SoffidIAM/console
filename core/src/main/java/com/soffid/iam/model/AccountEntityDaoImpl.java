@@ -95,6 +95,13 @@ public class AccountEntityDaoImpl extends
         entity.getNetworkDiscovery().clear();
         AccountSnapshotEntity snapshot = entity.getSnapshot();
         
+        getSession()
+        	.createQuery("update com.soffid.iam.model.IssueEntity "
+        		 	   + "set requester=null "
+        		 	   + "where requester.id=:id")
+        	.setLong("id", entity.getId())
+        	.executeUpdate();
+        
 		try {
 			getAuditEntityDao().unlinkAccounts(entity);
 		} catch (InternalErrorException e) {

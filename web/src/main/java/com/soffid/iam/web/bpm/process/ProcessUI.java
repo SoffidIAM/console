@@ -55,6 +55,7 @@ import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.api.Job;
 import com.soffid.iam.bpm.api.ProcessDefinition;
 import com.soffid.iam.bpm.api.ProcessInstance;
@@ -282,16 +283,31 @@ public class ProcessUI extends FrameHandler {
             	fechaCreacionTarea.setValue(task.getCreate());
             	if (task.getActorId() != null)
             	{
-            		if (users.length() > 0)
-            			users.append (", "); //$NON-NLS-1$
-            		users.append(task.getActorId());
+            		User u = EJBLocator.getUserService().findUserByUserName( task.getActorId() );
+            		if (u == null) {
+            			if (users.length() > 0)
+                			users.append (", "); //$NON-NLS-1$
+                		users.append( task.getActorId() );
+            		}else {
+            			if (users.length() > 0)
+                			users.append (", "); //$NON-NLS-1$
+                		users.append(u.getUserName()+" "+u.getFullName());
+            		}
             	}
             	else
             	{
                     for (Iterator it2 = task.getPooledActors().iterator(); it2.hasNext();) {
-                		if (users.length() > 0)
-                			users.append (", "); //$NON-NLS-1$
-                         users.append(it2.next());
+                    	String us = (String) it2.next();
+                    	User u = EJBLocator.getUserService().findUserByUserName( us);
+                    	if (u == null) {
+                			if (users.length() > 0)
+                    			users.append (", "); //$NON-NLS-1$
+                    		users.append( us );
+                		}else {
+                			if (users.length() > 0)
+                    			users.append (", "); //$NON-NLS-1$
+                    		users.append(u.getUserName()+" "+u.getFullName());
+                		}
                     }
             	}
             }

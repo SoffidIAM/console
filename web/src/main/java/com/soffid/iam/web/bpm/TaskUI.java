@@ -81,6 +81,7 @@ import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.exception.NASException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
+import com.soffid.iam.service.UserService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.bpm.attachment.TaskAttachmentManager;
 import com.soffid.iam.web.component.CustomField3;
@@ -326,22 +327,35 @@ public class TaskUI extends FrameHandler implements EventListener {
         tarea.setValue(task.getName());
         fechaInicioProceso.setValue(instanciaProceso.getStart());
         if (task.getActorId() == null) {
-            String users = null;
+            String users = "";
             String us = null;
             User u = null;
             for (Iterator it = task.getPooledActors().iterator(); it.hasNext();) {
             	us =   (String) it.next();
-            	u = EJBLocator.getUserService().findUserByUserName( us);
-                if (users == null)
-                	
-                    users = u.getUserName() + " " + u.getFullName();
-                else
-                    users = users + ", " + u.getUserName() + " " + u.getFullName(); //$NON-NLS-1$
+            	log.info("us = "+us);
+            	u = EJBLocator.getUserService().findUserByUserName(us);
+            	log.info(" u = "+ u);
+            	if(u == null) {
+            		if (users == "")
+            			users = us;
+            		else
+            			users = users + ", " + us; //$NON-NLS-1$
+            	} else {
+            		log.info("u = "+u);
+            		log.info("users = " + users);
+            		if (users == "")
+            			users = u.getUserName() + " " + u.getFullName();
+            		else
+            			users = users + ", " + u.getUserName() + " " + u.getFullName(); //$NON-NLS-1$
+            	}
             }
             asignadoA.setValue(users);
         } else {
         	User u = EJBLocator.getUserService().findUserByUserName( task.getActorId() );
-            asignadoA.setValue(u.getUserName() + " " + u.getFullName());
+        	if(u == null)
+        		asignadoA.setValue(task.getActorId());
+        	else
+        		asignadoA.setValue(u.getUserName() + " " + u.getFullName());
             if (task.isOpen() && task.getStart() == null && task.getActorId().equals(Security.getCurrentUser()))
             {
             	task = engine.startTask(task);

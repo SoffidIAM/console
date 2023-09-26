@@ -284,17 +284,30 @@ public class ProcessUI extends FrameHandler {
             	if (task.getActorId() != null)
             	{
             		User u = EJBLocator.getUserService().findUserByUserName( task.getActorId() );
-            		if (users.length() > 0)
-            			users.append (", "); //$NON-NLS-1$
-            		users.append(u.getUserName()+" "+u.getFullName());
+            		if (u == null) {
+            			if (users.length() > 0)
+                			users.append (", "); //$NON-NLS-1$
+                		users.append( task.getActorId() );
+            		}else {
+            			if (users.length() > 0)
+                			users.append (", "); //$NON-NLS-1$
+                		users.append(u.getUserName()+" "+u.getFullName());
+            		}
             	}
             	else
             	{
                     for (Iterator it2 = task.getPooledActors().iterator(); it2.hasNext();) {
-                    	User u = EJBLocator.getUserService().findUserByUserName( (String) it2.next());
-                		if (users.length() > 0)
-                			users.append (", "); //$NON-NLS-1$
-                		users.append(u.getUserName()+" "+u.getFullName());
+                    	String us = (String) it2.next();
+                    	User u = EJBLocator.getUserService().findUserByUserName( us);
+                    	if (u == null) {
+                			if (users.length() > 0)
+                    			users.append (", "); //$NON-NLS-1$
+                    		users.append( us );
+                		}else {
+                			if (users.length() > 0)
+                    			users.append (", "); //$NON-NLS-1$
+                    		users.append(u.getUserName()+" "+u.getFullName());
+                		}
                     }
             	}
             }

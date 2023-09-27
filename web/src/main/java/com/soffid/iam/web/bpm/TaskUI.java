@@ -336,14 +336,12 @@ public class TaskUI extends FrameHandler implements EventListener {
             	u = EJBLocator.getUserService().findUserByUserName(us);
             	if(u == null) {
             		if (users.length() > 0)
-            			users.append(us);
-            		else
-            			users.append(", " + us); //$NON-NLS-1$
+            			users.append(", ");
+            		users.append(us); //$NON-NLS-1$
             	} else {
             		if (users.length() > 0)
-            			users.append( u.getUserName() + " " + u.getFullName() );
-            		else
-            			users.append(", " + u.getUserName() + " " + u.getFullName()); //$NON-NLS-1$
+            			users.append(", ");
+            		users.append(u.getUserName() + " " + u.getFullName()); //$NON-NLS-1$
             	}
             }
             asignadoA.setValue(users.toString());

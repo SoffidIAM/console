@@ -269,7 +269,14 @@ public class HostEntityDaoImpl extends
             getHostPortEntityDao().remove(maquinaEntity.getPorts());
             getHostServiceEntityDao().remove(maquinaEntity.getServices());
             getHostSystemEntityDao().remove(maquinaEntity.getSystems());
-            getHostAttributeEntityDao().remove(maquinaEntity.getAttributes());
+            getHostAttributeEntityDao().remove(new LinkedList<>( maquinaEntity.getAttributes() ));
+            
+            getSession().createQuery("update com.soffid.iam.model.IssueHostEntity "
+            		+ "set host = null "
+            		+ "where host.id = :id")
+            	.setLong("id", maquinaEntity.getId())
+            	.executeUpdate();
+            
             super.remove(maquinaEntity);
             auditarMaquina("D", nomMaquina); //$NON-NLS-1$
         } catch (Throwable e) {

@@ -548,43 +548,10 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 
 			// Eliminamos las asociaciones con otros ROLES (en ambos casos)
 			// No se borra porque NO PUEDEN EXISTIR para poder borrar el Role(!!)
-			/*
-			 * for (Iterator it= rolAssociacioRolSocContenidor.iterator();
-			 * it.hasNext();) { // El método remove(Collection) can be a little
-			 * bit dangerous RoleDependencyEntity associacio =
-			 * (RoleDependencyEntity) it.next();
-			 * getRoleDependencyEntityDao().remove(associacio); }
-			 * rolAssociacioRolSocContenidor.clear();
-			 * 
-			 * 
-			 * for (Iterator it = rolAssociacioRolSocContingut.iterator();
-			 * it.hasNext();) { RoleDependencyEntity associacio =
-			 * (RoleDependencyEntity) it.next();
-			 * getRoleDependencyEntityDao().remove(associacio); }
-			 * rolAssociacioRolSocContingut.clear();
-			 * 
-			 * // Eliminamos relaciones con roles (padres) y con grupos //
-			 * Obtenemos las relaciones con GRUPOS for (Iterator it=
-			 * grupsPosseidors.iterator(); it.hasNext();) { RoleGroupEntity
-			 * rolsgrup = (RoleGroupEntity) it.next();
-			 * getRoleGroupEntityDao().remove(rolsgrup); }
-			 * grupsPosseidors.clear();
-			 * 
-			 * // Roles: relaciones con Ficheros for (Iterator it =
-			 * rolFitxers.iterator(); it.hasNext();) { RolFitxerEntity rolfitxer
-			 * = (RolFitxerEntity) it.next();
-			 * getRolFitxerEntityDao().remove(rolfitxer); } rolFitxers.clear();
-			 * 
-			 * // Realaciones con Usuarios for (Iterator it =
-			 * rolsUsuari.iterator(); it.hasNext();) { RolsUsuarisEntity
-			 * rolusuari = (RolsUsuarisEntity) it.next();
-			 * getRolsUsuarisEntityDao().remove(rolusuari); }
-			 * rolsUsuari.clear(); // Relaciones con XarxaAC for (Iterator it =
-			 * rolsAutoritzacioXarxa.iterator(); it.hasNext();) { XarxaACEntity
-			 * autoritzacio = (XarxaACEntity) it.next();
-			 * getXarxaACEntityDao().remove (autoritzacio); }
-			 */
-
+			getSession().createQuery("delete from com.soffid.iam.model.EntryPointRoleEntity where role.id=:id" )
+				.setParameter("id", roleEntity.getId())
+				.executeUpdate();
+			
 			String nomRol = roleEntity.getName();
 			String codiBaseDeDades = roleEntity.getSystem().getName();
 			String codiAplicacio = roleEntity.getInformationSystem().getName();

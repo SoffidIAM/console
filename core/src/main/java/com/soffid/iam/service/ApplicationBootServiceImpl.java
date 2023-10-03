@@ -1413,9 +1413,6 @@ public class ApplicationBootServiceImpl extends
 			usu.setFirstName( firstName == null ? "Soffid": firstName); //$NON-NLS-1$
 			String lastName = System.getProperty("soffid.startup.lastName");
 			usu.setLastName(lastName == null ? "Administrator": lastName); //$NON-NLS-1$
-			usu.setHomeServer("null"); //$NON-NLS-1$
-			usu.setProfileServer("null"); //$NON-NLS-1$
-			usu.setMailServer("null"); //$NON-NLS-1$
 			usu.setUserType("I"); //$NON-NLS-1$
 			usu.setActive(new Boolean(true));
 			usu = usuariSvc.create(usu);

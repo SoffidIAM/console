@@ -656,9 +656,6 @@ public class ReconcileServiceImpl extends ReconcileServiceBase implements Applic
 			user.setMiddleName(userFullName[2]);
 		}
 
-		user.setProfileServer("null"); //$NON-NLS-1$
-		user.setMailServer("null"); //$NON-NLS-1$
-		user.setHomeServer("null"); //$NON-NLS-1$
 		user.setPrimaryGroup(recAccount.getPrimaryGroup());
 		user.setUserType(recAccount.getUserType());
 		user.setActive(recAccount.isActive());

@@ -162,7 +162,7 @@ public abstract class MaquinaEntity {
 	@Operation(translated="findByIP")
 	@DaoFinder("select host "
 			+ "from com.soffid.iam.model.HostEntity as host "
-			+ "where host.hostIP=:hostIP and host.tenant.id=:tenantId "
+			+ "where host.hostIP=:hostIP and host.tenant.id=:tenantId and host.deleted=false "
 			+ "order by host.lastSeen desc")
 	public Collection<es.caib.seycon.ng.model.MaquinaEntity> findByAdreca(
 		@Nullable java.lang.String hostIP) {

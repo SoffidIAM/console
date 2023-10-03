@@ -34,6 +34,7 @@
 				jsonObject="com.soffid.iam.api.Host" 
 				defaultAttributes="name, description, ip"
 				preference="hosts"
+				enforcedFilter="deleted eq false"
 				dataPath="/model:/host" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatable id="listbox" autocommit="true" 

@@ -197,6 +197,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				}
 			
 			processAutomaticIssues(entity, policies);
+			getIssueEntityDao().update(entity);
 			return getIssueEntityDao().toIssue(entity);
 		}
 		else

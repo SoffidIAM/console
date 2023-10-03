@@ -42,21 +42,30 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			if (!handlerExists())
 				registerHandler();
 			
-			ScheduledTask sc = new ScheduledTask();
-			sc.setActive(false);
-			sc.setDayOfWeekPattern("6");
-			sc.setDayPattern("*");
-			sc.setHandlerName(SystemScheduledTasks.NETWORK_DISCOVERY);
-			sc.setHoursPattern("0");
-			sc.setMinutesPattern("0");
-			sc.setMonthsPattern("*");
-			sc.setName("Discover network "+network.getDescription());
-			sc.setParams(ne.getId().toString());
-			sc.setServerName("*");
-			getScheduledTaskService().create(sc);
+			final String name = "Discover network "+network.getDescription();
+			if (!taskExists(ne.getId().toString())) {
+				ScheduledTask sc = new ScheduledTask();
+				sc.setActive(false);
+				sc.setDayOfWeekPattern("6");
+				sc.setDayPattern("*");
+				sc.setHandlerName(SystemScheduledTasks.NETWORK_DISCOVERY);
+				sc.setHoursPattern("0");
+				sc.setMinutesPattern("0");
+				sc.setMonthsPattern("*");
+				sc.setName(name);
+				sc.setParams(ne.getId().toString());
+				sc.setServerName("*");
+				getScheduledTaskService().create(sc);
+			}
 			ne.setDiscovery(true);
 			getNetworkEntityDao().update(ne);			
 		}
+	}
+
+
+	private boolean taskExists(String name) throws InternalErrorException {
+		ScheduledTask task = getScheduledTaskService().findScheduledTaskByHandlerAndParams(SystemScheduledTasks.NETWORK_DISCOVERY, name);
+		return task != null;
 	}
 
 
@@ -335,6 +344,8 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 						String dn = hp.getDescription().substring(t+8);
 						if (dn.contains(","))
 							dn = dn.substring(0, dn.indexOf(","));
+						if (dn.endsWith("0."))
+							dn = dn.substring(0, dn.length() - 2);
 						StringBuffer sb = new StringBuffer();
 						for (String part: dn.split("\\.")) {
 							if (sb.length() > 0) sb.append(",");

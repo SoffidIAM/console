@@ -49,11 +49,15 @@ public class IssueEntityDaoImpl extends IssueEntityDaoBase {
 	}
 
 	private void calculateDescription(IssueEntity source, Issue target) {
-		String msg = MessageFactory.getString("com.soffid.iam.model.issues.messages", 
-				"issue."+source.getType());
-		if (msg != null) {
-			String s = new IssueTextFormatter().format(msg, target, source);
-			target.setDescription(s);
+		try {
+			String msg = MessageFactory.getString("com.soffid.iam.model.issues.messages", 
+					"issue."+source.getType());
+			if (msg != null) {
+				String s = new IssueTextFormatter().format(msg, target, source);
+				target.setDescription(s);
+			}
+		} catch (Exception e) {
+			target.setDescription(source.getType());
 		}
 	}
 

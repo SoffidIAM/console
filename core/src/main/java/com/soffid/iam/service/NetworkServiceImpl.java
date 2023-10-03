@@ -502,8 +502,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         	else
         	{
         		HostEntity entity = getHostEntityDao().hostToEntity(maquina);
+        		entity.setFolders("N");
+        		entity.setMail("N");
+        		entity.setHostIP(null);
         		entity.setDeleted(true);
         		getHostEntityDao().update(entity);
+        		getHostAliasEntityDao().remove(new LinkedList<>(entity.getHostAlias()));
     			createHostTask(entity);
         	}
         }
@@ -987,12 +991,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Host handleFindHostByIp(String ip) throws Exception {
-    	for (HostEntity host: getHostEntityDao().findByIP(ip))
-    	{
-    		if (host.getDeleted() == null || ! host.getDeleted().booleanValue())
-    			return getHostEntityDao().toHost(host);
-    	}
-    	for (HostEntity host: getHostEntityDao().findByIP(ip))
+    	CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+    	criteria.setMaximumResultSize(1);
+		for (HostEntity host: getHostEntityDao().findByIP(criteria , ip))
     	{
    			return getHostEntityDao().toHost(host);
     	}

@@ -20,6 +20,7 @@ public class AutoAck implements AutomaticActionHandler {
 	@Override
 	public void process(Issue event, IssueEntity entity, IssuePolicyActionEntity actionEntity) throws InternalErrorException {
 		entity.setAcknowledged(new Date());
+		entity.setStatus(IssueStatus.ACKNOWLEDGED);
 		event.setAcknowledged(entity.getAcknowledged());
 		event.setStatus(IssueStatus.ACKNOWLEDGED);
 	}

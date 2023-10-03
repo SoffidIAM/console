@@ -361,12 +361,14 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     protected void handleUpdate(com.soffid.iam.api.Host maquina) throws java.lang.Exception {
         if (teAccesEscripturaMaquina(maquina)) {
             HostEntity hostEntity = getHostEntityDao().load(maquina.getId());
-            if (!hostEntity.getName().equals(maquina.getName()))
-    			createHostTask(hostEntity.getName());
+            boolean sync = ! compareHost(maquina, hostEntity);
+            if (sync)
+            	if (!hostEntity.getName().equals(maquina.getName()))
+            		createHostTask(hostEntity.getName());
             getHostEntityDao().hostToEntity(maquina, hostEntity, true);
 			getHostEntityDao().update(hostEntity);
             updateHostAttributes(maquina, hostEntity);
-			createHostTask(maquina.getName());
+			if (sync) createHostTask(maquina.getName());
             updateHostAlias(hostEntity, maquina.getHostAlias());
         } else {
             // Comprovem permís per actualitzar el SO de la màquina
@@ -402,6 +404,28 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             }
         }
     }
+
+    private boolean compareHost(Host maquina, HostEntity hostEntity) {
+    	if (! compare(maquina.getName(), hostEntity.getName())) return false;
+    	if (! compare(maquina.getDescription(), hostEntity.getDescription())) return false;
+    	if (! compare(maquina.getDhcp(), hostEntity.getDhcp())) return false;
+    	if (! compare(maquina.getDynamicIp(), hostEntity.getDynamicIP())) return false;
+    	if (! compare(maquina.getHostAlias(), hostEntity.getHostAlias())) return false;
+    	if (! compare(maquina.getIp(), hostEntity.getHostIP())) return false;
+    	if (! compare(maquina.getMac(), hostEntity.getMac())) return false;
+    	if (! compare(maquina.getMail(), hostEntity.getMail())) return false;
+    	if (! compare(maquina.getNetworkCode(), hostEntity.getNetwork().getName())) return false;
+    	if (! compare(maquina.getOffice(), hostEntity.getFolders())) return false;
+    	if (! compare(maquina.getOs(), hostEntity.getOperatingSystem() == null ? null: hostEntity.getOperatingSystem().getName())) return false;
+    	if (! compare(maquina.getPrintersServer(), hostEntity.getPrintersServer())) return false;
+		return true;
+	}
+    
+	private boolean compare(Object o1, Object o2) {
+		if (o1 == null) return o2 == null;
+		else return o1.equals(o2);
+	}
+
 
     private void updateHostAlias(HostEntity host, List<String> hostAlias) {
     	HashSet<String> l = new HashSet<>(hostAlias);

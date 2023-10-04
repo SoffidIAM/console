@@ -267,9 +267,14 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             	.setParameter("userid", usuari.getId())
             	.executeUpdate();
 
+            getSession().createQuery("delete from com.soffid.iam.model.UserGroupAttributeEntity where userGroup.user.id=:userid")
+	        	.setParameter("userid", usuari.getId())
+	        	.executeUpdate();
+
             getUserEmailEntityDao().remove(usuari.getUserMailList());
             getUserPreferenceEntityDao().remove(usuari.getPreferences());
             getUserPrinterEntityDao().remove(usuari.getPrinters());
+            
             
             new SchemaTools().deleteDependencies(getSession(), "SC_USUARI", usuari.getId());
             

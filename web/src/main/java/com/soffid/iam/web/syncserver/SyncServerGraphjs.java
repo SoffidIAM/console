@@ -84,7 +84,7 @@ public class SyncServerGraphjs extends Graphjs {
 				for (Server server: syncServerService.getSyncServerInstances()) {
 					if (server.getId().equals(id)) {
 						JSONObject base = (JSONObject) new YamlParser().parse(template);
-						SyncServerInfo status = syncServerService.getSyncServerInfo(server.getUrl());
+						SyncServerInfo status = SyncServerMonitor.getMonitor().getSyncServerInfo(server.getUrl());
 						JSONArray data = new JSONArray();
 						data.put (status.getConnectedAgents());
 						data.put (status.getNumberOfAgents() -

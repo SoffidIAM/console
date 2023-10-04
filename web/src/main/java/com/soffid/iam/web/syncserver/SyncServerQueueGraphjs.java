@@ -58,7 +58,7 @@ public class SyncServerQueueGraphjs extends Graphjs {
 	
 				JSONObject base = (JSONObject) new YamlParser().parse(template);
 				
-				Map<String, Vector<Object[]>> stats = EJBLocator.getSyncServerService().getPendingTasksStats();
+				Map<String, Vector<Object[]>> stats = SyncServerMonitor.getMonitor().getStats();
 				int num = 0;
 				
 				JSONArray datasets = new JSONArray();

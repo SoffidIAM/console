@@ -65,8 +65,8 @@ public class SyncServerPerformanceGraphjs extends Graphjs {
 						int step = 10;
 						long now = System.currentTimeMillis();
 						int seconds = 1200;
-						Map<String, int[]> stats = EJBLocator.getSyncServerService().getStats(server.getUrl(), "tasks-success", seconds, step);
-						Map<String, int[]> statsError = EJBLocator.getSyncServerService().getStats(server.getUrl(), "tasks-error", seconds, step);
+						Map<String, int[]> stats = SyncServerMonitor.getMonitor().getSuccessStats(server.getUrl());
+						Map<String, int[]> statsError = SyncServerMonitor.getMonitor().getFailureStats(server.getUrl());
 	
 						LinkedList<String> labelsSet = new LinkedList<>();
 						Map<String, JSONArray> datasets = new HashMap<>();

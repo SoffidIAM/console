@@ -75,18 +75,27 @@ public class SyncServerTasksGraphjs extends Graphjs {
 			try {
 				JSONObject base = (JSONObject) new YamlParser().parse(template);
 				random = new Random(10);
-				Collection<AgentStatusInfo> status = EJBLocator.getSyncServerService().getServerAgentStatus();
+				Collection<AgentStatusInfo> status = SyncServerMonitor.getMonitor().getAgentStatus();
 	
 				JSONArray data = new JSONArray();
 				JSONArray labels = new JSONArray();
 				JSONArray colors = new JSONArray();
-	
-				int i = 0;
-				for (AgentStatusInfo agent: status ) {
-					String c = getColor(i, null);
-					colors.put(c);
-					labels.put(agent.getAgentName());
-					data.put(agent.getPendingTasks());
+
+				if (status.size() > 0) {
+					int i = 0;
+					for (AgentStatusInfo agent: status ) {
+						String c = getColor(++i, null);
+						colors.put(c);
+						labels.put(agent.getAgentName());
+						data.put(agent.getPendingTasks());
+					}
+				} else {
+					for (int i = 0; i < 32; i++) {
+						String c = getColor(++i, null);
+						colors.put(c);
+						labels.put("");
+						data.put(0);
+					}
 				}
 				((JSONObject)base.query("/data")).put("labels", labels);
 				((JSONObject)base.query("/data/datasets/0")).put("data", data);

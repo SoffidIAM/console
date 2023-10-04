@@ -73,7 +73,7 @@ public class DynamicBindings implements Bindings {
 
 	@Override
 	public boolean containsKey(Object key) {
-		return "serviceLocator".equals(key) || vars.containsKey(key);
+		return "serviceLocator".equals(key) || vars.containsKey(key) || true;
 	}
 
 	@Override

@@ -245,7 +245,7 @@ public class ScimHelper {
 			if (q2 == null || q2.trim().isEmpty())
 				q2 = jsonQuery;
 			else
-				q2 = "( " +q2 + " ) and "+jsonQuery;
+				q2 = "( " +q2 + " ) and ("+jsonQuery+")";
 		}
 		
 		AbstractExpression expr = ExpressionParser.parse(q2);

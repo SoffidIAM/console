@@ -456,7 +456,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>shell-plugin</artifactId>
-			<version>1.4.6</version>
+			<version>1.4.8</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>

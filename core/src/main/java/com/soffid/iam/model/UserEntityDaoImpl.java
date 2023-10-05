@@ -172,7 +172,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     
     
     private void createTask(com.soffid.iam.model.UserEntity usuari) throws InternalErrorException {
-		String status = ConfigurationCache.getProperty("soffid.task.mode");
 		TaskEntity tasque = getTaskEntityDao().newTaskEntity();
         tasque.setDate(new Timestamp(System.currentTimeMillis()));
         tasque.setTransaction(TaskHandler.INDEX_OBJECT);
@@ -185,10 +184,10 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         tasque.setTransaction(TaskHandler.UPDATE_USER);
         tasque.setUser(usuari.getUserName());
         getTaskEntityDao().createForce(tasque);
-        tasque = getTaskEntityDao().newTaskEntity();
-        tasque.setDate(new Timestamp(System.currentTimeMillis()));
         if (usuari.getPrimaryGroup() != null)
         {
+        	tasque = getTaskEntityDao().newTaskEntity();
+        	tasque.setDate(new Timestamp(System.currentTimeMillis()));
 	        tasque.setTransaction(TaskHandler.UPDATE_GROUP);
 	        tasque.setGroup(usuari.getPrimaryGroup().getName());
 	        getTaskEntityDao().createForce(tasque);

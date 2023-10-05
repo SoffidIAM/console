@@ -23,17 +23,17 @@ public class Configuration {
 		return cc;
 	}
 
-	public static ClassConfig getClassConfig (String resourceName) throws UnsupportedEncodingException, JSONException, ClassNotFoundException
+	public static ClassConfig getClassConfig (String className) throws UnsupportedEncodingException, JSONException, ClassNotFoundException
 	{
-		ClassConfig cc = currentConfig.get(resourceName);
-		if (cc != null)
-			return cc;
-		
-		if (resourceName == null)
+ 		if (className == null)
 			return null;
-		
-		resourceName = resourceName.replace('.', '/') + ".query.json";
-		
+
+ 		ClassConfig cc = currentConfig.get(className);
+ 		if (cc != null)
+ 			return cc;
+ 		
+		String resourceName = className.replace('.', '/') + ".query.json";
+
 		InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
 		
 		if (in == null)
@@ -46,7 +46,7 @@ public class Configuration {
 			cc = new ClassConfig();
 			
 			String hibernateClass = obj.getString("hibernateClass");
-			cc.setClazz(resourceName);
+			cc.setClazz(className);
 			cc.setHibernateClass(hibernateClass);
 			cc.setAttributes(new HashMap<String, AttributeConfig>());
 			

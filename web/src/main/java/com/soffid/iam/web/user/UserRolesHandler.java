@@ -80,9 +80,9 @@ public class UserRolesHandler extends Div implements AfterCompose {
 	public void showDetails(Event event) {
 		Window w = getWindowModify();
 		w.doHighlighted();
-		Component trash = w.getFellow("trash");
+		Component trash = w.getFellowIfAny("trash");
 		Object ruleId = getListbox().getJXPathContext().getValue("ruleId");
-		trash.setVisible(ruleId == null);
+		if (trash != null)  trash.setVisible(ruleId == null);
 
 		SoDRisk risk = (SoDRisk) getListbox().getJXPathContext().getValue("sodRisk");
 		CustomField3 sodRisk = (CustomField3) w.getFellow("sodRisk");

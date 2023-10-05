@@ -55,6 +55,7 @@ import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupAttributeEntity;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.GroupEntityDao;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
@@ -68,6 +69,7 @@ import com.soffid.iam.model.RoleGroupEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserEntityDao;
 import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.UserGroupEntityDao;
@@ -439,19 +441,26 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			if (grup.getEndDate() != null)
 				grup.setEndDate(new Date());
 		} else {
-			Group copyObject = getGroupEntityDao().toGroup(old);
-			copyObject.setId(null);
+			GroupEntity copyEntity = getGroupEntityDao().newGroupEntity();
+			copyEntity.setBudgetSection(old.getBudgetSection());
+			copyEntity.setDescription(old.getDescription());
+			copyEntity.setDriveLetter(old.getDriveLetter());
+			copyEntity.setName(old.getName());
+			copyEntity.setObsolete("S");
+			copyEntity.setOrganizational(old.getOrganizational());
+			copyEntity.setParent(old.getParent());
+			copyEntity.setTenant(old.getTenant());
+			copyEntity.setUnitType(old.getUnitType());
 			if (grup.getStartDate() != null) {
-				copyObject.setEndDate(grup.getStartDate());
+				copyEntity.setEndDate(grup.getStartDate());
 			} else {
-				copyObject.setEndDate(new Date());
-				grup.setStartDate(copyObject.getEndDate());
+				copyEntity.setEndDate(new Date());
+				grup.setStartDate(copyEntity.getEndDate());
 			}
-			GroupEntity copy = getGroupEntityDao().groupToEntity(copyObject);
-			copy.setObsolete("S");
-			copy.setEndDate(new Date());
-			getGroupEntityDao().create(copy);
-			updateGroupAttributes(copyObject, copy);
+			getGroupEntityDao().create(copyEntity);
+			Group copy = getGroupEntityDao().toGroup(copyEntity);
+			copy.getAttributes().putAll(grup.getAttributes());
+			updateGroupAttributes(copy, copyEntity);
 		}
 	}
 
@@ -891,25 +900,34 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAndFilterAsync(String text, String filter) throws Exception {
-		String q = generateQuickSearchQuery(text, filter);
-		return handleFindGroupByJsonQueryAsync(q);
+		final AsyncList<Group> result = new AsyncList<Group>();
+		
+		getAsyncRunnerService().run(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					internalFindGroup(result, text, generateQueryCurrent(filter), null, null);
+				} catch (Throwable e) {
+					throw new RuntimeException(e);
+				}				
+			}
 			
+		}, result);
+
+		return result;			
 	}
 
 	@Override
 	protected AsyncList<Group> handleFindGroupHistoryByTextAndFilterAsync(String text, String filter, Date date) throws Exception {
-		String q = generateQuickSearchQuery(text, filter);
 		if (date == null)
-			return handleFindGroupByJsonQueryAsync(q);
+			return handleFindGroupByTextAndFilterAsync(text, filter);
 		else {
-			String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
 			final AsyncList<Group> result = new AsyncList<Group>();
-			final String q2 = "("+q+") and (not startDate pr or startDate le \""+s+"\") and"
-					+ "(not endDate pr or endDate ge \""+s+"\")";
 			getAsyncRunnerService().run(new Runnable() {
 				public void run() {
 					try {
-						findByJsonQuery(result, q2, new CriteriaSearchConfiguration());
+						internalFindGroup(result, text, generateQueryDate(filter, date), null, null);
 					} catch (Exception e) {
 						result.cancel(e);
 					}
@@ -921,48 +939,53 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	@Override
 	protected List<Group> handleFindGroupByTextAndFilter(String text, String filter) throws Exception {
-		String q = generateQueryCurrent(text, filter);
-
-		return handleFindGroupByJsonQuery(q);
+		return handleFindGroupByTextAndFilter(text, filter, null, null).getResources();
 	}
 
 	@Override
 	protected PagedResult<Group> handleFindGroupByTextAndFilter(String text, String filter, Integer first, Integer pageSize) throws Exception {
-		String q = generateQuickSearchQuery(text, filter);
-		return handleFindGroupByJsonQuery(q, first, pageSize);
+		final List<Group> result = new LinkedList<Group>();
+		return internalFindGroup(result, text, generateQueryCurrent(filter), first, pageSize);
 	}
 
-	private String generateQuickSearchQuery(String text, String filter) {
-		String q = generateQuickSearchQuery(text);
+	protected String generateQueryCurrent(String filter) {
+		String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
+		
+		String q = null;
 		String [] split = removeOrderBy(filter);
 		filter = split[0];
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+")";
-		else if ( filter != null && ! filter.trim().isEmpty())
+	
+		if (ConfigurationCache.isHistoryEnabled()) {
+			if ( filter != null && ! filter.trim().isEmpty())
+				q = "("+filter+")  and ( not endDate pr  or endDate ge \""+s+"\")";
+			else
+				q = "(not endDate pr) or endDate ge \""+s+"\"";
+			if (split[1] != null)
+				q += " "+split[1];
+		} else {
 			q = filter;
-		if (split[1] != null)
-			q += " "+split[1];
+		}
+		
 		return q;
 	}
 
-	protected String generateQueryCurrent(String text, String filter) {
-		String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date());
+	protected String generateQueryDate(String filter, Date d) {
+		String s = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d);
 		
-		String q = generateQuickSearchQuery(text);
+		String q = null;
 		String [] split = removeOrderBy(filter);
 		filter = split[0];
-		
-		if (!q.isEmpty() && filter != null && ! filter.trim().isEmpty())
-			q = "("+q+") and ("+filter+") and ( not endDate pr  or endDate ge \""+s+"\")";
-		else if ( filter != null && ! filter.trim().isEmpty())
-			q = "("+filter+")  and ( not endDate pr  or endDate ge \""+s+"\")";
-		else if (!q.isEmpty())
-			q = "("+q+")  and ( not endDate pr or endDate ge \""+s+"\")";
-		else
-			q = "(not endDate pr) or endDate ge \""+s+"\"";
-		
-		if (split[1] != null)
-			q += " "+split[1];
+	
+		if (ConfigurationCache.isHistoryEnabled()) {
+			q = "(not startDate pr or startDate le \""+s+"\") and"
+					+ "(not endDate pr or endDate ge \""+s+"\")";
+			if ( filter != null && ! filter.trim().isEmpty())
+				q = "("+filter+") and " + q;
+			if (split[1] != null)
+				q += " "+split[1];
+		} else {
+			q = filter;
+		}
 		
 		return q;
 	}
@@ -979,121 +1002,65 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 	@Override
 	protected List<Group> handleFindGroupByText(String text) throws Exception {
-		String q = generateQueryCurrent(text, null);
-		return handleFindGroupByJsonQuery(q);
+		return handleFindGroupByTextAndFilter(text, null, null, null).getResources();
 	}
 	
 	@Override
 	protected AsyncList<Group> handleFindGroupByTextAsync(final String text) throws Exception {
-		String q = generateQuickSearchQuery(text);
-		return handleFindGroupByJsonQueryAsync(q);
+		return handleFindGroupByTextAndFilterAsync(text, null);
 	}
 
 
 
-	protected PagedResult<Group> findByJsonQuery ( AsyncList<Group> result, String query, CriteriaSearchConfiguration cs) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError, InterruptedException, ExecutionException
+	protected PagedResult<Group> internalFindGroup ( List<Group> result, String text, String query, Integer first, Integer pageSize) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError, InterruptedException, ExecutionException
 	{
-		return findByJsonQuery(result, query, null, null);
-	}
-
-	protected PagedResult<Group> findByJsonQuery ( AsyncList<Group> result, String query, Integer first, Integer pageSize) throws EvalException, InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, JSONException, ParseException, TokenMgrError, InterruptedException, ExecutionException
-	{
-		// Register virtual attributes for additional data
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 
-		// Prepare query HQL
-		AbstractExpression expression = ExpressionParser.parse(query);
-		expression.setOracleWorkaround( CustomDialect.isOracle());
-		HQLQuery hql = expression.generateHSQLString(Group.class);
-		String qs = hql.getWhereString().toString();
-		if (qs.isEmpty())
-			qs = "o.tenant.id = :tenantId";
-		else
-			qs = "(" + qs + ") and o.tenant.id = :tenantId";
-		hql.setWhereString(new StringBuffer(qs));
-
-		// Include HQL parameters
-		Map<String, Object> params = hql.getParameters();
-		Parameter paramArray[] = new Parameter[params.size() + 1];
-		int i = 0;
-		for (String s : params.keySet())
-			paramArray[i++] = new Parameter(s, params.get(s));
-		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
-
-		CriteriaSearchConfiguration cfg = new CriteriaSearchConfiguration();
-		cfg.setFirstResult(first);
-		cfg.setMaximumResultSize(pageSize);
-		// Execute HQL and generate result
-		int totalResults = 0;
-		for (GroupEntity ge : getGroupEntityDao().query(hql.toString(), paramArray, cfg )) {
-			if (result.isCancelled())
-				return null;
-			Group g = getGroupEntityDao().toGroup(ge);
-			if (!hql.isNonHQLAttributeUsed() || expression.evaluate(g)) {
-				if (getAuthorizationService().hasPermission(Security.AUTO_GROUP_QUERY, ge)) {
-					result.add(g);
-					totalResults ++;
-				}
+		final GroupEntityDao dao = getGroupEntityDao();
+		ScimHelper h = new ScimHelper(Group.class);
+		h.setPrimaryAttributes(new String[] { "name" } );
+		
+		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
+		config.setFirstResult(first);
+		config.setMaximumResultSize(pageSize);
+		h.setConfig(config);
+		h.setTenantFilter("tenant.id");
+		h.setGenerator((entity) -> {
+			GroupEntity ge = (GroupEntity) entity;
+			try {
+				if (getAuthorizationService().hasPermission(Security.AUTO_GROUP_QUERY, ge))
+					return dao.toGroup(ge);
+				else
+					return null;
+			} catch (InternalErrorException e) {
+				throw new RuntimeException(e);
 			}
-		}
-		PagedResult<Group> pagedResult = new PagedResult<Group>();
-		pagedResult.setResources(result);
-		pagedResult.setStartIndex( first != null ? first: 0);
-		pagedResult.setItemsPerPage( pageSize );
-		if ( pageSize  != null) {
-			@SuppressWarnings("unchecked")
-			List <Long> ll = ( List <Long>) new QueryBuilder()
-					.query( hql.toCountString(), 
-							paramArray);
-			for ( Long l: ll ) {
-				pagedResult.setTotalResults( new Integer(l.intValue()) );
-			}
-		} else {
-			pagedResult.setTotalResults(totalResults);
-		}
-		return pagedResult;
+		});
+		
+		h.search(text, query, (Collection) result); 
+
+		PagedResult<Group> pr = new PagedResult<>();
+		pr.setStartIndex(first);
+		pr.setItemsPerPage(pageSize);
+		pr.setTotalResults(h.count());
+		pr.setResources(result);
+		return pr;
 	}
 
 	@Override
 	protected List<Group> handleFindGroupByJsonQuery(String query) throws InternalErrorException, Exception {
-		AsyncList<Group> result = new AsyncList<Group>();
-		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-
-		String q = generateQueryCurrent(null, query);
-		findByJsonQuery(result, q, new CriteriaSearchConfiguration());
-		if (result.isCancelled())
-			TimeOutUtils.generateException();
-		result.done();
-		return result.get();
+		return handleFindGroupByTextAndFilter(null, query, null, null).getResources();
 	}
 
 	@Override
 	protected PagedResult<Group> handleFindGroupByJsonQuery(String query, Integer first, Integer pageSize) throws InternalErrorException, Exception {
-		AsyncList<Group> result = new AsyncList<Group>();
-		result.setTimeout(TimeOutUtils.getGlobalTimeOut());
-		String q = generateQueryCurrent(null, query);
-		PagedResult<Group> pr = findByJsonQuery(result, q, first, pageSize);
-		if (result.isCancelled())
-			TimeOutUtils.generateException();
-		result.done();
-		return pr;
+		return handleFindGroupByTextAndFilter(null, query, first, pageSize);
 	}
 
 
 	@Override
 	protected AsyncList<Group> handleFindGroupByJsonQueryAsync(final String query) throws Exception {
-		final AsyncList<Group> result = new AsyncList<Group>();
-		getAsyncRunnerService().run(new Runnable() {
-			public void run() {
-				try {
-					String q = generateQueryCurrent(null, query);
-					findByJsonQuery(result, q, new CriteriaSearchConfiguration());
-				} catch (Exception e) {
-					result.cancel(e);
-				}
-			}
-		}, result);
-		return result;
+		return handleFindGroupByTextAndFilterAsync(null, query);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -125,6 +126,23 @@ public class TaskEntityDaoImpl extends com.soffid.iam.model.TaskEntityDaoBase {
     		q.setString(2, tasqueEntity.getSystemName());
     		q.setLong(3, tasqueEntity.getTenant().getId());
     		if (! q.list().isEmpty())
+    			return true;
+    	}
+    	else if (tasqueEntity.getTransaction().equals( TaskHandler.INDEX_OBJECT))
+    	{
+    		Query q = getSession().createQuery("select distinct 1 from com.soffid.iam.model.TaskEntity as t "
+    				+ "where t.server is null and t.systemName is null and t.transaction=? and t.customObjectType=? and t.primaryKeyValue=?  and t.tenant.id=?" );
+    		q.setString(0, tasqueEntity.getTransaction());
+    		q.setString(1, tasqueEntity.getCustomObjectType());
+    		q.setLong(2, tasqueEntity.getPrimaryKeyValue());
+    		q.setLong(3, tasqueEntity.getTenant().getId());
+    		if (! q.list().isEmpty())
+    			return true;
+    		List l = getSession().createQuery("select distinct 1 from com.soffid.iam.model.CustomObjectTypeEntity "
+    				+ "where name=? and textIndex=true")
+    				.setString(0, tasqueEntity.getCustomObjectType())
+    				.list();
+    		if (l.isEmpty())
     			return true;
     	}
 		return false;

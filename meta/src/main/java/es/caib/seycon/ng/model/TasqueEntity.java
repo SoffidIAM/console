@@ -8,12 +8,14 @@ package es.caib.seycon.ng.model;
 
 import java.util.Collection;
 
+import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity(table = "SC_TASQUE", translatedName = "TaskEntity", translatedPackage = "com.soffid.iam.model")
 @Depends({ es.caib.seycon.ng.comu.Tasca.class,
-		es.caib.seycon.ng.model.TaskLogEntity.class })
+		es.caib.seycon.ng.model.TaskLogEntity.class,
+		CustomObjectTypeEntity.class})
 public abstract class TasqueEntity {
 
 	@Column(name = "TAS_ID")

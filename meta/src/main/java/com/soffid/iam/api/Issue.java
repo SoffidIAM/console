@@ -36,7 +36,7 @@ public class Issue {
 	
 	String type;
 
-	@Attribute(multiline = true)
+	@Attribute(multiline = true, readonly = true)
 	@Nullable String description;
 
 	@Attribute(defaultValue="0", type = "NUMBER", readonly = true)

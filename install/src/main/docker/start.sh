@@ -83,6 +83,10 @@ function configure {
 		echo "dbDriverClass=$DB_DRIVER"
 		echo "dbDriverUrl=$DB_URL"
 		echo "dbStatus=1"
+		if [[ "HIDE_MENU" != "" ]] 
+		then
+			echo "soffid.menu.hidden=$HIDE_MENU"
+		fi
 	) > /opt/soffid/iam-console-3/conf/system.properties		
 
     cp /opt/soffid/iam-console-3/conf/tomee.xml /opt/soffid/iam-console-3/conf/tomee.xml.template

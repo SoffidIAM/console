@@ -108,6 +108,9 @@ public class Dispatcher {
 	public boolean readOnly;
 
 	@Attribute(defaultValue = "false")
+	public boolean pause;
+
+	@Attribute(defaultValue = "false")
 	public boolean fullReconciliation;
 
 	@Description("Forrward changes to each agent after load")

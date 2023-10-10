@@ -373,6 +373,7 @@ public class AgentHandler extends FrameHandler {
 	{
 		super.onChangeForm(evt);
 		onEnableManualAccount();
+		onChangePause();
 		try {
 			JXPathContext ctx = listbox.getJXPathContext();
 			DataNode dn = (DataNode) ctx.getValue("/");
@@ -539,6 +540,18 @@ public class AgentHandler extends FrameHandler {
 			((Row)getFellow("groups_row")).setVisible(true);
 		}
 		missatge.setVisible(true);
+	}
+	
+	public void onChangePause ()
+	{
+		if (((Switch)getFellow("pause")).isChecked())
+		{
+			(getFellow("pausedLabel")).setVisible(true);
+		}
+		else
+		{
+			(getFellow("pausedLabel")).setVisible(false);
+		}
 	}
 	
 	

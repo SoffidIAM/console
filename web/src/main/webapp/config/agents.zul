@@ -239,6 +239,14 @@
 									<switch bind="@readOnly" disabled="${!canModifyAgent}" id="detall_readonly" onCheck=""/>
 								</row>
 								<row>
+									<label value="${c:l('agents.zul.Pause')}"/>
+									<div>
+										<switch bind="@pause" disabled="${!canModifyAgent}" id="pause"
+											onCheck="ref:frame.onChangePause"/>
+										<label value="${c:l('agents.zul.Paused')}" style="color: red; font-weight: bold; margin-left: 25px" id="pausedLabel"/>
+									</div>
+								</row>
+								<row>
 									<label value="${c:l('agents.zul.ManualAccountCreation')}"/>
 									<switch bind="@manualAccountCreation" disabled="${!canModifyAgent}" id="detall_manual" 
 										onCheck="ref:frame.onEnableManualAccount"/>

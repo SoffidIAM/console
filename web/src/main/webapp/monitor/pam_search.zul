@@ -74,6 +74,10 @@ display:none !important;
 					dataType="STRING" maxlength="200"
 					id="text"/>
 
+				<customfield3 label="${c:l('pamSearch.screenshots')}" onOK="ref:frame.buscar"
+					dataType="STRING" maxlength="200"
+					id="screenshots"/>
+
 				<customfield3 label="${c:l('com.soffid.iam.api.User.userName')}" onOK="ref:frame.buscar"
 					dataType="USER" id="user"/>
 

@@ -102,6 +102,12 @@ public class PamSessionService {
 			@Nullable String url, @Nullable String text,
 			@Nullable String user, @Nullable Date since, @Nullable Date until) {return null;}
 
+	@Operation(grantees = {pamSession_query.class})
+	@Description("Searches in pam sessions log")
+	List<PamSession> search(
+			@Nullable String jumpServerGroup,
+			@Nullable String url, @Nullable String text, @Nullable String screenshots,
+			@Nullable String user, @Nullable Date since, @Nullable Date until) {return null;}
 }
 
 @Role (name="seu:pamSessionConfigure" ) class Soffid_PamSessionConfigure { }

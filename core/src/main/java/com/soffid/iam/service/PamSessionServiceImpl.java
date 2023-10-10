@@ -690,6 +690,12 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 	@Override
 	protected List<PamSession> handleSearch(String jumpServerGroup, String url, String text, String user, Date since,
 			Date until) throws Exception {
+		return handleSearch(jumpServerGroup, url, text, null, user, since, until);
+	}
+	
+	@Override
+	protected List<PamSession> handleSearch(String jumpServerGroup, String url, String text, String screenshots, String user, Date since,
+			Date until) throws Exception {
 		DateFormat df = new SimpleDateFormat("yyyyMMddHHmmssZ");
 		List<PamSession> list = new LinkedList<>();
 		for (JumpServerGroupEntity jsg: getJumpServerGroupEntityDao().loadAll()) {
@@ -702,6 +708,10 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 					storeUrl += "url="+URLEncoder.encode(url, "UTF-8")+"&";
 				if (text != null)
 					storeUrl += "keystrokes="+URLEncoder.encode(text, "UTF-8")+"&";
+				if (screenshots != null)
+					storeUrl += "screenshots="+URLEncoder.encode(screenshots, "UTF-8")+"&";
+				else
+					storeUrl += "screenshots=&";
 				if (user != null)
 					storeUrl += "user="+URLEncoder.encode(user, "UTF-8")+"&";
 				if (since != null)

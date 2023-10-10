@@ -60,12 +60,13 @@ public class Search extends FrameHandler
 		String jsg = (String) ((Databox)getFellow("jumpServerGroup")).getValue();
 		String url = (String) ((Databox)getFellow("url")).getValue();
 		String text = (String) ((Databox)getFellow("text")).getValue();
+		String screenshots = (String) ((Databox)getFellow("screenshots")).getValue();
 		String user = (String) ((Databox)getFellow("user")).getValue();
 		Date sd = (Date) ((Databox)getFellow("startDate")).getValue();
 		Date sd2 = (Date) ((Databox)getFellow("startDate2")).getValue();
 
 		
-		sessions = EJBLocator.getPamSessionService().search(jsg, url, text, user, sd, sd2);
+		sessions = EJBLocator.getPamSessionService().search(jsg, url, text, screenshots, user, sd, sd2);
 			
 		if(sessions.size() == 0)
 		{

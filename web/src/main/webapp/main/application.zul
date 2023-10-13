@@ -46,10 +46,10 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 		<image style="height: 32px; float: right " src="/anonymous/wait.gif" id="waiting"/>
 	</popup>
 	<script src="/js/ssokm.js"/>
-	<h:div id="soffidAraleExtensionDetector"/>
 	<html><![CDATA[
-	<form id="pamLauncherForm" action="/" target="_blank" method="POST">
-		<input type="hidden" id="pamLauncherFormSessionId" name="sessionId"/>
-	</form>	
+		<div id="soffidAraleExtensionDetector"/>
+		<form id="pamLauncherForm" action="/" target="_blank" method="POST">
+			<input type="hidden" id="pamLauncherFormSessionId" name="sessionId"/>
+		</form>	
 	]]></html>
 </window>

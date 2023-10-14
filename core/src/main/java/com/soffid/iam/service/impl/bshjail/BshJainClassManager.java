@@ -11,7 +11,8 @@ import bsh.BshClassManager;
 import bsh.UtilEvalError;
 
 public class BshJainClassManager extends BshClassManager {
-
+	static boolean disabled = "true".equals(System.getenv("SOFFID_TRUSTED_SCRIPTS"));
+	
 	public BshJainClassManager() {
 	}
 
@@ -58,6 +59,8 @@ public class BshJainClassManager extends BshClassManager {
 	}
 
 	private boolean isAllowed(String name) {
+		if (disabled) return true;
+		
 		if (name.equals("java.lang.Class"))
 			return false;
 		

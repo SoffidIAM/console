@@ -58,6 +58,7 @@ import com.soffid.iam.bpm.service.BpmConfigService;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.doc.nas.comm.DatabaseStrategy;
 import com.soffid.iam.model.AgentDescriptorEntity;
+import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.service.impl.ConsoleTrustedCertificateLoader;
@@ -535,6 +536,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("112");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("112"))
+		{
+			updatePauseAttribute();
+			cfg.setValue("113");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void fixAgentDescriptor() {
@@ -683,6 +690,25 @@ public class ApplicationBootServiceImpl extends
 			executeSentence(conn, "UPDATE SC_EVPOAC SET EPA_STATUS='N' "
 					+ "WHERE EPA_STATUS IS NULL OR EPA_STATUS=''",
 								new Object[] {});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	private void updatePauseAttribute() throws IOException, Exception 
+	{
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_DISPAT SET DIS_PAUSEY=? "
+					+ "WHERE DIS_PAUSEY IS NULL",
+								new Object[] {
+										CustomDialect.isPostgresql() ? false: 0
+								});
 		}
 		finally
 		{

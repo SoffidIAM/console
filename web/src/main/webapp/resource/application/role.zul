@@ -45,7 +45,7 @@
 		</div>
 		
 		<div sclass="card__face card__face--back" use="com.soffid.iam.web.application.ApplicationRoleHandler"
-			id="handler">
+			id="handler" standalone="true">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"  lastAction="ref:frame.confirmApply" visible="${!embed }">
 				<pager datatable="listbox"/>
 				<databutton image="/img/trash.svg" onlyIcon="true"

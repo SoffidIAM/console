@@ -6,6 +6,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
@@ -47,5 +48,6 @@ public class RoleHandler extends FrameHandler {
 	public void importCsv (Event ev) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
 		new RoleImporter().importCsv(this);
 	}
+
 
 }

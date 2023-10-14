@@ -102,7 +102,13 @@ public class AccountEntityDaoImpl extends
         	.setLong("id", entity.getId())
         	.executeUpdate();
         
-		try {
+        getSession()
+	    	.createQuery("delete com.soffid.iam.model.SessionEntity "
+	    		 	   + "where account.id=:id")
+	    	.setLong("id", entity.getId())
+	    	.executeUpdate();
+
+        try {
 			getAuditEntityDao().unlinkAccounts(entity);
 		} catch (InternalErrorException e) {
 			throw new RuntimeException(e);

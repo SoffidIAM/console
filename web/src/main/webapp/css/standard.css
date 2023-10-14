@@ -3209,6 +3209,9 @@ div.options {
 		height: 80px; 
 	}
 	
+	.topline img.logo.col_der {
+		display: none;
+	}
 }
 
 /********* MENU BAR **************/
@@ -3992,6 +3995,12 @@ div.wizard-bar div.separator-d {
 	.col_izq img.menu3starter,
 	div.col_der.help {
 		 display:none;
+	}
+}
+
+@media only screen and (max-width: 400px) {
+	div.col_cen {
+		display: none;
 	}
 }
 

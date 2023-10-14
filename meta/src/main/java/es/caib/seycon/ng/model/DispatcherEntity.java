@@ -148,9 +148,10 @@ public abstract class DispatcherEntity {
 		defaultValue="false")
 	public boolean readOnly;
 
+	@Nullable
 	@Column (name="DIS_PAUSEY",
 			defaultValue="false")
-		public boolean pause;
+	public boolean pause;
 
 	@Column (name="DIS_AUTHRT",
 		defaultValue="false")

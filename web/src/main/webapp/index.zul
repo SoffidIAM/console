@@ -16,7 +16,7 @@
 	<script src='~./js/codemirror/java-classes.js' />
 	<script src='/comu/syncserver-classes.js' />
 	<script src="/js/html2canvas.min.js" />
-	
+
 	<application id="app" allowOpenMultipleTabs="true" autoReload="true" favorits="//favorits/favorits"
 	    template="main/application.zul" 
 		initialPage="${initialPage}"
@@ -26,6 +26,11 @@
 			<label style="color:red;" id="fail-safe-mode-label" value="WARNING: Fail-safe mode. See log file"/>
 		</div>
 	</application>
+	<html><![CDATA[
+      	<div id="soffidAraleExtensionDetector" />
+	]]>
+	</html>
+	
 	<image src="img/wait.gif" style="display:none;visibility:hidden;"/>		
 	<timer delay="120000" repeats="true" onTimer="ref:main.onTimer"/>	
 </div> 

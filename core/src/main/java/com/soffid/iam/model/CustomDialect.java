@@ -35,7 +35,8 @@ public class CustomDialect extends Dialect {
     static boolean oracle = false;
     static boolean mysql = false;
     static boolean sqlServer = false;
-
+    static boolean postgresql = false;
+    
     public CustomDialect() {
         super();
         if (dialectClass != null)
@@ -81,6 +82,7 @@ public class CustomDialect extends Dialect {
 	        	proxyDialect = new SQLServerDialect();
 	        } else if ("postgresql".equals (type)) { //$NON-NLS-1$
 	        	oracle = false;
+	        	postgresql = true;
 	            proxyDialect = new PostgreSQLDialect();
 	        } else {
 	            throw new RuntimeException("Unable to get dialect for database type ["+type+"]"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -529,6 +531,10 @@ public class CustomDialect extends Dialect {
 
 	public static boolean isSqlServer() {
 		return sqlServer;
+	}
+
+	public static boolean isPostgresql() {
+		return postgresql;
 	}
     
     

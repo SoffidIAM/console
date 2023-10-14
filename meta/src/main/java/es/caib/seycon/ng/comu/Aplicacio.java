@@ -33,13 +33,13 @@ public abstract class Aplicacio {
 	@Nullable
 	public java.lang.String parent;
 
-	@Attribute(customUiHandler = "com.soffid.iam.web.application.NameFieldHandler")
+	@Attribute(customUiHandler = "com.soffid.iam.web.application.NameFieldHandler", searchCriteria = true)
 	public java.lang.String relativeName;
 
 	@Attribute(translated = "name", readonly = true  )
 	public java.lang.String codi;
 	
-	@Attribute(translated = "description" )
+	@Attribute(translated = "description", searchCriteria = true )
 	public java.lang.String nom;
 
 	@Description("where source files are located")

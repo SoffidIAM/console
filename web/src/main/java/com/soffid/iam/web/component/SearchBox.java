@@ -569,6 +569,14 @@ public class SearchBox extends HtmlBasedComponent implements AfterCompose {
 						s += datatype.getName();
 					}
 				}
+				if (s.isEmpty())
+					for (DataType datatype: EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(getJsonObject(), null)) {
+						if (! datatype.isReadOnly() && datatype.getType() != TypeEnumeration.SEPARATOR)
+						{
+							s = datatype.getName();
+							break;
+						}
+					}
 			} catch (Exception e) {
 			}
 		}

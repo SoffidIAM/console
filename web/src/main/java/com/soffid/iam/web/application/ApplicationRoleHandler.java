@@ -55,6 +55,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	private static final int WIZARD_GRANTEE = 2;
 	private static final int WIZARD_GROUP = 3;
 	private String listboxPath;
+	private boolean standalone;
 	
 	private UserService userService;
 	private Role currentRole;
@@ -90,12 +91,12 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	public void showDetails(Event event) {
 		DataNode dn = (DataNode) getListbox().getJXPathContext().getValue("/");
 		currentRole = (Role) dn.getInstance();
-		getWindowModify().doHighlighted();
+		((Window)getWindowModify()).doHighlighted();
 		displayRemoveButton(false);
 	}
 	
 	public void closeDetails(Event event) throws Exception {
-		Window w = getWindowModify();
+		Window w = (Window) getWindowModify();
 		w.setVisible(false);
 		if (event != null)
 			event.stopPropagation();
@@ -124,8 +125,8 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		}
 	}
 
-	public Window getWindowModify() {
-		return (Window) getFellow("modify-window");
+	public Component getWindowModify() {
+		return standalone ? this:  getFellow("modify-window");
 	}
 	
 	public DynamicColumnsDatatable getListbox() {
@@ -708,6 +709,16 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 
 	public DataModel getModel() {
 		return (DataModel) getPage().getFellowIfAny("model");
+	}
+
+	
+	public boolean isStandalone() {
+		return standalone;
+	}
+
+	
+	public void setStandalone(boolean standalone) {
+		this.standalone = standalone;
 	}
 
 }

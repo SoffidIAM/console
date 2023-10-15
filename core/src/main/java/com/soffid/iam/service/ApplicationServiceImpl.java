@@ -2093,10 +2093,10 @@ public class ApplicationServiceImpl extends
 							 ra.getStatus().equals(RoleDependencyStatus.STATUS_TOREMOVE)))
 					{
 		                for (AccountEntity ae : getAccountsForDispatcher(originUser, originAccount, ra.getContained().getSystem())) {
-		                    RolAccountDetail n = new RolAccountDetail(ra, ae, currentRol);
+		                    RolAccountDetail n = new RolAccountDetail(ra, ae, parent);
 		                    parentsToAdd.add(n);
 		                    n.granteeRol = rol;
-		                    n.parent = currentRol;
+		                    n.parent = parent;
 		                    n.generateHash();
 		                    if (! rad.contains(n)) {
 		                        if (type == DIRECT || type == ALL) rad.add(n);

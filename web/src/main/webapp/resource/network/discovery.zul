@@ -321,7 +321,7 @@
 		xmlns:h="http://www.w3.org/1999/xhtml"
 		id="add_entrypoint"
 		position="top, center" sizable="true"
-		title="${c:l('discovery.addAccount')}" visible="false"
+		title="${c:l('discovery.addEntryPoint')}" visible="false"
 		style="width: 80%; max-width: 800px">
 
 		<customfield3 id="type" dataType="STRING" label="${c:l('discovery.entryPointType') }" required="true"/>

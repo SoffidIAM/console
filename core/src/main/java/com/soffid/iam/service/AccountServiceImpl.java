@@ -96,6 +96,7 @@ import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.remote.RemoteServiceLocator;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.account.AccountNameGenerator;
 import com.soffid.iam.service.impl.ObjectVariableResolver;
 import com.soffid.iam.service.impl.SshKeyGenerator;
@@ -399,6 +400,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			audit("E", acc);
 
 		createAccountTask(acc);
+		
+		SoffidPrincipalImpl.clearCache();
 		return account;
 	}
 
@@ -940,9 +943,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		account = getVaultService().addToFolder(account);
 
-		if (anyChange)
+		if (anyChange) {
 			createAccountTask(ae);
-		
+			SoffidPrincipalImpl.clearCache();
+		}		
 		return account;
 	}
 
@@ -1095,6 +1099,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         acc.setDisabled(false);
 						acc.setStatus(AccountStatus.ACTIVE);
                         getAccountEntityDao().update(acc);
+                        SoffidPrincipalImpl.clearCache();
                         audit("E", acc);
                     }
                     if ( (acc.getStatus() == AccountStatus.ACTIVE ||
@@ -1102,6 +1107,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         acc.setDisabled(true);
 						acc.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(acc);
+                        SoffidPrincipalImpl.clearCache();
                         audit("e", acc);
                     }
                 }
@@ -1117,6 +1123,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     if (accs.isEmpty()) {
                         try {
                             generateAccount(null, ue, disEntity, false);
+                            SoffidPrincipalImpl.clearCache();
                         } catch (Exception e) {
                             LogFactory.getLog(getClass()).warn(String.format(Messages.getString("AccountServiceImpl.ErrorGeneratinAccount"), user, dis.getName()), e);
                         }
@@ -1130,6 +1137,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     							acc.setStatus(AccountStatus.ACTIVE);
                                 getAccountEntityDao().update(acc);
                                 audit("E", acc);
+                                SoffidPrincipalImpl.clearCache();
                             }
                             if (!description.equals(acc.getDescription())) {
                                 acc.setDescription(description);
@@ -1147,6 +1155,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
                             audit("e", acc);
+                            SoffidPrincipalImpl.clearCache();
                    		}
                         if (! description.equals(acc.getDescription())) {
                             acc.setDescription(description);
@@ -1164,6 +1173,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						account.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(account);
                         audit("e", account);
+                        SoffidPrincipalImpl.clearCache();
                		}
                 }
             }

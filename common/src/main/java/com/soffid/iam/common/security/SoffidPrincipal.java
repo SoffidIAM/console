@@ -10,8 +10,6 @@ public interface SoffidPrincipal extends Principal {
 
 	public String getTenant();
 
-	public long getAccountId();
-
 	public String getHolderGroup();
 
 	public String[] getRoles() ;

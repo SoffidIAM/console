@@ -152,6 +152,7 @@ public class AuthorizationServiceImpl extends
         AuthorizationEntity auto = getAuthorizationEntityDao().authorizationRoleToEntity(autoritzacio);
         getAuthorizationEntityDao().create(auto);
 
+        SoffidPrincipalImpl.clearCache();
         return getAuthorizationEntityDao().toAuthorizationRole(auto);
     }
 
@@ -160,6 +161,7 @@ public class AuthorizationServiceImpl extends
         if (autoritzacio.getId() != null) {
             getAuthorizationEntityDao().remove(autoritzacio.getId());
         }
+        SoffidPrincipalImpl.clearCache();
     }
 
     /*

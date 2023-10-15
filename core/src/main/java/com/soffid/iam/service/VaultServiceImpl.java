@@ -21,6 +21,7 @@ import com.soffid.iam.api.VaultFolder;
 import com.soffid.iam.api.VaultFolderAccountPermissions;
 import com.soffid.iam.api.VaultFolderPermissions;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.GroupEntity;
@@ -958,6 +959,9 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected List<VaultFolder> handleFindFolders(String filter)
 			throws Exception {
+		// Clear security tokens
+		SoffidPrincipal principal = Security.getSoffidPrincipal();
+		principal.getAccountIds();
 		if (filter == null || filter.trim().length() == 0)
 			return getRootFolders();
 		else

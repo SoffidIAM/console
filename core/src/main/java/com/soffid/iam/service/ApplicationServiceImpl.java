@@ -106,6 +106,7 @@ import com.soffid.iam.model.UserEntity;
 import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.attribute.AttributePersister;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.iam.service.impl.RolGrantDiffReport;
@@ -934,6 +935,7 @@ public class ApplicationServiceImpl extends
         if (rolsUsuaris.getUserCode() != null && rolsUsuaris.getRuleId() == null)
         	notifyUserChange(getUserEntityDao().findByUserName(rolsUsuaris.getUserCode()));
 
+		SoffidPrincipalImpl.clearCache();
         return rolsUsuaris;
     }
 
@@ -1300,6 +1302,7 @@ public class ApplicationServiceImpl extends
             if (user != null && rolsUsuarisEntity.getRule() == null)
             	notifyUserChange(user);
             
+    		SoffidPrincipalImpl.clearCache();
             return;
         } 
         throw new SeyconAccessLocalException("aplicacioService", "delete (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -1493,6 +1496,7 @@ public class ApplicationServiceImpl extends
                 if (rolsUsuaris.getUserCode() != null && rolsUsuaris.getRuleId() == null)
                 	notifyUserChange(getUserEntityDao().findByUserName(rolsUsuaris.getUserCode()));
 
+                SoffidPrincipalImpl.clearCache();
             	return rolsUsuaris;
     		} else {
             	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:create", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -3942,6 +3946,7 @@ public class ApplicationServiceImpl extends
 			getRoleEntityDao().update(role, false);
 		}
 		handleSynchronizeRole(getRoleEntityDao().toRole(roleEntity));
+		SoffidPrincipalImpl.clearCache();
 		return grant;
 	}
 	
@@ -3985,6 +3990,7 @@ public class ApplicationServiceImpl extends
 			}
 			getRoleEntityDao().update(role, false);
 		}
+		SoffidPrincipalImpl.clearCache();
 	}
 
 	@Override
@@ -4005,6 +4011,7 @@ public class ApplicationServiceImpl extends
 			role.getOwnedRoles().add(grant);
 			getRoleEntityDao().update(role, false);
 		}
+		SoffidPrincipalImpl.clearCache();
 		return grant;
 	}
 

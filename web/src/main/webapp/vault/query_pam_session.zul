@@ -82,6 +82,9 @@ display:none !important;
 				  var soffidVideos = ${videos };
 				  var soffidCaptions = ${captions };
 				  var soffidChapters = ${chapterStart };
+				  var videoStart = ${videoStart };
+				  var videoEnd = ${videoEnd };
+				  if (soffidChapters[0] > videoStart) videoStart = soffidChapters[0];
 				  var showCaptions = false;
 				  var video = document.getElementById("video");
 				  var videoContainer = document.getElementById("${videoContainer.uuid }");
@@ -156,8 +159,8 @@ display:none !important;
 				  // Event listener for the seek bar
  				  seekBar.addEventListener("change", function() {
 					  // Calculate the new time
-					  var videoSize = ${videoEnd } - ${videoStart };
-					  var time = videoSize * (seekBar.value / 100) + ${videoStart };
+					  var videoSize = videoEnd - videoStart;
+					  var time = videoSize * (seekBar.value / 100) + videoStart;
 					  var newChapter = 0;
 					  for (var i = 0; i < soffidChapters.length; i++) {
 						  if ( time > soffidChapters[i]) {
@@ -187,16 +190,16 @@ display:none !important;
  				  seekBar.addEventListener("input", function() {
 					  // Calculate the new time
 					  video.pause();
-					  var videoSize = ${videoEnd } - ${videoStart };
-					  var time = videoSize * (seekBar.value / 100) + ${videoStart };
+					  var videoSize = videoEnd - videoStart;
+					  var time = videoSize * (seekBar.value / 100) + videoStart;
 					  var t = new Date( time);
 					  seekLabel.innerText = zk.formatDate(t, "${timeFormat }");
 					});
 					// Update the seek bar as the video plays
 					video.addEventListener("timeupdate", function() {
-					  var videoSize = ${videoEnd } - ${videoStart };
+					  var videoSize = videoEnd - videoStart;
 					  var chapterStart = soffidChapters[currentChapter] ;
-					  var position = video.currentTime * 1000 + chapterStart - ${videoStart};
+					  var position = video.currentTime * 1000 + chapterStart - videoStart;
 					  seekBar.value = 100 * position / videoSize;
 					  var t = new Date( chapterStart + video.currentTime * 1000);
 					  seekLabel.innerText = zk.formatDate(t, "${timeFormat }");
@@ -215,6 +218,9 @@ display:none !important;
 						  });
 					  } else {
 					      playButton.src = "${execution.contextPath }/img/play.svg"
+						  var chapterStart = soffidChapters[currentChapter] ;
+					      videoEnd = video.currentTime * 1000 + chapterStart;
+					      seekBar.value = 100;
 					  } 
 					});
 					// Pause the video when the slider handle is being dragged

@@ -15,16 +15,12 @@
 	<style>
 		div.grid td {vertical-align: top;}
 		div.grid td.gc div { min-height: 24px};
-video::-webkit-media-controls-enclosure {
-display:none !important;
-}
+		video::-webkit-media-controls-enclosure {display:none !important;}
+		
+		.custom-video-controls {}
 
-.custom-video-controls {
-}
-
-		#video {
-			background-color: black;
-		}
+		#video {background-color: black;}
+		
 		div#videoContainer {
 			display: inline-block;
 			text-align: center;
@@ -186,6 +182,7 @@ display:none !important;
 						soffidCaptions = captions;
 						soffidChapters = chapters;
 						videoStart = start;
+						if (soffidChapters[0] > videoStart) videoStart = soffidChapters[0];
 						videoEnd = end;
 						document.getElementById("videosrc").setAttribute("src", soffidVideos[0]);
 						document.getElementById("videocaption").setAttribute("src", soffidCaptions[0]);
@@ -329,6 +326,9 @@ display:none !important;
 							  });
 						  } else {
 						      playButton.src = "${execution.contextPath }/img/play.svg"
+							  var chapterStart = soffidChapters[currentChapter] ;
+						      videoEnd = video.currentTime * 1000 + chapterStart;
+						      seekBar.value = 100;
 						  } 
 						});
 						// Pause the video when the slider handle is being dragged

@@ -224,6 +224,8 @@ public class FrameHandler extends Frame {
 	}
 	
 	protected HtmlBasedComponent getCard() {
+		if (getPage() == null)
+			return null;
 		final HtmlBasedComponent card = (HtmlBasedComponent) getPage().getFellowIfAny("card");
 		return card;
 	}
@@ -259,7 +261,7 @@ public class FrameHandler extends Frame {
 
 	protected DataModel getModel() {
 		DataModel model = (DataModel) getFellowIfAny("model");
-		if (model == null)
+		if (model == null && getPage() != null)
 			model = (DataModel) getPage().getFellowIfAny("model");
 		return model;
 	}

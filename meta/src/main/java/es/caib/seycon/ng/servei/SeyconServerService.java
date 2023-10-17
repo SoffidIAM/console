@@ -61,7 +61,7 @@ public abstract class SeyconServerService {
 
 	@Operation(grantees = { roles.monitor_agent_list.class }, translated = "getServerAgentStatus")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getServerAgentStatus(java.lang.String url)
+	public java.util.Collection<es.caib.seycon.ng.comu.AgentStatusInfo> getServerAgentStatus(@Nullable java.lang.String url)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
@@ -96,7 +96,7 @@ public abstract class SeyconServerService {
 
 	@Operation(grantees = { roles.monitor_agent_list.class }, translated = "getAgentTasks")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
-	public java.util.Collection<es.caib.seycon.ng.comu.SeyconAgentTaskLog> getAgentTasks(java.lang.String url,
+	public java.util.Collection<es.caib.seycon.ng.comu.SeyconAgentTaskLog> getAgentTasks(@Nullable java.lang.String url,
 			java.lang.String agentCodi) throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}

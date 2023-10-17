@@ -234,6 +234,17 @@ public abstract class TasqueEntity {
 
 	@DaoFinder("select tasques from \n"
 			+ "com.soffid.iam.model.TaskEntity tasques\n"
+			+ "where tasques.server is not null and "
+			+ "(tasques.systemName is null or tasques.systemName = :system) "
+			+ "and tasques.tenant.id = :tenantId "
+			+ "order by tasques.date, tasques.id")
+	public java.util.List<es.caib.seycon.ng.model.TasqueEntity> findBySystem(
+			String system) {
+		return null;
+	}
+
+	@DaoFinder("select tasques from \n"
+			+ "com.soffid.iam.model.TaskEntity tasques\n"
 			+ "where tasques.server=:server and tasques.serverInstance=:serverInstance and "
 			+ "(tasques.systemName is null or tasques.systemName = :system) "
 			+ "and tasques.tenant.id = :tenantId "

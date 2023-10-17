@@ -210,48 +210,96 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
         // Aquí asumim que la configuració ja està feta (!!)
         // Config.configureClient(name, port);
 
-        try {
-            RemoteServiceLocator rsl = createRemoteServiceLocator(url);
-            
-            SyncStatusService status = rsl.getSyncStatusService();
-
-            // Obtenin tots els agents del servidor
-            Collection<AgentStatusInfo> agentstatus0 = status.getSyncAgentsInfo(Security.getCurrentTenantName());
-            LinkedList<AgentStatusInfo> agentstatus;
-			if (agentstatus0 == null)
-            	agentstatus = new LinkedList<AgentStatusInfo>();
-			else
-				agentstatus = new LinkedList<AgentStatusInfo> (agentstatus0);
-			
-			String server;
-			try { server = new URL(url).getHost(); } catch (Exception e) {server = url;}
-			
-			List<AgentStatusInfo> m = new LinkedList<>();
-
-			ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
-			if (si == null) 
-				si = getServerInstanceEntityDao().findByName(server);
-			Collection<Object[]> tasks = si == null ?
-					getTaskEntityDao().countTasksBySystem(server) :
-					getTaskEntityDao().countTasksBySystem(si.getServer().getName(), si.getName());
-			Collection<Object[]> tl = si == null?
-					getTaskLogEntityDao().countTasksByServerAndSystem(server) :
-					getTaskLogEntityDao().countTasksByServerAndSystem(si.getServer().getName(), si.getName());
-
-			for ( AgentStatusInfo as: agentstatus) {
-				as.setPendingTasks(0);
-				for (Object[] tll: tasks) {
-					if ( tll[0] == null || tll[0].toString().trim().isEmpty() ||
-							tll[0].equals(as.getAgentName())) {
-						as.setPendingTasks( as.getPendingTasks() + ((Long) tll[1]).intValue());
+    	try {
+    		LinkedList<AgentStatusInfo> agentstatus;
+	    	if (url == null) {
+	    		agentstatus = new LinkedList<>();
+	    		// Fetch data
+	    		Collection<Object[]> tasks = getTaskEntityDao().countTasksBySystem();
+				Collection<Object[]> tl = getTaskLogEntityDao().countTasksBySystem();
+				// Arrange data by system
+	    		for (com.soffid.iam.api.System system: getDispatcherService().findAllActiveDispatchers()) {
+	    			AgentStatusInfo a = new AgentStatusInfo();
+	    			a.setAgentName(system.getName());
+	    			a.setClassName(system.getClassName());
+	    			a.setUrl(system.getUrl());
+					a.setPendingTasks(0);
+					for (Object[] tll: tasks) {
+						if ( tll[0] == null || tll[0].toString().trim().isEmpty() ||
+								tll[0].equals(a.getAgentName())) {
+							a.setPendingTasks( a.getPendingTasks() + ((Long) tll[1]).intValue());
+						}
+					}
+					for (Object[] tll: tl) {
+						if ( a.getAgentName().equals(tll[0])) {
+							a.setPendingTasks( a.getPendingTasks() - ((Long) tll[1]).intValue());
+						}
+					}
+					agentstatus.add(a);
+	    		}
+	    		// Get status from agent
+	    		for (Server server: handleGetSyncServers()) {
+	    			try {
+	    	            RemoteServiceLocator rsl = createRemoteServiceLocator(server.getUrl());
+	    	            SyncStatusService status = rsl.getSyncStatusService();
+	    				for (AgentStatusInfo asi: status.getSyncAgentsInfo(Security.getCurrentTenantName())) {
+	    					for (AgentStatusInfo asi2: agentstatus) {
+	    						if (asi2.getAgentName().equals(asi.getAgentName())) {
+	    							if (asi.getStackTrace() != null && !asi.getStackTrace().trim().isEmpty() ||
+	    									asi2.getStatus() == null) {
+	    								asi2.setStatus(asi.getStatus());
+	    								asi2.setStackTrace(asi.getStackTrace());
+	    								asi2.setVersion(asi.getVersion());
+	    								asi2.setStatusMessage(asi.getStatusMessage());
+	    								break;
+	    							}
+	    						}
+	    					}
+	    				}
+	    			} catch (Exception e) {
+	    			}
+	    		}
+	    	} else {
+	            RemoteServiceLocator rsl = createRemoteServiceLocator(url);
+	            
+	            SyncStatusService status = rsl.getSyncStatusService();
+	
+	            // Obtenin tots els agents del servidor
+	            Collection<AgentStatusInfo> agentstatus0 = status.getSyncAgentsInfo(Security.getCurrentTenantName());
+	            if (agentstatus0 == null)
+	            	agentstatus = new LinkedList<AgentStatusInfo>();
+				else
+					agentstatus = new LinkedList<AgentStatusInfo> (agentstatus0);
+				
+				String server;
+				try { server = new URL(url).getHost(); } catch (Exception e) {server = url;}
+				List<AgentStatusInfo> m = new LinkedList<>();
+				
+				ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
+				if (si == null) 
+					si = getServerInstanceEntityDao().findByName(server);
+				Collection<Object[]> tasks = si == null ?
+						getTaskEntityDao().countTasksBySystem(server) :
+							getTaskEntityDao().countTasksBySystem(si.getServer().getName(), si.getName());
+				Collection<Object[]> tl = si == null?
+						getTaskLogEntityDao().countTasksByServerAndSystem(server) :
+							getTaskLogEntityDao().countTasksByServerAndSystem(si.getServer().getName(), si.getName());
+				
+				for ( AgentStatusInfo as: agentstatus) {
+					as.setPendingTasks(0);
+					for (Object[] tll: tasks) {
+						if ( tll[0] == null || tll[0].toString().trim().isEmpty() ||
+								tll[0].equals(as.getAgentName())) {
+							as.setPendingTasks( as.getPendingTasks() + ((Long) tll[1]).intValue());
+						}
+					}
+					for (Object[] tll: tl) {
+						if ( as.getAgentName().equals(tll[0])) {
+							as.setPendingTasks( as.getPendingTasks() - ((Long) tll[1]).intValue());
+						}
 					}
 				}
-				for (Object[] tll: tl) {
-					if ( as.getAgentName().equals(tll[0])) {
-						as.setPendingTasks( as.getPendingTasks() - ((Long) tll[1]).intValue());
-					}
-				}
-			}
+	    	}				
 
             Collections.sort(agentstatus, new Comparator<AgentStatusInfo>() {
 				@Override
@@ -261,13 +309,12 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 			});
 
             return agentstatus;
-
-        } catch (Throwable th) {
-        	LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
-            throw new InternalErrorException(String.format(
-                    Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
-        }
-
+	
+    	} catch (Throwable th) {
+    		LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
+    		throw new InternalErrorException(String.format(
+    				Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
+    	}
     }
 
     /**
@@ -396,16 +443,24 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
      *      java.lang.String)
      */
     protected java.util.Collection<SyncAgentTaskLog> handleGetAgentTasks(java.lang.String url, java.lang.String agentCodi) throws java.lang.Exception {
-        // Ens quedem només amb el host
-        String host = new URL(url).getHost();
-
-		ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
-		if (si == null) 
-			si = getServerInstanceEntityDao().findByName(host);
-        Collection<TaskEntity> tasques = si == null ? 
-        		getTaskEntityDao().findByServerAndSystem(host, agentCodi):
-       			getTaskEntityDao().findByServerAndSystem(si.getServer().getName(), si.getName(), agentCodi);
-        		
+    	Collection<TaskEntity> tasques;
+        Collection<TaskLogEntity> allTaskLog;
+    	if (url == null) {
+	        tasques = getTaskEntityDao().findBySystem(agentCodi);
+            allTaskLog = getTaskLogEntityDao().findBySystem(agentCodi);
+    	} else {
+	    	String host = new URL(url).getHost();
+	
+			ServerInstanceEntity si = getServerInstanceEntityDao().findByUrl(url);
+			if (si == null) 
+				si = getServerInstanceEntityDao().findByName(host);
+	        tasques = si == null ? 
+	        		getTaskEntityDao().findByServerAndSystem(host, agentCodi):
+	       			getTaskEntityDao().findByServerAndSystem(si.getServer().getName(), si.getName(), agentCodi);
+            allTaskLog = si == null ?
+            		getTaskLogEntityDao().findByServerAndSystem(host, agentCodi) :
+            		getTaskLogEntityDao().findByServerAndSystem(si.getServer().getName(), si.getName(), agentCodi);
+    	}        		
         // Construim el resultat
         LinkedList<SyncAgentTaskLog> tasquesAgent = new LinkedList();
 
@@ -417,9 +472,6 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             // Tipus TaskLogEntity
             // En principi no importa l'ordre.. (es fa amb l'ordre de les
             // tasques)
-            Collection allTaskLog = si == null ?
-            		getTaskLogEntityDao().findByServerAndSystem(host, agentCodi) :
-            		getTaskLogEntityDao().findByServerAndSystem(si.getServer().getName(), si.getName(), agentCodi);
             HashMap<Long, TaskLogEntity> allTaskLogs = new HashMap<Long, TaskLogEntity>();
 
             for (Iterator tit = allTaskLog.iterator(); tit.hasNext(); ) {
@@ -447,7 +499,8 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 	public SyncAgentTaskLog generateSeyconAgentTaskLog(java.lang.String agentCodi, TaskEntity t, TaskLogEntity tl) {
 		SyncAgentTaskLog satl;
 		if (tl == null) {
-		    satl = new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, "PENDING", "", null, null, null, null, null, null, t.getPriority(), null);
+		    satl = new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, "PENDING", "", null, null, null, null, null, null, 
+		    		t.getPriority(), null, t.getServerInstance() == null ? t.getServer(): t.getServerInstance());
 		} else {
 		    Calendar dataDarreraExecucio = null;
 		    if (tl.getLastExecution() != null) {
@@ -464,7 +517,9 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 		        dataCreacio = Calendar.getInstance();
 		        dataCreacio.setTime(tl.getCreationDate());
 		    }
-		    satl = new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, tl.getCompleted(), tl.getMessage(), dataCreacio, tl.getLastExecution(), dataDarreraExecucio, tl.getNextExecution(), dataProximaExecucio, tl.getExecutionsNumber(), t.getPriority(), tl.getStackTrace());
+		    satl = new SyncAgentTaskLog(t.getId(), tascaToString(t), agentCodi, tl.getCompleted(), tl.getMessage(), dataCreacio, 
+		    		tl.getLastExecution(), dataDarreraExecucio, tl.getNextExecution(), dataProximaExecucio, tl.getExecutionsNumber(), 
+		    		t.getPriority(), tl.getStackTrace(), t.getServerInstance() == null ? t.getServer(): t.getServerInstance());
 		}
 		return satl;
 	}

@@ -84,7 +84,8 @@ public class SyncserverHandler extends FrameHandler {
 		Div div = (Div) getFellow("servers");
 		div.getChildren().clear();
 		try {
-			for ( Server server: EJBLocator.getSyncServerService().getSyncServers()) {
+			final Collection<Server> syncServers = EJBLocator.getSyncServerService().getSyncServers();
+			for ( Server server: syncServers) {
 				Map<String, Object> m = new HashMap<>();
 				m.put("url", server.getUrl());
 				m.put("name", server.getName());
@@ -94,6 +95,7 @@ public class SyncserverHandler extends FrameHandler {
 				Component c = Executions.getCurrent().createComponents("/monitor/syncserver-server.zul", div, m);
 				c.setAttribute("serverId", server.getId());
 			}
+			getFellow("globalTasksDiv").setVisible(syncServers.size() != 1);
 		} catch (InternalErrorException | NamingException | CreateException e) {
 			throw new UiException (e);
 		}
@@ -374,7 +376,7 @@ public class SyncserverHandler extends FrameHandler {
 		hideAllDivs();
 		serverId = getServerId(event);
 		serverUrl = getUrl(event);
-		((Label)getFellow("form-label")).setValue(serverUrl);
+		((Label)getFellow("form-label")).setValue(serverUrl == null ? Labels.getLabel("seyconserver.zul.AllServers"): serverUrl);
 		getFellow("tab_agents").setVisible(true);
 		getFellow("refreshButton").setVisible(true);
 		showDetails();
@@ -417,6 +419,7 @@ public class SyncserverHandler extends FrameHandler {
         		String messages = currentTask.getMessage();
 	        	w.setTitle(currentTask.getTaskDescription());
 	        	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
+	        	((Databox) w.getFellow("server")).setValue(currentTask.getServer());
 	        	((Databox) w.getFellow("message")).setValue(messages == null ? "" : messages);
 	        	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
 	        	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
@@ -447,6 +450,7 @@ public class SyncserverHandler extends FrameHandler {
     		String messages = currentTask.getMessage();
         	w.setTitle(currentTask.getTaskDescription());
         	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
+        	((Databox) w.getFellow("server")).setValue(currentTask.getServer());
         	((Databox) w.getFellow("message")).setValue(messages == null ? "" : messages);
         	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
         	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
@@ -480,6 +484,7 @@ public class SyncserverHandler extends FrameHandler {
 
     	w.setTitle(currentTask.getTaskDescription());
     	((Databox) w.getFellow("task")).setValue(currentTask.getTaskDescription());
+    	((Databox) w.getFellow("server")).setValue(currentTask.getServer());
     	((Databox) w.getFellow("message")).setValue(currentTask.getMessage());
     	((Databox) w.getFellow("priority")).setValue(currentTask.getPriority());
     	((Databox) w.getFellow("executions")).setValue(currentTask.getExecutionsNumber());
@@ -768,6 +773,7 @@ public class SyncserverHandler extends FrameHandler {
 				if (!found)
 					c.detach();
 			}
+			getFellow("globalTasksDiv").setVisible(syncServers.size() != 1);
 		} catch (InternalErrorException | NamingException | CreateException e) {
 			throw new UiException (e);
 		}

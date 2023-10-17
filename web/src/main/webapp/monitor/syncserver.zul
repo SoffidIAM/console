@@ -28,6 +28,10 @@
 	         <graphjs refresh="10000" use="com.soffid.iam.web.syncserver.SyncServerTasksGraphjs" />
 	         <graphjs refresh="10000" use="com.soffid.iam.web.syncserver.SyncServerQueueGraphjs" />
 			<div sclass="options options-small" style="display: inline-block; text-align: left">
+				<div sclass="menuoption" onClick="ref:frame.viewAgents" id="globalTasksDiv" visible="false">
+					<image src="/img/engine.svg"/>
+					<label sclass='menuoption-title' value="${c:l('seyconserver.zul.VeureAgents')}" />
+				</div> 
 				<div sclass="menuoption" onClick="ref:frame.viewUnscheduledTasks">
 					<image src="/img/grid.svg"/>
 					<label sclass='menuoption-title' value="${c:l('seyconserver.zul.Unscheduled')}" />
@@ -187,6 +191,7 @@
 		</div>
 		<databox label="${c:l('seyconserver.zul.Tasca') }" type="STRING" readonly="true" id="task"/>
 		<databox label="${c:l('seyconserver.zul.Priority') }" type="STRING" readonly="true" id="priority"/>
+		<databox label="${c:l('agents.zul.Server') }" type="STRING" readonly="true" id="server"/>
 		<databox label="${c:l('seyconserver.zul.Executions') }" type="STRING" readonly="true" id="executions"/>
 		<databox label="${c:l('seyconserver.zul.Message') }" type="STRING" readonly="true" id="message"/>
 		<databox label="${c:l('seyconserver.zul.Executiontime') }" type="DATE" readonly="true" id="lastExecution"/>

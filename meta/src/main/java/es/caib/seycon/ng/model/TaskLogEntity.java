@@ -97,6 +97,15 @@ public abstract class TaskLogEntity {
 	@DaoFinder("select tlog "
 			+ "from com.soffid.iam.model.TaskLogEntity tlog "
 			+ "where tlog.system.name=:system  " //$NON-NLS-1$
+			+ "order by tlog.task.id, tlog.system.name")
+	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findBySystem(java.lang.String system) {
+		return null;
+	}
+	
+
+	@DaoFinder("select tlog "
+			+ "from com.soffid.iam.model.TaskLogEntity tlog "
+			+ "where tlog.system.name=:system  " //$NON-NLS-1$
 			+ "and (tlog.task.server=:server and :server is not null or tlog.task.server is null and :server is null) "
 			+ "order by tlog.task.id, tlog.system.name")
 	public java.util.List<es.caib.seycon.ng.model.TaskLogEntity> findByServerAndSystem(

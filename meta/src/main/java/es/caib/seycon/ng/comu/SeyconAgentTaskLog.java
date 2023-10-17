@@ -48,5 +48,7 @@ public class SeyconAgentTaskLog {
 	public java.lang.Long prioritat;
 
 	public java.lang.String stackTrace;
+	
+	public String server;
 
 }

@@ -35,7 +35,6 @@ public class CustomField3 extends InputField3 {
 	String visibilityScript;
 	boolean visible = true;
 	boolean required = false;
-	boolean raisePrivileges = false;
 	boolean noLabel = false;
 	String enumeration = null;
 	String metadata = null;
@@ -255,11 +254,11 @@ public class CustomField3 extends InputField3 {
 	}
 
 	public boolean isRaisePrivileges() {
-		return raisePrivileges;
+		return super.isRaisePrivileges();
 	}
 
 	public void setRaisePrivileges(boolean raisePrivileges) {
-		this.raisePrivileges = raisePrivileges;
+		super.setRaisePrivileges(raisePrivileges);
 	}
 
 	public String getFilterExpression() {

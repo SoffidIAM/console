@@ -3,6 +3,7 @@ package com.soffid.iam.bpm.business;
 import com.soffid.iam.bpm.model.ProcessDefinitionUserRole;
 import com.soffid.iam.bpm.model.dal.ProcessDefinitionRolesDal;
 import com.soffid.iam.bpm.service.BpmEngineImpl;
+import com.soffid.iam.utils.Security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -173,6 +174,8 @@ public class ProcessDefinitionRolesBusiness {
 
 	public boolean canAccess(String[] userGroups, TaskInstance ti) {
 		if (ti.getActorId() != null) {
+			if (ti.getActorId().equals(Security.getCurrentUser()))
+				return true;
 			for (String userGroup: userGroups) {
 				if (userGroup.equals(ti.getActorId()))
 					return true;

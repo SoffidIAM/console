@@ -66,7 +66,7 @@
 		<div>
 			<div id="progressImage2" style="text-align: center">
 				<image src="/anonymous/wait.gif" style="height: 24px"/>
-				<label value="${c:l('mesg:org.zkoss.zul.mesg.MZul:PLEASE_WAIT')}"/>
+				<label value="${c:l('tools.processing')}"/>
 			</div>
 			<datatable id="previewlistbox" autocommit="true" 
 				maxheight="calc( 100vh - 450px )"
@@ -93,7 +93,7 @@
 		<div style="padding: 64px">
 			<div id="progressImage3" style="text-align: center">
 				<image src="/anonymous/wait.gif" style="height: 24px"/>
-				<label value="${c:l('mesg:org.zkoss.zul.mesg.MZul:PLEASE_WAIT')}"/>
+				<label value="${c:l('tools.processing')}"/>
 				<progressmeter id="progressPct" style="width: 100%"/>
 			</div>
 			<div id="progressImage4" style="text-align: center">

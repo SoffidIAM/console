@@ -118,7 +118,7 @@
 			<div style="float: left; display: inline-block">
 				<div id="progressImage">
 					<image src="/anonymous/wait.gif" style="height: 24px"/>
-					<label value="${c:l('mesg:org.zkoss.zul.mesg.MZul:PLEASE_WAIT')}"/>
+					<label value="${c:l('tools.processing')}"/>
 				</div>
 			</div>
 			<div style="text-align: right; width: 100%">
@@ -129,7 +129,7 @@
 		<div style="padding: 64px">
 			<div id="progressImage2" style="text-align: center">
 				<image src="/anonymous/wait.gif" style="height: 24px"/>
-				<label value="${c:l('mesg:org.zkoss.zul.mesg.MZul:PLEASE_WAIT')}"/>
+				<label value="${c:l('tools.processing')}"/>
 				<progressmeter id="progressPct" style="width: 100%"/>
 			</div>
 			<div id="progressImage3" style="text-align: center">

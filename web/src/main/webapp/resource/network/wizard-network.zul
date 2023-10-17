@@ -4,7 +4,8 @@
 
 <window id="network_wizard" position="top-center" closable="false" sizable="false"
 	use="com.soffid.iam.web.discovery.NetworkWizardHandler"
-	style="width: 80%; height: 450px; max-width: 800px; top: 200px !important;">
+	title="${c:l('wizard-network.register')}"
+	style="width: 80%; height: 550px; max-width: 800px; top: 200px !important;">
 	<wizard id="wizard">
 		<attribute name="steps">
 	- ${c:l("wizard-network.register")}

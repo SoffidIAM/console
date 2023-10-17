@@ -4,8 +4,9 @@
 
 
 <window id="pam02_w" position="top-center" closable="false" sizable="false"
+		title="${c:l('wizard-pam.vault') }"
 		use="com.soffid.iam.web.wheel.Pam02Handler"
-			style="width: 80%; height: 80vh; max-width: 800px; top: 200px !important;">
+		style="width: 80%; height: 80vh; max-width: 800px; top: 200px !important;">
 	<datamodel id="model" rootNode="root" src="accountDescriptor.xml"/>
 	<timer id="timer" delay="1000" repeats="true" onTimer="ref:pam02_w.onTimer" running="false"/>
 	<wizard id="wizard">

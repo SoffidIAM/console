@@ -4,8 +4,9 @@
 
 
 <window id="iga01_w" position="top-center" closable="false" sizable="false"
+		title="${c:l('wizard-iga.connect') }"
 		use="com.soffid.iam.web.wheel.Iga01Handler"
-			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
+			style="width: 80%; height: 500px; max-width: 600px; top: 200px !important;">
 	<timer id="timer" delay="1000" repeats="true" onTimer="ref:iga01_w.onTimer" running="false"/>
 	<wizard id="wizard">
 			<attribute name="steps">

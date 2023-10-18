@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?page id="finderWizard"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?component name="input_criteri" macro-uri="comu/input_criteri.zul"?>
+<?component name="input_etiqueta" macro-uri="comu/input_etiqueta.zul"?>
+<window id="window" closable="false" position="top, center"
+	use="com.soffid.iam.web.popup.FinderHandler"
+	sizable="true" 
+	style="min-width: 40em;"
+	visible="false"
+	onDisplay="ref:window.start"
+	onClose="ref:window.close" 
+	width="75%">
+
+	<datamodel id="model" rootNode="groups" src="descriptorGroup.xml"/>
+	
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<menu2>
+			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:window.changeColumns"/>
+		</menu2>
+		<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Group" 
+				defaultAttributes="name, description"
+				preference="com.soffid.iam.api.Group"
+				style="width: calc(100% - 32px)"
+				dataPath="/window/model:/group" variableName="query" variableNameText="textQuery"></searchbox>
+	</div>
+	
+	<datatree2 id="listbox"
+		width="100%" dataPath="/window/model:/"
+		reorder="false"
+		header="${c:l('com.soffid.iam.api.Group.name') }" 
+		openLevels="1"
+		enablefilter="false"
+		use='com.soffid.iam.web.group.GroupDataTree2'
+		onAddGroup="ref:frame.addGroup"
+		onSelect="ref:window.onSelect">
+		<attribute name="finders">
+		<![CDATA[
+		- path: /group
+		  icon: /img/group.svg
+		  value: name
+		  leaf: false
+		  ]]>
+		</attribute>
+	</datatree2>
+
+	<div align="right">
+		<button id="finishButton" label="${c:l('editorJS.zul.Accepta')}" onClick="ref:window.accept"/>
+		<button label="${c:l('editorJS.zul.Cancel·la')}" onClick="ref:window.close"/>
+	</div>								
+</window>

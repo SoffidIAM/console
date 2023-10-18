@@ -54,7 +54,8 @@ public class GroupDataHandler extends InputFieldDataHandler<Group> {
 		FinderHandler.startWizard("Select group", Group.class.getName(),
 				databox, multiple, 
 				filter,
-				listener);
+				listener,
+				"popup/finder-group.zul");
 		
 	}
 

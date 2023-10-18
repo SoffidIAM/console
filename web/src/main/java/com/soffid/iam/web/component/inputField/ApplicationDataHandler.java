@@ -55,7 +55,8 @@ public class ApplicationDataHandler extends InputFieldDataHandler<Application> {
 		FinderHandler.startWizard("Select application", Application.class.getName(),
 				databox, multiple, 
 				filter,
-				listener);
+				listener,
+				"popup/finder-app.zul");
 		
 	}
 

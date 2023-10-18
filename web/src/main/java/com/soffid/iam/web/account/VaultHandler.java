@@ -561,7 +561,12 @@ public class VaultHandler extends FrameHandler {
 	public void viewPassword2() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
 		getCard().setSclass ( "card" );
 		unselectAfterPassword = true;
-		viewPassword();
+		try {
+			viewPassword();
+		} catch (Exception e) {
+			unselect();
+			throw e;
+		}
 	}
 	
 	public void viewPassword() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
@@ -574,6 +579,7 @@ public class VaultHandler extends FrameHandler {
 		if(service.isUpdatePending(account) && account.getType().equals(AccountType.PRIVILEGED))
 		{
 			Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("selfService.UpdatePending"));
+			unselect();
 		}
 		else
 		{
@@ -627,8 +633,12 @@ public class VaultHandler extends FrameHandler {
 	public void closeShowPassword() throws NamingException, CreateException, WrongValueException, InternalErrorException, InterruptedException {
 		Window showPassword = (Window) getFellow("showPassword");
 		showPassword.setVisible(false);
+		unselect();
+	}
+
+	protected void unselect() {
 		if (unselectAfterPassword) {
-			unselectAfterPassword = true;
+			unselectAfterPassword = false;
 			DataTree2 dt = (DataTree2) getListbox();
 			dt.setSelectedIndex(new int[0]);
 		}

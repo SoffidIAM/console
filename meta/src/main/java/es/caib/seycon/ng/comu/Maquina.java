@@ -42,6 +42,7 @@ public class Maquina {
 	@JsonAttribute(hibernateAttribute = "hostIP")
 	public java.lang.String adreca;
 	
+	@Nullable
 	@Attribute(translated = "os", type = "OS" )
 	public java.lang.String sistemaOperatiu;
 

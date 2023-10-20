@@ -5,6 +5,7 @@
 
 <?component name="host_sessions" macro-uri="host-sessions.zul"?>
 <?component name="host_acl" macro-uri="host-acl.zul"?>
+<?component name="ostype" macro-uri="ostype.zul"?>
 
 <frame xmlns:h="http://www.w3.org/1999/xhtml" mold="div" style="position: relative" 
 	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/hosts"
@@ -28,6 +29,7 @@
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('host:all:create') &amp;&amp; soffid:isUserInRole('network:all:update')}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
+					<menu2item image="/img/windows.svg" label="${c:l('ostype.operatingSystems') }" if="${soffid:isUserInRole('operatingSystem:update')}" onClick="ref:frame.operatingSystems"/>
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"
@@ -96,4 +98,5 @@
 			</tabbox>
 		</div>
 	</div>
+	<ostype id="osType"/>
 </frame>

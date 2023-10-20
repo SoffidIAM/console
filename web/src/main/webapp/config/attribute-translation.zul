@@ -40,9 +40,19 @@
 					td.appendChild(input);
 					input.value = value[col.value];
 					input.setAttribute("style", "width: 100%; border: none");
+					var i = -1;
+					var tt = td;
+					while (tt.previousElementSibling != null) {
+						i ++;
+						tt = tt.previousElementSibling;
+					}
+					
+					if (td.parentElement.data.text == null)
+						td.parentElement.data.text = [];
 					zk.listen(input, 'change',
 							() => {
 								td.parentElement.data.value[col.value]=input.value;
+								td.parentElement.data.text[i] = input.value;
 								zkDatatable.sendClientAction(input,"onEditValue", [col.value, input.value]);
 							});
 					var ds = document.getElementById("${model.uuid}");

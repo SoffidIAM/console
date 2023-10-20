@@ -17,6 +17,12 @@
 			</new-instance-bean>
 		</finder>
 
+		<finder name="osType" type="osType">
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="findAllOSTypes"> <!-- os:query -->
+			</ejb-finder>
+			<new-instance-bean className="com.soffid.iam.api.OsType">
+			</new-instance-bean>
+		</finder>
 	</datanode>
 
 	<datanode name="host">
@@ -71,6 +77,20 @@
 	<datanode name="session" />
 
 	<datanode name="alias">  <!-- host:update, host:create i host:delete -->
+		<ejb-handler jndi="java:/module/NetworkService-v2">
+			<insert-method method="create" returnBean="true">
+				<parameter value="${instance}" />
+			</insert-method>
+			<delete-method method="delete">
+				<parameter value="${instance}" />
+			</delete-method>
+			<update-method method="update">
+				<parameter value="${instance}" />
+			</update-method>
+		</ejb-handler>
+	</datanode>
+
+	<datanode name="osType">  <!-- os:create, os:delete i os:update -->
 		<ejb-handler jndi="java:/module/NetworkService-v2">
 			<insert-method method="create" returnBean="true">
 				<parameter value="${instance}" />

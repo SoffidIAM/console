@@ -16,6 +16,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Host;
@@ -217,5 +218,11 @@ public class HostHandler extends FrameHandler {
 			String empty = svc.getFirstAvailableIP(network);
 			XPathUtils.setValue((DataSource)getListbox(), "ip", empty);
 		}
+	}
+	
+	public void operatingSystems(Event ev) {
+		final Window window = (Window)getFellow("osType").getFellow("handler");
+		window.doHighlighted();
+		window.invalidate();
 	}
 }

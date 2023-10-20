@@ -168,6 +168,10 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
             
             createMailTask(usuariGrup);
             
+            getSession().createQuery("delete from com.soffid.iam.model.UserGroupAttributeEntity where userGroup.id=:id")
+	        	.setParameter("id", usuariGrup.getId())
+	        	.executeUpdate();
+
             super.remove(usuariGrup);
             getSession(false).flush();
 

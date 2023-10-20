@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
+
+<window id="handler" title="${c:l('ostype.operatingSystems') }" style="height: 800px; width: 80%; min-width: 600px"
+		use="com.soffid.iam.web.host.OsTypeHandler">
+	<style>
+		div.datatable.atttranslation table.tbody td:last-child {
+			width: 48px;
+			min-width: 24px;
+		}
+	</style>
+
+	<div sclass="navigation-bar">
+		<menu2>
+			<menu2item image="/img/add.svg"
+				label="${c:l('agents.zul.Afegeixnou') }"
+				if="${canCreateAttributeTranslation}" onClick="ref:handler.addNew" />
+			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
+		</menu2>
+	</div>
+	
+	<script><![CDATA[
+		function renderColumn(td, col, value) {
+			var input = document.createElement("input");
+			td.appendChild(input);
+			input.value = value[col.value];
+
+			var i = -1;
+			var tt = td;
+			while (tt.previousElementSibling != null) {
+				i ++;
+				tt = tt.previousElementSibling;
+			}
+			
+			if (td.parentElement.data.text == null)
+				td.parentElement.data.text = [];
+			td.parentElement.data.text[i] = input.value;
+			input.setAttribute("style", "width: 100%; border: none");
+			zk.listen(input, 'change',
+					() => {
+						td.parentElement.data.value[col.value]=input.value;
+						td.parentElement.data.text[i] = input.value;
+						zkDatatable.sendClientAction(input,"onEditValue", [col.value, input.value]);
+					});
+			var ds = document.getElementById("${model.uuid}");
+			zkDatasource.registerInput(ds, input);
+		}
+	]]></script>
+	<datatable id="listbox" 
+		sclass="datatable atttranslation"
+		autocommit="false"
+		multiselect="true"
+		onMultiSelect="ref:handler.multiSelect"
+		updateRowEvent = "false"
+		dataPath="/model:/osType" maxheight="500px" sortColumn="0"
+		onRemove="ref:handler.delete"
+		onEditValue="ref:handler.onEditValue"
+		enablefilter="true">
+		<attribute name="columns"><![CDATA[
+- name: ${c:l('autoritzacions.zul.Codi')} 
+  value: name
+  render: renderColumn
+  className: datetimeColumn
+- name: ${c:l('autoritzacions.zul.Description')} 
+  value: description
+  render: renderColumn
+  className: datetimeColumn
+- name: "" 
+  template: <img src="${execution.contextPath }/img/remove.svg" class="imageclic" title="${c:l('agents.DeleteAgent') }" onClick='zkDatatable.sendClientAction(this,"onRemove")'>
+  sort: false
+  ]]>
+		</attribute>
+	</datatable>
+	<div width="100%" style="text-align: right"
+		if="${soffid:isUserInRole('operatingSystem:create') || soffid:isUserInRole('operatingSystem:delete')}">
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false" if="${soffid:isUserInRole('operatingSystem:delete')}">-</div>
+		<div class="addButton" onClick="ref:handler.addNew" if="${soffid:isUserInRole('operatingSystem:create')}">
+			+
+		</div>
+	</div>
+	<div style="text-align: right; width: 100%">
+		<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:handler.undo">
+		</databutton>
+		<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:handler.apply"/>
+	</div>
+</window>

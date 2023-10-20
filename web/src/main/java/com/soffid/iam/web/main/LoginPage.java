@@ -1,8 +1,10 @@
 package com.soffid.iam.web.main;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,6 +16,7 @@ import org.zkoss.zk.ui.UiException;
 import org.zkoss.zul.Html;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.filter.TenantExtractor;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.zk.BPMLabelLocator;
@@ -61,7 +64,17 @@ public class LoginPage extends Html {
 		boolean autoLogin = false;		                  
 		Execution currentExecution = Executions.getCurrent();
 		HttpServletRequest req = (HttpServletRequest) currentExecution.getNativeRequest();
+		
+		String tenantHost;
 		try {
+			tenantHost = new TenantExtractor().getTenant(req);
+		} catch (InternalErrorException e) {
+			throw new UiException(e);
+		}
+
+		Security.setClientRequest(req);
+		try {
+			Security.nestedLogin(tenantHost, "anonymous", new String[0]);
 			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
 			boolean saml = "true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml"));
 			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
@@ -112,6 +125,8 @@ public class LoginPage extends Html {
 			setVariable("maintenance", maintenance, false);
 		} catch (InternalErrorException e) {
 			throw new UiException(e);
+		} finally {
+			Security.nestedLogoff();
 		}
 	}
 	

@@ -81,7 +81,7 @@
 		<html if="${!maintenance}">
 		</html>
 		<label if="${maintenance }" style="display: inline-block; font-weight: bold; margin-top: 25px" value="${c:l('login.lblMaintenance') }"/>
-<html><![CDATA[
+		<html><![CDATA[
 			</form>
 			</div>
 		</div>

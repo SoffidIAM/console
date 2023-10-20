@@ -213,7 +213,8 @@ public class LoginServiceImpl implements LoginService {
 					
 					if ("true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||
 						"true".equals(System.getProperty("soffid.auth.maintenance"))) {
-						if (!principal.hasRole("authorization:all")) {
+						if (!principal.hasRole("authorization:all") && 
+							Arrays.binarySearch(principal.getSoffidRoles(), "SOFFID_ADMIN") < 0) {
 							log.info(masterMessage = username + " login rejected. System in maintenance mode");
 							return null;
 						}

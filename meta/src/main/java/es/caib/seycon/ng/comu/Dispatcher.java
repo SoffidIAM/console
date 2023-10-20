@@ -128,7 +128,12 @@ public class Dispatcher {
 	public byte[] blobParam;
 
 	@Nullable
+	@Attribute(readonly = true)
 	public java.util.Calendar timeStamp;
+
+	@Nullable
+	@Attribute(readonly = true)
+	public java.util.Calendar created;
 
 	@Nullable
 	public String authoritativeProcess;

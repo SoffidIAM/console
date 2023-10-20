@@ -98,6 +98,10 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public java.util.Date lastSeen;
 
+	@Nullable
+	@Column(name="MAQ_CREATED")
+	public java.util.Date created;
+
 	@Column (name="MAQ_DELETED")
 	@Nullable
 	public java.lang.Boolean deleted;

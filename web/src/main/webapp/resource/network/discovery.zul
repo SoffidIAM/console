@@ -32,6 +32,7 @@
 				  - template: ""
 				  - template: ""
 				  - template: ""
+				  - template: ""
 				- path: /host
 				  icon: #{soffid:getHostIcon(this)}
 				  value: name
@@ -40,10 +41,12 @@
 				   - value: ip
 				   - value: os
 				   - value: dispatchers
+				   - value: created
 				- path: /serviceHolder
 				  value: instance[2]
 				  leaf: false
 				  columns:
+				  - template: ""
 				  - template: ""
 				  - template: ""
 				  - template: ""
@@ -56,6 +59,7 @@
 				  - template: ""
 				  - template: ""
 				  - template: ""
+				  - template: ""
 				- path: /system
 				  template: >-
 				    #{name}
@@ -64,11 +68,13 @@
 				  - template: ""
 				  - template: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenAccounts')">${c:l('seu.accounts')}</button>
 				  - template: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenSystem')">${c:l('discovery.agent')}</button> 
+				  - value: created
 				- path: /dispatcherHolder
 				  value: instance[2]
 				  leaf: false
 				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddSystem')">${c:l('agents.zul.Afegeixnou')}</button>
 				  columns:
+				  - template: ""
 				  - template: ""
 				  - template: ""
 				  - template: ""
@@ -96,6 +102,7 @@
 - name: ${c:l('com.soffid.iam.api.Host.ip')}
 - name: ${c:l('com.soffid.iam.api.Host.os')}
 - name: ${c:l('discovery.managed')}
+- name: ${c:l('com.soffid.iam.api.Host.created')}
 					]]>
 				</attribute>
   			</datatree2>

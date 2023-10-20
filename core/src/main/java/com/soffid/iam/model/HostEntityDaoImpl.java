@@ -287,6 +287,7 @@ public class HostEntityDaoImpl extends
 
     public void create(com.soffid.iam.model.HostEntity maquina) throws RuntimeException {
         try {
+        	maquina.setCreated(new Date());
             super.create(maquina);
             getSession(false).flush();
             auditarMaquina("C", maquina.getName()); //$NON-NLS-1$

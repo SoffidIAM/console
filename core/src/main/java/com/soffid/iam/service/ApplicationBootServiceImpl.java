@@ -542,7 +542,31 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("113");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("112"))
+		{
+			addDateAttributes();
+			cfg.setValue("114");
+			configSvc.update(cfg);
+		}
 	}
+
+	private void addDateAttributes() throws SQLException {
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_DISPAT SET DIS_CREATED=? WHERE DIS_CREATED IS NULL ",
+								new Object[] {new java.util.Date()});
+			executeSentence(conn, "UPDATE SC_MAQUIN SET MAQ_CREATED=? WHERE DIS_CREATED IS NULL ",
+					new Object[] {new java.util.Date()});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
 
 	private void fixAgentDescriptor() {
 		for (AgentDescriptorEntity ad: getAgentDescriptorEntityDao().loadAll()) {

@@ -166,6 +166,10 @@ public abstract class DispatcherEntity {
 	@Nullable
 	public java.util.Date timeStamp;
 
+	@Column (name="DIS_CREATED")
+	@Nullable
+	public java.util.Date created;
+
 	@ForeignKey (foreignColumn="OBM_DIS_ID")
 	public java.util.Collection<es.caib.seycon.ng.model.ObjectMappingEntity> objectMappings;
 

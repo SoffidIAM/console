@@ -77,6 +77,11 @@ public class Maquina {
 	@Attribute(readonly = true)
 	public java.util.Calendar lastSeen;
 
+	@Nullable
+	@Attribute(readonly = true)
+	public java.util.Calendar created;
+
+
 	@Column (name="MAQ_LOCKED")
 	@Nullable
 	public java.lang.Boolean locked;

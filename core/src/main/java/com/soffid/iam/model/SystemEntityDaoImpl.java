@@ -32,6 +32,7 @@ import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,7 +66,7 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
             Collection<SystemGroupEntity> grups = dispatcherEntity.getSystemGroup();
             dispatcherEntity.setSystemGroup(null);
             dispatcherEntity.setUserType(null);
-            
+            dispatcherEntity.setCreated(new Date());
             super.create(dispatcherEntity);
             getSession(false).flush();
 

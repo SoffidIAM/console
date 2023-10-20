@@ -31,6 +31,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Switch;
 import es.caib.zkib.datamodel.DataNode;
+import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
@@ -83,7 +84,7 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		if (event != null) event.stopPropagation();
 	}
 	
-	public void onSetPassword(Event event) throws CommitException, WrongValueException, InternalErrorException, BadPasswordException
+	public void onSetPassword(Event event) throws Exception
 	{
 		DataSource listbox = (DataSource) XPathUtils.getPath(getPage(), listboxPath);
 		listbox.commit();
@@ -94,7 +95,7 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 		Radio sendCurrent = (Radio) w.getFellow("sendCurrent");
 
 		String user = (String) listbox.getJXPathContext().getValue("userName");
-		String domain = (String) tree.getJXPathContext().getValue("name");
+		String domain = (String) tree.getJXPathContext().getValue("domainName");
 		
 		Switch s = (Switch) w.getFellow("temporary");
 		if (gt.getSelectedItem() == sendCurrent) {
@@ -117,6 +118,8 @@ public class UserAccountsHandler extends Div implements AfterCompose {
 			showPasswordAssist(domain, nouPassword);
 		}
 
+		DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(listbox, "/domini");
+		coll.refresh();
 		onCancelPassword(event );
 	}
 

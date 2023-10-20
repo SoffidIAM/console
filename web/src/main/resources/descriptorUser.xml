@@ -39,7 +39,7 @@
 
 	<datanode name="dominiContrasenya">
 		<custom-attribute name="status">
-			if (instance.failures == null || instance.failures == 0x) return "";
+			if (instance.failures == null || instance.failures == 0) return "";
 			String f = org.zkoss.util.resource.Labels.getLabel("accounts.failed");
 			f += ": ";
 			f += instance.failures;

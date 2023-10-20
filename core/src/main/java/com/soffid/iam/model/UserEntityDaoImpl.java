@@ -266,7 +266,8 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
             	.setParameter("userid", usuari.getId())
             	.executeUpdate();
 
-            getSession().createQuery("delete from com.soffid.iam.model.UserGroupAttributeEntity where userGroup.user.id=:userid")
+            getSession().createQuery("delete from com.soffid.iam.model.UserGroupAttributeEntity "
+            		+ "where userGroup in (select ug from com.soffid.iam.model.UserGroupEntity as ug where user.id=:userid)")
 	        	.setParameter("userid", usuari.getId())
 	        	.executeUpdate();
 

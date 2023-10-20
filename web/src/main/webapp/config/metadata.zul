@@ -24,22 +24,39 @@
 		<div sclass="card__face card__face--front">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
+					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateMetadata}"  onClick="ref:frame.addNew"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>
 			<datatable id="listbox" autocommit="true" dataPath="/model:/customObject"
 				multiselect="true"
+				use="com.soffid.iam.web.component.DynamicColumnsDatatable"
 				onMultiSelect="ref:frame.multiSelect"
+				preference="metadata-cols"
 				sortColumn="0" onSelect="ref:frame.showDetails">
-				<attribute name="columns">
+				<attribute name="allColumns">
 					<![CDATA[
 		- name: ${c:l('com.soffid.iam.api.CustomObjectType.name')}
 		  value: name
+		  default: true
 		- name: ${c:l('com.soffid.iam.api.CustomObjectType.description')}
 		  value: description
+		  default: true
 		- name: ${c:l('com.soffid.iam.api.CustomObjectType.builtin')}
+		  value: builtin
 		  template: ${'$'}{builtin? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+		  default: true
+		- name: ${c:l('com.soffid.iam.api.CustomObjectType.ownerRoles')}
+		  value: managerRoles
+		- name: ${c:l('com.soffid.iam.api.CustomObjectType.userRoles')}
+		  value: userRoles
+		- name: ${c:l('com.soffid.iam.api.CustomObjectType.publicAccess')}
+		  value: publicAccess
+		  template: ${'$'}{publicAccess? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+		- name: ${c:l('com.soffid.iam.api.CustomObjectType.textIndex')}
+		  template: ${'$'}{textIndex? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+		  value: textIndex
 					]]>
 				</attribute>
 			</datatable>
@@ -55,6 +72,7 @@
 					<pager datatable="listbox"/>
 					
 					<menu2>
+						<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns2"/>
 						<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateMetadata &amp;&amp; canUpdateMetadata &amp;&amp; canDeleteMetadata}" onClick="ref:frame.importAttributeCsv"/>
 						<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadAttributeCsv"/>
 						<menu2item if="${canDeleteMetadata}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
@@ -83,27 +101,67 @@
 					</style>
 					<datatable id="metadataGrid" autocommit="true" use="com.soffid.iam.web.agent.MetadataTable"
 								dataPath="/metadata" maxheight="50vh" sortColumn="0"
+								preference="metadata-d-cols"
 								sclass="datatable hideFirstCol"
 								reorder="true"
 								multiselect="true"
 								onMultiSelect="ref:frame.multiSelect"
 								onReorder="ref:frame.reorder"
 								onSelect="ref:frame.showAttributeDetails" enablefilter="true">
-								<attribute name="columns"><![CDATA[
+								<attribute name="customColumns"><![CDATA[
 				- name: ${c:l('dadesAddicionals.zul.Ordre')}
 				  value: order 
+				  enabled: true
+				  ]]></attribute>
+				<attribute name="allColumns"><![CDATA[
 				- name: ${c:l('dadesAddicionals.zul.Codi-2')}
 				  value: name 
 				  sort: false
+				  default: true
 				- name: ${c:l('dadesAddicionals.zul.Label')}
 				  value: label 
 				  sort: false
+				  default: true
 				- name: ${c:l('dadesAddicionals.zul.Type')}
 				  value: typeDescription
 				  sort: false
+				  default: true
 				- name: ${c:l('com.soffid.iam.api.CustomObjectType.builtin')}
 				  template: ${'$'}{builtin? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
 				  sort: false
+				  value: builtin
+				  default: true
+				- name: ${c:l('dadesAddicionals.zul.letterCase')}
+				  value: letterCase
+				  template: >-
+				    #{letterCase.value=='u'? 'Uppercase' :
+				    letterCase.value=='l'? 'Lowercase' :
+				    letterCase.value=='m'? 'Mixed case' :
+				    ''}
+				- name: ${c:l('dadesAddicionals.zul.Hint')}
+				  value: hint
+				- name: ${c:l('dadesAddicionals.zul.Description')}
+				  value: description
+				- name: ${c:l('dadesAddicionals.zul.Required')}
+				  template: ${'$'}{required? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+				  value: required
+				- name: ${c:l('dadesAddicionals.zul.IncludeInSearch')}
+				  value: searchCriteria
+				  template: ${'$'}{searchCriteria? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+				- name: ${c:l('dadesAddicionals.zul.Unique')}
+				  value: unique
+				  template: ${'$'}{unique? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+				- name: ${c:l('dadesAddicionals.zul.Multivalued')}
+				  value: multiValued
+				  template: ${'$'}{multiValued? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
+				- name: ${c:l('dadesAddicionals.zul.MultivaluedRows')}
+				  value: multiValuedRows
+				- name: ${c:l('dadesAddicionals.zul.Size')}
+				  value: size
+				- name: ${c:l('dadesAddicionals.zul.Values')}
+				  value: values
+				- name: ${c:l('attributeQuery.Filter')}
+				  value: filterExpression
 				  				]]></attribute>
 					</datatable>
 					<div width="100%" style="text-align: right"

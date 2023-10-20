@@ -47,10 +47,12 @@ import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
+import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.Editor;
 import com.soffid.iam.web.popup.ImportCsvHandler;
+import com.soffid.iam.web.popup.SelectColumnsHandler;
 import com.soffid.iam.web.util.RemoveOnCloseStream;
 
 import au.com.bytecode.opencsv.CSVWriter;
@@ -629,6 +631,11 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 			form.getFellow("letterCase").setVisible(type == TypeEnumeration.STRING_TYPE);
 		} catch (Exception e) {}
 	}
+	
+	public void changeColumns2(Event event) throws IOException {
+		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getFellow("metadataGrid"));
+	}
+
 }
 
 class OrderComparator implements Comparator<DataType>

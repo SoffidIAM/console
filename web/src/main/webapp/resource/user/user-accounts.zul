@@ -46,11 +46,12 @@
 		<attribute name="finders"><![CDATA[
 		- path: /domini
 		  template: >-
-		    #{name} 
+		    #{domainName} 
 		    <button class="small-button" style="position:relative; left: 16px; ${soffid:isUserInRole('user:password:update') || 
 		    	soffid:isUserInRole('user:password:set') || 
 		    	soffid:isUserInRole('user:password:set-no-temporary') ? '': 'display:none'}"
 		      onclick="zkDatatree2.sendClientAction(this, 'onSetPassword')">${c:l('changepass.CanviPWD') }</button>
+		      #{status}
 		- path: /policy[1]/account
 		  value: system
 		  leaf: true

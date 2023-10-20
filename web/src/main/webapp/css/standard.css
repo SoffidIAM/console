@@ -1409,7 +1409,7 @@ button.small-button {
 	height: 2em;
  	border-radius: 8px;
  	font-size: 10pt;
- 	margin-top: 0px;
+ 	margin-top: -3px;
  	margin-bottom: 0px;
 }	
 

@@ -28,9 +28,9 @@
 	<datanode name="politicaContrasenya">
 		<finder name="account" type ="account" refreshAfterCommit="true">
 			<ejb-finder jndi="java:/module/AccountService-v2"
-				method="findUserAccountsByDomain" if="${parent.instance.name != null &amp;&amp; parent.parent.instance.userName!=null}">
+				method="findUserAccountsByDomain" if="${parent.instance.domainName != null &amp;&amp; parent.parent.instance.userName!=null}">
 					<parameter value="${parent.parent.instance.userName}"/>
-					<parameter value="${parent.instance.name}"/>
+					<parameter value="${parent.instance.domainName}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.UserAccount">
 			</new-instance-bean>
@@ -38,19 +38,33 @@
 	</datanode>
 
 	<datanode name="dominiContrasenya">
+		<custom-attribute name="status">
+			if (instance.failures == null || instance.failures == 0x) return "";
+			String f = org.zkoss.util.resource.Labels.getLabel("accounts.failed");
+			f += ": ";
+			f += instance.failures;
+			if (instance.lockedUntil != null) {
+				f += " ";
+				f += org.zkoss.util.resource.Labels.getLabel("accounts.lockedUntil");
+				f += ": ";
+				f += es.caib.zkib.component.DateFormats.getDateTimeFormat().format(instance.lockedUntil.getTime());
+			}
+			return "&lt;div style='float: right'&gt;"+f+"&lt;/div&gt;";
+		</custom-attribute>
 		<finder name="policy" type ="politicaContrasenya" refreshAfterCommit="true">
 			<ejb-finder jndi="java:/module/UserDomainService-v2"
 				method="findPolicyByTypeAndPasswordDomain">
 					<parameter value="${parent.instance.userType}"/>
-					<parameter value="${instance.name}"/>
+					<parameter value="${instance.domainName}"/>
 			</ejb-finder>
 		</finder>
 	</datanode>
 
 	<datanode name="usuari"> 
 		<finder name="domini" type="dominiContrasenya" refreshAfterCommit="true">
-			<ejb-finder jndi="java:/module/UserDomainService-v2"
-				method="findAllPasswordDomain">
+			<ejb-finder jndi="java:/module/UserService-v2"
+				method="findPasswordDomainStatus">
+				<parameter value="${instance.userName}"/>
 			</ejb-finder>
 		</finder>
 		<finder name="session" type="sessio"> <!-- user:session:query -->

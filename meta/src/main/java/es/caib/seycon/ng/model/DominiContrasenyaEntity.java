@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.List;
+
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
@@ -59,6 +61,16 @@ public abstract class DominiContrasenyaEntity {
 			+ "where de.name=:systemName and de.tenant.id = :tenantId")
 	public es.caib.seycon.ng.model.DominiContrasenyaEntity findByDispatcher(
 		java.lang.String systemName) {
+	 return null;
+	}
+
+	@DaoFinder("select distinct pd "
+			+ "from com.soffid.iam.model.UserEntity as user "
+			+ "join user.accounts as ua "
+			+ "join ua.account.system.passwordDomain as pd "
+			+ "where pd.tenant.id =:tenantId and user.id=:id")
+	public List<es.caib.seycon.ng.model.DominiContrasenyaEntity> findByUser(
+		Long id) {
 	 return null;
 	}
 }

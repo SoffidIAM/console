@@ -744,7 +744,7 @@ public class Security {
 	}
 	
 	static Collection<NetmaskMatch> matches = null;
-	protected static void parseTrustedIps(String s) throws UnknownHostException {
+	protected static void parseTrustedIps(String s) {
 		if (s != null) {
 			
 			matches = new LinkedList<>();
@@ -770,17 +770,23 @@ public class Security {
 				}
 				int slash = part.indexOf("/");
 				if (slash < 0) {
-					byte[] addr = InetAddress.getByName(part).getAddress();
-					matches.add(new NetmaskMatch(addr, addr.length * 8));
+					try {
+						byte[] addr = InetAddress.getByName(part).getAddress();
+						matches.add(new NetmaskMatch(addr, addr.length * 8));
+					} catch (UnknownHostException e) {
+					}
 				} else {
-					byte[] addr = InetAddress.getByName(part.substring(0, slash)).getAddress();
-					int bits = Integer.parseInt(part.substring(slash+1));
-					matches.add(new NetmaskMatch(addr, bits));
+					try {
+						byte[] addr = InetAddress.getByName(part.substring(0, slash)).getAddress();
+						int bits = Integer.parseInt(part.substring(slash+1));
+						matches.add(new NetmaskMatch(addr, bits));
+					} catch (UnknownHostException e) {
+					}
 				}
 			}
 		}
 	}
-	public static void setClientRequest (HttpServletRequest req) throws UnknownHostException
+	public static void setClientRequest (HttpServletRequest req)
 	{
 		String ip = req.getRemoteAddr();
 		String trustedProxies;
@@ -809,13 +815,16 @@ public class Security {
 		setClientIp(ip);
 	}
 
-	private static boolean isTrusted(String ip, String trustedProxies) throws UnknownHostException {
+	private static boolean isTrusted(String ip, String trustedProxies) {
 		if (matches == null) parseTrustedIps(trustedProxies);
-		byte[] addrBytes = InetAddress.getByName(ip).getAddress();
-		for (NetmaskMatch m: matches) {
-//			log.info("Checking "+ip+" against "+m.address[0]+"."+m.address[1]+"."+m.address[2]+"."+m.address[3]+"/"+m.bits);
-			if (m.match(addrBytes))
-				return true;
+		byte[] addrBytes;
+		try {
+			addrBytes = InetAddress.getByName(ip).getAddress();
+			for (NetmaskMatch m: matches) {
+				if (m.match(addrBytes))
+					return true;
+			}
+		} catch (UnknownHostException e) {
 		}
 		return false;
 	}

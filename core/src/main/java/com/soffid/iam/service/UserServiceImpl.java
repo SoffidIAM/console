@@ -70,6 +70,7 @@ import com.soffid.iam.api.MailList;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordDomainStatus;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Printer;
 import com.soffid.iam.api.PrinterUser;
@@ -3825,6 +3826,25 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				n ++;
 		}
 		return n <= 1;
+	}
+
+	@Override
+	protected List<PasswordDomainStatus> handleFindPasswordDomainStatus(String user) throws Exception {
+		UserEntity entity = getUserEntityDao().findByUserName(user);
+		List<PasswordDomainStatus> r = new LinkedList<>();
+		for (PasswordDomainEntity domain: getPasswordDomainEntityDao().findByUser(entity.getId())) {
+			PasswordDomainStatus status = new PasswordDomainStatus();
+			status.setDomainName(domain.getName());
+			for (PasswordEntity pass: getPasswordEntityDao().findByUserDomain(entity, domain)) {
+				if (pass.getOrder() == null || pass.getOrder().longValue() == 0) {
+					status.setFailures(pass.getFails());
+					status.setLockedUntil(pass.getUnlockDate());
+					break;
+				}
+			}
+			r.add(status);
+		}
+		return r;
 	}
 
 

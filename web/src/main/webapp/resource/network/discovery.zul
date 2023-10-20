@@ -28,11 +28,6 @@
 				  icon: /img/network.svg
 				  value: name
 				  leaf: false
-				  columns:
-				  - template: ""
-				  - template: ""
-				  - template: ""
-				  - template: ""
 				- path: /host
 				  icon: #{soffid:getHostIcon(this)}
 				  value: name
@@ -45,27 +40,16 @@
 				- path: /serviceHolder
 				  value: instance[2]
 				  leaf: false
-				  columns:
-				  - template: ""
-				  - template: ""
-				  - template: ""
-				  - template: ""
 				- path: /service
 				  template: >-
 				    #{service}: <a href="${execution.contextPath }/resource/account/account.zul?name=#{accountName}&system=#{accountSystem}" target="_blank">
 				    #{accountName} </a>
 				  leaf: true
-				  columns:
-				  - template: ""
-				  - template: ""
-				  - template: ""
-				  - template: ""
 				- path: /system
-				  template: >-
-				    #{name}
+				  template: ""
 				  leaf: true
 				  columns:
-				  - template: ""
+				  - value: name
 				  - template: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenAccounts')">${c:l('seu.accounts')}</button>
 				  - template: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onOpenSystem')">${c:l('discovery.agent')}</button> 
 				  - value: created
@@ -73,28 +57,15 @@
 				  value: instance[2]
 				  leaf: false
 				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddSystem')">${c:l('agents.zul.Afegeixnou')}</button>
-				  columns:
-				  - template: ""
-				  - template: ""
-				  - template: ""
-				  - template: ""
 				- path: /entryPointHolder
 				  value: instance[2]
 				  leaf: false
 				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddEntryPoint')">${c:l('agents.zul.Afegeixnou')}</button>
-				  columns:
-				  - template: ""
-				  - template: ""
-				  - template: ""
 				- path: /entryPoint
 				  template: >-
 				    <a href="${execution.contextPath }/resource/menu/menu.zul?filter=id eq #{id}" target="_blank">
 				    #{name}</a> 
 				  leaf: true
-				  columns:
-				  - template: ""
-				  - template: ""
-				  - template: ""
 				  ]]>
   				</attribute>
 				<attribute name="columns">

@@ -15,6 +15,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.PagedResult;
+import com.soffid.iam.api.PasswordDomainStatus;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.IssueUserEntity;
@@ -762,4 +763,7 @@ public abstract class UsuariService {
 	
 	@Operation( grantees = {roles.user_merge.class} )
 	public void merge(Long srcId, Long targetId, @Nullable Long eventId) {}
+	
+	@Operation( grantees = {roles.user_query.class} )
+	public List<PasswordDomainStatus> findPasswordDomainStatus(String user) {return null;}
 }

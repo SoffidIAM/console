@@ -1882,7 +1882,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         			xarxa = dao.newNetworkEntity();
         			xarxa.setName(defaultNetwork);
         			xarxa.setAddress("0.0.0.0"); //$NON-NLS-1$
-        			xarxa.setMask("255.255.255.255"); //$NON-NLS-1$
+        			xarxa.setMask("0.0.0.0"); //$NON-NLS-1$
         			xarxa.setDchpSupport(true);
         			xarxa.setDescription("Autocreated network for unknown IP adresses"); //$NON-NLS-1$
         			xarxa.setNormalized("N"); //$NON-NLS-1$

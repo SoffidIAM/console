@@ -570,7 +570,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountAttributeEntity aae = findAccountAttributeEntity ( attributes, key, value);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = getAccountAttributeEntityDao().newAccountAttributeEntity();
 			aae.setAccount(entity);
 			aae.setMetadata(metadata);

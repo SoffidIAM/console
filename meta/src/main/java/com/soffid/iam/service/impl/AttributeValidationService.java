@@ -1,5 +1,6 @@
 package com.soffid.iam.service.impl;
 
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.mda.annotation.Depends;
@@ -10,6 +11,7 @@ import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.model.AplicacioEntity;
 import es.caib.seycon.ng.model.GrupEntity;
 import es.caib.seycon.ng.model.MaquinaEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.TipusUsuariEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 import es.caib.seycon.ng.model.XarxaEntity;
@@ -20,5 +22,6 @@ import es.caib.seycon.ng.servei.XarxaService;
 	XarxaEntity.class, 
 	MaquinaEntity.class} )
 public class AttributeValidationService {
-	public void validate ( TypeEnumeration type, @Nullable CustomObjectTypeEntity customObjectType, @Nullable Object value) {}
+	public void validate ( TipusDadaEntity metadata, @Nullable Object value) {}
+	public void validate ( AccountMetadataEntity metadata, @Nullable Object value) {}
 }

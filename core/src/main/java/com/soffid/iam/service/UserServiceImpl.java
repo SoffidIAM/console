@@ -3313,7 +3313,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		UserDataEntity aae = findUserDataEntity(attributes, key, value, metadata);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = getUserDataEntityDao().newUserDataEntity();
 			aae.setUser(entity);
 			aae.setDataType(metadata);

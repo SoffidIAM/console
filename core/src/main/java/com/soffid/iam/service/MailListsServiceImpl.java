@@ -869,7 +869,7 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 		MailListAttributeEntity aae = findMailListAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = getMailListAttributeEntityDao().newMailListAttributeEntity();
 			aae.setMailList(entity);
 			aae.setMetadata(metadata);

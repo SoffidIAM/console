@@ -2806,7 +2806,7 @@ public class ApplicationServiceImpl extends
 		ApplicationAttributeEntity aae = findApplicationAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = getApplicationAttributeEntityDao().newApplicationAttributeEntity();
 			aae.setInformationSystem(entity);
 			aae.setMetadata(metadata);
@@ -2902,7 +2902,7 @@ public class ApplicationServiceImpl extends
 		RoleAttributeEntity aae = findRoleAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = getRoleAttributeEntityDao().newRoleAttributeEntity();
 			aae.setRole(entity);
 			aae.setMetadata(metadata);

@@ -95,7 +95,7 @@ public abstract class AttributePersister<ENTITY,ATTRIBUTEENTITY> {
 		ATTRIBUTEENTITY aae = findAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = createNewAttribute(entity, metadata, value);
 			getEntityAttributes(entity).add(aae);
 			return true;

@@ -1,6 +1,11 @@
 package com.soffid.iam.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
+import com.soffid.iam.model.AccountMetadataEntity;
 import com.soffid.iam.model.CustomObjectTypeEntity;
+import com.soffid.iam.model.MetaDataEntity;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -8,8 +13,26 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 public class AttributeValidationServiceImpl extends AttributeValidationServiceBase {
 
 	@Override
-	protected void handleValidate(TypeEnumeration type, CustomObjectTypeEntity customObjectType, Object value)
+	protected void handleValidate(MetaDataEntity metadata, Object value)
 			throws Exception {
+		TypeEnumeration type = metadata.getType();
+		CustomObjectTypeEntity customObjectType = metadata.getDataObjectType();
+		final String values = metadata.getValues();
+		validate(value, type, customObjectType, values);
+	}
+
+	@Override
+	protected void handleValidate(AccountMetadataEntity metadata, Object value)
+			throws Exception {
+		TypeEnumeration type = metadata.getType();
+		CustomObjectTypeEntity customObjectType = metadata.getDataObjectType();
+		final String values = metadata.getValues();
+		validate(value, type, customObjectType, values);
+	}
+
+
+	protected void validate(Object value, TypeEnumeration type, CustomObjectTypeEntity customObjectType,
+			final String values) throws InternalErrorException, UnsupportedEncodingException {
 		if (value == null || value.equals("")) //$NON-NLS-1$
 			return;
 		if (type == TypeEnumeration.APPLICATION_TYPE)
@@ -52,6 +75,20 @@ public class AttributeValidationServiceImpl extends AttributeValidationServiceBa
 		{
 			if (getNetworkEntityDao().findByName( value.toString()) == null)
 				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.9"), value)); //$NON-NLS-1$
+		}
+		if (values != null && !values.trim().isEmpty()) {
+			boolean valid = false;
+			for (String t: values.split(" ")) {
+				String v = URLDecoder.decode(t, "UTF-8");
+				if (v.contains(":"))
+					v = v.substring(0, v.indexOf(":"));
+				if (v.trim().equals(value.toString().trim())) {
+					valid = true;
+					break;
+				}
+			}
+			if (!valid)
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.10"), value)); //$NON-NLS-1$
 		}
 	}
 

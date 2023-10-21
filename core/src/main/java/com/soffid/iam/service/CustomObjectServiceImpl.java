@@ -236,7 +236,7 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		CustomObjectAttributeEntity aae = findAttributeEntity(attributes, key, value);
 		if (aae == null)
 		{
-			getAttributeValidationService().validate(metadata.getType(), metadata.getDataObjectType(), value);
+			getAttributeValidationService().validate(metadata, value);
 			aae = getCustomObjectAttributeEntityDao().newCustomObjectAttributeEntity();
 			aae.setCustomObject(entity);
 			aae.setMetadata(metadata);

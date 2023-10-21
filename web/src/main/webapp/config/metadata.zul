@@ -109,11 +109,12 @@
 								onReorder="ref:frame.reorder"
 								onSelect="ref:frame.showAttributeDetails" enablefilter="true">
 								<attribute name="customColumns"><![CDATA[
+				  ]]></attribute>
+				<attribute name="allColumns"><![CDATA[
 				- name: ${c:l('dadesAddicionals.zul.Ordre')}
 				  value: order 
 				  enabled: true
-				  ]]></attribute>
-				<attribute name="allColumns"><![CDATA[
+				  default: true
 				- name: ${c:l('dadesAddicionals.zul.Codi-2')}
 				  value: name 
 				  sort: false
@@ -133,34 +134,45 @@
 				  default: true
 				- name: ${c:l('dadesAddicionals.zul.letterCase')}
 				  value: letterCase
+				  sort: false
 				  template: >-
 				    #{letterCase.value=='u'? 'Uppercase' :
 				    letterCase.value=='l'? 'Lowercase' :
 				    letterCase.value=='m'? 'Mixed case' :
 				    ''}
 				- name: ${c:l('dadesAddicionals.zul.Hint')}
+				  sort: false
 				  value: hint
 				- name: ${c:l('dadesAddicionals.zul.Description')}
+				  sort: false
 				  value: description
 				- name: ${c:l('dadesAddicionals.zul.Required')}
+				  sort: false
 				  template: ${'$'}{required? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
 				  value: required
 				- name: ${c:l('dadesAddicionals.zul.IncludeInSearch')}
+				  sort: false
 				  value: searchCriteria
 				  template: ${'$'}{searchCriteria? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
 				- name: ${c:l('dadesAddicionals.zul.Unique')}
+				  sort: false
 				  value: unique
 				  template: ${'$'}{unique? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
 				- name: ${c:l('dadesAddicionals.zul.Multivalued')}
+				  sort: false
 				  value: multiValued
 				  template: ${'$'}{multiValued? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
 				- name: ${c:l('dadesAddicionals.zul.MultivaluedRows')}
+				  sort: false
 				  value: multiValuedRows
 				- name: ${c:l('dadesAddicionals.zul.Size')}
+				  sort: false
 				  value: size
 				- name: ${c:l('dadesAddicionals.zul.Values')}
+				  sort: false
 				  value: values
 				- name: ${c:l('attributeQuery.Filter')}
+				  sort: false
 				  value: filterExpression
 				  				]]></attribute>
 					</datatable>

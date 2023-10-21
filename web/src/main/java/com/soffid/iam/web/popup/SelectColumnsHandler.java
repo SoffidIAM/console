@@ -74,10 +74,12 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 					o.put("name", colDef.getString("name"));
 					o.put("sort", false);
 					o.put("mandatory", isMandatory(mandatory, value));
-					selected.add(new Integer(data.length()));
-					data.put(o);
-					colNames.add(colDef.getString("name"));
-					cols.put(colDef);
+					if (! isMandatory(mandatory, value)) {
+						selected.add(new Integer(data.length()));
+						data.put(o);
+						colNames.add(colDef.getString("name"));
+						cols.put(colDef);
+					}
 				}				
 			}
 	
@@ -89,11 +91,13 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 				String value = colDef.optString("value", "");
 				if (colDef.optString("name", null) != null &&
 						!colNames.contains(colDef.getString("name"))) {
-					o.put("name", colDef.getString("name"));
-					o.put("sort", false);
-					o.put("mandatory", isMandatory(mandatory, value));
-					data.put(o);
-					cols.put(colDef);
+					if (! isMandatory(mandatory, value)) {
+						o.put("name", colDef.getString("name"));
+						o.put("sort", false);
+						o.put("mandatory", isMandatory(mandatory, value));
+						data.put(o);
+						cols.put(colDef);
+					}
 				}
 			}
 			
@@ -191,22 +195,31 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 					mandatory = ((DynamicColumnsDatatable) c).getMandatoryColumns();
 			} catch (Exception e) {
 			}
+			JSONArray srccols = src.getAllColumns();
+			for (int i = 0; i < srccols.length(); i++) {
+				JSONObject colDef = srccols.getJSONObject( i );
+				String value = colDef.optString("value", "");
+				if (isMandatory(mandatory, value)) {
+					colDef.put("enabled", true);
+					cols.put(colDef);
+					allCols.put(colDef);
+				}
+			}
 			for (int i = 0; i < positions.length; i++) 
 			{
 				JSONObject colDef = this.cols.getJSONObject( positions[i] );
 				String value = colDef.optString("value", "");
-				allCols.put(colDef);
-				if (isMandatory(mandatory, value)) {
-					colDef.put("enabled", true);
-					cols.put(colDef);
-				} else if (selected.length == 0) {
-					colDef.put("enabled", colDef.optBoolean("default"));
-					cols.put(colDef);
-				} else if (Arrays.binarySearch(selected, positions[i]) >= 0) {
-					colDef.put("enabled", true);
-					cols.put(colDef);
-				} else {
-					colDef.put("enabled", false);
+				if (!isMandatory(mandatory, value)) {
+					allCols.put(colDef);
+					if (selected.length == 0) {
+						colDef.put("enabled", colDef.optBoolean("default"));
+						cols.put(colDef);
+					} else if (Arrays.binarySearch(selected, positions[i]) >= 0) {
+						colDef.put("enabled", true);
+						cols.put(colDef);
+					} else {
+						colDef.put("enabled", false);
+					}
 				}
 			}
 			

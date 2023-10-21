@@ -42,4 +42,12 @@ public class MetadataTable extends DynamicColumnsDatatable {
 		this.customColumns = customColumns;
 	}
 
+
+
+	@Override
+	public String[] getMandatoryColumns() throws Exception {
+		// TODO Auto-generated method stub
+		return new String[] {"order"};
+	}
+
 }

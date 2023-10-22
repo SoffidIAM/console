@@ -88,6 +88,7 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -408,7 +409,10 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 			GroupEntity old = getGroupEntityDao().load(grup.getId());
 			makeACopy(old, grup);
 		}
-		GroupEntity entity = getGroupEntityDao().groupToEntity(grup);
+		GroupEntity entity = getGroupEntityDao().load(grup.getId());
+		if (entity == null) return null;
+		String oldName = entity.getName();
+		getGroupEntityDao().groupToEntity(grup, entity, true);
 		// Check for loops
 		for (GroupEntity e = entity.getParent(); e != null; e = e.getParent()) {
 			if (e == entity) {
@@ -417,6 +421,8 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 		}
 		getGroupEntityDao().update(entity);
 		updateGroupAttributes(grup, entity);
+		getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.GROUP_TYPE, 
+				oldName, grup.getName());
 		return getGroupEntityDao().toGroup(entity);
 	}
 

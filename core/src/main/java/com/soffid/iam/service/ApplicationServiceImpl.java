@@ -90,6 +90,7 @@ import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
 import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAccountEntityDao;
@@ -131,6 +132,7 @@ import es.caib.seycon.ng.comu.Rol;
 import es.caib.seycon.ng.comu.RolGrant;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
@@ -285,6 +287,8 @@ public class ApplicationServiceImpl extends
             updateApplicationAttributes(aplicacio, aplEntity);
             if ( ! old.equals(aplEntity.getName())) {
             	recursiveRenameChildren ( aplEntity.getChildren(), aplEntity.getName());            	
+    			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.APPLICATION_TYPE, 
+    					old, aplEntity.getName());
             }
         } else {
             throw new SeyconAccessLocalException("aplicacioService", //$NON-NLS-1$
@@ -898,6 +902,8 @@ public class ApplicationServiceImpl extends
             		t.setDb(rol.getSystem());
             		getTaskEntityDao().create(t);
             	}
+               	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.ROLE_TYPE, 
+                			oldName+"@"+rol.getSystem(), rol.getName()+"@"+rol.getSystem());
             }
             
             return getRoleEntityDao().toRole(rolEntity);

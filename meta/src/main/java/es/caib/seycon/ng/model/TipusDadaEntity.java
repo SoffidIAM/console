@@ -13,6 +13,7 @@ import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.Attribute;
 import com.soffid.mda.annotation.Column;
 import com.soffid.mda.annotation.DaoFinder;
+import com.soffid.mda.annotation.DaoOperation;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Entity;
@@ -21,6 +22,8 @@ import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.Index;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
+
+import es.caib.seycon.ng.comu.TypeEnumeration;
 
 @Entity (table="SC_TIPDAD", translatedName="MetaDataEntity", translatedPackage="com.soffid.iam.model" )
 @Depends ({es.caib.seycon.ng.model.AuditoriaEntity.class,
@@ -229,6 +232,10 @@ public abstract class TipusDadaEntity {
 	public java.util.List<es.caib.seycon.ng.model.TipusDadaEntity> findByScope(MetadataScope scope) {
 	 return null;
 	}
+	
+	// Method to rename attribute values
+	@DaoOperation
+	void renameAttributeValues(TypeEnumeration type, String oldValue, String newValue) {}
 }
 
 @Index (name="TAD_UK_CODE",	

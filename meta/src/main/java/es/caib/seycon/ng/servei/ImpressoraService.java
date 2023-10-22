@@ -18,6 +18,7 @@ import com.soffid.mda.annotation.Service;
 import es.caib.seycon.ng.comu.Impressora;
 import es.caib.seycon.ng.comu.UsuariImpressora;
 import es.caib.seycon.ng.model.GrupEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 
 @Service (translatedName="PrinterService",
 	translatedPackage="com.soffid.iam.service")
@@ -28,7 +29,8 @@ import es.caib.seycon.ng.model.GrupEntity;
 	es.caib.seycon.ng.model.ImpressoraEntity.class,
 	GrupEntity.class,
 	AutoritzacioService.class,
-	AsyncRunnerService.class})
+	AsyncRunnerService.class,
+	TipusDadaEntity.class})
 public abstract class ImpressoraService {
 
 	@Operation ( grantees={roles.Tothom.class},

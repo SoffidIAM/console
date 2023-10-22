@@ -67,6 +67,7 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.TipusDomini;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.UnknownApplicationException;
@@ -289,12 +290,14 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	protected MailList handleUpdate(MailList llistaCorreu) throws Exception {
-		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
-		// Fem cas específic per a llistes que s'han quedat sense membres
-		// des de l'inferficie d'usuari del seu (es borren al quedar-se sense
-		// membres). Per al cas de que després d'esborrar usuaris vullguen
-		// afegir
-		// nous o modificar la llista...
+		EmailListEntity llistaCorreuEntity = getEmailListEntityDao().load(llistaCorreu.getId());
+		if (llistaCorreuEntity != null && (
+				!llistaCorreuEntity.getName().equals(llistaCorreu.getName()) ||
+				!llistaCorreuEntity.getDomain().getName().equals(llistaCorreu.getDomainName())))
+			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.MAIL_LIST_TYPE, 
+					llistaCorreuEntity.getName()+"@"+llistaCorreuEntity.getDomain().getName(), 
+					llistaCorreu.getName()+"@"+llistaCorreu.getDomainName());
+		llistaCorreuEntity = getEmailListEntityDao().mailListToEntity(llistaCorreu);
 		if (llistaCorreuEntity.getId() != null)
 			getEmailListEntityDao().update(llistaCorreuEntity);
 		else
@@ -440,7 +443,13 @@ public class MailListsServiceImpl extends com.soffid.iam.service.MailListsServic
 	}
 
 	protected MailDomain handleUpdate(MailDomain dominiCorreu) throws Exception {
-		EmailDomainEntity dominiCorreuEntity = this.getEmailDomainEntityDao().mailDomainToEntity(dominiCorreu);
+		EmailDomainEntity dominiCorreuEntity = getEmailDomainEntityDao().load(dominiCorreu.getId());
+		if (dominiCorreu != null && 
+				!dominiCorreuEntity.getName().equals(dominiCorreu.getName()))
+			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.MAIL_DOMAIN_TYPE, 
+					dominiCorreuEntity.getName(), 
+					dominiCorreu.getName());
+		dominiCorreuEntity = this.getEmailDomainEntityDao().mailDomainToEntity(dominiCorreu);
 		getEmailDomainEntityDao().update(dominiCorreuEntity);
 		return getEmailDomainEntityDao().toMailDomain(dominiCorreuEntity);
 	}

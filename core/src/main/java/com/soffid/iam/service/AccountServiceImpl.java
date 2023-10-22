@@ -122,6 +122,7 @@ import es.caib.seycon.ng.comu.AccountCriteria;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.ServerType;
 import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -970,6 +971,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getName()));
 			anyChange = true;
 			account.setOldName(ae.getName());
+			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.ACCOUNT_TYPE, 
+					ae.getName()+"@"+ae.getSystem().getName(), 
+					account.getName()+"@"+account.getSystem());
 		}
 		if ( (ae.getDescription() == null ? account.getDescription() != null: ! ae.getDescription().equals( account.getDescription())) ||
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||

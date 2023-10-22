@@ -76,6 +76,7 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.XarxaSearchCriteria;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -235,7 +236,11 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IncompatibleIPMessage"), xarxa.getIp(), xarxa.getMask(), maquina.getIp()));
                 }
             }
-
+            
+            NetworkEntity old = getNetworkEntityDao().load(xarxa.getId());
+            if (old != null && !old.getName().equals(xarxa.getName()))
+            	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.NETWORK_TYPE, 
+            			old.getName(), xarxa.getName());
             getNetworkEntityDao().update(getNetworkEntityDao().networkToEntity(xarxa));
         } else {
             throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedUpdateNet")); //$NON-NLS-1$
@@ -363,8 +368,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             HostEntity hostEntity = getHostEntityDao().load(maquina.getId());
             boolean sync = ! compareHost(maquina, hostEntity);
             if (sync) {
-	            if (!hostEntity.getName().equals(maquina.getName()))
+	            if (!hostEntity.getName().equals(maquina.getName())) {
 	    			createHostTask(hostEntity);
+	    			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.HOST_TYPE, 
+	    					hostEntity.getName(), maquina.getName());
+
+	            }
             }
             getHostEntityDao().hostToEntity(maquina, hostEntity, true);
 			getHostEntityDao().update(hostEntity);
@@ -1945,7 +1954,12 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	@Override
 	protected void handleUpdate (OsType osType) throws Exception
 	{
-		OsTypeEntity entity = getOsTypeEntityDao().osTypeToEntity(osType);
+		OsTypeEntity old = getOsTypeEntityDao().load(osType.getId());
+        if (old != null && !old.getName().equals(osType.getName()))
+        	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.OS_TYPE, 
+        			old.getName(), osType.getName());
+
+        OsTypeEntity entity = getOsTypeEntityDao().osTypeToEntity(osType);
 		
 		getOsTypeEntityDao().update(entity);
 	}

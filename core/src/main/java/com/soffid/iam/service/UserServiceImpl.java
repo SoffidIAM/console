@@ -139,6 +139,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.comu.ServerType;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
@@ -1560,9 +1561,12 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				upe.setUserName(usuari.getUserName());
 				getUserProcessEntityDao().update(upe);
 			}
+			String oldName = usuariAbans.getUserName();
 			usuariAbans.setUserName(usuari.getUserName());
 			getUserEntityDao().update(usuariAbans);
 			getUserEntityDao().createUpdateTasks(usuariAbans, previousUser);
+			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.USER_TYPE, 
+					oldName, usuari.getUserName());
 		}
 
 		/* IAM-318: Propagar canvis de grup primari */

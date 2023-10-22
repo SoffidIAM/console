@@ -36,6 +36,7 @@ import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class CustomObjectServiceImpl extends CustomObjectServiceBase {
@@ -152,6 +153,8 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 		if (! entity.getName().equals(obj.getName()))
 		{
 			generateTask(entity);
+			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.CUSTOM_OBJECT_TYPE, 
+					entity.getName(), obj.getName());
 		}
 		getCustomObjectEntityDao().customObjectToEntity(obj, entity, true);
 		getCustomObjectEntityDao().create(entity);

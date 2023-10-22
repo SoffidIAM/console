@@ -46,6 +46,7 @@ import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DominiUsuariEntity;
 import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 import es.caib.seycon.ng.model.ServerCertificateEntity;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import roles.agent_create;
 import roles.agent_query;
 import roles.agent_queryObjects;
@@ -70,7 +71,8 @@ import roles.server_manage_server;
 		AsyncRunnerService.class,
 		AuditoriaService.class,
 		HostSystemEntity.class,
-		ServerRegistrationTokenEntity.class})
+		ServerRegistrationTokenEntity.class,
+		TipusDadaEntity.class})
 public abstract class DispatcherService {
 
 	@Operation(grantees = { roles.agent_create.class }, translated = "create")

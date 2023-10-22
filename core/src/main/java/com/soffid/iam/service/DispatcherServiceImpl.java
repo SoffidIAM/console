@@ -82,6 +82,7 @@ import com.soffid.iam.model.ObjectMappingEntity;
 import com.soffid.iam.model.ObjectMappingPropertyEntity;
 import com.soffid.iam.model.ObjectMappingTriggerEntity;
 import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.ReconcileTriggerEntity;
 import com.soffid.iam.model.ReconcileTriggerEntityDao;
 import com.soffid.iam.model.RoleEntity;
@@ -119,6 +120,7 @@ import com.soffid.scimquery.parser.TokenMgrError;
 
 import es.caib.seycon.ng.comu.Dispatcher;
 import es.caib.seycon.ng.comu.ServerType;
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
@@ -299,7 +301,8 @@ public class DispatcherServiceImpl extends
 			SystemEntity entityOld = dispatcher.getId() == null ? 
 					getSystemEntityDao().findByName(dispatcher.getName()) :
 					getSystemEntityDao().load(dispatcher.getId());
-	
+			String oldName = entityOld.getName();
+			
 			// fem còpia dels antics per comparar
 			Collection<UserTypeSystemEntity> tipusUsuariOld = new java.util.HashSet<com.soffid.iam.model.UserTypeSystemEntity>(
 					entityOld.getUserType());
@@ -317,6 +320,10 @@ public class DispatcherServiceImpl extends
 			updateServers();
 	
 			getSystemEntityDao().update(entityOld);
+			
+			if (!oldName.equals(dispatcher.getName()))
+	        	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.SYSTEM_TYPE, 
+	        			oldName, dispatcher.getName());
 			
 			return getSystemEntityDao().toSystem(entityOld);
 		} finally {

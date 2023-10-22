@@ -29,11 +29,14 @@ import com.soffid.iam.model.ForbiddenWordEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.PolicyForbiddenWordEntity;
+import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.UserDomainEntity;
 import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.account.AccountNameGenerator;
+
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -109,6 +112,10 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 	 * @see es.caib.seycon.ng.servei.DominiUsuariService#update(es.caib.seycon.ng.comu.TipusUsuari)
 	 */
 	protected com.soffid.iam.api.UserType handleUpdate(com.soffid.iam.api.UserType tipusUsuari) throws java.lang.Exception {
+    	UserTypeEntity old = getUserTypeEntityDao().load(tipusUsuari.getId());
+        if (old != null && !old.getName().equals(tipusUsuari.getName()))
+        	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.USER_TYPE_TYPE, 
+        			old.getName(), tipusUsuari.getName());
 		UserTypeEntity entity = getUserTypeEntityDao().userTypeToEntity(tipusUsuari);
 		getUserTypeEntityDao().update(entity);
 		return getUserTypeEntityDao().toUserType(entity);

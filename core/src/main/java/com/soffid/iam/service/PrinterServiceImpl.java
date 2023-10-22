@@ -29,6 +29,7 @@ import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.NetworkEntityDao;
+import com.soffid.iam.model.OsTypeEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.PrinterEntityDao;
@@ -46,6 +47,7 @@ import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
 
+import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.SeyconAccessLocalException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -106,6 +108,10 @@ public class PrinterServiceImpl extends
      * @see es.caib.seycon.ng.servei.ImpressoraService#update(es.caib.seycon.ng.comu.Impressora)
      */
     protected Printer handleUpdate(com.soffid.iam.api.Printer impressora) throws java.lang.Exception {
+    	PrinterEntity old = getPrinterEntityDao().load(impressora.getId());
+        if (old != null && !old.getName().equals(impressora.getName()))
+        	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.OS_TYPE, 
+        			old.getName(), impressora.getName());
 
         PrinterEntity entity = getPrinterEntityDao().printerToEntity(impressora);
         getPrinterEntityDao().update(entity);

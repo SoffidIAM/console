@@ -195,6 +195,50 @@ public class MetaDataEntityDaoImpl extends
                 this.remove(entity);
             }
         }
-	}	
+	}
 
+	static Class[] references = new Class[] {
+		AccountAttributeEntity.class,
+		ApplicationAttributeEntity.class,
+		CustomObjectAttributeEntity.class,
+		GroupAttributeEntity.class,
+		HostAttributeEntity.class,
+		MailListAttributeEntity.class,
+		RoleAttributeEntity.class,
+		UserGroupAttributeEntity.class
+	};
+
+	@Override
+	protected void handleRenameAttributeValues(TypeEnumeration type, String oldValue, String newValue)
+			throws Exception {
+		for (Class cl: references) {
+			getSession().createQuery("update "+cl.getName()+" "
+					+ "set value=:newvalue "
+					+ "where value=:oldvalue and metadata.id in "
+					+ "(select id from com.soffid.iam.model.MetaDataEntity where type=:type)")
+				.setString("newvalue", newValue)
+				.setString("oldvalue", oldValue)
+				.setString("type", type.toString())
+				.executeUpdate();
+		}
+
+		getSession().createQuery("UPDATE com.soffid.iam.model.AccountAttributeEntityImpl "
+				+ "SET value=:newvalue "
+				+ "WHERE value=:oldvalue AND systemMetadata.id in "
+				+ "(select id from com.soffid.iam.model.MetaDataEntity where type=:type)")
+			.setString("newvalue", newValue)
+			.setString("oldvalue", oldValue)
+			.setString("type", type.toString())
+			.executeUpdate();
+
+		getSession().createQuery("UPDATE com.soffid.iam.model.UserDataEntityImpl "
+				+ "SET value=:newvalue "
+				+ "WHERE value=:oldvalue AND dataType.id in "
+				+ "(select id from com.soffid.iam.model.MetaDataEntity where type=:type)")
+			.setString("newvalue", newValue)
+			.setString("oldvalue", oldValue)
+			.setString("type", type.toString())
+			.executeUpdate();
+		
+	}	
 }

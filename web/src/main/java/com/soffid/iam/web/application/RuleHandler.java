@@ -241,7 +241,8 @@ public class RuleHandler extends FrameHandler implements AfterCompose {
 		List roles = new LinkedList();
 		for (DataNode dn: (Collection<DataNode>) XPathUtils.getValue(getForm(),"/ruleAssignedRole"))
 		{
-			roles.add(dn.getInstance());
+			if (dn != null && dn.getInstance() != null)
+				roles.add(dn.getInstance());
 		}
 		com.soffid.iam.service.ejb.RulesService svc = com.soffid.iam.EJBLocator.getRulesService();
 		String file = svc.generateChangesReport(r, roles);

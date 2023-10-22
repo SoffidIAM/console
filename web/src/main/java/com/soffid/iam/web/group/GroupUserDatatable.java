@@ -63,7 +63,7 @@ public class GroupUserDatatable extends DatatypeColumnsDatatable {
 			if (Boolean.TRUE.equals(dt3.getBuiltin()))
 				dt3.setName("user_."+dt3.getName());
 			else
-				dt3.setName("user_s.attributes."+dt3.getName());
+				dt3.setName("user_.attributes."+dt3.getName());
 			dt3.setBuiltin(true);
 			l.add(dt3);
 		}

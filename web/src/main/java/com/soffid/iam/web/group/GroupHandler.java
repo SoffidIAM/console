@@ -61,6 +61,7 @@ public class GroupHandler extends FrameHandler {
 		String name = req.getParameter("name");
 		SearchBox sb = (SearchBox) getFellow("searchBox");
 		if (name != null) {
+			sb.setBasicMode();
 			sb.addAttribute("name").setSearchFilter(name);
 		}
 		sb.search();

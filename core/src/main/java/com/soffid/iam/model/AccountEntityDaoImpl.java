@@ -228,20 +228,26 @@ public class AccountEntityDaoImpl extends
 			for (AccountAttributeEntity att : source.getAttributes()) {
 				final Object objectValue = att.getObjectValue();
 				if (objectValue != null) {
-					if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+					final Boolean multiValued = att.getSystemMetadata() != null ?
+							att.getSystemMetadata().getMultiValued():
+							att.getMetadata().getMultiValued();
+					final String attName = att.getSystemMetadata() != null ?
+							att.getSystemMetadata().getName() :
+							att.getMetadata().getName();
+					if (multiValued != null && multiValued.booleanValue())
 					{
-						LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+						LinkedList<Object> r = (LinkedList<Object>) attributes.get(attName);
 						if (r == null)
 						{
 							r = new LinkedList<Object>();
-							attributes.put(att.getMetadata().getName(), r);
+							attributes.put(attName, r);
 						}
 						if (objectValue != null)
 							r.add(objectValue);
 					}
 					else
 					{
-						attributes.put(att.getMetadata().getName(),objectValue);
+						attributes.put(attName,objectValue);
 					}
 				}
 			}

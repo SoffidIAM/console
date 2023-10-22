@@ -5,6 +5,7 @@
 
 package com.soffid.iam.model;
 
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.UserData;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.SeyconException;
@@ -26,12 +27,33 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
 	@Override
     public void toUserData(AccountAttributeEntity sourceEntity, UserData targetVO) {
 		super.toUserData(sourceEntity, targetVO);
-        targetVO.setAttribute(sourceEntity.getMetadata().getName());
+        targetVO.setAttribute(sourceEntity.getSystemMetadata() == null ?
+        		sourceEntity.getMetadata().getName():
+        		sourceEntity.getSystemMetadata().getName());
         targetVO.setAccountName(sourceEntity.getAccount().getName());
         targetVO.setSystemName(sourceEntity.getAccount().getSystem().getName());
-    	targetVO.setDataLabel(sourceEntity.getMetadata().getLabel());
+    	targetVO.setDataLabel(sourceEntity.getSystemMetadata() == null ?
+    			sourceEntity.getMetadata().getLabel():
+    	sourceEntity.getSystemMetadata().getLabel() ) ;
     	if (targetVO.getDataLabel() == null || targetVO.getDataLabel().trim().length() == 0) 
-    		targetVO.setDataLabel(sourceEntity.getMetadata().getName());
+    		targetVO.setDataLabel(sourceEntity.getSystemMetadata() == null?
+    				sourceEntity.getMetadata().getName() : 
+    				sourceEntity.getSystemMetadata().getName());
+    	if (sourceEntity.getSystemMetadata() != null && sourceEntity.getValue() != null) {
+        	targetVO.setValue(sourceEntity.getValue());
+        	if(sourceEntity.getSystemMetadata().getType()!= null){
+        		targetVO.setDateValue(null);
+        		if(sourceEntity.getSystemMetadata().getType().toString().equals("D")){ //$NON-NLS-1$
+        			Date dateObj = (Date) sourceEntity.getObjectValue();
+        			if (dateObj != null)
+        			{
+	    				Calendar calendar = Calendar.getInstance();
+	    				calendar .setTime(dateObj);
+	    				targetVO.setDateValue(calendar);
+        			}
+        		} 
+        	}
+    	}
         if(sourceEntity.getMetadata() != null && sourceEntity.getValue() != null) 
         {
         	targetVO.setValue(sourceEntity.getValue());
@@ -58,12 +80,20 @@ public class AccountAttributeEntityDaoImpl extends AccountAttributeEntityDaoBase
         if(accountEntity == null) {
         	throw new SeyconException(String.format(com.soffid.iam.model.Messages.getString("AccountAttributeEntityDaoImpl.1"), sourceVO.getAccountName(), sourceVO.getSystemName())); //$NON-NLS-1$
         }
-        AccountMetadataEntity metadata = getAccountMetadataEntityDao().findByName(sourceVO.getSystemName(), sourceVO.getAttribute());
-		if (metadata == null) {
+        MetaDataEntity metadata = null;
+        for (MetaDataEntity m: getMetaDataEntityDao()
+        		.findByObjectTypeAndName(Account.class.getName(), 
+        				sourceVO.getAttribute()))
+        {
+        	metadata = m;
+        }
+        AccountMetadataEntity systemMetadata = getAccountMetadataEntityDao().findByName(sourceVO.getSystemName(), sourceVO.getAttribute());
+		if (metadata == null && systemMetadata == null) {
 			throw new SeyconException(String.format(Messages.getString("DadaUsuariEntityDaoImpl.4"), sourceVO.getAttribute())); //$NON-NLS-1$
 		}
         targetEntity.setAccount(accountEntity);
-        targetEntity.setMetadata(metadata);
+        targetEntity.setSystemMetadata(systemMetadata);
+        targetEntity.setMetadata(systemMetadata == null ? metadata: null);
         targetEntity.setValue(sourceVO.getValue());
         if (metadata != null && TypeEnumeration.DATE_TYPE.equals(metadata.getType()))
         {

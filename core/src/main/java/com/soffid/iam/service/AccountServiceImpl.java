@@ -75,6 +75,7 @@ import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.CustomDialect;
 import com.soffid.iam.model.GroupEntity;
 import com.soffid.iam.model.IssueEntity;
+import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.QueryBuilder;
 import com.soffid.iam.model.RoleAccountEntity;
@@ -496,20 +497,43 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				else
 				{
 					AccountMetadataEntity metadata = findMetadata (entity, key);
-					if (v instanceof Collection)
-					{
-						Collection l = (Collection) v;
-						for (Object o: (Collection) v)
+					if (metadata != null) {
+						if (v instanceof Collection)
 						{
-							if (o != null)
+							Collection l = (Collection) v;
+							for (Object o: (Collection) v)
 							{
-								updateAccountAttribute(entity, entities, key, metadata, o);
+								if (o != null)
+								{
+									updateAccountAttribute(entity, entities, key, metadata, o);
+								}
 							}
 						}
-					}
-					else
-					{
-						updateAccountAttribute(entity, entities, key, metadata, v);
+						else
+						{
+							updateAccountAttribute(entity, entities, key, metadata, v);
+						}						
+					} else {
+						MetaDataEntity commonMetadata = findCommonMetadata(entity, key);
+						if (commonMetadata != null) {
+							if (v instanceof Collection)
+							{
+								Collection l = (Collection) v;
+								for (Object o: (Collection) v)
+								{
+									if (o != null)
+									{
+										updateAccountAttribute(entity, entities, key, commonMetadata, o);
+									}
+								}
+							}
+							else
+							{
+								updateAccountAttribute(entity, entities, key, commonMetadata, v);
+							}
+						} else {
+							throw new InternalErrorException(String.format("Unable to find metadada for attribute %s", key));
+						}
 					}
 				}
 			}
@@ -541,6 +565,30 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 		}
 		
+		for ( MetaDataEntity m: getMetaDataEntityDao().findByObjectTypeAndName(Account.class.getName(), null))
+		{
+			if (Boolean.FALSE.equals(m.getBuiltin())) {
+				Object o = app.getAttributes().get(m.getName());
+				if ( o == null || "".equals(o))
+				{
+					if (m.getRequired() != null && m.getRequired().booleanValue())
+						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+				} else {
+					if (m.getUnique() != null && m.getUnique().booleanValue())
+					{
+						Collection<String> l = (Collection<String>) ( o instanceof Collection? (Collection) o: Collections.singletonList(o) );
+						for (String v: l)
+						{
+							List<AccountAttributeEntity> p = getAccountAttributeEntityDao().findByNameAndValue(app.getSystem(), m.getName(), v);
+							if (p.size() > 1)
+								throw new InternalErrorException(String.format("Already exists an account with %s %s",
+										m.getLabel(), v));
+						}
+					}
+				}
+			}
+		}
+
 		byte[] previousStatus = (byte[]) app.getAttributes().get(AccountEntityDaoImpl.PREVIOUS_STATUS_ATTRIBUTE);
 		if (previousStatus != null) {
 			if (entity.getSnapshot() == null) {
@@ -573,6 +621,25 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			getAttributeValidationService().validate(metadata, value);
 			aae = getAccountAttributeEntityDao().newAccountAttributeEntity();
 			aae.setAccount(entity);
+			aae.setSystemMetadata(metadata);
+			aae.setObjectValue(value);
+			getAccountAttributeEntityDao().create(aae);
+			entity.getAttributes().add(aae);
+			entity.setLastChange(new Date());
+		}
+		else
+			attributes.remove(aae);
+	}
+
+	private void updateAccountAttribute(AccountEntity entity, 
+			LinkedList<AccountAttributeEntity> attributes, String key,
+			MetaDataEntity metadata, Object value) throws InternalErrorException {
+		AccountAttributeEntity aae = findAccountAttributeEntity ( attributes, key, value);
+		if (aae == null)
+		{
+			getAttributeValidationService().validate(metadata, value);
+			aae = getAccountAttributeEntityDao().newAccountAttributeEntity();
+			aae.setAccount(entity);
 			aae.setMetadata(metadata);
 			aae.setObjectValue(value);
 			getAccountAttributeEntityDao().create(aae);
@@ -588,7 +655,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			Object o) {
 		for (AccountAttributeEntity aae: entities)
 		{
-			if (aae.getMetadata().getName().equals(key))
+			if (aae.getMetadata() != null && aae.getMetadata().getName().equals(key) ||
+				aae.getSystemMetadata() != null && aae.getSystemMetadata().getName().equals(key))
 			{
 				if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
 					return aae;
@@ -597,11 +665,19 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		return null;
 	}
 
+	private MetaDataEntity findCommonMetadata(AccountEntity entity, String key) throws InternalErrorException {
+		for ( MetaDataEntity m: getMetaDataEntityDao().findByObjectTypeAndName(Account.class.getName(), key)) {
+			if (Boolean.FALSE.equals(m.getBuiltin()))
+				return m;
+		}
+		return null;
+	}
+	
 	private AccountMetadataEntity findMetadata(AccountEntity entity, String key) throws InternalErrorException {
 		for (AccountMetadataEntity m: entity.getSystem().getMetaData())
 			if (m.getName().equals(key))
 				return m;
-		throw new InternalErrorException(String.format("Unable to find metadada for attribute %s", key));
+		return null;
 	}
 
 	private Collection<String> getAclGrupCollectionForLevel(Account account, AccountAccessLevelEnum level) {
@@ -2437,7 +2513,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			for (AccountMetadataEntity metadata : metaList) {
                 boolean found = false;
                 for (AccountAttributeEntity data : accountEntity.getAttributes()) {
-                    if (data.getMetadata() == metadata) {
+                    if (data.getSystemMetadata() == metadata) {
                         found = true;
                         AttributeVisibilityEnum vis = data.getAttributeVisibility();
                         if (vis.equals(AttributeVisibilityEnum.EDITABLE) || vis.equals(AttributeVisibilityEnum.READONLY)) result.add(getAccountAttributeEntityDao().toUserData(data));
@@ -2446,7 +2522,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 }
                 if (!found) {
                     AccountAttributeEntity data = getAccountAttributeEntityDao().newAccountAttributeEntity();
-                    data.setMetadata(metadata);
+                    data.setSystemMetadata(metadata);
                     data.setAccount(accountEntity);
                     if (data.getAttributeVisibility().equals(AttributeVisibilityEnum.EDITABLE) || data.getAttributeVisibility().equals(AttributeVisibilityEnum.READONLY)) {
                         UserData d = getAccountAttributeEntityDao().toUserData(data);
@@ -2484,10 +2560,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (accountEntity == null)
 			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.AccountNotFound"), attribute.getAccountName(), attribute.getSystemName())); //$NON-NLS-1$
 
-		AccountMetadataEntity meta = getAccountMetadataEntityDao().findByName(attribute.getSystemName(), attribute.getAttribute());
+		
+		AccountMetadataEntity meta = getAccountMetadataEntityDao().findByName(attribute.getSystemName(), 
+				attribute.getAttribute());
 		if (meta == null)
 		{
-			throw new InternalErrorException("Metadata not found for attribute " + attribute.getAttribute());
+			MetaDataEntity meta0 = findCommonMetadata(accountEntity, attribute.getAttribute());
+			if (meta0 == null)
+				throw new InternalErrorException("Metadata not found for attribute " + attribute.getAttribute());
 		}
 		AccountAttributeEntity entity = getAccountAttributeEntityDao().userDataToEntity(attribute);
 		AttributeVisibilityEnum visibility = entity.getAttributeVisibility();
@@ -2958,6 +3038,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			Integer start, Integer pageSize,
 			List<Account> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, 
 				EvalException, JSONException, ParseException, TokenMgrError {
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
 		final AccountEntityDao dao = getAccountEntityDao();
 		final AuthorizationService authorizationService = getAuthorizationService();
 		ScimHelper h = new ScimHelper(Account.class);

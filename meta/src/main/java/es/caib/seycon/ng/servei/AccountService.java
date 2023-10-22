@@ -45,6 +45,7 @@ import es.caib.seycon.ng.comu.SeyconAgentTaskLog;
 import es.caib.seycon.ng.comu.Usuari;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.model.TipusDadaEntity;
 import roles.account_attribute_query;
 import roles.account_attribute_update;
 import roles.account_query;
@@ -71,6 +72,7 @@ import roles.account_query;
 	es.caib.seycon.ng.model.AuditoriaEntity.class,
 	AutoritzacioService.class,
 	AccountAttributeEntity.class, AccountMetadataEntity.class,
+	TipusDadaEntity.class,
 	AuditoriaService.class,
 	BpmEngine.class,
 	VaultService.class,

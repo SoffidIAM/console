@@ -41,40 +41,52 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 			v = AttributeVisibilityEnum.EDITABLE;
 		else 
 		{
-			com.soffid.iam.model.AccountMetadataEntity tda = getMetadata();
-			if (tda == null)
-				v = AttributeVisibilityEnum.HIDDEN;
+			com.soffid.iam.model.AccountMetadataEntity tda = getSystemMetadata();
+			AttributeVisibilityEnum uservis = null, admin = null, operator = null;
+			if (tda == null) {
+				MetaDataEntity tda0 = getMetadata();
+				if (tda0 == null)
+					return AttributeVisibilityEnum.HIDDEN;
+				else {
+					uservis = tda0.getUserVisibility();
+					operator = tda0.getOperatorVisibility();
+					admin = tda0.getAdminVisibility();
+				}
+			}
 			else
 			{
-				String user = Security.getCurrentUser();
-				if (user != null)
+				uservis = tda.getUserVisibility();
+				operator = tda.getOperatorVisibility();
+				admin = tda.getAdminVisibility();
+			}
+			String user = Security.getCurrentUser();
+			if (user != null)
+			{
+				AccountEntity account = getAccount();
+				if (account.getType().equals(AccountType.USER))
 				{
-					AccountEntity account = getAccount();
-					if (account.getType().equals(AccountType.USER))
+					for (UserAccountEntity uac: account.getUsers())
 					{
-						for (UserAccountEntity uac: account.getUsers())
+						if (uac.getUser() != null && uac.getUser().getUserName().equals(user))
 						{
-							if (uac.getUser() != null && uac.getUser().getUserName().equals(user))
-							{
-								return tda.getUserVisibility() == null ? AttributeVisibilityEnum.HIDDEN: tda.getUserVisibility();
-							}
+							return uservis == null ? AttributeVisibilityEnum.HIDDEN: uservis;
 						}
 					}
 				}
-				AuthorizationService autService = ServiceLocator.instance().getAuthorizationService();
-				if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
-					v =  tda.getAdminVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getAdminVisibility();
-				else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE))
-					v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.EDITABLE: tda.getOperatorVisibility();
-				else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY))
-				{
-					v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: tda.getOperatorVisibility();
-					if (AttributeVisibilityEnum.EDITABLE.equals (v))
-						v = AttributeVisibilityEnum.READONLY;
-				}
-				else
-					v = AttributeVisibilityEnum.HIDDEN;
 			}
+			AuthorizationService autService = ServiceLocator.instance().getAuthorizationService();
+			if (Security.isUserInRole(Security.AUTO_AUTHORIZATION_ALL))
+				v =  admin == null ? AttributeVisibilityEnum.EDITABLE: admin;
+			else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_UPDATE))
+				v = operator == null ? AttributeVisibilityEnum.EDITABLE: operator;
+			else if (Security.isUserInRole(Security.AUTO_ACCOUNT_ATTRIBUTE_QUERY))
+			{
+				v = tda.getOperatorVisibility() == null ? AttributeVisibilityEnum.READONLY: operator;
+				if (AttributeVisibilityEnum.EDITABLE.equals (v))
+					v = AttributeVisibilityEnum.READONLY;
+			}
+			else
+				v = AttributeVisibilityEnum.HIDDEN;
 		}
 		return v;
 		
@@ -96,14 +108,18 @@ public class AccountAttributeEntityImpl extends com.soffid.iam.model.AccountAttr
 
 	@Override
 	public void setObjectValue(Object value) {
-		AttributeParser ap = new AttributeParser(getMetadata().getName(), getMetadata().getType(), value);
+		AttributeParser ap = getSystemMetadata() == null ?
+				new AttributeParser(getMetadata().getName(), getMetadata().getType(), value) :
+				new AttributeParser(getSystemMetadata().getName(), getSystemMetadata().getType(), value);
 		setValue(ap.getValue());
 		setBlobDataValue(ap.getBlobValue());
 	}
 
 	@Override
 	public Object getObjectValue() {
-		return AttributeParser.getObjectValue( getMetadata().getType(), getValue(), getBlobDataValue());
+		return getSystemMetadata() == null?
+				AttributeParser.getObjectValue( getMetadata().getType(), getValue(), getBlobDataValue()) :
+				AttributeParser.getObjectValue( getSystemMetadata().getType(), getValue(), getBlobDataValue());
 	}
 
 

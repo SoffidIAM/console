@@ -43,7 +43,7 @@ public class AdditionalDataJSONConfiguration {
 	public static void registerVirtualAttributes() throws UnsupportedEncodingException, ClassNotFoundException, JSONException {
 		registerVirtualAttribute(GroupAttributeEntity.class, "metadata.name", "value", "group");
 		registerVirtualAttribute(UserDataEntity.class, "dataType.name", "value", "user");
-		registerVirtualAttribute(AccountAttributeEntity.class, "metadata.name", "value", "account");
+		registerVirtualAttribute(AccountAttributeEntity.class, "systemMetadata.name metadata.name", "value", "account");
 		registerVirtualAttribute(ApplicationAttributeEntity.class, "metadata.name", "value", "informationSystem");
 		registerVirtualAttribute(RoleAttributeEntity.class, "metadata.name", "value", "role");
 		registerVirtualAttribute(CustomObjectAttributeEntity.class, "metadata.name", "value", "customObject");

@@ -270,7 +270,7 @@ public abstract class AbstractExpression implements Serializable {
 			String path = ctx.partialPath+"."+part;
 			String pp = ctx.partialPath.substring(0, ctx.partialPath.lastIndexOf("."));
 			String obj = query.getObjects().get(path);
-			String s[] = attConfig.getVirtualAttributeName().split("\\.");
+			String van[] = attConfig.getVirtualAttributeName().split(" ");
 
 			int number = query.getNextObject();
 			obj = ROOT_OBJECT_NAME +number;
@@ -280,11 +280,23 @@ public abstract class AbstractExpression implements Serializable {
 			query.getParameters().put(param, part);
 
 			ctx.objectCondition = "exists ( select 1 from "+
-					entityConfig.getHibernateClass()+" as "+ctx.objectName+
-					" left join "+ctx.objectName+"."+s[0]+" as "+ctx.objectName+"aux"+
-					" where "+ctx.objectName+"."+
-					attConfig.getParentEntity() + "=" + pp+" and "+
-					ctx.objectName+"aux."+s[1]+"=:"+param+" and ";
+					entityConfig.getHibernateClass()+" as "+ctx.objectName;
+			int num = 0;
+			for (String va: van) {
+				String s[] = va.split("\\.");
+				ctx.objectCondition += 
+						" left join "+ctx.objectName+"."+s[0]+" as "+ctx.objectName+"aux"+ (num++);
+			}
+			ctx.objectCondition += " where "+ctx.objectName+"."+
+					attConfig.getParentEntity() + "=" + pp+" and (";
+			num = 0;
+			for (String va: van) {
+				String s[] = va.split("\\.");
+				if (num > 0) ctx.objectCondition += " OR ";
+				ctx.objectCondition += 
+						ctx.objectName+"aux"+(num++)+"."+s[1]+"=:"+param;
+			}
+			ctx.objectCondition += ") and ";
 			ctx.closeCondition = ")";
 			ctx.partialPath = null;
 			ctx.objectName = ctx.objectName+"."+attConfig.getVirtualAttributeValue();
@@ -298,21 +310,40 @@ public abstract class AbstractExpression implements Serializable {
 				query.getObjects().put(path, obj);
 				query.getJoinString().append("\nleft join "+ctx.partialPath+" as "+obj);
 				String obj2 = obj+"aux";
-				String s[] = attConfig.getVirtualAttributeName().split("\\.");
+				String van[] = attConfig.getVirtualAttributeName().split(" ");
 				
 				int i = query.getNextParameter();
 				String param  = "p"+i;
 				query.getParameters().put(param, part);
 				
-				query.getJoinString().append("\nleft join "+obj+"."+s[0]+
-						" as "+obj2+" with "+
-						obj2+"."+s[1]+"=:"+param);
+				int num = 0;
+				for (String va: van) {
+					String[] s = va.split("\\.");
+					int n = num++;
+					query.getJoinString().append("\nleft join "+obj+"."+s[0]+
+							" as "+obj2+(n)+" with "+
+							obj2+(n)+"."+s[1]+"=:"+param);
+				}
 			}
 			ctx.partialPath = null;
 			int i = query.getNextParameter();
 			String obj2 = obj+"aux";
-			String s[] = attConfig.getVirtualAttributeName().split("\\.");
-			ctx.objectCondition = obj2+"."+s[1]+" is not null and ";
+			String van[] = attConfig.getVirtualAttributeName().split(" ");
+			if (van.length > 1) 
+				ctx.objectCondition = "(";
+			else
+				ctx.objectCondition = "";
+			int num = 0;
+			for (String va: van) {
+				String[] s = va.split("\\.");
+				if (ctx.objectCondition.length() > 1)
+					ctx.objectCondition += " OR ";
+				ctx.objectCondition += obj2+(num++)+"."+s[1]+" is not null ";
+			}
+			if (van.length > 1)
+				ctx.objectCondition += ") and ";
+			else
+				ctx.objectCondition += " and ";
 			ctx.objectName = obj+"."+attConfig.getVirtualAttributeValue();
 		}
 	}

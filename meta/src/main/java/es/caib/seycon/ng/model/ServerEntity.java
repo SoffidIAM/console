@@ -43,7 +43,7 @@ public abstract class ServerEntity {
 	@Nullable
 	public java.lang.String url;
 
-	@Column (name="SRV_JVMOPT", length=256)
+	@Column (name="SRV_JVMOPT", length=1024)
 	@Nullable
 	public java.lang.String javaOptions;
 

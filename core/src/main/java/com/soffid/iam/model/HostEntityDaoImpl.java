@@ -83,7 +83,8 @@ public class HostEntityDaoImpl extends
 					r = new LinkedList<Object>();
 					attributes.put(att.getMetadata().getName(), r);
 				}
-				r.add(att.getObjectValue());
+				if (att.getObjectValue() != null)
+					r.add(att.getObjectValue());
 			}
 			else
 			{

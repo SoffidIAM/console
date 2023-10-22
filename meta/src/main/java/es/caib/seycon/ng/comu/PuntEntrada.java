@@ -58,6 +58,7 @@ public class PuntEntrada {
 	public byte[] imgIcona2;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "informationSystem.name")
 	public String informationSystem;
 
 	@Nullable
@@ -81,6 +82,7 @@ public class PuntEntrada {
 	public java.lang.String xmlPUE;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "system.name")
 	public java.lang.String system;
 
 }

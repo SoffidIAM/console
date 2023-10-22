@@ -77,7 +77,7 @@
 						</row>
 						<row>
 							<label value="${c:l('servers.zul.JavaOptions')} :"/>
-							<textbox bind="@javaOptions" maxlength="256" multiline="true"
+							<textbox bind="@javaOptions" maxlength="1024" multiline="true"
 									rows="1"
 									style="width:100%; resize: vertical"/>
 						</row>

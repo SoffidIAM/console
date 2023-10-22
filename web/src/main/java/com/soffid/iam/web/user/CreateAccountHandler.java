@@ -1,5 +1,6 @@
 package com.soffid.iam.web.user;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.ejb.CreateException;
@@ -15,7 +16,9 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.System;
+import com.soffid.iam.api.User;
 import com.soffid.iam.web.component.CustomField3;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -24,6 +27,8 @@ import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Wizard;
+import es.caib.zkib.datamodel.DataModelCollection;
+import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
@@ -135,30 +140,44 @@ public class CreateAccountHandler extends Window implements AfterCompose {
 			String passwordPolicy = system.getPasswordsDomain();
 			DataSource usersDataSource = (DataSource) Path.getComponent(userDataSource);
 			
-			for (Iterator iterator = usersDataSource.getJXPathContext()
-					.iteratePointers("/domini[@id="+system.getPasswordsDomainId()+"]");
-					iterator.hasNext();)
-			{
-				Wizard interator;
-				Pointer p = (Pointer) iterator.next();
-				Object o = p.getValue();
-				
-				CustomField3 accountNameField = getAccountNameField();
-				String accountName = (String) accountNameField.getValue();
-				
-				DataTree2 accountsTree = (DataTree2) Path.getComponent(dataSource);
-				String path = p.asPath()+"/policy[1]/account";
-				
-				Account account = new Account();
-				account.setName(accountName);
-				account.setSystem(systemName);
-				account.setPasswordPolicy((String) usersDataSource.getJXPathContext().getValue("userType"));
-				account.setStatus(AccountStatus.ACTIVE);
-				newUserPath = XPathUtils.createPath(usersDataSource, path, account);
-				
-				accountsTree.setSelectedIndexByXPath(newUserPath);
-				wizard.next();
+			Wizard interator;
+			
+			CustomField3 accountNameField = getAccountNameField();
+			String accountName = (String) accountNameField.getValue();
+			
+			DataTree2 accountsTree = (DataTree2) Path.getComponent(dataSource);
+
+			User user = (User) XPathUtils.eval(usersDataSource, "instance");
+			
+			PasswordPolicy policy = EJBLocator.getUserDomainService().findPolicyByTypeAndPasswordDomain(user.getUserType(), system.getPasswordsDomain());
+			if (policy == null) {
+				Missatgebox.avis(Labels.getLabel("user_createaccount.invalidDispatcher"));
+				return;
+			
+			
+			}				
+			
+			Account account = EJBLocator.getAccountService().createAccount(user, system, accountName);
+
+			DataNodeCollection passwordDomains = (DataNodeCollection) XPathUtils.eval(usersDataSource, "domini");
+			passwordDomains.refresh();
+			for (int i = 0; i < passwordDomains.size(); i++) {
+				DataModelNode passwordDomain = passwordDomains.getDataModel(i);
+				DataModelCollection policies = passwordDomain.getListModel("policy");
+				for (int j = 0; j < policies.getSize(); j++) {
+					DataModelNode policyNode = policies.getDataModel(j);
+					DataModelCollection accounts = policyNode.getListModel("account");
+					for (int k = 0; k < accounts.getSize(); k++) {
+						DataNode accountNode = (DataNode) accounts.getDataModel(k);
+						Long id = (Long) accountNode.get("id");
+						if (account.getId().equals(id)) {
+							accountsTree.setSelectedIndex(new int[]{i, k});
+						}
+					}
+				}
 			}
+			wizard.next();
+			return;
 		}
 	}
 	

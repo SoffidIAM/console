@@ -542,11 +542,34 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("113");
 			configSvc.update(cfg);
 		}
-		if (cfg.getValue().equals("112"))
+		if (cfg.getValue().equals("113"))
 		{
 			addDateAttributes();
 			cfg.setValue("114");
 			configSvc.update(cfg);
+		}
+		if (cfg.getValue().equals("114"))
+		{
+			updateForbiddenWords();
+			cfg.setValue("115");
+			configSvc.update(cfg);
+		}
+	}
+
+	private void updateForbiddenWords() throws SQLException {
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_BADWORD "
+					+ "SET BDW_TEN_ID=? "
+					+ "WHERE BDW_TEN_ID IS NULL",
+								new Object[] {Security.getCurrentTenantId()});
+		}
+		finally
+		{
+			conn.close();
 		}
 	}
 
@@ -558,7 +581,7 @@ public class ApplicationBootServiceImpl extends
 		{
 			executeSentence(conn, "UPDATE SC_DISPAT SET DIS_CREATED=? WHERE DIS_CREATED IS NULL ",
 								new Object[] {new java.util.Date()});
-			executeSentence(conn, "UPDATE SC_MAQUIN SET MAQ_CREATED=? WHERE DIS_CREATED IS NULL ",
+			executeSentence(conn, "UPDATE SC_MAQUIN SET MAQ_CREATED=? WHERE MAQ_CREATED IS NULL ",
 					new Object[] {new java.util.Date()});
 		}
 		finally

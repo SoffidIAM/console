@@ -178,6 +178,7 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 	@Override
     protected void handleDelete(ForbiddenWord paraulaProhibida) throws Exception {
 		ForbiddenWordEntity entity = getForbiddenWordEntityDao().forbiddenWordToEntity(paraulaProhibida);
+		getPolicyForbiddenWordEntityDao().remove(entity.getPolicies());
 		getForbiddenWordEntityDao().remove(entity);
 
 	}
@@ -372,6 +373,14 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 
 	@Override
     protected PasswordPolicyForbbidenWord handleCreate(PasswordPolicyForbbidenWord paraulaProhibidaContrasenyaDomini) throws Exception {
+		final ForbiddenWord forbiddenWord = paraulaProhibidaContrasenyaDomini.getForbiddenWord();
+		final ForbiddenWordEntity forbiddenWord2 = getForbiddenWordEntityDao().findByName(forbiddenWord.getForbiddenWord());
+		if (forbiddenWord2 == null) {
+			forbiddenWord.setId(null);
+			paraulaProhibidaContrasenyaDomini.setForbiddenWord(handleCreate(forbiddenWord));
+		} else {
+			forbiddenWord.setId(forbiddenWord2.getId());
+		}
 		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().passwordPolicyForbbidenWordToEntity(paraulaProhibidaContrasenyaDomini);
 		getPolicyForbiddenWordEntityDao().create(entity);
 		return getPolicyForbiddenWordEntityDao().toPasswordPolicyForbbidenWord(entity);
@@ -386,8 +395,15 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 
 	@Override
     protected void handleDelete(PasswordPolicyForbbidenWord paraulaProhibidaContrasenyaDomini) throws Exception {
-		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().passwordPolicyForbbidenWordToEntity(paraulaProhibidaContrasenyaDomini);
-		getPolicyForbiddenWordEntityDao().remove(entity);
+		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().load(paraulaProhibidaContrasenyaDomini.getId());
+		if (entity != null) {
+			ForbiddenWordEntity word = entity.getForbiddenWord();
+			Collection<PolicyForbiddenWordEntity> list = word.getPolicies();
+			getPolicyForbiddenWordEntityDao().remove(entity);
+			list.remove(entity);
+			if (list.isEmpty())
+				getForbiddenWordEntityDao().remove(word);
+		}
 	}
 
 	@Override

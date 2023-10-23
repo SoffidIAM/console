@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import com.soffid.iam.model.TenantEntity;
 import com.soffid.mda.annotation.*;
 
 @Entity (table="SC_BADWORD" , translatedName="ForbiddenWordEntity", translatedPackage="com.soffid.iam.model")
@@ -23,4 +24,9 @@ public abstract class ParaulesProhibidesEntity {
 	@ForeignKey (foreignColumn="BDC_BDW_ID", translated="policies")
 	public java.util.Collection<es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity> paraulaProhibidaContrasenya;
 
+	@Nullable @Column(name="BDW_TEN_ID")
+	TenantEntity tenant;
+	
+	@DaoFinder
+	ParaulesProhibidesEntity findByName(String forbiddenWord) { return null; }
 }

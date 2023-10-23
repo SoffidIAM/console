@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
@@ -216,7 +217,16 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 				syncServers.add(ss.getUrl());
 		}
 		data.put("syncServers", syncServers);
-		secrets.put("accountName", entity.getLoginName() == null? entity.getName(): entity.getLoginName());
+		String loginName = entity.getLoginName() == null? entity.getName(): entity.getLoginName();
+		if (!loginName.contains("\\") && targetUrl.startsWith("rdp:")) {
+			for (Entry<String, String> entry: getDispatcherService().findActiveDirectoryDomains().entrySet() ) {
+				if (entry.getValue().equals(entity.getSystem().getName())) {
+					loginName = entry.getKey()+"\\"+loginName;
+					break;
+				}
+			}
+		}
+		secrets.put("accountName", loginName);
 		if (password != null) secrets.put("password", password.getPassword());
 		if (sshKey != null) secrets.put("sshKey", sshKey.getPassword());
 
@@ -279,7 +289,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		if (Security.getCurrentUser() != null) {
 			AccessLogEntity log = getAccessLogEntityDao().newAccessLogEntity();
 			log.setAccessType("L");
-			log.setAccountName(entity.getLoginName() == null ? entity.getName():  entity.getLoginName());
+			log.setAccountName(loginName);
 			final String host = new URI(targetUrl).getHost();
 			log.setServer(findHost(host));
 			InetAddress addr = InetAddress.getByName(host);

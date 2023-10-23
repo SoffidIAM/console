@@ -1852,7 +1852,6 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			handleStoreAndForwardPassword(user, passwordDomain, password, mustChange);
 		} else {
 			handleStoreAccountPassword(account, password, mustChange, untilDate);
-
 			createAccountTask(TaskHandler.UPDATE_ACCOUNT_PASSWORD, account.getName(), account.getSystem().getName(),
 					password, mustChange, untilDate);
 		}

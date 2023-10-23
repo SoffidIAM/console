@@ -400,7 +400,13 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected List<VaultFolder> handleGetRootFolders() throws Exception {
 		List<VaultFolderEntity> list = getVaultFolderEntityDao().findPublicRoots();
-		if (Security.getCurrentUser() != null)
+		String userName = Security.getCurrentUser();
+		if (userName == null) {
+			User user = getUserService().getCurrentUser();
+			if (user != null)
+				userName = user.getUserName();
+		}
+		if (userName != null)
 			list.addAll( getVaultFolderEntityDao().findPersonalFolders(Security.getCurrentUser()) );
 		
 		List<VaultFolder> folders = getVaultFolderEntityDao().toVaultFolderList(list);
@@ -418,7 +424,6 @@ public class VaultServiceImpl extends VaultServiceBase {
 		}
 		if (! personal)
 		{
-			String userName = Security.getCurrentUser();
 			if (userName  != null)
 			{
 				UserEntity userEntity = getUserEntityDao().findByUserName(userName);

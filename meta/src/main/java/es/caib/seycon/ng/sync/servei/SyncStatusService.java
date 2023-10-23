@@ -214,4 +214,7 @@ public abstract class SyncStatusService {
 	public void resendUserPassword(String user, String passwordDomain)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	Map<String,String> findActiveDirectoryDomains() {return null;}
+
 }

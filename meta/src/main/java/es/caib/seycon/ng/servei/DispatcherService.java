@@ -573,4 +573,6 @@ public abstract class DispatcherService {
 
 	@Operation(grantees = {server_manage_server.class, server_manage_proxy.class})
 	public boolean isRegistrationTokenAlive(String token) { return false;}
+	
+	Map<String,String> findActiveDirectoryDomains() {return null;}
 }

@@ -2233,4 +2233,10 @@ public class DispatcherServiceImpl extends
 		return t != null;
 	}
 
+	@Override
+	protected Map<String, String> handleFindActiveDirectoryDomains() throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		return svc.findActiveDirectoryDomains();
+	}
+
 }

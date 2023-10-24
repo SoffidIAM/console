@@ -129,6 +129,7 @@
 
 	<window id="tasksWindow" visible="false" title="${c:l('usuaris.Tasques') }" position="top, center" closable="false">
 		<datatable id="tasks"
+			onSelect="ref:frame.selectTaskDetails"
 			incrementalrefresh="true"><attribute name="columns"><![CDATA[
 - name: ${c:l('seyconserver.zul.Tasca')}
   value: taskDescription
@@ -148,6 +149,8 @@
 - name: ${c:l('seyconserver.zul.Scheduled')}
   value: nextExecutionDate_datetime
 		]]></attribute></datatable>
+		<customfield3 id="taskError" label="${c:l('seyconserver.zul.Message')}" multiline="true"
+			visible="false"/>
 		<div style="margin-left:auto; margin-right:auto">
 			<button image="/img/ok-r.svg" label="${c:l('canviPassword.zul.Accepta')}" onClick="ref:frame.closeTaskWindow"/>
 		</div>

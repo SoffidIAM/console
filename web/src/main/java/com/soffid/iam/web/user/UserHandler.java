@@ -3,7 +3,9 @@ package com.soffid.iam.web.user;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -25,6 +27,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
 
 import java.text.SimpleDateFormat;
+
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.SyncAgentTaskLog;
@@ -32,6 +35,7 @@ import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchBox;
@@ -53,7 +57,9 @@ public class UserHandler extends FrameHandler {
 	private boolean canQueryUser;
 	private ConfigurationService configSvc;
 	private String wizard;
-
+	private List<SyncAgentTaskLog> activeTasks;
+	private String activeTaskId;
+	
 	public UserHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
 
@@ -186,17 +192,49 @@ public class UserHandler extends FrameHandler {
 	public void viewTasks (Event event) throws InternalErrorException, NamingException, CreateException {
 		String userName = (String) XPathUtils.getValue(getForm(), "userName");
 
+		boolean show = false;
 		Window w = (Window) getFellow("tasksWindow");
 		DataTable dt = (DataTable) w.getFellow("tasks");
 		JSONArray array = new JSONArray();
-		for (SyncAgentTaskLog tl: EJBLocator.getUserService().getActiveTasks(userName)) {
+		activeTasks = new java.util.LinkedList<>(EJBLocator.getUserService().getActiveTasks(userName));
+		final CustomField3 errorField = (CustomField3)w.getFellow("taskError");
+		for (SyncAgentTaskLog tl: activeTasks) {
 			JSONObject j = dt.wrap(tl);
 			array.put(j);
+			String s = tl.getAgentCode()+ " - " + tl.getTaskId();
+			if (s.equals(activeTaskId) &&
+					tl.getMessage() != null && 
+					!tl.getMessage().trim().isEmpty()) {
+				if (! tl.getMessage().equals(errorField.getValue()))
+					errorField.setValue(tl.getMessage());
+				show = true;
+			}
 		}
+		if (errorField.isVisible() != show)
+			errorField.setVisible(show);
 		dt.setData(array);
 		w.doHighlighted();
 	}
 
+	public void selectTaskDetails(Event event) {
+		Window w = (Window) getFellow("tasksWindow");
+		DataTable dt = (DataTable) w.getFellow("tasks");
+		int selected = dt.getSelectedIndex();
+		CustomField3 cf = ((CustomField3)w.getFellow("taskError"));
+		if (selected >= 0 && selected < activeTasks.size()) {
+			SyncAgentTaskLog task = activeTasks.get(selected);
+			activeTaskId = task.getAgentCode()+ " - " + task.getTaskId();
+			if (task.getMessage() != null && !task.getMessage().trim().isEmpty()) {
+				cf.setVisible(true);
+				cf.setValue(task.getMessage());
+			} else {
+				cf.setVisible(false);
+			}
+		} else {
+			cf.setVisible(false);
+		}
+	}
+	
 	public void closeTaskWindow(Event event) {
 		Window w = (Window) getFellow("tasksWindow");
 		w.setVisible(false);

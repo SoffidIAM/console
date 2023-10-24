@@ -51,6 +51,14 @@ public abstract class RulesService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Operation ( grantees={roles.rule_query.class})
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.util.Collection<com.soffid.iam.api.Rule> findRulesByRole(Long roleId)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+
 	@Operation ( grantees={roles.rule_admin.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public com.soffid.iam.api.RuleAssignedRole create(

@@ -48,4 +48,15 @@ public abstract class RuleEntity {
 		@Nullable java.lang.String description) {
 	 return null;
 	}
+
+	@DaoFinder("select rule "
+			+ "from com.soffid.iam.model.RuleEntity as rule "
+			+ "join rule.roles as roles "
+			+ "join roles.role as role "
+			+ "where rule.tenant.id=:tenantId and "
+			+ "role.id=:roleId")
+	public java.util.List<com.soffid.iam.model.RuleEntity> findByRoleId(
+		@Nullable Long roleId) {
+	 return null;
+	}
 }

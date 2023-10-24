@@ -134,6 +134,8 @@
 		</ejb-handler>
 	</datanode>
 
+	<datanode name="rule" transient="true" />
+	
 	<datanode name="role">
 		<finder name="grant" type="grant">
 			<ejb-finder jndi="java:/module/ApplicationService-v2" method="findUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName">
@@ -143,6 +145,11 @@
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.RoleAccount">
 			</new-instance-bean>
+		</finder>
+		<finder name="rule" type="rule" refreshAfterCommit="true">
+			<ejb-finder jndi="java:/module/RulesService-v2" method="findRulesByRole">
+				<parameter value="${instance.id}" />
+			</ejb-finder>
 		</finder>
 		<ejb-handler jndi="java:/module/ApplicationService-v2">
 			<insert-method method="create2" returnBean="true">

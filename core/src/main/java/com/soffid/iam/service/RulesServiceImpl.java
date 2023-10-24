@@ -193,4 +193,10 @@ public class RulesServiceImpl extends RulesServiceBase
 		return getRuleEvaluatorService().queryProcessStatus(process);
 	}
 
+	@Override
+	protected Collection<Rule> handleFindRulesByRole(Long roleId) throws Exception {
+		List<RuleEntity> list = getRuleEntityDao().findByRoleId(roleId);
+		return getRuleEntityDao().toRuleList(list);
+	}
+
 }

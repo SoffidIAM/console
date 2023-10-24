@@ -128,7 +128,8 @@
 	</div>
 
 	<window id="tasksWindow" visible="false" title="${c:l('usuaris.Tasques') }" position="top, center" closable="false">
-		<datatable id="tasks"><attribute name="columns"><![CDATA[
+		<datatable id="tasks"
+			incrementalrefresh="true"><attribute name="columns"><![CDATA[
 - name: ${c:l('seyconserver.zul.Tasca')}
   value: taskDescription
 - name: ${c:l('seyconserver.zul.Agent')}

@@ -168,6 +168,9 @@ public class UserHandler extends FrameHandler {
 							"/img/warning.svg");
 				}
 			}
+			if (getFellow("tasksWindow").isVisible()) {
+				viewTasks(null);
+			}
 		} catch (Exception e) {
 			b.setVisible(false);
 		}

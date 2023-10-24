@@ -57,6 +57,9 @@
 						disabled="true"
 						bind="type"
 						maxlength="100"/>
+					<div style="margin-left: 200px">
+						<label id="desc2" />
+					</div>
 					<customfield3
 						label="${c:l('com.soffid.iam.api.IssuePolicy.description') }"
 						dataType="string"

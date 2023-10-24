@@ -1559,6 +1559,11 @@ div.databox.fixedtext div.container div.text {
 	word-break: break-all;
 }
 
+div.databox[multiline='true'] div.container div.text.readonly {
+	white-space: normal;
+	word-wrap: break-word;
+}
+
 .button-container {
 	margin-top: 7px;
 }

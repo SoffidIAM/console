@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
@@ -38,6 +39,11 @@ public class IssuePolicyHandler extends FrameHandler {
 	@Override
 	public void onChangeForm(Event ev) throws Exception {
 		super.onChangeForm(ev);
+		try {
+			String issue = (String) XPathUtils.eval(getListbox(), "type");
+			String label = Labels.getLabel("issues."+issue+".definition");
+			((Label)getFellow("desc2")).setValue(label);
+		} catch (Exception e) {}
 	}
 
 	public void addAction(Event ev) throws Exception {

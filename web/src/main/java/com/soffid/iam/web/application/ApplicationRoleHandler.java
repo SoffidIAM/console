@@ -112,7 +112,10 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 						DataTable dt = getListbox();
 						dt.delete();
 						dt.commit();
-						getWindowModify().setVisible(false);
+						if (isStandalone())
+							((RoleHandler) getPage().getFellow("frame")).hideDetails();
+						else
+							getWindowModify().setVisible(false);
 					}
 				});
 	}
@@ -612,14 +615,18 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		previewWindow.setVisible(false);
 	}
 
-	public void applyPreview(Event event) throws InternalErrorException, NamingException, CreateException {
+	public void applyPreview(Event event) throws InternalErrorException, NamingException, CreateException, CommitException {
 		Role r = (Role) ((DataNode) getListbox().getJXPathContext().getValue("/")).getInstance();
 		EJBLocator.getApplicationService().synchronizeRole(r);
 		getListbox().commit();
 		EJBLocator.getApplicationService().synchronizeRole(r);
 		Window previewWindow = (Window) getFellow("previewWindow");
 		previewWindow.setVisible(false);
-		getWindowModify().setVisible(false);
+
+		if (isStandalone())
+			((RoleHandler) getPage().getFellow("frame")).hideDetails();
+		else
+			getWindowModify().setVisible(false);
 	}
 
 	public void displayRemoveButton(boolean display) {

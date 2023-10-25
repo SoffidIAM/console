@@ -941,6 +941,16 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>agent:invoke</codi>
+		<descripcio>Invoke agent transaction</descripcio>
+		<ambit>Agents</ambit>
+		<hereta>
+			agent:query
+		</hereta>
+	</autoritzacio>
+
+
+	<autoritzacio>
 		<codi>agent:delete</codi>
 		<descripcio>Delete agents</descripcio>
 		<ambit>Agents</ambit>

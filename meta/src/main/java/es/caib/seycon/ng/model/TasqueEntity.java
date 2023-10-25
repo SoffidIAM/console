@@ -143,6 +143,11 @@ public abstract class TasqueEntity {
 	@Nullable
 	public java.lang.String customTaskName;
 
+	@Column(name = "TAS_PARAM", length = 128000)
+	@Nullable
+	@Description("Serialized JSON parameters")
+	public java.lang.String parameters;
+
 	@Column(name = "TAS_SOURCE", length = 50)
 	@Nullable
 	public String sourceTransaction;

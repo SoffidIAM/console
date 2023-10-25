@@ -102,6 +102,7 @@ public class TaskHandler
     public static final String UPDATE_SERVICE_PASSWORD = "UpdateServicePassword"; //$NON-NLS-1$
     public static final String UPDATE_EXT_OBJECT = "UpdateExtendedObject"; //$NON-NLS-1$
     public static final String INDEX_OBJECT = "IndexObject"; //$NON-NLS-1$
+    public static final String ASYNC_INVOKE = "AsyncInvoke"; //$NON-NLS-1$
     
 	public Group getGroup() {
 		return grup;

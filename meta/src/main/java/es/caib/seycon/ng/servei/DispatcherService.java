@@ -48,6 +48,7 @@ import es.caib.seycon.ng.model.ObjectMappingTriggerEntity;
 import es.caib.seycon.ng.model.ServerCertificateEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 import roles.agent_create;
+import roles.agent_invoke;
 import roles.agent_query;
 import roles.agent_queryObjects;
 import roles.agent_update;
@@ -460,21 +461,28 @@ public abstract class DispatcherService {
 		return null;
 	}
 
-	@Operation(grantees = { agent_create.class, agent_update.class })
+	@Operation(grantees = { agent_invoke.class })
 	@Description("Invokes a custom method")
 	public Collection<Map<String,Object>> invoke(String dispatcher, String verb,
 			@Nullable String object, @Nullable Map<String,Object> attributes) throws InternalErrorException {
 		return null;
 	}
 
-	@Operation(grantees = { agent_create.class, agent_update.class })
+	@Operation(grantees = { agent_invoke.class })
+	@Description("Invokes a custom method")
+	public Long invokeAsync(String dispatcher, String verb,
+			@Nullable String object, @Nullable Map<String,Object> attributes) throws InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { agent_invoke.class, agent_queryObjects.class })
 	@Description("Loads system object and transforms into Soffid Object")
 	public GetObjectResults getSoffidObject(String dispatcher, SoffidObjectType type, String object1,
 			@Nullable String object2) throws InternalErrorException {
 		return null;
 	}
 
-	@Operation(grantees = { agent_create.class, agent_update.class })
+	@Operation(grantees = { agent_invoke.class })
 	@Description("Loads account into soffid database")
 	public GetObjectResults reconcile(String dispatcher, String accountName) throws InternalErrorException {
 		return null;

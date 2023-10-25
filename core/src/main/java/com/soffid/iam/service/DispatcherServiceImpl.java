@@ -38,6 +38,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -2078,6 +2079,35 @@ public class DispatcherServiceImpl extends
 		if (svc == null)
 			throw new InternalErrorException ("No sync server available");
 		return svc.invoke(dispatcher, verb, object, attributes);
+	}
+
+	@Override
+	protected Long handleInvokeAsync(String dispatcher, String verb, String object,
+			Map<String, Object> attributes) throws Exception {
+		Audit audit = new Audit();
+		audit.setObject("SC_DISPAT");
+		audit.setAction("I");
+		audit.setCalendar(Calendar.getInstance());
+		audit.setCustomObjectType(verb);
+		audit.setCustomObjectName(object);
+		if (object.length() > 100)
+			audit.setCustomObjectName(object.substring(0, 99));
+		audit.setDatabase(dispatcher);
+		getAuditService().create(audit);
+		
+		JSONObject data = new JSONObject(attributes);
+
+		TaskEntity task = getTaskEntityDao().newTaskEntity();
+		task.setTransaction(TaskHandler.ASYNC_INVOKE);
+		task.setSystemName(dispatcher);
+		task.setDb(dispatcher);
+		task.setParameters(data.toString());
+		task.setCustomTaskName(verb);
+		task.setCustomObjectName(object);
+		task.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
+		task.setStatus("P");
+		getTaskEntityDao().create(task);
+		return task.getId();
 	}
 
 	Map<Long,AsyncProcessTracker> proc = new HashMap<>();

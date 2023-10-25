@@ -117,4 +117,8 @@ public class Tasca {
 	
 	@Nullable
 	public java.lang.String customTaskName;
+
+	@Nullable
+	@Description("Serialized JSON parameters")
+	public java.lang.String parameters;
 }

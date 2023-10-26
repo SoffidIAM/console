@@ -83,9 +83,13 @@ function configure {
 		echo "dbDriverClass=$DB_DRIVER"
 		echo "dbDriverUrl=$DB_URL"
 		echo "dbStatus=1"
-		if [[ "HIDE_MENU" != "" ]] 
+		if [[ "$HIDE_MENU" != "" ]] 
 		then
 			echo "soffid.menu.hidden=$HIDE_MENU"
+		fi
+		if [[ "$AUTH_METHODS" != "" ]] 
+		then
+			echo "soffid.auth.methods=$AUTH_METHODS"
 		fi
 	) > /opt/soffid/iam-console-3/conf/system.properties		
 

@@ -74,9 +74,12 @@ public class LoginPage extends Html {
 
 		Security.setClientRequest(req);
 		try {
+			String authMethods = System.getProperty("soffid.auth.methods");
 			Security.nestedLogin(tenantHost, "anonymous", new String[0]);
 			String tenant = new com.soffid.iam.filter.TenantExtractor().getTenant(req);
-			boolean saml = "true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml"));
+			boolean saml = authMethods == null ? 
+					"true".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.saml")):
+					authMethods.contains("SAML");
 			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
 			byte[] motd = ServiceLocator.instance().getConfigurationService().getBlob("soffid.auth.motd");
 			String motdString = motd == null ? null: new String(motd, StandardCharsets.UTF_8);
@@ -107,8 +110,10 @@ public class LoginPage extends Html {
 				session.removeAttribute("samlLoginToken");
 				if (!autoLogin)
 				{
-					boolean classic = ! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic"));
-					if (!classic )
+					boolean classic = authMethods == null ? 
+							! "false".equals(com.soffid.iam.utils.ConfigurationCache.getTenantProperty(tenant, "soffid.auth.classic")):
+							authMethods.contains("PASSWORD");
+					if (!classic)
 					{
 						setVariable("redirect", Executions.getCurrent().getContextPath()+"/saml", false);
 					}

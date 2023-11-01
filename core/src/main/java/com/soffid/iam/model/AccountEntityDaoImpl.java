@@ -132,9 +132,10 @@ public class AccountEntityDaoImpl extends
 	public void toAccount(com.soffid.iam.model.AccountEntity source,
 			Account target) {
 		try {
-			Log log = LogFactory.getLog(getClass());
 			AccountCacheEntry entry = (AccountCacheEntry) getCache().get(source.getId());
-			if ( entry != null)
+			if ( entry != null && (
+					source.getLastChange() == null ||
+					source.getLastChange().equals(entry.account.getLastChange())))
 			{
 				fetchFromCache(target, entry);
 				return ;

@@ -2,7 +2,9 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 <?taglib uri="/WEB-INF/tld/soffid.dsp.tld" prefix="soffid" ?>
 
-<window id="handler" title="${c:l('ostype.operatingSystems') }" style="height: 800px; width: 80%; min-width: 600px"
+<window id="handler" title="${c:l('ostype.operatingSystems') }" 
+	style="height: 800px; width: 80%; min-width: 600px"
+	visible="false"
 		use="com.soffid.iam.web.host.OsTypeHandler">
 	<style>
 		div.datatable.atttranslation table.tbody td:last-child {

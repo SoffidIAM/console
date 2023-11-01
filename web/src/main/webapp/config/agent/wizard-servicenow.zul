@@ -3,8 +3,9 @@
 
 
 <window id="ad" position="top-center" closable="false" sizable="false"
+			title="${c:l('wizard.connection') }"
 			use="com.soffid.iam.web.agent.ServiceNowWizardHandler"
-			style="width: 80%; height: 450px; max-width: 800px; top: 200px !important;">
+			style="width: 80%; height: 500px; max-width: 800px; top: 200px !important;">
 	<style>
 		span.inline input[type='radio'] + label {
 			width: auto;

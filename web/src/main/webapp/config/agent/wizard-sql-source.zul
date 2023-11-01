@@ -3,8 +3,9 @@
 
 
 <window id="sql_source" position="top-center" closable="false" sizable="false"
+			title="${c:l('wizard.connection') }"
 			use="com.soffid.iam.web.agent.SqlSourceWizardHandler"
-			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">
+			style="width: 80%; height: 500px; max-width: 600px; top: 200px !important;">
 	<timer id="timer" delay="1000" repeats="true" onTimer="ref:sql_source.onTimer" running="false"/>
 	<wizard id="wizard">
 			<attribute name="steps">

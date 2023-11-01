@@ -73,7 +73,7 @@
 					</form>
 				</tabpanel>
 				<tabpanel>
-					<div>
+					<div class="navigation-bar dummy">
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>
 						<label bind="../listbox:/description"></label>
@@ -121,7 +121,7 @@
 					</div>
 				</tabpanel>
 				<tabpanel>
-					<div>
+					<div class="navigation-bar dummy">
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>
 						<label bind="../listbox:/description"></label>
@@ -169,7 +169,7 @@
 					</div>
 				</tabpanel>
 				<tabpanel>
-					<div>
+					<div class="navigation-bar dummy">
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>
 						<label bind="../listbox:/description"></label>
@@ -215,7 +215,7 @@
 					<role_users listbox="../../listbox" readonly="${false }"/>
 				</tabpanel>
 				<tabpanel >
-					<div>
+					<div class="navigation-bar dummy">
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>
 						<label bind="../listbox:/description"></label>

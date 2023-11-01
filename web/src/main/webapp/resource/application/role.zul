@@ -48,10 +48,6 @@
 			id="handler" standalone="true">
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"  lastAction="ref:frame.confirmApply" visible="${!embed }">
 				<pager datatable="listbox"/>
-				<databutton image="/img/trash.svg" onlyIcon="true"
-						 if="${soffid:isUserInRole('user:group:delete')}" 
-						label="${c:l('plugins.zul.Delete') }" 
-						onClick="ref:handler.delete"/>
 			</div>
 	
 			<tabbox>
@@ -69,6 +65,12 @@
 				</tabs>
 				<tabpanels>
 					<tabpanel>
+						<div class="navigation-bar" if="${soffid:isUserInRole('user:group:delete')}" >
+							<menu2>
+								<menu2item if="${soffid:isUserInRole('user:group:delete')}"  image="/img/trash.svg" 
+									label="${c:l('plugins.zul.Delete') }" onClick="ref:handler.delete"/>
+							</menu2>
+						</div>
 						<form id="form" width="100%" dataPath="listbox:/">
 							<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
 								id="attributes"
@@ -77,7 +79,7 @@
 						</form>
 					</tabpanel>
 					<tabpanel>
-						<div>
+						<div class="navigation-bar dummy">
 							<label bind="listbox:/@name"></label>
 							<label value = " - "/>
 							<label bind="listbox:/description"></label>
@@ -124,7 +126,7 @@
 						</div>
 					</tabpanel>
 					<tabpanel>
-						<div>
+						<div class="navigation-bar dummy">
 							<label bind="listbox:/@name"></label>
 							<label value = " - "/>
 							<label bind="listbox:/description"></label>
@@ -172,7 +174,7 @@
 						</div>
 					</tabpanel>
 					<tabpanel>
-						<div>
+						<div class="navigation-bar dummy">
 							<label bind="listbox:/@name"></label>
 							<label value = " - "/>
 							<label bind="listbox:/description"></label>
@@ -215,15 +217,10 @@
 						</div>
 					</tabpanel>
 					<tabpanel fulfill="roleusersTabe.onSelect">
-						<div>
-							<label bind="listbox:/@name"></label>
-							<label value = " - "/>
-							<label bind="listbox:/description"></label>
-						</div>
 						<role_users listbox="../listbox" readonly="${readonly }"/>
 					</tabpanel>
 					<tabpanel fulfill="rulesTab.onSelect"  if="${soffid:isUserInRole('rule:admin') }">
-						<div>
+						<div class="navigation-bar dummy">
 							<label bind="listbox:/@name"></label>
 							<label value = " - "/>
 							<label bind="listbox:/description"></label>

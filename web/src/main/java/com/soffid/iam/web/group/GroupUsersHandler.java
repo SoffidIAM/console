@@ -34,6 +34,7 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Wizard;
+import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
@@ -102,7 +103,16 @@ public class GroupUsersHandler extends Div implements AfterCompose {
 		ObjectAttributesDiv d = (ObjectAttributesDiv) w.getFellow("attributes");
 		if (d.validate()) {
 			DataTable dt = getListbox();
+			DataTree2 groupsListbox = (DataTree2) Path.getComponent(listboxPath);
+			String group = (String) XPathUtils.eval(dt, "group");
+			String groupName = (String) XPathUtils.eval(groupsListbox, "name");
+			boolean isPrimaryGroup = Boolean.TRUE.equals(XPathUtils.eval(dt, "primaryGroup"));
 			dt.commit();
+			if (isPrimaryGroup && !groupName.equals(group)) {
+				DataModelNode node = (DataModelNode) XPathUtils.eval(dt, "/.");
+				node.delete();
+				dt.commit();
+			}
 			closeDetails(null);
 		}
 	}

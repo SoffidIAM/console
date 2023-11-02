@@ -128,11 +128,11 @@ public class IssueHandler extends FrameHandler {
 									if (!first)
 										sb.append("</p><p style='margin-left: 100px'>");
 									first = false;
-									sb .append(inputField3.translateToUserInterface( toHtml(v)));
+									sb .append(toHtml(inputField3.translateToUserInterface( vv )));
 								}
 							} else {
 								
-								sb .append(inputField3.translateToUserInterface( toHtml(v)));
+								sb .append( toHtml (inputField3.translateToUserInterface(v)));
 							}
 							sb.append("</p>");
 						}

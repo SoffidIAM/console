@@ -248,7 +248,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 
 	private void updateGroupsAndRoles() {
 		List<String> l = new LinkedList<>();
-		l.addAll(Arrays.asList(roles));
+		l.addAll(Arrays.asList(soffidRoles));
 		l.addAll(Arrays.asList(groups));
 		String[] a = l.toArray(new String[l.size()]);
 		Arrays.sort(a);

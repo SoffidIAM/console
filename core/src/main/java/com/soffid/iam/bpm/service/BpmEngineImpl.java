@@ -3557,7 +3557,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 			if (jsonQuery == null || jsonQuery.trim().isEmpty()) {
 				LinkedList<ProcessInstance> procInstances = new LinkedList<ProcessInstance>();
 				if (text == null || text.isEmpty()) {
-					List<org.jbpm.graph.exe.ProcessInstance> list = context.getSession().createQuery("select p from org.jbpm.graph.exe.ProcessInstance as p").list();
+					List<org.jbpm.graph.exe.ProcessInstance> list = context.getSession()
+							.createQuery("select p from org.jbpm.graph.exe.ProcessInstance as p").list();
 					for (org.jbpm.graph.exe.ProcessInstance process: list) 
 					{
 						ProcessInstance proc = handleGetProcess(process.getId());

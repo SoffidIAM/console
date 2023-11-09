@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import org.json.JSONException;
 
 import com.soffid.iam.api.User;
+import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.model.AccountAttributeEntity;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.CustomObjectAttributeEntity;
@@ -57,6 +58,10 @@ public class AdditionalDataJSONConfiguration {
 			attributeConfig.setHibernateColumn("attributes");
 			attributeConfig.setAttributeName("userData");
 			classConfig.getAttributes().put("userData", attributeConfig);
+		}
+		classConfig = Configuration.getClassConfig(ProcessInstance.class);
+		if (! classConfig.getHibernateClass().equals(org.jbpm.graph.exe.ProcessInstance.class.getName())) {
+			classConfig.setHibernateClass(org.jbpm.graph.exe.ProcessInstance.class.getName());
 		}
 	}
 }

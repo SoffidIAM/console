@@ -128,6 +128,20 @@ public class LoginServiceImpl implements LoginService {
 					PasswordService ps = ServiceLocator.instance().getPasswordService();
 					PreferencesService prefsSvc = ServiceLocator.instance().getPreferencesService();
 					
+					if ( ! tenants.contains(tenant.getName()))
+					{
+			            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
+			            		getBeansOfType(ApplicationBootService.class);
+	
+			            for ( Object service: beans.keySet())
+			            {
+			            	log.info ("Executing startup bean: " + service);
+			            	
+			            	((ApplicationBootService) beans.get(service)).tenantBoot(tenant);
+			            }
+			            tenants.add(tenant.getName());
+					}
+
 					String dispatcher = ps.getDefaultDispatcher();
 					Account acc = null;
 					try {
@@ -220,19 +234,6 @@ public class LoginServiceImpl implements LoginService {
 						}
 					}
 					
-					if ( ! tenants.contains(tenant.getName()))
-					{
-			            Map beans = com.soffid.iam.ServiceLocator.instance().getContext().
-			            		getBeansOfType(ApplicationBootService.class);
-	
-			            for ( Object service: beans.keySet())
-			            {
-			            	log.info ("Executing startup bean: " + service);
-			            	
-			            	((ApplicationBootService) beans.get(service)).tenantBoot(tenant);
-			            }
-			            tenants.add(tenant.getName());
-					}
 					return principal;
 				} finally {
 					Security.nestedLogoff();

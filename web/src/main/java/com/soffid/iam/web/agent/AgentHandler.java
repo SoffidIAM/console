@@ -331,7 +331,6 @@ public class AgentHandler extends FrameHandler {
 		SearchDictionary dictionary = searchBox.getDictionary();
 		SearchAttributeDefinition att = findAttribute(dictionary, "url");
 		if (att != null) {
-			
 			AttributeSearchBox box = searchBox.addAttribute("url");
 			
 			Set<String> values = new HashSet<>();
@@ -340,7 +339,12 @@ public class AgentHandler extends FrameHandler {
 			while (iterator.hasNext())
 				values.add (iterator.next());
 			box.setSelectedValues(values);
-		}			
+		}		
+		att = findAttribute(dictionary,"usage");
+		if (att != null) {
+			AttributeSearchBox box = searchBox.addAttribute("usage");
+			box.setSelectedValues(Set.of("IAM"));
+		}
 //		searchBox.search();
 		
 		DataNodeCollection servers = (DataNodeCollection) getModel().getValue("/server");
@@ -527,17 +531,38 @@ public class AgentHandler extends FrameHandler {
 	
 	public void onEnableManualAccount ()
 	{
-		if (((Switch)getFellow("detall_manual")).isChecked())
-		{
-			((Row)getFellow("rols_row")).setVisible(false);
-			((Row)getFellow("r_tipusUsuari")).setVisible(false);
-			((Row)getFellow("groups_row")).setVisible(false);
+		String selected = (String) ((Select) getFellow("usage")).getSelectedValue();
+		if ("PAM".equals(selected)) {
+			getFellow("detall_manual").getParent().setVisible(false);
+			getFellow("rols_row").setVisible(false);
+			getFellow("r_tipusUsuari").setVisible(false);
+			getFellow("groups_row").setVisible(false);
+			getFellow("userdomain_row").setVisible(false);
+			Select s = (Select) getFellow("cbDominiUsuaris");
+			if (s.getSelectedValue() == null)
+			{
+				DataNode dn = (DataNode) s.getModel().getElementAt(0);
+				s.setSelectedValue((String) dn.get("code"));
+			}
+			getFellow("detall_segur").getParent().setVisible(false);
 		}
-		else
+		else 
 		{
-			((Row)getFellow("rols_row")).setVisible(true);
-			((Row)getFellow("r_tipusUsuari")).setVisible(true);
-			((Row)getFellow("groups_row")).setVisible(true);
+			getFellow("userdomain_row").setVisible(true);
+			getFellow("detall_manual").getParent().setVisible(true);
+			getFellow("detall_segur").getParent().setVisible(true);
+			if (((Switch)getFellow("detall_manual")).isChecked())
+			{
+				((Row)getFellow("rols_row")).setVisible(false);
+				((Row)getFellow("r_tipusUsuari")).setVisible(false);
+				((Row)getFellow("groups_row")).setVisible(false);
+			}
+			else
+			{
+				((Row)getFellow("rols_row")).setVisible(true);
+				((Row)getFellow("r_tipusUsuari")).setVisible(true);
+				((Row)getFellow("groups_row")).setVisible(true);
+			}
 		}
 		missatge.setVisible(true);
 	}
@@ -553,7 +578,6 @@ public class AgentHandler extends FrameHandler {
 			(getFellow("pausedLabel")).setVisible(false);
 		}
 	}
-	
 	
 	public void onChangeClass() {
 		//System.out.println("On change class");

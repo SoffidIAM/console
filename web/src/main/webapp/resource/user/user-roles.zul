@@ -160,7 +160,8 @@
 
 				<customfield3 dataType="ROLE" id="role"
 					label="${c:l('user-roles.selectRole') }"
-					required="true" >
+					required="true"
+					filterExpression="system.usage eq 'IAM'" >
 				</customfield3>		
 			
 				<div style="text-align: right; width: 100%">

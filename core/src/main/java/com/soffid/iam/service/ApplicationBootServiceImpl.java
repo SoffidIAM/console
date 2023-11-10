@@ -554,6 +554,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("115");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("115"))
+		{
+			updateDispatcherType();
+			cfg.setValue("116");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void updateForbiddenWords() throws SQLException {
@@ -566,6 +572,23 @@ public class ApplicationBootServiceImpl extends
 					+ "SET BDW_TEN_ID=? "
 					+ "WHERE BDW_TEN_ID IS NULL",
 								new Object[] {Security.getCurrentTenantId()});
+		}
+		finally
+		{
+			conn.close();
+		}
+	}
+
+	private void updateDispatcherType() throws SQLException {
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		
+		try
+		{
+			executeSentence(conn, "UPDATE SC_DISPAT "
+					+ "SET DIS_TYPE='IAM' "
+					+ "WHERE DIS_TYPE IS NULL",
+								new Object[] {});
 		}
 		finally
 		{

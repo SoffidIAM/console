@@ -28,6 +28,7 @@
 					preference="system-query"
 					dataPath="/window/model:/objects" 
 					style="width: calc(100% - 32px)"
+					enforcedFilter="usage eq 'IAM'"
 					variableName="query" variableNameText="textQuery"/>
 					
 			<datatable id="listbox" autocommit="true" 

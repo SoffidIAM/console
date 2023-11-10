@@ -78,6 +78,7 @@
 				variableNameText="text"
 				jsonObject="com.soffid.iam.api.System"
 				defaultAttributes="name,description,url" dataPath="model:/agent"
+				enforcedFilter="(usage eq 'IAM' or usage eq 'PAM')"
 				variableName="query">
 			</searchbox>
 
@@ -173,7 +174,12 @@
 									<label value="${c:l('agents.zul.Descripcion') }"/>
 									<textbox bind="@description" id="detall_description" maxlength="250" width="100%" constraint="no empty"/>
 								</row>
-								
+								<row>
+									<label value="${c:l('com.soffid.iam.api.System.usage')}"/>
+									<select bind="@usage" id="usage"
+										onSelect="ref:frame.onEnableManualAccount"
+										options='[{"value":"PAM","label":"PAM"}, {"value":"IAM","label":"IAM"}]' />
+								</row>
 								<row>
 									<label value="${c:l('agents.zul.Tipus-2')}"/>
 									<div>
@@ -278,7 +284,7 @@
 									</div>
 								</row>
 								
-								<row>
+								<row id="passdomain_row">
 									<input_etiqueta value="${c:l('agents.zul.DominideContrasenyes')}"/>
 									<div>
 										<select bind="@passwordsDomain" dataPath="/model:/dominisContrasenya" id="cbDominiContrasenyes"

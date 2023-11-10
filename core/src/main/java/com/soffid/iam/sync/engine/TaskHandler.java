@@ -30,6 +30,8 @@ public class TaskHandler
 	String tenant;
 	Long tenantId;
 	ExtensibleObject result;
+	boolean pamTask;
+	TaskHandlerLog pamLog;
 	
 	public String getTenant() {
 		return tenant;
@@ -453,5 +455,21 @@ public class TaskHandler
 
 	public void setResult(ExtensibleObject result) {
 		this.result = result;
+	}
+
+	public boolean isPamTask() {
+		return pamTask;
+	}
+
+	public void setPamTask(boolean pamTask) {
+		this.pamTask = pamTask;
+	}
+
+	public TaskHandlerLog getPamLog() {
+		return pamLog;
+	}
+
+	public void setPamLog(TaskHandlerLog pamLog) {
+		this.pamLog = pamLog;
 	}
 }

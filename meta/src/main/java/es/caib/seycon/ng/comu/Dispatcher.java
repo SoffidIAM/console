@@ -77,7 +77,7 @@ public class Dispatcher {
 	public java.lang.Long id;
 
 	@Nullable
-	@Attribute(translated = "userTypes" )
+	@Attribute(translated = "userTypes", listOfValues = {"IAM", "PAM"} )
 	public java.lang.String relacioLaboral;
 
 	@Nullable
@@ -158,6 +158,11 @@ public class Dispatcher {
 	@Nullable
 	public Long longTimeout;	
 	
+	@Description("Type of dispatcher: PAM, IAM or SSE")
+	@Nullable
+	@Attribute(defaultValue = "\"IAM\"")
+	String usage;	
+
 	@Nullable
 	@Description("Owner tenant")
 	public String tenant;

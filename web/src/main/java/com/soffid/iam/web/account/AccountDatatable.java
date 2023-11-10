@@ -42,7 +42,8 @@ public class AccountDatatable extends DatatypeColumnsDatatable {
 				it.remove();
 		}
 		
-		for (System system: EJBLocator.getDispatcherService().findAllActiveDispatchers()) {
+		for (System system: EJBLocator.getDispatcherService()
+				.findSystemByTextAndFilter(null, null, null, null).getResources()) {
 			for ( DataType dt: EJBLocator.getAdditionalDataService().findSystemDataTypes(system.getName())) {
 				if (!names.contains(dt.getName())) {
 					names.add(dt.getName());

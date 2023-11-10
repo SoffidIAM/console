@@ -206,6 +206,11 @@ public abstract class DispatcherEntity {
 	@Nullable
 	Long longTimeout;	
 	
+	@Column (name="DIS_TYPE")
+	@Description("Usage of dispatcher: PAM, IAM or SSE")
+	@Nullable
+	String usage;	
+
 	// ************************ DAOS ******************************
 	@DaoFinder("from com.soffid.iam.model.SystemEntity se "
 			+ "where (:name is null or se.name like :name) and "
@@ -266,6 +271,10 @@ public abstract class DispatcherEntity {
 				+ "dis.className = d.className and "
 				+ "d.service = :t")
 	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findServices(String url, boolean t) {
+		return null;
+	}
+
+	public Collection<es.caib.seycon.ng.model.DispatcherEntity> findByUsage(String usage) {
 		return null;
 	}
 }

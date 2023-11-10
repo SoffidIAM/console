@@ -42,9 +42,11 @@ public class SystemFieldHandler extends InputFieldUIHandler {
 		});
 		List<String> values = new LinkedList<>();
 		for (System s: active)
-			values.add(s.getName()+":"+s.getName()+" - "+s.getDescription());
+			if ("PAM".equals( s.getUsage()) || "IAM".equals( s.getUsage()))
+				values.add(s.getName()+":"+s.getName()+" - "+s.getDescription());
 		for (System s: all)
-			if (s.getUrl() == null)
+			if (s.getUrl() == null &&
+				("PAM".equals( s.getUsage()) || "IAM".equals( s.getUsage())))
 				values.add(s.getName()+":"+s.getName()+" - "+s.getDescription());
 		field.setValues(values);
 	}

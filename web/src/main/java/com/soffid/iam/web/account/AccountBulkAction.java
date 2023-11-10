@@ -47,11 +47,13 @@ public class AccountBulkAction extends BulkAction {
 		dt.setMultiValued(true);
 		dt.setType(TypeEnumeration.ROLE_TYPE);
 		l.addFirst(dt);
-		for (com.soffid.iam.api.System d: EJBLocator.getDispatcherService().findAllActiveDispatchers())
+		for (com.soffid.iam.api.System d: EJBLocator.getDispatcherService()
+				.findSystemByTextAndFilter(null, null, null, null).getResources())
 		{
 			for (DataType att: EJBLocator.getAdditionalDataService().findSystemDataTypes(d.getName()))
 			{
-				if ( ! names.contains(att.getName())) {
+				if ( ! names.contains(att.getName()) &&
+						att.getType() != TypeEnumeration.SEPARATOR) {
 					names.add(att.getName());
 					l.add(att);
 				}

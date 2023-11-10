@@ -166,6 +166,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     protected UserAccount handleCreateAccount(User usuari, com.soffid.iam.api.System dispatcher, String name) throws Exception {
 		UserEntity ue = getUser(usuari.getUserName());
 		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
+		if (! "IAM".equals(de.getUsage())) //$NON-NLS-1$
+			throw new InternalErrorException(
+					String.format(Messages.getString("AccountServiceImpl.1"), //$NON-NLS-1$
+							de.getName()));
+
 		UserAccountEntity uae = generateAccount(name, ue, de, true);
 		createAccountTask(uae.getAccount());
 		return getUserAccountEntityDao().toUserAccount(uae);
@@ -178,7 +183,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			List<AccountEntity> existing = getAccountEntityDao().findByUserAndSystem(ue.getUserName(), de.getName());
 			for (AccountEntity accountEntity: existing) {
 				if ( ! accountEntity.isDisabled())
-					throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName()));
+					throw new NeedsAccountNameException(String.format(Messages.getString("AccountServiceImpl.AlreadyUserAccount"), ue.getUserName(), de.getName())); //$NON-NLS-1$
 			}
 			// Search if already has a user name for this user domain
 			
@@ -188,7 +193,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			name = guessAccountName(ue.getUserName(), de.getName());
 							
 			if (name == null)
-				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")+" ("+ue.getUserName()+" / "+de.getName()+") "); //$NON-NLS-1$
+				throw new NeedsAccountNameException(Messages.getString("AccountServiceImpl.AccountNameRequired")+" ("+ue.getUserName()+" / "+de.getName()+") "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		}
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(name, de.getName());
 		if (acc != null)
@@ -215,12 +220,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	    		if (getDispatcherService().isUserAllowed(dispatcher, ue.getUserName()))
 	    		{
 	    			if (acc.isDisabled())
-	    				audit("E", acc);
+	    				audit("E", acc); //$NON-NLS-1$
 	    			acc.setDisabled( false );
 	    			acc.setStatus(AccountStatus.ACTIVE);
 	    		} else {
 	    			if (! acc.isDisabled())
-	    				audit("e", acc);
+	    				audit("e", acc); //$NON-NLS-1$
 	    			acc.setDisabled( true );
 	    			if (acc.getStatus() == AccountStatus.ACTIVE)
 	    				acc.setStatus(AccountStatus.DISABLED);
@@ -230,7 +235,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	    		uae = bindAccountToUser(ue, acc);
 			}
 			else
-				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), name + "@" + de.getName()));
+				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), name + "@" + de.getName())); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
     		acc = getAccountEntityDao().newAccountEntity();
     		acc.setDescription(ue.getFullName());
@@ -239,7 +244,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     		acc.setType(AccountType.USER);
     		acc.setPasswordPolicy(ue.getUserType());
     		acc.setPasswordPolicy( ue.getUserType() );
-    		if ( "S".equals(ue.getActive()) )
+    		if ( "S".equals(ue.getActive()) ) //$NON-NLS-1$
     		{
 	    		acc.setDisabled(false);
 	    		acc.setStatus(AccountStatus.ACTIVE);
@@ -250,7 +255,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     		getAccountEntityDao().create(acc);
     		uae = bindAccountToUser(ue, acc);
     		if (! acc.isDisabled())
-    			audit("C", acc);
+    			audit("C", acc); //$NON-NLS-1$
 		}
 
 
@@ -328,13 +333,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	@Override
     protected Account handleCreateAccount(com.soffid.iam.api.Account account) throws Exception {
 		String ssoSystem = ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
-		if (account.getName().equals("?") && account.getSystem().equals(ssoSystem)) {
+		if (account.getName().equals("?") && account.getSystem().equals(ssoSystem)) { //$NON-NLS-1$
 			account.setName( Long.toString( findLastAccount(ssoSystem) ));
 		}
 		AccountEntity acc = getAccountEntityDao().findByNameAndSystem(account.getName(), account.getSystem());
 		if (acc != null)
 		{
-			throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + account.getSystem()));
+			throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + account.getSystem())); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		acc = getAccountEntityDao().newAccountEntity();
 		acc.setAcl(new HashSet<AccountAccessEntity>());
@@ -399,7 +404,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		account.setId(acc.getId());
 
 		if (! acc.isDisabled())
-			audit("E", acc);
+			audit("E", acc); //$NON-NLS-1$
 
 		createAccountTask(acc);
 		
@@ -533,7 +538,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 								updateAccountAttribute(entity, entities, key, commonMetadata, v);
 							}
 						} else {
-							throw new InternalErrorException(String.format("Unable to find metadada for attribute %s", key));
+							throw new InternalErrorException(String.format("Unable to find metadada for attribute %s", key)); //$NON-NLS-1$
 						}
 					}
 				}
@@ -547,10 +552,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		for ( AccountMetadataEntity m: md)
 		{
 			Object o = app.getAttributes().get(m.getName());
-			if ( o == null || "".equals(o))
+			if ( o == null || "".equals(o)) //$NON-NLS-1$
 			{
 				if (m.getRequired() != null && m.getRequired().booleanValue())
-					throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+					throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.18"), m.getLabel())); //$NON-NLS-1$
 			} else {
 				if (m.getUnique() != null && m.getUnique().booleanValue())
 				{
@@ -559,7 +564,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					{
 						List<AccountAttributeEntity> p = getAccountAttributeEntityDao().findByNameAndValue(app.getSystem(), m.getName(), v);
 						if (p.size() > 1)
-							throw new InternalErrorException(String.format("Already exists an account with %s %s",
+							throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.19"), //$NON-NLS-1$
 									m.getLabel(), v));
 					}
 				}
@@ -570,10 +575,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			if (Boolean.FALSE.equals(m.getBuiltin())) {
 				Object o = app.getAttributes().get(m.getName());
-				if ( o == null || "".equals(o))
+				if ( o == null || "".equals(o)) //$NON-NLS-1$
 				{
 					if (m.getRequired() != null && m.getRequired().booleanValue())
-						throw new InternalErrorException(String.format("Missing attribute %s", m.getLabel()));
+						throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.18"), m.getLabel())); //$NON-NLS-1$
 				} else {
 					if (m.getUnique() != null && m.getUnique().booleanValue())
 					{
@@ -582,7 +587,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						{
 							List<AccountAttributeEntity> p = getAccountAttributeEntityDao().findByNameAndValue(app.getSystem(), m.getName(), v);
 							if (p.size() > 1)
-								throw new InternalErrorException(String.format("Already exists an account with %s %s",
+								throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.19"), //$NON-NLS-1$
 										m.getLabel(), v));
 						}
 					}
@@ -764,7 +769,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                    } else if (access.getRole() != null) {
 	                        for (Iterator<String> it = newroles[index].iterator(); !found && it.hasNext(); ) {
 	                            String r = it.next();
-	                            if (r.equals(access.getRole().getName()+"@"+access.getRole().getSystem().getName())) {
+	                            if (r.equals(access.getRole().getName()+"@"+access.getRole().getSystem().getName())) { //$NON-NLS-1$
 	                                it.remove();
 	                                found = true;
 	                            }
@@ -867,24 +872,24 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			account.setDisabled( account.getStatus() != AccountStatus.ACTIVE && account.getStatus() != AccountStatus.FORCED_ACTIVE);
 		if (AccountStatus.REMOVED.equals(ae.getStatus()) && !account.getStatus().equals(AccountStatus.REMOVED))
 		{
-			audit("C", ae);
+			audit("C", ae); //$NON-NLS-1$
 		}
 		else if ( ! AccountStatus.REMOVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.REMOVED))
 		{
-			audit("D", ae);
+			audit("D", ae); //$NON-NLS-1$
 		}
 		else if ( ! AccountStatus.ARCHIVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.ARCHIVED))
 		{
-			audit("I", ae);
+			audit("I", ae); //$NON-NLS-1$
 		}
 		else if ((! ae.isDisabled() || AccountStatus.ARCHIVED == ae.getStatus()) && account.isDisabled())
 		{
 			anyChange = true;
-			audit("e", ae);
+			audit("e", ae); //$NON-NLS-1$
 		}
 		else if (ae.isDisabled() && !account.isDisabled())
 		{
-			audit("E", ae);
+			audit("E", ae); //$NON-NLS-1$
 			anyChange = true;
 		}
 		if (! account.getType().equals( ae.getType() ) )
@@ -950,11 +955,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		if (ae.getType().equals(AccountType.USER)) {
 			for (UserAccountEntity ua: ae.getUsers()) {
-				if (!"S".equals(ua.getUser().getActive())) {
+				if (!"S".equals(ua.getUser().getActive())) { //$NON-NLS-1$
 					Issue i = new Issue();
-					i.setType("enabled-account-on-disabled-user");
+					i.setType("enabled-account-on-disabled-user"); //$NON-NLS-1$
 					i.setCreated(new Date());
-					i.setAccount(account.getName()+"@"+account.getSystem());
+					i.setAccount(account.getName()+"@"+account.getSystem()); //$NON-NLS-1$
 					IssueUser iu = new IssueUser();
 					iu.setUserId(ua.getUser().getId());
 					iu.setUserName(ua.getUser().getUserName());
@@ -968,12 +973,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (! account.getName().equals(ae.getName()))
 		{
 			if (getAccountEntityDao().findByNameAndSystem(account.getName(), ae.getSystem().getName()) != null)
-				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getName()));
+				throw new AccountAlreadyExistsException(String.format(Messages.getString("AccountServiceImpl.AccountAlreadyExists"), account.getName() + "@" + ae.getSystem().getName())); //$NON-NLS-1$ //$NON-NLS-2$
 			anyChange = true;
 			account.setOldName(ae.getName());
 			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.ACCOUNT_TYPE, 
-					ae.getName()+"@"+ae.getSystem().getName(), 
-					account.getName()+"@"+account.getSystem());
+					ae.getName()+"@"+ae.getSystem().getName(),  //$NON-NLS-1$
+					account.getName()+"@"+account.getSystem()); //$NON-NLS-1$
 		}
 		if ( (ae.getDescription() == null ? account.getDescription() != null: ! ae.getDescription().equals( account.getDescription())) ||
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
@@ -1019,7 +1024,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (anyChange)
 			ae.setLastChange(new Date());
 		
-		getAccountEntityDao().update(ae, anyChange ? "U": null);
+		getAccountEntityDao().update(ae, anyChange ? "U": null); //$NON-NLS-1$
 
 		account = getVaultService().addToFolder(account);
 
@@ -1142,7 +1147,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	protected Account handleFindAccount(String accountAndDispatcher)
 			throws Exception
 	{
-		int i = accountAndDispatcher.lastIndexOf("@");
+		int i = accountAndDispatcher.lastIndexOf("@"); //$NON-NLS-1$
 		if (i < 0) return null;
 		return handleFindAccount(accountAndDispatcher.substring(0, i), accountAndDispatcher.substring(i+1));
 	}
@@ -1171,41 +1176,41 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         List<AccountEntity> accounts = getAccountEntityDao().findByUser(ue.getId());
 		
 		SystemEntityDao disDao = getSystemEntityDao();
-		for (SystemEntity disEntity : disDao.loadAll()) {
+		for (SystemEntity disEntity : disDao.findByUsage("IAM")) { //$NON-NLS-1$
             if (disEntity.getManualAccountCreation() != null && disEntity.getManualAccountCreation().booleanValue()) {
                 for (AccountEntity acc : accounts) if (acc.getSystem() == disEntity) {
                     if ((acc.getStatus() == AccountStatus.LOCKED || acc.getStatus() == AccountStatus.DISABLED) && 
-                    		"S".equals(ue.getActive())) {
+                    		"S".equals(ue.getActive())) { //$NON-NLS-1$
                         acc.setDisabled(false);
 						acc.setStatus(AccountStatus.ACTIVE);
                         getAccountEntityDao().update(acc);
                         SoffidPrincipalImpl.clearCache();
-                        audit("E", acc);
+                        audit("E", acc); //$NON-NLS-1$
                     }
                     if ( (acc.getStatus() == AccountStatus.ACTIVE ||
-                    		acc.getStatus() == AccountStatus.FORCED_ACTIVE ) && !"S".equals(ue.getActive())) {
+                    		acc.getStatus() == AccountStatus.FORCED_ACTIVE ) && !"S".equals(ue.getActive())) { //$NON-NLS-1$
                         acc.setDisabled(true);
 						acc.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(acc);
                         SoffidPrincipalImpl.clearCache();
-                        audit("e", acc);
+                        audit("e", acc); //$NON-NLS-1$
                     }
                 }
             } else if (disEntity.isMainSystem() || disEntity.getUrl() != null) {
                 com.soffid.iam.api.System dis = disDao.toSystem(disEntity);
                 String description = ue.getFullName();
-                if (description.length() > 50) description = description.substring(0, 47) + "...";
+                if (description.length() > 50) description = description.substring(0, 47) + "..."; //$NON-NLS-1$
                 LinkedList<AccountEntity> accs = new LinkedList<AccountEntity>();
                 for (AccountEntity account: accounts)
                 	if (account.getSystem() == disEntity)
                 		accs.add(account);
-                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user, perms)) {
+                if ("S".equals(ue.getActive()) && getDispatcherService().isUserAllowed(dis, user, perms)) { //$NON-NLS-1$
                     if (accs.isEmpty()) {
                         try {
                             generateAccount(null, ue, disEntity, false);
                             SoffidPrincipalImpl.clearCache();
                         } catch (Exception e) {
-                            LogFactory.getLog(getClass()).warn(String.format(Messages.getString("AccountServiceImpl.ErrorGeneratinAccount"), user, dis.getName()), e);
+                            LogFactory.getLog(getClass()).warn(String.format(Messages.getString("AccountServiceImpl.ErrorGeneratinAccount"), user, dis.getName()), e); //$NON-NLS-1$
                         }
                     } else {
                         for (AccountEntity acc : accs) {
@@ -1216,7 +1221,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                                 acc.setDescription(description);
     							acc.setStatus(AccountStatus.ACTIVE);
                                 getAccountEntityDao().update(acc);
-                                audit("E", acc);
+                                audit("E", acc); //$NON-NLS-1$
                                 SoffidPrincipalImpl.clearCache();
                             }
                             if (!description.equals(acc.getDescription())) {
@@ -1227,14 +1232,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     }
                 } else if (!accs.isEmpty()) {
                     for (AccountEntity acc : accs) {
-                    	if (! "S".equals(ue.getActive()) && acc.getStatus() == AccountStatus.FORCED_ACTIVE ||
+                    	if (! "S".equals(ue.getActive()) && acc.getStatus() == AccountStatus.FORCED_ACTIVE || //$NON-NLS-1$
                     			acc.getStatus() == AccountStatus.ACTIVE )
                     	{
                             acc.setDisabled(true);
     						acc.setStatus(AccountStatus.DISABLED);
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
-                            audit("e", acc);
+                            audit("e", acc); //$NON-NLS-1$
                             SoffidPrincipalImpl.clearCache();
                    		}
                         if (! description.equals(acc.getDescription())) {
@@ -1243,7 +1248,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         }
                     }
                 }
-            } else if ( "N".equals(ue.getActive())) { // Disable accounts in offline systems
+            } else if ( "N".equals(ue.getActive())) { // Disable accounts in offline systems //$NON-NLS-1$
                 LinkedList<AccountEntity> accs = new LinkedList<AccountEntity>();
                 for (AccountEntity account: accounts) {
                 	if (account.getSystem() == disEntity && 
@@ -1252,7 +1257,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         account.setDisabled(true);
 						account.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(account);
-                        audit("e", account);
+                        audit("e", account); //$NON-NLS-1$
                         SoffidPrincipalImpl.clearCache();
                		}
                 }
@@ -1294,7 +1299,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 		else if (! oldAccount.getId().equals(accountEntity.getId()))
 		{
-			throw new AccountAlreadyExistsException(account.getName() + "@" + account.getSystem());
+			throw new AccountAlreadyExistsException(account.getName() + "@" + account.getSystem()); //$NON-NLS-1$
 		}
 	}
 
@@ -1332,10 +1337,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			return userName;
 		else if (du.getType().equals(TipusDominiUsuariEnumeration.SHELL))
 		{
-			Object o = evalExpression(du, ue, dispatcherName, du.getBshExpr(), "User domain "+du.getName());
+			Object o = evalExpression(du, ue, dispatcherName, du.getBshExpr(), "User domain "+du.getName()); //$NON-NLS-1$
 			if (o != null && ! (o instanceof String))
 				throw new InternalErrorException(
-						String.format("Create expression for domain %s returned a non String object: %s",
+						String.format(Messages.getString("AccountServiceImpl.53"), //$NON-NLS-1$
 								du.getName(), o.toString()));
 			return (String) o;
 		}
@@ -1623,7 +1628,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			ae.setOldName(null);
 			ae.setLastUpdated(new Date());
-			getAccountEntityDao().update(ae, "A");
+			getAccountEntityDao().update(ae, "A"); //$NON-NLS-1$
 		}
 	}
 
@@ -1734,18 +1739,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			String url, String auth) throws IOException, InternalErrorException {
         RemoteServiceLocator rsl = new RemoteServiceLocator(url);
         rsl.setAuthToken(auth);
-		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		SyncStatusService sss = rsl.getSyncStatusService();
 		Password p = sss.getAccountPassword(usuari.getUserName(), acc.getId(), level);
 		if (p != null) {
 		    Audit audit = new Audit();
-		    audit.setAction("S");
-		    audit.setObject("SSO");
+		    audit.setAction("S"); //$NON-NLS-1$
+		    audit.setObject("SSO"); //$NON-NLS-1$
 		    audit.setAuthor(Security.getCurrentUser());
 		    audit.setCalendar(Calendar.getInstance());
 		    audit.setAccount(acc.getName());
 		    audit.setDatabase(acc.getSystem().getName());
-		    audit.setApplication("-");
+		    audit.setApplication("-"); //$NON-NLS-1$
 		    getAuditService().create(audit);
 		}
 		return p;
@@ -1779,7 +1784,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		/// Now, do the job
 		if (password == null)
 		{
-			log.info("generating new password");
+			log.info("generating new password"); //$NON-NLS-1$
 			result = ips.generateFakeAccountPassword(ae);
 	        if (online) { 
 	        	sendPasswordNow (ae, result, temporary);
@@ -1833,10 +1838,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		try {
 		    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
 		    rsl.setAuthToken(auth);
-			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		    sss = rsl.getSyncStatusService();
 		} catch (Exception e) {
-			log.warn("Error sending password", e);
+			log.warn("Error sending password", e); //$NON-NLS-1$
 		}
 		if (sss != null)
 		{
@@ -1877,7 +1882,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			{
 				UserEntity currentUser = ae.getUsers().iterator().next().getUser();
 				if (! currentUser.getId().equals(callerUe.getId()))
-					throw new SecurityException(String.format("Cannot change password. The current owner is %s", currentUser.getUserName()));
+					throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.62"), currentUser.getUserName())); //$NON-NLS-1$
 			}
 		}
 		if (! Security.isUserInRole(Security.AUTO_ACCOUNT_HP_PASSWORD))
@@ -1985,13 +1990,13 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			log.setToken(pi.getRootToken());
 			log.setActorId(Security.getCurrentUser());
 			li.startCompositeLog(log);
-			pi.getContextInstance().createVariable("requester", Security.getCurrentUser());
-			pi.getContextInstance().createVariable("requesterFullName", Security.getSoffidPrincipal().getFullName());
-			pi.getContextInstance().createVariable("account", acc.getId());
-			pi.getContextInstance().createVariable("accountSystem", acc.getSystem());
-			pi.getContextInstance().createVariable("accountName", acc.getName());
-			pi.getContextInstance().createVariable("password", p.toString());
-			pi.getContextInstance().createVariable("until", until);
+			pi.getContextInstance().createVariable("requester", Security.getCurrentUser()); //$NON-NLS-1$
+			pi.getContextInstance().createVariable("requesterFullName", Security.getSoffidPrincipal().getFullName()); //$NON-NLS-1$
+			pi.getContextInstance().createVariable("account", acc.getId()); //$NON-NLS-1$
+			pi.getContextInstance().createVariable("accountSystem", acc.getSystem()); //$NON-NLS-1$
+			pi.getContextInstance().createVariable("accountName", acc.getName()); //$NON-NLS-1$
+			pi.getContextInstance().createVariable("password", p.toString()); //$NON-NLS-1$
+			pi.getContextInstance().createVariable("until", until); //$NON-NLS-1$
 			pi.signal();
 			ctx.save(pi);
 			if (li != null) {
@@ -2097,7 +2102,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                         for (TaskLogEntity tl : tasque.getLogs()) {
                             if (tl.getSystem().getId().equals(accEntity.getSystem().getId())) {
                                 found = true;
-                                if (!"S".equals(tl.getCompleted())) return true;
+                                if (!"S".equals(tl.getCompleted())) return true; //$NON-NLS-1$
                             }
                         }
                         if (!found) return true;
@@ -2128,9 +2133,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		List<TaskEntity> coll = getTaskEntityDao().findByAccount(accEntity.getName(), accEntity.getSystem().getName());
 		for (TaskEntity tasque : coll) {
             if (tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT) || tasque.getTransaction().equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_ACCOUNT_PASSWORD)) {
-            	if ("X".equals( tasque.getStatus()) && status < 1)
+            	if ("X".equals( tasque.getStatus()) && status < 1) //$NON-NLS-1$
             		status = 1;
-            	else if ("E".equals( tasque.getStatus()) && status < 3)
+            	else if ("E".equals( tasque.getStatus()) && status < 3) //$NON-NLS-1$
             		status = 3;
             	else if (status < 2) 
             		status = 2;
@@ -2143,7 +2148,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 coll = getTaskEntityDao().findByUser(ua.getUser().getUserName());
                 for (TaskEntity tasque : coll) {
                     if (tasque.getTransaction().equals(TaskHandler.UPDATE_USER) || accEntity.getSystem().getPasswordDomain().getName().equals(tasque.getPasswordsDomain()) && (tasque.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || tasque.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD))) {
-                    	if ("X".equals( tasque.getStatus()))
+                    	if ("X".equals( tasque.getStatus())) //$NON-NLS-1$
                     	{
                     		if (status < 1) status = 1;
                     	} else {
@@ -2151,7 +2156,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                        for (TaskLogEntity tl : tasque.getLogs()) {
 	                            if (tl.getSystem().getId().equals(accEntity.getSystem().getId())) {
 	                                found = true;
-	                                if (!"S".equals(tl.getCompleted())) {
+	                                if (!"S".equals(tl.getCompleted())) { //$NON-NLS-1$
 	                                	if (tl.getExecutionsNumber() != null && tl.getExecutionsNumber().longValue() > 1L && status < 3)
 	                                		status = 3;
 	                                	else if (status < 2) 
@@ -2170,7 +2175,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 
-	final static Collection<String> traceableAccountActions = Arrays.asList("E", "M", "I", "C", "D", "e"); 
+	final static Collection<String> traceableAccountActions = Arrays.asList("E", "M", "I", "C", "D", "e");  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	private void audit(String action, AccountEntity account) throws Exception {
 
         String codiUsuariCanvi = Security.getCurrentAccount();
@@ -2188,8 +2193,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         	for (UserAccountEntity ua : account.getUsers()) auditoria.setUser(ua.getUser().getUserName());
         }
 
-    	if (auditoria.getObject().equals("SC_ACCOUN") && traceableAccountActions.contains(auditoria.getAction())) {
-    		auditoria.setSearchIndex("ACC#"+account.getId());
+    	if (auditoria.getObject().equals(Messages.getString("AccountServiceImpl.81")) && traceableAccountActions.contains(auditoria.getAction())) { //$NON-NLS-1$
+    		auditoria.setSearchIndex("ACC#"+account.getId()); //$NON-NLS-1$
     	}
         getAuditService().create(auditoria);
     }
@@ -2208,7 +2213,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		query = "select account " + //$NON-NLS-1$
 			"from com.soffid.iam.model.AccountEntity as account " + //$NON-NLS-1$
-			"where account.passwordExpiration between :currentDate and :limitDate and "
+			"where account.passwordExpiration between :currentDate and :limitDate and " //$NON-NLS-1$
 			+ "account.system.tenant.id = :tenantId "; //$NON-NLS-1$
 		
 		paramsList.add(new Parameter("currentDate", currentDate)); //$NON-NLS-1$
@@ -2247,7 +2252,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			{
 				UserType element2 = it2.next();
 				query += "passwordPolicy.codi = :passwordPolicy" + element2.getCode(); //$NON-NLS-1$
-				paramsList.add(new Parameter("passwordPolicy" + element2.getCode(), element2.getCode()));
+				paramsList.add(new Parameter("passwordPolicy" + element2.getCode(), element2.getCode())); //$NON-NLS-1$
 				
 				// Check last element
 				if (it.hasNext())
@@ -2362,7 +2367,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		if (! ae.getType().equals(AccountType.PRIVILEGED))
 		{
-			throw new InternalErrorException("Trying to check in a non privileged account");
+			throw new InternalErrorException(Messages.getString("AccountServiceImpl.85")); //$NON-NLS-1$
 		}
 
 		
@@ -2389,23 +2394,23 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			}
 			else
 			{
-				throw new SecurityException("Trying to checkin a not owned account");
+				throw new SecurityException(Messages.getString("AccountServiceImpl.86")); //$NON-NLS-1$
 			}
 		}
 	}
 
 	@Override
 	protected void handleCheckinHPAccounts() throws Exception {
-		List<AccountEntity> accounts = getAccountEntityDao().query(""
-				+ "select acc\n" + 
-				"from   com.soffid.iam.model.AccountEntity as acc\n" + 
-				"join   acc.system as dispatcher\n" + 
-				"join   acc.users as uac\n" + 
-				"join   uac.user as user\n" + 
-				"where acc.type='P' and dispatcher.tenant.id=:tenantId\n" + 
-				"order by dispatcher.name, acc.name, acc.loginName",
+		List<AccountEntity> accounts = getAccountEntityDao().query("" //$NON-NLS-1$
+				+ "select acc\n" +  //$NON-NLS-1$
+				"from   com.soffid.iam.model.AccountEntity as acc\n" +  //$NON-NLS-1$
+				"join   acc.system as dispatcher\n" +  //$NON-NLS-1$
+				"join   acc.users as uac\n" +  //$NON-NLS-1$
+				"join   uac.user as user\n" +  //$NON-NLS-1$
+				"where acc.type='P' and dispatcher.tenant.id=:tenantId\n" +  //$NON-NLS-1$
+				"order by dispatcher.name, acc.name, acc.loginName", //$NON-NLS-1$
 				new Parameter[] {
-						new Parameter("tenantId", Security.getCurrentTenantId())
+						new Parameter("tenantId", Security.getCurrentTenantId()) //$NON-NLS-1$
 				});
 
 		Date now = new Date();
@@ -2540,8 +2545,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private void auditChange(UserData dadaUsuari, AccountEntity account) throws InternalErrorException {
 		Audit audit = new Audit();
-		audit.setObject("SC_ACCATT");
-		audit.setAction("U");
+		audit.setObject("SC_ACCATT"); //$NON-NLS-1$
+		audit.setAction("U"); //$NON-NLS-1$
 		audit.setAccount(dadaUsuari.getAccountName());
 		audit.setDatabase(dadaUsuari.getSystemName());
 		audit.setCalendar(Calendar.getInstance());
@@ -2550,7 +2555,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (account.getType().equals (AccountType.USER))
 		{
 			for (UserAccountEntity uae : account.getUsers()) {
-                audit.setObject("SC_DADUSU");
+                audit.setObject("SC_DADUSU"); //$NON-NLS-1$
                 audit.setUser(uae.getUser().getUserName());
             }
 		}
@@ -2571,7 +2576,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		{
 			MetaDataEntity meta0 = findCommonMetadata(accountEntity, attribute.getAttribute());
 			if (meta0 == null)
-				throw new InternalErrorException("Metadata not found for attribute " + attribute.getAttribute());
+				throw new InternalErrorException(Messages.getString("AccountServiceImpl.99") + attribute.getAttribute()); //$NON-NLS-1$
 		}
 		AccountAttributeEntity entity = getAccountAttributeEntityDao().userDataToEntity(attribute);
 		AttributeVisibilityEnum visibility = entity.getAttributeVisibility();
@@ -2589,7 +2594,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 		else
 		{
-			throw new SecurityException(String.format("Not authorized to modify attribute %s", attribute.getAttribute()));
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.102"), attribute.getAttribute())); //$NON-NLS-1$
 		}
 	}
 
@@ -2607,7 +2612,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountMetadataEntity meta = getAccountMetadataEntityDao().findByName(attribute.getSystemName(), attribute.getAttribute());
 		if (meta == null)
 		{
-			throw new InternalErrorException("Metadata not found for attribute " + attribute.getAttribute());
+			throw new InternalErrorException(Messages.getString("AccountServiceImpl.99") + attribute.getAttribute()); //$NON-NLS-1$
 		}
 		AccountAttributeEntity entity = getAccountAttributeEntityDao().userDataToEntity(attribute);
 		AttributeVisibilityEnum visibility = entity.getAttributeVisibility();
@@ -2619,7 +2624,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 		else
 		{
-			throw new SecurityException(String.format("Not authorized to modify attribute %s", attribute.getAttribute()));
+			throw new SecurityException(String.format(Messages.getString("AccountServiceImpl.102"), attribute.getAttribute())); //$NON-NLS-1$
 		}
 	}
 
@@ -2690,16 +2695,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		HQLQuery hql = expr.generateHSQLString(com.soffid.iam.api.Account.class);
 		String qs = hql.getWhereString().toString();
 		if (qs.isEmpty())
-			qs = "o.system.tenant.id = :tenantId";
+			qs = "o.system.tenant.id = :tenantId"; //$NON-NLS-1$
 		else
-			qs = "("+qs+") and o.system.tenant.id = :tenantId";
+			qs = "("+qs+") and o.system.tenant.id = :tenantId"; //$NON-NLS-1$ //$NON-NLS-2$
 		hql.setWhereString(new StringBuffer(qs));
 		Map<String, Object> params = hql.getParameters();
 		Parameter paramArray[] = new Parameter[1+params.size()];
 		int i = 0;
 		for (String s : params.keySet())
 			paramArray[i++] = new Parameter(s, params.get(s));
-		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId());
+		paramArray[i++] = new Parameter("tenantId", Security.getCurrentTenantId()); //$NON-NLS-1$
 		
 		
 		@SuppressWarnings("unchecked")
@@ -2804,11 +2809,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				needs = true;
 			else
 			{
-				Object o = evalExpression(du, ue, dispatcher, du.getBshExprCreate(), "Create expression for user domain "+du.getName());
+				Object o = evalExpression(du, ue, dispatcher, du.getBshExprCreate(), Messages.getString("AccountServiceImpl.107")+du.getName()); //$NON-NLS-1$
 				if (o == null || ! (o instanceof Boolean))
 					throw new InternalErrorException(
-							String.format("Create expression for domain %s returned a non boolean object: %s",
-									du.getName(), o == null ? "null": o.toString()));
+							String.format(Messages.getString("AccountServiceImpl.108"), //$NON-NLS-1$
+									du.getName(), o == null ? "null": o.toString())); //$NON-NLS-1$
 				needs = ((Boolean)o).booleanValue();
 			}
 		}
@@ -3001,7 +3006,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	public PasswordValidation getAccountSynchronizationStatus(Account account, String url, String auth) throws IOException, InternalErrorException {
 		RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
 		rsl.setAuthToken(auth);
-		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		SyncStatusService sss = rsl.getSyncStatusService();
 		PasswordValidation status = sss.checkPasswordSynchronizationStatus(account.getName(), account.getSystem());
 		if (status != null) {
@@ -3046,12 +3051,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		final AccountEntityDao dao = getAccountEntityDao();
 		final AuthorizationService authorizationService = getAuthorizationService();
 		ScimHelper h = new ScimHelper(Account.class);
-		h.setPrimaryAttributes(new String[] { "name", "description", "loginName", "system"});
+		h.setPrimaryAttributes(new String[] { "name", "description", "loginName", "system"}); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
-		h.setTenantFilter("system.tenant.id");
+		h.setTenantFilter("system.tenant.id"); //$NON-NLS-1$
 		h.setGenerator((entity) -> {
 			Account u = dao.toAccount((AccountEntity) entity);
 			try {
@@ -3101,7 +3106,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				tl = new SyncAgentTaskLog();
 				tl.setTaskId(task.getId());
 				tl.setAgentCode(accEntity.getSystem().getName());
-				tl.setComplete( "X".equals(task.getStatus()) ? "ON HOLD": "PENDING");
+				tl.setComplete( "X".equals(task.getStatus()) ? "ON HOLD": "PENDING"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				tl.setCreationDate(Calendar.getInstance());
 				tl.getCreationDate().setTime(task.getDate());
 				tl.setExecutionsNumber(0L);
@@ -3118,10 +3123,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						tl.setNextExecutionDate(Calendar.getInstance());
 						tl.getNextExecutionDate().setTime(new Date(tle.getNextExecution()));	        								
 					}
-					if ("S".equals(tle.getCompleted())) {
-						tl.setComplete("DONE");
+					if ("S".equals(tle.getCompleted())) { //$NON-NLS-1$
+						tl.setComplete("DONE"); //$NON-NLS-1$
 					} else if (tle.getMessage() != null) {
-						tl.setComplete("ERROR");
+						tl.setComplete("ERROR"); //$NON-NLS-1$
 						tl.setMessage(tle.getMessage());
 					}
 					tl.setExecutionsNumber(tle.getExecutionsNumber());
@@ -3139,12 +3144,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     if (task.getTransaction().equals(TaskHandler.UPDATE_USER) || 
                     		accEntity.getSystem().getPasswordDomain().getName().equals(task.getPasswordsDomain()) && 
                     		(task.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || task.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD))) {
-                    	if ("X".equals( task.getStatus()))
+                    	if ("X".equals( task.getStatus())) //$NON-NLS-1$
                     	{
                     		SyncAgentTaskLog tl;
                     		tl = new SyncAgentTaskLog();
                     		tl.setTaskId(task.getId());
-                    		tl.setComplete( "ON HOLD");
+                    		tl.setComplete( "ON HOLD"); //$NON-NLS-1$
                     		tl.setCreationDate(Calendar.getInstance());
                     		tl.getCreationDate().setTime(task.getDate());
                     		tl.setExecutionsNumber(0L);
@@ -3155,7 +3160,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             				SyncAgentTaskLog tl;
             				tl = new SyncAgentTaskLog();
             				tl.setTaskId(task.getId());
-            				tl.setComplete( "PENDING");
+            				tl.setComplete( "PENDING"); //$NON-NLS-1$
             				tl.setAgentCode(accEntity.getSystem().getName());
             				tl.setCreationDate(Calendar.getInstance());
             				tl.getCreationDate().setTime(task.getDate());
@@ -3166,7 +3171,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             				boolean add = true;
             				for (TaskLogEntity tle : task.getLogs()) {
             					if (tle.getSystem() == accEntity.getSystem()) {
-	        						if ("S".equals(tle.getCompleted())) add = false;
+	        						if ("S".equals(tle.getCompleted())) add = false; //$NON-NLS-1$
 	        						else {
 	        							if (tle.getLastExecution() != null) {
 	        								tl.setLastExecution(tle.getLastExecution());
@@ -3178,10 +3183,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	        								tl.setNextExecutionDate(Calendar.getInstance());
 	        								tl.getNextExecutionDate().setTime(new Date(tle.getNextExecution()));	        								
 	        							}
-	        							if ("S".equals(tle.getCompleted())) {
-	        								tl.setComplete("DONE");
+	        							if ("S".equals(tle.getCompleted())) { //$NON-NLS-1$
+	        								tl.setComplete("DONE"); //$NON-NLS-1$
 	        							} else if (tle.getMessage() != null) {
-	        								tl.setComplete("ERROR");
+	        								tl.setComplete("ERROR"); //$NON-NLS-1$
 	        								tl.setMessage(tle.getMessage());
 	        							}
 	        							tl.setExecutionsNumber(tle.getExecutionsNumber());
@@ -3296,7 +3301,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			throw lastException;
 		
 		AccountEntity e = getAccountEntityDao().load(account.getId());
-		e.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem()));
+		e.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem())); //$NON-NLS-1$
 		getAccountEntityDao().update(e);
 		
 		return getAccountEntityDao().toAccount(e);
@@ -3305,12 +3310,12 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	private void setAccountSshPrivateKey(Account account, String privateKey, String url, String auth) throws InternalErrorException, IOException {
         RemoteServiceLocator rsl = new RemoteServiceLocator(url);
         rsl.setAuthToken(auth);
-		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		SyncStatusService sss = rsl.getSyncStatusService();
 		sss.setAccountSshPrivateKey(account.getName(), account.getSystem(), new Password(privateKey));
 	    Audit audit = new Audit();
-	    audit.setAction("S");
-	    audit.setObject("SC_ACCOUN");
+	    audit.setAction("S"); //$NON-NLS-1$
+	    audit.setObject("SC_ACCOUN"); //$NON-NLS-1$
 	    audit.setAuthor(Security.getCurrentUser());
 	    audit.setCalendar(Calendar.getInstance());
 	    audit.setAccount(account.getName());
@@ -3380,18 +3385,18 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			String url, String auth) throws IOException, InternalErrorException {
         RemoteServiceLocator rsl = new RemoteServiceLocator(url);
         rsl.setAuthToken(auth);
-		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+		rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		SyncStatusService sss = rsl.getSyncStatusService();
 		Password p = sss.getAccountSshKey(usuari.getUserName(), acc.getId(), level);
 		if (p != null) {
 		    Audit audit = new Audit();
-		    audit.setAction("H");
-		    audit.setObject("SSO");
+		    audit.setAction("H"); //$NON-NLS-1$
+		    audit.setObject("SSO"); //$NON-NLS-1$
 		    audit.setAuthor(Security.getCurrentUser());
 		    audit.setCalendar(Calendar.getInstance());
 		    audit.setAccount(acc.getName());
 		    audit.setDatabase(acc.getSystem().getName());
-		    audit.setApplication("-");
+		    audit.setApplication("-"); //$NON-NLS-1$
 		    getAuditService().create(audit);
 		}
 		return p;
@@ -3402,8 +3407,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
 		if (entity.getSecrets() == null)
 			return false;
-		String id = "ssh.";
-		for (String secret: entity.getSecrets().split(","))
+		String id = "ssh."; //$NON-NLS-1$
+		for (String secret: entity.getSecrets().split(",")) //$NON-NLS-1$
 		{
 			if (secret.startsWith(id))
 				return true;
@@ -3444,10 +3449,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		try {
 		    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
 		    rsl.setAuthToken(auth);
-			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount());
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		    sss = rsl.getSyncStatusService();
 		} catch (Exception e) {
-			log.warn("Error sending password", e);
+			log.warn("Error sending password", e); //$NON-NLS-1$
 		}
 		if (sss != null)
 		{
@@ -3491,7 +3496,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						throw new InternalErrorException(Messages.getString("AccountServiceImpl.AccounNotBounForUser")); //$NON-NLS-1$
 				}
 				else if (ae.getType().equals(AccountType.IGNORED) && 
-						! ae.getSystem().getName().equals( ConfigurationCache.getProperty("AutoSSOSystem")) )
+						! ae.getSystem().getName().equals( ConfigurationCache.getProperty("AutoSSOSystem")) ) //$NON-NLS-1$
 				{
 					throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.NoAuthorizedChangePassAccDisabled"))); //$NON-NLS-1$
 				}
@@ -3543,7 +3548,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					return null;
 				});
 			} catch (InternalErrorException e) {
-				log.warn("Error processing task", e);
+				log.warn("Error processing task", e); //$NON-NLS-1$
 				t.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
 			} finally {
 				Security.nestedLogoff();				
@@ -3570,7 +3575,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						steps ++ ;
 						t.setProgress((float)steps / rules.size());
 					} catch (Exception e) {
-						log.warn("Error processing task", e);
+						log.warn("Error processing task", e); //$NON-NLS-1$
 						t.setErrorMessage(SoffidStackTrace.generateShortDescription(e));
 					}
 				}
@@ -3585,28 +3590,28 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	private void applyRule(AsyncProcessTracker t, String scimQuery, DisableObjectRule rule, HashSet<Long> processedUsers, List<Object[]> actions) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
 		String query;
 		ScimHelper h = new ScimHelper(Account.class);
-		h.setTenantFilter("system.tenant.id");
-		if ("P".equals(rule.getCriteria())) {
+		h.setTenantFilter("system.tenant.id"); //$NON-NLS-1$
+		if ("P".equals(rule.getCriteria())) { //$NON-NLS-1$
 			HashMap m = new HashMap<>();
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.DATE, - rule.getParameter());
-			m.put("limit", c.getTime());
-			h.setExtraWhere("o.passwordExpiration < :limit");
+			m.put("limit", c.getTime()); //$NON-NLS-1$
+			h.setExtraWhere("o.passwordExpiration < :limit"); //$NON-NLS-1$
 			h.setExtraParameters(m);
 		}
-		else if ("L".equals(rule.getCriteria())) {
+		else if ("L".equals(rule.getCriteria())) { //$NON-NLS-1$
 			HashMap m = new HashMap<>();
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.DATE, - rule.getParameter());
-			m.put("limit", c.getTime());
-			h.setExtraWhere("o.lastLogin < :limit");
+			m.put("limit", c.getTime()); //$NON-NLS-1$
+			h.setExtraWhere("o.lastLogin < :limit"); //$NON-NLS-1$
 			h.setExtraParameters(m);
 		} else {
 			return;
 		}
 		
 		
-		h.setOrder("o.id");
+		h.setOrder("o.id"); //$NON-NLS-1$
 		h.setPageSize(100);
 		AsyncList<Object> list = new AsyncList<>();
 		h.setGenerator((data) -> {
@@ -3623,7 +3628,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 					try {
 						processAction (account, rule);
 					} catch (Exception e) {
-						throw new SeyconException("Error processing account "+account.getName()+" @ "+account.getSystem().getName(), e);
+						throw new SeyconException("Error processing account "+account.getName()+" @ "+account.getSystem().getName(), e); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				}
 			}
@@ -3634,15 +3639,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private void processAction(AccountEntity user, DisableObjectRule rule) throws Exception {
 		Account userObject = getAccountEntityDao().toAccount(user);
-		if (rule.getAction().equals("E")) {
+		if (rule.getAction().equals("E")) { //$NON-NLS-1$
 			List<String> actors = new LinkedList<>();
 			
 			try {
 				if (rule.getEmailCopy() != null && ! rule.getEmailCopy().trim().isEmpty()) {
 					String actorsString = replace(rule.getEmailCopy(), userObject);
-					if (actorsString.startsWith("[") && actorsString.endsWith("]"))
+					if (actorsString.startsWith("[") && actorsString.endsWith("]")) //$NON-NLS-1$ //$NON-NLS-2$
 						actorsString = actorsString.substring(1, actorsString.length()-1);
-					for (String actor: actorsString.split("[ ,]+")) {
+					for (String actor: actorsString.split("[ ,]+")) { //$NON-NLS-1$
 						actors.add(actor);
 					}
 				}
@@ -3658,16 +3663,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 						replace(rule.getEmailSubject(), userObject),
 						replace(rule.getEmailBody(), userObject));
 			} catch (InternalErrorException e) {
-				log.warn("Error sending notification email to "+actors, e);
+				log.warn("Error sending notification email to "+actors, e); //$NON-NLS-1$
 			}
 		}
-		if (rule.getAction().equals("D")) {
+		if (rule.getAction().equals("D")) { //$NON-NLS-1$
 			if (userObject.getStatus() != AccountStatus.FORCED_DISABLED ) {
 				userObject.setStatus(AccountStatus.FORCED_DISABLED);
 				handleUpdateAccount2(userObject);
 			}
 		}
-		if (rule.getAction().equals("R")) {
+		if (rule.getAction().equals("R")) { //$NON-NLS-1$
 			if (userObject.getStatus() != AccountStatus.REMOVED ) {
 				userObject.setStatus(AccountStatus.REMOVED);
 				handleUpdateAccount2(userObject);
@@ -3677,7 +3682,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 	private String replace(String text, Account user) {
 		
-		text = text.replace("#{", "${");
+		text = text.replace("#{", "${"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		VariableResolver pResolver = new ObjectVariableResolver (user);
 		ExpressionEvaluatorImpl ee = new ExpressionEvaluatorImpl();

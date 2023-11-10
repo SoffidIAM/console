@@ -417,7 +417,9 @@ public class SearchDictionaryBuilder {
 	private static SearchDictionary addAccountAttributes(SearchDictionary sd1) throws InternalErrorException, NamingException, CreateException {
 		SearchDictionary sd2 = new SearchDictionary(sd1);
 		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>(sd1.getAttributes()));
-		for (com.soffid.iam.api.System d: EJBLocator.getDispatcherService().findAllActiveDispatchers())
+		for (com.soffid.iam.api.System d: EJBLocator.getDispatcherService()
+				.findSystemByTextAndJsonQuery(null, null, null, null)
+				.getResources())
 		{
 			for (DataType att: EJBLocator.getAdditionalDataService().findSystemDataTypes(d.getName()))
 			{

@@ -1940,7 +1940,7 @@ public class DispatcherServiceImpl extends
 			@Override
 			public void run() {
 				try {
-					handleFindSystemByTextAndJsonQueryAsync(text, jsonQuery, null, null, result);
+					doFindSystemByTextAndJsonQuery(text, jsonQuery, null, null, result);
 				} catch (Throwable e) {
 					throw new RuntimeException(e);
 				}				
@@ -1957,23 +1957,6 @@ public class DispatcherServiceImpl extends
 		return doFindSystemByTextAndJsonQuery(text, jsonQuery, start, pageSize, result);
 	}
 	
-	private void handleFindSystemByTextAndJsonQueryAsync(String text, String jsonQuery,
-			Integer start, Integer pageSize,
-			Collection<com.soffid.iam.api.System> result) throws Exception {
-		final SystemEntityDao dao = getSystemEntityDao();
-		ScimHelper h = new ScimHelper(com.soffid.iam.api.System.class);
-		h.setPrimaryAttributes(new String[] { "name", "description"});
-		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
-		config.setFirstResult(start);
-		config.setMaximumResultSize(pageSize);
-		h.setConfig(config);
-		h.setTenantFilter("tenant.id");
-		h.setGenerator((entity) -> {
-			return dao.toSystem((SystemEntity) entity);
-		}); 
-		h.search(text, jsonQuery, (Collection) result); 
-	}
-
 	@Override
 	protected AsyncList<System> handleFindSystemByTextAndFilterAsync(String text, String query) throws Exception {
 		final AsyncList<System> result = new AsyncList<System>();
@@ -2009,6 +1992,7 @@ public class DispatcherServiceImpl extends
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
 		h.setTenantFilter("tenant.id");
+		h.setExtraWhere("(o.usage = 'IAM' or o.usage = 'PAM')");
 		h.setGenerator((entity) -> {
 			return dao.toSystem((SystemEntity) entity);
 		}); 

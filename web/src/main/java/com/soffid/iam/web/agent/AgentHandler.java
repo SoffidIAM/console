@@ -545,9 +545,11 @@ public class AgentHandler extends FrameHandler {
 				s.setSelectedValue((String) dn.get("code"));
 			}
 			getFellow("detall_segur").getParent().setVisible(false);
+			getFellow("shared_row").setVisible(false);
 		}
 		else 
 		{
+			getFellow("shared_row").setVisible(true);
 			getFellow("userdomain_row").setVisible(true);
 			getFellow("detall_manual").getParent().setVisible(true);
 			getFellow("detall_segur").getParent().setVisible(true);

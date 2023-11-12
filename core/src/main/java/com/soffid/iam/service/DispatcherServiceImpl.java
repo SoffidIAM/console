@@ -1613,9 +1613,12 @@ public class DispatcherServiceImpl extends
 			HashSet<String> userTypes,
 			UserDomainEntity ud, AccountDiffReport report) throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException {
 		boolean match = true;
-		match = matchGroup(u, groups);
-		match = match && matchUserType(u, userTypes);
-
+		if ("PAM".equals(dispatcher.getUsage()))
+			match = false;
+		else {
+			match = matchGroup(u, groups);
+			match = match && matchUserType(u, userTypes);
+		}
 		
 		List<AccountEntity> accounts = getAccountEntityDao().findByUserAndSystem(u.getUserName(), dispatcher.getName());
 		if (accounts.isEmpty() && u.getActive().equals("S"))

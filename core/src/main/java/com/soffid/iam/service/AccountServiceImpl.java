@@ -1263,6 +1263,25 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 }
             }
         }
+
+		for (AccountEntity account: getAccountEntityDao().query(
+				  "select account "
+				+ "from com.soffid.iam.model.AccountEntity as account "
+				+ "join account.system as system "
+				+ "join account.users as users "
+				+ "where account.disabled=:dis and system.usage=:usage and "
+				+ "users.user.id = :user", new Parameter[] {
+						new Parameter("dis", false),
+						new Parameter("usage", "PAM"),
+						new Parameter("user", ue.getId())
+				})) {
+            account.setDisabled(true);
+			account.setStatus(AccountStatus.DISABLED);
+            getAccountEntityDao().update(account);
+            audit("e", account); //$NON-NLS-1$
+            SoffidPrincipalImpl.clearCache();
+            createAccountTask(account);
+		}
 	}
 
 	@Override

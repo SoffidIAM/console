@@ -208,7 +208,7 @@
 												style="margin-right: 2em" /> 
 									</div>
 								</row>
-								<row>
+								<row id='shared_row'>
 									${c:l('agents.zul.sharedThread')}:
 									<div >
 										<switch bind="@sharedDispatcher"  disabled="${!canModifyAgent}"  onCheck="agentThreadsBox.setDisabled(self.isChecked())"/>

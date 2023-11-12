@@ -376,6 +376,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(account.getGrantedGroups() != null && !account.getGrantedGroups().isEmpty()))
 				throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
 					
+			if (! "IAM".equals(acc.getSystem().getUsage())) //$NON-NLS-1$
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.1"),  acc.getSystem().getName()) ); //$NON-NLS-1$
+
 			String owner = account.getOwnerUsers().iterator().next();
 			
 			UserEntity ue = getUserEntityDao().findByUserName(owner);
@@ -1014,8 +1017,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
-		if (account.getType().equals(AccountType.USER))
+		if (account.getType().equals(AccountType.USER)) {
+			if (! "IAM".equals(ae.getSystem().getUsage())) //$NON-NLS-1$
+				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.1"), ae.getSystem().getName()) ); //$NON-NLS-1$
 			removeAcl (ae);
+		}
 		else if (updateAcl(ae, account))
 		{
 			anyChange = true;
@@ -1265,15 +1271,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
         }
 
 		for (AccountEntity account: getAccountEntityDao().query(
-				  "select account "
-				+ "from com.soffid.iam.model.AccountEntity as account "
-				+ "join account.system as system "
-				+ "join account.users as users "
-				+ "where account.disabled=:dis and system.usage=:usage and "
-				+ "users.user.id = :user", new Parameter[] {
-						new Parameter("dis", false),
-						new Parameter("usage", "PAM"),
-						new Parameter("user", ue.getId())
+				  "select account " //$NON-NLS-1$
+				+ "from com.soffid.iam.model.AccountEntity as account " //$NON-NLS-1$
+				+ "join account.system as system " //$NON-NLS-1$
+				+ "join account.users as users " //$NON-NLS-1$
+				+ "where account.disabled=:dis and system.usage=:usage and " //$NON-NLS-1$
+				+ "users.user.id = :user", new Parameter[] { //$NON-NLS-1$
+						new Parameter("dis", false), //$NON-NLS-1$
+						new Parameter("usage", "PAM"), //$NON-NLS-1$ //$NON-NLS-2$
+						new Parameter("user", ue.getId()) //$NON-NLS-1$
 				})) {
             account.setDisabled(true);
 			account.setStatus(AccountStatus.DISABLED);

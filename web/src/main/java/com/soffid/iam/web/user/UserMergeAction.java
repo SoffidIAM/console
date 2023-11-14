@@ -45,6 +45,17 @@ public class UserMergeAction extends MergeAction {
 					EJBLocator.getIssueService().registerAction(currentIssue, "Merge user "+name+" into "+targetName);
 			}
 		}
+
+		for (int pos: srcPosition) {
+			if (pos != targetPosition) {
+				xpath = xPaths.get(pos);
+				DataNode dn = (DataNode) XPathUtils.eval(dataSource, xpath);
+				dn.delete();
+				dn.setTransient(true);
+			}
+		}
+		dataSource.commit();
+		targetNode.setDirty(false);
 		
 		if (currentIssue != null) {
 			for (int i = 0; i < names.size(); i++) {
@@ -68,16 +79,6 @@ public class UserMergeAction extends MergeAction {
 			EJBLocator.getIssueService().update(currentIssue);
 		}
 
-		for (int pos: srcPosition) {
-			if (pos != targetPosition) {
-				xpath = xPaths.get(pos);
-				DataNode dn = (DataNode) XPathUtils.eval(dataSource, xpath);
-				dn.delete();
-				dn.setTransient(true);
-			}
-		}
-		dataSource.commit();
-		targetNode.setDirty(false);
 	}
 
 	

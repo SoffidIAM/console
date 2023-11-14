@@ -3234,7 +3234,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountEntity accountEntity = getAccountEntityDao().load(account.getId());
 		if (accountEntity == null)
 			return;
-		for (UserAccountEntity uac: accountEntity.getUsers()) {
+		for (UserAccountEntity uac: new LinkedList<>(accountEntity.getUsers())) {
 			if (uac.getWorkflowId().equals(processId) &&
 					uac.getUser().getUserName().equals(user) &&
 					uac.getApproved() == null) {

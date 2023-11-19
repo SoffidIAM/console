@@ -943,21 +943,23 @@ public class VaultServiceImpl extends VaultServiceBase {
 			folder.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
 			l.add(folder);
 		}
-		UserEntity userEntity = getUserEntityDao().findByUserName(userName);
-		if (userEntity != null)
-		{
-			VaultFolderEntity folder = getVaultFolderEntityDao().newVaultFolderEntity();
-			folder.setName(Messages.getString("VaultServiceImpl.13")); //$NON-NLS-1$
-			folder.setDescription(Messages.getString("VaultServiceImpl.14")); //$NON-NLS-1$
-			folder.setPersonal(true);
-			getVaultFolderEntityDao().create(folder);
-			VaultFolderAccessEntity ace = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
-			ace.setUser( userEntity );
-			ace.setLevel(AccountAccessLevelEnum.ACCESS_OWNER);
-			ace.setVault(folder);
-			getVaultFolderAccessEntityDao().create(ace);
-			folder.getAcl().add(ace);
-			l.add(getVaultFolderEntityDao().toVaultFolder(folder));
+		if (l.isEmpty()) {
+			UserEntity userEntity = getUserEntityDao().findByUserName(userName);
+			if (userEntity != null)
+			{
+				VaultFolderEntity folder = getVaultFolderEntityDao().newVaultFolderEntity();
+				folder.setName(Messages.getString("VaultServiceImpl.13")); //$NON-NLS-1$
+				folder.setDescription(Messages.getString("VaultServiceImpl.14")); //$NON-NLS-1$
+				folder.setPersonal(true);
+				getVaultFolderEntityDao().create(folder);
+				VaultFolderAccessEntity ace = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
+				ace.setUser( userEntity );
+				ace.setLevel(AccountAccessLevelEnum.ACCESS_OWNER);
+				ace.setVault(folder);
+				getVaultFolderAccessEntityDao().create(ace);
+				folder.getAcl().add(ace);
+				l.add(getVaultFolderEntityDao().toVaultFolder(folder));
+			}
 		}
 		return l;
 	}

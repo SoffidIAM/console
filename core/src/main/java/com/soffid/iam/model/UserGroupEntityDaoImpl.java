@@ -73,7 +73,9 @@ public class UserGroupEntityDaoImpl extends com.soffid.iam.model.UserGroupEntity
     public void update(UserGroupEntity usuariGrup) {
         try {
 
-            if (usuariGrup.getGroup().getObsolete() != null && usuariGrup.getGroup().getObsolete().compareTo("S") == 0) { //$NON-NLS-1$
+            if (usuariGrup.getGroup().getObsolete() != null && 
+            		usuariGrup.getGroup().getObsolete().compareTo("S") == 0 &&
+            		usuariGrup.getEnd() == null) { //$NON-NLS-1$
                 throw new SeyconException(String.format(Messages.getString("UserGroupEntityDaoImpl.0"), usuariGrup.getGroup().getName()));
             }
             if (usuariGrup.getUser().getUserName().equals(Security.getCurrentUser())) {

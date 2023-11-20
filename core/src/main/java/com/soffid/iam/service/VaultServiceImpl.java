@@ -25,6 +25,7 @@ import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AccountAccessEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.TaskEntity;
 import com.soffid.iam.model.UserEntity;
@@ -141,10 +142,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 		VaultFolderEntity entity = getVaultFolderEntityDao().load (folder.getId());
 		folder = getVaultFolderEntityDao().toVaultFolder(entity);
 		if (!folder.getAccessLevel().equals( AccountAccessLevelEnum.ACCESS_OWNER ))
-			throw new SeyconException("Insufficient permissions");
+			throw new SeyconException(Messages.getString("VaultServiceImpl.0")); //$NON-NLS-1$
 		
 		if (!entity.getChildren().isEmpty())
-			throw new SeyconException("Cannot remove folder with accounts inside");
+			throw new SeyconException(Messages.getString("VaultServiceImpl.1")); //$NON-NLS-1$
 		
 		getVaultFolderAccessEntityDao().remove(entity.getAcl());
 		getVaultFolderEntityDao().remove(entity);
@@ -326,7 +327,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 				folder.getOwnerRoles().isEmpty() &&
 				folder.getOwnerUsers().isEmpty())
 		{
-			throw new InternalErrorException("Missing owner(s) for folder "+folder.getName());
+			throw new InternalErrorException(Messages.getString("VaultServiceImpl.2")+folder.getName()); //$NON-NLS-1$
 		}
 	}
 	
@@ -335,15 +336,15 @@ public class VaultServiceImpl extends VaultServiceBase {
 		
 		if (folder.getParentId() == null)
 		{
-			if (! Security.isUserInRole("sso:createSharedFolders"))
-				throw new SecurityException("Not authorized. Missing permission sso:craeteSharedFolders");
+			if (! Security.isUserInRole("sso:createSharedFolders")) //$NON-NLS-1$
+				throw new SecurityException(Messages.getString("VaultServiceImpl.4")); //$NON-NLS-1$
 		}
 		else
 		{
 			VaultFolderEntity parent = getVaultFolderEntityDao().load(folder.getParentId());
 			AccountAccessLevelEnum al = getVaultFolderEntityDao().toVaultFolder(parent).getAccessLevel();
 			if (! al.equals( AccountAccessLevelEnum.ACCESS_OWNER))
-				throw new SecurityException("Not authorized. Missing owner permission on parent folder");
+				throw new SecurityException(Messages.getString("VaultServiceImpl.5")); //$NON-NLS-1$
 		}
 		
 		checkAnyOnwer(folder);
@@ -368,13 +369,13 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Checks current permission
 		AccountAccessLevelEnum al = getVaultFolderEntityDao().toVaultFolder(entity).getAccessLevel();
 		if (! al.equals( AccountAccessLevelEnum.ACCESS_OWNER))
-			throw new SecurityException("Not authorized. Missing owner permission on folder");
+			throw new SecurityException(Messages.getString("VaultServiceImpl.6")); //$NON-NLS-1$
 
 		// Checks permission on new parent folder
 		if (folder.getParentId() == null && entity.getParent() != null)
 		{
-			if (! Security.isUserInRole("sso:createSharedFolders"))
-				throw new SecurityException("Not authorized. Missing permission sso:craeteSharedFolders");
+			if (! Security.isUserInRole("sso:createSharedFolders")) //$NON-NLS-1$
+				throw new SecurityException(Messages.getString("VaultServiceImpl.8")); //$NON-NLS-1$
 		}
 		if (folder.getParentId() != null && 
 				(entity.getParent() == null || !entity.getParent().getId().equals(folder.getParentId())))
@@ -382,7 +383,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 			VaultFolderEntity parent = getVaultFolderEntityDao().load(folder.getParentId());
 			al = getVaultFolderEntityDao().toVaultFolder(parent).getAccessLevel();
 			if (! al.equals( AccountAccessLevelEnum.ACCESS_OWNER))
-				throw new SecurityException("Not authorized. Missing owner permission on parent folder");
+				throw new SecurityException(Messages.getString("VaultServiceImpl.9")); //$NON-NLS-1$
 		}
 
 		
@@ -406,43 +407,11 @@ public class VaultServiceImpl extends VaultServiceBase {
 			if (user != null)
 				userName = user.getUserName();
 		}
-		if (userName != null)
-			list.addAll( getVaultFolderEntityDao().findPersonalFolders(Security.getCurrentUser()) );
 		
 		List<VaultFolder> folders = getVaultFolderEntityDao().toVaultFolderList(list);
 		filterFolders(folders);
-		
-		// Ensure there is a personal folder
-		boolean personal = false;
-		for (VaultFolder folder: folders)
-		{
-			if (folder.isPersonal())
-			{
-				personal = true;
-				break;
-			}
-		}
-		if (! personal)
-		{
-			if (userName  != null)
-			{
-				UserEntity userEntity = getUserEntityDao().findByUserName(userName);
-				if (userEntity != null)
-				{
-					VaultFolderEntity folder = getVaultFolderEntityDao().newVaultFolderEntity();
-					folder.setName("Personal accounts");
-					folder.setDescription("Accounts that won't be shared");
-					folder.setPersonal(true);
-					getVaultFolderEntityDao().create(folder);
-					VaultFolderAccessEntity ace = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
-					ace.setUser( userEntity );
-					ace.setLevel(AccountAccessLevelEnum.ACCESS_OWNER);
-					ace.setVault(folder);
-					getVaultFolderAccessEntityDao().create(ace);
-					folder.getAcl().add(ace);
-					folders.add( getVaultFolderEntityDao().toVaultFolder(folder));
-				}
-			}
+		if (userName != null) {
+			folders.addAll(getPersonalFolders(userName));
 		}
 		
 		Collections.sort(folders, new Comparator<VaultFolder>() {
@@ -557,7 +526,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 						for (Iterator<String> it = newroles[index].iterator(); !found && it.hasNext();)
 						{
 							String r = it.next();
-							if (r.equals (access.getRole().getName()+"@"+access.getRole().getSystem().getName()))
+							if (r.equals (access.getRole().getName()+"@"+access.getRole().getSystem().getName())) //$NON-NLS-1$
 							{
 								it.remove();
 								found = true;
@@ -734,7 +703,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Checks current permission
 		AccountAccessLevelEnum al = getVaultFolderEntityDao().toVaultFolder(entity).getAccessLevel();
 		if (! al.equals( AccountAccessLevelEnum.ACCESS_OWNER))
-			throw new SecurityException("Not authorized. Missing owner permission on folder");
+			throw new SecurityException(Messages.getString("VaultServiceImpl.11")); //$NON-NLS-1$
 
 		VaultFolderPermissions p = new VaultFolderPermissions();
 		Vector<Object> grantee = new Vector<Object>();
@@ -855,7 +824,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		// Checks current permission
 		AccountAccessLevelEnum al = getVaultFolderEntityDao().toVaultFolder(entity).getAccessLevel();
 		if (! al.equals( AccountAccessLevelEnum.ACCESS_OWNER))
-			throw new SecurityException("Not authorized. Missing owner permission on folder");
+			throw new SecurityException(Messages.getString("VaultServiceImpl.12")); //$NON-NLS-1$
 		
 		
 		for ( VaultFolderAccountPermissions ap: permissions.getAccounts())
@@ -953,12 +922,46 @@ public class VaultServiceImpl extends VaultServiceBase {
 
 	@Override
 	protected VaultFolder handleGetPersonalFolder() throws Exception {
-		for (VaultFolder folder: handleGetRootFolders())
-		{
-			if (folder.isPersonal())
-				return folder;
+		String userName = Security.getCurrentUser();
+		if (userName == null) {
+			User user = getUserService().getCurrentUser();
+			if (user != null)
+				userName = user.getUserName();
+		}
+		if (userName != null) {
+			List<VaultFolder> l = getPersonalFolders(userName);
+			if (!l.isEmpty())
+				return l.iterator().next();
 		}
 		return null;
+	}
+
+	protected List<VaultFolder> getPersonalFolders(String userName) {
+		List<VaultFolder> l = new LinkedList<>();
+		for (VaultFolderEntity entity: getVaultFolderEntityDao().findPersonalFolders( Security.getCurrentUser())) {
+			VaultFolder folder = getVaultFolderEntityDao().toVaultFolder(entity);
+			folder.setAccessLevel(AccountAccessLevelEnum.ACCESS_OWNER);
+			l.add(folder);
+		}
+		if (l.isEmpty()) {
+			UserEntity userEntity = getUserEntityDao().findByUserName(userName);
+			if (userEntity != null)
+			{
+				VaultFolderEntity folder = getVaultFolderEntityDao().newVaultFolderEntity();
+				folder.setName(Messages.getString("VaultServiceImpl.13")); //$NON-NLS-1$
+				folder.setDescription(Messages.getString("VaultServiceImpl.14")); //$NON-NLS-1$
+				folder.setPersonal(true);
+				getVaultFolderEntityDao().create(folder);
+				VaultFolderAccessEntity ace = getVaultFolderAccessEntityDao().newVaultFolderAccessEntity();
+				ace.setUser( userEntity );
+				ace.setLevel(AccountAccessLevelEnum.ACCESS_OWNER);
+				ace.setVault(folder);
+				getVaultFolderAccessEntityDao().create(ace);
+				folder.getAcl().add(ace);
+				l.add(getVaultFolderEntityDao().toVaultFolder(folder));
+			}
+		}
+		return l;
 	}
 
 	@Override
@@ -972,7 +975,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		else
 		{
 			LinkedList<VaultFolder> list = new LinkedList<VaultFolder>();
-			for (VaultFolderEntity entity: getVaultFolderEntityDao().findByName("%"+filter.replace('*', '%')+"%"))
+			for (VaultFolderEntity entity: getVaultFolderEntityDao().findByName("%"+filter.replace('*', '%')+"%")) //$NON-NLS-1$ //$NON-NLS-2$
 			{
 				VaultFolder folder = getVaultFolderEntityDao().toVaultFolder(entity);
 				if (! folder.getAccessLevel().equals(AccountAccessLevelEnum.ACCESS_NONE))
@@ -1062,12 +1065,12 @@ public class VaultServiceImpl extends VaultServiceBase {
 			List<VaultFolder> result) throws Exception {
 		final VaultFolderEntityDao dao = getVaultFolderEntityDao();
 		ScimHelper h = new ScimHelper(VaultFolder.class);
-		h.setPrimaryAttributes(new String[] { "name", "description"});
+		h.setPrimaryAttributes(new String[] { "name", "description"}); //$NON-NLS-1$ //$NON-NLS-2$
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
-		h.setTenantFilter("tenant.id");
+		h.setTenantFilter("tenant.id"); //$NON-NLS-1$
 
 		h.setGenerator((entity) -> {
 			VaultFolder folder =  dao.toVaultFolder((VaultFolderEntity) entity);
@@ -1097,7 +1100,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		LinkedList<VaultElement> l = new LinkedList<>();
 		for (VaultFolder v: handleFindFolders(filter)) {
 			VaultElement ve = new VaultElement();
-			ve.setType("folder");
+			ve.setType("folder"); //$NON-NLS-1$
 			ve.setFolder(v);
 			ve.setId(v.getId());
 			ve.setParentId(v.getParentId());
@@ -1107,7 +1110,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		{
 			for (Account a: handleFindAccounts(filter)) {
 				VaultElement ve = new VaultElement();
-				ve.setType("account");
+				ve.setType("account"); //$NON-NLS-1$
 				ve.setAccount(a);
 				ve.setId(a.getId());
 				ve.setParentId(a.getVaultFolderId());
@@ -1119,19 +1122,19 @@ public class VaultServiceImpl extends VaultServiceBase {
 
 	@Override
 	protected VaultElement handleCreate(VaultElement folder) throws Exception {
-		if ("account".equals(folder.getType())) {
+		if ("account".equals(folder.getType())) { //$NON-NLS-1$
 			String ssoSystem = com.soffid.iam.utils.ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
 			String permission = folder.getAccount().getSystem().equals(ssoSystem) ?
-					"sso:manageAccounts" : "account:create";
+					"sso:manageAccounts" : "account:create"; //$NON-NLS-1$ //$NON-NLS-2$
 			if (! Security.isUserInRole(permission))
-				throw new SecurityException("Not authorized");
+				throw new SecurityException("Not authorized"); //$NON-NLS-1$
 			folder.setAccount( getAccountService().createAccount2(folder.getAccount()) );
 			folder.setId(folder.getAccount().getId());
 			folder.setParentId(folder.getAccount().getVaultFolderId());
 		}
-		if ("folder".equals(folder.getType())) {
-			if (! Security.isUserInRole("sso:manageAccounts"))
-				throw new SecurityException("Not authorized");
+		if ("folder".equals(folder.getType())) { //$NON-NLS-1$
+			if (! Security.isUserInRole("sso:manageAccounts")) //$NON-NLS-1$
+				throw new SecurityException("Not authorized"); //$NON-NLS-1$
 			folder.setFolder( handleCreate(folder.getFolder()) );
 			folder.setId(folder.getFolder().getId());
 			folder.setParentId(folder.getFolder().getParentId());
@@ -1141,17 +1144,17 @@ public class VaultServiceImpl extends VaultServiceBase {
 
 	@Override
 	protected VaultElement handleUpdate(VaultElement folder) throws Exception {
-		if ("account".equals(folder.getType())) {
+		if ("account".equals(folder.getType())) { //$NON-NLS-1$
 			Account acc = getAccountService().findAccountById(folder.getAccount().getId());
 			if (acc == null || acc.getAccessLevel() != AccountAccessLevelEnum.ACCESS_OWNER)
-				throw new SecurityException("Not authorized to modify this account");
+				throw new SecurityException(Messages.getString("VaultServiceImpl.30")); //$NON-NLS-1$
 			folder.setAccount( getAccountService().updateAccount2(folder.getAccount()) );
 			folder.setParentId(folder.getAccount().getVaultFolderId());
 		}
-		if ("folder".equals(folder.getType())) {
+		if ("folder".equals(folder.getType())) { //$NON-NLS-1$
 			VaultFolder f = handleFindFolder(folder.getFolder().getId());
 			if (f == null || f.getAccessLevel() != AccountAccessLevelEnum.ACCESS_OWNER)
-				throw new SecurityException("Not authorized to modify this vault folder");
+				throw new SecurityException(Messages.getString("VaultServiceImpl.32")); //$NON-NLS-1$
 			folder.setFolder( handleUpdate(folder.getFolder()) );
 			folder.setParentId(folder.getFolder().getParentId());
 		}
@@ -1160,10 +1163,10 @@ public class VaultServiceImpl extends VaultServiceBase {
 
 	@Override
 	protected void handleRemove(VaultElement folder) throws Exception {
-		if ("account".equals(folder.getType())) {
+		if ("account".equals(folder.getType())) { //$NON-NLS-1$
 			getAccountService().removeAccount(folder.getAccount());
 		}
-		if ("folder".equals(folder.getType())) {
+		if ("folder".equals(folder.getType())) { //$NON-NLS-1$
 			handleRemove(folder.getFolder());
 		}
 	}
@@ -1177,14 +1180,14 @@ public class VaultServiceImpl extends VaultServiceBase {
 			if (a == null)
 				return null;
 			VaultElement ve = new VaultElement();
-			ve.setType("account");
+			ve.setType("account"); //$NON-NLS-1$
 			ve.setAccount(a);
 			ve.setId(a.getId());
 			ve.setParentId(a.getVaultFolderId());
 			return ve;
 		} else {
 			VaultElement ve = new VaultElement();
-			ve.setType("folder");
+			ve.setType("folder"); //$NON-NLS-1$
 			ve.setFolder(v);
 			ve.setId(v.getId());
 			ve.setParentId(v.getParentId());
@@ -1195,11 +1198,11 @@ public class VaultServiceImpl extends VaultServiceBase {
 	@Override
 	protected List<VaultElement> handleGetChildren(VaultElement parent) throws Exception {
 		LinkedList<VaultElement> l = new LinkedList<>();
-		if (! parent.getType().equals("folder"))
+		if (! parent.getType().equals("folder")) //$NON-NLS-1$
 			return l;
 		for (VaultFolder v: handleGetChildren(parent.getFolder())) {
 			VaultElement ve = new VaultElement();
-			ve.setType("folder");
+			ve.setType("folder"); //$NON-NLS-1$
 			ve.setFolder(v);
 			ve.setId(v.getId());
 			ve.setParentId(v.getParentId());
@@ -1207,7 +1210,7 @@ public class VaultServiceImpl extends VaultServiceBase {
 		}
 		for (Account a: handleList(parent.getFolder())) {
 			VaultElement ve = new VaultElement();
-			ve.setType("account");
+			ve.setType("account"); //$NON-NLS-1$
 			ve.setAccount(a);
 			ve.setId(a.getId());
 			ve.setParentId(a.getVaultFolderId());

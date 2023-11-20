@@ -196,12 +196,12 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		if ( userId != null && 
 				clearCacheTimestamp < System.currentTimeMillis() &&
 				(timestamp < clearCacheTimestamp ||
-						timestamp < System.currentTimeMillis() - 10 * 60 * 60 * 1000L)) { // 10 minutes cache
+						timestamp < System.currentTimeMillis() - 10 * 60 * 1000L)) { // 10 minutes cache
 			executor.execute( () -> {
 				if (clearCacheTimestamp > System.currentTimeMillis()) // Give time to finish transaction
 					return ;
 				if (timestamp >= clearCacheTimestamp && 
-					timestamp > System.currentTimeMillis() - 10 * 60 * 60 * 1000L)
+					timestamp > System.currentTimeMillis() - 10 * 60 * 1000L)
 					return; // Already processed and not needed
 				timestamp = System.currentTimeMillis();
 				User user = null;

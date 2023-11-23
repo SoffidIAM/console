@@ -158,6 +158,17 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 			getSession().createQuery("delete from com.soffid.iam.model.TaskLogEntity where system.id=:system")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.IssueUserEntity where issue.id in "
+					+ "(select id from com.soffid.iam.model.IssueEntity where system.id=:system)")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.IssueHostEntity where issue.id in "
+					+ "(select id from com.soffid.iam.model.IssueEntity where system.id=:system)")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.IssueEntity where system.id=:system")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
 			
 			for ( EntryPointEntity ep: dispatcherEntity.getEntryPoints())
 			{

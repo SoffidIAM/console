@@ -212,6 +212,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				AccountStatus.REMOVED.equals ( acc.getStatus()) )
 
 			{
+				if (AccountStatus.REMOVED.equals(acc.getStatus())) {
+					getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-purged", 
+							acc.getName(), acc.getSystem().getName(), new String[] {});
+				}
 				acc.setType(AccountType.USER);
 	    		acc.setDescription(ue.getFullName());
 	    		acc.setPasswordPolicy(ue.getUserType());
@@ -880,20 +884,32 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		else if ( ! AccountStatus.REMOVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.REMOVED))
 		{
 			audit("D", ae); //$NON-NLS-1$
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-purged", 
+					account.getName(), account.getSystem(), new String[] {});
 		}
 		else if ( ! AccountStatus.ARCHIVED.equals(ae.getStatus()) && account.getStatus().equals(AccountStatus.ARCHIVED))
 		{
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-disabled", 
+					account.getName(), account.getSystem(), new String[] {});
 			audit("I", ae); //$NON-NLS-1$
 		}
 		else if ((! ae.isDisabled() || AccountStatus.ARCHIVED == ae.getStatus()) && account.isDisabled())
 		{
 			anyChange = true;
 			audit("e", ae); //$NON-NLS-1$
+			if (account.getStatus() == AccountStatus.LOCKED)
+				getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/credential-compromise", 
+						account.getName(), account.getSystem(), new String[] {});
+			else
+				getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-disabled", 
+					account.getName(), account.getSystem(), new String[] {});
 		}
 		else if (ae.isDisabled() && !account.isDisabled())
 		{
 			audit("E", ae); //$NON-NLS-1$
 			anyChange = true;
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-enabled", 
+					account.getName(), account.getSystem(), new String[] {});
 		}
 		if (! account.getType().equals( ae.getType() ) )
 		{
@@ -982,6 +998,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.ACCOUNT_TYPE, 
 					ae.getName()+"@"+ae.getSystem().getName(),  //$NON-NLS-1$
 					account.getName()+"@"+account.getSystem()); //$NON-NLS-1$
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/identifier-changed", 
+					account.getName(), account.getSystem(), new String[] {});
 		}
 		if ( (ae.getDescription() == null ? account.getDescription() != null: ! ae.getDescription().equals( account.getDescription())) ||
 				(ae.getStatus() == null ? account.getStatus() != null : !ae.getStatus().equals(account.getStatus())) ||
@@ -1075,6 +1093,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 
 		getAccountEntityDao().remove(ae);
+		
+		getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-purged", 
+				account.getName(), account.getSystem(), new String[] {});
 	}
 
 	private void createAccountTask(AccountEntity ae)
@@ -1316,6 +1337,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		AccountEntity oldAccount = dao.findByNameAndSystem(account.getName(), accountEntity.getSystem().getName());
 		if (oldAccount == null)
 		{
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/identifier-changed", 
+					account.getName(), account.getSystem(), new String[] {});
 			if (accountEntity.getOldName() == null)
 				accountEntity.setOldName(accountEntity.getName());
 			accountEntity.setName(account.getName());

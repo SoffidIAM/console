@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.model.TenantEntity;
 import com.soffid.iam.service.IssueService;
+import com.soffid.iam.service.SignalService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -39,8 +40,8 @@ import es.caib.seycon.ng.sync.servei.TaskGenerator;
 	es.caib.seycon.ng.model.AccountEntity.class,
 	TenantEntity.class,
 	SeyconServerService.class,
-	IssueService.class})
-
+	IssueService.class,
+	SignalService.class})
 public abstract class InternalPasswordService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

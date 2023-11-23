@@ -27,6 +27,7 @@ import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.MailService;
 import com.soffid.iam.service.PamSecurityHandlerService;
+import com.soffid.iam.service.SignalService;
 import com.soffid.iam.service.VaultService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
@@ -85,7 +86,8 @@ import roles.account_query;
 	AccountSnapshotEntity.class,
 	MailService.class,
 	IssueService.class,
-	IssueEntity.class})
+	IssueEntity.class,
+	SignalService.class})
 public abstract class AccountService {
 
 	/// listUserAccounts

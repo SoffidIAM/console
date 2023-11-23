@@ -25,6 +25,7 @@ import com.soffid.iam.model.VaultFolderEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.MailService;
+import com.soffid.iam.service.SignalService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -92,7 +93,8 @@ import es.caib.seycon.ng.model.UserAccountEntity;
 	MailService.class,
 	IssueService.class,
 	IssueEntity.class,
-	IssueUserEntity.class})
+	IssueUserEntity.class,
+	SignalService.class})
 public abstract class UsuariService {
 
 	@Operation(translated = "createUser")

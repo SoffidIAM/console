@@ -380,6 +380,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				getAccountEntityDao().update(acc, null);
 			}
 		}
+		if (mustChange)
+			getSignalService().signalUser("https://schemas.openid.net/secevent/risc/event-type/account-credential-change-required",
+				usuari.getUserName(), new String[] {});
+		else
+			getSignalService().signalUser("https://schemas.openid.net/secevent/caep/event-type/credential-change",
+					usuari.getUserName(), new String[] {"credentialType", "password"});
 	}
 
 	/**
@@ -1472,6 +1478,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			account.setPasswordExpiration(c.getTime());
 			getAccountEntityDao().update(account, "p");
 		}
+		if (mustChange)
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/account-credential-change-required",
+				account.getName(),
+				account.getSystem().getName(), 
+				new String[] {});
+		else
+			getSignalService().signalAccount("https://schemas.openid.net/secevent/caep/event-type/credential-change",
+					account.getName(), account.getSystem().getName(), new String[] {"credentialType", "password"});
 	}
 
 	@Override

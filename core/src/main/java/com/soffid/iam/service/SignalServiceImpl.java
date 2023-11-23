@@ -11,4 +11,7 @@ public class SignalServiceImpl extends SignalServiceBase {
 	protected void handleSignalUser(String signal, String user, String[] attributes) throws Exception {
 	}
 
+	@Override
+	protected void handleSignal(String signal, String[] attributes) throws Exception {
+	}
 }

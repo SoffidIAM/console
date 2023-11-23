@@ -13,6 +13,7 @@
  */
 package com.soffid.iam.model;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.lang.MessageFactory;
@@ -103,20 +104,54 @@ public class AuditEntityDaoImpl extends
 			super.create(auditoria);
 			getSession(false).flush();
 			
-			String syslogServer = ConfigurationCache.getProperty ("soffid.syslog.server");
-			if (syslogServer != null && syslogServer.trim().length() > 0)
-			{
-				try {
-					Audit audobj = toAudit(auditoria);
+			try {
+				Audit audobj = toAudit(auditoria);
+				String syslogServer = ConfigurationCache.getProperty ("soffid.syslog.server");
+				if (syslogServer != null && syslogServer.trim().length() > 0)
+				{
 	
 					InetAddress addr = InetAddress.getByName(syslogServer);
 					
 					sendSysLog (addr, audobj);
-				} catch (Throwable t) {
-					log.warn("Unable to send syslog information", t);
 				}
+				
+				
+				if (auditoria.getAccount() != null) {
+					ServiceLocator.instance().getSignalService().signalAccount("https://schemas.soffid.com/secevent/risc/event-type/audit",
+							auditoria.getAccount(), auditoria.getDb(),
+							new String[] {
+								"action", audobj.getObject()+"/"+audobj.getAction(),
+								"message", audobj.getMessage(),
+								"role", audobj.getRole(),
+								"author", audobj.getAuthor(),
+								"sourceip", audobj.getSourceIp()
+							});
+				}
+				else if (auditoria.getUser() != null) {
+					ServiceLocator.instance().getSignalService().signalUser("https://schemas.soffid.com/secevent/risc/event-type/audit",
+							auditoria.getUser(),
+							new String[] {
+									"action", audobj.getObject()+"/"+audobj.getAction(),
+									"message", audobj.getMessage(),
+									"role", audobj.getRole(),
+									"author", audobj.getAuthor(),
+									"sourceIp", audobj.getSourceIp()
+								});
+				}
+				else
+				{
+					ServiceLocator.instance().getSignalService().signal("https://schemas.soffid.com/secevent/risc/event-type/audit",
+							new String[] {
+									"action", audobj.getObject()+"/"+audobj.getAction(),
+									"message", audobj.getMessage(),
+									"role", audobj.getRole(),
+									"author", audobj.getAuthor(),
+									"sourceIp", audobj.getSourceIp()
+								});
+				}
+			} catch (Throwable t) {
+				log.warn("Unable to send syslog information", t);
 			}
-			
 			
 			
 		} catch (Throwable e) {

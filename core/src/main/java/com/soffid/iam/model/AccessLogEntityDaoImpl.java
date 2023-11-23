@@ -9,6 +9,7 @@
  */
 package com.soffid.iam.model;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.UserEntity;
@@ -32,7 +33,15 @@ public class AccessLogEntityDaoImpl extends
     public void create(com.soffid.iam.model.AccessLogEntity registreAcces) throws RuntimeException {
         try {
             super.create(registreAcces);
-            getSession(false).flush();
+			ServiceLocator.instance().getSignalService().signalUser("https://schemas.soffid.com/secevent/risc/event-type/log",
+					registreAcces.getUser().getUserName(),
+					new String[] {
+							"action", registreAcces.getAccessType().equals("L") ? "login": "login-failed",
+							"sourceIp", registreAcces.getClientAddress() == null ?
+									registreAcces.getHostAddress() :
+									registreAcces.getClientAddress(),
+							"date", Long.toString( registreAcces.getEndDate().getTime() )
+						});
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message), e);
@@ -326,5 +335,26 @@ public class AccessLogEntityDaoImpl extends
         }
 
     }
+
+	@Override
+	public void update(AccessLogEntity registreAcces) {
+        try {
+            super.update(registreAcces);
+            if (registreAcces.getEndDate() != null) {
+				ServiceLocator.instance().getSignalService().signalUser("https://schemas.soffid.com/secevent/risc/event-type/log",
+						registreAcces.getUser().getUserName(),
+						new String[] {
+								"action", "logout",
+								"sourceIp", registreAcces.getClientAddress() == null ?
+										registreAcces.getHostAddress() :
+										registreAcces.getClientAddress(),
+								"date", Long.toString( registreAcces.getEndDate().getTime() )
+							});
+            }
+        } catch (Throwable e) {
+            String message = ExceptionTranslator.translate(e);
+			throw new SeyconException(String.format(Messages.getString("AccessLogEntityDaoImpl.errorCreating"), registreAcces.getSessionId(), message), e);
+        }
+	}
 
 }

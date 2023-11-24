@@ -332,7 +332,7 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 		s.setSharedDispatcher(true);
 		s.setTrusted(false);
 		if ("AD".equalsIgnoreCase(agentType)) {
-			s.setClassName("com.soffid.iam.sync.agent2.CustomizableActiveDirectoryAgent_v2");
+			s.setClassName("com.soffid.iam.sync.agent2.CustomizableActiveDirectoryAgent");
 			s.setSharedDispatcher(false);
 			s.setParam0(host.getName());
 			s.setParam1(host.getName());

@@ -26,7 +26,9 @@ public class IssueTextFormatter {
 			processed = j + 1;
 			try {
 				if (variable.equals("url")) {
-					String externalURL = ConfigurationCache.getProperty("soffid.externalURL");
+					String externalURL = System.getProperty("soffid.externalURL");
+					if (externalURL == null)
+						externalURL = ConfigurationCache.getProperty("soffid.externalURL");
 					if (externalURL == null)
 						externalURL = ConfigurationCache.getProperty("AutoSSOURL");
 					if (externalURL == null)

@@ -90,6 +90,10 @@ function configure {
 		if [[ "$AUTH_METHODS" != "" ]] 
 		then
 			echo "soffid.auth.methods=$AUTH_METHODS"
+		fi 
+		if [[ "$EXTERNAL_URL" != "" ]] 
+		then
+			echo "soffid.externalURL=$EXTERNAL_URL"
 		fi
 	) > /opt/soffid/iam-console-3/conf/system.properties		
 

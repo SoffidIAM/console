@@ -67,7 +67,9 @@ public class AuthenticationHandler extends FrameHandler {
 	public void downloadMetadata() throws InternalErrorException, NamingException, CreateException
 	{
 		HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
-		String hostName = ConfigurationCache.getProperty("soffid.externalURL");
+		String hostName = System.getProperty("soffid.externalURL");
+		if (hostName != null)
+			hostName = ConfigurationCache.getProperty("soffid.externalURL");
 		if (hostName == null) hostName = req.getHeader("Host");
 		String md = com.soffid.iam.EJBLocator.getSamlService().generateMetadata(hostName);
 		Filedownload.save (md, "text/plain", "soffid-metadata.xml");

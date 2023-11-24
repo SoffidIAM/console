@@ -153,7 +153,9 @@ public class Iga01Handler extends Window {
 		newToken = ServiceLocator.instance().getDispatcherService().preRegisterServer(srt);
 
 
-		String url = ConfigurationCache.getProperty("soffid.externalURL");
+		String url = System.getProperty("soffid.externalURL");
+		if (url == null)
+			url = ConfigurationCache.getProperty("soffid.externalURL");
 		if (url == null)
 			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null) {

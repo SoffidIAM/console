@@ -339,7 +339,9 @@ public class Mail implements ActionHandler {
 				.getUsedVariableResolver();
 		if (variableResolver != null) {
 			Properties prop = new Properties();
-			String externalURL = ConfigurationCache.getProperty("soffid.externalURL");
+			String externalURL = System.getProperty("soffid.externalURL");
+			if (externalURL == null)
+				externalURL = ConfigurationCache.getProperty("soffid.externalURL");
 			if (externalURL == null)
 				externalURL = ConfigurationCache.getProperty("AutoSSOURL");
 			if (externalURL == null)

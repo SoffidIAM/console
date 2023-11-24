@@ -723,7 +723,9 @@ public class SAMLServiceInternal {
 
 	private String getBaseURL(String hostName) throws InternalErrorException 
 	{
-		String url = ConfigurationCache.getTenantProperty(com.soffid.iam.utils.Security.getCurrentTenantName(), "soffid.externalURL");
+		String url = System.getProperty("soffid.externalURL");
+		if (url == null)
+			url = ConfigurationCache.getTenantProperty(com.soffid.iam.utils.Security.getCurrentTenantName(), "soffid.externalURL");
 		if (url == null)
 			url = ConfigurationCache.getProperty("AutoSSOURL");
 		if (url == null)

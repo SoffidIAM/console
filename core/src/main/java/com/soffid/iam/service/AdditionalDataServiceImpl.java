@@ -165,6 +165,11 @@ public class AdditionalDataServiceImpl extends
 
 		if (tipusDada.getSystemName() != null && tipusDada.getSystemName().trim().length() > 0)
 		{
+			SystemEntity system = getSystemEntityDao().findByName(tipusDada.getSystemName());
+			if (system == null) {
+				// Hack for network discovery, where a phantom system is created for testing purposes
+				return tipusDada;
+			}
 			validateUniqueOrderForAccountMetadata(tipusDada);
 			AccountMetadataEntity tipusDadaMateixCodi = getAccountMetadataEntityDao().findByName(tipusDada.getSystemName(), tipusDada.getCode());
 			if(tipusDadaMateixCodi != null) {

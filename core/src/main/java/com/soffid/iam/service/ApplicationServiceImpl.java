@@ -4103,6 +4103,8 @@ public class ApplicationServiceImpl extends
 			if (rad.parent == null) {
 				rgl.add(rad.hierarchy);
 			} else {
+				if (rad.parent.hierarchy == null)
+					rad.parent.hierarchy = new RoleGrantHierarchy();
 				rad.parent.hierarchy.getNested().add(rad.hierarchy);
 			}
 		}

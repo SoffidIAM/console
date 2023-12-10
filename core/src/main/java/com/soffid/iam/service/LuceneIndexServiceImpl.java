@@ -20,10 +20,12 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Collector;
@@ -51,6 +53,14 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 		INDEXED_STRING.setTokenized(true);
 		INDEXED_STRING.freeze();
 	}
+	public static final FieldType FULL_TEXT_INDEXED_STRING = new FieldType();
+	static {
+		FULL_TEXT_INDEXED_STRING.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
+		FULL_TEXT_INDEXED_STRING.setOmitNorms(false);
+		FULL_TEXT_INDEXED_STRING.setStored(true);
+		FULL_TEXT_INDEXED_STRING.setTokenized(true);
+		FULL_TEXT_INDEXED_STRING.freeze();
+	}
 	
     Hashtable<String, LuceneIndexStatus> status = new Hashtable<>();
 	DateFormat dfDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -71,6 +81,13 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 			try { 
 				// Delete pre-existing document
 				w.deleteDocuments(new Term ("_id", doc.get("_id"))); //$NON-NLS-1$ //$NON-NLS-2$
+				if (!s.isUseFullContentPositions()) {
+					IndexableField contents = doc.getField("$contents");
+					if (contents != null) {
+						doc.removeField(contents.name());
+						doc.add(new Field(contents.name(), contents.stringValue(), INDEXED_STRING ));
+					}
+				}
 				w.addDocument(doc);
 				s.setDirty();
 			} finally {
@@ -132,7 +149,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 			}
 		}
 		log.info("Indexing "+contents.toString());
-		doc.add(new Field("$contents", contents.toString(), INDEXED_STRING));
+		doc.add(new Field("$contents", contents.toString(), FULL_TEXT_INDEXED_STRING));
 		return doc;
 	}
 
@@ -193,7 +210,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 								try {
 									s.saveIfNeeded();
 								} catch (Error e) {
-									log.warn("Error indexing data ", e);
+									log.warn("Error saving index ", e);
 									exit = true;
 								}
 								return null;

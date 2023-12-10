@@ -97,21 +97,26 @@ public abstract class Usuari {
 	public java.lang.String comentari;
 	
 	@Nullable
-	@Attribute(translated = "createdByUser", synonyms = {"createdBy"}, readonly = true, type = "USER" , separator="_audit")
+	@Attribute(translated = "createdByUser", synonyms = {"createdBy"}, readonly = true, type = "USER" , separator="_audit", entityAttribute = "creationUser")
+	@JsonAttribute(hibernateAttribute = "creationUser")
 	public java.lang.String usuariCreacio;
 	
 	@Nullable
 	@Attribute(translated = "createdDate", readonly = true,
-	synonyms = {"createdOn"},
-	type = "DATE_TIME")
+		synonyms = {"createdOn"},
+		entityAttribute="creationDate",
+		type = "DATE_TIME")
+	@JsonAttribute(hibernateAttribute = "creationDate")
 	public java.util.Calendar dataCreacioUsuari;
 
 	@Nullable
-	@Attribute(translated = "modifiedByUser", synonyms= {"modifiedBy"}, type="USER", readonly=true )
+	@Attribute(translated = "modifiedByUser", synonyms= {"modifiedBy"}, type="USER", readonly=true, entityAttribute = "lastUserModification" )
+	@JsonAttribute(hibernateAttribute = "lastUserModification")
 	public java.lang.String usuariDarreraModificacio;
 
 	@Nullable
 	@Attribute(translated = "modifiedDate", entityAttribute = "lastModificationDate", synonyms= {"modifiedOn"}, type="DATE_TIME", readonly = true )
+	@JsonAttribute(hibernateAttribute = "lastModificationDate")
 	public java.util.Calendar dataDarreraModificacioUsuari;
 
 

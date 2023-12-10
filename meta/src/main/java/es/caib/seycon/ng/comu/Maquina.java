@@ -31,6 +31,7 @@ public class Maquina {
 	
 	@Nullable
 	@Attribute(translated = "networkCode", type = "NETWORK" )
+	@JsonAttribute(hibernateAttribute = "network.name")
 	public java.lang.String codiXarxa;
 	
 	@Nullable

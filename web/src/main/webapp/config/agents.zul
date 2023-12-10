@@ -720,16 +720,19 @@
 									<label value="${c:l('controlAcces.zul.type')}"/>
 									<radiogroup id="type" style="margin-left: 60px; width: calc (100% - 60px); display: block">
 										<div sclass="radiooption">
-											<radio id="r_user" label="${c:l('controlAcces.zul.Usuari')}" onCheck="ref:accessControl.activaRadio())"/>	
+											<radio id="r_user" label="${c:l('controlAcces.zul.Usuari')}" onCheck="ref:accessControl.activaRadio())"  sclass="inlineCheck"/>	
 											<div  style="width: calc(100% - 230px); display: inline-block">
 												<customfield3 dataType="USER" noLabel="true" id="user" required="true"/>			
 											</div>
 										</div>
 										<div sclass="radiooption">
-											<radio id="r_role"  label="${c:l('controlAcces.zul.Rol')}" onCheck="ref:accessControl.activaRadio()"/>
+											<radio id="r_role"  label="${c:l('controlAcces.zul.Rol')}" onCheck="ref:accessControl.activaRadio()" sclass="inlineCheck"/>
 											<div  style="width: calc(100% - 230px); display: inline-block">
 												<customfield3 dataType="ROLE" noLabel="true" id="role" required="true"/>			
 											</div>	
+										</div>
+										<div sclass="anyUserOption">
+											<radio id="r_any" label="${c:l('controlAcces.zul.Any')}" onCheck="ref:accessControl.activaRadio())"  sclass="inlineCheck"/>	
 										</div>
 									</radiogroup>
 									<customfield3 dataType="STRING" label="${c:l('controlAcces.zul.Maquines')}" id="host" required="true"/>

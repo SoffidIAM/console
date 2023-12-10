@@ -4212,3 +4212,16 @@ div.merge div.databox select,
 div.merge div.databox input {
 	cursor: pointer;
 }
+
+span.inlineCheck {
+	display: inline;
+	vertical-align: bottom;
+}
+span.inlineCheck input {
+	height: 15px;
+	margin-bottom: 12px;	
+}
+span.inlineCheck label {
+	display: inline;
+	
+}

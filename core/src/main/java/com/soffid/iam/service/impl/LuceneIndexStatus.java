@@ -10,8 +10,17 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.FieldInfo;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
+import org.hibernate.Hibernate;
+import org.hibernate.UnresolvableObjectException;
 
 import com.soffid.iam.config.Config;
 import com.soffid.iam.model.LuceneIndexEntity;
@@ -30,6 +39,7 @@ public class LuceneIndexStatus {
 	private LuceneIndexPartEntityDao luceneIndexPartEntityDao;
 	private boolean dirty;
 	private boolean indexOwner;
+	boolean useFullContentPositions;
 	
 	public LuceneIndexStatus(LuceneIndexEntityDao luceneIndexEntityDao,
 			LuceneIndexPartEntityDao luceneIndexPartEntityDao,
@@ -50,8 +60,27 @@ public class LuceneIndexStatus {
 		if (directory == null) {
 			fetchFromDatabase();
 			directory = new NIOFSDirectory(getIndexDir().toPath());
+			searchContentsField();
 		}
 		return directory;
+	}
+	
+	private void searchContentsField() {
+		useFullContentPositions = true;
+		IndexReader reader;
+		try {
+			reader = DirectoryReader.open(directory);
+			IndexSearcher indexer = new IndexSearcher(reader);
+			for (LeafReaderContext leaf: indexer.getLeafContexts()) {
+				for (FieldInfo fi: leaf.reader().getFieldInfos()) {
+					if (fi.getName().equals("$contents")) {
+						useFullContentPositions = fi.getIndexOptions() == IndexOptions.DOCS_AND_FREQS_AND_POSITIONS;
+						break;
+					}
+				}
+			}
+		} catch (IOException e) {
+		}
 	}
 	
 	private File getBaseDir() throws FileNotFoundException, IOException {
@@ -101,6 +130,7 @@ public class LuceneIndexStatus {
 			}
 		}
 	}
+	
 	public File getIndexDir() throws FileNotFoundException, IOException {
 		File root = getBaseDir();
 		File dir = new File(root, name);
@@ -128,7 +158,6 @@ public class LuceneIndexStatus {
 		} else {
 			luceneIndexEntityDao.lock(current);
 		}
-
 		synchronizedSave(dir, current);
 	}
 	
@@ -199,8 +228,13 @@ public class LuceneIndexStatus {
 	}
 	
 	public void saveIfNeeded() throws FileNotFoundException, IOException, InternalErrorException {
-		if (dirty)
-			save();
+		if (dirty) {
+			try {
+				save();
+			} catch (InternalErrorException e) {
+				LogFactory.getLog(getClass()).warn("Error saving text index "+name+": "+e.toString());
+			}
+		}
 	}
 	public synchronized void reset() throws FileNotFoundException, IOException, InternalErrorException {
 		dirty = false;
@@ -222,6 +256,7 @@ public class LuceneIndexStatus {
 		directory.close();
 		directory = new NIOFSDirectory(getIndexDir().toPath());
 		save();
+		useFullContentPositions = true;
 	}
 	
 	public void fetchforWriting() throws InterruptedException, FileNotFoundException, IOException, InternalErrorException {
@@ -255,5 +290,8 @@ public class LuceneIndexStatus {
 			else
 				Thread.sleep(l);
 		} while (true);
+	}
+	public boolean isUseFullContentPositions() {
+		return useFullContentPositions;
 	}
 }

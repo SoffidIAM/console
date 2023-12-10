@@ -10,6 +10,10 @@ public class LuceneIndexEntityDaoImpl extends LuceneIndexEntityDaoBase {
 		LuceneIndexEntity e = super.findByName(name);
 		if (e == null)
 			return e;
+		if (e != null) {
+			getSession().evict(e);
+			e = super.findByName(name);
+		}
 		return e;
 	}
 

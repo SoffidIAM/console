@@ -60,13 +60,13 @@ public class Indexer {
 		INDEXED_STRING.freeze();
 	}
 
-	public static final FieldType STORED_STRING = new FieldType();
+	public static final FieldType FULL_TEXT_INDEXED_STRING = new FieldType();
 	static {
-		STORED_STRING.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
-		STORED_STRING.setOmitNorms(true);
-		STORED_STRING.setStored(true);
-		STORED_STRING.setTokenized(true);
-		STORED_STRING.freeze();
+		FULL_TEXT_INDEXED_STRING.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
+		FULL_TEXT_INDEXED_STRING.setOmitNorms(false);
+		FULL_TEXT_INDEXED_STRING.setStored(true);
+		FULL_TEXT_INDEXED_STRING.setTokenized(true);
+		FULL_TEXT_INDEXED_STRING.freeze();
 	}
 
 	private Indexer () {
@@ -158,7 +158,7 @@ public class Indexer {
 
 		d.add(new Field ("$contents",  //$NON-NLS-1$
 				contents.toString(),
-				STORED_STRING));
+				FULL_TEXT_INDEXED_STRING));
 		d.add(new Field ("$end",  //$NON-NLS-1$
 				pi.getEnd() == null ? "false": "true", //$NON-NLS-1$ //$NON-NLS-2$
 				INDEXED_STRING));

@@ -63,7 +63,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 		String agent = (String) XPathUtils.eval(dataSource, "name");
 
 		Window w = (Window) getFellow("accessControlWindow");
-		((Radiogroup)w.getFellow("type")).setSelectedIndex(0);
+		((Radiogroup)w.getFellow("type")).setSelectedIndex(2);
 		((CustomField3)w.getFellow("user")).setText("");
 		((CustomField3)w.getFellow("role")).setText("");
 		((CustomField3)w.getFellow("role")).setFilterExpression("system eq \""+agent.replace("\\", "\\\\").replace("\"", "\\\"")+"\"");
@@ -105,13 +105,21 @@ public class AccessControlHandler extends Div implements AfterCompose {
 			f = ((CustomField3)w.getFellow("user"));
 			if (! f.attributeValidateAll()) return;	
 			acc.setGenericUser((String) f.getValue());
+			acc.setRoleId(null);
+			acc.setRoleDescription(null);
 		}
-		if (selected == 1) {
+		else if (selected == 1) {
 			f = ((CustomField3)w.getFellow("role"));
 			if (! f.attributeValidateAll()) return;
 			Role roleName = (Role) f.getValueObject();
 			acc.setRoleId(roleName.getId());
 			acc.setRoleDescription(roleName.getDescription());
+			acc.setGenericUser(null);
+		}
+		else {
+			acc.setGenericUser("%");
+			acc.setRoleDescription(null);
+			acc.setRoleId(null);
 		}
 		f = ((CustomField3)w.getFellow("host"));
 		if (! f.attributeValidateAll()) return;	
@@ -156,8 +164,10 @@ public class AccessControlHandler extends Div implements AfterCompose {
 			String agent = (String) XPathUtils.eval(gridControlAccess.getDataSource(), "name");
 
 			Window w = (Window) getFellow("accessControlWindow");
-			((Radiogroup)w.getFellow("type")).setSelectedIndex( currentAccessControl.getRoleId() == null ? 0: 1 );
-			((CustomField3)w.getFellow("user")).setText(currentAccessControl.getGenericUser());
+			final int option = "%".equals(currentAccessControl.getGenericUser()) ? 2:
+				currentAccessControl.getRoleId() == null ? 0: 1;
+			((Radiogroup)w.getFellow("type")).setSelectedIndex( option );
+			((CustomField3)w.getFellow("user")).setText(option == 0 ? currentAccessControl.getGenericUser(): null);
 			((CustomField3)w.getFellow("role")).setFilterExpression("system eq \""+agent.replace("\\", "\\\\").replace("\"", "\\\"")+"\"");
 			if (currentAccessControl.getRoleId() == null) {
 				((CustomField3)w.getFellow("role")).setText("");
@@ -166,8 +176,8 @@ public class AccessControlHandler extends Div implements AfterCompose {
 				((CustomField3)w.getFellow("role")).setText(role.getName()+"@"+role.getSystem());
 			}
 			((CustomField3)w.getFellow("host")).setText(currentAccessControl.getGenericHost());
-			((CustomField3)w.getFellow("user")).setVisible(currentAccessControl.getRoleId() == null);
-			((CustomField3)w.getFellow("role")).setVisible(currentAccessControl.getRoleId() != null);
+			((CustomField3)w.getFellow("user")).setVisible(option == 0);
+			((CustomField3)w.getFellow("role")).setVisible(option == 1);
 			((CustomField3)w.getFellow("app")).setText(currentAccessControl.getProgram());
 			((CustomField3)w.getFellow("comments")).setText(currentAccessControl.getComments());
 			w.doHighlighted();

@@ -40,7 +40,7 @@ public class AccessLogEntityDaoImpl extends
 							"sourceIp", registreAcces.getClientAddress() == null ?
 									registreAcces.getHostAddress() :
 									registreAcces.getClientAddress(),
-							"date", Long.toString( registreAcces.getEndDate().getTime() )
+							"date", Long.toString(  registreAcces.getStartDate().getTime() )
 						});
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);

@@ -59,7 +59,16 @@ public class Indexer {
 		INDEXED_STRING.setTokenized(true);
 		INDEXED_STRING.freeze();
 	}
-	
+
+	public static final FieldType STORED_STRING = new FieldType();
+	static {
+		STORED_STRING.setIndexOptions(IndexOptions.DOCS_AND_FREQS);
+		STORED_STRING.setOmitNorms(true);
+		STORED_STRING.setStored(true);
+		STORED_STRING.setTokenized(true);
+		STORED_STRING.freeze();
+	}
+
 	private Indexer () {
 		try {
 			maxFieldLength = Integer.parseInt(System.getProperty("soffid.indexer.max-field-size"));
@@ -149,7 +158,7 @@ public class Indexer {
 
 		d.add(new Field ("$contents",  //$NON-NLS-1$
 				contents.toString(),
-				INDEXED_STRING));
+				STORED_STRING));
 		d.add(new Field ("$end",  //$NON-NLS-1$
 				pi.getEnd() == null ? "false": "true", //$NON-NLS-1$ //$NON-NLS-2$
 				INDEXED_STRING));

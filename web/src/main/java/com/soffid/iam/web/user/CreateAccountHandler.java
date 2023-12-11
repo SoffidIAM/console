@@ -161,6 +161,7 @@ public class CreateAccountHandler extends Window implements AfterCompose {
 
 			DataNodeCollection passwordDomains = (DataNodeCollection) XPathUtils.eval(usersDataSource, "domini");
 			passwordDomains.refresh();
+			newUserPath = null;
 			for (int i = 0; i < passwordDomains.size(); i++) {
 				DataModelNode passwordDomain = passwordDomains.getDataModel(i);
 				DataModelCollection policies = passwordDomain.getListModel("policy");
@@ -172,6 +173,7 @@ public class CreateAccountHandler extends Window implements AfterCompose {
 						Long id = (Long) accountNode.get("id");
 						if (account.getId().equals(id)) {
 							accountsTree.setSelectedIndex(new int[]{i, k});
+							newUserPath = accountsTree.getSelectedItemXPath();
 						}
 					}
 				}
@@ -187,10 +189,13 @@ public class CreateAccountHandler extends Window implements AfterCompose {
 		setVisible(false);
 	}
 
-	public void backAndRollback(Event ev) {
+	public void backAndRollback(Event ev) throws CommitException {
 		DataTree2 accountsTree = (DataTree2) Path.getComponent(dataSource);
 		DataSource usersDataSource = (DataSource) Path.getComponent(userDataSource);
-		XPathUtils.removePath(usersDataSource, newUserPath);
+		if (newUserPath != null) {
+			XPathUtils.removePath(usersDataSource, newUserPath);
+			usersDataSource.commit();
+		}
 		wizard.previous();
 	}
 	

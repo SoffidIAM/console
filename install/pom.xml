@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.5.9.9-SNAPSHOT</version>
+		<version>3.5.9-9-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>install</artifactId>
@@ -190,7 +190,7 @@
 						<configuration>
 							<tasks>
 								<exec executable="${basedir}/src/main/wix/generateWix.sh" failonerror="true">
-									<arg value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}" />
+									<arg value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${parsedVersion.buildNumber}" />
 								</exec>
 							</tasks>
 						</configuration>
@@ -285,7 +285,7 @@
 								</artifact>
 								<artifact>
 									<file>
-										target/soffid-iamconsole-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-1.noarch.rpm
+										target/soffid-iamconsole-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-${parsedVersion.buildNumber}.noarch.rpm
 									</file>
 									<type>rpm</type>
 								</artifact>

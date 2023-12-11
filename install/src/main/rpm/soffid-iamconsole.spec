@@ -1,7 +1,7 @@
 Buildroot: /home/gbuades/soffid/console/install/target/soffid-iamconsole-3.0.0
 Name: soffid-iamconsole
 Version: ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}
-Release: 1
+Release: ${parsedVersion.buildNumber}
 Summary: Soffid IAM Console
 License: GPL
 Distribution: Soffid IAM

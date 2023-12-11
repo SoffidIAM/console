@@ -92,6 +92,9 @@ public class NetworkWizardHandler extends Window implements AfterCompose{
 		if ( Boolean.FALSE.equals(n.getDiscovery()))
 			networkDiscoveryService.enableNetworkDiscoveryScheduledTask(n);
 
+		for (Account account: accounts) {
+			networkDiscoveryService.createNetworkAccount(n, account);
+		}
 		ScheduledTask st = networkDiscoveryService.findNetworkDiscoveryScheduledTask(n);
 		EJBLocator.getScheduledTaskService().startNow(st);
 
@@ -177,6 +180,9 @@ public class NetworkWizardHandler extends Window implements AfterCompose{
 		r.setChecked(true);
 		w.getFellow("div_new_account").setVisible(true);
 		w.getFellow("div_existing_account").setVisible(false);
+		((InputField3) w.getFellow("new_account")).setValue(null);
+		((InputField3) w.getFellow("new_password")).setValue(null);
+		((InputField3) w.getFellow("existing_account")).setValue(null);
 	}
 
 	public void setNewAccount(Event event) {

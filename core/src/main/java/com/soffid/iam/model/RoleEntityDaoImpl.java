@@ -535,8 +535,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 				//                msgError += Messages.getString("RoleEntityDaoImpl.6");  //$NON-NLS-1$
 			} else if (rolsUsuari.size() != 0) {
 				msgError += Messages.getString("RoleEntityDaoImpl.7"); //$NON-NLS-1$
-			} else if (rolsAutoritzacioXarxa.size() != 0) {
-				msgError += Messages.getString("RoleEntityDaoImpl.8"); //$NON-NLS-1$
 			} else if (roleEntity.getNotificationEntities().size() != 0) {
 				msgError += Messages.getString("RoleEntityDaoImpl.9"); //$NON-NLS-1$
 			}
@@ -549,6 +547,9 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
 			// Eliminamos las asociaciones con otros ROLES (en ambos casos)
 			// No se borra porque NO PUEDEN EXISTIR para poder borrar el Role(!!)
 			getSession().createQuery("delete from com.soffid.iam.model.EntryPointRoleEntity where role.id=:id" )
+				.setParameter("id", roleEntity.getId())
+				.executeUpdate();
+			getSession().createQuery("delete from com.soffid.iam.model.NetworkAuthorizationEntity where role.id=:id" )
 				.setParameter("id", roleEntity.getId())
 				.executeUpdate();
 			

@@ -151,7 +151,7 @@ public abstract class DispatcherEntity {
 	@Nullable
 	@Column (name="DIS_PAUSEY",
 			defaultValue="false")
-	public boolean pause;
+	public Boolean pause;
 
 	@Column (name="DIS_AUTHRT",
 		defaultValue="false")

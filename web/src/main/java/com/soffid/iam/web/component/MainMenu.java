@@ -245,8 +245,12 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 				small = false;
 			}
 			else  {
-				small = stack.getLast().isSmall();
-				currentOptions = stack.getLast().getOptions();
+				final MenuOption last = stack.getLast();
+				small = last.isSmall();
+				currentOptions = last.getOptions();
+				if (last.getHandler() != null && currentOptions == null) {
+					currentOptions = last.getHandler().getOptions(last);
+				}
 			}
 			
 			if (s != null) {

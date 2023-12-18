@@ -438,6 +438,8 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		init (name, 
 				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
 				soffidRoles == null ? new String[0]: soffidRoles.toArray(new String[soffidRoles.size()]) );
+		this.permissions = permissions.toArray(new String[permissions.size()]);
+		Arrays.sort(this.permissions);
 		this.holderGroup = holderGroup;
 		this.fullName = fullName;
 		this.userName = userName;

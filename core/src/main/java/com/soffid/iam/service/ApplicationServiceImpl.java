@@ -4286,7 +4286,7 @@ public class ApplicationServiceImpl extends
 		for (int i = 1; i < 10; i++) {
 			for (int type = 0; type < 3; type ++) {
 				ScimHelper h = generateRedundantRolesQuery(i, type, query);
-				total += h.count(null, "");
+				total += h.count();
 			}
 		}
 		if (total > 0) {

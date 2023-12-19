@@ -3579,6 +3579,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		
 		if ( "S".equals(user.getActive()))
 		{
+			auditChange("S", userName, passwordDomain);
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {
 	            	if (se.getInstances().isEmpty()) {

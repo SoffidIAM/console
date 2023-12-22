@@ -51,9 +51,8 @@
 			<datatable id="listbox" autocommit="false" 
 				use="com.soffid.iam.web.user.RoleAccountDatatable"
 				preference="com.soffid.iam.web.user.RoleAccount-cols"
-				onMultiSelect="ref:handler.multiSelect"
 				dataPath="model:/grant" maxheight="60vh" sortColumn="0"
-				onSelect="ref:handler.showDetails" enablefilter="true">
+				enablefilter="true">
 		<attribute name="allColumns"><![CDATA[
 - name: ${c:l('com.soffid.iam.api.RoleAccount.risk')}
   width: 30px

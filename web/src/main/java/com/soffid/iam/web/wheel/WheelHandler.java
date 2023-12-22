@@ -13,8 +13,10 @@ import org.zkoss.util.Locales;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.au.AuRequest;
 import org.zkoss.zk.au.Command;
+import org.zkoss.zk.au.ComponentCommand;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Label;
@@ -26,6 +28,8 @@ import com.soffid.iam.api.Server;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkib.component.DataTable;
+import es.caib.zkib.component.ReorderEvent;
 import es.caib.zkib.component.Switch;
 
 public class WheelHandler extends FrameHandler {
@@ -38,7 +42,6 @@ public class WheelHandler extends FrameHandler {
 	private Quarter[] quarters;
 	
 	public WheelHandler () throws Exception {
-		System.out.println("");
 	}
 
 	@Override
@@ -116,12 +119,23 @@ public class WheelHandler extends FrameHandler {
 			String hideTips = EJBLocator.getPreferencesService().findMyPreference("wheel-tips");
 			if ("false".equals(hideTips)) 
 				welcome.setVisible(false);
-			else
-				welcome.doHighlighted();
+			else {
+				response("showOrNot", new org.zkoss.zk.au.out.AuScript(this, 
+						  "if  ('hide' != localStorage.getItem('welcome')) {\n"
+						+ "  zkau.send ({uuid: '"+getUuid()+"', cmd: 'onShowWelcome', data : []}, 5);\n"
+						+ "}"));
+			}
 		} catch (Exception e) {
 		}
 	}
-	
+
+	private static Command _onShowWelcome  = new ComponentCommand ("onShowWelcome", 0) {
+		protected void process(AuRequest request) {
+			final WheelHandler w = (WheelHandler) request.getComponent();
+			w.welcome.doHighlighted();
+		}
+	};
+
 	public void nextWelcome (Event ev) {
 		Window w;
 		switch (welcomePosition++) {
@@ -189,8 +203,10 @@ public class WheelHandler extends FrameHandler {
 	
 	public void onChangeShowagainswitch(Event ev) throws InternalErrorException, NamingException, CreateException {
 		Switch i = (Switch) ev.getTarget();
-		String value = i.isChecked() ? "false": "true";
-		EJBLocator.getPreferencesService().updateMyPreference("wheel-tips", value);
+		response("setShow", new org.zkoss.zk.au.out.AuScript(this, 
+				  "localStorage.setItem('welcome', '"+(i.isChecked()?"hide":"show")+"')"));
+		EJBLocator.getPreferencesService().updateMyPreference("wheel-tips",
+				i.isChecked() ? "false": "true");
 	}
 	
 	//3.-searchOptions 
@@ -238,6 +254,8 @@ public class WheelHandler extends FrameHandler {
 	public Command getCommand(String cmdId) {
 		if ("onSector".equals(cmdId))
 			return _onSectorCommand;
+		if ("onShowWelcome".equals(cmdId))
+			return _onShowWelcome;
 		return super.getCommand(cmdId);
 				
 	}

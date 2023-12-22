@@ -169,7 +169,7 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>build-rpm</id>
+						<id>build-ls </id>
 						<phase>package</phase>
 						<configuration>
 							<tasks>
@@ -285,7 +285,7 @@
 								</artifact>
 								<artifact>
 									<file>
-										target/soffid-iamconsole-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-1.noarch.rpm
+										target/soffid-iamconsole-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}-${parsedVersion.buildNumber}.noarch.rpm
 									</file>
 									<type>rpm</type>
 								</artifact>

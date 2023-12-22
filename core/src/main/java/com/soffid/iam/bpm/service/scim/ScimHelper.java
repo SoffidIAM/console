@@ -30,6 +30,7 @@ import com.soffid.iam.utils.TimeOutUtils;
 import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.HQLQuery;
 import com.soffid.scimquery.conf.AttributeConfig;
+import com.soffid.scimquery.conf.ClassConfig;
 import com.soffid.scimquery.conf.Configuration;
 import com.soffid.scimquery.expr.AbstractExpression;
 import com.soffid.scimquery.parser.ExpressionParser;
@@ -76,8 +77,6 @@ public class ScimHelper {
 	
 	public void search (String textFilter, String jsonQuery, Collection<Object> result) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
 		AdditionalDataJSONConfiguration.registerVirtualAttributes();
-
-		AbstractExpression expr = evaluateQuery(textFilter, jsonQuery);
 
 		if (session == null) {
 			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
@@ -355,7 +354,18 @@ public class ScimHelper {
 			else
 				queryObject.setParameter(s, v);
 		}
-		queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+		if (tenantFilter != null)
+			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+		if (extraParameters != null) {
+			for (Entry<String, Object> entry: extraParameters.entrySet()) {
+				final Object value = entry.getValue();
+				if (value != null && value instanceof Collection)
+					queryObject.setParameterList(entry.getKey(), (Collection) value);
+				else
+					queryObject.setParameter(entry.getKey(), value);
+			}
+			
+		}
 
 		for (Object o: queryObject.list()) {
 			if (o instanceof Long)
@@ -474,4 +484,47 @@ public class ScimHelper {
 		if (dt != null && dt.isTextIndex())
 			textIndex  = true;
 	}
+	
+	public int delete (String jsonQuery) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
+		AdditionalDataJSONConfiguration.registerVirtualAttributes();
+
+		if (session == null) {
+			SessionFactory sf = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+			session = sf.getCurrentSession();
+		}
+					
+		AbstractExpression expr = evaluateQuery(null, jsonQuery);
+
+		String hqlQuery = hql.toString();
+		int i = hqlQuery.indexOf(" from ");
+		hqlQuery = hqlQuery.substring(0, i) + ".id "+hqlQuery.substring(i);
+		
+		String hc = Configuration.getClassConfig(objectClass).getHibernateClass();
+
+		org.hibernate.Query queryObject = session.createQuery( "delete from "+hc+" where id in ("+hqlQuery+")" );
+		Map<String, Object> params = hql.getParameters();
+		for (String s : params.keySet())
+		{
+			Object v = params.get(s);
+			if (v == null)
+				queryObject.setParameter(s, v, 
+						org.hibernate.Hibernate.STRING);
+			else
+				queryObject.setParameter(s, v);
+		}
+		if (tenantFilter != null)
+			queryObject.setParameter("tenantId", Security.getCurrentTenantId());
+		if (extraParameters != null) {
+			for (Entry<String, Object> entry: extraParameters.entrySet()) {
+				final Object value = entry.getValue();
+				if (value != null && value instanceof Collection)
+					queryObject.setParameterList(entry.getKey(), (Collection) value);
+				else
+					queryObject.setParameter(entry.getKey(), value);
+			}
+			
+		}
+		return queryObject.executeUpdate();
+	}
+
 }

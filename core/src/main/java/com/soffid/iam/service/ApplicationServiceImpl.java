@@ -4283,39 +4283,18 @@ public class ApplicationServiceImpl extends
 	protected void removeRedundantRoles(String query, AsyncProcessTracker tracker) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {
 		int total = 0;
 		int count = 0;
-		for (int i = 1; i < 10; i++) {
-			for (int type = 0; type < 3; type ++) {
-				ScimHelper h = generateRedundantRolesQuery(i, type, query);
-				total += h.count(null, query);
-			}
-		}
-		if (total == 0) total =1 ;
 		HashSet<Long> ids = new HashSet<>();
 		final RoleAccountEntityDao dao = getRoleAccountEntityDao();
-		final int counters[] = new int[]{count, total};
+		float step = 0;
 		for (int i = 1; i < 10; i++) {
 			for (int type = 0; type < 3; type ++) {
 				ScimHelper h = generateRedundantRolesQuery(i, type, query);
-				h.setPageSize(500);
-				h.setGenerator((Object entity) -> {
-					Object[] array = (Object[]) entity;
-					RoleAccountEntity o1 = (RoleAccountEntity) array[0];
-					if (!ids.contains(o1.getId()) && applyRedundancy (array))
-					{
-						ids.add(o1.getId());
-						dao.remove(o1);
-					}
-					counters[0] ++;
-					if (counters[0] >= counters[1])
-						tracker.setProgress((float)1.0);
-					else
-						tracker.setProgress((float)counters[0] / (float)counters[1]);
-					return null;
-				}); 
-				
-				h.search(null, query, new LinkedList<>()); 
+				h.delete(null);
+				step ++ ;
+				tracker.setProgress((float) ( step  / 27.0));
 			}
 		}
+		tracker.setProgress((float)1.0);
 	}
 	
 	protected void findRedundantRoles(AsyncList<RoleAccount> result, String query) throws UnsupportedEncodingException, ClassNotFoundException, JSONException, InternalErrorException, EvalException, ParseException, TokenMgrError {

@@ -289,33 +289,31 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	@Override
 	protected void handleRemoveAccount(UserAccount account) throws Exception
 	{
-		UserEntity ue = getUser(account.getUser());
-		if (ue != null)
-		{
-			AccountEntity acc = getAccountEntityDao().load(account.getId());
-			if (acc == null)
-				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.UnknownAccount"), account.getId())); //$NON-NLS-1$
-		
-			if (!acc.getType().equals(AccountType.USER))
-				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.NotPersonalAccount"), account.getId())); //$NON-NLS-1$
-				
-			Collection<UserAccountEntity> list = acc.getUsers();
-			if (list.size() != 1)
-				throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.MoreThanOneUserAccount"), account.getId())); //$NON-NLS-1$
+		AccountEntity acc = getAccountEntityDao().load(account.getId());
+		if (acc == null) 
+			return;
+		if (acc == null)
+			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.UnknownAccount"), account.getId())); //$NON-NLS-1$
+	
+		if (!acc.getType().equals(AccountType.USER))
+			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.NotPersonalAccount"), account.getId())); //$NON-NLS-1$
 			
+		Collection<UserAccountEntity> list = acc.getUsers();
+		if (list.size() != 1)
+			throw new InternalErrorException (String.format(Messages.getString("AccountServiceImpl.MoreThanOneUserAccount"), account.getId())); //$NON-NLS-1$
+		
 //			if (!acc.getRoles().isEmpty())
 //				throw new NotAllowedException(String.format(Messages.getString("AccountServiceImpl.CannotDeleteAccount"), account.getName(), account.getSystem())); //$NON-NLS-1$
-			
-			UserAccountEntity ua = list.iterator().next();
-			
-			createAccountTask(acc);
-			for (RoleAccountEntity ra: new LinkedList<RoleAccountEntity> (acc.getRoles()))
-			{
-				getRoleAccountEntityDao().remove(ra);
-			}
-			acc.getRoles().clear();
-			getAccountEntityDao().remove(acc);
+		
+		UserAccountEntity ua = list.iterator().next();
+		
+		createAccountTask(acc);
+		for (RoleAccountEntity ra: new LinkedList<RoleAccountEntity> (acc.getRoles()))
+		{
+			getRoleAccountEntityDao().remove(ra);
 		}
+		acc.getRoles().clear();
+		getAccountEntityDao().remove(acc);
 	}
 
 

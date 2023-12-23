@@ -128,6 +128,8 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 		task.setLastEnd(oldtask.getLastEnd());
 		task.setLastExecution(oldtask.getLastExecution());
 		task.setNextExecution(oldtask.getNextExecution());
+		if (task.isActive() && ! "*".equals(oldtask.getServerName()))
+			task.setServerName(oldtask.getServerName());
 		getScheduledTaskEntityDao().scheduledTaskToEntity(task, entity, true);
 		getScheduledTaskEntityDao().update(entity);
 		audit (task.getName(), "U"); //$NON-NLS-1$
@@ -250,11 +252,9 @@ public class ScheduledTaskServiceImpl extends ScheduledTaskServiceBase
 				
 			}
 		}
-		if (entity.getServer() == null) {
-			try {
-				entity.setServer( getServerEntityDao().findByName( Config.getConfig().getHostName() ) );
-			} catch (IOException e) {
-			}
+		try {
+			entity.setServer( getServerEntityDao().findByName( Config.getConfig().getHostName() ) );
+		} catch (IOException e) {
 		}
 		entity.setLogReferenceID(null);
 		entity.setError(false);

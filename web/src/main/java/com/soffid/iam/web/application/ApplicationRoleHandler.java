@@ -597,8 +597,8 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 			List<RoleAccount> rr = new LinkedList<>();
 			DataNodeCollection dnc = (DataNodeCollection) getListbox().getJXPathContext().getValue("/grant");
 			for (int i = 0; i < dnc.size(); i++) {
-				DataNode dn = (DataNode) dnc.getDataModel(i);
-				if (dn.isDeleted())
+				DataNode dn = (DataNode) dnc.get(i);
+				if (dn == null || dn.isDeleted())
 					rr.add((RoleAccount) dn.getInstance());
 				else if (dn.isNew())
 					ra.add((RoleAccount) dn.getInstance());

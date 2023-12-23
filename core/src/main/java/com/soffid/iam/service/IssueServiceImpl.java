@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -173,12 +174,15 @@ public class IssueServiceImpl extends IssueServiceBase {
 				entity.setActor(currentPolicy.getActor());
 			addHistory(entity, "Created"); //$NON-NLS-1$
 			getIssueEntityDao().create(entity);
-			if (issue.getUsers() != null) 
+			HashSet<String> users = new HashSet<>();
+			if (issue.getUsers() != null) {
 				for (IssueUser user: issue.getUsers()) {
 					IssueUserEntity issueUserEntity = getIssueUserEntityDao().issueUserToEntity(user);
 					UserEntity userEntity = user.getUserId() == null ?
 							getUserEntityDao().findByUserName(user.getUserName() ) :
 								getUserEntityDao().load(user.getUserId());
+					if (userEntity == null)
+						throw new InternalErrorException("Wrong user name or user id");
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
 					issueUserEntity.setExternalId(user.getExternalId());
@@ -187,7 +191,13 @@ public class IssueServiceImpl extends IssueServiceBase {
 					issueUserEntity.setAction(EventUserAction.UNKNOWN);
 					getIssueUserEntityDao().create(issueUserEntity);
 					entity.getUsers().add(issueUserEntity);
+					users.add(issueUserEntity.getUser().getUserName());
 				}
+			}
+			if (issue.getType().equals("duplicated-user") && users.size() < 2) {
+					throw new InternalErrorException("Please, specify more than one user to create a duplicated-user issue");
+			}
+			
 			if (issue.getHosts() != null) 
 				for (IssueHost host: issue.getHosts()) {
 					IssueHostEntity hostEntity = getIssueHostEntityDao().issueHostToEntity(host);

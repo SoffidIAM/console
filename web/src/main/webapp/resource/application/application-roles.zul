@@ -77,9 +77,14 @@
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>
 						<label bind="../listbox:/description"></label>
+						<menu2>
+							<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns2"/>
+							<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv2"/>
+						</menu2>
 					</div>
 					<datatable id="ownedRoles" autocommit="false" 
 						use="com.soffid.iam.web.application.GrantDatatable" 
+						preference="ownedRoles"
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGranted"
 						multiselect="true"
@@ -88,30 +93,49 @@
 					    onRemove="ref:handler.removeGranted"
 						dataPath="../listbox:/ownedRoles" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
-					<attribute name="columns"><![CDATA[
+						<attribute name="allColumns"><![CDATA[
 - name: ${c:l('aplica_rolinfo.zul.Rol')}
   value: ownerRoleName
+  default: true
+  mandatory: true
 - name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
   value: ownerSystem
+  default: true
+  mandatory: true
 - name: ${c:l('aplica_rolinfo.zul.Domini')}
   value: ownerRolDomainValue
+  default: true
+  mandatory: true
 - name: ""
+  value: "arrow"
   width: 24px
   sort: false
   filter: false
   className: selector
   template: <img class="small-icon" src="${execution.contextPath }/img/next.svg">
+  default: true
+  mandatory: true
 - name: ${c:l('aplica_rolinfo.zul.Rol')}
   value: roleName
+  default: true
+  mandatory: true
 - name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
   value: system
+  default: true
+  mandatory: true
+- name: ${c:l('aplica_rolsllista.zul.Aplicacia-2')}
+  value: informationSystem
 - name: ${c:l('aplica_rolinfo.zul.Domini')}
   value: domainValue
+  default: true
+  mandatory: true
 - name: ${c:l('aplica_rolsllista.zul.Mandatory') }
   value: mandatory
   filter: false
   sort: false
   className: selector
+  default: true
+  mandatory: true
   template: <input type="checkbox" title="${c:l('aplica_rolsllista.zul.Mandatory') }" #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
 					]]></attribute>
 					</datatable>
@@ -125,8 +149,13 @@
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>
 						<label bind="../listbox:/description"></label>
+						<menu2>
+							<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns2"/>
+							<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv2"/>
+						</menu2>
 					</div>
 					<datatable id="ownerRoles" autocommit="false" 
+						preference="ownerRoles"
 						use="com.soffid.iam.web.application.GrantDatatable" 
 					    sclass="datatable roleGrant"
 					    onSetMandatory="ref:handler.setMandatoryGrantee"
@@ -136,14 +165,20 @@
 					    onRemove="ref:handler.removeGrantee"
 						dataPath="../listbox:/ownerRoles" maxheight="60vh" sortColumn="0"
 						enablefilter="true">
-					<attribute name="columns"><![CDATA[
+						<attribute name="allColumns"><![CDATA[
 - name: ${c:l('aplica_rolinfo.zul.Rol')}
   value: ownerRoleName
+  default: true
 - name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
   value: ownerSystem
+  default: true
 - name: ${c:l('aplica_rolinfo.zul.Domini')}
   value: ownerRolDomainValue
+- name: ${c:l('aplica_rolsllista.zul.Aplicacia-2')}
+  value: ownerInformationSystem
 - name: ""
+  default: true
+  value: "arrow"
   width: 24px
   sort: false
   filter: false
@@ -151,17 +186,21 @@
   template: <img class="small-icon" src="${execution.contextPath }/img/next.svg">
 - name: ${c:l('aplica_rolinfo.zul.Rol')}
   value: roleName
+  default: true
 - name: ${c:l('aplica_rolsllista.zul.Basededades-2')}
   value: system
+  default: true
 - name: ${c:l('aplica_rolinfo.zul.Domini')}
   value: domainValue
+  default: true
 - name: ${c:l('aplica_rolsllista.zul.Mandatory') }
+  default: true
   value: mandatory
   className: selector
   filter: false
   sort: false
   template: <input type="checkbox"  title="${c:l('aplica_rolsllista.zul.Mandatory') }"  #{mandatory? "checked='checked'": "" } onInput="zkDatatable.sendClientAction(this, 'onSetMandatory', [this.checked])" />
-					]]></attribute>
+						]]></attribute>
 					</datatable>
 					<div width="100%" if="${soffid:isUserInRole('application:update')}" style="height: 48px">
 						<div class="deleteButton" onClick="ref:handler.deleteSelected2" visible="false">-</div>

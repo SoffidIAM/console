@@ -196,31 +196,26 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			} catch (Exception e) {
 			}
 			JSONArray srccols = src.getAllColumns();
-			for (int i = 0; i < srccols.length(); i++) {
-				JSONObject colDef = srccols.getJSONObject( i );
-				String value = colDef.optString("value", "");
-				if (isMandatory(mandatory, value)) {
-					colDef.put("enabled", true);
-					cols.put(colDef);
-					allCols.put(colDef);
-				}
-			}
 			for (int i = 0; i < positions.length; i++) 
 			{
-				JSONObject colDef = this.cols.getJSONObject( positions[i] );
+				JSONObject colDef = srccols.getJSONObject( positions[i] );
 				String value = colDef.optString("value", "");
-				if (!isMandatory(mandatory, value)) {
-					allCols.put(colDef);
+				boolean sel = isMandatory(mandatory, value) ||  
+						colDef.optBoolean("mandatory");
+				if (!sel) {
 					if (selected.length == 0) {
-						colDef.put("enabled", colDef.optBoolean("default"));
-						cols.put(colDef);
+						sel = colDef.optBoolean("default");;
 					} else if (Arrays.binarySearch(selected, positions[i]) >= 0) {
-						colDef.put("enabled", true);
-						cols.put(colDef);
-					} else {
-						colDef.put("enabled", false);
+						sel = true;
 					}
 				}
+				if (sel) {
+					colDef.put("enabled", true);
+					cols.put(colDef);
+				} else {
+					colDef.put("enabled", false);
+				}
+				allCols.put(colDef);
 			}
 			
 			src.setColumns(cols.toString());

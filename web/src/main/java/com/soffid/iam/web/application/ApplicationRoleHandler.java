@@ -169,8 +169,18 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		SelectColumnsHandler.startWizard((DynamicColumnsDatatable) getListbox());
 	}
 	
+	public void changeColumns2(Event event) throws IOException {
+		DynamicColumnsDatatable dt = (DynamicColumnsDatatable) event.getTarget().getParent().getParent().getNextSibling();
+		SelectColumnsHandler.startWizard(dt);
+	}
+
 	public void downloadCsv(Event event) {
 		getListbox().download();
+	}
+
+	public void downloadCsv2(Event event) {
+		DataTable dt = (DataTable) event.getTarget().getParent().getParent().getNextSibling();
+		dt.download();
 	}
 
 	public void addNewGranted (Event event) throws NamingException, CreateException, InternalErrorException, IOException {

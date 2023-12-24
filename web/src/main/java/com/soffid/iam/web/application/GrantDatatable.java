@@ -6,12 +6,13 @@ import org.json.JSONObject;
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
+import com.soffid.iam.web.component.DynamicColumnsDatatable;
 
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datamodel.DataNode;
 
 
-public class GrantDatatable extends DataTable {
+public class GrantDatatable extends DynamicColumnsDatatable {
 	@Override
 	protected JSONObject getClientValue(Object element) throws JSONException {
 		JSONObject s = super.getClientValue(element);

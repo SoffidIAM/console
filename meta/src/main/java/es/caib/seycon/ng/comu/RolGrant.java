@@ -46,6 +46,9 @@ public class RolGrant {
 	public java.lang.String ownerAccountName;
 
 	@Nullable
+	public java.lang.String ownerInformationSystem;
+
+	@Nullable
 	@Attribute(translated="ownerSystem")
 	public java.lang.String ownerDispatcher;
 

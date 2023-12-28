@@ -45,6 +45,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 	private Div navigator;
 	private Div optionsDiv;
 	boolean small;
+	boolean verySmall;
 	private String option;
 	
 	@Override
@@ -54,6 +55,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		option = (String) req.getParameter("option");
 		Application.setTitle(Labels.getLabel("menu.title"));
 		small = false;
+		verySmall = false;
 		try {
 			options = new MenuParser().getMenus(menu);
 			currentOptions = options;
@@ -123,6 +125,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 					else 
 						currentOptions = option.getOptions();
 					small = option.isSmall();
+					verySmall = option.isVerySmall();
 					setUrl("/main/menu.zul?option="+optionName);
 				}
 				return true;
@@ -158,7 +161,8 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			optionName = menuOption.getLiteral() != null ? menuOption.getLiteral(): Labels.getLabel( menuOption.getLabel() );
 		} while (true);
 		
-		if (small) optionsDiv.setSclass("options options-small");
+		if (verySmall) optionsDiv.setSclass("options options-very-small");
+		else if (small) optionsDiv.setSclass("options options-small");
 		else optionsDiv.setSclass("options");
 		
 		optionsDiv.getChildren().clear();
@@ -243,10 +247,12 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 			if (stack.isEmpty()) {
 				currentOptions = options;
 				small = false;
+				verySmall = false;
 			}
 			else  {
 				final MenuOption last = stack.getLast();
 				small = last.isSmall();
+				verySmall = last.isVerySmall();
 				currentOptions = last.getOptions();
 				if (last.getHandler() != null && currentOptions == null) {
 					currentOptions = last.getHandler().getOptions(last);
@@ -303,6 +309,7 @@ public class MainMenu extends FrameHandler implements AfterCompose {
 		} else {
 			stack.add(option);
 			small = option.isSmall();
+			verySmall = option.isVerySmall();
 			currentOptions = option.getOptions();
 			this.option = option.getLabel();
 			loadMenus();

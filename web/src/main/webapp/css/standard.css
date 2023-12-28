@@ -2970,6 +2970,7 @@ div.options {
 	text-align: center;
 }
 
+
 .options .menuoption img {
 	object-fit: contain;
 	padding-left: 47px;
@@ -3009,11 +3010,33 @@ div.options {
 	height: 80px; 
 }
 
+.options.options-very-small .menuoption .menuoption-suboptions, 
 .options.options-small .menuoption .menuoption-suboptions, 
 .options.options-tiny .menuoption .menuoption-suboptions{
 	display: none;
 }
 
+
+.options.options-very-small .menuoption img {
+    object-fit: contain;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-radius: 10px;
+    width: 60px;
+    height: 45px;
+    margin: 0px;
+    margin-bottom: 0px;
+    vertical-align: middle;
+}
+
+options.options-very-small .menuoption span {
+    font-size: 10pt;
+    display: inline-block;
+    width: 100px;
+    vertical-align: middle;
+}
 
 .options div.menuoption-tip-shadow {
 	width: 272px;
@@ -3057,7 +3080,8 @@ div.options {
 	background-color: #e8e8e8;
 }
 
-.options.options-small .menuoption:hover img {
+.options.options-small .menuoption:hover img,
+.options.options-very-small .menuoption:hover img {
 	padding-left: 0px;
 	padding-right: 0px;
 	padding-top: 0px;
@@ -3067,6 +3091,17 @@ div.options {
 .options.options-small .menuoption:hover img {
 	box-shadow: 6px 6px 4px {GREEN};
 }
+
+.options.options-very-small .menuoption:hover img {
+	box-shadow: none;
+	background-coler: none;
+}
+
+.options.options-very-small .menuoption:hover {
+	background-color: #e8e8e8;
+}
+
+
 .options.options-tiny .menuoption:hover img {
 	box-shadow: 6px 6px 4px {GREEN};
 	padding: 4px;
@@ -3217,7 +3252,46 @@ div.options {
 	.topline img.logo.col_der {
 		display: none;
 	}
+
+	.options.options-very-small .menuoption {
+		width: 250px;
+	}
+	
+	.options.options-very-small .menuoption img {
+	}
+	
+	.options.options-very-small .menuoption span.menuoption-title {
+	}
+	
 }
+
+.options.options-very-small .menuoption {
+	text-align: left;
+	padding: 10px;
+}
+
+.options.options-very-small .menuoption img {
+    object-fit: contain;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border-radius: 10px;
+    width: 60px;
+    height: 45px;
+    margin: 0px;
+    margin-bottom: 0px;
+    vertical-align: middle;
+    border:none;
+}
+
+.options.options-very-small .menuoption span.menuoption-title {
+    font-size: 10pt;
+    display: inline-block;
+    width: calc(100% - 60px);
+    vertical-align: middle;
+}
+
 
 /********* MENU BAR **************/
 div.navigation-bar {

@@ -52,6 +52,7 @@ public class LauncherMenuHandler implements DynamicMenuHandler {
 			log.warn("Error fetching process to start", e);
 		}
 		option.setSmall(list.size() > 6);
+		option.setVerySmall(list.size() > 24);
 		return list;
 	}
 

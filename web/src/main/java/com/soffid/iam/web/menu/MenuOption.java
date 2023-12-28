@@ -24,6 +24,7 @@ public class MenuOption implements Cloneable {
 	DynamicMenuHandler handler;
 	private DynamicLauncher execHandler;
 	private Account account;
+	private boolean verySmall;
 	
 	public String getLabel() {
 		return label;
@@ -146,5 +147,12 @@ public class MenuOption implements Cloneable {
 	
 	public void setImage(Image image) {
 		this.image = image;
+	}
+	public void setVerySmall(boolean b) {
+		verySmall = b;
+	}
+	
+	public boolean isVerySmall() {
+		return verySmall;
 	}
 }

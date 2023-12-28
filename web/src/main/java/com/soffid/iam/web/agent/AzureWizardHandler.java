@@ -17,8 +17,11 @@ import org.zkoss.util.resource.Labels;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.System;
+import com.soffid.iam.api.UserDomain;
+import com.soffid.iam.service.ejb.UserDomainService;
 import com.soffid.iam.web.component.CustomField3;
 
+import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
@@ -55,6 +58,16 @@ public class AzureWizardHandler extends BaseWizardHandler {
 				+ "{\"oauthParam\":\"scope\",\"oauthValue\":\"https://graph.microsoft.com/.default\"}]}")
 				.getBytes(StandardCharsets.UTF_8));
 		s.setUsersDomain("EMAIL");
+		
+		UserDomainService uds = new EJBLocator().getUserDomainService();
+		if (uds.findUserDomainByName("EMAIL") == null) {
+			UserDomain d = new UserDomain();
+			d.setName("EMAIL");
+			d.setType(TipusDominiUsuariEnumeration.SHELL);
+			d.setBshExpr("/*js*/\nuser.mailDomain ? user.shortName+\"@\"+user.mailDomain: attributes[\"EMAIL\"]");
+			d.setDescription("Email address");
+			uds.create(d);
+		}
 	}
 	
 	private String encode(String string) {

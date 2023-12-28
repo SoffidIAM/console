@@ -3,7 +3,7 @@
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
 
 
-<window id="iga02_w" position="top-center" closable="false" sizable="false"
+<window id="am01_w" position="top-center" closable="false" sizable="false"
 		title="${c:l('wheel.users.title') }"
 		use="com.soffid.iam.web.wheel.Iga02Handler"
 			style="width: 80%; height: 450px; max-width: 600px; top: 200px !important;">

@@ -48,8 +48,9 @@ public class Sector {
 
 	protected void activate() {
 		Window w = (Window) getHandler().getFellowIfAny(getTag()+"_w");
-		if (w == null)
-			w = (Window) Executions.getCurrent().createComponents("/config/wheel/"+getTag()+".zul", getHandler(), new HashMap<>());
+		if (w != null)
+			w.detach();
+		w = (Window) Executions.getCurrent().createComponents("/config/wheel/"+getTag()+".zul", getHandler(), new HashMap<>());
 		w.doHighlighted();
 	}
 	

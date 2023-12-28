@@ -90,6 +90,17 @@ public class SeyconKeyStore {
     {
         if (file != null)
         {
+        	File old = new File (file.getPath()+".5");
+        	if ( old.canRead() )
+        		old.delete();
+        	for (int i = 4; i >= 1; i--) {
+        		File f = new File(file.getPath()+"."+i);
+        		if (f.canRead()) 
+        			f.renameTo(old);
+        		old = f;
+        	}
+        	if (file.canRead())
+        		file.renameTo(old);
             Password password = getKeyStorePassword();
             ks.store( new FileOutputStream ( file ), password.getPassword().toCharArray());
             ConnectionFactory.reloadKeys();

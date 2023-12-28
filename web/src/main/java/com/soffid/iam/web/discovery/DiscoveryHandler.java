@@ -9,6 +9,7 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zhtml.S;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.ComponentNotFoundException;
@@ -446,20 +447,24 @@ public class DiscoveryHandler extends FrameHandler {
 					types.add("rdp: Remote Desktop Protocol (rdp)");
 			}
 		}
-		Window w = (Window) getFellow("add_entrypoint");
-		w.doHighlighted();
-		DataNodeCollection tree = (DataNodeCollection) getModel().getValue("/app");
-		tree.refresh();
-		CustomField3 type = (CustomField3) w.getFellow("type");
-		type.setListOfValues(types.toArray(new String[types.size()]));
-		type.setValue(null);
-		if (types.size() == 1) {
-			String t = types.get(0);
-			if (t.contains(":"))
-				t = t.substring(0, t.indexOf(":")).trim();
-			type.setValue(t);
+		if (types.isEmpty()) {
+			Missatgebox.avis(Labels.getLabel("discovery.noService"));
+		} else {
+			Window w = (Window) getFellow("add_entrypoint");
+			w.doHighlighted();
+			DataNodeCollection tree = (DataNodeCollection) getModel().getValue("/app");
+			tree.refresh();
+			CustomField3 type = (CustomField3) w.getFellow("type");
+			type.setListOfValues(types.toArray(new String[types.size()]));
+			type.setValue(null);
+			if (types.size() == 1) {
+				String t = types.get(0);
+				if (t.contains(":"))
+					t = t.substring(0, t.indexOf(":")).trim();
+				type.setValue(t);
+			}
+			type.updateMetadata();
 		}
-		type.updateMetadata();
 	}
 
 	public void applyAddEntryPoint(Event event) throws Exception {

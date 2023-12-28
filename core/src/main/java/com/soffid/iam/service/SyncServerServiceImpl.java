@@ -312,8 +312,8 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
 	
     	} catch (Throwable th) {
     		LogFactory.getLog(getClass()).info("Unable to connecto to "+url, th);
-    		throw new InternalErrorException(String.format(
-    				Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
+    		throw new InternalErrorException(
+    				Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th); //$NON-NLS-1$
     	}
     }
 
@@ -838,8 +838,7 @@ public class SyncServerServiceImpl extends com.soffid.iam.service.SyncServerServ
             return stats.getStats(metric, seconds, step);
         } catch (Throwable th) {
         	LogFactory.getLog(getClass()).info("Unable to connecto to "+server, th);
-            throw new InternalErrorException(String.format(
-                    Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th.getMessage())); //$NON-NLS-1$
+            throw new InternalErrorException(Messages.getString("SeyconServerServiceImpl.NoConnectionToServer"), th); //$NON-NLS-1$
         }
 	}
 

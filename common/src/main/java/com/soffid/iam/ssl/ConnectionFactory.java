@@ -13,9 +13,11 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -61,23 +63,26 @@ public class ConnectionFactory {
         KeyStore ks = SeyconKeyStore.loadKeyStore(file);
 
         if (loader != null) {
-        	List<X509Certificate> certs = loader.loadCerts(ks);
-        	if (certs != null) {
-    			for (Enumeration<String> e =  ks.aliases(); e.hasMoreElements();) {
-    				String alias = e.nextElement();
-    				if (alias.startsWith("trusted-")) {
-    					ks.deleteEntry(alias);
-    				}
-    			}
-    			int i = 0;
-    			for (X509Certificate trustedCert: certs) {
-    				ks.setCertificateEntry("trusted-"+i, trustedCert);
-    				i ++;
-    			}
-    			if (file != null) {
-    				Password password = SeyconKeyStore.getKeyStorePassword();
-    				ks.store( new FileOutputStream ( file ), password.getPassword().toCharArray());
-    			}
+        	synchronized (loader) {
+                ks = SeyconKeyStore.loadKeyStore(file);
+	        	List<X509Certificate> certs = loader.loadCerts(ks);
+	        	if (certs != null && anyChange (certs, ks)) {
+	    			for (Enumeration<String> e =  ks.aliases(); e.hasMoreElements();) {
+	    				String alias = e.nextElement();
+	    				if (alias.startsWith("trusted-")) {
+	    					ks.deleteEntry(alias);
+	    				}
+	    			}
+	    			int i = 0;
+	    			for (X509Certificate trustedCert: certs) {
+	    				ks.setCertificateEntry("trusted-"+i, trustedCert);
+	    				i ++;
+	    			}
+	    			if (file != null) {
+	    				Password password = SeyconKeyStore.getKeyStorePassword();
+	    				SeyconKeyStore.saveKeyStore(ks, file);
+	    			}
+	        	}
         	}
         }
         for (Enumeration<String> e = ks.aliases(); e.hasMoreElements(); ) {
@@ -93,7 +98,22 @@ public class ConnectionFactory {
         sslFactory = ctx.getSocketFactory();
     }
 
-    public static void reloadKeys () throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException
+    private static boolean anyChange(List<X509Certificate> certs, KeyStore ks) throws KeyStoreException {
+    	certs = new LinkedList<>(certs);
+		for (Enumeration<String> e =  ks.aliases(); e.hasMoreElements();) {
+			String alias = e.nextElement();
+			if (alias.startsWith("trusted-")) {
+				Certificate cert = ks.getCertificate(alias);
+				if (! certs.contains(cert))
+					return true;
+				else
+					certs.remove(cert);
+			}
+		}
+		return ! certs.isEmpty();
+	}
+
+	public static void reloadKeys () throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException
     {
     	init ();
     }

@@ -722,7 +722,7 @@
 										<div sclass="radiooption">
 											<radio id="r_user" label="${c:l('controlAcces.zul.Usuari')}" onCheck="ref:accessControl.activaRadio())"  sclass="inlineCheck"/>	
 											<div  style="width: calc(100% - 230px); display: inline-block">
-												<customfield3 dataType="USER" noLabel="true" id="user" required="true"/>			
+												<customfield3 dataType="STRING" noLabel="true" id="user" required="true"/>			
 											</div>
 										</div>
 										<div sclass="radiooption">

@@ -68,7 +68,7 @@ public class AccessControlHandler extends Div implements AfterCompose {
 		((CustomField3)w.getFellow("role")).setText("");
 		((CustomField3)w.getFellow("role")).setFilterExpression("system eq \""+agent.replace("\\", "\\\\").replace("\"", "\\\"")+"\"");
 		((CustomField3)w.getFellow("host")).setText("%");
-		((CustomField3)w.getFellow("user")).setVisible(true);
+		((CustomField3)w.getFellow("user")).setVisible(false);
 		((CustomField3)w.getFellow("role")).setVisible(false);
 		((CustomField3)w.getFellow("app")).setText("%");
 		((CustomField3)w.getFellow("comments")).setText("");

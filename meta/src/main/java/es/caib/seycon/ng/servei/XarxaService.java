@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.List;
+
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
+import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
@@ -636,4 +639,13 @@ public abstract class XarxaService {
 	}
 	
 	boolean canLogin(String user, String host) { return false; }
+	
+	// Methods for network discovery page
+	@Description("Finds network by network name or network description or network IP or contained host name or description or IP")
+	@Operation(grantees = { roles.network_all_query.class })
+	public List<Xarxa> findNetworkByText_Discovery(@Nullable String text) {return null;}
+	// Methods for network discovery page
+	@Description("Finds all hosts or search contained host by name or description or IP")
+	@Operation(grantees = { roles.network_all_query.class })
+	public List<Maquina> findHostsByNetwork_Discovery(Xarxa parent, @Nullable String text) {return null;}
 }

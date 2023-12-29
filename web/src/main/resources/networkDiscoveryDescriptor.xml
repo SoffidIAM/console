@@ -4,14 +4,8 @@
 	<datanode name="root">
 		<finder name="network" type="network">
 			<ejb-finder jndi="java:/module/NetworkService-v2"
-				method="findNetworkByFilter">
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
-				<parameter value="${null}"/>
+				method="findNetworkByText_Discovery">
+				<parameter value="${textQuery}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Network">
 			</new-instance-bean>
@@ -44,8 +38,9 @@
 			</ejb-finder>
 		</finder>						
 		<finder name="host" type="host">
-			<ejb-finder jndi="java:/module/NetworkService-v2" method="findHostsByNetwork" if="${instance.discovery == true}">  <!-- network:query -->
+			<ejb-finder jndi="java:/module/NetworkService-v2" method="findHostsByNetwork_Discovery" if="${instance.discovery == true}">  <!-- network:query -->
 				<parameter value="${instance}"/>
+				<parameter value="${textQuery}"/>
 			</ejb-finder>
 			<new-instance-bean className="com.soffid.iam.api.Host"> 
 			</new-instance-bean>

@@ -227,7 +227,6 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      */
     protected void handleUpdate(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
         if (AutoritzacionsUsuari.canUpdateAllNetworks() || hasNetworkAuthorizations(Security.getCurrentUser(), xarxa.getCode(), new int[]{ADMINISTRACIO})) {
-
             @SuppressWarnings(value = "rawtypes")
             Collection maquines = findHostByFilter(null, null, null, null, null, null, null, null, null, xarxa.getCode(), null, new Boolean(false));
             for (Iterator iterator = maquines.iterator(); iterator.hasNext(); ) {
@@ -2031,9 +2030,17 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	private PagedResult<Network> doFindNetworkByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
 			List<Network> result) throws TokenMgrError, Exception {
+		final String[] primaryAttributes = new String[] { "name", "description", "address"};
+		return doFindNetworkByTextAndJsonQuery(text, jsonQuery, start, pageSize, result, primaryAttributes);
+	}
+
+	protected PagedResult<Network> doFindNetworkByTextAndJsonQuery(String text, String jsonQuery, Integer start,
+			Integer pageSize, List<Network> result, final String[] primaryAttributes)
+			throws InternalErrorException, Exception, UnsupportedEncodingException, ClassNotFoundException,
+			EvalException, ParseException, TokenMgrError {
 		final NetworkEntityDao dao = getNetworkEntityDao();
 		ScimHelper h = new ScimHelper(Network.class);
-		h.setPrimaryAttributes(new String[] { "name", "description", "address"});
+		h.setPrimaryAttributes(primaryAttributes);
 		CriteriaSearchConfiguration config = new CriteriaSearchConfiguration();
 		config.setFirstResult(start);
 		config.setMaximumResultSize(pageSize);
@@ -2231,4 +2238,39 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		}
 		
 	}
+
+	
+	@Override
+	protected List<Host> handleFindHostsByNetwork_Discovery(Network parent, String text) throws Exception {
+		if (parent instanceof ExtendedNetwork)
+			return handleFindHostByTextAndJsonQuery(text, "network.id eq "+parent.getId(), null, null).getResources();
+		else
+			return handleFindHostByTextAndJsonQuery(null, "network.id eq "+parent.getId(), null, null).getResources();
+	}
+
+	@Override
+	protected List<Network> handleFindNetworkByText_Discovery(String text) throws Exception {
+		List<Network> l = handleFindNetworkByTextAndJsonQuery(text, null, null, null).getResources();
+		List<Network> l2 = new LinkedList<>();
+		final String[] hostAttributes = new String[] { "hosts.name", "hosts.description", "hosts.hostIP"};
+		doFindNetworkByTextAndJsonQuery(text, null, null, null, l2, hostAttributes);
+		for (Network n: l2) {
+			if (!isIncluded (n, l)) l.add(new ExtendedNetwork( n ));
+		}
+		return l;
+	}
+
+	private boolean isIncluded(Network n, List<Network> l) {
+		for (Network nn: l)
+			if (nn.getId().equals(n.getId()))
+				return true;
+		return false;
+	}
 }
+
+class ExtendedNetwork extends Network {
+	public ExtendedNetwork(Network otherBean) {
+		super(otherBean);
+	}
+}
+

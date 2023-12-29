@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -286,7 +287,7 @@ public class ScimHelper {
 	String generateQuickSearchQuery (String text) throws InternalErrorException, UnsupportedEncodingException, JSONException, ClassNotFoundException {
 		if (text == null || text.trim().isEmpty())
 			return  "";
-		String[] split = text.trim().split("[ ,./-]+");
+		String[] split = split(text.trim());
 		
 		StringBuffer sb = new StringBuffer("");
 		for (int i = 0; i < split.length; i++)
@@ -320,6 +321,58 @@ public class ScimHelper {
 			}
 		}
 		return sb.toString();
+	}
+
+	public static String[] split(String s) {
+		if (s.startsWith("\"") && s.endsWith("\"") && s.length() > 2)
+			return new String[] {s.substring(1, s.length()-1)};
+
+		StringBuffer buffer = new StringBuffer();
+		List<String> l = new java.util.LinkedList<>();
+		boolean number = false;
+		for (int i = 0; i < s.length(); i++) {
+			char ch = s.charAt(i);
+			switch (ch) {
+			case ' ':
+			case ',':
+			case '/':
+			case '-':
+				if (buffer.length() > 0) l.add(buffer.toString());
+				buffer = new StringBuffer();
+				break;
+			case '.':
+				if (number) 
+				{
+					buffer.append(ch);
+					number = false;
+				}
+				else
+				{
+					if (buffer.length() > 0) l.add(buffer.toString());
+					buffer = new StringBuffer();
+				}
+				break;
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				number = true;
+				buffer.append(ch);
+				break;
+			default:
+				number = false;
+				buffer.append(ch);
+				break;
+			}
+		}
+		if (buffer.length() > 0) l.add(buffer.toString());
+		return l.toArray(new String[l.size()]);
 	}
 
 	public int count (String textFilter, String jsonQuery) throws InternalErrorException, UnsupportedEncodingException, ClassNotFoundException, EvalException, JSONException, ParseException, TokenMgrError {
@@ -424,13 +477,6 @@ public class ScimHelper {
 		this.session = session;
 	}
 
-
-	public static String[] split(String text) {
-		if (text.startsWith("\"") && text.endsWith("\"") && text.length() > 2)
-			return new String[] {text.substring(1, text.length()-1)};
-		else
-			return text.trim().split("[ ,./-]+");
-	}
 
 
 	public String getExtraJoin() {

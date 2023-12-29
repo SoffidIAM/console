@@ -12,11 +12,19 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 			</div>
 			<timer delay="300" repeats="true" running="true" onTimer="ref:frame.updateTree"/>
+			
+			<searchbox auto="true" id="searchBox"
+				jsonObject="com.soffid.iam.api.Network"
+				enableBasic="false"
+				enableAdvanced="false" 
+				defaultAttributes="name"
+				preference="discovery"
+				dataPath="/model:/network" variableName="query" variableNameText="textQuery"></searchbox>
 			<datatree2 id="listbox"
 				width="100%" dataPath="/model:/"
 				header="${c:l('com.soffid.iam.api.Group.name') }" 
 				openLevels="1"
-				enablefilter="true"
+				enablefilter="false"
 				onOpenAccounts="ref:frame.openAccounts"
 				onOpenSystem="ref:frame.openSystem"
 				onAddSystem="ref:frame.addSystem"
@@ -28,6 +36,7 @@
 				  icon: /img/network.svg
 				  value: name
 				  leaf: false
+				  expand: #{soffid:expandNetwork(this)}
 				- path: /host
 				  icon: #{soffid:getHostIcon(this)}
 				  value: name
@@ -40,6 +49,7 @@
 				- path: /serviceHolder
 				  value: instance[2]
 				  leaf: false
+				  expand: true
 				- path: /service
 				  template: >-
 				    #{service}: <a href="${execution.contextPath }/resource/account/account.zul?name=#{accountName}&system=#{accountSystem}" target="_blank">
@@ -57,10 +67,12 @@
 				  value: instance[2]
 				  leaf: false
 				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddSystem')">${c:l('agents.zul.Afegeixnou')}</button>
+				  expand: true
 				- path: /entryPointHolder
 				  value: instance[2]
 				  leaf: false
 				  tail: <button class="small-button" onclick="zkDatatree2.sendClientAction(this, 'onAddEntryPoint')">${c:l('agents.zul.Afegeixnou')}</button>
+				  expand: true
 				- path: /entryPoint
 				  template: >-
 				    <a href="${execution.contextPath }/resource/menu/menu.zul?filter=id eq #{id}" target="_blank">

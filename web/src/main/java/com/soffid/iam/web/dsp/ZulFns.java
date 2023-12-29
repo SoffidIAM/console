@@ -14,6 +14,7 @@ import org.zkoss.xel.fn.CommonFns;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Host;
+import com.soffid.iam.api.Network;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.laf.StandardColors;
@@ -107,5 +108,8 @@ public class ZulFns {
 			}
 		}
 		return o.toString();
+	}
+	public static final java.lang.String expandNetwork(es.caib.zkib.datamodel.DataNode node) {
+		return node.getInstance().getClass() == Network.class ? "false" : "true";
 	}
 }

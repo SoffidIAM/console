@@ -50,4 +50,5 @@ public class Xarxa {
 
 	@Nullable
 	String discoveryServer;
+
 }

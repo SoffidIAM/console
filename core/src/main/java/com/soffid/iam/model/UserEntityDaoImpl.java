@@ -222,7 +222,6 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 			tasque.setTransaction(TaskHandler.UPDATE_USER);
 			tasque.setUser(usuari.getUserName());
 			getTaskEntityDao().create(tasque);
-
         } catch (Throwable e) {
             String message = ExceptionTranslator.translate(e);
 
@@ -1251,10 +1250,14 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 			.setLong("id", src)
 			.executeUpdate();
 		
+		removeUserCacheEntry(src);
+		removeUserCacheEntry(target);
+
 		UserEntity su = load(src);
 		UserEntity tu = load(target);
 		getSession().evict(su);
 		getSession().evict(tu);
+		
 	}
     
     

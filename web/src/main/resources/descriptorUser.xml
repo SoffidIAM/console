@@ -61,6 +61,11 @@
 	</datanode>
 
 	<datanode name="usuari"> 
+		<ejb-refresh jndi="java:/module/UserService-v2"
+				method="findUserByUserId">
+				<parameter value="${instance.id}"/>
+		</ejb-refresh>
+		
 		<finder name="domini" type="dominiContrasenya" refreshAfterCommit="true">
 			<ejb-finder jndi="java:/module/UserService-v2"
 				method="findPasswordDomainStatus">

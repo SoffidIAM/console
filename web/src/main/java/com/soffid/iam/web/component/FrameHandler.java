@@ -519,4 +519,13 @@ public class FrameHandler extends Frame {
 			});
 		}
 	}
+  
+  public void refresh(Event e) {
+	  DataNode node = (DataNode) XPathUtils.eval(getListbox(), "/.");
+	  if (node.isCommitPending() || node.isUpdated() || node.isNew()) {
+		  Missatgebox.avis(Labels.getLabel("usuaris.Confirmar"));
+	  }
+	  else
+		  node.refresh();
+  }
 }

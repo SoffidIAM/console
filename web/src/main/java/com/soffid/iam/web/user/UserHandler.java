@@ -272,12 +272,11 @@ public class UserHandler extends FrameHandler {
 				"_blank");
 	}
 	
-	public void refresh(Event ev) throws InternalErrorException, NamingException, CreateException {
+	public void synchronize(Event ev) throws InternalErrorException, NamingException, CreateException {
 		String user = (String) XPathUtils.eval(getForm(), "userName");
 		EJBLocator.getUserService().refreshChanges(user);
-		
 	}
-	
+
 	public void userPrinters(Event ev) {
 		Window w = (Window) getFellow("printersWindow");
 		w.doHighlighted();

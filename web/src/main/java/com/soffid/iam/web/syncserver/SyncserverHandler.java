@@ -622,6 +622,12 @@ public class SyncserverHandler extends FrameHandler {
 						new Object [] {currentAgent.getUrl()}),
 								(event2) -> {
 									if (event2.getName().equalsIgnoreCase("onOK")) {
+										String serverUrl = this.serverUrl;
+										if (serverUrl == null) {
+											final Collection<Server> syncServers = EJBLocator.getSyncServerService().getSyncServers();
+											if (syncServers.size() > 0)
+												serverUrl = syncServers.iterator().next().getUrl();
+										}
 										String agentUrl = currentAgent.getUrl();
 										if (currentAgent.getUrl() == null ||
 												"local".equals(currentAgent.getUrl())) {

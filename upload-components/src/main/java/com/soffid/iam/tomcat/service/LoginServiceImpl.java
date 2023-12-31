@@ -152,11 +152,11 @@ public class LoginServiceImpl implements LoginService {
 					}
 					if (acc == null) {
 						log.info(masterMessage = username + " login rejected. Unknown account");
-						wrongUser (username);
+						wrongUser (account);
 						return null;
 					}
 					if (acc.isDisabled()) {
-						wrongUser (username);
+						wrongUser (account);
 						log.info(masterMessage = username + " login rejected. Disabled account");
 						return null;
 					}
@@ -458,7 +458,7 @@ public class LoginServiceImpl implements LoginService {
 //		Host h;
 //		ih.setHostIp(ip);
 //		i.setHosts(Arrays.asList(ih));
-
+		
 		server.createInternalIssue(i);
 	}
 }

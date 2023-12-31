@@ -181,7 +181,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 					UserEntity userEntity = user.getUserId() == null ?
 							getUserEntityDao().findByUserName(user.getUserName() ) :
 								getUserEntityDao().load(user.getUserId());
-					if (userEntity == null)
+					if (userEntity == null && ! issue.getType().equals("login-not-recognized"))
 						throw new InternalErrorException("Wrong user name or user id");
 					issueUserEntity.setIssue(entity);
 					issueUserEntity.setUser(userEntity);
@@ -191,7 +191,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 					issueUserEntity.setAction(EventUserAction.UNKNOWN);
 					getIssueUserEntityDao().create(issueUserEntity);
 					entity.getUsers().add(issueUserEntity);
-					users.add(issueUserEntity.getUser().getUserName());
+					users.add(issueUserEntity.getUserName());
 				}
 			}
 			if (issue.getType().equals("duplicated-user") && users.size() < 2) {

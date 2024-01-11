@@ -20,7 +20,7 @@ public class OtpWindow extends Window {
 	}
 
 	public void onCancelPassword(Event event) {
-		detach();
+		getParent().detach();
 	}
 	
 	public void onSetPassword (Event event) throws WrongValueException, InternalErrorException, NamingException, CreateException {
@@ -28,7 +28,7 @@ public class OtpWindow extends Window {
 		if (com.soffid.iam.EJBLocator.getOTPValidationService().validatePin(handler.getChallenge(), password.getValue()))
 		{
 			handler.enable();
-			detach();
+			getParent().detach();
 		}
 		else
 		{

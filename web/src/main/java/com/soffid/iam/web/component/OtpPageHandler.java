@@ -21,6 +21,7 @@ import com.soffid.iam.utils.ConfigurationCache;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class OtpPageHandler {
+	private static final String OTP_WINDOW_ID = "___________otp_window_top_screen_____________";
 	private static final String OTP_TIME_SESSION_ATTR = "$Soffid-otp-time$";
 	Component component;
 	Component parent;
@@ -123,6 +124,7 @@ public class OtpPageHandler {
 		map.put("handler", this);
 
 		otpWindow = new Window();
+		otpWindow.setId(OTP_WINDOW_ID);
 		if (component == null) {
 			Page p = Executions.getCurrent().getDesktop().getPage(page);
 			otpWindow.setPage(p);
@@ -152,6 +154,8 @@ public class OtpPageHandler {
 	public boolean needsOtp (Component comp, String resource) 
 	{
 		if (hasPreviousOtp())
+			return false;
+		if (otpInProgress(comp))
 			return false;
 		
 		component = comp;
@@ -198,6 +202,17 @@ public class OtpPageHandler {
 			throw new UiException(e);
 		}
 	}
+	private boolean otpInProgress(Component comp) {
+		Page p = comp == null ? Executions.getCurrent().getDesktop().getPage(page): comp.getPage();
+		if (p == null)
+			return false;
+		Component w = p.getFellowIfAny(OTP_WINDOW_ID);
+		if (w == null)
+			return false;
+		else
+			return w.isVisible();
+	}
+	
 	public Window getOtpWindow() {
 		return otpWindow;
 	}

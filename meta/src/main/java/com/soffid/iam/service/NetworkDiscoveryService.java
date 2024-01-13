@@ -129,4 +129,8 @@ public class NetworkDiscoveryService {
 	@Description("Generates a candidate system definiton")
 	@Operation (grantees= {networkDiscovery_schedule.class})
 	Dispatcher createSystemCandidate(Maquina host, String type, String userName, Password password, @Nullable String instance) { return null; }
+
+	@Description("Removes a candidate system definiton")
+	@Operation (grantees= {networkDiscovery_schedule.class})
+	void disconnectSystemFromHost(Maquina host, Dispatcher system) { }
 }

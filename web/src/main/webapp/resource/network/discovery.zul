@@ -97,7 +97,7 @@
 				<pager datatree2="listbox"/>
 				
 				<menu2>
-					<menu2item if="${canDeleteUser}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
+					<menu2item if="${soffid:isUserInRole('host:all:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 				</menu2>
 				
 				<databutton image="/img/save.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.applyNoClose" onlyIcon="true"/>

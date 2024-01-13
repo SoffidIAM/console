@@ -25,17 +25,24 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.AccessTreeExecution;
 import com.soffid.iam.api.Account;
+import com.soffid.iam.api.ApplicationAccessTree;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.HostPort;
+import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.JumpServerGroup;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordDomain;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.Server;
+import com.soffid.iam.api.Service;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.UserDomain;
+import com.soffid.iam.service.DispatcherService;
 import com.soffid.iam.service.ejb.AccountService;
+import com.soffid.iam.service.ejb.EntryPointService;
+import com.soffid.iam.service.ejb.NetworkDiscoveryService;
+import com.soffid.iam.service.ejb.NetworkService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
@@ -539,4 +546,79 @@ public class DiscoveryHandler extends FrameHandler {
 		if ("new".equals(wizard)) 
 			Executions.createComponents("/resource/network/wizard-network.zul", this, new HashMap<>());
 	}
+	
+	public void delete() throws CommitException {
+		Object o = XPathUtils.eval(getForm(), "/instance");
+		if ( o instanceof Host) {
+			Missatgebox.confirmaOK_CANCEL(Labels.getLabel("common.delete"), 
+					(event) -> { if (event.getName().equals("onOK")) deleteStep2 (); });
+		}
+	}
+
+	private void deleteStep2() throws NamingException, CreateException, InternalErrorException, CommitException {
+		DataNodeCollection systems = (DataNodeCollection) XPathUtils.eval(getForm(), "/dispatcherHolder/system");
+		if (systems.isEmpty())
+			deleteStep3 ();
+		else
+			Missatgebox.confirmaOK_CANCEL(Labels.getLabel("discovery.deleteSystems"), 
+				(event) -> {if (event.getName().equals("onOK")) deleteStep3(); });
+		
+	}
+
+	private void deleteStep3() throws NamingException, CreateException, InternalErrorException, CommitException {
+		DataNodeCollection entryPoints = (DataNodeCollection) XPathUtils.eval(getForm(), "/entryPointHolder/entryPoint");
+		if (entryPoints.isEmpty())
+			deleteStep4 ();
+		else
+			Missatgebox.confirmaOK_CANCEL(Labels.getLabel("discovery.deleteEntryPoints"), 
+				(event) -> {if (event.getName().equals("onOK")) deleteStep4(); });
+		
+	}
+
+	private void deleteStep4() throws NamingException, CreateException, InternalErrorException, CommitException {
+		Host host = (Host) XPathUtils.eval(getForm(), "/instance");
+		NetworkService ns = EJBLocator.getNetworkService();
+		NetworkDiscoveryService nds = EJBLocator.getNetworkDiscoveryService();
+		com.soffid.iam.service.ejb.DispatcherService ds = EJBLocator.getDispatcherService();
+		EntryPointService eps = EJBLocator.getEntryPointService();
+		
+		DataNodeCollection serviceHolder = (DataNodeCollection) XPathUtils.eval(getForm(), "/serviceHolder");
+		if (serviceHolder.size() > 0) {
+			DataNodeCollection services = (DataNodeCollection) XPathUtils.eval(getForm(), "/serviceHolder/service");
+			for (int i = 0; i < services.size(); i++) {
+				DataNode dn = (DataNode) services.getDataModel(i);
+				if (dn != null && !dn.isDeleted()) {
+					HostService hs = (HostService) dn.getInstance();
+					nds.deleteHostService(hs);
+				}
+			}
+		}
+		DataNodeCollection systems = (DataNodeCollection) XPathUtils.eval(getForm(), "/dispatcherHolder/system");
+		for (int i = 0; i < systems.size(); i++) {
+			DataNode dn = (DataNode) systems.getDataModel(i);
+			if (dn != null && !dn.isDeleted()) {
+				System hs = (System) dn.getInstance();
+				if ("PAM".equals(hs.getUsage())) {
+					ds.delete(hs);
+				} else {
+					nds.disconnectSystemFromHost(host, hs);
+				}
+			}
+		}
+		DataNodeCollection entryPoints = (DataNodeCollection) XPathUtils.eval(getForm(), "/entryPointHolder/entryPoint");
+		for (int i = 0; i < entryPoints.size(); i++) {
+			DataNode dn = (DataNode) entryPoints.getDataModel(i);
+			if (dn != null && !dn.isDeleted()) {
+				AccessTree aat =(AccessTree) dn.getInstance();
+				eps.delete(aat);
+			}
+		}
+		
+		DataTree2 dt = (DataTree2) getListbox();
+		dt.delete();
+		
+		hideDetails();
+	}
+
 }
+

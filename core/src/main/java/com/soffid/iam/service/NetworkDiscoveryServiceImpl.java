@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.HeaderParam;
+
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.Account;
@@ -485,6 +487,17 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 		HostServiceEntity entity = getHostServiceEntityDao().load(service.getId());
 		if (entity != null && entity.isManual()) {
 			getHostServiceEntityDao().remove(entity);
+		}
+	}
+
+
+	@Override
+	protected void handleDisconnectSystemFromHost(Host host, System system) throws Exception {
+		HostEntity he = getHostEntityDao().load(host.getId());
+		for (HostSystemEntity link: new LinkedList<>( he.getSystems())) {
+			if (link.getSystem().getId().equals(system.getId())) {
+				getHostSystemEntityDao().remove(link);
+			}
 		}
 	}
 

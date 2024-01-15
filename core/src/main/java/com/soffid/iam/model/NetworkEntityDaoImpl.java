@@ -125,6 +125,9 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
         targetVO.setLanAccess(new Boolean(sourceEntity.getNormalized().compareTo("S") == 0)); //$NON-NLS-1$
         targetVO.setDhcpSupport(sourceEntity.isDchpSupport());
         targetVO.setDiscoveryServer(sourceEntity.getDiscoveryServer() == null ? null: sourceEntity.getDiscoveryServer().getName());
+        targetVO.setDiscoveryRanges(new LinkedList<>());
+        for (NetworkDiscoverRangeEntity r: sourceEntity.getRanges())
+        	targetVO.getDiscoveryRanges().add(r.getRange());
     }
 
     /**

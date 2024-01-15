@@ -44,7 +44,7 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			if (!handlerExists())
 				registerHandler();
 			
-			final String name = "Discover network "+network.getDescription();
+			final String name = "Discover network "+network.getName()+" - "+network.getDescription();
 			if (!taskExists(ne.getId().toString())) {
 				ScheduledTask sc = new ScheduledTask();
 				sc.setActive(false);

@@ -5,6 +5,8 @@
 //
 
 package es.caib.seycon.ng.comu;
+import java.util.List;
+
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.ServerEntity;
@@ -51,4 +53,6 @@ public class Xarxa {
 	@Nullable
 	String discoveryServer;
 
+	@Nullable @Attribute(defaultValue = "new java.util.LinkedList()")
+	List<String> discoveryRanges;
 }

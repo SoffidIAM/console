@@ -25,13 +25,6 @@
 			<new-instance-bean className="com.soffid.iam.api.NetworkAuthorization"> 
 			</new-instance-bean>
 		</finder>						
-		<custom-handler className="com.soffid.iam.web.discovery.DummyPersistenceHandler"/>
-		<validator>
-			<attribute-validator expr="${instance.name}" notNull="true" friendlyName="networks.CodeValidation"/>
-			<attribute-validator expr="${instance.ip}" notNull="true" friendlyName="networks.AddressValidation"/>
-			<attribute-validator expr="${instance.mask}" notNull="true" friendlyName="networks.MaskValidation"/>
-			<attribute-validator expr="${instance.description}" notNull="true" friendlyName="networks.DescriptionValidation"/>
-		</validator>
 		<finder name="task" type="task" refreshAfterCommit="true">
 			<ejb-finder jndi="java:/module/NetworkDiscoveryService-v2" method="findNetworkDiscoveryScheduledTask">  <!-- network:query -->
 				<parameter value="${instance}"/>

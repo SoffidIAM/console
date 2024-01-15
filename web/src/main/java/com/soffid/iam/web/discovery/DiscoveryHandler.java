@@ -126,8 +126,12 @@ public class DiscoveryHandler extends FrameHandler {
 	
 	public void enableNetwork(Event ev) throws Exception {
 		Network n = (Network) XPathUtils.eval(getForm(), "instance"); 
+		getModel().commit();
 		EJBLocator.getNetworkDiscoveryService().enableNetworkDiscoveryScheduledTask(n);
 		XPathUtils.setValue(getForm(), "discovery", true);
+		DataNode dn = (DataNode) XPathUtils.eval(getForm(), "/");
+		dn.refresh();
+		dn.setDirty(false);
 		getModel().commit();
 		onChangeForm(ev);
 	}

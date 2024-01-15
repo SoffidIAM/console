@@ -15,6 +15,7 @@ import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.HostAttributeEntity;
 import com.soffid.iam.model.HostEntryPointEntity;
 import com.soffid.iam.model.HostSystemEntity;
+import com.soffid.iam.model.NetworkDiscoverRangeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.mda.annotation.Depends;
@@ -59,7 +60,8 @@ import roles.Tothom;
 	AsyncRunnerService.class,
 	HostAttributeEntity.class,
 	TipusDadaEntity.class,
-	AttributeValidationService.class})
+	AttributeValidationService.class,
+	NetworkDiscoverRangeEntity.class})
 public abstract class XarxaService {
 
 	@Operation ( grantees={roles.host_all_query.class},

@@ -48,6 +48,7 @@ import com.soffid.iam.model.HostSystemEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.MetaDataEntityDao;
 import com.soffid.iam.model.NetworkAuthorizationEntity;
+import com.soffid.iam.model.NetworkDiscoverRangeEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.NetworkEntityDao;
 import com.soffid.iam.model.OsTypeEntity;
@@ -217,12 +218,26 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             NetworkEntity entity = getNetworkEntityDao().networkToEntity(xarxa);
             getNetworkEntityDao().create(entity);
             xarxa.setId(entity.getId());
+            updateNetworkDiscoveryRanges(xarxa, entity);
             return getNetworkEntityDao().toNetwork(entity);
         }
         throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedMakeNet")); //$NON-NLS-1$
     }
 
-    /**
+    private void updateNetworkDiscoveryRanges(Network xarxa, NetworkEntity entity) {
+    	getNetworkDiscoverRangeEntityDao().remove(entity.getRanges());
+    	entity.getRanges().clear();
+    	if (xarxa.getDiscoveryRanges() != null) {
+	    	for (String r: xarxa.getDiscoveryRanges()) {
+	    		NetworkDiscoverRangeEntity ndr = getNetworkDiscoverRangeEntityDao().newNetworkDiscoverRangeEntity();
+	    		ndr.setNetwork(entity);
+	    		ndr.setRange(r);
+	    		getNetworkDiscoverRangeEntityDao().create(ndr);
+	    	}
+    	}
+	}
+
+	/**
      * @see es.caib.seycon.ng.servei.XarxaService#update(es.caib.seycon.ng.comu.Xarxa)
      */
     protected void handleUpdate(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
@@ -240,7 +255,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             if (old != null && !old.getName().equals(xarxa.getName()))
             	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.NETWORK_TYPE, 
             			old.getName(), xarxa.getName());
-            getNetworkEntityDao().update(getNetworkEntityDao().networkToEntity(xarxa));
+            final NetworkEntity entity = getNetworkEntityDao().networkToEntity(xarxa);
+			getNetworkEntityDao().update(entity);
+            updateNetworkDiscoveryRanges(xarxa, entity);
         } else {
             throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedUpdateNet")); //$NON-NLS-1$
         }
@@ -274,6 +291,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             		throw new InternalErrorException(String.format(Messages.getString("XarxaServiceImpl.IntegrityViolationHosts"),  //$NON-NLS-1$
     						new Object[]{xarxaEntity.getName(), maq.getName()}));
         	}
+        	getNetworkDiscoverRangeEntityDao().remove(xarxaEntity.getRanges());
             getNetworkEntityDao().remove(xarxaEntity);
         } else {
             throw new InternalErrorException(Messages.getString("NetworkServiceImpl.NotAuthorizedDeleteNet")); //$NON-NLS-1$

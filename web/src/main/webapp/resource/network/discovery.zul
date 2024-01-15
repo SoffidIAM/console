@@ -131,6 +131,13 @@
 						readonly="true"
 						bind="mask"
 						maxlength="50"/>
+					<customfield3
+						label="${c:l('com.soffid.iam.api.Network.discoveryRanges') }"
+						dataType="string"
+						readonly="false"
+						bind="discoveryRanges"
+						multiValue="true"
+						maxlength="50"/>
 					<div id="taskdiv">
 						<customfield3
 							use="com.soffid.iam.web.network.DiscoveryServerField"

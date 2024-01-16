@@ -122,7 +122,18 @@ public abstract class PoliticaContrasenyaEntity {
 	
 	@Nullable
 	@Description("Automatically unlock after X seconds. Null locks permanently")
+	@Column(name = "PCD_UNLSEC")
 	Integer unlockAfterSeconds;
+
+	@Description("Script to check password is valid")
+	@Column(name="PCD_PACHSC", length = 5000)
+	@Nullable 
+	String validationScript;
+	
+	@Description("Description of script to check password is valid")
+	@Column(name="PCD_PACHDE")
+	@Nullable 
+	String validationScriptDescription;
 
 	@Operation(translated="findByPasswordDomain")
 	@DaoFinder("select pol from \n"

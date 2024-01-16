@@ -19,6 +19,7 @@ import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.Task;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountPasswordEntity;
@@ -104,7 +105,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private ApplicationContext ctx;
 
 	/**
-	 * @throws InternalErrorException
+	 * @throws Exception 
+	 * @throws IOException 
 	 * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPolicy(es.caib.seycon.ng.model.UsuariEntity,
 	 *      es.caib.seycon.ng.model.PoliticaContrasenyaDominiEntity,
 	 *      com.soffid.iam.api.Password)
@@ -113,8 +115,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
 			com.soffid.iam.model.PasswordPolicyEntity politica, com.soffid.iam.api.Password password, 
 			boolean ignoreMinimumPeriod)
-			throws InternalErrorException {
-		PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, getUserAccounts(user, politica));
+			throws IOException, Exception {
+		PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, getUserAccounts(user, politica), user);
 
 		if (pcr != PolicyCheckResult.VALID)
 			return pcr;
@@ -136,12 +138,13 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (System.currentTimeMillis() - pe.getDate().getTime() < politica.getMinimumPeriod().longValue() * 1000 * 60 * 60 * 24 )
 				return PolicyCheckResult.NOT_YET; 
 		}
+		
 		return PolicyCheckResult.VALID; // No previous password
 	}
 
 	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
 			com.soffid.iam.model.PasswordPolicyEntity politica, com.soffid.iam.api.Password password)
-			throws InternalErrorException {
+			throws IOException, Exception {
 		return handleCheckPolicy(user, politica, password, false);
 	}
 	
@@ -168,7 +171,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	/**
-	 * @throws InternalErrorException
+	 * @throws Exception 
+	 * @throws IOException 
 	 * @see es.caib.seycon.ng.servei.InternalPasswordService#checkPolicy(es.caib.seycon.ng.model.UsuariEntity,
 	 *      es.caib.seycon.ng.model.PoliticaContrasenyaDominiEntity,
 	 *      com.soffid.iam.api.Password)
@@ -177,7 +181,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
 			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password,
 			boolean ignoreMinimumPeriod)
-			throws InternalErrorException {
+			throws IOException, Exception {
 		PasswordPolicyEntity politica = getUserPolicy(user, passwordDomain);
 		if (politica == null)
 			throw new InternalError ("No password policy available for user "+user.getUserName()+" and password domain "+passwordDomain.getName());
@@ -187,12 +191,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	@SuppressWarnings(value = "rawtypes")
 	protected PolicyCheckResult handleCheckPolicy(com.soffid.iam.model.UserEntity user,
 			com.soffid.iam.model.PasswordDomainEntity passwordDomain, com.soffid.iam.api.Password password)
-			throws InternalErrorException {
+			throws IOException, Exception {
 		return handleCheckPolicy(user, passwordDomain, password, false);
 	}
 	
 	private PolicyCheckResult internalCheckBasicPolicy(com.soffid.iam.model.PasswordPolicyEntity politica,
-			com.soffid.iam.api.Password password, Collection<AccountEntity> accounts) {
+			com.soffid.iam.api.Password password, Collection<AccountEntity> accounts, UserEntity user) throws InternalErrorException, IOException, Exception {
 		String uncrypted = password.getPassword();
 		if (politica.getMaxLength() != null && uncrypted.length() > politica.getMaxLength().longValue()) {
 			return PolicyCheckResult.TOO_LONG;
@@ -271,6 +275,16 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		if (politica.getComplexPasswords() != null && politica.getComplexPasswords().booleanValue()) {
 			return checkComplexRequirements(accounts, password);
+		}
+		if (politica.getValidationScript() != null && ! politica.getValidationScript().isEmpty()) {
+			HashMap<String, Object> m = new HashMap<String,Object>();
+			m.put("user", getUserEntityDao().toUser( user ));
+			if (! accounts.isEmpty())
+				m.put("account", getAccountEntityDao().toAccount( accounts.iterator().next() ));
+			m.put("password", password);
+			Object o = Evaluator.instance().evaluate(politica.getValidationScript(), m, "Password policy "+politica.getDescription());
+			if (! Boolean.TRUE.equals(o)) 
+				return PolicyCheckResult.CUSTOM_CHECK;
 		}
 		return PolicyCheckResult.VALID;
 	}
@@ -515,7 +529,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private void renewAutomaticPasswords(PasswordDomainEntity dc, PasswordPolicyEntity pc)
-			throws InternalErrorException {
+			throws IOException, Exception {
 		Calendar c = new GregorianCalendar();
 //        c.set(Calendar.HOUR_OF_DAY, 0);
 //        c.set(Calendar.MINUTE, 0);
@@ -556,7 +570,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private void disableUntrustedManualPasswords(PasswordDomainEntity dc, PasswordPolicyEntity pc)
-			throws InternalErrorException {
+			throws IOException, Exception {
 		Calendar c = new GregorianCalendar();
 //        c.set(Calendar.HOUR_OF_DAY, 0);
 //        c.set(Calendar.MINUTE, 0);
@@ -686,7 +700,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private Password generateRandomPassword(UserEntity usuariEntity, PasswordDomainEntity dc, PasswordPolicyEntity pc,
-			boolean minLength, boolean maxLength) throws InternalErrorException {
+			boolean minLength, boolean maxLength) throws IOException, Exception {
 		Random r = new Random(System.currentTimeMillis() + hashCode());
 		Password password;
 		int retries = 0;
@@ -1395,7 +1409,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 	@Override
 	protected PolicyCheckResult handleCheckAccountPolicy(AccountEntity account, Password password)
-			throws InternalErrorException {
+			throws IOException, Exception {
 		if (account.getType().equals(AccountType.USER)) {
 			UserEntity user = getUsuari(account);
 			PasswordDomainEntity passwordDomain = getPasswordDomain(account);
@@ -1408,7 +1422,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				return PolicyCheckResult.NOPOLICY_DEFINED;
 			}
 
-			PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, Collections.singleton(account));
+			PolicyCheckResult pcr = internalCheckBasicPolicy(politica, password, Collections.singleton(account), null);
 
 			if (pcr != PolicyCheckResult.VALID)
 				return pcr;
@@ -1806,7 +1820,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private Password generateRandomPassword(AccountEntity account, PasswordPolicyEntity pc, boolean minLength,
-			boolean maxLength) throws InternalErrorException {
+			boolean maxLength) throws IOException, Exception {
 		Random r = new Random(System.currentTimeMillis() + hashCode());
 		Password password;
 		int retries = 0;
@@ -1988,8 +2002,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				politica.getAvailableTime());
 		addCondition(b, Messages.getString("PasswordServiceImpl.RenewalTimeCondition"), //$NON-NLS-1$
 				politica.getRenewalTime());
-		addCondition(b, Messages.getString("PasswordServiceImpl.MinimumDurationCondition"), //$NON-NLS-1$
+		addCondition(b, Messages.getString("PasswordServiceImpl.MinimumPeriodCondition"), //$NON-NLS-1$
 				politica.getMinimumPeriod());
+		addCondition(b, politica.getValidationScriptDescription(), //$NON-NLS-1$
+				Long.valueOf( politica.getValidationScript() == null ? 0 : politica.getValidationScript().trim().length()) );
 		return b.toString();
 	}
 
@@ -2003,7 +2019,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	@Override
 	protected PolicyCheckResult handleCheckPolicy(PasswordPolicyEntity policy, Password password) throws Exception {
 		Collection<AccountEntity> accounts = Collections.emptyList();
-		return internalCheckBasicPolicy(policy, password, accounts);
+		return internalCheckBasicPolicy(policy, password, accounts, null);
 	}
 
 	/*

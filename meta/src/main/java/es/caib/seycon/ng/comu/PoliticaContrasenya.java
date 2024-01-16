@@ -116,4 +116,12 @@ public class PoliticaContrasenya {
 
 	@Description ("Enable complex password just like MS AD")
 	public boolean complexPasswords;
+	
+	@Description("Script to check password is valid")
+	@Nullable 
+	String validationScript;
+
+	@Description("Description of script to check password is valid")
+	@Nullable 
+	String validationScriptDescription;
 }

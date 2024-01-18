@@ -1,5 +1,6 @@
 package com.soffid.iam.web.issue;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,9 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.PasswordDomainStatus;
+import com.soffid.iam.api.System;
+import com.soffid.iam.api.UserAccount;
 
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
@@ -33,6 +37,17 @@ public class UnlockAccount implements ManualActionHandler {
 			}
 			Account account = EJBLocator.getAccountService().findAccount(issue.getAccount());
 			if (account.getStatus() != AccountStatus.LOCKED ) {
+				if (account instanceof UserAccount) {
+					System s = EJBLocator.getDispatcherService().findDispatcherByName(account.getSystem());
+					for (PasswordDomainStatus pd: 
+						EJBLocator.getUserService().findPasswordDomainStatus(((UserAccount) account).getUser())) {
+						if (pd.getDomainName().equals(s.getPasswordsDomain())) {
+							if (pd.getLockedUntil() != null &&
+									pd.getLockedUntil().after(new Date()))
+								return;
+						}
+					}
+				}
 				w.setVisible(false);
 				String msg = String.format(Labels.getLabel("issues.accountNotLocked"),
 						account.getLoginName());
@@ -66,6 +81,14 @@ public class UnlockAccount implements ManualActionHandler {
 					// Cannot happen
 				}
 				w.setVisible(false);
+				String msg = String.format(Labels.getLabel("issues.accountUnlocked"),
+						account.getLoginName());
+				EJBLocator.getIssueService().registerAction(issue, msg);
+				if (issues.size() == 1)
+					Missatgebox.avis(msg);
+			} else if (account instanceof UserAccount) {
+				System s = EJBLocator.getDispatcherService().findDispatcherByName(account.getSystem());
+				EJBLocator.getUserService().unlockPasswordDomain(((UserAccount) account).getUser(), s.getPasswordsDomain());
 				String msg = String.format(Labels.getLabel("issues.accountUnlocked"),
 						account.getLoginName());
 				EJBLocator.getIssueService().registerAction(issue, msg);

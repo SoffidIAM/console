@@ -3852,5 +3852,22 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		return r;
 	}
 
+	@Override
+	protected void handleUnlockPasswordDomain(String user, String passwordDomain)
+			throws Exception {
+		UserEntity entity = getUserEntityDao().findByUserName(user);
+		List<PasswordDomainStatus> r = new LinkedList<>();
+		PasswordDomainEntity pd = getPasswordDomainEntityDao().findByName(passwordDomain);
+		if (entity != null && pd != null) {
+			for (PasswordEntity pass: getPasswordEntityDao().findByUserDomain(entity, pd)) {
+				if (pass.getOrder() == null || pass.getOrder().longValue() == 0) {
+					pass.setFails(0);
+					pass.setUnlockDate(null);
+					getPasswordEntityDao().update(pass);
+				}
+			}
+		}
+	}
+
 
 }

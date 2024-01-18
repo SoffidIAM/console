@@ -768,4 +768,8 @@ public abstract class UsuariService {
 	
 	@Operation( grantees = {roles.user_query.class} )
 	public List<PasswordDomainStatus> findPasswordDomainStatus(String user) {return null;}
+
+	
+	@Operation( grantees = {roles.user_password_set.class, roles.user_password_update.class} )
+	public void unlockPasswordDomain(String user, String passwordDomain) {}
 }

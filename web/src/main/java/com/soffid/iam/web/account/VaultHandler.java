@@ -1,10 +1,12 @@
 package com.soffid.iam.web.account;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map.Entry;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -70,6 +72,8 @@ public class VaultHandler extends FrameHandler {
 
 	public VaultHandler() throws InternalErrorException {
 		com.soffid.iam.api.Tenant masterTenant = com.soffid.iam.ServiceLocator.instance().getTenantService().getMasterTenant();
+		boolean full = Security.isUserInRole("account:update");
+				
 	}
 
 	@Override
@@ -105,16 +109,29 @@ public class VaultHandler extends FrameHandler {
 				getFellow("updatePasswordButton").setVisible(false);
 				getFellow("updateSshButton").setVisible(false);
 			} else {
+				boolean personal = isPersonal();
 				updateAccountIcons(changeTab);
 				ObjectAttributesDiv att = (ObjectAttributesDiv) getFellow("userAttributes");
-				
+		
 				AccountAccessLevelEnum level = instance.getAccount().getAccessLevel();
 				boolean owner = (level == AccountAccessLevelEnum.ACCESS_OWNER) || instance.getAccount().getId() == null;
 				if (att.isReadonly() == owner ) {
 					att.setReadonly(!owner);
 					att.refresh();
 				}
-				getFellow("accountBasics").setVisible(owner);
+				
+				getFellow("accountBasics").setVisible(owner && !personal);
+				if (personal || !owner) {
+					((Tabbox)getFellow("accountTabbox")).setSelectedIndex(0);
+				}
+				((CustomField3)getFellow("description")).setReadonly(!personal);
+				((CustomField3)getFellow("loginName")).setReadonly(!personal);
+				((CustomField3)getFellow("loginUrl")).setReadonly(!personal);
+				getFellow("commitbar").setVisible(personal);
+				if (getFellowIfAny("name") != null)
+					getFellow("name").setVisible(!personal);
+				getFellow("system").setVisible(!personal);
+				getFellow("lockedBy").setVisible(!personal);
 				try {
 					DataNodeCollection coll = (DataNodeCollection) XPathUtils.eval(getForm(), "../services");
 					boolean display = owner && instance.getAccount().getType() == AccountType.SHARED;
@@ -123,6 +140,20 @@ public class VaultHandler extends FrameHandler {
 			}
 		}
 		updateStatus();
+	}
+
+	protected boolean isPersonal() {
+		DataTree2 lb = (DataTree2) getListbox();
+		boolean personal = false;
+		int pos[] = lb.getSelectedItem();
+		if (pos.length > 1) {
+			pos = Arrays.copyOf(pos, pos.length-1);
+			String path = (String) lb.getXpathAt(pos);
+			VaultElement o = (VaultElement) XPathUtils.eval(getModel(), path+"/instance");
+			if (o.getType().equals("folder"))
+				personal = o.getFolder().isPersonal();
+		}
+		return personal;
 	}
 
 	public void updateAccountIcons(boolean changeTab) {
@@ -202,6 +233,7 @@ public class VaultHandler extends FrameHandler {
 		DataTree2 tree = (DataTree2) getListbox();
 		Long parentId = (Long) tree.getJXPathContext().getValue("/folder/id");
 		String parent = (String) tree.getJXPathContext().getValue("/folder/name");
+		Boolean personal = (Boolean) tree.getJXPathContext().getValue("/folder/personal");
 		VaultElement e = new VaultElement();
 		e.setType("account");
 		e.setAccount(new Account());
@@ -213,6 +245,8 @@ public class VaultHandler extends FrameHandler {
 		e.getAccount().setPasswordPolicy(ssoPolicy);
 		e.getAccount().setType(AccountType.IGNORED);
 		e.getAccount().setStatus(AccountStatus.ACTIVE);
+		if (personal)
+			e.getAccount().setName("?");
 		tree.addNew("/vault", e);
 		showDetails();
 	}
@@ -244,20 +278,22 @@ public class VaultHandler extends FrameHandler {
 		Form2 form = (Form2) getFellow("accountProperties");
 		form.getDataSource().commit();
 		Account acc = (Account) XPathUtils.eval(form, "/.");
-		try {
-			for (UserType ut: EJBLocator.getUserDomainService().findAllUserType()) {
-				if (ut.getName().equals(acc.getPasswordPolicy())) {
-					if (ut.isUnmanaged())
-					{
-						Missatgebox.avis( String.format("Warning. The account policy [%s] is marked as unmanaged. The password will not be sent to the target system", 
-								ut.getDescription()),
-								(ev2) -> doPasswordChange() );
-						return;
+		if (! isPersonal() ) {
+			try {
+				for (UserType ut: EJBLocator.getUserDomainService().findAllUserType()) {
+					if (ut.getName().equals(acc.getPasswordPolicy())) {
+						if (ut.isUnmanaged())
+						{
+							Missatgebox.avis( String.format("Warning. The account policy [%s] is marked as unmanaged. The password will not be sent to the target system", 
+									ut.getDescription()),
+									(ev2) -> doPasswordChange() );
+							return;
+						}
 					}
 				}
+			} catch (Exception e) {
+				// Ignore errors due to lack of permissions
 			}
-		} catch (Exception e) {
-			// Ignore errors due to lack of permissions
 		}
 		try {
 			System system = EJBLocator.getDispatcherService().findDispatcherByName(acc.getSystem());

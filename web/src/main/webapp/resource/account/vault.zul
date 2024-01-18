@@ -25,6 +25,21 @@
 	}
 	</script>
 	
+	<style>
+	@media only screen and (max-width: 700px) {
+		div.datatree.vault div.tbody div.tree-label div.tree-cell:nth-child(2),
+		div.datatree.vault div.thead div.column:nth-child(2)
+	 	{
+			display: none;
+		}
+		div.datatree.vault div.tbody div.tree-label div.tree-cell:nth-child(1),
+		div.datatree.vault div.thead div.column:nth-child(1)
+		{
+			width: 100% !important;
+		}
+	}	
+	</style>
+	
 	<datamodel id="model" rootNode="root" src="descriptorVault.xml" onCommit="ref:frame.onChangeForm2"/>
 	<timer onTimer="ref:frame.updateStatus" running="false" delay="5000" repeats="true" />
 	<div sclass="card" id="card">
@@ -42,6 +57,7 @@
 				dataPath="/model:/vault" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatree2 id="listbox"
+				sclass="datatree vault"
 				width="100%" dataPath="/model:/"
 				reorder="true"
 				onReorder="ref:frame.reorder"
@@ -73,6 +89,7 @@
   columns:
   - template: >-
         #{type=='account'? account.description: folder.description}
+    $class: hide-vertical
 ]]>
 		</attribute>
 				<attribute name="columns"><![CDATA[
@@ -110,12 +127,12 @@
 							<tabpanels>
 								<tabpanel>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.name" 
-										if="${soffid:isUserInRole('account:query') }"/>
-									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.description" />
-									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.system" />
-									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginName" />
-									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginUrl" />
-									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.lockedBy" />
+										if="${soffid:isUserInRole('account:query') }" id="name"/>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.description" id="description"/>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.system" id="system"/>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginName" id="loginName"/>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginUrl" id="loginUrl"/>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.lockedBy" id="lockedBy" />
 									<div sclass="options options-small">
 										<div sclass="menuoption" id="launch_button" onClick="ref:frame.launch"> 
 											<image src="/img/link.svg"/>
@@ -134,6 +151,11 @@
 											<label sclass='menuoption-title' value="${c:l('vault.unlockAccount')}" />
 										</div> 
 									</div>
+									<div style="text-align: right; width: 100%" id="commitbar">
+										<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
+										</databutton>
+										<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
+									</div>					
 								</tabpanel>
 								<tabpanel>
 									<div use="com.soffid.iam.web.component.ObjectAttributesDiv"

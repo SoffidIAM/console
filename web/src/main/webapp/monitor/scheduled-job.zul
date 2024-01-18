@@ -17,7 +17,8 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
-					<menu2item image="/img/refresh.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('schedule:show')}" onClick="ref:frame.refresh"/>
+					<menu2item image="/img/refresh.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('schedule:show')}" 
+					onClick="ref:frame.refresh"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 				</menu2>
 			</div>

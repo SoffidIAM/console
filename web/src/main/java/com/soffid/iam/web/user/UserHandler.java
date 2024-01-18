@@ -23,6 +23,10 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.FulfillEvent;
+import org.zkoss.zk.ui.metainfo.ZScript;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Window;
 
@@ -37,6 +41,7 @@ import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.Menu2item;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
@@ -44,6 +49,7 @@ import com.soffid.iam.web.popup.ImportCsvHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
+import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.JXPathException;
@@ -277,8 +283,14 @@ public class UserHandler extends FrameHandler {
 		EJBLocator.getUserService().refreshChanges(user);
 	}
 
-	public void userPrinters(Event ev) {
+	public void userPrinters(Event ev) throws Exception {
+		Menu2item item = (Menu2item) getFellow("printersMenu");
+		for (Iterator it = item.getListenerIterator("onClick"); it.hasNext();) {
+			EventListener l = (EventListener) it.next();
+			l.onEvent(ev);
+		}
 		Window w = (Window) getFellow("printersWindow");
 		w.doHighlighted();
 	}
+	
 }

@@ -4,6 +4,13 @@
 <div use="com.soffid.iam.web.user.UserSharedAccountsHandler" id="handler">
 	<div class="navigation-bar dummy">
 		<label bind="${arg.listbox}:/@userName"></label> - <label bind="${arg.listbox}:/@fullName"/>
+		<menu2>
+			<menu2item image="/img/printer.svg" label="${c:l('seu.impressores') }" id="printersMenu" onClick="ref:frame.userPrinters"/>
+			<menu2item image="/img/menu/audit.svg" label="${c:l('seu.auditoria') }" onClick="ref:frame.audit" if="${soffid:isUserInRole('seu:auditoria:show') }"/>
+			<menu2item image="/img/menu/access-record.svg" label="${c:l('seu.registresaccess') }" onClick="ref:frame.accessLog" if="${soffid:isUserInRole('seu:registreAcces:show') }"/>
+			<menu2item image="/img/sync.svg" label="${c:l('usuaris.PropagarCanvi') }" onClick="ref:frame.synchronize" />
+			<menu2item image="/img/refresh.svg" label="${c:l('debug.zul.Refrescar') }" onClick="ref:frame.refreshCurrentNode" />
+		</menu2>
 	</div>
 
 	<datatable dataPath="${arg.listbox}:/sharedAccount" 

@@ -62,7 +62,7 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
 		try {
 			listbox = (DataTable) getFellow("listbox"); //$NON-NLS-1$
 
-			refresh ();
+			refresh (null);
 			HttpServletRequest req = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
 			String taskId = req.getParameter("taskId");
 			if (taskId != null)
@@ -98,7 +98,7 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
         taskUi.openTaskInstance(task);
 	}
 	
-	public void refresh() throws RemoteException,
+	public void refresh(Event ev) throws RemoteException,
 			InterruptedException, CreateException, NamingException,
 			BPMException, InternalErrorException {
 		BpmEngine engine = EJBLocator.getBpmEngine();
@@ -204,7 +204,7 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
         else
         {
         	try {
-				refresh();
+				refresh(null);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

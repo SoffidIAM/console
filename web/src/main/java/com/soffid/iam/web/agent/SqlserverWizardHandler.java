@@ -40,7 +40,7 @@ public class SqlserverWizardHandler extends BaseWizardHandler {
 		s.setParam2(url);
 		s.setParam3("true"); // Generate child agents
 		s.setParam4("false"); // Debug
-		s.setDescription("Mariadb "+url);
+		s.setDescription("SQL Server "+url);
 	}
 	
 	protected boolean validateConnectionAttributes() {

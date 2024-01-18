@@ -896,7 +896,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 				+ "left join usuari.mailDomain as dominiCorreu " //$NON-NLS-1$
 				+ "left join usuari.userType as tipusUsuariDomini "; //$NON-NLS-1$
 		if (dni != null) {
-			query += "left join usuari.userData as dadaUsuari " //$NON-NLS-1$
+			query += "left join usuari.attributes as dadaUsuari " //$NON-NLS-1$
 					+ "left join dadaUsuari.dataType as tipusDada "; //$NON-NLS-1$
 		}
 		query += "where usuari.tenant.id=:tenantId and " //$NON-NLS-1$

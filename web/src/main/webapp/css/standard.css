@@ -3999,6 +3999,41 @@ div.highlighted div.section {
 	}
 }
 	
+@media only screen and (max-width: 430px) {
+	div.databox.longlabel div.container, 
+	div.databox div.container,
+	div.databox div.container.wrapped,
+	div.databox.longlabel div.container.wrapped {
+	    width: calc(100% - 50px);
+		display: block;
+		margin-left: 50px;
+	
+	}
+	div.databox div.container.switch {
+		display: block;
+		margin-left: 50px;
+	
+	}
+	div.databox div.container span {
+	    width: 100%;
+		display: block;
+		margin-left: 0px;
+	}
+	div.databox div.container input.name, div.databox div.container span.name {
+	    width: calc(100% - 30px);
+	    min-width: 50px;
+	}
+	div.databox.databox_switch div.container span {
+	    width: 38px;
+	}
+	div.databox.databox_switch div.container span span.handle {
+	    width: 2px;
+	}
+	.switch span.slider {
+		height: 20px;
+	}
+	
+}
 	
 /*** WIZARD **/
 div.wizard-bar {

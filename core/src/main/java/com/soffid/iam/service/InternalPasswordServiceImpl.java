@@ -278,7 +278,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 		if (politica.getValidationScript() != null && ! politica.getValidationScript().isEmpty()) {
 			HashMap<String, Object> m = new HashMap<String,Object>();
-			m.put("user", getUserEntityDao().toUser( user ));
+			if (user != null)
+				m.put("user", getUserEntityDao().toUser( user ));
 			if (! accounts.isEmpty())
 				m.put("account", getAccountEntityDao().toAccount( accounts.iterator().next() ));
 			m.put("password", password);

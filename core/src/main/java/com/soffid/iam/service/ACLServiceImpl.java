@@ -32,7 +32,7 @@ public class ACLServiceImpl extends ACLServiceBase  {
 		if (ue == null)
 			return new AccessControlList();
 		
-		PermissionCache pc = getCache().get(userId);
+		PermissionCache pc = getCache().get(Security.getCurrentTenantName()+":"+userId);
 		if (pc != null)
 		{
 			return pc.acl;
@@ -61,7 +61,7 @@ public class ACLServiceImpl extends ACLServiceBase  {
 		pc.acl = acl;
 		pc.lastModification = ue.getLastModificationDate();
 		pc.evaluationDate = new Date();
-		getCache().put(userId, pc);
+		getCache().put(Security.getCurrentTenantName()+":"+userId, pc);
 //		log.info("Entry stored");
 		
 		return acl;
@@ -217,8 +217,8 @@ public class ACLServiceImpl extends ACLServiceBase  {
 	}
 
 	
-	private ICacheAccess<Long, PermissionCache> cache;
-	private ICacheAccess<Long, PermissionCache> getCache()
+	private ICacheAccess<String, PermissionCache> cache;
+	private ICacheAccess<String, PermissionCache> getCache()
 	{ 
 		if (cache == null)
 			cache = JCSCacheProvider.buildCache(PermissionCache.class.getName());

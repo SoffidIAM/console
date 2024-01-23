@@ -86,20 +86,16 @@ public class ConfigurationCache {
 	
 	public static void setProperty (String property, String value)
 	{
-		try {
-			String tenant = Security.getCurrentTenantName();
-			if (tenant == null)
-				return;
-			HashMap<String, TimedValue<String>> map = cache.get(tenant);
-			if (map == null)
-			{
-				map = new HashMap<String, TimedValue<String>>();
-				cache.put(tenant, map);
-			}
-			map.put(property, new TimedValue<String>(value, Security.isSyncServer() ? 0:  System.currentTimeMillis() + 60_000L));
-		} catch (InternalErrorException e) {
-			throw new RuntimeException(e);
+		String tenant = Security.getCurrentTenantName();
+		if (tenant == null)
+			return;
+		HashMap<String, TimedValue<String>> map = cache.get(tenant);
+		if (map == null)
+		{
+			map = new HashMap<String, TimedValue<String>>();
+			cache.put(tenant, map);
 		}
+		map.put(property, new TimedValue<String>(value, Security.isSyncServer() ? 0:  System.currentTimeMillis() + 60_000L));
 	}
 
 	public static String getMasterProperty(String property) {
@@ -111,20 +107,16 @@ public class ConfigurationCache {
 	}
 
 	public static void remove(String property) {
-		try {
-			String tenant = Security.getCurrentTenantName();
-			if (tenant == null)
-				return;
-			HashMap<String, TimedValue<String>> map = cache.get(tenant);
-			if (map == null)
-			{
-				map = new HashMap<String, TimedValue<String>>();
-				cache.put(tenant, map);
-			}
-			map.remove(property);
-		} catch (InternalErrorException e) {
-			throw new RuntimeException(e);
+		String tenant = Security.getCurrentTenantName();
+		if (tenant == null)
+			return;
+		HashMap<String, TimedValue<String>> map = cache.get(tenant);
+		if (map == null)
+		{
+			map = new HashMap<String, TimedValue<String>>();
+			cache.put(tenant, map);
 		}
+		map.remove(property);
 	}
 	
 	public static boolean isHistoryEnabled() {

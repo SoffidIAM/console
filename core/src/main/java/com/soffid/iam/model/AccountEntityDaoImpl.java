@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jcs.access.behavior.ICacheAccess;
+import org.apache.commons.jcs.access.exception.CacheException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -53,14 +54,18 @@ public class AccountEntityDaoImpl extends
 	public void create(com.soffid.iam.model.AccountEntity entity) {
 		super.create(entity);
 		auditar("C", entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
-		getCache().remove(entity.getId());
+		removeCacheEntry(entity);
+	}
+
+	protected void removeCacheEntry(com.soffid.iam.model.AccountEntity entity) {
+		getCache().remove(Security.getCurrentTenantName()+":"+entity.getId());
 	}
 
 	@Override
 	public void update(com.soffid.iam.model.AccountEntity entity) {
 		try {
 			handleUpdate(entity, "U");
-			getCache().remove(entity.getId());
+			removeCacheEntry(entity);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -68,7 +73,7 @@ public class AccountEntityDaoImpl extends
 
 	@Override
 	public void remove(com.soffid.iam.model.AccountEntity entity) {
-		getCache().remove(entity.getId());
+		removeCacheEntry(entity);
 		getAccountAccessEntityDao().remove(
 				new LinkedList<com.soffid.iam.model.AccountAccessEntity>(entity
 						.getAcl()));
@@ -132,13 +137,16 @@ public class AccountEntityDaoImpl extends
 	public void toAccount(com.soffid.iam.model.AccountEntity source,
 			Account target) {
 		try {
-			AccountCacheEntry entry = (AccountCacheEntry) getCache().get(source.getId());
-			if ( entry != null && (
-					source.getLastChange() == null ||
-					source.getLastChange().equals(entry.account.getLastChange())))
-			{
-				fetchFromCache(target, entry);
-				return ;
+			Object c =  getCache().get(Security.getCurrentTenantName()+":"+source.getId());
+			if (c instanceof AccountCacheEntry) {
+				AccountCacheEntry entry = (AccountCacheEntry) c;
+				if ( entry != null && (
+						source.getLastChange() == null ||
+						source.getLastChange().equals(entry.account.getLastChange())))
+				{
+					fetchFromCache(target, entry);
+					return ;
+				}
 			}
 			super.toAccount(source, target);
 			// Incompatible types source.dispatcher and target.dispatcher
@@ -343,7 +351,7 @@ public class AccountEntityDaoImpl extends
 
 		entry.account.setAccessLevel(AccountAccessLevelEnum.ACCESS_NONE);
 		
-		getCache().put(source.getId(), entry);
+		getCache().put(Security.getCurrentTenantName()+":"+source.getId(), entry);
 	}
 
 	private void fetchFromCache(Account target, AccountCacheEntry entry)
@@ -528,13 +536,13 @@ public class AccountEntityDaoImpl extends
 	protected void handleUpdate(AccountEntity entity, String auditType)
 			throws Exception {
 		super.update(entity);
-		getCache().remove(entity.getId());
+		removeCacheEntry(entity);
 		if (auditType != null)
 			auditar(auditType, entity.getName(), entity.getSystem().getName()); //$NON-NLS-1$
 	}
 
-	private ICacheAccess<Long, AccountCacheEntry> cache;
-	private ICacheAccess<Long, AccountCacheEntry> getCache()
+	private ICacheAccess<String, AccountCacheEntry> cache;
+	private ICacheAccess<String, AccountCacheEntry> getCache()
 	{ 
 		if (cache == null)
 		{
@@ -571,7 +579,7 @@ public class AccountEntityDaoImpl extends
 	
 	public void handleRemoveFromCache (AccountEntity entity) 
 	{
-		getCache().remove(entity.getId());
+		removeCacheEntry(entity);
 	}
 
 	@Override

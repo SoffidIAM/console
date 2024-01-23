@@ -240,7 +240,7 @@ public abstract class AccountService {
 	@Description ("Finds an account by id")
 	@Operation ( grantees={roles.user_create.class,roles.user_query.class,
 			roles.user_update.class,roles.agent_query.class,
-			roles.agent_update.class})
+			roles.agent_update.class, roles.account_query.class})
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Account findAccountById(long id)
 		throws es.caib.seycon.ng.exception.InternalErrorException {

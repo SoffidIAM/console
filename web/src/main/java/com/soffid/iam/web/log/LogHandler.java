@@ -59,11 +59,8 @@ public class LogHandler extends FrameHandler {
 	public String getFileName() {
 		String file = System.getProperty("catalina.home") + "/logs/soffid.";
 		
-		try {
-			if (! Security.getCurrentTenantName().equals(Security.getMasterTenantName()))
-				file = file + Security.getCurrentTenantName()+".";
-		} catch (InternalErrorException e) {
-		}
+		if (! Security.getCurrentTenantName().equals(Security.getMasterTenantName()))
+			file = file + Security.getCurrentTenantName()+".";
 		
 		file = file + new Timestamp(System.currentTimeMillis()).toString().substring(0, 10)+".log";
 		return file;

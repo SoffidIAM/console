@@ -690,9 +690,19 @@ public class VaultHandler extends FrameHandler {
 		boolean b = super.insertBefore(newChild, refChild);
 		if ( newChild instanceof DataModel) {
 			HttpServletRequest request = (HttpServletRequest) Executions.getCurrent().getNativeRequest();
+			String requestedId = request.getParameter("accountId");
 			String requestedAccount = request.getParameter("account");
 			String requestedSystem = request.getParameter("system");
-			if (requestedAccount != null && requestedSystem != null)
+			if (requestedId != null) {
+				try {
+					account = EJBLocator.getAccountService().findAccountById(Long.parseLong(requestedId));
+					if (account != null)
+						((DataModel)newChild).getVariables().declareVariable("id", account.getId());
+				} catch (InternalErrorException | NamingException | CreateException e) {
+					e.printStackTrace();
+				}
+			}
+			else if (requestedAccount != null && requestedSystem != null)
 			{
 				try {
 					account = EJBLocator.getAccountService().findAccount(requestedAccount, requestedSystem);

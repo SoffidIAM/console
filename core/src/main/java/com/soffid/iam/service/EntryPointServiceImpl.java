@@ -798,11 +798,11 @@ public class EntryPointServiceImpl extends
         if (p == null)
         	return new PermissionsCache();
         
-		PermissionsCache entry = getCache().get(p);
+		PermissionsCache entry = getCache().get(getCacheKey(p));
         if (entry != null)
         	return entry;
         
-        getCache().remove(p);
+        getCache().remove(getCacheKey(p));
 			 
 		return calculateAuthorizations(p);
 	}
@@ -853,7 +853,7 @@ public class EntryPointServiceImpl extends
 			// Get active accounts
 			entry.getAccountsPUE().addAll(p.getAccountIds());
  			// Guardem les dades de l'usuari actual
-			getCache().put(p, entry);
+			getCache().put(getCacheKey(p), entry);
 			return entry;
 		} else {
 			PermissionsCache entry = new PermissionsCache();
@@ -873,9 +873,13 @@ public class EntryPointServiceImpl extends
             // Get active accounts
            	entry.getAccountsPUE().add(acc.getId());
  			// Guardem les dades de l'usuari actual
-			getCache().put(p, entry);
+			getCache().put(getCacheKey(p), entry);
 			return entry;
 		}
+	}
+
+	protected String getCacheKey(SoffidPrincipal p) {
+		return p.getTenant()+"\\"+p.getName();
 	}
 
 	private boolean isOrigenAncestorDesti(Long origenId, Long destiId) {
@@ -2497,8 +2501,8 @@ public class EntryPointServiceImpl extends
 	}
 
 	
-	private ICacheAccess<Principal, PermissionsCache> cache;
-	private ICacheAccess<Principal, PermissionsCache> getCache()
+	private ICacheAccess<String, PermissionsCache> cache;
+	private ICacheAccess<String, PermissionsCache> getCache()
 	{ 
 		if (cache == null)
 			cache = JCSCacheProvider.buildCache(PermissionsCache.class.getName());

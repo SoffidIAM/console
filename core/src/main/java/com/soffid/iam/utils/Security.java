@@ -516,11 +516,7 @@ public class Security {
     	assertCanSetIdentity();
     	
         String ctn;
-		try {
-			ctn = getCurrentTenantName()+"\\";
-		} catch (InternalErrorException e) {
-			throw new RuntimeException(e);
-		}
+		ctn = getCurrentTenantName()+"\\";
         if (! user.startsWith(ctn))
         	user = ctn + user;
         int i = user.indexOf('\\');
@@ -609,7 +605,7 @@ public class Security {
 		} 
     }
     
-    public static String getCurrentTenantName () throws InternalErrorException
+    public static String getCurrentTenantName () 
     {
     	SoffidPrincipal p = getSoffidPrincipal();
     	if (p != null)

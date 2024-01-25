@@ -1,5 +1,8 @@
 package com.soffid.iam.service.impl.events;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 import org.apache.commons.beanutils.BeanUtils;
 
 import com.soffid.iam.api.Issue;
@@ -7,6 +10,8 @@ import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.IssueHostEntity;
 import com.soffid.iam.model.IssueUserEntity;
 import com.soffid.iam.utils.ConfigurationCache;
+
+import es.caib.seycon.ng.comu.SoDRisk;
 
 public class IssueTextFormatter {
 	public String format(String msg, Issue event, IssueEntity entity) {
@@ -71,6 +76,20 @@ public class IssueTextFormatter {
 							.append("@")
 							.append(event.getRoleAccount().getRoleName());
 				}
+				else if (variable.equals("risk")) {
+					if (event.getRisk() == SoDRisk.SOD_FORBIDDEN) {
+						result.append("Forbidden");
+					}
+					else if (event.getRisk() == SoDRisk.SOD_HIGH) {
+						result.append("High");
+					}
+					else if (event.getRisk() == SoDRisk.SOD_LOW) {
+						result.append("Low");
+					}
+					else if (event.getRisk() == SoDRisk.SOD_NA) {
+						result.append("N/A");
+					}
+				}
 				else {
 					Object property = BeanUtils.getProperty(event, variable);
 					if (property != null)
@@ -84,5 +103,4 @@ public class IssueTextFormatter {
 		result.append(msg.substring(processed));
 		return result.toString();
 	}
-
 }

@@ -358,6 +358,7 @@ public class DiscoveryHandler extends FrameHandler {
 			}
 		}
 		else if ("Postgresql".equalsIgnoreCase(type) ||
+				"Mariadb".equalsIgnoreCase(type) ||
 				"SqlServer".equalsIgnoreCase(type)) {
 			instance.setVisible(true);
 			instanceUrl.setVisible(false);			

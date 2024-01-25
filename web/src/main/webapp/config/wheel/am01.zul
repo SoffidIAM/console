@@ -10,29 +10,29 @@
 	<div id="step1">
 		<div style="height: 320px">
 			<label multiline="true" value="${c:l('wheel.users.explanation') }" />
-			<radiogroup id="radio" onCheck="ref:iga02_w.onRadio()" style="display:block; margin-top: 20px">
+			<radiogroup id="radio" onCheck="ref:am01_w.onRadio()" style="display:block; margin-top: 20px">
 				<radio value="csv" label="${c:l('wheel.users.loadcsv') }" style="display:block"></radio>
 				<radio value="auth" label="${c:l('wheel.users.loadauth') }" style="display:block"></radio>
 				<radio value="form" label="${c:l('wheel.users.manually') }" style="display:block"></radio>
 			</radiogroup>
 		</div>
 		<div style="text-align: right; width: 100%">
-			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga02_w.back" />
-			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga02_w.step2" id="step2Button"/>
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:am01_w.back" />
+			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:am01_w.step2" id="step2Button"/>
 		</div>
 				
 	</div>
 	<div id="step2">
 		<div style="height: 320px">
 			<label multiline="true" value="${c:l('wheel.users.explanation2') }" />
-			<radiogroup id="radio2" onCheck="ref:iga02_w.onRadio2()" style="display:block; margin-top:20px">
+			<radiogroup id="radio2" onCheck="ref:am01_w.onRadio2()" style="display:block; margin-top:20px">
 				<radio value="ad" label="${c:l('wheel.users.ad') }" style="display:block"></radio>
 				<radio value="sql" label="${c:l('wheel.users.relationalDatabase') }" style="display:block"></radio>
 			</radiogroup>
 		</div>
 		<div style="text-align: right; width: 100%">
-			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:iga02_w.back" />
-			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:iga02_w.step3" id="step3Button"/>
+			<button image="/img/undo-r.svg" label="${c:l('common.undo')}" onClick="ref:am01_w.back" />
+			<button image="/img/next-r.svg" label="${c:l('user_createaccount.Next')}" onClick="ref:am01_w.step3" id="step3Button"/>
 		</div>
 				
 	</div>

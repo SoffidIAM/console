@@ -102,12 +102,19 @@ public class DiscoveryHandler extends FrameHandler {
 				getFellow("notaskdiv").setVisible( ! Boolean.TRUE.equals(enabled));
 				getFellow("taskdiv").setVisible( Boolean.TRUE.equals(enabled));
 				getFellow("deleteAccountButton").setVisible(false);
+				if (getFellowIfAny("deleteHost") != null)
+					getFellowIfAny("deleteHost").setVisible(false);
 			} else if (o instanceof Host){
 				getFellow("hostDiv").setVisible(true);
+				if (getFellowIfAny("deleteHost") != null)
+					getFellowIfAny("deleteHost").setVisible(true);
 			} else {
 				if (getModel() != null)
 					getModel().commit();
 				
+				if (getFellowIfAny("deleteHost") != null)
+					getFellowIfAny("deleteHost").setVisible(false);
+
 				try {
 					displayRemoveButton(getListbox(), false);
 				} catch (ComponentNotFoundException e) {} // Ignore

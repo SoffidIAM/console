@@ -52,6 +52,12 @@ public class IssueTextFormatter {
 						else
 							result.append(u.getUserName());
 					}
+					if (first && event.getRoleAccount() != null) {
+						if (event.getRoleAccount().getUserCode() != null)
+							result.append(event.getRoleAccount().getUserCode());
+						else
+							result.append(event.getRoleAccount().getAccountName());
+					}
 				}
 				else if (variable.equals("host")) {
 					boolean first = true;

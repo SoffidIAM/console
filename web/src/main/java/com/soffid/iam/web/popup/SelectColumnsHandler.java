@@ -36,6 +36,7 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 	private JSONArray cols;
 	private int positions[];
 	private boolean table;
+	private JSONArray sourceColumns;
 
 	public SelectColumnsHandler() {
 		
@@ -53,8 +54,8 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			String colsString = src.getColumns();
 			if (colsString == null) {
 				JSONArray ar = new JSONArray();
-				for (int i = 0; i < srccols.length() && i < 6; i++)
-					ar.put(srccols.get(i));
+				for (int i = 0; i < sourceColumns.length() && i < 6; i++)
+					ar.put(sourceColumns.get(i));
 				colsString = ar.toString();
 			}
 				
@@ -66,11 +67,13 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			} catch (Exception e) {
 			}
 			HashSet<String> colNames = new HashSet();
+			sourceColumns = new JSONArray();
 			for (int i = 0; i < cols2.length(); i++) {
 				JSONObject o = new JSONObject();
 				JSONObject colDef = cols2.getJSONObject(i);
 				String value = colDef.optString("value", "");
 				if (colDef.optString("name", null) != null) {
+					sourceColumns.put(colDef);
 					o.put("name", colDef.getString("name"));
 					o.put("sort", false);
 					o.put("mandatory", isMandatory(mandatory, value));
@@ -92,6 +95,7 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 				if (colDef.optString("name", null) != null &&
 						!colNames.contains(colDef.getString("name"))) {
 					if (! isMandatory(mandatory, value)) {
+						sourceColumns.put(colDef);
 						o.put("name", colDef.getString("name"));
 						o.put("sort", false);
 						o.put("mandatory", isMandatory(mandatory, value));
@@ -105,7 +109,6 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 			for (int i = 0; i < positions.length; i++) positions[i] = i;
 			
 		} else {
-			table = false;
 			DataTree2 src = (DataTree2) c;
 			cols = src.getColumns();
 			positions = new int[cols.length()];
@@ -195,10 +198,9 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 					mandatory = ((DynamicColumnsDatatable) c).getMandatoryColumns();
 			} catch (Exception e) {
 			}
-			JSONArray srccols = src.getAllColumns();
 			for (int i = 0; i < positions.length; i++) 
 			{
-				JSONObject colDef = srccols.getJSONObject( positions[i] );
+				JSONObject colDef = sourceColumns.getJSONObject( positions[i] );
 				String value = colDef.optString("value", "");
 				boolean sel = isMandatory(mandatory, value) ||  
 						colDef.optBoolean("mandatory");

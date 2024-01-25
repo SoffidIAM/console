@@ -272,6 +272,14 @@ public class VaultHandler extends FrameHandler {
 			showDetails();
 			getModel().getVariables().declareVariable("id", null);
 		}
+		try {
+			String pref = EJBLocator.getPreferencesService().findMyPreference("passwordManagerInstalled");
+			if (pref == null) {
+				EJBLocator.getPreferencesService().updateMyPreference("passwordManagerInstalled", "true");
+				response(null, new org.zkoss.zk.au.out.AuScript(this, "setTimeout(doRegisterVault, 1000);"));
+			}
+		} catch (Exception e) {
+		}
 	}
 
 	public void setPassword(Event event) throws InternalErrorException, NamingException, CreateException, CommitException {
@@ -856,5 +864,9 @@ public class VaultHandler extends FrameHandler {
 		}
 		XPathUtils.setValue(getForm(), "sshPublicKey", acc.getSshPublicKey());
 		w.setVisible(false);
+	}
+	
+	public void configurePasswordManager() {
+		response(null, new org.zkoss.zk.au.out.AuScript(this, "doRegisterVault()"));
 	}
 }

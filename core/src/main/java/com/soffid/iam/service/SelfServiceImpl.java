@@ -581,5 +581,15 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 //		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
 		getAccountService().checkinHPAccount(account);
 	}
+	@Override
+	protected Account handleGetAccountById(long id) throws Exception {
+		Account acc = getAccountService().findAccountById(id);
+		if (acc == null || 
+				acc.getAccessLevel() == AccountAccessLevelEnum.ACCESS_NAVIGATE ||
+				acc.getAccessLevel() == AccountAccessLevelEnum.ACCESS_NONE)
+			return null;
+		else
+			return acc;
+	}
 	
 }

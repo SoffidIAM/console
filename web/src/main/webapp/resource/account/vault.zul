@@ -48,6 +48,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
 				<menu2>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('sso:createSharedFolders')}"  onClick="ref:frame.addNew"/>
+					<menu2item image="/img/unlock.svg" label="${c:l('vault.installVault') }" if="${soffid:isUserInRole('sso:manageAccounts')}"  onClick="ref:frame.configurePasswordManager"/>
 				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"

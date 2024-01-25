@@ -232,4 +232,10 @@ public abstract class SelfService {
 	public List<DadaUsuari> getAccountAttributes (Account acc) {
 		return null;
 	}
+
+	@Operation
+	@Description("Get account")
+	public Account getAccountById (long id) {
+		return null;
+	}
 }

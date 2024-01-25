@@ -501,6 +501,7 @@ public class DiscoveryHandler extends FrameHandler {
 				newAccessTree = EJBLocator.getEntryPointService().create(newAccessTree);
 				String url ;
 				url = typeValue+"://"+host.getName();
+				EJBLocator.getEntryPointService().getAllMimeTypeExecution();
 				for (String scope: new String[] {"L", "W", "I"}) {
 					AccessTreeExecution exec = new AccessTreeExecution();
 					exec.setExecutionTypeCode("PAM");

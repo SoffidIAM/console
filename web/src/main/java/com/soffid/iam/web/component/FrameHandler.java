@@ -95,7 +95,7 @@ public class FrameHandler extends Frame {
 			} else {
 				if (! nomenu) {
 					setVisible(false);
-					throw new SecurityException("This URL is forbidden");
+					throw new SecurityException("The URL "+getPage().getRequestPath()+"is forbidden");
 				}
 			}
 			

@@ -156,7 +156,8 @@
 				selectIcon="/img/pencil.svg"
 				/>
 			<customfield3 label="${c:l('com.soffid.iam.api.IssuePolicyAction.processDefinition') }" dataType="STRING"
-				bind="processDefinition" id="processDefinition" readonly="true"/>
+				uiHandler="com.soffid.iam.web.issue.ProcessDefinitionFieldHandler"
+				bind="processDefinition" id="processDefinition" required="true"/>
 		</form>
 		<div style="text-align: right; width: 100%">
 			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 

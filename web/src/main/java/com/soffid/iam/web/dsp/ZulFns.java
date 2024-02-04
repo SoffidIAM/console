@@ -112,4 +112,5 @@ public class ZulFns {
 	public static final java.lang.String expandNetwork(es.caib.zkib.datamodel.DataNode node) {
 		return node.getInstance().getClass() == Network.class ? "false" : "true";
 	}
+	
 }

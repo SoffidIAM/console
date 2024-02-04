@@ -31,6 +31,7 @@ public class IssuePolicyAction {
 	String emailAddress;
 	
 	@Nullable
+	@Attribute(customUiHandler = "com.soffid.iam.web.issue.ProcessDefinitionFieldHandler", type = "STRING", multivalue = false)
 	String processDefinition;
 	
 	@Nullable

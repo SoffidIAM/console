@@ -203,46 +203,51 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 				if (timestamp >= clearCacheTimestamp && 
 					timestamp > System.currentTimeMillis() - 10 * 60 * 1000L)
 					return; // Already processed and not needed
-				timestamp = System.currentTimeMillis();
-				User user = null;
-				Security.nestedLogin(tenant, "anonymous", Security.ALL_PERMISSIONS);
-				try {
-					user = userService.findUserByUserId(userId);
-					
-					int i = name.indexOf('\\');
-					String account;
-					if (i < 0) {
-						account = name;
-					} else {
-						account = name.substring(i + 1);
-					}
-
-					Account acc = accountService.findAccount(account, dispatcherService.findSoffidDispatcher().getName());
-					if (acc == null || acc.isDisabled() ||
-							user == null || Boolean.FALSE.equals( user.getActive())) {
-						permissions = new String[0];
-						soffidRoles = new String[0];
-						groups = new String[0];
-						accountIds = new LinkedList<>();
-						return;
-					}
-					
-					// Update authorizations
-					updatePermissions(acc);
-					// Update account ids
-					accountIds = new LinkedList<Long>(accountService.getUserGrantedAccountIds(user));
-					// UdpateGroups
-					updateGroups(acc);
-					// update roles
-					updateRoles(acc, user);
-					// update group and roles
-					updateGroupsAndRoles();
-				} catch (Exception e) {
-					LogFactory.getLog(getClass()).warn("Error refreshing permissions of "+name,e);
-				} finally {
-					Security.nestedLogoff();
-				}
+				fetchPrincipalProperties();
 			});
+		}
+	}
+
+	protected void fetchPrincipalProperties() {
+		timestamp = System.currentTimeMillis();
+		User user = null;
+		Security.nestedLogin(tenant, "anonymous", Security.ALL_PERMISSIONS);
+		try {
+			user = userService.findUserByUserId(userId);
+			int i = name.indexOf('\\');
+			String account;
+			if (i < 0) {
+				account = name;
+			} else {
+				account = name.substring(i + 1);
+			}
+
+			Account acc = accountService.findAccount(account, dispatcherService.findSoffidDispatcher().getName());
+			if (acc == null || acc.isDisabled() ||
+					user == null || Boolean.FALSE.equals( user.getActive())) {
+				permissions = new String[0];
+				soffidRoles = new String[0];
+				groups = new String[0];
+				accountIds = new LinkedList<>();
+				return;
+			}
+			
+			userName = user.getUserName();
+			fullName = user.getFullName();
+			// Update authorizations
+			updatePermissions(acc);
+			// Update account ids
+			accountIds = new LinkedList<Long>(accountService.getUserGrantedAccountIds(user));
+			// UdpateGroups
+			updateGroups(acc);
+			// update roles
+			updateRoles(acc, user);
+			// update group and roles
+			updateGroupsAndRoles();
+		} catch (Exception e) {
+			LogFactory.getLog(getClass()).warn("Error refreshing permissions of "+name,e);
+		} finally {
+			Security.nestedLogoff();
 		}
 	}
 
@@ -413,6 +418,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		}
 		return o == null ? null : new HashMap<>(o.getAttributes());
 	}
+
 	public SoffidPrincipalImpl(SoffidPrincipal p)  {
 		this(p.getName(),
 				p.getUserName(),
@@ -425,6 +431,19 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 				p.getAccountIds(),
 				p.getGroupIds(),
 				p.getUserId());
+	}
+
+	public SoffidPrincipalImpl(String name, Long userId)  {
+		super(name, "*", new LinkedList<>());
+		this.userId = userId;
+		int i = name.indexOf("\\");
+		if (i > 0)
+		{
+			tenant = name.substring(0, i);
+		}
+		else
+			tenant = "master";
+		fetchPrincipalProperties();
 	}
 
 	public SoffidPrincipalImpl(String name,

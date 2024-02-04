@@ -274,7 +274,7 @@ public class VaultHandler extends FrameHandler {
 		}
 		try {
 			String pref = EJBLocator.getPreferencesService().findMyPreference("passwordManagerInstalled");
-			if (pref == null) {
+			if (pref == null && Security.isUserInRole("sso:passwordManager")) {
 				EJBLocator.getPreferencesService().updateMyPreference("passwordManagerInstalled", "true");
 				response(null, new org.zkoss.zk.au.out.AuScript(this, "setTimeout(doRegisterVault, 1000);"));
 			}
@@ -867,6 +867,7 @@ public class VaultHandler extends FrameHandler {
 	}
 	
 	public void configurePasswordManager() {
-		response(null, new org.zkoss.zk.au.out.AuScript(this, "doRegisterVault()"));
+		if (Security.isUserInRole("sso:passwordManager"))
+			response(null, new org.zkoss.zk.au.out.AuScript(this, "doRegisterVault()"));
 	}
 }

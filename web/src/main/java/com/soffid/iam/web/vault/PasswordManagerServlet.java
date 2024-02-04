@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.collections.map.LRUMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -31,8 +32,14 @@ import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.LaunchType;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.System;
+import com.soffid.iam.api.User;
+import com.soffid.iam.api.UserAccount;
 import com.soffid.iam.api.VaultFolder;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AdditionalDataService;
+import com.soffid.iam.service.PasswordManagerService;
 import com.soffid.iam.service.ejb.AccountService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -48,38 +55,98 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 		"/vault/passwordManager"})
 public class PasswordManagerServlet extends HttpServlet {
 	Log log = LogFactory.getLog(getClass());
+	PasswordManagerService svc = ServiceLocator.instance().getPasswordManagerService();
+	HashMap<String, SoffidPrincipal> principals = new HashMap<>();
 	
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String action = req.getParameter("action");
+		String token = req.getParameter("token");
+		String newToken = null;
 		JSONObject r = new JSONObject();
+		String user = null;
 		try {
-			if (Security.getCurrentUser() == null) {
+			if (token != null)
+				user = svc.findUserByToken(token);
+			if (Security.getCurrentUser() != null) {
+				if (! Security.isUserInRole("sso:passwordManager")) {
+					user = null;
+					r.put("success",  false);					
+				}
+				if (user == null || !user.equals(Security.getCurrentUser())) {
+					user = Security.getCurrentUser();
+					if (token != null || req.getParameter("wantToken") != null)
+						newToken = svc.generateToken(user);
+				}
+			}
+			if (user == null) {
 				r.put("success",  false);
 			}
 			else 
 			{
-				r.put("success", true);
-				if ("list".equals(action)) {
-					r.put("data",  doList(req));
-				}
-				else if ("get-password".equals(action)) {
-					r.put("data",  getPassword(req));
-				}
-				else if ("set-password".equals(action)) {
-					r.put("data",  setPassword(req, r));
+				SoffidPrincipal principal = registerPrincipal(user);
+				if (principal == null) {
+					r.put("success",  false);
 				} else {
-					r.put("success", false);
+					r.put("success", true);
+					if (newToken == null)
+						newToken = svc.renewToken(token);
+					Security.nestedLogin(principal);
+					try {
+						if ("list".equals(action)) {
+							r.put("data",  doList(req));
+						}
+						else if ("get-password".equals(action)) {
+							r.put("data",  getPassword(req));
+						}
+						else if ("set-password".equals(action)) {
+							r.put("data",  setPassword(req, r));
+						} else {
+							r.put("success", false);
+						}
+					} finally {
+						Security.nestedLogoff();
+					}
 				}
 			}
 		} catch (Exception e) {
-			log.warn("Error fetching user "+Security.getCurrentUser()+" accounts", e);
+			log.warn("Error fetching user "+user+" accounts", e);
 			r.put("success", false);
 		}
+		if (newToken != null)
+			r.put("newToken", newToken);
 		resp.setContentType("application/json");
 		ServletOutputStream out = resp.getOutputStream();
 		out.write(r.toString().getBytes(StandardCharsets.UTF_8));
 		out.close();
+	}
+
+	private SoffidPrincipal registerPrincipal(String user) throws InternalErrorException, NamingException, CreateException {
+		final String tag = Security.getCurrentTenantName()+"\\"+user;
+		SoffidPrincipal principal = principals.get(tag);
+		if (principal != null) 
+			return principal;
+		
+		Security.nestedLogin(Security.ALL_PERMISSIONS);
+		try {
+			User u = EJBLocator.getUserService().findUserByUserName(user);
+			if (u == null || !u.getActive())
+				return null;
+			System d = EJBLocator.getDispatcherService().findSoffidDispatcher();
+			for (UserAccount account: EJBLocator.getAccountService()
+					.findUsersAccounts(user, d.getName())) {
+				if (!account.isDisabled()) {
+					SoffidPrincipalImpl p = new SoffidPrincipalImpl(
+							Security.getCurrentTenantName()+"\\"+account.getName(), 
+							u.getId());
+					principals.put(tag, p);
+					return p;
+				}
+			}
+		} finally {
+			Security.nestedLogoff();
+		}
+		return null;
 	}
 
 	private JSONArray doList(HttpServletRequest req) throws InternalErrorException, NamingException, CreateException {

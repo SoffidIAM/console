@@ -1612,6 +1612,12 @@
 	</autoritzacio>
 	
 	<autoritzacio>
+		<codi>sso:passwordManager</codi>
+		<descripcio>Install password manager</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+	
+	<autoritzacio>
 		<codi>tenant:query</codi>
 		<descripcio>Query existing tenants</descripcio>
 		<ambit>Tenancy</ambit>

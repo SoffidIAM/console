@@ -47,6 +47,8 @@ function dumpFiles {
    cd ..
 }
 
+echo "Generating from $(dirname $0)"
+
 dir=$(dirname $0)
 base=$(realpath "$dir/../../..")
 
@@ -66,4 +68,4 @@ cat $base/target/wix/feature.wxs  >>$base/target/wix/console.wxs
 cat $base/target/wix/tail.wxs >>$base/target/wix/console.wxs
 
 cd $base
-wixl -a x64 $base/target/wix/console.wxs
+wixl -v -a x64 $base/target/wix/console.wxs

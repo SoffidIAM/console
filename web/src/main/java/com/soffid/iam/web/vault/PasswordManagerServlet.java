@@ -89,8 +89,11 @@ public class PasswordManagerServlet extends HttpServlet {
 					r.put("success",  false);
 				} else {
 					r.put("success", true);
-					if (newToken == null)
+					if (newToken == null) {
 						newToken = svc.renewToken(token);
+						if (newToken != null && newToken.equals(token))
+							newToken = null;
+					}
 					Security.nestedLogin(principal);
 					try {
 						if ("list".equals(action)) {

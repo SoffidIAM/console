@@ -62,12 +62,21 @@ public class NavigationBar extends Div implements AfterCompose {
 		}
 		else 
 		{
-			String name = Labels.getLabel("menu.title");				
-			Label label = new Label(name);
-			label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
-			label.setAttribute("target", "");
-			label.setSclass("link");
-			insertBefore(label, getFirstChild());				
+			boolean popup = false;
+			for (Object c : getChildren()) {
+				if (c instanceof SearchBox) {
+					popup = true;
+					break;
+				}
+			}
+			if (!popup) {
+				String name = Labels.getLabel("menu.title");
+				Label label = new Label(name);
+				label.addEventHandler("onClick",  new EventHandler(ZScript.parseContent("ref:"+frame+".menu"), null));
+				label.setAttribute("target", "");
+				label.setSclass("link");
+				insertBefore(label, getFirstChild());
+			}
 		}
 	}
 

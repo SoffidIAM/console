@@ -14,7 +14,7 @@
 
 	<datamodel id="model" rootNode="root" src="descriptorFinder.xml"/>
 	
-	<div>
+	<div sclass="navigation-bar">
 		<menu2>
 			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:window.changeColumns"/>
 		</menu2>

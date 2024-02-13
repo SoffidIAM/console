@@ -85,7 +85,7 @@
 			</form>
 			</div>
 		</div>
-       	<div class="soffid-logo-corner"><a hrloginboxef="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
+       	<div class="soffid-logo-corner"><a target="_blank" href="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
 		]]></html>
 		<html id="motd" if="${showMotd }"><![CDATA[
 		   <div class="login" id="motdbox"> 

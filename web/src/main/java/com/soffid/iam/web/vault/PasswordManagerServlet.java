@@ -292,7 +292,7 @@ public class PasswordManagerServlet extends HttpServlet {
            					md.setUserVisibility(AttributeVisibilityEnum.EDITABLE);
            					md.setOperatorVisibility(AttributeVisibilityEnum.EDITABLE);
            					md.setCode(attributeName);
-           					md.setValidationExpression("false");
+           					md.setVisibilityExpression("false");
            					md.setLabel("Form data");
       						md.setType(TypeEnumeration.SSO_FORM_TYPE);
            					md.setSize(1024);

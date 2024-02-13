@@ -1016,11 +1016,13 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			issue.setType("locked-account");
 			issue.setHash(contra.getId().toString());
 			getIssueService().createInternalIssue(issue);
-			getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/credential-compromise",
-					account2.getName(), account2.getSystem().getName(), 
-					new String[] {
-							"credentialType", "password"
-					});
+			if (account2 != null) {
+				getSignalService().signalAccount("https://schemas.openid.net/secevent/risc/event-type/credential-compromise",
+						account2.getName(), account2.getSystem().getName(), 
+						new String[] {
+								"credentialType", "password"
+				});
+			}
 			if (ppe.getUnlockAfterSeconds() != null) {
 				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
 				if (account2 != null) {

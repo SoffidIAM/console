@@ -20,6 +20,8 @@ import java.security.cert.Certificate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.soffid.iam.interp.ExtensibleObjectNamespace;
+
 import bsh.BshClassManager;
 import bsh.ConsoleInterface;
 import bsh.EvalError;
@@ -165,7 +167,8 @@ public class SecureInterpreter {
 		BshJainClassManager bshcm = new BshJainClassManager();
 		BshJailNamespace bshnm = new BshJailNamespace(null, bshcm, "Secure Namespace");
 		interp  = new Interpreter(new StringReader(""), 
-				System.out, System.err, false, bshnm);
+				System.out, System.err, false, bshnm,
+				null, "-");
 	}
 
 
@@ -174,8 +177,15 @@ public class SecureInterpreter {
 		return eval (expr, getNameSpace());
 	}
 
-	public Object eval (final String expr, final NameSpace ns) throws MalformedURLException, EvalError
+	public Object eval (final String expr, final NameSpace ns) 
+			throws MalformedURLException, EvalError
 	{
+		return eval(expr, ns, "script");
+	}
+
+
+	public Object eval(final String expr, final NameSpace ns, final String label) 
+		throws MalformedURLException, EvalError {
 		Object [] result  = AccessController.doPrivileged(
 				new PrivilegedAction<Object[]>() {
 					public Object[] run() {
@@ -199,7 +209,9 @@ public class SecureInterpreter {
 						return AccessController.doPrivileged(new PrivilegedAction<Object[]>() {
 							public Object[] run() {
 								try {
-									return new Object[] { interp.eval(expr, ns) };
+									return new Object[] { interp.eval(
+											new StringReader(expr),
+											ns, label) };
 								} catch (EvalError e) {
 									return new Object[] { null, e};
 								} catch (RuntimeException e) {

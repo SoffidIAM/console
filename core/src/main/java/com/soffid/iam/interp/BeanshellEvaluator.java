@@ -32,17 +32,21 @@ public class BeanshellEvaluator extends Evaluator {
 						"interpeter", vars);
 		
 		try {
-			Object result = interpret.eval(script, newNs);
+			if (!script.endsWith(";"))
+				script += ";";
+			
+			Object result = interpret.eval(script, newNs, label);
 			if (result != null && result instanceof Primitive)
 			{
 				result = ((Primitive)result).getValue();
 			}
 			return result;
 		} catch (ParseException e) {
-			throw new InternalErrorException("Error evaluating "+label+": "+e.getMessage()+"\nat: "+e.getScriptStackTrace());
+			throw new InternalErrorException("Error evaluating "+label+": "+
+					e.getMessage());
 		} catch (TargetError e) {
 			throw new InternalErrorException ("Error evaluating "+label+": "+
-					e.getTarget().getMessage(),
+					e.getTarget().getMessage()+" at line "+e.getErrorLineNumber()+" " +e.getScriptStackTrace(),
 					e.getTarget());
 		} catch (EvalError e) {
 			String msg;
@@ -51,7 +55,7 @@ public class BeanshellEvaluator extends Evaluator {
 			} catch (Exception e2) {
 				msg = e.getMessage();
 			}
-			throw new InternalErrorException ("Error evaluating "+label+": "+msg);
+			throw new InternalErrorException ("Error evaluating "+label+": "+msg, e);
 		}
 	}
 

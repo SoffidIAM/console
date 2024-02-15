@@ -10,6 +10,7 @@ import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.openjdk.nashorn.api.scripting.ClassFilter;
 import org.openjdk.nashorn.api.scripting.JSObject;
 import org.openjdk.nashorn.api.scripting.NashornException;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.soffid.iam.api.Account;
 
@@ -42,7 +44,7 @@ public class JavascriptEvaluator extends Evaluator {
 		Bindings bindings = new DynamicBindings(vars);
 		engine.setBindings(bindings , ScriptContext.ENGINE_SCOPE);
 		try {
-			return unwrap(secureRun(engine, script));
+			return unwrap(secureRun(engine, script), engine);
         } catch (ScriptException se) {
             // get the original cause
             Throwable cause = se.getCause();
@@ -62,23 +64,31 @@ public class JavascriptEvaluator extends Evaluator {
             throw se;
         }
 	}
-	private Object unwrap(Object r) {
+	private Object unwrap(Object r, ScriptEngine engine) {
 		if (r == null)
 			return null;
+		if (r instanceof ScriptObjectMirror) {
+			ScriptObjectMirror som = (ScriptObjectMirror) r;
+			if (som.hasMember("getTime") && som.hasMember("getTimezoneOffset")) {
+				long timestampLocalTime = (long) (double) som.callMember("getTime"); 
+				int timezoneOffsetMinutes = (int) (double) som.callMember("getTimezoneOffset");
+				return new Date(timestampLocalTime + timezoneOffsetMinutes * 60 * 1000);
+			}
+		}
 		if (r instanceof org.openjdk.nashorn.api.scripting.AbstractJSObject) {
 			org.openjdk.nashorn.api.scripting.AbstractJSObject js = (AbstractJSObject) r;
 			if (js.isArray()) {
 				List<Object> l = new LinkedList<>();
 				Number length = (Number) js.getMember("length");
 				for (int i = 0; i < length.intValue(); i++)
-					l.add(unwrap(js.getSlot(i)));
+					l.add(unwrap(js.getSlot(i), engine));
 				return l;
 			}
 			else 
 			{
 				HashMap m = new HashMap<>();
 				for (Object value: js.keySet()) {
-					m.put(value, unwrap(js.getMember(value.toString())));
+					m.put(value, unwrap(js.getMember(value.toString()), engine));
 				}
 				return m;
 			}

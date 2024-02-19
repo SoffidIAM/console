@@ -2,7 +2,6 @@ package com.soffid.iam.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -18,8 +17,6 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,9 +39,7 @@ import org.json.JSONTokener;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.Host;
 import com.soffid.iam.api.JumpServerGroup;
-import com.soffid.iam.api.Network;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.api.Password;
@@ -58,8 +54,7 @@ import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.SessionEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.ssl.AlwaysTrustConnectionFactory;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -69,6 +64,8 @@ import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class PamSessionServiceImpl extends PamSessionServiceBase {
+
+	private static String PROPERTY_TIMEOUT = "soffid.pam.search.recordings.timeout";
 
 	@Override
 	protected JumpServerGroup handleCreate(JumpServerGroup jumpServerGroup) throws Exception {
@@ -730,16 +727,21 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 					storeUrl += "until="+URLEncoder.encode(Long.toString(until.getTime()), "UTF-8")+"&";
 				Response response;
 				try {
-					response = 
-							WebClient
-							.create(storeUrl, jsg.getStoreUserName(), 
-									Password.decode(jsg.getPassword()).getPassword(), null)
-							.type(MediaType.APPLICATION_JSON)
-							.accept(MediaType.APPLICATION_JSON)
-							.get();
-					
+					WebClient client = WebClient.create(storeUrl, jsg.getStoreUserName(), Password.decode(jsg.getPassword()).getPassword(), null);
+					HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
+					long milisecondsToWait = 60000;
+					try {
+						milisecondsToWait = Long.parseLong(ConfigurationCache.getMasterProperty(PROPERTY_TIMEOUT));
+					} catch (Exception e) {}
+					conduit.getClient().setConnectionTimeout(milisecondsToWait);
+					conduit.getClient().setReceiveTimeout(milisecondsToWait);
+					client.type(MediaType.APPLICATION_JSON);
+					client.accept(MediaType.APPLICATION_JSON);
+					response = client.get();
 				} catch (Exception e) {
-					throw new InternalErrorException ("Error connecting to "+storeUrl+": "+e.getMessage() );
+					if (e.getMessage().contains("SocketTimeoutException"))
+						throw new InternalErrorException("Internal timeout reached, use parameter \"soffid.pam.search.recordings.timeout\" to increase the milliseconds.");
+					throw new InternalErrorException("Error connecting to "+storeUrl+": "+e.getMessage() );
 				}
 				
 				if (response.getStatus() != 200)

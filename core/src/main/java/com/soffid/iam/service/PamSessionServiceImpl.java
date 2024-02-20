@@ -740,7 +740,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 					response = client.get();
 				} catch (Exception e) {
 					if (e.getMessage().contains("SocketTimeoutException"))
-						throw new InternalErrorException("Internal timeout reached, use parameter \"soffid.pam.search.recordings.timeout\" to increase the milliseconds.");
+						throw new InternalErrorException("Timeout reached in the query, use the parameter \"soffid.pam.search.recordings.timeout\" to specify a longer timeout in milliseconds (default 60000).");
 					throw new InternalErrorException("Error connecting to "+storeUrl+": "+e.getMessage() );
 				}
 				

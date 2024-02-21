@@ -2,7 +2,6 @@ package com.soffid.iam.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -19,7 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,9 +39,7 @@ import org.json.JSONTokener;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.Host;
 import com.soffid.iam.api.JumpServerGroup;
-import com.soffid.iam.api.Network;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.api.Password;
@@ -58,8 +54,6 @@ import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.SessionEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.ssl.AlwaysTrustConnectionFactory;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
@@ -726,8 +720,16 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 					storeUrl += "user="+URLEncoder.encode(user, "UTF-8")+"&";
 				if (since != null)
 					storeUrl += "since="+URLEncoder.encode(Long.toString(since.getTime()), "UTF-8")+"&";
-				if (until != null)
+				if (until != null) {
+			        Calendar cal = Calendar.getInstance();
+			        cal.setTime(until);
+			        cal.add(Calendar.DATE, 1);
+			        cal.set(Calendar.HOUR, 0);
+			        cal.set(Calendar.MINUTE, 0);
+			        cal.set(Calendar.MILLISECOND, 0);
+			        until = cal.getTime();
 					storeUrl += "until="+URLEncoder.encode(Long.toString(until.getTime()), "UTF-8")+"&";
+				}
 				Response response;
 				try {
 					response = 

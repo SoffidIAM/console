@@ -2546,6 +2546,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 				}
 				prop.setValue(value);
 				context.getSession().save(prop);
+			} else {
+				throw new InternalErrorException(Messages.getString("BpmEngineImpl.NotAuthorizedToChangeStatus"));
 			}
     		audit(def, value.equals("true")?"D": "E");
 			return VOFactory.newProcessDefinition(def, context);

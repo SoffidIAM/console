@@ -1890,6 +1890,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     addr2 = InetAddress.getByAddress(b);
                     String addrText = addr2.getHostAddress();
                     xarxa = dao.findByAddress(addrText);
+                    if (xarxa != null)
+                    	return xarxa;
                 } catch (java.net.UnknownHostException e) {
                     throw new InternalErrorException("Unable to parse address "+e.getMessage());
                 }

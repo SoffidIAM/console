@@ -488,7 +488,7 @@ public class ProcessUI extends FrameHandler {
 	}
 
     
-	public void openTree(Event ev) throws InternalErrorException, BPMException, NamingException, CreateException {
+	public void openTree(Event ev) throws InternalErrorException, BPMException, NamingException, CreateException, ClassNotFoundException, IOException, DocumentException, SQLException {
 		DataTree2 dt = (DataTree2) ev.getTarget();
 		int[] selected = dt.getSelectedItem();
 		JSONObject current = currentTasks;
@@ -496,6 +496,9 @@ public class ProcessUI extends FrameHandler {
 			current = current.getJSONArray("children").getJSONObject(s);
 		}
 		String type = current.getString("type");
+		if ("process".equals(type)) {
+			openProcessInstance(EJBLocator.getBpmEngine().getProcess(current.getLong("processId")), true);
+		}
 		if ("task".equals(type)) {
 			openTask(current);
 		}

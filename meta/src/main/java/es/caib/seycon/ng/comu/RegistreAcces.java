@@ -52,6 +52,10 @@ public class RegistreAcces {
 	public java.lang.String nomClinet;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "clientAddress")
+	public java.lang.String clientAddress;
+
+	@Nullable
 	@Attribute(translated = "accessType" )
 	public java.lang.String tipusAcces;
 

@@ -532,6 +532,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         		entity.setMail("N");
         		entity.setHostIP(null);
         		entity.setDeleted(true);
+        		entity.setSerialNumber(null);
         		getHostEntityDao().update(entity);
         		getHostAliasEntityDao().remove(new LinkedList<>(entity.getHostAlias()));
     			createHostTask(entity);
@@ -1740,7 +1741,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     @Override
     protected Host handleFindHostBySerialNumber(String serialNumber) throws Exception {
         HostEntity maquina = getHostEntityDao().findBySerialNumber(serialNumber);
-        if (maquina == null)
+        if (maquina == null || Boolean.TRUE.equals(maquina.getDeleted()))
             return null;
         else
             return getHostEntityDao().toHost(maquina);
@@ -1803,7 +1804,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         // Third. Test if this serial is already used (with another name)
         if (maquina == null) {
             maquina = getHostEntityDao().findBySerialNumber(serialNumber);
-            if (maquina != null && !nomMaquina.equals(maquina.getName())) {
+            if (maquina != null && Boolean.TRUE.equals(maquina.getDeleted()))
+            	maquina = null;
+            if (maquina != null && 
+            		!nomMaquina.equals(maquina.getName())) {
             	anyChange = true;
                 maquina.setName(nomMaquina);
             }

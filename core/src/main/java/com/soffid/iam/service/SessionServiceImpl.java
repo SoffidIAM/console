@@ -71,8 +71,11 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     private HostEntity findMaquina(String nomOrIp) {
         HostEntity maquina = getHostEntityDao().findByName(nomOrIp);
 
-        if (maquina == null)
+        if (maquina == null) {
         	maquina = getHostEntityDao().findBySerialNumber(nomOrIp);
+        	if (maquina != null && Boolean.TRUE.equals(maquina.getDeleted()))
+        		maquina = null;
+        }
         
         if (maquina == null)
             maquina = findMaquinaByIp(nomOrIp);

@@ -496,7 +496,7 @@ public class ProcessUI extends FrameHandler {
 			current = current.getJSONArray("children").getJSONObject(s);
 		}
 		String type = current.getString("type");
-		if ("process".equals(type)) {
+		if ("process".equals(type) && current.getLong("processId")!=getCurrentProcess().getId()) {
 			openProcessInstance(EJBLocator.getBpmEngine().getProcess(current.getLong("processId")), true);
 		}
 		if ("task".equals(type)) {

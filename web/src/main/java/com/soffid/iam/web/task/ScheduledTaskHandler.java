@@ -1,33 +1,21 @@
 package com.soffid.iam.web.task;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import javax.ejb.CreateException;
-import javax.enterprise.concurrent.LastExecution;
 import javax.naming.NamingException;
 
-import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Execution;
-import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Filedownload;
-import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskLog;
-import com.soffid.iam.bpm.api.Job;
-import com.soffid.iam.bpm.api.ProcessInstance;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
-import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.bpm.exception.BPMException;
@@ -35,9 +23,6 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.Databox;
-import es.caib.zkib.component.Form2;
-import es.caib.zkib.datamodel.DataNode;
-import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.events.XPathRerunEvent;
@@ -124,6 +109,7 @@ public class ScheduledTaskHandler extends FrameHandler {
 			}
 		}
 		updateStatus(event);
+		getModel().commit();
 	}
 	
 	public void downloadLog(Event event) throws IllegalArgumentException, InternalErrorException, DocumentBeanException, NamingException, CreateException {
@@ -174,10 +160,11 @@ public class ScheduledTaskHandler extends FrameHandler {
 		}
 	}
 	
-	public void start(Event event) throws InternalErrorException, NamingException, CreateException, InterruptedException {
+	public void start(Event event) throws InternalErrorException, NamingException, CreateException, InterruptedException, CommitException {
 		ScheduledTask task = (ScheduledTask) XPathUtils.eval(getForm(), "instance");
 		EJBLocator.getScheduledTaskService().startNow(task );
 		Thread.sleep(2000);
+		getModel().commit();
 		updateStatus(event);
 	}
 	

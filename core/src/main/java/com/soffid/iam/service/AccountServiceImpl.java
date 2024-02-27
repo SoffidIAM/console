@@ -166,7 +166,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
     protected UserAccount handleCreateAccount(User usuari, com.soffid.iam.api.System dispatcher, String name) throws Exception {
 		UserEntity ue = getUser(usuari.getUserName());
 		SystemEntity de = getSystemEntityDao().load(dispatcher.getId());
-		if (! "IAM".equals(de.getUsage())) //$NON-NLS-1$
+		if (de.getUsage() != null && ! "IAM".equals(de.getUsage())) //$NON-NLS-1$
 			throw new InternalErrorException(
 					String.format(Messages.getString("AccountServiceImpl.1"), //$NON-NLS-1$
 							de.getName()));
@@ -378,7 +378,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				(account.getGrantedGroups() != null && !account.getGrantedGroups().isEmpty()))
 				throw new InternalErrorException(Messages.getString("AccountServiceImpl.CannotChangeSharedAccount")); //$NON-NLS-1$
 					
-			if (! "IAM".equals(acc.getSystem().getUsage())) //$NON-NLS-1$
+			if (acc.getSystem().getUsage() != null && ! "IAM".equals(acc.getSystem().getUsage())) //$NON-NLS-1$
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.1"),  acc.getSystem().getName()) ); //$NON-NLS-1$
 
 			String owner = account.getOwnerUsers().iterator().next();
@@ -1034,7 +1034,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		getAccountEntityDao().accountToEntity(account, ae, false);
 
 		if (account.getType().equals(AccountType.USER)) {
-			if (! "IAM".equals(ae.getSystem().getUsage())) //$NON-NLS-1$
+			if (ae.getSystem().getUsage() != null && ! "IAM".equals(ae.getSystem().getUsage())) //$NON-NLS-1$
 				throw new InternalErrorException(String.format(Messages.getString("AccountServiceImpl.1"), ae.getSystem().getName()) ); //$NON-NLS-1$
 			removeAcl (ae);
 		}

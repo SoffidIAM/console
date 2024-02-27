@@ -92,6 +92,7 @@ private static final long serialVersionUID = 1L;
   public String host;
   /** Máquina desde donde se entra */
   public String client;
+  public String clientName;
   /** Información adicional dependiente del sistema */
   public String info;
   /** Volcado de datos
@@ -115,4 +116,10 @@ private static final long serialVersionUID = 1L;
     stream.println (Messages.getString("LogEntry.client")+client); //$NON-NLS-1$
     stream.println (Messages.getString("LogEntry.info")+info); //$NON-NLS-1$
   }
+public String getClientName() {
+	return clientName;
+}
+public void setClientName(String clientName) {
+	this.clientName = clientName;
+}
 }

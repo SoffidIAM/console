@@ -670,6 +670,7 @@ public class VaultHandler extends FrameHandler {
 			}
 			else{
 				Missatgebox.avis(org.zkoss.util.resource.Labels.getLabel("selfService.EmptyField"));
+				unselect();
 			}
 		}	
 	}

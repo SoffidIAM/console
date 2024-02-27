@@ -17,6 +17,7 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -723,8 +724,16 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 					storeUrl += "user="+URLEncoder.encode(user, "UTF-8")+"&";
 				if (since != null)
 					storeUrl += "since="+URLEncoder.encode(Long.toString(since.getTime()), "UTF-8")+"&";
-				if (until != null)
+				if (until != null) {
+			        Calendar cal = Calendar.getInstance();
+			        cal.setTime(until);
+			        cal.add(Calendar.DATE, 1);
+			        cal.set(Calendar.HOUR, 0);
+			        cal.set(Calendar.MINUTE, 0);
+			        cal.set(Calendar.MILLISECOND, 0);
+			        until = cal.getTime();
 					storeUrl += "until="+URLEncoder.encode(Long.toString(until.getTime()), "UTF-8")+"&";
+				}
 				Response response;
 				try {
 					WebClient client = WebClient.create(storeUrl, jsg.getStoreUserName(), Password.decode(jsg.getPassword()).getPassword(), null);

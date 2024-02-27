@@ -65,6 +65,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.MetadataCache;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
@@ -239,6 +240,12 @@ public class AdditionalDataServiceImpl extends
 	protected com.soffid.iam.api.DataType handleUpdate(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().trim().length() == 0)
 		{
+			List<MetaDataEntity> tipusDadaMateixCodi = getMetaDataEntityDao().findByObjectTypeAndName(tipusDada.getCustomObjectType(), tipusDada.getCode());
+			for (MetaDataEntity mde : tipusDadaMateixCodi) {
+				if (mde.getId()!=null && tipusDada.getId()!=null && mde.getId().longValue()!=tipusDada.getId().longValue())
+					throw new InternalErrorException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCodeUpdate"), new Object[]{tipusDada.getCode()}));
+			}
+
 			getMetadataCache().clear(tipusDada.getObjectType());
 			MetaDataEntity tipusDadaEntity = getMetaDataEntityDao().load(tipusDada.getId());
 			if (Boolean.TRUE.equals(tipusDada.getSearchCriteria()) != Boolean.TRUE.equals(tipusDadaEntity.getSearchCriteria()) &&
@@ -257,6 +264,13 @@ public class AdditionalDataServiceImpl extends
 			getMetaDataEntityDao().update(tipusDadaEntity);
 			return getMetaDataEntityDao().toDataType(tipusDadaEntity);
 		} else {
+
+			List<AccountMetadataEntity> tipusDadaMateixCodi = getAccountMetadataEntityDao().findBySystem(tipusDada.getSystemName());
+			for (AccountMetadataEntity ame : tipusDadaMateixCodi) {
+				if (ame.getName().equals(tipusDada.getCode()) && ame.getId()!=null && tipusDada.getId()!=null && ame.getId().longValue()!=tipusDada.getId().longValue())
+					throw new InternalErrorException(String.format(Messages.getString("AdditionalDataServiceImpl.IntegrityViolationCodeUpdate"), new Object[]{tipusDada.getCode()}));
+			}
+
 			AccountMetadataEntity tipusDadaEntity = getAccountMetadataEntityDao().dataTypeToEntity(tipusDada);
 			
 			if (tipusDadaEntity.getAdminVisibility() == null)

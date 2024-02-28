@@ -2,7 +2,10 @@ package com.soffid.iam.interp;
 
 import java.util.Map;
 
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.service.impl.bshjail.SecureInterpreter;
+import com.soffid.iam.utils.Security;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -17,8 +20,10 @@ public class BeanshellEvaluator extends Evaluator {
 
 	@Override
 	public Object evaluate(String script, Map<String, Object> vars, String label) throws Exception {
-		if (!vars.containsKey("out"))
-			vars.put("out", System.out);
+		if (!vars.containsKey("log"))
+			vars.put("log", LogFactory.getLog(Evaluator.class));
+		if (!vars.containsKey("principal"))
+			vars.put("principal", Security.getSoffidPrincipal());
 		SecureInterpreter interpreter = interpreters.get();
 		if ( interpreter == null)
 		{
@@ -33,7 +38,7 @@ public class BeanshellEvaluator extends Evaluator {
 		
 		try {
 			if (!script.endsWith(";"))
-				script += ";";
+				script += "\n;";
 			
 			Object result = interpret.eval(script, newNs, label);
 			if (result != null && result instanceof Primitive)

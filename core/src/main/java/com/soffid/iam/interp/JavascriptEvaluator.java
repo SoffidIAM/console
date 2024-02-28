@@ -22,6 +22,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
+import org.apache.commons.logging.LogFactory;
 import org.openjdk.nashorn.api.scripting.AbstractJSObject;
 import org.openjdk.nashorn.api.scripting.ClassFilter;
 import org.openjdk.nashorn.api.scripting.JSObject;
@@ -30,6 +31,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -37,8 +39,10 @@ public class JavascriptEvaluator extends Evaluator {
 	static ClassFilter classFilter = new SoffidClassFilter();
 	@Override
 	public Object evaluate(String script, Map<String, Object> vars, String label) throws Exception {
-		if (!vars.containsKey("out"))
-			vars.put("out", System.out);
+		if (!vars.containsKey("log"))
+			vars.put("log", LogFactory.getLog(Evaluator.class));
+		if (!vars.containsKey("principal"))
+			vars.put("principal", Security.getSoffidPrincipal());
 		NashornScriptEngineFactory factory = new NashornScriptEngineFactory ();
 		ScriptEngine engine = factory.getScriptEngine(classFilter);
 		Bindings bindings = new DynamicBindings(vars);

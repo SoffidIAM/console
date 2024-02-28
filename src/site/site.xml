@@ -31,8 +31,8 @@
   </bannerRight>
   <body>
     <menu name="Overview" inherit="top">
-      <item name="UML Model" href="iam-meta/uml/index.html"/>
-      <item name="Documentation" href="http://confluence.soffid.org"/>
+      <item name="UML Model" href="uml/index.html"/>
+      <item name="Documentation" href="http://bookstack.soffid.com"/>
       <item name="Download" href="http://www.soffid.com/download"/>
     </menu>
     <menu name="Parent module" ref="parent" inherit="bottom"/>

@@ -91,6 +91,7 @@
             <targetServer>tomee</targetServer>
             <translate>true</translate>
             <translateEntities>true</translateEntities>
+            <generateDoc>false</generateDoc>
             <asyncCollectionClass>com.soffid.iam.api.AsyncList</asyncCollectionClass>
             <pagedResultClass>com.soffid.iam.api.PagedResult</pagedResultClass>
           </configuration>

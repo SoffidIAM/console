@@ -18,7 +18,7 @@ public abstract class ServeiEntity {
 	@Identifier
 	public java.lang.Long id;
 
-	@Column (name="SER_CODI", length=10, translated="name")
+	@Column (name="SER_CODI", length=50, translated="name")
 	public java.lang.String codi;
 
 	@Column (name="SER_DESCRI", length=50, translated="description")

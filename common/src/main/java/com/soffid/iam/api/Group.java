@@ -6,6 +6,7 @@ import java.util.Map;
 import es.caib.seycon.ng.comu.Aplicacio;
 
 public class Group extends AbstractGroup {
+	private static final long serialVersionUID = 1;
 
 	public Group() {
 		super();

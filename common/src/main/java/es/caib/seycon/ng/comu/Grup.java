@@ -8,6 +8,7 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.PagedResult;
 
 public class Grup extends AbstractGrup {
+	private static final long serialVersionUID = 1;
 
 	public Grup() {
 		super();

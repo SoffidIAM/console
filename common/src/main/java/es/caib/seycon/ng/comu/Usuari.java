@@ -7,6 +7,7 @@ import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.User;
 
 public class Usuari extends AbstractUsuari {
+	private static final long serialVersionUID = 1;
 
 	public Usuari() {
 		super();

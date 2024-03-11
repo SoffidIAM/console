@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Map;
 
 public class User extends AbstractUser {
+	private static final long serialVersionUID = 1;
+
 	public User() {
 	}
 

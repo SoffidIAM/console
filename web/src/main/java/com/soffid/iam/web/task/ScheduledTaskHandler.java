@@ -109,7 +109,8 @@ public class ScheduledTaskHandler extends FrameHandler {
 			}
 		}
 		updateStatus(event);
-		getModel().commit();
+		if (isNetworkDiscoveryPage(event))
+			getModel().commit();
 	}
 	
 	public void downloadLog(Event event) throws IllegalArgumentException, InternalErrorException, DocumentBeanException, NamingException, CreateException {
@@ -164,7 +165,8 @@ public class ScheduledTaskHandler extends FrameHandler {
 		ScheduledTask task = (ScheduledTask) XPathUtils.eval(getForm(), "instance");
 		EJBLocator.getScheduledTaskService().startNow(task );
 		Thread.sleep(2000);
-		getModel().commit();
+		if (isNetworkDiscoveryPage(event))
+			getModel().commit();
 		updateStatus(event);
 	}
 	
@@ -180,6 +182,10 @@ public class ScheduledTaskHandler extends FrameHandler {
 					"text/plain; charset=utf-8",
 					name+".txt");			
 		}
+	}
+
+	private boolean isNetworkDiscoveryPage(Event event) {
+		return event.getTarget().getPage().getRequestPath().equals("/resource/network/discovery.zul");
 	}
 }
 

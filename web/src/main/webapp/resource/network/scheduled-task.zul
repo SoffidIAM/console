@@ -7,7 +7,8 @@
 	id="frame" 
 	use="com.soffid.iam.web.task.ScheduledTaskHandler" 
 	mold="default"
-	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	discovery="true">
 	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />
 	<form2 dataPath="." width="100%" onChangeXPath="ref:frame.onChangeForm" id="form" sclass="">
 		<div sclass="section">

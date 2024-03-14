@@ -7,7 +7,8 @@
 	id="frame" title="${c:l('main.lblAdminJobs')}"
 	help="https://bookstack.soffid.com/books/soffid-3-reference-guide/page/scheduled-tasks"
 	use="com.soffid.iam.web.task.ScheduledTaskHandler" 
-	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	discovery="false">
 	
 	<datamodel id="model" rootNode="root" src="scheduledTaskDescriptor.xml"/>
 	<timer onTimer="ref:frame.updateStatus" running="true" delay="5000" repeats="true" />

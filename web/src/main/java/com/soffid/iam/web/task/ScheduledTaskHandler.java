@@ -33,7 +33,7 @@ public class ScheduledTaskHandler extends FrameHandler {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	boolean discovery;
 
 	public ScheduledTaskHandler () throws InternalErrorException {
 		super();
@@ -109,7 +109,7 @@ public class ScheduledTaskHandler extends FrameHandler {
 			}
 		}
 		updateStatus(event);
-		if (isNetworkDiscoveryPage(event))
+		if (isDiscovery())
 			getModel().commit();
 	}
 	
@@ -165,7 +165,7 @@ public class ScheduledTaskHandler extends FrameHandler {
 		ScheduledTask task = (ScheduledTask) XPathUtils.eval(getForm(), "instance");
 		EJBLocator.getScheduledTaskService().startNow(task );
 		Thread.sleep(2000);
-		if (isNetworkDiscoveryPage(event))
+		if (isDiscovery())
 			getModel().commit();
 		updateStatus(event);
 	}
@@ -184,8 +184,15 @@ public class ScheduledTaskHandler extends FrameHandler {
 		}
 	}
 
-	private boolean isNetworkDiscoveryPage(Event event) {
-		return event.getTarget().getPage().getRequestPath().equals("/resource/network/discovery.zul");
+	
+	public boolean isDiscovery() {
+		return discovery;
+	}
+
+
+	
+	public void setDiscovery(boolean discovery) {
+		this.discovery = discovery;
 	}
 }
 

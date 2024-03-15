@@ -2515,7 +2515,11 @@ public class EntryPointServiceImpl extends
 			return "I";
 		Network network = getNetworkService().findNetworkByIpAddress(address);
     	String defaultNetwork = ConfigurationCache.getProperty("soffid.network.internet"); //$NON-NLS-1$
-    	if (network == null || network.getCode().equals(defaultNetwork))
+    	
+    	if (network == null || 
+    			network.getCode().equals(defaultNetwork) || 
+    			network.getMask().trim().equals("0.0.0.0") ||
+    			network.getMask().trim().equals("0:0:0:0:0:0:0:0"))
     		return "I";
     	else if ( Boolean.TRUE.equals( network.getLanAccess() ) )
     		return "L";

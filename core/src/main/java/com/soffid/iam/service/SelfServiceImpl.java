@@ -162,19 +162,10 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	}
 
 
-	private String getRemoteIp () throws IllegalArgumentException, IllegalAccessException, InvocationTargetException
-	{
-		
-		if (clientIpValveClass == null || getClientIpMethod == null)
-			return null;
-		else
-	        return (String) getClientIpMethod.invoke(null);
-	}
-	
 	protected String handleGetClientHost() throws InternalErrorException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
 	{
 		NetworkService xs = getNetworkService();
-		String ip = getRemoteIp();
+		String ip = Security.getClientIp();
 		if (ip == null)
 			return Messages.getString("SelfServiceImpl.UnknownHost"); //$NON-NLS-1$
         Host maq = xs.findHostByIp(ip);
@@ -192,24 +183,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	
 	private String getAmbit () throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InternalErrorException
 	{
-		
-		String ip = getRemoteIp();
-		NetworkService xs = getNetworkService();
-		if (ip == null)
-			return "I"; //$NON-NLS-1$
-		else
-		{
-	        String ambit = "I"; //$NON-NLS-1$
-	        Host maq = xs.findHostByIp(ip);
-	        if (maq != null) {
-	            Network xarxa = xs.findNetworkByName(maq.getNetworkCode());
-	            if (xarxa != null && xarxa.getLanAccess().booleanValue())
-	                ambit = "L"; //$NON-NLS-1$
-	            else
-	                ambit = "W"; //$NON-NLS-1$
-	        }
-	        return ambit;
-		}
+		return getEntryPointService().getScopeForAddress(Security.getClientIp());
 	}
 	/* (non-Javadoc)
 	 * @see es.caib.seycon.ng.servei.SelfServiceBase#handleFindRoot()

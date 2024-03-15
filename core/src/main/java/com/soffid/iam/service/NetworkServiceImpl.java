@@ -1884,17 +1884,21 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     private NetworkEntity guessNetwork(byte[] b) throws InternalErrorException {
         NetworkEntityDao dao = getNetworkEntityDao();
         NetworkEntity xarxa = null;
+        byte maskAddress[] = new byte [b.length];
+        Arrays.fill(maskAddress, (byte) -1);
         for (int bc = b.length - 1; xarxa == null && bc >= 0; bc--) {
             byte mascara = (byte) 255;
             for (int bits = 0; xarxa == null && bits < 8; bits++) {
                 mascara = (byte) (mascara << 1);
                 b[bc] = (byte) (b[bc] & mascara);
+                maskAddress[bc] = (byte) mascara;
                 InetAddress addr2;
                 try {
                     addr2 = InetAddress.getByAddress(b);
                     String addrText = addr2.getHostAddress();
+                    String maskText = InetAddress.getByAddress(maskAddress).getHostAddress();
                     xarxa = dao.findByAddress(addrText);
-                    if (xarxa != null)
+                    if (xarxa != null && xarxa.getMask().equals(maskText))
                     	return xarxa;
                 } catch (java.net.UnknownHostException e) {
                     throw new InternalErrorException("Unable to parse address "+e.getMessage());

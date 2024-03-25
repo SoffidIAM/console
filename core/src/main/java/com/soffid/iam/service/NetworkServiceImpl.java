@@ -2271,9 +2271,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	@Override
 	protected List<Host> handleFindHostsByNetwork_Discovery(Network parent, String text) throws Exception {
 		if (parent instanceof ExtendedNetwork)
-			return handleFindHostByTextAndJsonQuery(text, "network.id eq "+parent.getId(), null, null).getResources();
+			return handleFindHostByTextAndJsonQuery(text, "deleted eq false and network.id eq "+parent.getId(), null, null).getResources();
 		else
-			return handleFindHostByTextAndJsonQuery(null, "network.id eq "+parent.getId(), null, null).getResources();
+			return handleFindHostByTextAndJsonQuery(null, "deleted eq false and network.id eq "+parent.getId(), null, null).getResources();
 	}
 
 	@Override

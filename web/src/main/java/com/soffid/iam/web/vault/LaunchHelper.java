@@ -158,9 +158,9 @@ public class LaunchHelper {
 			openWssoEntryPoint(item, exec, accounts, directLink);
 		}
 		else if (directLink)
-			Clients.evalJavaScript("window.location.href='"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"';");
+			Clients.evalJavaScript("window.location.href='"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"&scope="+exec.getScope()+"';");
 		else
-			Clients.evalJavaScript("window.open('"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"', '_blank');");
+			Clients.evalJavaScript("window.open('"+ Executions.getCurrent().getContextPath()+ "/execucions?id="+item.getId()+"&scope="+exec.getScope()+"', '_blank');");
 
 	}
 	

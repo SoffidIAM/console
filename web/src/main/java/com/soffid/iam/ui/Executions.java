@@ -2,6 +2,7 @@ package com.soffid.iam.ui;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.servlet.ServletConfig;
@@ -10,9 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.caib.seycon.ng.EJBLocator;
-import es.caib.seycon.ng.comu.ExecucioPuntEntrada;
-import es.caib.seycon.ng.comu.PuntEntrada;
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.AccessTree;
+import com.soffid.iam.api.AccessTreeExecution;
+import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.vault.LaunchHelper;
 
 public class Executions extends HttpServlet {
 
@@ -29,41 +32,39 @@ public class Executions extends HttpServlet {
 		String mime = (String) request.getParameter("mime"); //$NON-NLS-1$
 		String contingut = (String) request.getParameter("contingut"); //$NON-NLS-1$
 
-		if (id == null)
-		{
-			if (!"".equals(mime) && !"".equals(contingut)) { //$NON-NLS-1$ //$NON-NLS-2$
-	
-				if ("text/html".equals(mime)) { //$NON-NLS-1$
-					response.sendRedirect(contingut);
-				} else {
-					response.reset();
-					response.resetBuffer();
-					response.setContentType(URLDecoder.decode(mime,"UTF-8")); //$NON-NLS-1$
-					response.getWriter().print(URLDecoder.decode(contingut,"UTF-8")); //$NON-NLS-1$
-				}
-			}
-		} else {
+		if (id != null) {
 			try {
-				PuntEntrada pe = EJBLocator.getPuntEntradaService().findPuntEntradaById(Long.decode(id).longValue());
+				AccessTree pe = EJBLocator.getEntryPointService().findApplicationAccessById(Long.decode(id).longValue());
 				if (pe != null)
 				{
-					for (Iterator<ExecucioPuntEntrada> it = pe.getExecucions().iterator(); it.hasNext();)
-					{
-						ExecucioPuntEntrada exe = it.next();
-						if ("text/html".equals(exe.getTipusMimeExecucio())) { //$NON-NLS-1$
-							response.sendRedirect(exe.getContingut());
+					String scope = request.getParameter("scope");
+					if (scope == null)
+						scope = com.soffid.iam.ServiceLocator.instance()
+							.getEntryPointService()
+							.getScopeForAddress(Security.getClientIp());
+					AccessTreeExecution selected = null;
+					if ("L".equals(scope))
+						selected = findExecution (pe.getExecutions(), "L");
+					if ("W".equals(scope) || "L".equals(scope) && selected == null)
+						selected = findExecution (pe.getExecutions(), "W");
+					if (selected == null)
+						selected = findExecution (pe.getExecutions(), "I");
+
+					if (selected != null) {
+						if ("text/html".equals(selected.getTypeMimeExecution())) { //$NON-NLS-1$
+							response.sendRedirect(selected.getContent());
 						} else {
 							response.reset();
 							response.resetBuffer();
-							String fileName = pe.getNom()+"."+exe.getCodiTipusExecucio().toLowerCase();
+							String fileName = pe.getName()+"."+selected.getExecutionTypeCode().toLowerCase();
 							response.addHeader("Content-Disposition", "attachment; filename=\"" + fileName+"\"");
-							response.setContentType(URLDecoder.decode(exe.getTipusMimeExecucio(),"UTF-8")); //$NON-NLS-1$
-							if ( exe.getCodiTipusExecucio().equals("MZN"))
+							response.setContentType(URLDecoder.decode(selected.getTypeMimeExecution(),"UTF-8")); //$NON-NLS-1$
+							if ( selected.getExecutionTypeCode().equals("MZN"))
 								response.getWriter().print(URLDecoder.decode(id,"UTF-8")); //$NON-NLS-1$
 							else
-								response.getWriter().print(exe.getContingut()); //$NON-NLS-1$
+								response.getWriter().print(selected.getContent()); //$NON-NLS-1$
 						}
-						return;
+						
 					}
 				}
 			} catch (Throwable e) {
@@ -71,4 +72,12 @@ public class Executions extends HttpServlet {
 			}
 		}
 	}
+
+	private AccessTreeExecution findExecution(Collection<AccessTreeExecution> executions, String scope) {
+		for (AccessTreeExecution exe: executions)
+			if (scope.equals(exe.getScope()))
+				return exe;
+		return null;
+	}
+
 }

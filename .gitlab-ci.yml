@@ -25,6 +25,10 @@ cache:
 maven_install:
   stage: compile
   script:
+    - cp "$DOCKER_CLIENT_KEY" $HOME/.docker/key.pem
+    - cp "$DOCKER_CLIENT_CERT" $HOME/.docker/cert.pem
+    - cp "$DOCKER_CLIENT_CA" $HOME/.docker/ca.pem
+    - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
     - mvn install $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS
 
 maven_deploy:
@@ -34,6 +38,9 @@ maven_deploy:
     - 'eval $(ssh-agent -s)'
     - 'base64 -d $KEYSTORE >/tmp/keystore.p12'
     - mkdir "$HOME/.docker"
+    - cp "$DOCKER_CLIENT_KEY" $HOME/.docker/key.pem
+    - cp "$DOCKER_CLIENT_CERT" $HOME/.docker/cert.pem
+    - cp "$DOCKER_CLIENT_CA" $HOME/.docker/ca.pem
     - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
     - mvn $MAVEN_CLI_OPTS -s $DEPLOYER_SETTINGS $MAVEN_CERT_OPTS deploy
   rules:
@@ -57,6 +64,10 @@ maven_release:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
     - git pull gitlab "$CI_COMMIT_BRANCH" --no-edit
+    - cp "$DOCKER_CLIENT_KEY" $HOME/.docker/key.pem
+    - cp "$DOCKER_CLIENT_CERT" $HOME/.docker/cert.pem
+    - cp "$DOCKER_CLIENT_CA" $HOME/.docker/ca.pem
+    - cp $DOCKER_CONFIG_JSON "$HOME/.docker/config.json"
     - mvn release:prepare $MAVEN_CLI_OPTS  $MAVEN_CERT_OPTS -s $DEPLOYER_SETTINGS --batch-mode -DtagNameFormat='version-@{project.version}' -DpreparationGoals='install'
     - git remote -v
     - git push gitlab "$CI_COMMIT_BRANCH"

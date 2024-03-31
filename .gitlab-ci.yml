@@ -25,6 +25,7 @@ cache:
 maven_install:
   stage: compile
   script:
+    - mkdir "$HOME/.docker"
     - cp "$DOCKER_CLIENT_KEY" $HOME/.docker/key.pem
     - cp "$DOCKER_CLIENT_CERT" $HOME/.docker/cert.pem
     - cp "$DOCKER_CLIENT_CA" $HOME/.docker/ca.pem
@@ -64,6 +65,7 @@ maven_release:
     - git config --global user.email "$GITLAB_USER_EMAIL"
     - git config --global user.name "$GITLAB_USER_NAME"
     - git pull gitlab "$CI_COMMIT_BRANCH" --no-edit
+    - mkdir "$HOME/.docker"
     - cp "$DOCKER_CLIENT_KEY" $HOME/.docker/key.pem
     - cp "$DOCKER_CLIENT_CERT" $HOME/.docker/cert.pem
     - cp "$DOCKER_CLIENT_CA" $HOME/.docker/ca.pem

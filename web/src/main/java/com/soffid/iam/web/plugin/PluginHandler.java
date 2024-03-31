@@ -165,6 +165,6 @@ public class PluginHandler extends FrameHandler {
 	{
 		org.zkoss.zul.Window p = (org.zkoss.zul.Window) getFellow("popupRefreshPage"); //$NON-NLS-1$
 		p.doHighlighted();
-		response("reload", new org.zkoss.zk.au.out.AuScript(this,  "play(); setTimeout(()=>{document.location.reload()}, 10000);"));
+		response("reload", new org.zkoss.zk.au.out.AuScript(this,  "play(); setTimeout(()=>{reloadPage()}, 10000);"));
 	}
 }

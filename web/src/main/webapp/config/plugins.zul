@@ -31,6 +31,12 @@
 		}
 	}
 	
+	
+	function reloadPage() {
+		fetch ("plugins.zul")
+			.then( function () { document.location.reload()})
+			.catch( function() { setTimeout(reloadPage, 1000); } )
+	}
 	</script>
 
 	<datamodel id="model" rootNode="serverPlugins" src="descriptorPlugins.xml"/>

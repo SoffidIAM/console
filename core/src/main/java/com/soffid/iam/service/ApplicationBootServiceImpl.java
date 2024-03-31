@@ -391,6 +391,7 @@ public class ApplicationBootServiceImpl extends
 				new Thread( () -> {
 					try {
 						getAsyncRunnerService().runNewTransaction(() -> {
+							Thread.sleep(60000);
 							cfg2.setValue("104"); //$NON-NLS-1$
 							updateAuditLogs();
 							configSvc.update(cfg2);
@@ -400,6 +401,7 @@ public class ApplicationBootServiceImpl extends
 						log.warn("Error updating audit tables");
 					}
 				}).start();
+				return;
 			}
 
 			if (version < 106) { //$NON-NLS-1$

@@ -72,8 +72,8 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 			<label id="counter" style="margin-right: 32px"/>
 			<button label="${c:l('mesg:org.zkoss.zul.mesg.MZul:CANCEL' )}" onClick="ref:appWindow.cancelTimeout"/>
 		</div>
-		<timer delay="60000" onTimer="ref:appWindow.confirmTimeout" 
-			running="false" repeats="false" 
+		<timer delay="1000" onTimer="ref:appWindow.confirmTimeout" 
+			running="false" repeats="true" 
 			id="timer"/>
 	</window>
 </window>

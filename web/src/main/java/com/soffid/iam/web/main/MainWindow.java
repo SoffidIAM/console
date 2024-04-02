@@ -39,7 +39,8 @@ import es.caib.zkib.zkiblaf.MissatgeboxDlg;
 
 public class MainWindow extends Window {
 	private HashSet<WeakReference<MainWindow>> mainWindows;
-
+	long timeoutAt = 0;
+	
 	public void menu (Event evt) throws Exception {
 		Menu3 menu3 = (Menu3) getFellow("menu3");
 		menu3.open();
@@ -124,16 +125,14 @@ public class MainWindow extends Window {
 			mainWindows = new HashSet<>();
 			getDesktop().getSession().setAttribute("mainWindows", mainWindows);
 		}
-		if (!mainWindows.contains(weakReference)) {
-			weakReference = new WeakReference<MainWindow>(this);
-			mainWindows.add( weakReference);
-			getDesktop().addListener(new DesktopCleanup() {
-				@Override
-				public void cleanup(Desktop desktop) throws Exception {
+		getDesktop().addListener(new DesktopCleanup() {
+			@Override
+			public void cleanup(Desktop desktop) throws Exception {
+				synchronized(mainWindows) {
 					mainWindows.remove(weakReference);
 				}
-			});
-		}
+			}
+		});
 	}
 
 	@Override
@@ -153,6 +152,9 @@ public class MainWindow extends Window {
 	private WeakReference<MainWindow> weakReference = new WeakReference<MainWindow>(this);
 	
 	protected void onTimeout() {
+		synchronized(mainWindows) {
+			mainWindows.add( weakReference);
+		}
 		Window w = (Window) getFellow("sessionTimeoutWindow");
 		if (!w.isVisible()) {
 			w.doHighlighted();
@@ -169,7 +171,7 @@ public class MainWindow extends Window {
 					+ "label.logoutInterval = logoutInterval;"));
 			Timer t = (Timer) w.getFellow("timer");
 			t.start();
-			t.setRepeats(true);
+			timeoutAt = System.currentTimeMillis() + 60_000;
 		}
 	}
 
@@ -182,24 +184,35 @@ public class MainWindow extends Window {
 				+ "clearInterval(label.logoutInterval);"));
 		t.stop();
 		w.setVisible(false);
+		mainWindows.clear();
 	}
 
 	public void confirmTimeout (Event ev) {
-		for (Iterator<WeakReference<MainWindow>> iterator = mainWindows.iterator();
-				iterator.hasNext();) {
-			WeakReference<MainWindow> r = iterator.next();
-			if (r.get() == null)
-				iterator.remove();
+		if (mainWindows.isEmpty()) {
+			cancelTimeout(ev);
 		}
-		if (mainWindows.size() <= 1) {
-			getDesktop().getSession().invalidate();
+		else if (System.currentTimeMillis() > timeoutAt) {
+			synchronized(mainWindows) {
+				for (Iterator<WeakReference<MainWindow>> iterator = mainWindows.iterator();
+						iterator.hasNext();) {
+					WeakReference<MainWindow> r = iterator.next();
+					if (r.get() == null)
+						iterator.remove();
+				}
+				if (mainWindows.size() == 1) {
+					getDesktop().getSession().invalidate();
+				}
+				mainWindows.remove(weakReference);
+			}
+			getDesktop().getExecution().sendRedirect("/anonymous/logout.zul");
 		}
-		getDesktop().getExecution().sendRedirect("/anonymous/logout.zul");
 	}
 
 	@Override
 	public void onPageDetached(Page page) {
 		super.onPageDetached(page);
-		mainWindows.remove(weakReference);
+		synchronized(mainWindows) {
+			mainWindows.remove(weakReference);
+		}
 	}
 }

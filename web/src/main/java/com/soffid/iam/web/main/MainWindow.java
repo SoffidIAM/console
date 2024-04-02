@@ -124,12 +124,13 @@ public class MainWindow extends Window {
 			mainWindows = new HashSet<>();
 			getDesktop().getSession().setAttribute("mainWindows", mainWindows);
 		}
-		if (!mainWindows.contains(getDesktop())) {
-			mainWindows.add( new WeakReference<MainWindow>(this));
+		if (!mainWindows.contains(weakReference)) {
+			weakReference = new WeakReference<MainWindow>(this);
+			mainWindows.add( weakReference);
 			getDesktop().addListener(new DesktopCleanup() {
 				@Override
 				public void cleanup(Desktop desktop) throws Exception {
-					mainWindows.remove(MainWindow.this);
+					mainWindows.remove(weakReference);
 				}
 			});
 		}
@@ -149,6 +150,7 @@ public class MainWindow extends Window {
 		}
 	};
 	private MissatgeboxDlg currentTimeoutDlg;
+	private WeakReference<MainWindow> weakReference = new WeakReference<MainWindow>(this);
 	
 	protected void onTimeout() {
 		Window w = (Window) getFellow("sessionTimeoutWindow");
@@ -198,6 +200,6 @@ public class MainWindow extends Window {
 	@Override
 	public void onPageDetached(Page page) {
 		super.onPageDetached(page);
-		mainWindows.remove(this);
+		mainWindows.remove(weakReference);
 	}
 }

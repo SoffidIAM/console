@@ -21,6 +21,7 @@ public class SAMLConfig {
 	protected String principalAttribute;
 	protected boolean samlDebug;
 	String motd;
+	public Integer sessionTimeout;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -171,5 +172,13 @@ public class SAMLConfig {
 	
 	public void setMotd(String motd) {
 		this.motd = motd;
+	}
+	
+	public Integer getSessionTimeout() {
+		return sessionTimeout;
+	}
+	
+	public void setSessionTimeout(Integer sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
 	}
 }

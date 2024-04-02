@@ -20,8 +20,14 @@
 				<switch bind="maintenanceMode"  ></switch>
 				<label value="${c:l('parametres.zul.maintenanceMode')}"  style="margin-left: 16px" />
 			</div>
-			<label sclass="label longlabel" value="${c:l('parametres.zul.motd')}: "/>
-			<customfield3 bind="motd"  dataType="HTML" noLabel="true"  style="width: 30em; display: inline-block"/>
+			<div width="100%">
+				<label sclass="label longlabel" value="${c:l('parametres.zul.motd')}: "/>
+				<customfield3 bind="motd"  dataType="HTML" noLabel="true"  style="width: 30em; display: inline-block"/>
+			</div>
+			<div width="100%">
+				<label sclass="label longlabel"  value="${c:l('parametres.zul.sessionTimeout')}: "/>
+				<customfield3 bind="sessionTimeout"  dataType="NUMBER" noLabel="true"  style="width: 30em; display: inline-block"/>
+			</div>
 		</div>
 		<div>
 			<label sclass="separator" value="${c:l('parametres.zul.classicMethod')}"/>

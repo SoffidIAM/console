@@ -75,6 +75,11 @@ public class SamlDataModel extends SimpleDataNode {
 
 				byte[] motd = EJBLocator.getConfigurationService().getBlob("soffid.auth.motd");
 				c.motd = motd == null ? null: new String(motd, StandardCharsets.UTF_8);
+				try {
+					final String timeout = ConfigurationCache.getProperty("soffid.auth.timeout");
+					if (timeout != null && !timeout.trim().isEmpty())
+						c.setSessionTimeout(Integer.parseInt(timeout.trim()));
+				} catch (NumberFormatException e) {}
 				return Collections.singleton(c);
 			}
 		}, SamlDataNode.class);

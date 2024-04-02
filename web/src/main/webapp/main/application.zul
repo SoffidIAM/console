@@ -4,6 +4,11 @@
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss.org/2005/zk"
  width="100%" xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
  use="com.soffid.iam.web.main.MainWindow" >
+ 	<script>
+ 		var sessionTimeout = ${sessionTimeout };
+ 		var mainWindowUuid = '${appWindow.uuid }';
+ 	</script>
+ 	<script src="/js/timeout.js"/>
 	<div sclass="topline">		
 		<menu2 image="/img/gear.svg" sclass="col_der">
 			<label value="${nom } - ${usuari } " sclass="welcome"/>
@@ -52,4 +57,23 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zk="http://www.zkoss
 			<input type="hidden" id="pamLauncherFormSessionId" name="sessionId"/>
 		</form>	
 	]]></html>
+	<window id="sessionTimeoutWindow"
+		visible="false"
+		title="${c:l('timeout.title') }"
+		border="normal" closable="false"
+		position="center,center" sizable="true"
+		width="500px">
+		<image src="/img/warning.svg" style="width: 32px; margin-right:10px;float:left;"/>
+		<label sclass="missatge" multiline="true" value="${c:l('timeout.message') }" 
+			style="display: inline-block; width: calc(100% - 42px)" 
+			id="message" hyphen='true'/>
+		<separator bar="true" style="margin:5px 6px;"/>
+		<div style="width: 100%; vertical-align: middle; margin-left:auto; text-align: right">
+			<label id="counter" style="margin-right: 32px"/>
+			<button label="${c:l('mesg:org.zkoss.zul.mesg.MZul:CANCEL' )}" onClick="ref:appWindow.cancelTimeout"/>
+		</div>
+		<timer delay="60000" onTimer="ref:appWindow.confirmTimeout" 
+			running="false" repeats="false" 
+			id="timer"/>
+	</window>
 </window>

@@ -1,20 +1,31 @@
 package com.soffid.iam.web.main;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.jbpm.graph.exe.Execution;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.au.AuRequest;
+import org.zkoss.zk.au.Command;
+import org.zkoss.zk.au.out.AuScript;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.util.DesktopCleanup;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Timer;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.ui.Executions;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.Frame;
 import com.soffid.iam.web.component.Menu3;
@@ -23,13 +34,12 @@ import es.caib.bpm.filters.WorkflowInterceptor;
 import es.caib.zkib.zkiblaf.Application;
 import es.caib.zkib.zkiblaf.Frameable;
 import es.caib.zkib.zkiblaf.Missatgebox;
+import es.caib.zkib.zkiblaf.MissatgeboxDlg;
 
 
 public class MainWindow extends Window {
-	@Override
-	public void setPage (Page page) {
-	}
-	
+	private HashSet<WeakReference<MainWindow>> mainWindows;
+
 	public void menu (Event evt) throws Exception {
 		Menu3 menu3 = (Menu3) getFellow("menu3");
 		menu3.open();
@@ -50,13 +60,6 @@ public class MainWindow extends Window {
 	@Override
 	public void setParent(Component parent) {
 		super.setParent(parent);
-		SoffidPrincipal p = Security.getSoffidPrincipal();
-		String usuari = p.getName();
-		String nom = p.getFullName();
-		if (usuari.startsWith("master\\"))
-			usuari = usuari.substring(7);
-		getPage().getNamespace().setVariable("usuari", usuari, true);
-		getPage().getNamespace().setVariable("nom", nom, true);
 	}
 	
 	public void profile(Event event) {
@@ -100,5 +103,101 @@ public class MainWindow extends Window {
 		} else {
 			Application.jumpTo("/main/menu.zul");
 		}
+	}
+
+	@Override
+	public void onPageAttached(Page newpage, Page oldpage) {
+		super.onPageAttached(newpage, oldpage);
+		SoffidPrincipal p = Security.getSoffidPrincipal();
+		String usuari = p.getName();
+		String nom = p.getFullName();
+		if (usuari.startsWith("master\\"))
+			usuari = usuari.substring(7);
+		getPage().getNamespace().setVariable("usuari", usuari, true);
+		getPage().getNamespace().setVariable("nom", nom, true);
+		String t = ConfigurationCache.getProperty("soffid.auth.timeout");
+		if (t == null || t.trim().isEmpty()) t = "false";
+		getPage().getNamespace().setVariable("sessionTimeout", t, true);
+		// Register session desktops
+		mainWindows = (HashSet<WeakReference<MainWindow>>) getDesktop().getSession().getAttribute("mainWindows");
+		if (mainWindows == null) {
+			mainWindows = new HashSet<>();
+			getDesktop().getSession().setAttribute("mainWindows", mainWindows);
+		}
+		if (!mainWindows.contains(getDesktop())) {
+			mainWindows.add( new WeakReference<MainWindow>(this));
+			getDesktop().addListener(new DesktopCleanup() {
+				@Override
+				public void cleanup(Desktop desktop) throws Exception {
+					mainWindows.remove(MainWindow.this);
+				}
+			});
+		}
+	}
+
+	@Override
+	public Command getCommand(String cmdId) {
+		if (cmdId.equals("onTimeout"))
+			return onTimeoutCommand ;
+		else
+			return super.getCommand(cmdId);
+	}
+	private static Command onTimeoutCommand = new Command("onTimeout", 0) {
+		@Override
+		protected void process(AuRequest request) {
+			((MainWindow)request.getComponent()).onTimeout();
+		}
+	};
+	private MissatgeboxDlg currentTimeoutDlg;
+	
+	protected void onTimeout() {
+		Window w = (Window) getFellow("sessionTimeoutWindow");
+		if (!w.isVisible()) {
+			w.doHighlighted();
+			final Label counter = (Label)(w.getFellow("counter"));
+			counter.setValue("");
+			response(null, new AuScript(this, ""
+					+ "var v = Date.now() + 60000;"
+					+ "let label=document.getElementById('"+counter.getUuid()+"');"
+					+ "var logoutInterval = setInterval( () => {"
+					+ "   let t = Math.floor((v - Date.now()) / 1000);"
+					+ "   if (t <= 30 && t >= 0)"
+					+ "      label.innerText = t; "
+					+ "}, 1000);"
+					+ "label.logoutInterval = logoutInterval;"));
+			Timer t = (Timer) w.getFellow("timer");
+			t.start();
+			t.setRepeats(true);
+		}
+	}
+
+	public void cancelTimeout (Event ev) {
+		Window w = (Window) getFellow("sessionTimeoutWindow");
+		Timer t = (Timer) w.getFellow("timer");
+		final Label counter = (Label)(w.getFellow("counter"));
+		response(null, new AuScript(this, ""
+				+ "let label=document.getElementById('"+counter.getUuid()+"');"
+				+ "clearInterval(label.logoutInterval);"));
+		t.stop();
+		w.setVisible(false);
+	}
+
+	public void confirmTimeout (Event ev) {
+		for (Iterator<WeakReference<MainWindow>> iterator = mainWindows.iterator();
+				iterator.hasNext();) {
+			WeakReference<MainWindow> r = iterator.next();
+			if (r.get() == null)
+				iterator.remove();
+		}
+		if (mainWindows.size() <= 1) {
+			getDesktop().getSession().invalidate();
+		}
+		getDesktop().getExecution().sendRedirect("/anonymous/logout.zul");
+	}
+
+	@Override
+	public void onPageDetached(Page page) {
+		super.onPageDetached(page);
+		mainWindows.remove(this);
 	}
 }

@@ -125,6 +125,9 @@ public class MainWindow extends Window {
 			mainWindows = new HashSet<>();
 			getDesktop().getSession().setAttribute("mainWindows", mainWindows);
 		}
+		synchronized (mainWindows) {
+			mainWindows.clear();
+		}
 		getDesktop().addListener(new DesktopCleanup() {
 			@Override
 			public void cleanup(Desktop desktop) throws Exception {
@@ -148,7 +151,6 @@ public class MainWindow extends Window {
 			((MainWindow)request.getComponent()).onTimeout();
 		}
 	};
-	private MissatgeboxDlg currentTimeoutDlg;
 	private WeakReference<MainWindow> weakReference = new WeakReference<MainWindow>(this);
 	
 	protected void onTimeout() {
@@ -167,7 +169,7 @@ public class MainWindow extends Window {
 					+ "   let t = Math.floor((v - Date.now()) / 1000);"
 					+ "   if (t <= 30 && t >= 0)"
 					+ "      label.innerText = t; "
-					+ "}, 1000);"
+					+ "}, 200);"
 					+ "label.logoutInterval = logoutInterval;"));
 			Timer t = (Timer) w.getFellow("timer");
 			t.start();

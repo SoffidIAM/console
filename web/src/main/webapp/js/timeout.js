@@ -1,11 +1,9 @@
 if (sessionTimeout && sessionTimeout > 0) {
 	if (typeof(SharedWorker) !== "undefined") {
 		var worker = new SharedWorker("/soffid/js/timeout-sharedworker.js");
-		console.log("Created worker");
 		worker.port.start();
 		worker.port.postMessage({msg:"configure", timeout: sessionTimeout});
 		worker.port.onmessage = (e) => {
-			console.log("Received message from worker");
 			zkau.send ({uuid: mainWindowUuid, cmd: "onTimeout", data : []}, 5);					
 		};
 		window.addEventListener("keypress", (e) => {

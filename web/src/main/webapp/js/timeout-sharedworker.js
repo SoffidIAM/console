@@ -1,5 +1,3 @@
-console.log("Initiialized message from worker");
-
 var ports = [];
 var timeout = 0;
 var closeAt = 0;

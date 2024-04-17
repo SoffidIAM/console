@@ -115,7 +115,7 @@
   template: #{serverStart_datetime}
   default: true
 - name: ${c:l('registreAcces.zul.Datafi')}
-  vaule: serverEnd
+  value: serverEnd
   template: #{serverEnd_datetime}
   default: true
 			]]></attribute>

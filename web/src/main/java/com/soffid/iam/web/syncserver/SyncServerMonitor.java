@@ -59,7 +59,7 @@ public class SyncServerMonitor {
 				try {
 					readLoop();
 				} catch (Exception e) {
-					
+					log.warn("Error fetching sync server status", e);
 				} finally {
 					Security.nestedLogoff();
 				}
@@ -78,6 +78,8 @@ public class SyncServerMonitor {
 				newServerUrls.add(server.getUrl());
 				if (t == null) {
 					servers.add(server.getUrl());
+				}
+				if (t == null || !t.isAlive()) {
 					t = new Thread( () -> {
 						Security.nestedLogin(tenant, "anonymous", Security.ALL_PERMISSIONS);
 						try {

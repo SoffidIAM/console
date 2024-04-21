@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>root</artifactId>
 		<groupId>com.soffid.iam.console</groupId>
-		<version>3.5.27</version>
+		<version>3.5.28-SNAPSHOT</version>
 	</parent>
 	<artifactId>default-plugin</artifactId>
 	<packaging>jar</packaging>

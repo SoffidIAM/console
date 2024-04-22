@@ -549,43 +549,40 @@ public class ServerPluginServiceImpl extends com.soffid.iam.service.ServerPlugin
     	}
 	}
 
-	private int compareVersions(String version1, String version2) {
-		String[] versionA = version1.split("[.-]*");
-		String[] versionB = version2.split("[.-]*");
-		for ( int i = 0; i <  versionB.length && i < versionA.length; i++)
-		{
-			if (versionB[i].equals(versionA[i]))
-			{
-				// Skip to next
-			}
-			else
-			{
+	public int compareVersions(String version1, String version2) {
+		String[] versionA = version1.split("\\-")[0].split("\\.");
+		String[] versionB = version2.split("\\-")[0].split("\\.");
+		for (int i=0; i <  versionB.length && i<versionA.length; i++) {
+			if (!versionB[i].equals(versionA[i])) {
 				Integer i1 = null;
 				Integer i2 = null;
 				try {
 					i1 = Integer.parseInt(versionA[i]);
-				} catch ( NumberFormatException e ) { }
+				} catch (NumberFormatException e) { }
 				try {
 					i2 = Integer.parseInt(versionB[i]);
-				} catch ( NumberFormatException e ) { }
-				if (i1 != null && i2 != null)
-				{
-					int c = i1.intValue() - i2.intValue();
-					if ( c != 0 ) return c;
-				}
-				else if ( i1 == null)
+				} catch (NumberFormatException e) { }
+				if (i1!=null && i2!=null)
+				    return (i1.intValue() < i2.intValue()) ? -1 : 1;
+				else if (i1==null)
 					return -1;
-				else if ( i2 == null)
-					return +1;
-				else
-				{
-					int c = versionA[i].compareToIgnoreCase(versionB[i]);
-					if (c != 0)
-						return c;
-				}
+				return 1; //i2==null
 			}
 		}
-		return versionA.length - versionB.length;
+		if (versionA.length<versionB.length)
+		    return -1;
+		else if (versionA.length==versionB.length) {
+		    boolean is1Snapshot = version1.contains("-");
+	        boolean is2Snapshot = version2.contains("-");
+		    if (is1Snapshot && !is2Snapshot)
+		        return -1;
+		    else if (!is1Snapshot && is2Snapshot)
+		        return 1;
+		    else if (is1Snapshot && is2Snapshot)
+		        return compareVersions(version1.split("\\-")[1], version2.split("\\-")[1]);
+		    return 0;
+		}
+		return 1; //(versionA.length>versionB.length)
 	}
 
 	@Override

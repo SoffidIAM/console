@@ -631,6 +631,10 @@ public class InputField3 extends Databox
 	}
 
 	private Map<String,Object> createVars() throws EvalError {
+		return createVars(null);
+	}
+
+	private Map<String,Object> createVars(Integer position) throws EvalError {
 		BindContext ctx = XPathUtils.getComponentContext(this);
 		Object value = null;
 		try {
@@ -673,6 +677,9 @@ public class InputField3 extends Databox
 		} while (c != null);
 
 		vars.put("value", value); //$NON-NLS-1$
+		if (position!=null) {
+			vars.put("position", position.intValue());
+		}
 		vars.put("attributes", attributes); //$NON-NLS-1$
 		vars.put("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
 		vars.put("inputField", this); //$NON-NLS-1$
@@ -823,7 +830,7 @@ public class InputField3 extends Databox
 		{
 			try {
 				Object o = Evaluator.instance().evaluate(dataType.getValidationExpression(), 
-						createVars(), 
+						createVars(position),
 						"Validation expression for "+dataType.getName());
 				if (o == null)
 					throw new UiException(String.format("Validation expression for attribute %s has returned a null value", dataType.getCode())); //$NON-NLS-1$

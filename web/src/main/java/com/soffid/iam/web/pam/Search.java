@@ -89,7 +89,7 @@ public class Search extends FrameHandler
 			}
 			if (session.getServerEnd() != null) {
 				o.put("serverEnd", session.getServerEnd().getTime());
-				o.put("serverEnd_datatime", df.format(session.getServerEnd()));
+				o.put("serverEnd_datetime", df.format(session.getServerEnd()));
 			} else {
 				o.put("serverEnd_datetime", "");				
 			}

@@ -8,6 +8,9 @@ import java.util.Map;
 
 import javax.ws.rs.HeaderParam;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AccessTree;
 import com.soffid.iam.api.Account;
@@ -32,10 +35,13 @@ import com.soffid.iam.model.NetworkDiscoveryAccountEntity;
 import com.soffid.iam.model.NetworkEntity;
 import com.soffid.iam.model.ServerEntity;
 import com.soffid.iam.model.SystemEntity;
+import com.sun.org.apache.xalan.internal.xsltc.DOM;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
+	Log log = LogFactory.getLog(getClass());
+	
 	@Override
 	protected void handleEnableNetworkDiscoveryScheduledTask(Network network) throws Exception {
 		NetworkEntity ne = getNetworkEntityDao().load(network.getId());
@@ -219,25 +225,42 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 		if (accountName.equals("localsystem")) return;
 		AccountEntity acc = null;
 		if (accountName.startsWith(".\\")) {
-			accountName = accountName.substring(2);
+			String accountName2 = accountName.substring(2);
 			service.setAccountName(accountName);
-			acc = getAccountEntityDao().findByNameAndSystem(accountName, s.getName());
+			acc = getAccountEntityDao().findByNameAndSystem(accountName2, s.getName());
 		}
 		else if (accountName.contains("\\"))
 		{
 			int i = accountName.indexOf("\\");
 			String domain = accountName.substring(0,i);
-			accountName = accountName.substring(i+1);
+			String accountName2 = accountName.substring(i+1);
 			String system = domainToSystemMap.get(domain.toUpperCase());
-			acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
+			if (system == null) {
+				log.info("Cannot found system for "+domain.toUpperCase()+" // "+domainToSystemMap);
+			} else {
+				acc = getAccountEntityDao().findByNameAndSystem(accountName2, system);
+			}
 		}
 		else
 		{
 			acc = getAccountEntityDao().findByNameAndSystem(accountName, s.getName());
 		}
+		if (acc == null && accountName.contains("@")) {
+			int i = accountName.indexOf("@");
+			String domain = accountName.substring(i+1);
+			String accountName2 = accountName.substring(0,i);
+			String system = domainToSystemMap.get(domain.toLowerCase());
+			if (system == null) {
+				log.info("Cannot found system for "+domain.toLowerCase()+" // "+domainToSystemMap);
+			} else {
+				acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
+			}
+		}
 		if (acc != null) {
 			service.setAccountId(acc.getId());
 			service.setAccountSystem(s.getName());
+		} else {
+			log.info("Account "+accountName+"  not found");
 		}
 	}
 

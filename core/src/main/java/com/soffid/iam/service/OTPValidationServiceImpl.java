@@ -80,4 +80,16 @@ public class OTPValidationServiceImpl extends OTPValidationServiceBase {
 		}
 		return challenge;
 	}
+
+	@Override
+	protected String handleGenerateTypeForAudit(Challenge challenge) throws Exception {
+		if (challenge.getOtpHandler() == null)
+			return null;
+		for (OTPHandler handler: handlers) {
+			if (handler.getClass().getName().equals(challenge.getOtpHandler())) {
+				return handler.generateTypeForAudit(challenge);
+			}
+		}
+		return "?";
+	}
 }

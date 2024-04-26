@@ -315,4 +315,9 @@ public class LinotpHandler implements OTPHandler {
 	public Challenge resendToken(Challenge challenge, boolean alternativeMethod) {
 		return challenge;
 	}
+
+	@Override
+	public String generateTypeForAudit(Challenge challenge) throws Exception {
+		return "O";
+	}
 }

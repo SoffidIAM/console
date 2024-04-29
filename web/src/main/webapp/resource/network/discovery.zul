@@ -137,7 +137,8 @@
 						readonly="false"
 						bind="discoveryRanges"
 						multiValue="true"
-						maxlength="50"/>
+						maxlength="50"
+						onChange="ref:frame.cleanEmptyValues"/>
 					<div id="taskdiv">
 						<customfield3
 							use="com.soffid.iam.web.network.DiscoveryServerField"

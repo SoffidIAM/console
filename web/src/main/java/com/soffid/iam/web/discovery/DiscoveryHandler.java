@@ -633,5 +633,16 @@ public class DiscoveryHandler extends FrameHandler {
 		hideDetails();
 	}
 
+	public void cleanEmptyValues(Event ev) throws Exception {
+		List<String> ranges = (List<String>) XPathUtils.eval(getForm(), "discoveryRanges");
+		List<String> ranges2 = new LinkedList<String>();
+		for (String range : ranges) {
+			if (range!=null && !range.trim().isEmpty()) {
+				ranges2.add(range);
+			}
+		}
+		XPathUtils.setValue(getForm(), "discoveryRanges", ranges2);
+		onChangeForm(ev);
+	}
 }
 

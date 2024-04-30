@@ -17,20 +17,28 @@
 	width="100%"/>
 	<separator spacing="5px"/>
 	
-	<div id="env">
-		Available context variables:
-	</div>	
-	<html id="envtext" style="margin-left: 36px; display: block;"/>
-	<div>
+	<div style="float: right">
 		Programming reference links:
-	</div>
-	<div style="margin-left: 36px">
-		<h:a href="http://www.soffid.org/doc/console/latest/uml/" target="_blank">Service model</h:a>
+		<div style="margin-left: 36px">
+			<h:a href="http://www.soffid.org/doc/console/latest/uml/" target="_blank">Service model</h:a>
+		</div>
+	
+		<div style="margin-left: 36px">
+			<h:a href="http://www.soffid.org/doc/console/latest/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</h:a>
+		</div>	
 	</div>
 
-	<div style="margin-left: 36px">
-		<h:a href="http://www.soffid.org/doc/console/latest/iam-common/apidocs/index.html"  target="_blank">Full java classes documentation</h:a>
+	<div id="env">
+		Available context variables:
+		<html style="margin-left: 36px; display: block;"><![CDATA[
+			<b>principal</b>: ${c:l('editorJS.principal')}<br>
+			<b>serviceLocator</b>: ${c:l('editorJS.serviceLocator')}<br>
+			<b>log</b>: ${c:l('editorJS.log')}<br>
+		]]>
+		</html>
 	</div>	
+	<html id="envtext" style="margin-left: 36px; display: block;"/>
+	
 
 	<separator spacing="5px"/>
 	<div align="right">

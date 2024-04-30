@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.soffid.iam.api.PamPolicy;
 import com.soffid.mda.annotation.Column;
+import com.soffid.mda.annotation.DaoFinder;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Entity;
 import com.soffid.mda.annotation.Identifier;
@@ -33,8 +34,19 @@ public class PamPolicyEntity {
 	@Column(name="PPO_DATE")
 	Date date;
 
+	@Nullable
+	@Column(name="PPO_RECDUR")
+	Integer recordingDuration;
+
+	@Nullable
+	@Column(name="PPO_EXPRES", length = 16000)
+	String expression;
+
+	@Nullable
+	@Column(name="PPO_PRIORI")
+	Integer priority;
+
 	PamPolicyEntity findByName (String name) { return null; }
-	
 	
 	@Column(name="PPO_TEN_ID")
 	TenantEntity tenant;

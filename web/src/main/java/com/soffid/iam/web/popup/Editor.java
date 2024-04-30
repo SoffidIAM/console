@@ -3,6 +3,7 @@ package com.soffid.iam.web.popup;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -31,6 +32,13 @@ public class Editor extends Window implements AfterCompose {
 		edit(textbox, vars, env, null);
 	}
 	public static void edit ( InputElement textbox, String vars, String env, EventListener listener) {
+		try {
+			JSONObject o = new JSONObject(vars);
+			o.put("serviceLocator", "com.soffid.iam.ServiceLocator");
+			o.put("principal", "com.soffid.iam.common.security.SoffidPrincipal");
+			o.put("log", "org.apache.commons.logging.Log");
+			vars = o.toString();
+		} catch (Exception e) {}
 		Page p = textbox.getPage();
 		Editor editorWindow = (Editor) p.getFellowIfAny("editorWindow");
 		if (editorWindow == null) {

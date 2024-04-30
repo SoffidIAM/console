@@ -136,3 +136,20 @@ CodeMirrorJavaTypes['es.caib.seycon.ng.sync.engine.extobj.BSHAgentbject'] = {
 		'soffidToSystem':'java.util.Map',
 		'systemToSoffid':'java.util.Map'
 };
+CodeMirrorJavaTypes['org.apache.commons.logging.Log'] = {
+		'info':'void',
+		'warn':'void',
+		'debug':'void',
+		'fatal':'void'
+};
+CodeMirrorJavaTypes['com.soffid.iam.common.security.SoffidPrincipal'] = {
+		'getFullName':'java.lang.String',
+		'getGroups':'java.lang.String[]',
+		'getRoles':'java.lang.String[]',
+		'getSoffidRoles':'java.lang.String[]',
+		'getTenant':'java.lang.String',
+		'getUserName':'java.lang.String',
+		'getName':'java.lang.String',
+		'hasRole':'boolean'
+};
+

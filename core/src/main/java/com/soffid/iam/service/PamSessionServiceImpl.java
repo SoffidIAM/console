@@ -18,10 +18,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -30,6 +32,8 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.json.JSONArray;
@@ -47,12 +51,14 @@ import com.soffid.iam.api.Password;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.Server;
 import com.soffid.iam.api.Session;
+import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
+import com.soffid.iam.model.PamPolicyEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -65,7 +71,8 @@ import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class PamSessionServiceImpl extends PamSessionServiceBase {
-
+	Log log = LogFactory.getLog(getClass());
+	
 	private static String PROPERTY_TIMEOUT = "soffid.pam.search.recordings.timeout";
 
 	@Override
@@ -149,7 +156,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 	}
 	
 	@Override
-	protected NewPamSession handleCreateJumpServerSession(Account account, String entryPointDescriptor, String pamPolicy)
+	protected NewPamSession handleCreateJumpServerSession(Account account, String entryPointDescriptor, 
+			String pamPolicy)
 			throws Exception {
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
 
@@ -167,9 +175,42 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		if (jumpServerGroup == null)
 			throw new InternalErrorException(String.format("Cannot start session. Server group %s does not exist",serverGroup));
 
+		if (pamPolicy == null) {
+			pamPolicy = findPolicy(account, url);
+		}
 		if ( pamPolicy == null && entity.getFolder() != null && entity.getFolder().getPamPolicy() != null )
 			pamPolicy = entity.getFolder().getPamPolicy().getName();
 		return createJumpServerSession (entity, jumpServerGroup, url, pamPolicy, Security.getClientIp(), TipusSessio.PAM, null);
+	}
+
+	private String findPolicy(Account account, String entryPointDescriptor) {
+		List<PamPolicyEntity> l = getPamPolicyEntityDao().loadAll();
+		
+		l.sort(new Comparator<PamPolicyEntity>() {
+			@Override
+			public int compare(PamPolicyEntity o1, PamPolicyEntity o2) {
+				int i1 = o1.getPriority() == null ? 0: o1.getPriority().intValue();
+				int i2 = o2.getPriority() == null ? 0: o2.getPriority().intValue();
+				return i1 - i2;
+			}
+		});
+		
+		Map<String, Object> vars = new HashMap<>();
+		vars.put("account", account);
+		vars.put("url", entryPointDescriptor);
+		for (PamPolicyEntity rule: l) {
+			if (rule.getExpression() != null && !rule.getExpression().isEmpty()) {
+				try {
+					if (Boolean.TRUE.equals(Evaluator.instance().evaluate(rule.getExpression(), 
+							vars, "Policy "+rule.getName()))) {
+						return rule.getName();
+					}
+				} catch (Exception e) {
+					log.warn("Error evaluating rule "+rule.getExpression(), e);
+				}
+			}
+		}
+		return null;
 	}
 
 	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl, String pamPolicy, 
@@ -807,9 +848,12 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		if (jumpServerGroup == null)
 			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
 		getPamSecurityHandlerService().checkPermission(entity, "launch");
-		String policyName = null;
-		if ( entity.getFolder() != null && entity.getFolder().getPamPolicy() != null )
+		String policyName = findPolicy(account, account.getLoginUrl());
+		if (policyName == null &&
+				entity.getFolder() != null && 
+				entity.getFolder().getPamPolicy() != null )
 			policyName = entity.getFolder().getPamPolicy().getName();
-		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl(), policyName, sourceIp, type, info);
+		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl(), 
+				policyName, sourceIp, type, info);
 	}
 }

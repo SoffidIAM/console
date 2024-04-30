@@ -11,6 +11,7 @@ import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.PamSession;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
+import com.soffid.iam.model.PamPolicyEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
 import com.soffid.mda.annotation.Nullable;
@@ -41,7 +42,8 @@ import roles.Tothom;
 	MaquinaEntity.class,
 	DispatcherService.class,
 	XarxaService.class,
-	PamSecurityHandlerService.class})
+	PamSecurityHandlerService.class,
+	PamPolicyEntity.class})
 public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	List<JumpServerGroup> findJumpServerGroups() {return null;}

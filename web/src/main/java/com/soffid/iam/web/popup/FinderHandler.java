@@ -201,7 +201,6 @@ public class FinderHandler extends Window implements AfterCompose {
 		}
 	}
 
-
 	public String getNameForPath(DynamicColumnsDatatable lb, String path) {
 		JXPathContext ds = lb.getDataSource().getJXPathContext();
 		path = lb.getXPath()+path;
@@ -310,6 +309,24 @@ public class FinderHandler extends Window implements AfterCompose {
 						}
 					}
 					listener.onEvent(new Event("onSelect", lb, values));
+				}
+			} else if (c instanceof DataTree2) {
+				DataTree2 dt = (DataTree2) c;
+				String path = dt.getSelectedItemXPath();
+				if (path != null) {
+					String name = getNameForPath(dt, path);
+					if (name != null) {
+						try {
+							List<String> values = new LinkedList<>();
+							values.add(name);
+							listener.onEvent(new Event("onSelect", c, values));
+						} catch (Exception e) {
+							throw new UiException(e);
+						}
+						setVisible(false);
+					} else {
+						Missatgebox.avis("Internal error: Cannot get object name");
+					}
 				}
 			}
 		}

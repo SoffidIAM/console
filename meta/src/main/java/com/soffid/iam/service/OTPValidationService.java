@@ -22,5 +22,8 @@ public class OTPValidationService {
 
 	@Operation(grantees= {Tothom.class})
 	public boolean resetFailCount (String account) {return false;}
+
+	@Operation(grantees= {Tothom.class})
+	public String generateTypeForAudit(Challenge challenge) {return null;}
 }
 

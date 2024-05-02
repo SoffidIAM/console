@@ -10,4 +10,6 @@ public interface OTPHandler {
 	boolean resetFailCount (String account) throws Exception;
 
 	Challenge resendToken(Challenge challenge, boolean alternativeMethod) throws Exception;
+
+	String generateTypeForAudit(Challenge challenge) throws Exception;
 }

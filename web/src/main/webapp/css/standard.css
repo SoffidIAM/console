@@ -2372,9 +2372,9 @@ table.preview-table {
 
 table.preview-table thead tr {font-weight: normal}
 
-table.preview-table tr td.grant {color: green;}
-
-table.preview-table tr td.revoke {color: red;}
+table.preview-table tr td .grant {color: green;}
+table.preview-table tr td .revoke {color: red;}
+table.preview-table tr td .toEffectiveRole {color: blue;}
 
 div.datatable table.thead td,
 table.preview-table thead {

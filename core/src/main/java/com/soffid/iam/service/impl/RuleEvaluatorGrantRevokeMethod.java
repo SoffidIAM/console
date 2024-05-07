@@ -15,4 +15,5 @@ public interface RuleEvaluatorGrantRevokeMethod
 	void grant(RuleEntity rule, UserEntity user, RoleEntity role, String domainValue, AccountEntity account)
 			throws InternalErrorException, NeedsAccountNameException, AccountAlreadyExistsException ;
 	void revoke(UserEntity user, RoleAccountEntity role) throws InternalErrorException;
+	void toEffectiveRole(UserEntity user, RoleAccountEntity role, RuleEntity rule) throws InternalErrorException;
 }

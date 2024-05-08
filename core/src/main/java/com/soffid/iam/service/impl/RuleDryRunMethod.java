@@ -7,7 +7,6 @@ import java.util.LinkedList;
 
 import org.hibernate.Hibernate;
 
-import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
@@ -35,7 +34,7 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 		out.print("<td>User</td>");
 		out.print("<td>Role to grant</td>");
 		out.print("<td>Role to revoke</td>");
-		out.print("<td>Role to effective</td>");
+		out.print("<td>Role to bind*</td>");
 		out.println("</tr></thead>");
 		out.println("<tbody>");
 		
@@ -144,7 +143,10 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 
 	public void close() {
 		dumpLine();
-		out.println("</tbody></table></body></html>");
+		String footerTxt = "* Role to bind applies when the user already has the role directly bound. "
+				+ "The role will be transformed into a role bound by rule (it will be visible in the user's effective roles tab).";
+		String footerHtml = "<div style=\"margin-top:14px\">"+footerTxt+"</div>";
+		out.println("</tbody></table>"+footerHtml+"</body></html>");
 		out.close();
 	}
 

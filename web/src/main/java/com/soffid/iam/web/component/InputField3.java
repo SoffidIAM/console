@@ -677,8 +677,9 @@ public class InputField3 extends Databox
 		} while (c != null);
 
 		vars.put("value", value); //$NON-NLS-1$
-		if (position!=null) {
-			vars.put("position", position.intValue());
+		Integer pos = getUIPosition(position);
+		if (pos!=null) {
+			vars.put("position", pos.intValue());
 		}
 		vars.put("attributes", attributes); //$NON-NLS-1$
 		vars.put("serviceLocator", new com.soffid.iam.EJBLocator()); //$NON-NLS-1$
@@ -726,6 +727,25 @@ public class InputField3 extends Databox
 		vars.put("context", ownerContext); //$NON-NLS-1$
 		vars.put("requestContext", ownerContext); //$NON-NLS-1$
 		return vars;
+	}
+
+	private Integer getUIPosition(Integer position) {
+		// Creation or object removed
+		if (position==null ||
+				this.collectionValue==null ||
+				this.collectionValue.isEmpty() ||
+				this.collectionValue.get(position.intValue())==null)
+			return null;
+		// Object added
+		Integer uiPosition = position;
+		if (position!=null) {
+			for (int i=0; i<position.intValue(); i++) {
+				Object value = this.collectionValue;
+				if (value==null)
+					uiPosition--;
+			}
+		}
+		return uiPosition;
 	}
 
 	public void setOwnerContext(String ownerContext) {

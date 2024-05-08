@@ -740,7 +740,7 @@ public class InputField3 extends Databox
 		Integer uiPosition = position;
 		if (position!=null) {
 			for (int i=0; i<position.intValue(); i++) {
-				Object value = this.collectionValue;
+				Object value = this.collectionValue.get(i);
 				if (value==null)
 					uiPosition--;
 			}

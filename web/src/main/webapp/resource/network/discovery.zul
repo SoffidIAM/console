@@ -96,7 +96,7 @@
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" lastAction="ref:frame.confirmApply">
 				<pager datatree2="listbox"/>
 				
-				<menu2>
+				<menu2 id="menuHamb">
 					<menu2item id="deleteHost" if="${soffid:isUserInRole('host:all:delete')}" image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }" onClick="ref:frame.delete"/>
 				</menu2>
 				

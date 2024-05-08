@@ -3,6 +3,7 @@ package com.soffid.iam.web.launcher;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,26 +60,28 @@ public class LauncherMenuHandler implements DynamicMenuHandler {
 	private void processAppMenu(MenuOption option, List<MenuOption> list) throws InternalErrorException, NamingException, CreateException {
 		AccessTree entryPoint = option.getAccessTree();
 		for (AccessTree child: EJBLocator.getSelfService().findChildren(entryPoint )) {
-			MenuOption o = new MenuOption();
-			if (child.getIcon1Id() == null)
-				o.setImg( child.isMenu() ? "/img/menu/container.svg": "/img/menu/launcher.svg" );
-			else 
-				generateIcon(o, child);
-			o.setLiteral(child.getName());
-			if (child.isMenu()) {
-				o.setHandler(this);
-				o.setMenuType("appmenu");
-			} 
-			else {
-				o.setExecHandler( new MenuEntryLauncher());
+			if (!child.isMenu() || (child.isMenu() && hasEntries(child))) {
+				MenuOption o = new MenuOption();
+				if (child.getIcon1Id() == null)
+					o.setImg( child.isMenu() ? "/img/menu/container.svg": "/img/menu/launcher.svg" );
+				else
+					generateIcon(o, child);
+				o.setLiteral(child.getName());
+				if (child.isMenu()) {
+					o.setHandler(this);
+					o.setMenuType("appmenu");
+				}
+				else {
+					o.setExecHandler( new MenuEntryLauncher());
+				}
+				o.setMenuId(child.getId().toString());
+				o.setAccessTree(child);
+				if (child.getCode() != null && !child.getCode().trim().isEmpty())
+					o.setLabel("appmenu_"+child.getCode());
+				else
+					o.setLabel("appmenu_"+child.getId());
+				list.add(o);
 			}
-			o.setMenuId(child.getId().toString());
-			o.setAccessTree(child);
-			if (child.getCode() != null && !child.getCode().trim().isEmpty())
-				o.setLabel("appmenu_"+child.getCode());
-			else
-				o.setLabel("appmenu_"+child.getId());
-			list.add(o);
 		}
 	}
 
@@ -102,14 +105,16 @@ public class LauncherMenuHandler implements DynamicMenuHandler {
 		Long id = Long.parseLong(option.getMenuId());
 		VaultFolder folder = EJBLocator.getVaultService().findFolder(id.longValue());
 		for (VaultFolder child: EJBLocator.getVaultService().getChildren( folder )) {
-			MenuOption o = new MenuOption();
-			o.setImg("/img/menu/container.svg");
-			o.setLiteral(child.getName());
-			o.setHandler(this);
-			o.setMenuType("vaultfolder");
-			o.setMenuId(child.getId().toString());
-			o.setLabel("vaultfolder_"+child.getId());
-			list.add(o);
+			if (hasAccounts(child)) {
+				MenuOption o = new MenuOption();
+				o.setImg("/img/menu/container.svg");
+				o.setLiteral(child.getName());
+				o.setHandler(this);
+				o.setMenuType("vaultfolder");
+				o.setMenuId(child.getId().toString());
+				o.setLabel("vaultfolder_"+child.getId());
+				list.add(o);
+			}
 		}
 		
 		for (Account account: EJBLocator.getVaultService().list(folder)) {
@@ -124,31 +129,59 @@ public class LauncherMenuHandler implements DynamicMenuHandler {
 		}
 	}
 
+	private boolean hasAccounts(VaultFolder folder) throws InternalErrorException, NamingException, CreateException {
+		List<Account> accounts = EJBLocator.getVaultService().list(folder);
+		if (!accounts.isEmpty())
+			return true;
+		for (VaultFolder child: EJBLocator.getVaultService().getChildren(folder)) {
+			boolean hasAccounts = hasAccounts(child);
+			if (hasAccounts)
+				return true;
+		}
+		return false;
+	}
+
 	public void processRoot(List<MenuOption> list) throws InternalErrorException, NamingException, CreateException {
 		AccessTree root = EJBLocator.getSelfService().findRoot();
-		MenuOption o = new MenuOption();
-		if (root.getIcon1Id() == null)
-			o.setImg( "/img/menu/container.svg" );
-		else 
-			generateIcon(o, root);
-		o.setLiteral(root.getName());
-		o.setLabel("appmenu");
-		o.setHandler(this);
-		o.setMenuType("appmenu");
-		o.setMenuId(root.getId().toString());
-		o.setAccessTree(root);
-		list.add(o);
-		
-		for ( VaultFolder folder: EJBLocator.getVaultService().getPublicRootFolders()) {
-			o = new MenuOption();
-			o.setImg("/img/menu/container.svg");
-			o.setLiteral(folder.getName());
+		if (hasEntries(root)) {
+			MenuOption o = new MenuOption();
+			if (root.getIcon1Id() == null)
+				o.setImg( "/img/menu/container.svg" );
+			else
+				generateIcon(o, root);
+			o.setLiteral(root.getName());
+			o.setLabel("appmenu");
 			o.setHandler(this);
-			o.setMenuType("vaultfolder");
-			o.setLabel("vaultfolder_"+folder.getId());
-			o.setMenuId(folder.getId().toString());
+			o.setMenuType("appmenu");
+			o.setMenuId(root.getId().toString());
+			o.setAccessTree(root);
 			list.add(o);
 		}
+		for ( VaultFolder folder: EJBLocator.getVaultService().getPublicRootFolders()) {
+			if (hasAccounts(folder)) {
+				MenuOption o = new MenuOption();
+				o.setImg("/img/menu/container.svg");
+				o.setLiteral(folder.getName());
+				o.setHandler(this);
+				o.setMenuType("vaultfolder");
+				o.setLabel("vaultfolder_"+folder.getId());
+				o.setMenuId(folder.getId().toString());
+				list.add(o);
+			}
+		}
+	}
+
+	private boolean hasEntries(AccessTree entryPoint) throws InternalErrorException, NamingException, CreateException {
+		Collection<AccessTree> entryPoints = EJBLocator.getSelfService().findChildren(entryPoint);
+		for (AccessTree entry : entryPoints) {
+			if (!entry.isMenu())
+				return true;
+		}
+		for (AccessTree entry : entryPoints) {
+			if (entry.isMenu() && hasEntries(entry))
+				return true;
+		}
+		return false;
 	}
 
 	@Override

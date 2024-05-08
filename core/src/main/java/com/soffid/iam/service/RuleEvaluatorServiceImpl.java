@@ -39,6 +39,7 @@ import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
@@ -353,12 +354,15 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 					}
 				}
 				if (match) {
-					it.remove();
+					if (ra.getRule()==null) {
+						// Direct role to indirect role
+						method.toEffectiveRole(user, ra, rule);
+					} else {
+						it.remove();
+					}
 					return;
 				}
 			}
-			
-			
 		}
 		// Second. Assign now
 		method.grant(rule, user, role, stringValue, account);
@@ -568,6 +572,13 @@ public class RuleEvaluatorServiceImpl extends RuleEvaluatorServiceBase implement
 			} finally {
 				Security.nestedLogoff();
 			}
+		}
+
+		@Override
+		public void toEffectiveRole(UserEntity user, RoleAccountEntity roleAccount, RuleEntity rule) throws InternalErrorException {
+			roleAccount.setRule(rule);
+			RoleAccount ra2 =  getRoleAccountEntityDao().toRoleAccount(roleAccount);
+			getApplicationService().update(ra2);
 		}
 	}
 

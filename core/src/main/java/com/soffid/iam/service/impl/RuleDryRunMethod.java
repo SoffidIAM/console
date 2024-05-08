@@ -22,6 +22,7 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 	private PrintStream out;
 	private LinkedList<String> revokes;
 	private LinkedList<String> grants;
+	private LinkedList<String> toEffectiveRoles;
 	private String currentUser;
 	
 	
@@ -29,18 +30,18 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 		outFile = File.createTempFile("ruleEngine", ".html");
 		out = new PrintStream(outFile, "UTF-8");
 		
-		out.print("<table class='preview-table'><thead><tr class='head'><td>");
-		out.print("User");
-		out.print("</td><td>");
-		out.print("Role to grant");
-		out.print("</td><td>");
-		out.print("Role to revoke");
+		out.print("<table class='preview-table'><thead><tr class='head'>");
+		out.print("<td>User</td>");
+		out.print("<td>Role to grant</td>");
+		out.print("<td>Role to revoke</td>");
+		out.print("<td>Role to bind*</td>");
 		out.println("</tr></thead>");
 		out.println("<tbody>");
 		
 		currentUser = null;
 		grants = new LinkedList<String>();
 		revokes = new LinkedList<String>();
+		toEffectiveRoles = new LinkedList<String>();
 	}
 	
 	
@@ -63,10 +64,18 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 				out.print(escape(revoke));
 				out.print("</div>");
 			}
+			out.print("</td><td>");
+			for (String toEffectiveRole: toEffectiveRoles)
+			{
+				out.print("<div class='toEffectiveRole'>");
+				out.print(escape(toEffectiveRole));
+				out.print("</div>");
+			}
 			out.println("</td></tr>");
 			currentUser = null;
 			revokes.clear();
 			grants.clear();
+			toEffectiveRoles.clear();
 		}
 	}
 	
@@ -115,9 +124,29 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 		revokes.add(msg);
 	}
 
+	@Override
+	public void toEffectiveRole(UserEntity user, RoleAccountEntity roleAccount, RuleEntity rule) throws InternalErrorException {
+		if (!user.getId().equals( currentUser)) {
+			dumpLine();
+			currentUser = user.getUserName()+" "+user.getFullName();
+		}
+		RoleEntity role = roleAccount.getRole();
+		String msg = role.getName()+" @ "+role.getSystem().getName();
+		if (roleAccount.getDomainValue() != null)
+			msg = msg + " / "+roleAccount.getDomainValue().getValue();
+		if (roleAccount.getGroup() != null)
+			msg = msg + " / "+roleAccount.getGroup().getName();
+		if (roleAccount.getInformationSystem() != null)
+			msg = msg + " / "+roleAccount.getInformationSystem().getName();
+		toEffectiveRoles.add(msg);
+	}
+
 	public void close() {
 		dumpLine();
-		out.println("</tbody></table></body></html>");
+		String footerTxt = "* Role to bind applies when the user already has the role directly bound. "
+				+ "The role will be transformed into a role bound by rule (it will be visible in the user's effective roles tab).";
+		String footerHtml = "<div style=\"margin-top:14px\">"+footerTxt+"</div>";
+		out.println("</tbody></table>"+footerHtml+"</body></html>");
 		out.close();
 	}
 

@@ -6,10 +6,12 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.SessioEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 
 @Depends({PasswordManagerTokenEntity.class,
-	UsuariEntity.class})
+	UsuariEntity.class,
+	SessioEntity.class})
 @Service(internal = true)
 public class PasswordManagerService {
 	@Operation ( grantees={roles.Tothom.class})

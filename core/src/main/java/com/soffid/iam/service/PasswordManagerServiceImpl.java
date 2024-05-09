@@ -5,8 +5,11 @@ import java.util.Base64;
 import java.util.Date;
 
 import com.soffid.iam.model.PasswordManagerTokenEntity;
+import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.comu.TipusSessio;
 
 public class PasswordManagerServiceImpl extends PasswordManagerServiceBase {
 
@@ -16,6 +19,12 @@ public class PasswordManagerServiceImpl extends PasswordManagerServiceBase {
 		PasswordManagerTokenEntity t = getPasswordManagerTokenEntityDao().findByToken(token);
 		if (t == null)
 			t = getPasswordManagerTokenEntityDao().findByOldToken(token);
+		if (t == null) {
+			for (SessionEntity s: getSessionEntityDao().findByKey(token)) {
+				if (s.getUser().getActive().equals("S") && s.getType() == TipusSessio.ESSO)
+					return s.getUser().getUserName();
+			}
+		}
 		if (t == null)
 			return null;
 		else if (t.getUser().getActive().equals("S"))

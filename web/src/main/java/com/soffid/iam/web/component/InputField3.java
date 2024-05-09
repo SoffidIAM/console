@@ -267,7 +267,7 @@ public class InputField3 extends Databox
 					dataHandler = new UserDataHandler(dataType);
 					setSelectIcon("/img/user.svg");
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_USER_QUERY);
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole(Security.AUTO_USER_QUERY);
 					copyProperties(User.class, "userName");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.PRINTER_TYPE))
@@ -275,7 +275,7 @@ public class InputField3 extends Databox
 					dataHandler = new PrinterDataHandler(dataType);
 					setSelectIcon("/img/printer.svg");
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
 					copyProperties(Printer.class, "name");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.SYSTEM_TYPE))
@@ -283,62 +283,67 @@ public class InputField3 extends Databox
 					dataHandler = new SystemDataHandler(dataType);
 					setSelectIcon("/img/system.svg");
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole(Security.AUTO_PRINTER_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.APPLICATION_TYPE))
 				{
 					dataHandler = new ApplicationDataHandler(dataType);
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_APPLICATION_QUERY);
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole(Security.AUTO_APPLICATION_QUERY);
 					copyProperties(Application.class.getName(), "relativeName");
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.CUSTOM_OBJECT_TYPE)) {
 					dataHandler = new CustomObjectDataHandler(dataType);
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole("customObject:query");
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole("customObject:query");
 					copyProperties(dataType.getCustomObjectType(), "name");
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new OUTypeDataHandler(dataType);
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole("organizationalUnit:query");
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole("organizationalUnit:query");
 				} else  if ( dataType.getType().equals(TypeEnumeration.GROUP_TYPE)) {
 					setSelectIcon("/img/group.svg");
 					dataHandler = new GroupDataHandler(dataType);
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_GROUP_QUERY);
+					noPermissions = ! raisePrivileges && ! Security.isUserInRole(Security.AUTO_GROUP_QUERY);
 					copyProperties(Group.class, "name");
 				} else if ( dataType.getType().equals(TypeEnumeration.HOST_TYPE)) {
 					setSelectIcon("/img/host.svg");
 					dataHandler = new HostDataHandler(dataType);
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_HOST_ALL_QUERY) &&
+					noPermissions = ! raisePrivileges &&
+							! Security.isUserInRole(Security.AUTO_HOST_ALL_QUERY) &&
 							! Security.isUserInRole(Security.AUTO_HOST_ALL_SUPPORT_VNC);
 					copyProperties(Host.class, "name");
 				} else if ( dataType.getType().equals(TypeEnumeration.ROLE_TYPE)) {
 					dataHandler = new RoleDataHandler(dataType);
 					setSelectIcon("/img/role.svg");
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_ROLE_QUERY);
+					noPermissions = ! raisePrivileges &&
+							! Security.isUserInRole(Security.AUTO_ROLE_QUERY);
 				} else if ( dataType.getType().equals(TypeEnumeration.ACCOUNT_TYPE)) {
 					dataHandler = new AccountDataHandler(dataType);
 					setSelectIcon("/img/account.svg");
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_ACCOUNT_QUERY);
+					noPermissions = ! raisePrivileges &&
+							! Security.isUserInRole(Security.AUTO_ACCOUNT_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.MAIL_DOMAIN_TYPE))
 				{
 					dataHandler = new MailDomainDataHandler(dataType);
 					setSelectIcon("/img/maildomain.svg");
 					setHyperlink(true);
-					noPermissions = ! Security.isUserInRole(Security.AUTO_MAIL_QUERY);
+					noPermissions = ! raisePrivileges &&
+							! Security.isUserInRole(Security.AUTO_MAIL_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.MAIL_LIST_TYPE))
 				{
 					dataHandler = new MailListDataHandler(dataType);
 					setHyperlink(true);
 					setSelectIcon("/img/maillist.svg");
-					noPermissions = ! Security.isUserInRole(Security.AUTO_MAIL_QUERY);
+					noPermissions = ! raisePrivileges &&
+							! Security.isUserInRole(Security.AUTO_MAIL_QUERY);
 				}
 				else if ( dataType.getType().equals(TypeEnumeration.NETWORK_TYPE))
 				{
@@ -1052,12 +1057,17 @@ public class InputField3 extends Databox
 		if (currentList != null)
 			currentList.cancel();
 		if ( dataHandler != null && ! noPermissions) {
+			if (raisePrivileges)
+				Security.nestedLogin(Security.ALL_PERMISSIONS);
 			try {
 				currentList = dataHandler.searchLucene(text, dataType.getFilterExpression());
 				currentList.setMaxSize(MAX_DROPDOWN_ROWS);
 			} catch (ListFullException e) { // Ignore
 			} catch (Exception e) {
 				log.info("Error searching for "+text, e);
+			} finally {
+				if (raisePrivileges)
+					Security.nestedLogoff();
 			}
 			currentPosition = 0;
 			return fetchObjects();
@@ -1086,23 +1096,30 @@ public class InputField3 extends Databox
 					throw th; 
 				}
 			} else if (currentList.size() > currentPosition) {
-				int i = 0;
-				result = new LinkedList();
-				while (it.hasNext() && currentPosition < MAX_DROPDOWN_ROWS)
-				{
-				    Object o = it.next();
-					if (i++ >= currentPosition)
+				if (raisePrivileges)
+					Security.nestedLogin(Security.ALL_PERMISSIONS);
+				try {
+					int i = 0;
+					result = new LinkedList();
+					while (it.hasNext() && currentPosition < MAX_DROPDOWN_ROWS)
 					{
-						String[] row = ((InputFieldDataHandler<Object>)dataHandler).toNameDescription(o);
-						if (descriptionExpression != null) {
-							row[1] = evaluateDescriptionExpression(o);
+					    Object o = it.next();
+						if (i++ >= currentPosition)
+						{
+							String[] row = ((InputFieldDataHandler<Object>)dataHandler).toNameDescription(o);
+							if (descriptionExpression != null) {
+								row[1] = evaluateDescriptionExpression(o);
+							}
+							result.add(row);
+							currentPosition ++;
 						}
-						result.add(row);
-						currentPosition ++;
 					}
+					if (currentPosition >= 100) 
+						currentList.cancel();
+				} finally {
+					if (raisePrivileges)
+						Security.nestedLogoff();
 				}
-				if (currentPosition >= 100) 
-					currentList.cancel();
 			} else {
 				result = new LinkedList<>();
 			}
@@ -1446,11 +1463,12 @@ public class InputField3 extends Databox
 	}
 	
 	protected void refreshValue () {
+		boolean oldRaisePrivileges = raisePrivileges;
 		raisePrivileges = true;
 		try {
 			super.refreshValue();
 		} finally {
-			raisePrivileges = false;
+			raisePrivileges = oldRaisePrivileges;
 		}
 	}
 	

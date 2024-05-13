@@ -51,6 +51,7 @@ public class ApplicationHandler extends FrameHandler {
 		SearchBox sb = (SearchBox) getFellow("searchBox");
 		if (name != null) {
 			sb.addAttribute("name").setSearchFilter(name);
+			sb.setBasicMode();
 			vars.declareVariable("enableQuery", true);
 			sb.search();
 		} else if (req.getParameter("filter") != null) {

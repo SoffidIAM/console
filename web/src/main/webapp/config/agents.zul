@@ -58,7 +58,6 @@
 			max-height: calc( 100vh - 100px );
 		}
 	</style>
-
 	
 	<datamodel id="model" rootNode="agents" src="descriptorAgent.xml" />
 
@@ -116,9 +115,9 @@
 					<menu2item if="${canDeleteAgent}"
 						image="/img/trash.svg" label="${c:l('plugins.zul.Delete') }"
 						onClick="ref:frame.delete" />
-					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canUpdateAgent}" onClick="ref:frame.importMapping"/>
-					<menu2item image="/img/export.svg" label="${c:l('tenant.zul.export') }" onClick="ref:frame.exportMapping"/>
-					<menu2item image="/img/add.svg" label="Create default mapping" if="${canUpdateAgent}" onClick="ref:frame.defaultMapping"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" id="importMapping" onClick="ref:frame.importMapping"/>
+					<menu2item image="/img/export.svg" label="${c:l('tenant.zul.export') }" id="exportMapping" onClick="ref:frame.exportMapping"/>
+					<menu2item image="/img/add.svg" label="Create default mapping" id="defaultMapping" onClick="ref:frame.defaultMapping"/>
 					<menu2item image="/img/question.svg" label="${c:l('agents.zul.Test') }" if="${canQueryAgent}" onClick="ref:frame.test"/>
 				</menu2>
 

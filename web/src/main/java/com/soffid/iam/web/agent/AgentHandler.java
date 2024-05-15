@@ -76,6 +76,7 @@ import com.soffid.iam.web.SearchDictionary;
 import com.soffid.iam.web.component.AttributeSearchBox;
 import com.soffid.iam.web.component.FileDump;
 import com.soffid.iam.web.component.FrameHandler;
+import com.soffid.iam.web.component.Menu2item;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.FileUpload2;
 
@@ -118,6 +119,9 @@ public class AgentHandler extends FrameHandler {
 	private Tab workflowTab;
 	private String selectedProcess;
 	private DebugTaskResults propagateLog;
+	private Menu2item importMapping;
+	private Menu2item exportMapping;
+	private Menu2item defaultMapping;
 
 	public AgentHandler() throws InternalErrorException {
 		super();
@@ -206,6 +210,9 @@ public class AgentHandler extends FrameHandler {
 		if (visible == false && attributeMappingTab.isSelected())
 			basicTab.setSelected(true);
 		attributeMappingTab.setVisible(visible);
+		importMapping.setVisible(visible);
+		exportMapping.setVisible(visible);
+		defaultMapping.setVisible(visible);
 	}
 
 	public void setVisibleMetadata(boolean visible) {
@@ -322,6 +329,9 @@ public class AgentHandler extends FrameHandler {
 		missatge = getFellow("missatge");
 		startTaskWindow = (Window) getFellow("startTaskWindow");
 		workflowTab = (Tab) getFellow("r_workflow");
+		importMapping = (Menu2item) getFellow("importMapping");
+		exportMapping = (Menu2item) getFellow("exportMapping");
+		defaultMapping = (Menu2item) getFellow("defaultMapping");
 
 		getModel().addEventListener("onCommit", 
 				(evt) -> onChangeClass());

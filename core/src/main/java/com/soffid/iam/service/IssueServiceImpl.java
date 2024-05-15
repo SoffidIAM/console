@@ -302,6 +302,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 				for (IssueUserEntity ue: entity.getUsers()) {
 					if (ue.getAction() == null || ue.getAction() == EventUserAction.UNKNOWN ) {
 						ue.setAction(EventUserAction.DIFFERENT_USER);
+						ue.setUser(null);
 						getIssueUserEntityDao().update(ue);
 					} else if (ue.getAction() != EventUserAction.DIFFERENT_USER) {
 						anyMerge = true;

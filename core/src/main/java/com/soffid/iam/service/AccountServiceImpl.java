@@ -875,6 +875,31 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			account.setStatus( account.isDisabled() ? AccountStatus.DISABLED: AccountStatus.ACTIVE);
 		else
 			account.setDisabled( account.getStatus() != AccountStatus.ACTIVE && account.getStatus() != AccountStatus.FORCED_ACTIVE);
+
+		// Check if resend domain password when user account is enabled
+		if (ae.getType()==AccountType.USER) {
+			if (!account.isDisabled() && ae.isDisabled()) {
+				if (ae.getSecrets()!=null && !ae.getSecrets().trim().isEmpty()) {
+					if (ae.getSystem().getUrl()!=null) {
+						for (ServerEntity se : getServerEntityDao().loadAll()) {
+							if (se.getType().equals(ServerType.MASTERSERVER)) {
+								String user = ae.getUsers().iterator().next().getUser().getUserName();
+								String passwordDomain = ae.getSystem().getPasswordDomain().getName();
+								if (se.getInstances().isEmpty()) {
+									resendUserPasswordNow(user, passwordDomain, se.getUrl(), se.getAuth());
+								} else {
+									for (ServerInstanceEntity si: se.getInstances()) {
+										resendUserPasswordNow(user, passwordDomain, si.getUrl(), si.getAuth());
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		if (AccountStatus.REMOVED.equals(ae.getStatus()) && !account.getStatus().equals(AccountStatus.REMOVED))
 		{
 			audit("C", ae); //$NON-NLS-1$
@@ -3475,11 +3500,11 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {
 	            	if (se.getInstances().isEmpty()) {
-	            		if (resendPasswordNow(ae, se.getUrl(), se.getAuth())) 
+	            		if (resendAccountPasswordNow(ae, se.getUrl(), se.getAuth()))
 	            			return;
 	            	} else {
 	            		for (ServerInstanceEntity si: se.getInstances()) {
-		            		if (resendPasswordNow(ae, si.getUrl(), si.getAuth())) 
+		            		if (resendAccountPasswordNow(ae, si.getUrl(), si.getAuth()))
 		            			return;
 	            			
 	            		}
@@ -3489,7 +3514,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		}
 	}
 
-	private boolean resendPasswordNow(AccountEntity account, String url, String auth)
+	private boolean resendAccountPasswordNow(AccountEntity account, String url, String auth)
 			throws InternalErrorException {
 		SyncStatusService sss = null;
 		try {
@@ -3507,7 +3532,24 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		} else
 			return false;
 	}
-	
+
+	private boolean resendUserPasswordNow(String user, String passwordDomain, String url, String auth) throws InternalErrorException {
+		SyncStatusService sss = null;
+		try {
+		    RemoteServiceLocator rsl = new com.soffid.iam.remote.RemoteServiceLocator(url);
+		    rsl.setAuthToken(auth);
+			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
+		    sss = rsl.getSyncStatusService();
+		} catch (Exception e) {
+			log.warn("Error sending password", e); //$NON-NLS-1$
+		}
+		if (sss != null) {
+			sss.resendUserPassword(user, passwordDomain);
+			return true;
+		} else
+			return false;
+	}
+
 	
 	private void checkCanSetPassword(Account account, AccountEntity ae)
 			throws InternalErrorException, BadPasswordException {

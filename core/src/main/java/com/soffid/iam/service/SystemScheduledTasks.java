@@ -18,4 +18,5 @@ public class SystemScheduledTasks
 	public static final String UPDATE_STATS = "system:update-stats";
 	public static final String RELEASE_PRIVILEGED_ACCOUNTS = "system:release-priv-accounts";
 	public static final String NETWORK_DISCOVERY = "system:network-discovery";
+	public static final String NETWORK_INTELLIGENCE_VERIFY_DOMAINS = "system:network-intelligence-verify-accounts";
 }

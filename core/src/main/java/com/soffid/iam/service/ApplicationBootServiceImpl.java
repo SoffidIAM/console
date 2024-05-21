@@ -1050,6 +1050,13 @@ public class ApplicationBootServiceImpl extends
 			getScheduledTaskService().create(handler);
 		}
 
+		if (!handlers.containsKey(SystemScheduledTasks.NETWORK_INTELLIGENCE_VERIFY_DOMAINS)) {
+			ScheduledTaskHandler handler = new ScheduledTaskHandler();
+			handler.setClassName("com.soffid.iam.service.cron.NetworkIntelligenceVerifyDomainsTask"); //$NON-NLS-1$
+			handler.setName(SystemScheduledTasks.NETWORK_INTELLIGENCE_VERIFY_DOMAINS);
+			getScheduledTaskService().create(handler);
+		}
+
 		for (ScheduledTask task : getScheduledTaskService().listTasks()) {
 			String id = task.getHandlerName();
 			if (task.getParams() != null)
@@ -1157,6 +1164,19 @@ public class ApplicationBootServiceImpl extends
 			task.setMinutesPattern("5");
 			task.setMonthsPattern("*");
 			task.setName("Release privileged accounts");
+			getScheduledTaskService().create(task);
+		}
+
+		if (!tasks.containsKey(SystemScheduledTasks.NETWORK_INTELLIGENCE_VERIFY_DOMAINS)) {
+			ScheduledTask task = new ScheduledTask();
+			task.setActive(false);
+			task.setDayOfWeekPattern("*");
+			task.setDayPattern("*");
+			task.setHandlerName(SystemScheduledTasks.NETWORK_INTELLIGENCE_VERIFY_DOMAINS);
+			task.setHoursPattern("0");
+			task.setMinutesPattern("0");
+			task.setMonthsPattern("*");
+			task.setName("Network intelligence verify domains");
 			getScheduledTaskService().create(task);
 		}
 	}

@@ -16,7 +16,6 @@ import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.zkib.component.Form;
 
 public class NetworkIntelligenceHandler extends FrameHandler {
 
@@ -39,21 +38,32 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 	public void validateToken(Event event) {
 		String token = (String) ((CustomField3) getFellow("token")).getValue();
 		if (token!=null && !token.trim().isEmpty()) {
-			NetworkIntelligence ni = validateTokenFromSsokm(token);
-			if (ni!=null) {
-				try {
-					setTokenToParam(ni);
-					setTokenToZul(ni);
-				} catch (Exception e) {
-					warnTokenToZul("Error validating token");
-				}
-				return;
-			}
+			NetworkIntelligence ni = null;
+			boolean serviceError = false;
 			try {
-				warnTokenToZul("Token not valid");
-				removeTokenParam();
-			} catch (Exception e) {
-				warnTokenToZul("Token not valid, error trying to update de system");
+				ni = validateLicense(token);
+			} catch(Exception e) {
+				serviceError = true;
+			}
+			if (serviceError) {
+				warnTokenToZul("Error trying to validate the token with the service, try it later");
+			} else {
+				if (ni!=null) {
+					try {
+						setTokenToParam(ni);
+						setTokenToZul(ni);
+					} catch (Exception e) {
+						warnTokenToZul("Internal error validating token, contact with the administrator");
+					}
+					return;
+				} else {
+					warnTokenToZul("Token not valid");
+					try {
+						removeTokenParam();
+					} catch (Exception e) {
+						warnTokenToZul("Token not valid and it has been an internal error tryint to remove it");
+					}
+				}
 			}
 		}
 	}
@@ -140,13 +150,9 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 			cs.delete(param);
 	}
 
-	private NetworkIntelligence validateTokenFromSsokm(String token) {
-		try {
-			NetworkIntelligenceService nis = (NetworkIntelligenceService) new InitialContext().lookup(NetworkIntelligenceServiceHome.JNDI_NAME);
-			NetworkIntelligence ni = nis.validateTokenFromSsokm(token);
-			return ni;
-		} catch (Exception e) {
-			return null;
-		}
+	private NetworkIntelligence validateLicense(String token) throws Exception {
+		NetworkIntelligenceService nis = (NetworkIntelligenceService) new InitialContext().lookup(NetworkIntelligenceServiceHome.JNDI_NAME);
+		NetworkIntelligence ni = nis.validateToken(token);
+		return ni;
 	}
 }

@@ -21,7 +21,7 @@ public class Account {
 	public java.lang.Long id;
 
 	@Description("System where the acounts lives")
-	@Attribute(separator = "_commonAttributes", translated = "system", customUiHandler = "com.soffid.iam.web.account.SystemFieldHandler" )
+	@Attribute(separator = "_commonAttributes", translated = "system", type = "SYSTEM")
 	@JsonAttribute(hibernateAttribute="system.name")
 	public java.lang.String dispatcher;
 	

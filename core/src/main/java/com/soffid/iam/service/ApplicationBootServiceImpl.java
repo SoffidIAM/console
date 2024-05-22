@@ -562,6 +562,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("116");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("116"))
+		{
+			updateRoleSystemType();
+			cfg.setValue("117");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void updateForbiddenWords() throws SQLException {
@@ -594,6 +600,17 @@ public class ApplicationBootServiceImpl extends
 		}
 		finally
 		{
+			conn.close();
+		}
+	}
+
+	private void updateRoleSystemType() throws SQLException {
+		DataSource ds = (DataSource) applicationContext.getBean("dataSource"); //$NON-NLS-1$
+		final Connection conn = ds.getConnection();
+		try {
+			executeSentence(conn, "UPDATE SC_TIPDAD SET TDA_TYPE='SY' WHERE TDA_SCOPE='role' AND TDA_CODI='system'", new Object[] {});
+			executeSentence(conn, "UPDATE SC_TIPDAD SET TDA_TYPE='SY' WHERE TDA_SCOPE='account' AND TDA_CODI='system'", new Object[] {});
+		} finally {
 			conn.close();
 		}
 	}

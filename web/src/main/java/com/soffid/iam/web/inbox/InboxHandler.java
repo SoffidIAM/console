@@ -167,7 +167,14 @@ public class InboxHandler extends com.soffid.iam.web.component.FrameHandler {
 					for (Entry<String, Object> att: ((Map<String, Object>)task.getVariables()).entrySet()) {
 						Object value = att.getValue();
 						if (value != null) {
-							listbox.wrapClientValue(atts, att.getKey(), value);
+							if (value instanceof String ||
+									value instanceof Date ||
+									value instanceof StringBuffer ||
+									value instanceof Number ||
+									value instanceof Boolean)
+								listbox.wrapClientValue(atts, att.getKey(), value);
+							else
+								listbox.wrapClientValue(atts, att.getKey(), value.toString());
 						}
 					}
 					o.put("attributes", atts);

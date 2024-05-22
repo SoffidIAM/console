@@ -768,7 +768,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			// 12345678901234567890123456
 			// 1 2 2
 			for (int i = 0; i < maxMins; i++) {
-				int ch = 'a' + r.nextInt(26);
+				char ch = randomLower(r);
 				sb.append((char) ch);
 			}
 			maxMins = 0;
@@ -787,32 +787,37 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		while (sb.length() < length) {
 			int remaining = length - sb.length();
 			if (minMins > 0 && minMins + minMays + minNums + minSims == remaining) {
-				sb.append((char) ('a' + r.nextInt(26)));
+				char ch = randomLower(r);
+				sb.append(ch);
 				minMins--;
 			} else if (minMays > 0 && minMays + minNums + minSims == remaining) {
-				sb.append((char) ('A' + r.nextInt(26)));
+				char ch = randomUpper(r);
+				sb.append(ch);
 				minMays--;
 			} else if (minNums > 0 && minNums + minSims == remaining) {
-				sb.append((char) ('0' + r.nextInt(10)));
+				char ch = randomNumber(r);
+				sb.append(ch);
 				minNums--;
 			} else if (minSims > 0 && minSims == remaining) {
 				sb.append((char) ('!' + r.nextInt(14)));
 				minSims--;
 			} else {
 				int ch = r.nextInt(26 + 26 + 10 + 15);
-				if (ch < 26 && maxMins > 0) {
+				if (ch < 26 && maxMins > 0 && ch != 11 /* l */) {
 					sb.append((char) ('a' + ch));
 					maxMins--;
 					if (minMins > 0)
 						minMins--;
 				}
-				if (ch >= 26 && ch < 26 + 26 && maxMays > 0) {
+				if (ch >= 26 && ch < 26 + 26 && maxMays > 0 && ch != 14 + 26 /* O */) {
 					sb.append((char) ('A' + ch - 26));
 					maxMays--;
 					if (minMays > 0)
 						minMays--;
 				}
-				if (ch >= 26 + 26 && ch < 26 + 26 + 10 && maxNums > 0) {
+				if (ch >= 26 + 26 && ch < 26 + 26 + 10 && maxNums > 0 &&
+						ch != 26 + 26 /* 0 */ && 
+						ch != 26 + 26 + 1 /* 1 */) {
 					sb.append((char) ('0' + ch - 26 - 26));
 					maxNums--;
 					if (minNums > 0)
@@ -839,6 +844,24 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 		password = new Password(new String(b));
 		return password;
+	}
+
+	protected char randomNumber(Random r) {
+		char ch;
+		do {ch = (char) ('0' + r.nextInt(10));} while (ch == '0' || ch == '1');
+		return ch;
+	}
+
+	protected char randomUpper(Random r) {
+		char ch;
+		do {ch = (char) ('A' + r.nextInt(26));} while (ch == 'O');
+		return ch;
+	}
+
+	protected char randomLower(Random r) {
+		char ch;
+		do { ch = (char) ('a' + r.nextInt(26)); } while (ch == 'l');
+		return ch;
 	}
 
 	/**

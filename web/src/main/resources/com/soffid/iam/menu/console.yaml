@@ -50,7 +50,7 @@
         - name: seu.roles
           url: /resource/application/role.zul
           img: /img/menu/roles.svg
-          permissions: ["seu:rules:show"]
+          permissions: ["seu:roles:show"]
         - name: seu.rules
           url: /resource/application/role-rules.zul
           img: /img/menu/role-rules.svg

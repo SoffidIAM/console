@@ -25,7 +25,7 @@ public abstract class Rol {
 	public java.lang.String descripcio;
 
 	@JsonAttribute(hibernateAttribute="system.name")
-	@Attribute(translated = "system", customUiHandler = "com.soffid.iam.web.application.SystemFieldHandler" )
+	@Attribute(translated = "system", type = "SYSTEM")
 	public java.lang.String baseDeDades;
 
 	@Nullable

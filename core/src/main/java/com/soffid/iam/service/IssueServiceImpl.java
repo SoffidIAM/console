@@ -214,7 +214,7 @@ public class IssueServiceImpl extends IssueServiceBase {
 			return issue;
 	}
 
-	private Long getNewIssueNumber() {
+	private synchronized Long getNewIssueNumber() {
 		Long next = 1L;
 		ConfigEntity config = getConfigEntityDao().findByCodeAndNetworkCode("soffid.issue.next", null); //$NON-NLS-1$
 		if (config == null) {

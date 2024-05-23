@@ -17,9 +17,6 @@
 		<div sclass="card__face card__face--front">
 	
 			<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
-				<menu2>
-					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('sso:createSharedFolders')}"  onClick="ref:frame.addNew"/>
-				</menu2>
 			</div>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.AccessTree" 

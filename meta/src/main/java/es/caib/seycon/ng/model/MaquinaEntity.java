@@ -37,7 +37,7 @@ public abstract class MaquinaEntity {
 	@Nullable
 	public java.lang.String adreca;
 
-	@Column (name="MAQ_DESCRI", length=50, translated="description")
+	@Column (name="MAQ_DESCRI", length=75, translated="description")
 	@Nullable
 	public java.lang.String descripcio;
 

@@ -89,13 +89,13 @@
 									<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" datamodel="/model" onClick="ref:frame.apply"/>
 								</div>					
 							</tabpanel>
-							<tabpanel fulfill="p_autoritzacions.onSelect" id="tp_autoritzacions">
+							<tabpanel fulfill="p_autoritzacions.onSelect">
 								<menu_acl listbox="//menueditor/listbox"/>
 							</tabpanel>
-							<tabpanel fulfill="p_execucions.onSelect" id="tp_executions">
+							<tabpanel fulfill="p_execucions.onSelect">
 								<menu_executions listbox="//menueditor/listbox"/>
 							</tabpanel>
-							<tabpanel fulfill="p_xml.onSelect" id="tp_xml">
+							<tabpanel fulfill="p_xml.onSelect">
 								<menu_sso listbox="//menueditor/listbox"/>
 							</tabpanel>
 						</tabpanels>

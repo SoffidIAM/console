@@ -38,12 +38,6 @@ public class MenuEditorHandler extends FrameHandler {
 			Long id = (Long) XPathUtils.getValue(getForm(), "id");
 			CustomField3 cf = (CustomField3) getFellow("menu");
 			cf.setReadonly(id != null);
-			
-			Boolean menu = (Boolean) XPathUtils.getValue(getForm(), "menu");
-			getFellow("p_execucions").setVisible( ! Boolean.TRUE.equals(menu)); 
-			getFellow("p_xml").setVisible( ! Boolean.TRUE.equals(menu)); 
-			getFellow("tp_executions").setVisible( ! Boolean.TRUE.equals(menu)); 
-			getFellow("tp_xml").setVisible( ! Boolean.TRUE.equals(menu)); 
 			onChangeMenu(ev);
 		} catch (JXPathNotFoundException e) {
 			

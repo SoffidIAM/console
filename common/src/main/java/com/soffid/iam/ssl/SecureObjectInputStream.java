@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 public class SecureObjectInputStream extends ObjectInputStream {
+	String blackList[];
 	public SecureObjectInputStream() throws IOException, SecurityException {
 		super();
 	}
@@ -19,12 +20,18 @@ public class SecureObjectInputStream extends ObjectInputStream {
 
 	@Override
 	protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+		if (blackList == null)
+		{
+			String b = System.getProperty("soffid.serializer.blacklist");
+			if (b == null) 
+				b = "bsh. org.openjdk.nashorn.internal.";
+			blackList = b.split(" ");
+		}
 		String className = desc.getName();
-		if ((className.startsWith("com.soffid.") && (className.contains(".api.") || className.contains(".common"))) ||
-			(className.contains("es.caib.")  && (className.contains(".api.") || className.contains(".common"))) ||
-			className.startsWith("java."))
-			return super.resolveClass(desc);
-		throw new ClassNotFoundException (desc.getName());
+		for (String s: blackList)
+			if (className.startsWith(s))
+				throw new ClassNotFoundException (desc.getName());
+		return super.resolveClass(desc);
 	}
 
 }

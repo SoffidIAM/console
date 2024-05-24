@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -2042,7 +2043,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	transient private Random random = new Random(new Date().getTime());
+	transient private Random random = new SecureRandom();
 
 	private void auditaCanviPassword(String codiUsuariAuditat,
 			String codiDominiContrasenyes) {

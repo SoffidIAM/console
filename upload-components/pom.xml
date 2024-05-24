@@ -11,14 +11,6 @@
 	<description>Upload components from EAR to database</description>
 	<packaging>ejb</packaging>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>ibkey</id>
-			<name>IBKEY Maven Repository</name>
-			<url>http://ibkey.sourceforge.net/maven</url>
-		</pluginRepository>
-	</pluginRepositories>
-
 	<build>
 		<resources>
 			<resource>

@@ -82,7 +82,8 @@ public class ErrorServlet extends HttpServlet {
 				} catch (Exception e) {
 
 				}
-			} else if (root instanceof NullPointerException && message.contains("z:redraw")) {
+			} else if (root instanceof NullPointerException && message.contains("z:redraw") && 
+					uri.startsWith("/") && ! uri.startsWith("//")) {
 				try {
 					resp.addHeader("Location", uri);
 					resp.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);

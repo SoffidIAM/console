@@ -1377,6 +1377,7 @@ zk.go = function (url, overwrite, target) {
 		//Bug 1773575: with # and the same url, no redraw
 	if (bProgress && url) {
 		bProgress =	url.indexOf("://") < 0 && !url.startsWith("mailto:")
+			&& !url.startsWith("data:")  && !url.startsWith("vbscript:")
 			&& !url.startsWith("javascript:") && !url.startsWith("about:");
 	}
 	if (!url) {
@@ -1413,7 +1414,8 @@ zk.go = function (url, overwrite, target) {
  * More precisely, whether the current document won't be changed.
  */
 zk.isNewWindow = function (url, target) {
-	return url.startsWith("mailto:") || url.startsWith("javascript:")
+	return url.startsWith("mailto:") || url.startsWith("javascript:")  
+		|| url.startsWith("data:")  || url.startsWith("vbscript:")
 		|| (target && target != "_self");
 };
 

@@ -337,6 +337,9 @@ public class DeployerBean implements DeployerService {
 			if (entry.getName().equals("META-INF/web.xml")
 					|| entry.getName().equals("META-INF\\web.xml")) {
 				// Nothing to do with web.xml
+				consumeStream(zin);
+			} else if (entry.getName().contains("..")) {
+				consumeStream(zin);
 			} else {
 				File f = new File(warFile, entry.getName());
 				if (entry.isDirectory()) {
@@ -410,6 +413,12 @@ public class DeployerBean implements DeployerService {
 		int read;
 		while ((read = zin.read(b)) > 0) {
 			out.write(b, 0, read);
+		}
+	}
+
+	public void consumeStream(InputStream zin) throws IOException {
+		byte b[] = new byte[4096];
+		while (zin.read(b) > 0) {
 		}
 	}
 
@@ -508,7 +517,9 @@ public class DeployerBean implements DeployerService {
 		ZipInputStream zin = new ZipInputStream( new FileInputStream(coreFile));
 		ZipEntry entry;
 		while ((entry = zin.getNextEntry()) != null) {
-			if (entry.isDirectory()) {
+			if (entry.getName().contains("..")) {
+				consumeStream(zin);
+			} else if (entry.isDirectory()) {
 				resources.putNextEntry(new ZipEntry(entry.getName()));
 				resources.closeEntry();
 			} else if (entry.getName().endsWith(".class")) {
@@ -536,7 +547,10 @@ public class DeployerBean implements DeployerService {
 		ZipEntry entry;
 		while ((entry = zin.getNextEntry()) != null) {
 			File f = new File(target, entry.getName());
-			if (entry.isDirectory()) {
+			if (entry.getName().contains("..")) {
+				consumeStream(zin);
+			}
+			else if (entry.isDirectory()) {
 				f.mkdirs();
 			} else {
 				if (entry.getName().endsWith(".war")) //$NON-NLS-1$
@@ -564,7 +578,9 @@ public class DeployerBean implements DeployerService {
 		ZipEntry entry;
 		while ((entry = zin2.getNextEntry()) != null) {
 			File f = new File(dir, entry.getName());
-			if (entry.isDirectory()) {
+			if (entry.getName().contains("..")) {
+				consumeStream(binaryStream);
+			} else if (entry.isDirectory()) {
 				f.mkdirs();
 			} else {
 				f.getParentFile().mkdirs();
@@ -615,7 +631,9 @@ public class DeployerBean implements DeployerService {
 		ZipInputStream zin = new ZipInputStream(in);
 		while ((entry = zin.getNextEntry()) != null) {
 			File f = new File(warFile, entry.getName());
-			if (entry.isDirectory()) {
+			if (entry.getName().contains("..")) {
+				consumeStream(zin);
+			} else if (entry.isDirectory()) {
 				f.mkdirs();
 			} else {
 				if ( exploded && canBeExploded(entry.getName()))

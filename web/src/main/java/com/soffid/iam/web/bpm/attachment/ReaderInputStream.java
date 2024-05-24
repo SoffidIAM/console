@@ -52,7 +52,7 @@ public class ReaderInputStream extends InputStream {
             throw new IOException(Messages.getString("ReaderInputStream.StreamClosed")); //$NON-NLS-1$
         }
 
-        byte result;
+        int result;
         if (slack != null && begin < slack.length) {
             result = slack[begin];
             if (++begin == slack.length) {
@@ -61,7 +61,7 @@ public class ReaderInputStream extends InputStream {
         } else {
             byte[] buf = new byte[1];
             if (read(buf, 0, 1) <= 0) {
-                result = -1;
+                return -1;
             }
             result = buf[0];
         }

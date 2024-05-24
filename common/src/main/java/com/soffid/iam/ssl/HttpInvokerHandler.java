@@ -93,7 +93,7 @@ public class HttpInvokerHandler implements InvocationHandler {
 
 		            oout.close();
 		            
-		            ObjectInputStream oin = new ObjectInputStream (c.getInputStream());
+		            SecureObjectInputStream oin = new SecureObjectInputStream (c.getInputStream());
 		            Object result = oin.readObject();
 		            oin.close ();
 		            

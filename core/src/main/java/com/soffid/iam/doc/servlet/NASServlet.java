@@ -62,8 +62,9 @@ public class NASServlet extends HttpServlet {
 		{
 			throw new ServletException("Missing configuration parameter soffid.ui.docLocalPath ");
 		}
-		File baseFile = new File (base);
 		File f = new File (base, req.getPathInfo());
+		if (!base.startsWith("/"))
+			base = base + "/";
 		if (  ! f.getCanonicalPath().startsWith(base))
 		{
 			throw new ServletException("Bad path "+req.getPathInfo());
@@ -146,6 +147,8 @@ public class NASServlet extends HttpServlet {
 				throw new ServletException("Missing configuration parameter soffid.ui.docPath ");
 			}
 			File f = new File (base, req.getPathInfo());
+			if (!base.startsWith("/"))
+				base = base + "/";
 			if (  ! f.getCanonicalPath().startsWith(base))
 			{
 				throw new ServletException("Bad path "+req.getPathInfo());

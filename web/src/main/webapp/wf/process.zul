@@ -41,8 +41,8 @@
 				<![CDATA[
 - path: process
   icon: /img/agent-green.svg
-  value: id
   leaf: false
+  template:  #{ (hasMoreThanOneProcess && processId==currentProcessId) ? c:cat3("<b>",c:string(id),"</b>") : id }
   columns:
     - value: description
     - value: startDate

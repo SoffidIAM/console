@@ -41,7 +41,9 @@
 		title="${c:l('user-groups.details')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails">
 
-		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<div sclass="navigation-bar">
+			<label bind="${arg.listbox}:/code"></label> - <label bind="${arg.listbox}:/name"></label>
+			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
 					 if="${soffid:isUserInRole('network:all:update')}" 
 					label="${c:l('plugins.zul.Delete') }" 
@@ -49,8 +51,17 @@
 		</div>
 
 		<form id="form" width="100%" dataPath="../listbox:/">
-			<customfield3 dataType="String" bind="${arg.listbox }:/name" readonly="true"
-				label="${c:l('aplica_permisosRol.zul.entryPoint') }"/>
+
+			<customfield3 dataType="STRING" id="level3"
+				bind="authorizationLevelDescription"
+				label="${c:l('network-acl.selectLevel')}"
+				listOfValues="admin: ${c:l('aplicacionsIntranet.zul.Administrador')}, exec: ${c:l('aplicacionsIntranet.zul.Autoritzat')}"
+				readonly="true" />
+
+			<customfield3 dataType="STRING" id="scope3"
+				bind="authorizationEntityType"
+				label="${c:l('accounts.scope')}"
+				readonly="true" />
 
 			<customfield3 dataType="USER" id="user3"
 				label="${c:l('aplicaIntranet_autoritzacio.User')}"
@@ -70,12 +81,6 @@
 			<customfield3 dataType="ACCOUNT" id="account3"
 				bind="authorizedEntityCode"
 				label="${c:l('auditoria.zul.account')}"
-				readonly="true" />
-
-			<customfield3 dataType="STRING" id="level3"
-				bind="authorizationLevelDescription"
-				label="${c:l('network-acl.selectLevel')}"
-				listOfValues="admin: ${c:l('aplicacionsIntranet.zul.Administrador')}, exec: ${c:l('aplicacionsIntranet.zul.Autoritzat')}"
 				readonly="true" />
 
 		</form>

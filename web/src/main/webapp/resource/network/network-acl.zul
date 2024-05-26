@@ -50,7 +50,9 @@
 		title="${c:l('user-groups.details')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails">
 
-		<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<div sclass="navigation-bar">
+			<label bind="${arg.listbox}:/name"></label> - <label bind="${arg.listbox}:/description"></label>
+			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
 					 if="${soffid:isUserInRole('network:all:update')}" 
 					label="${c:l('plugins.zul.Delete') }" 

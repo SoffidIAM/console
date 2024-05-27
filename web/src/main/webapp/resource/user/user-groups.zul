@@ -37,7 +37,9 @@
 		title="${c:l('user-groups.details')}" visible="false"
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
 
-		<div class="navigation-bar dummy">
+		<div sclass="navigation-bar">
+			<label bind="${arg.listbox}:/userName"></label> - <label bind="${arg.listbox}:/fullName"></label>
+			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
 					 if="${soffid:isUserInRole('user:group:delete')}" 
 					label="${c:l('plugins.zul.Delete') }" 

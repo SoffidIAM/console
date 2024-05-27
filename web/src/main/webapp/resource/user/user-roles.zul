@@ -102,9 +102,7 @@
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
 
 		<div sclass="navigation-bar dummy">
-			<label bind="${arg.listbox }:/userName"></label>
-			-
-			<label bind="${arg.listbox }:/fullName"></label>
+			<label bind="${arg.listbox }:/userName"></label> - <label bind="${arg.listbox }:/fullName"></label>
 			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
 					id="trash"

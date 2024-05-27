@@ -36,6 +36,8 @@
 		style="width: 80%; max-width: 800px" onClose="ref:handler.closeDetails()">
 
 		<div sclass="navigation-bar">
+			<label bind="${arg.listbox}:/name"></label> - <label bind="${arg.listbox}:/description"></label>
+			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
 					 if="${soffid:isUserInRole('user:group:delete')}" 
 					label="${c:l('plugins.zul.Delete') }" 

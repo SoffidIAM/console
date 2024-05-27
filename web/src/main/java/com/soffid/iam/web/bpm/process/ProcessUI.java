@@ -14,9 +14,11 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -643,12 +645,33 @@ public class ProcessUI extends FrameHandler {
 		} while ( ! current.isEmpty());
 
 		currentTasks = new JSONObject();
-		loadProcesses ( engine, roots, new HashSet<Long> (), currentTasks, true);
+		loadProcesses ( engine, roots, new HashSet<Long> (), currentTasks, true, proc, hasMoreThanOneProcess(engine, proc));
 		tablaTareas.setData(currentTasks);
 	}
 
+    private boolean hasMoreThanOneProcess(BpmEngine engine, ProcessInstance proc) {
 
-    private void loadProcesses(BpmEngine engine, Set<Long> roots, HashSet<Long> processed, JSONObject data, boolean expandir) throws InternalErrorException, BPMException {
+    	// If it has a father, it is a son
+    	Collection<Long> parents = new LinkedList<Long>();
+    	try {
+			parents = engine.findParentProceeses(proc.getId());
+		} catch (InternalErrorException e) {
+			e.printStackTrace();
+		}
+    	if (parents!=null && !parents.isEmpty())
+    		return true;
+
+    	// If it doesn't have a father, does is has children?
+   		HashSet<Long> childProcs = new HashSet<Long>();
+		try {
+			childProcs = new HashSet<Long>(engine.findChildProcesses(proc.getId()));
+		} catch (InternalErrorException e) {
+			e.printStackTrace();
+		}
+    	return !childProcs.isEmpty();
+	}
+
+	private void loadProcesses(BpmEngine engine, Set<Long> roots, HashSet<Long> processed, JSONObject data, boolean expandir, ProcessInstance processSelected, boolean hasMoreThanOneProcess) throws InternalErrorException, BPMException {
     	SimpleDateFormat df = new SimpleDateFormat( Labels.getLabel("selfService.Format")); //$NON-NLS-1$
     	for ( Long id: roots )
     	{
@@ -667,6 +690,8 @@ public class ProcessUI extends FrameHandler {
     				o.put("startDate", DateFormats.getDateTimeFormat().format(proc.getStart()));
     				o.put("currentTask", proc.getCurrentTask());
     				o.put("children", new JSONArray());
+    				o.put("currentProcessId", new Long(processSelected.getId()));
+    				o.put("hasMoreThanOneProcess", hasMoreThanOneProcess);
     				if (data.optJSONArray("children") == null)
     					data.put("children", new JSONArray());
     				data.getJSONArray("children").put(o);
@@ -675,7 +700,7 @@ public class ProcessUI extends FrameHandler {
 	    			loadProcessJobs ( engine, proc, o );
 	    			
 	    			HashSet<Long> childProcs = new HashSet<Long>(engine.findChildProcesses(proc.getId()));
-	    			loadProcesses(engine, childProcs, processed, o, false);
+	    			loadProcesses(engine, childProcs, processed, o, false, processSelected, hasMoreThanOneProcess);
     			}
     		}
     	}

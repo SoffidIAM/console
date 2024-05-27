@@ -57,17 +57,21 @@ public class MenuExecutionsHandler extends Div implements AfterCompose {
 	}
 	
 	public void initMethod(Event event) {
-		Component dd = (Component) event.getData();
-		CustomField3 cf = (CustomField3) dd.getChildren().get(1); 
-		boolean enabled = Boolean.TRUE.equals( XPathUtils.getValue(cf, "enabled"));
-		CustomField3 type = (CustomField3) cf.getNextSibling();
-		CustomField3 content = (CustomField3) type.getNextSibling();
-		CustomField3 explanation = (CustomField3) content.getNextSibling();
-		type.setVisible( enabled );
-		content.setVisible( enabled );
-		explanation.setVisible( enabled );
-		Button test = (Button) explanation.getNextSibling();
-		test.setVisible( enabled );
+		try {
+			Component dd = (Component) event.getData();
+			CustomField3 cf = (CustomField3) dd.getChildren().get(1);
+			boolean enabled = Boolean.TRUE.equals( XPathUtils.getValue(cf, "enabled"));
+			CustomField3 type = (CustomField3) cf.getNextSibling();
+			CustomField3 content = (CustomField3) type.getNextSibling();
+			CustomField3 explanation = (CustomField3) content.getNextSibling();
+			type.setVisible( enabled );
+			content.setVisible( enabled );
+			explanation.setVisible( enabled );
+			Button test = (Button) explanation.getNextSibling();
+			test.setVisible( enabled );
+		} catch (Exception e) {
+			// Avoid an exception when deleting an object
+		}
 	}
 	
 	public void test(Event event) throws Exception {

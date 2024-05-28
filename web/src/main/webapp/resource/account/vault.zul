@@ -328,8 +328,8 @@
 				<label value="${c:l('com.soffid.iam.api.Account.loginName') } : " sclass="label" style="width: 200px"/>
 				<imageclic src="/img/copy.svg" action="onClick: doCopy(this.nextElementSibling.nextElementSibling.id)"
 					title="${c:l('vault.account.copy')}"/>
-				<textbox bind="/listbox:/account/@loginName" disabled="true" readonly="true" />
-				<textbox bind="/listbox:/account/@loginName" id="loginName" readonly="true" style="display: none"/>
+				<textbox bind="/listbox:/account/loginName" disabled="true" readonly="true" />
+				<textbox bind="/listbox:/account/loginName" id="loginName" readonly="true" style="display: none"/>
 			</div>
 			<div id="divPassword">
 				<label id="labelPWDis" value="${c:l('selfService.ThePWDis')}" sclass="label"  style="width: 200px"/>

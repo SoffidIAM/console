@@ -535,6 +535,23 @@ public class AccountEntityDaoImpl extends
 	@Override
 	protected void handleUpdate(AccountEntity entity, String auditType)
 			throws Exception {
+		log.info("******************************************");
+		log.info("***");
+		log.info("***");
+		log.info("***");
+		log.info("***");
+		log.info("*** Update Account "+entity.getLoginName());
+		log.info("*** Secret         "+entity.getSecrets());
+		log.info("***");
+		log.info("***");
+		log.info("***");
+		log.info("***");
+		log.info("******************************************");
+		try {
+			throw new Exception();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		super.update(entity);
 		removeCacheEntry(entity);
 		if (auditType != null)
@@ -606,6 +623,10 @@ public class AccountEntityDaoImpl extends
 			}
 		}		
 		return AccountAccessLevelEnum.ACCESS_NONE;
+	}
+	
+	public void handleRefresh(AccountEntity e) {
+		getSession().refresh(e);
 	}
 }
 

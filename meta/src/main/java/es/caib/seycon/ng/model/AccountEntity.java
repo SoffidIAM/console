@@ -242,6 +242,12 @@ public abstract class AccountEntity {
 	}
 
 	@DaoOperation
+	public void refresh (AccountEntity entity) 
+	{
+		
+	}
+
+	@DaoOperation
 	public void removeFromCache (AccountEntity entity) 
 	{
 		

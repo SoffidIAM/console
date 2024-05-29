@@ -300,8 +300,9 @@
 		<div id="div_new_account">
 			<standardfield3 id="new_account" attribute="com.soffid.iam.api.Account.loginName" required="true"/>
 			<customfield3 id="new_password" dataType="PASSWORD" label="${c:l('accounts.setPassword.label') }" required="true"/>
+			<customfield3 dataType="STRING" multiline="true" label="${c:l('accounts.privateKey')}" id="newKey" required="true"/>
 		</div>		
-		
+
 		<div id="div_existing_account">
 			<customfield3 id="existing_account" dataType="ACCOUNT" label="${c:l('aplica_usuarisRolllista.zul.Codi') }" required="true"
 				filterExpression="secrets pr and not type eq U"/>

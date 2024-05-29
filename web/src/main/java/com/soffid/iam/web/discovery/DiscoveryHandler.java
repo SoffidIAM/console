@@ -246,14 +246,15 @@ public class DiscoveryHandler extends FrameHandler {
 	
 	public void addAccount(Event event) {
 		Window w = (Window) getFellow("add_account");
-		w.doHighlighted();
 		Radio r = (Radio) w.getFellow("radio_new_account");
 		r.setChecked(true);
 		w.getFellow("div_new_account").setVisible(true);
 		w.getFellow("div_existing_account").setVisible(false);
 		((InputField3) w.getFellow("new_account")).setValue(null);
 		((InputField3) w.getFellow("new_password")).setValue(null);
+		((InputField3) w.getFellow("newKey")).setValue(null);
 		((InputField3) w.getFellow("existing_account")).setValue(null);
+		w.doHighlighted();
 	}
 
 	public void setNewAccount(Event event) {
@@ -280,7 +281,11 @@ public class DiscoveryHandler extends FrameHandler {
 		{
 			InputField3 u = (InputField3) w.getFellow("new_account");
 			InputField3 p = (InputField3) w.getFellow("new_password");
-			if (u.attributeValidateAll() && p.attributeValidateAll()) {
+			InputField3 pk = (InputField3) w.getFellow("newKey");
+			String key = (String) pk.getValue();
+			if (u.attributeValidateAll() && 
+				(p.attributeValidateAll() || (key != null && !key.trim().isEmpty()))) 
+			{
 				Account acc  = new Account();
 				String ssoSystem = ConfigurationCache.getProperty("AutoSSOSystem"); //$NON-NLS-1$
 				acc.setName("?");
@@ -291,10 +296,15 @@ public class DiscoveryHandler extends FrameHandler {
 				acc.setType(AccountType.IGNORED);
 				AccountService accountService = EJBLocator.getAccountService();
 				acc = accountService.createAccount(acc);
-				accountService.setAccountPassword(acc,(Password) p.getValue());
+				Password pass = (Password) p.getValue();
+				if (pass != null && !pass.getPassword().isEmpty())
+					accountService.setAccountPassword(acc, pass);
+				if (key != null && !key.isEmpty())
+					acc = accountService.setAccountSshPrivateKey(acc, key);
 				XPathUtils.createPath(getForm().getDataSource(), "/account", acc);
 				getModel().commit();
 				w.setVisible(false);
+				p.setValue("");
 			}
 		} else {
 			InputField3 accfield = (InputField3) w.getFellow("existing_account");

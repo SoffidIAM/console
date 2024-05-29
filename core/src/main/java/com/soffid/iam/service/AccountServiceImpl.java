@@ -3371,11 +3371,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (lastException != null && !ok)
 			throw lastException;
 		
-		AccountEntity e = getAccountEntityDao().load(account.getId());
-		e.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem())); //$NON-NLS-1$
-		getAccountEntityDao().update(e);
-		
-		return getAccountEntityDao().toAccount(e);
+		account.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem()));
+		return account;
 	}
 
 	private void setAccountSshPrivateKey(Account account, String privateKey, String url, String auth) throws InternalErrorException, IOException {

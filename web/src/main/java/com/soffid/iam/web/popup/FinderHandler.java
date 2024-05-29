@@ -223,6 +223,10 @@ public class FinderHandler extends Window implements AfterCompose {
 		{
 			Long id = (Long) ds.getValue(path+"/id");
 			return id.toString();
+		} else if (className.equals("com.soffid.iam.api.Account")) {
+			name = (String) ds.getValue(path+"/name");
+			String system = (String) ds.getValue(path+"/system");
+			name = name+"@"+system;
 		} else {
 			try {
 				name = (String) ds.getValue(path+"/userName");

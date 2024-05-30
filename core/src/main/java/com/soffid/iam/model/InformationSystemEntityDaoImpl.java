@@ -97,6 +97,10 @@ public class InformationSystemEntityDaoImpl
 	public void remove(com.soffid.iam.model.InformationSystemEntity aplicacio) throws RuntimeException {
 		try {
 			String codiAplicacio = aplicacio.getName();
+			getSession().createQuery("delete from com.soffid.iam.model.NoticeEntityImpl "
+					+ "where application.id=:id")
+				.setLong("id", aplicacio.getId())
+				.executeUpdate();
 			super.remove(aplicacio);
 			getSession(false).flush();
 			auditarAplicacions("D", codiAplicacio);			 //$NON-NLS-1$

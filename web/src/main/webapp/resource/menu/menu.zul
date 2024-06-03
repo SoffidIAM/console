@@ -20,7 +20,8 @@
 			</div>
 			<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.AccessTree" 
-				defaultAttributes="name, description"
+				defaultAttributes="name"
+				preference="application-access-tree"
 				dataPath="/model:/app" variableName="query" variableNameText="textQuery"></searchbox>
 
 			<datatree2 id="listbox"

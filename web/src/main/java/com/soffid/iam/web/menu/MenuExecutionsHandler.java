@@ -52,10 +52,6 @@ public class MenuExecutionsHandler extends Div implements AfterCompose {
 		type.setVisible( enabled );
 		content.setVisible( enabled );
 		explanation.setVisible( enabled );
-		if (!enabled) {
-			type.setValue("");
-			content.setValue(null);
-		}
 		Button test = (Button) explanation.getNextSibling();
 		test.setVisible( enabled );
 	}

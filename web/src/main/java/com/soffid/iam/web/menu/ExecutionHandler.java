@@ -45,7 +45,6 @@ public class ExecutionHandler implements PersistenceHandler {
 			} else {
 				at.getExecutions().remove(wat.getExec());
 				EJBLocator.getEntryPointService().deleteExecution(at, wat.getExec());
-				wat.getExec().setId(null);
 			}
 		}
 	}

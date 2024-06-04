@@ -25,11 +25,12 @@ public class MimeTypeHandler extends InputFieldUIHandler {
 	@Override
 	public void afterCreate(InputField3 field) throws Exception {
 		field.setType(Type.LIST);
-		
 		if (field.getPage() != null) {
 			DataModel model = (DataModel) field.getPage().getFellow("model");
 			DataNodeCollection coll = (DataNodeCollection) model.getJXPathContext().getValue("/mimeType");
 			List<String> values = new LinkedList<String>();
+			if (field.getValue()!=null && !((String) field.getValue()).isEmpty())
+				values.add(":- "+es.caib.zkib.component.Messages.getString("Databox.0")+" -");
 			for (DataNode dn: (Collection<DataNode>) coll) {
 				AccessTreeExecutionType type = (AccessTreeExecutionType) dn.getInstance();
 				values.add(type.getCode()+":"+type.getMimeType());

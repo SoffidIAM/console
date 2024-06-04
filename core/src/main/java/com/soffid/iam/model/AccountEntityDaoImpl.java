@@ -478,6 +478,8 @@ public class AccountEntityDaoImpl extends
 		if (target.getLoginName() == null || target.getLoginName().trim().isEmpty() ||
 				target.getLoginName().equals(target.getOldName()))
 			target.setLoginName(source.getName());
+		if (source.getLaunchType()==null)
+			target.setLaunchType(null);
 	}
 
 	@SuppressWarnings(value = "unchecked")

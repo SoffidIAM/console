@@ -11,6 +11,9 @@
 
 	<datamodel id="model" class="com.soffid.web.saml.SamlDataModel"/>
 
+	<style>
+		div.databox.verylonglabel div.label { min-width: 342px; }
+	</style>
 	<form dataPath="model:/conf" id="samlform" width="100%">
 		<div>
 			<label sclass="separator" value="${c:l('parametres.zul.maintenance')}"/>
@@ -78,6 +81,31 @@
 			<div>
 				<switch bind="samlDebug" /> 
 				<label value="${c:l('console.saml.debug') }" style="margin-left: 16px" /> 
+			</div>
+		</div>
+		<label  sclass="separator" value="${c:l('parametres.zul.webservice')}"/>
+		<div style="margin-left: 150px">
+			<div>
+				<switch bind="userPasswordWebservice"  /> 
+				<label sclass="label" value="${c:l('parametres.zul.usernamePassword') }" /> 
+			</div>
+			<div>
+				<switch bind="jwtWebservice"  /> 
+				<label sclass="label" value="${c:l('parametres.zul.openidToken') }" /> 
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.openidUrl')}: "/>
+				<textbox bind="jwtConfigurationUrl" width="30em"/>
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.jwtIssuer')}: "/>
+				<textbox bind="jwtIssuer" width="30em"/>
+			</div>
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.jwtAudience')}: "/>
+				<customfield3 noLabel="true" sclass="databox verylonglabel" bind="jwtAudience" 
+					style="display: inline-block"
+					dataType="STRING" multiValue="true" width="30em"/>
 			</div>
 		</div>
 		<label  sclass="separator" value="${c:l('parametres.zul.linotpIntegration')}"/>

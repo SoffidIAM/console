@@ -403,4 +403,12 @@ public abstract class InternalPasswordService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	public Long getLastPasswordIdForUser(String user) {
+		return null;
+	}
+
+	public boolean isLastPasswordIdForUser(long id) {
+		return true;
+	}
 }

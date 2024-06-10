@@ -37,4 +37,6 @@ public class SamlService {
 	
 	@Description("Gets the list of Identity Providers from arbitrary URL")
 	List<String> findIdentityProviders (String url) {return null;}
+	
+	String validateOpenidToken(String token) {return null;}
 }

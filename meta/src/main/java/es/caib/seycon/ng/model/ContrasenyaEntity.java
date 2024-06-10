@@ -68,6 +68,7 @@ public abstract class ContrasenyaEntity {
 		es.caib.seycon.ng.model.DominiContrasenyaEntity domain) {
 	 return null;
 	}
+
 	@Operation(translated="findLastByUserDomain")
 	@DaoFinder("from  com.soffid.iam.model.PasswordEntity as contrasenyaEntity \n"
 			+ "where contrasenyaEntity.user = :user and contrasenyaEntity.domain = :domain\n"
@@ -77,6 +78,7 @@ public abstract class ContrasenyaEntity {
 		es.caib.seycon.ng.model.DominiContrasenyaEntity domain) {
 	 return null;
 	}
+
 }
 
 @Index(name="SC_CONTRA_ORDRE_UK", unique=true, columns= {"CTR_IDUSU", "CTR_DCN_ID", "CTR_ORDRE"}, entity=ContrasenyaEntity.class)

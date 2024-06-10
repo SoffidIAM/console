@@ -1,6 +1,8 @@
 package com.soffid.web.saml;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -69,6 +71,27 @@ public class SamlDataNode extends SimpleDataNode {
 		}
 		updateParam("soffid.otp.required", c.requireToken);
 		updateParam("soffid.otp.timeout", c.tokenTimeout == null?"" : c.tokenTimeout.toString());
+		updateParam("soffid.webservice.auth.password", c.userPasswordWebservice? "true": "false");
+		updateParam("soffid.webservice.auth.jwt", c.jwtWebservice? "true": "false");
+		updateParam("soffid.webservice.auth.jwt-conf-url", c.jwtConfigurationUrl);
+		updateParam("soffid.webservice.auth.jwt-iss", c.getJwtIssuer());
+		saveAudiences(c.getJwtAudience());
+	}
+
+	private void saveAudiences(List<String> jwtAudience) throws InternalErrorException, NamingException, CreateException {
+		final ConfigurationService configurationService = EJBLocator.getConfigurationService();
+		for (Configuration cfg: configurationService.findConfigurationByFilter(
+				"soffid.webservic.auth.jwt-aud%", 
+				null, null, null)) {
+			configurationService.delete(cfg);
+		}
+		int i = 0;
+		for (String s: jwtAudience) {
+			Configuration cfg = new Configuration();
+			cfg.setCode("soffid.webservice.auth.jwt-aud-"+(i++));
+			cfg.setValue(s);
+			configurationService.create(cfg);
+		}
 	}
 
 	private void updateParam(String param, String value) throws InternalErrorException, NamingException, CreateException {

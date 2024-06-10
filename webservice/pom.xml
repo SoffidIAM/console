@@ -145,9 +145,20 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.soffid.iam.console</groupId>
+			<artifactId>iam-tomee</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils-core</artifactId>
 			<version>1.8.3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

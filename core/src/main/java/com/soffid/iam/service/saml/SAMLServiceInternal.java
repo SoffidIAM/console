@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.KeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -27,17 +28,23 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.Map.Entry;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
@@ -64,6 +71,10 @@ import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.criterion.EntityIdCriterion;
@@ -155,12 +166,20 @@ import org.opensaml.xmlsec.signature.support.impl.ExplicitKeySignatureTrustEngin
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.SamlRequest;
 import com.soffid.iam.model.SamlAssertionEntityDao;
 import com.soffid.iam.model.SamlRequestEntity;
 import com.soffid.iam.model.SamlRequestEntityDao;
 import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
@@ -289,7 +308,7 @@ public class SAMLServiceInternal {
 			Transformer t = TransformerFactory.newDefaultInstance().newTransformer();
 			t.setOutputProperty(OutputKeys.INDENT, "yes");
 			t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			java.io.ByteArrayOutputStream out = new ByteArrayOutputStream();
 			t.transform(new DOMSource(entity.getDOM()), new StreamResult(out ));
 			return out.toString();
 		} catch (Exception e) {
@@ -1142,5 +1161,175 @@ public class SAMLServiceInternal {
 		
     	return ids;
 	}
+
+	public String validateOpenidToken(String token) throws JSONException, MalformedURLException, NoSuchAlgorithmException, InvalidKeySpecException, CertificateException, IOException, InternalErrorException {
+		HashMap<String, Algorithm> conf = readConfiguration();
+		if (conf == null)
+			return null;
+		DecodedJWT jwt = JWT.decode(token);
+		if (jwt.getExpiresAt() != null && jwt.getExpiresAt().before(new Date())) {
+			log.info("Received expired token "+token);
+		}
+		String issuer = ConfigurationCache.getProperty("soffid.webservice.auth.jwt-iss");
+		if (issuer != null && !issuer.isEmpty() && !issuer.equals(jwt.getIssuer()))
+		{
+			log.info("Received token from wrong issuer "+jwt.getIssuer());
+		}
+		List<String> audiences = getAudiences();
+		if (! audiences.isEmpty() && intersectionEmpty(audiences, jwt.getAudience())) {
+			log.info("Received token from wrong audience "+jwt.getAudience());
+		}
+		for (Entry<String, Algorithm> entry: conf.entrySet()) {
+			String name = entry.getKey();
+			String keyName = jwt.getKeyId();
+			if (keyName == null || keyName.equals(name)) {
+				try {
+					entry.getValue().verify(jwt);
+					return Security.getCurrentTenantName()+"\\"+jwt.getSubject();
+				} catch (SignatureVerificationException e) 
+				{
+					// Invalid signature
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean intersectionEmpty(List<String> audiences1, List<String> audiences2) {
+		for (String aud: audiences1)
+			if (audiences2.contains(aud))
+				return false;
+		return true;
+	}
+
+	private List<String> getAudiences() throws InternalErrorException {
+		List<String> l = new LinkedList<>();
+		for (Configuration cfg: ServiceLocator.instance().getConfigurationService().findConfigurationByFilter(
+				"soffid.webservice.auth.jwt-aud%", 
+				null, null, null)) {
+			if (cfg.getValue() != null && !cfg.getValue().trim().isBlank())
+				l.add(cfg.getValue());
+		}
+		return l;
+	}
+
+	class TenantConfig {
+		HashMap<String, Algorithm> algorithms =null;
+		String lastUrl = null;
+	}
 	
+	Map<String,TenantConfig> tenantConfig = new Hashtable<>();
+	
+	private HashMap<String, Algorithm> readConfiguration() throws JSONException, MalformedURLException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, CertificateException {
+		String url = ConfigurationCache.getProperty("soffid.webservice.auth.jwt-conf-url");
+		if (url == null)
+			return null;
+		
+		TenantConfig cfg = tenantConfig.get(Security.getCurrentTenantName());
+		
+		if (cfg != null && url.equals(cfg.lastUrl))
+			return cfg.algorithms;
+		
+		cfg = new TenantConfig();
+		tenantConfig.put(Security.getCurrentTenantName(), cfg);
+		
+		JSONObject o = new JSONObject(new JSONTokener(new URL(url).openStream()));
+		cfg.algorithms = new HashMap<>();
+		
+		JSONArray a = o.optJSONArray("keys");
+		if (a != null) {
+			for (int i = 0; i < a.length(); i++) {
+				JSONObject key = a.getJSONObject(i);
+				Algorithm alg = loadAlgorithm(key);
+				String name = key.optString("kid", "");
+				if (alg != null)
+					cfg.algorithms.put(name, alg);
+			}
+		}
+		
+		cfg.lastUrl = url;
+		return cfg.algorithms;
+	}
+
+	private Algorithm loadAlgorithm(JSONObject key) throws NoSuchAlgorithmException, InvalidKeySpecException, CertificateException, JSONException {
+		String alg = key.optString("alg");
+		if ("RS256".equals(alg)) {
+			PublicKey pub = parseRsaKey(key);
+			if (pub == null)
+				return null;
+			return Algorithm.RSA256((RSAPublicKey) pub, null);
+		}
+		if ("RS384".equals(alg)) {
+			PublicKey pub = parseRsaKey(key);
+			if (pub == null)
+				return null;
+			return Algorithm.RSA384((RSAPublicKey) pub, null);
+		}
+		if ("RS512".equals(alg)) {
+			PublicKey pub = parseRsaKey(key);
+			if (pub == null)
+				return null;
+			return Algorithm.RSA512((RSAPublicKey) pub, null);
+		}
+		if ("ES256".equals(alg)) {
+			PublicKey pub = parseEcKey(key);
+			if (pub == null)
+				return null;
+			return Algorithm.ECDSA256((ECPublicKey) pub, null);
+		}
+		if ("ES384".equals(alg)) {
+			PublicKey pub = parseEcKey(key);
+			if (pub == null)
+				return null;
+			return Algorithm.ECDSA384((ECPublicKey) pub, null);
+		}
+		if ("ES512".equals(alg)) {
+			PublicKey pub = parseEcKey(key);
+			if (pub == null)
+				return null;
+			return Algorithm.ECDSA512((ECPublicKey) pub, null);
+		}
+		return null;
+	}
+
+	protected PublicKey parseRsaKey(JSONObject key) throws NoSuchAlgorithmException, InvalidKeySpecException, CertificateException, JSONException {
+		if (key.has("n") && key.has("e")) {
+			BigInteger exp = parseBigInteger(key.getString("e"));
+			BigInteger modulus = parseBigInteger(key.getString("n"));
+			RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exp);
+			KeyFactory factory = KeyFactory.getInstance("RSA");
+			PublicKey pub = factory.generatePublic(spec);
+			return pub;
+		} else if (key.has("x5c")) {
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			X509Certificate cert = (X509Certificate)certFactory
+					.generateCertificate(
+							new ByteArrayInputStream(
+									java.util.Base64.getUrlDecoder().decode(
+											key.getString("x5c"))));
+			return cert.getPublicKey();
+		} else {
+			return null;
+		}
+	}
+
+	protected PublicKey parseEcKey(JSONObject key) throws NoSuchAlgorithmException, InvalidKeySpecException, CertificateException, JSONException {
+		if (key.has("x5c")) {
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			X509Certificate cert = (X509Certificate)certFactory
+					.generateCertificate(
+							new ByteArrayInputStream(
+									java.util.Base64.getUrlDecoder().decode(
+											key.getString("x5c"))));
+			return cert.getPublicKey();
+		} else {
+			return null;
+		}
+	}
+
+	private BigInteger parseBigInteger(String string) {
+		byte data[] = java.util.Base64.getUrlDecoder().decode(string);
+		BigInteger b = new BigInteger(+1, data);
+		return b;
+	}
 }

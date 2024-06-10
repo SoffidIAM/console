@@ -41,6 +41,7 @@ import com.soffid.iam.security.SoffidPrincipalImpl;
 import com.soffid.iam.service.AccountService;
 import com.soffid.iam.service.ApplicationBootService;
 import com.soffid.iam.service.AuthorizationService;
+import com.soffid.iam.service.InternalPasswordService;
 import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.PasswordService;
 import com.soffid.iam.service.PreferencesService;
@@ -70,9 +71,13 @@ public class LoginServiceImpl implements LoginService {
 	}
 
 	public SoffidPrincipal authenticate(String username, String credentials) {
+		return authenticate(username, credentials, false);
+	}
+	
+	public SoffidPrincipal authenticate(String username, String credentials, boolean jwt) {
 		String masterMessage = null;
 		try {
-			boolean samlAuthorized = false;
+			boolean tokenAuthorized = false;
 			if (username == null || username.trim().isEmpty())
 				return null;
 			
@@ -82,11 +87,20 @@ public class LoginServiceImpl implements LoginService {
 			ServiceLocator locator = ServiceLocator.instance();
 
 			SamlService saml = locator.getSamlService();
-			String samlPrincipal = saml.checkAuthenticationToken(new String[] {username, credentials});
-			if (samlPrincipal != null)
-			{
-				samlAuthorized = true;
-				username = samlPrincipal;
+			if (jwt) {
+				String samlPrincipal = saml.validateOpenidToken(username);
+				if (samlPrincipal != null)
+				{
+					tokenAuthorized = true;
+					username = samlPrincipal;
+				}
+			} else {
+				String samlPrincipal = saml.checkAuthenticationToken(new String[] {username, credentials});
+				if (samlPrincipal != null)
+				{
+					tokenAuthorized = true;
+					username = samlPrincipal;
+				}
 			}
 			if (credentials.length() > 2000)
 			{
@@ -161,7 +175,7 @@ public class LoginServiceImpl implements LoginService {
 						return null;
 					}
 	
-					SoffidPrincipal principal;
+					SoffidPrincipalImpl principal;
 					String passwordDomain = ps.getDefaultDispatcher();
 					List<Long> groupIds = new LinkedList<Long>();
 					List<String> groups = getUserGroups (acc, null, groupIds);
@@ -182,7 +196,7 @@ public class LoginServiceImpl implements LoginService {
 						}
 					}
 					
-					if (samlAuthorized ||
+					if (tokenAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
 							credentials), true, false)) {
 						roles.add("PASSWORD:VALID");
@@ -224,6 +238,9 @@ public class LoginServiceImpl implements LoginService {
 						return null;
 					}
 					
+					Long lastPass = ServiceLocator.instance().getInternalPasswordService()
+							.getLastPasswordIdForUser(userName);
+					principal.setPasswordId(lastPass);
 					
 					if ("true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||
 						"true".equals(System.getProperty("soffid.auth.maintenance"))) {
@@ -445,20 +462,42 @@ public class LoginServiceImpl implements LoginService {
     }
 
 	public static void wrongUser(String u) throws InternalErrorException {
-		IssueService server = ServiceLocator.instance().getIssueService();
-		Issue i = new Issue();
-		i.setCreated(new Date());
-		i.setStatus(IssueStatus.NEW);
-		i.setType("login-not-recognized");
-		IssueUser iu = new IssueUser();
-		iu.setUserName(u);
-		i.setUsers(Arrays.asList(iu));
-		i.setHash(u);
-//		IssueHost ih = new IssueHost();
-//		Host h;
-//		ih.setHostIp(ip);
-//		i.setHosts(Arrays.asList(ih));
-		
-		server.createInternalIssue(i);
+		if (u.length() < 100) {
+			IssueService server = ServiceLocator.instance().getIssueService();
+			Issue i = new Issue();
+			i.setCreated(new Date());
+			i.setStatus(IssueStatus.NEW);
+			i.setType("login-not-recognized");
+			IssueUser iu = new IssueUser();
+			iu.setUserName(u);
+			i.setUsers(Arrays.asList(iu));
+			i.setHash(u);
+	//		IssueHost ih = new IssueHost();
+	//		Host h;
+	//		ih.setHostIp(ip);
+	//		i.setHosts(Arrays.asList(ih));
+			
+			server.createInternalIssue(i);
+		}
 	}
+
+	@Override
+	public boolean hasPasswordChange(Principal principal) {
+		if (principal == null || ! (principal instanceof SoffidPrincipalImpl))
+			return false;
+		Long l = ((SoffidPrincipalImpl) principal).getPasswordId();
+		if (l == null)
+			return false;
+		InternalPasswordService psvc = ServiceLocator.instance().getInternalPasswordService();
+		try {
+			return ! psvc.isLastPasswordIdForUser(l);
+		} catch (InternalErrorException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public Principal authenticateJWT(String token)  {
+		return authenticate(token, "", true);
+	}
+
 }

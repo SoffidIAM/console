@@ -17,6 +17,7 @@ import org.apache.commons.beanutils.LazyDynaMap;
 import org.zkoss.zk.ui.Executions;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.utils.ConfigurationCache;
 
@@ -40,6 +41,11 @@ public class SamlDataModel extends SimpleDataNode {
 			
 			public Collection find() throws Exception {
 				SAMLConfig c = new SAMLConfig();
+				c.userPasswordWebservice = ! "false".equals(ConfigurationCache.getProperty("soffid.webservice.auth.password"));
+				c.jwtWebservice = "true".equals(ConfigurationCache.getProperty("soffid.webservice.auth.jwt"));
+				c.jwtConfigurationUrl = ConfigurationCache.getProperty("soffid.webservice.auth.jwt-conf-url");
+				c.jwtIssuer = ConfigurationCache.getMasterProperty("soffid.webservice.auth.jwt-iss");
+				c.jwtAudience = loadAudiences();
 				c.classicMethod =  ! "false".equals( ConfigurationCache.getProperty("soffid.auth.classic"));
 				c.samlMethod = "true".equals(ConfigurationCache.getProperty("soffid.auth.saml"));
 				c.samlDebug =  ! "false".equals( ConfigurationCache.getProperty("soffid.saml.debug"));
@@ -70,6 +76,7 @@ public class SamlDataModel extends SimpleDataNode {
 				
 				c.requireToken = ConfigurationCache.getProperty("soffid.otp.required");
 				c.optionalToken = ConfigurationCache.getProperty("soffid.otp.optional");
+				
 				String tokenTimeoutString = ConfigurationCache.getProperty("soffid.otp.timeout");
 				c.tokenTimeout = tokenTimeoutString == null || tokenTimeoutString.isEmpty() ? null: Long.valueOf( tokenTimeoutString );
 
@@ -81,6 +88,17 @@ public class SamlDataModel extends SimpleDataNode {
 						c.setSessionTimeout(Integer.parseInt(timeout.trim()));
 				} catch (NumberFormatException e) {}
 				return Collections.singleton(c);
+			}
+
+			private List<String> loadAudiences() throws InternalErrorException, NamingException, CreateException {
+				List<String> l = new LinkedList<>();
+				for (Configuration cfg: EJBLocator.getConfigurationService().findConfigurationByFilter(
+						"soffid.webservice.auth.jwt-aud%", 
+						null, null, null)) {
+					if (cfg.getValue() != null && !cfg.getValue().trim().isBlank())
+						l.add(cfg.getValue());
+				}
+				return l;
 			}
 		}, SamlDataNode.class);
 		

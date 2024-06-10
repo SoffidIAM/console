@@ -1,5 +1,7 @@
 package com.soffid.web.saml;
 
+import java.util.List;
+
 public class SAMLConfig {
 	public boolean classicMethod;
 	public boolean samlMethod;
@@ -22,6 +24,11 @@ public class SAMLConfig {
 	protected boolean samlDebug;
 	String motd;
 	public Integer sessionTimeout;
+	boolean userPasswordWebservice;
+	boolean jwtWebservice;
+	String jwtConfigurationUrl;
+	String jwtIssuer;
+	List<String> jwtAudience;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -180,5 +187,45 @@ public class SAMLConfig {
 	
 	public void setSessionTimeout(Integer sessionTimeout) {
 		this.sessionTimeout = sessionTimeout;
+	}
+	
+	public boolean isUserPasswordWebservice() {
+		return userPasswordWebservice;
+	}
+	
+	public void setUserPasswordWebservice(boolean userPasswordWebservice) {
+		this.userPasswordWebservice = userPasswordWebservice;
+	}
+	
+	public boolean isJwtWebservice() {
+		return jwtWebservice;
+	}
+	
+	public void setJwtWebservice(boolean jwtWebservice) {
+		this.jwtWebservice = jwtWebservice;
+	}
+	
+	public String getJwtConfigurationUrl() {
+		return jwtConfigurationUrl;
+	}
+	
+	public void setJwtConfigurationUrl(String jwtConfigurationUrl) {
+		this.jwtConfigurationUrl = jwtConfigurationUrl;
+	}
+	
+	public String getJwtIssuer() {
+		return jwtIssuer;
+	}
+	
+	public void setJwtIssuer(String jwtIssuer) {
+		this.jwtIssuer = jwtIssuer;
+	}
+	
+	public List<String> getJwtAudience() {
+		return jwtAudience;
+	}
+	
+	public void setJwtAudience(List<String> jwtAudience) {
+		this.jwtAudience = jwtAudience;
 	}
 }

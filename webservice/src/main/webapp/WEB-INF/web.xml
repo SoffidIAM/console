@@ -51,28 +51,4 @@
 		<location>/error401</location>
 	</error-page>
 	
-    <security-constraint>
-    	<display-name>Everything is protected</display-name>
-    	<web-resource-collection>
-    		<web-resource-name>Everything is protected</web-resource-name>
-    		<url-pattern>/*</url-pattern>
-    	</web-resource-collection>
-		<auth-constraint>
-		 	<role-name>PASSWORD:VALID</role-name>
-			<role-name>PASSWORD:EXPIRED</role-name>
-		</auth-constraint>
-    </security-constraint>
-
-    <login-config>
-    	<auth-method>BASIC</auth-method>
-    	<realm-name>Soffid Webservice</realm-name>
-    </login-config>
-    	
-	<security-role>
-		 	<role-name>PASSWORD:VALID</role-name>
-	</security-role>	
-	<security-role>
-			<role-name>PASSWORD:EXPIRED</role-name>
-	</security-role>	
-
 </web-app>

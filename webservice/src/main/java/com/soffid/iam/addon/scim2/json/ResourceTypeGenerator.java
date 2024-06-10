@@ -27,7 +27,6 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.DataType;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
-import es.caib.seycon.ng.comu.TypeEnumerationEnum;
 import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class ResourceTypeGenerator {

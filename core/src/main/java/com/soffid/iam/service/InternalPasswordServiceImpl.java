@@ -2253,4 +2253,21 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
         
         ServiceLocator.instance().getAuditService().create(auditoria);
     }
+
+	@Override
+	protected Long handleGetLastPasswordIdForUser(String user) throws Exception {
+		SystemEntity system = getSystemEntityDao().findSoffidSystem();
+		for (PasswordEntity p: getPasswordEntityDao().findLastByUserDomain(
+				getUserEntityDao().findByUserName(user), 
+				system.getPasswordDomain())) {
+			return p.getId();
+		}
+		return null;
+	}
+
+	@Override
+	protected boolean handleIsLastPasswordIdForUser(long id) throws Exception {
+		PasswordEntity p = getPasswordEntityDao().load(id);
+		return p != null && p.getOrder().longValue() == 0;
+	}
 }

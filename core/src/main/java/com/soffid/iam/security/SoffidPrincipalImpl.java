@@ -51,6 +51,8 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private Long userId;
 	long timestamp;
 	private String[] permissions;
+	private Long passwordId;
+	
 	static long clearCacheTimestamp;
 	private static Executor executor = Executors.newSingleThreadExecutor();
 	private static UserService userService;
@@ -537,6 +539,15 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 
 	public Long getUserId() {
 		return userId;
+	}
+
+	public Long getPasswordId() {
+		return passwordId;
+	}
+
+	public void setPasswordId(Long passwordId) {
+		if (this.passwordId == null)
+			this.passwordId = passwordId;
 	}
 	
 }

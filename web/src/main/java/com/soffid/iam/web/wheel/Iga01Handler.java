@@ -201,8 +201,8 @@ public class Iga01Handler extends Window {
 		int i1 = coreVersion.indexOf('.');
 		int i2 = coreVersion.indexOf('.', i1+1);
 		String prefix = coreVersion.substring(0, i2+1);
-		String list = downloadList("https://download.soffid.com/maven/com/soffid/iam/sync/syncserver/");
-		Pattern p = Pattern.compile("<a[^>]*>([0-9.]+)</a>");
+		String list = downloadList("https://download.soffid.com/maven/com/soffid/iam/sync/syncserver/maven-metadata.xml");
+		Pattern p = Pattern.compile("<version[^>]*>([0-9.]+)</version>");
 		Matcher m = p.matcher(list);
 		String last = null;
 		while (m.find()) {

@@ -3537,17 +3537,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		    rsl.setAuthToken(auth);
 			rsl.setTenant(Security.getCurrentTenantName()+"\\"+Security.getCurrentAccount()); //$NON-NLS-1$
 		    sss = rsl.getSyncStatusService();
+		    if (sss!=null) {
+				sss.resendUserPassword(user, passwordDomain);
+				return true;
+			}
 		} catch (Exception e) {
-			log.warn("Error sending password", e); //$NON-NLS-1$
+			log.warn("Error trying to resend password domain, e=", e); //$NON-NLS-1$
 		}
-		if (sss != null) {
-			sss.resendUserPassword(user, passwordDomain);
-			return true;
-		} else
-			return false;
+		return false;
 	}
 
-	
 	private void checkCanSetPassword(Account account, AccountEntity ae)
 			throws InternalErrorException, BadPasswordException {
 		String principal = Security.getCurrentAccount();

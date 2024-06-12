@@ -219,6 +219,10 @@ public class AdditionalDataServiceImpl extends
 	 * @see es.caib.seycon.ng.servei.DadesAddicionalsService#delete(es.caib.seycon.ng.comu.TipusDada)
 	 */
 	protected void handleDelete(com.soffid.iam.api.DataType tipusDada) throws java.lang.Exception {
+
+		if (tipusDada.getBuiltin()!=null && tipusDada.getBuiltin().booleanValue())
+			throw new InternalErrorException(String.format(Messages.getString("AdditionalDataServiceImpl.notDelete"), tipusDada.getName()));
+
 		if (tipusDada.getSystemName() == null || tipusDada.getSystemName().length() == 0)
 		{
 			getMetadataCache().clear(tipusDada.getObjectType());

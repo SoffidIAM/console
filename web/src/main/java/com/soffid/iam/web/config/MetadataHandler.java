@@ -1,12 +1,9 @@
 package com.soffid.iam.web.config;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -19,7 +16,6 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.ComponentNotFoundException;
@@ -27,23 +23,16 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.ext.AfterCompose;
-import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Filedownload;
-import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Row;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import com.google.common.collect.Lists;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.AttributeVisibilityEnum;
-import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
-import com.soffid.iam.model.MetaDataEntity;
-import com.soffid.iam.service.ejb.ApplicationService;
-import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
@@ -59,11 +48,9 @@ import au.com.bytecode.opencsv.CSVWriter;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.BindContext;
-import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.ReorderEvent;
 import es.caib.zkib.datamodel.DataModelCollection;
-import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
 import es.caib.zkib.datasource.CommitException;
@@ -509,16 +496,23 @@ public class MetadataHandler extends FrameHandler implements AfterCompose {
 		else return o.toString();
 	}
 
-	public void deleteAttribute (Event event) {
+	public void deleteAttribute(Event event) {
+
 		final DataTable metadataGrid = (DataTable) getFellow("metadataGrid");
+		String att = (String) XPathUtils.eval(metadataGrid, "code");
+		Boolean builtin = (Boolean) XPathUtils.eval(metadataGrid, "builtin");
+		if (builtin != null && builtin.booleanValue()) {
+			String msg = org.zkoss.util.resource.Labels.getLabel("dadesAddicionals.zul.notDelete");
+			Missatgebox.avis(String.format(msg, att));
+			return;
+		}
+
 		final Window metadataWindow = (Window) getFellow("objectAttributeWindow");
-		
 		Missatgebox.confirmaOK_CANCEL(org.zkoss.util.resource.Labels.getLabel("agents.DeleteAgent"),
 				org.zkoss.util.resource.Labels.getLabel("process.warning"),
 					(evt) -> {
 						if ("onOK".equals(evt.getName())) {
 							String msg = org.zkoss.util.resource.Labels.getLabel("dadesAddicionals.zul.confirmDelete");
-							String att = (String) XPathUtils.eval(metadataGrid, "code");
 							String object = (String) XPathUtils.eval(metadataGrid, "objectType");
 							msg = String.format(msg, att, object);
 							Missatgebox.confirmaYES_NO(msg, (evt2) -> {

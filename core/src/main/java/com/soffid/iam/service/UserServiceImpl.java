@@ -134,6 +134,7 @@ import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
 import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
+import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
 import com.soffid.iam.utils.ProcesWFUsuari;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.EvalException;
@@ -2013,9 +2014,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected String handleSetTemporaryPassword(String codiUsuari,
 			String codiDominiContrasenyes) throws Exception {
 		String pass = setRandomPassword(codiUsuari, codiDominiContrasenyes, true);
-		if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pass)) {
-			(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
-			throw new Exception(Messages.getString("password-breached.warning"));
+		if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(codiUsuari, codiDominiContrasenyes)) {
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pass)) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
+				throw new Exception(Messages.getString("password-breached.warning"));
+			}
 		}
 		return pass;
 	}
@@ -2024,9 +2027,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected String handleSetPassword(String codiUsuari,
 			String codiDominiContrasenyes) throws Exception {
 		String pass = setRandomPassword(codiUsuari, codiDominiContrasenyes, false);
-		if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pass)) {
-			(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
-			throw new Exception(Messages.getString("password-breached.warning"));
+		if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(codiUsuari, codiDominiContrasenyes)) {
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pass)) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
+				throw new Exception(Messages.getString("password-breached.warning"));
+			}
 		}
 		return pass;
 	}
@@ -3025,9 +3030,11 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			String codiDominiContrasenyes, Password newPassword, boolean mustChange)
 			throws Exception {
 
-		if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(newPassword.getPassword())) {
-			(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
-			throw new InternalErrorException(Messages.getString("password-breached.warning"));
+		if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(codiUsuari, codiDominiContrasenyes)) {
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(newPassword.getPassword())) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
+				throw new InternalErrorException(Messages.getString("password-breached.warning"));
+			}
 		}
 
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);

@@ -49,6 +49,7 @@ import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
 import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
+import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.CustomField3;
@@ -320,9 +321,11 @@ public class AccountHandler extends FrameHandler {
 		{
 			Textbox password = (Textbox) w.getFellow("password");
 
-			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getValue())) {
-				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+			if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(account)) {
+				if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getValue())) {
+					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+					throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+				}
 			}
 
 			EJBLocator.getAccountService().setAccountPassword(account, new Password( password.getValue()) );
@@ -335,9 +338,11 @@ public class AccountHandler extends FrameHandler {
 			Password nouPassword =  EJBLocator.getAccountService().generateAccountPassword(account);
 			showPasswordAssist(nouPassword.getPassword());
 
-			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(nouPassword.getPassword())) {
-				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+			if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(account)) {
+				if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(nouPassword.getPassword())) {
+					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+					throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+				}
 			}
 		}
 

@@ -27,8 +27,11 @@ import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.PasswordPolicy;
+import com.soffid.iam.api.User;
 import com.soffid.iam.service.ejb.PreferencesService;
 import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
+import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.common.ChangePass;
 import com.soffid.iam.web.component.FrameHandler;
@@ -279,10 +282,12 @@ public class ProfileHandler extends FrameHandler {
 		}
 		else
 		{
-			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pp1)) {
-				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-				p1.setWarning(null, Labels.getLabel("password-breached.warning"));
-				return;
+			if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(Security.getCurrentUser())) {
+				if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pp1)) {
+					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+					p1.setWarning(null, Labels.getLabel("password-breached.warning"));
+					return;
+				}
 			}
 
 			p0.setWarning(null,  "");

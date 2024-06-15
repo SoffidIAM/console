@@ -235,6 +235,8 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			String domain = accountName.substring(0,i);
 			String accountName2 = accountName.substring(i+1);
 			String system = domainToSystemMap.get(domain.toUpperCase());
+			if (system == null)
+				system = domainToSystemMap.get(domain.toLowerCase());
 			if (system == null) {
 				log.info("Cannot found system for "+domain.toUpperCase()+" // "+domainToSystemMap);
 			} else {
@@ -251,9 +253,12 @@ public class NetworkDiscoveryServiceImpl extends NetworkDiscoveryServiceBase {
 			String accountName2 = accountName.substring(0,i);
 			String system = domainToSystemMap.get(domain.toLowerCase());
 			if (system == null) {
-				log.info("Cannot found system for "+domain.toLowerCase()+" // "+domainToSystemMap);
+				acc = getAccountEntityDao().findByNameAndSystem(accountName2, s.getName());
+				if (system == null) {
+					log.info("Cannot found system for "+domain.toLowerCase()+" // "+domainToSystemMap);
+				}
 			} else {
-				acc = getAccountEntityDao().findByNameAndSystem(accountName, system);
+				acc = getAccountEntityDao().findByNameAndSystem(accountName2, system);
 			}
 		}
 		if (acc != null) {

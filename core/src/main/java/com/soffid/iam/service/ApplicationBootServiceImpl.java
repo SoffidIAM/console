@@ -568,6 +568,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("117");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("117"))
+		{
+			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, false);
+			cfg.setValue("118");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void updateForbiddenWords() throws SQLException {

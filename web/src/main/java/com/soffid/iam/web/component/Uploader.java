@@ -20,6 +20,7 @@ import org.zkoss.zk.ui.ext.AfterCompose;
 
 public class Uploader extends HtmlBasedComponent implements AfterCompose {
 	boolean multiple;
+	boolean noclose;
 
 	
 	public boolean isMultiple() {
@@ -94,6 +95,18 @@ public class Uploader extends HtmlBasedComponent implements AfterCompose {
 	public void afterCompose() {
 		if (getStyle() == null && "simple".equals(getMold()))
 			setStyle("display: inline-block");
+	}
+
+
+	
+	public boolean isNoclose() {
+		return noclose;
+	}
+
+
+	
+	public void setNoclose(boolean noclose) {
+		this.noclose = noclose;
 	}
 
 }

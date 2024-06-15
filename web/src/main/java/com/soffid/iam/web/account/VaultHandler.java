@@ -1,6 +1,12 @@
 package com.soffid.iam.web.account;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,12 +18,15 @@ import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONObject;
+import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.WrongValueException;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Image;
@@ -32,6 +41,7 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.CredentialTypeEnum;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.LaunchType;
@@ -55,6 +65,7 @@ import es.caib.seycon.ng.comu.AccountAccessLevelEnum;
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.zkdb.yaml.Yaml2Json;
 import es.caib.zkib.binder.BindContext;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
@@ -128,6 +139,8 @@ public class VaultHandler extends FrameHandler {
 				((CustomField3)getFellow("loginName")).setReadonly(!personal);
 				((CustomField3)getFellow("loginUrl")).setReadonly(!personal);
 				getFellow("commitbar").setVisible(personal);
+				if (getFellowIfAny("vaultFolderId") != null)
+					getFellow("vaultFolderId").setVisible(personal);
 				if (getFellowIfAny("name") != null)
 					getFellow("name").setVisible(!personal);
 				getFellow("system").setVisible(!personal);
@@ -286,6 +299,11 @@ public class VaultHandler extends FrameHandler {
 		Form2 form = (Form2) getFellow("accountProperties");
 		form.getDataSource().commit();
 		Account acc = (Account) XPathUtils.eval(form, "/.");
+		if (acc.getCredentialType() == CredentialTypeEnum.CT_KUBERNETES && !acc.isDisabled()) {
+			Window w = (Window) getFellow("newKubePassword");
+			w.doHighlighted();
+			return;
+		}
 		if (! isPersonal() ) {
 			try {
 				for (UserType ut: EJBLocator.getUserDomainService().findAllUserType()) {
@@ -369,9 +387,21 @@ public class VaultHandler extends FrameHandler {
 		Textbox p = (Textbox) w.getFellow("password");
 		p.setValue("");
 		w.setVisible(false);
+		w = (Window) getFellow("newKubePassword");
+		CustomField3 cf = (CustomField3) w.getFellow("data");
+		cf.setValue("");
+		w.setVisible(false);
 		if (event != null) event.stopPropagation();
 	}
 	
+	public void onCancelKubePassword(Event event) {
+		Window w = (Window) getFellow("newKubePassword");
+		Textbox p = (Textbox) w.getFellow("password");
+		p.setValue("");
+		w.setVisible(false);
+		if (event != null) event.stopPropagation();
+	}
+
 	public void onSetPassword(Event event) throws CommitException, WrongValueException, InternalErrorException, BadPasswordException, NamingException, CreateException
 	{
 		DataTree2 listbox = (DataTree2) getListbox();
@@ -399,6 +429,42 @@ public class VaultHandler extends FrameHandler {
 
 		onCancelPassword(event );
 	}
+
+	public void onSetKubePassword(Event event) throws CommitException, WrongValueException, InternalErrorException, BadPasswordException, NamingException, CreateException
+	{
+		DataTree2 listbox = (DataTree2) getListbox();
+		listbox.commit();
+
+		Window w = (Window) getFellow("newKubePassword");
+		CustomField3 cf = (CustomField3) w.getFellow("data");
+		if (cf.attributeValidateAll()) {
+			Account acc = (Account) XPathUtils.eval(getForm(), ".");
+			String s = (String) cf.getValue();
+			try {
+				JSONObject json = new JSONObject( new Yaml2Json().transform(s) );
+				String server = json.getJSONArray("clusters").getJSONObject(0).getJSONObject("cluster").getString("server");
+				URI serverUri = new URI(server);
+				if (acc.getLoginUrl() == null || acc.getLoginUrl().trim().isEmpty()) {
+					XPathUtils.setValue(getForm(), "loginUrl", "kube://"+serverUri.getHost()+":"+serverUri.getPort());
+				} else {
+					URI uri = new URI(acc.getLoginUrl());
+					if (uri.getHost() == null || uri.getHost().isEmpty()) {
+						uri = new URI("kube", uri.getUserInfo(), serverUri.getHost(), serverUri.getPort(),
+								uri.getPath(), uri.getQuery(), uri.getFragment());
+						XPathUtils.setValue(getForm(), "loginUrl", uri);
+					}
+				}
+				String user = json.getJSONArray("users").getJSONObject(0).getString("name");
+				XPathUtils.setValue(getForm(), "loginName", user);
+			} catch (Exception e) {
+				// Ignore parse error
+			}
+			getModel().commit();
+			EJBLocator.getSelfService().setAccountSshKey(acc, new Password(s) );
+		}
+		onCancelPassword(event );
+	}
+
 
 	public void onChangeSelectedGeneration (Event event)
 	{
@@ -870,5 +936,33 @@ public class VaultHandler extends FrameHandler {
 	public void configurePasswordManager() {
 		if (Security.isUserInRole("sso:passwordManager"))
 			response(null, new org.zkoss.zk.au.out.AuScript(this, "doRegisterVault()"));
+	}
+	
+	public void onUploadKube(UploadEvent ev) throws IOException {
+		Media m = ev.getMedia();
+		if (m != null) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			if (m.isBinary() && m.inMemory()) 
+				out.write(m.getByteData());
+			else if (m.isBinary() && !m.inMemory()) {
+				byte b[] = new byte[8190];
+				InputStream in = m.getStreamData();
+				for (int read = in.read(b); read > 0; read = in.read(b))
+					out.write(b, 0, read);
+				in.close();
+			}
+			else if (! m.isBinary() && m.inMemory())
+				out.write(m.getStringData().getBytes(StandardCharsets.UTF_8));
+			else {
+				char ach[] = new char[8192];
+				Reader in = m.getReaderData();
+				for (int read = in.read(ach); read >= 0; read = in.read(ach))
+					out.write(new String(ach, 0, read).getBytes(StandardCharsets.UTF_8));
+				in.close();
+			}
+			String s = out.toString(StandardCharsets.UTF_8);
+			CustomField3 cf = (CustomField3) ev.getTarget().getFellow("data");
+			cf.setValue(s);
+		}
 	}
 }

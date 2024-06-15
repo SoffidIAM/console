@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.CredentialTypeEnum;
 import com.soffid.iam.model.AccountSnapshotEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.VaultFolderEntity;
@@ -159,6 +160,9 @@ public abstract class AccountEntity {
 	@Nullable
 	AccountSnapshotEntity snapshot;
 
+	@Column(name = "ACC_CRETYP", length = 25)
+	@Nullable
+	public CredentialTypeEnum credentialType;
 
 	@Operation(translated = "findByNameAndSystem")
 	@DaoFinder("from com.soffid.iam.model.AccountEntity acc\n"

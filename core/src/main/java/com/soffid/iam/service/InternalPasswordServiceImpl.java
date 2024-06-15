@@ -46,6 +46,7 @@ import es.caib.seycon.ng.comu.AccountType;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.CredentialTypeEnum;
 import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.IssueStatus;
 import com.soffid.iam.api.IssueUser;
@@ -1490,37 +1491,42 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private void doStoreAccountPassword(AccountEntity account, PasswordPolicyEntity pcd,
 			com.soffid.iam.api.Password password, String estat, boolean mustChange, Date untilDate)
 			throws InternalErrorException {
-		reorderOldAccountPasswords(account, pcd);
-
-		AccountPasswordEntity ce = getAccountPasswordEntityDao().newAccountPasswordEntity();
-		ce.setOrder(new Long(0));
-		ce.setAccount(account);
-		Date d = new Date();
-		ce.setDate(d);
-		Calendar c = new GregorianCalendar();
-		c.setTime(d);
-		if (!mustChange) {
-			c.set(Calendar.HOUR_OF_DAY, 0);
-			c.set(Calendar.MINUTE, 0);
-			c.set(Calendar.SECOND, 0);
-			c.set(Calendar.MILLISECOND, 0);
-			if (pcd.getAvailableTime() != null && pcd.getType().equals("M")) //$NON-NLS-1$
-				c.add(Calendar.DAY_OF_MONTH, pcd.getAvailableTime().intValue());
-			else if (pcd.getRenewalTime() != null && pcd.getType().equals("A")) //$NON-NLS-1$
-				c.add(Calendar.DAY_OF_MONTH, pcd.getRenewalTime().intValue());
-			else
-				c.add(Calendar.DAY_OF_MONTH, 3650);
+		Calendar c = null;
+		
+		if (account.getCredentialType() == null || account.getCredentialType() == CredentialTypeEnum.CT_PASSWORD) {
+			
+			reorderOldAccountPasswords(account, pcd);
+			
+			AccountPasswordEntity ce = getAccountPasswordEntityDao().newAccountPasswordEntity();
+			ce.setOrder(new Long(0));
+			ce.setAccount(account);
+			Date d = new Date();
+			ce.setDate(d);
+			c = new GregorianCalendar();
+			c.setTime(d);
+			if (!mustChange) {
+				c.set(Calendar.HOUR_OF_DAY, 0);
+				c.set(Calendar.MINUTE, 0);
+				c.set(Calendar.SECOND, 0);
+				c.set(Calendar.MILLISECOND, 0);
+				if (pcd.getAvailableTime() != null && pcd.getType().equals("M")) //$NON-NLS-1$
+					c.add(Calendar.DAY_OF_MONTH, pcd.getAvailableTime().intValue());
+				else if (pcd.getRenewalTime() != null && pcd.getType().equals("A")) //$NON-NLS-1$
+					c.add(Calendar.DAY_OF_MONTH, pcd.getRenewalTime().intValue());
+				else
+					c.add(Calendar.DAY_OF_MONTH, 3650);
+			}
+			if (untilDate != null && c.getTime().after(untilDate))
+				c.setTime(untilDate);
+			ce.setExpirationDate(c.getTime());
+			ce.setPassword2(getDigest2(account.getId(), password));
+			ce.setActive(estat);
+			getAccountPasswordEntityDao().create(ce);
+			account.getPasswords().add(ce);
 		}
-		if (untilDate != null && c.getTime().after(untilDate))
-			c.setTime(untilDate);
-		ce.setExpirationDate(c.getTime());
-		ce.setPassword2(getDigest2(account.getId(), password));
-		ce.setActive(estat);
-		getAccountPasswordEntityDao().create(ce);
-		account.getPasswords().add(ce);
 		if (account.getSystem().getUrl() == null || account.getSystem().getUrl().isEmpty()) {
 			account.setLastPasswordSet(new Date());
-			account.setPasswordExpiration(c.getTime());
+			account.setPasswordExpiration(c == null ? null : c.getTime());
 			getAccountEntityDao().update(account, "p");
 		}
 		if (mustChange)
@@ -2151,12 +2157,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		} else {
 			handleStoreAccountPassword(account, password, mustChange, expirationDate);
 
-			Map<String, Exception> m = executeAccountOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, 
-					account.getName(), account.getSystem().getName(), password,
-					mustChange);
-			Exception ex = m.get(account.getSystem().getName());
-			if (ex != null)
-				throw ex;
+			if (account.getCredentialType() == null || account.getCredentialType() == CredentialTypeEnum.CT_PASSWORD) {
+				Map<String, Exception> m = executeAccountOB(TaskHandler.UPDATE_ACCOUNT_PASSWORD, 
+						account.getName(), account.getSystem().getName(), password,
+						mustChange);
+				Exception ex = m.get(account.getSystem().getName());
+				if (ex != null)
+					throw ex;
+			}
 		}
 	}
 

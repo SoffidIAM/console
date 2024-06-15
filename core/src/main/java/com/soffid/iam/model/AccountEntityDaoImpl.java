@@ -20,6 +20,7 @@ import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.CredentialTypeEnum;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
@@ -314,6 +315,8 @@ public class AccountEntityDaoImpl extends
 					target.setLoginUrl( (String) target.getAttributes().get("SSO:URL") );
 			}
 
+			if (target.getCredentialType() == null)
+				target.setCredentialType(CredentialTypeEnum.CT_PASSWORD);
 			storeCacheEntry(source, target);
 	
 			if (source.getType() == AccountType.PRIVILEGED) 
@@ -403,6 +406,7 @@ public class AccountEntityDaoImpl extends
 		target.setJumpServerGroup(entry.account.getJumpServerGroup());
 		target.setPasswordExpiration(entry.account.getPasswordExpiration());
 		target.setLockedBy(entry.account.getLockedBy());
+		target.setCredentialType(entry.account.getCredentialType());
 	}
 
 

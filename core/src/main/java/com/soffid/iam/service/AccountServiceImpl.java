@@ -43,6 +43,7 @@ import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.AttributeVisibilityEnum;
 import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.CredentialTypeEnum;
 import com.soffid.iam.api.DisableObjectRule;
 import com.soffid.iam.api.Group;
 import com.soffid.iam.api.HostService;
@@ -355,6 +356,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		acc.setServerName(account.getServerName());
 		acc.setServerType(account.getServerType());
 		acc.setLaunchType(account.getLaunchType());
+		acc.setCredentialType(account.getCredentialType());
 		if (account.getJumpServerGroup() != null && !account.getJumpServerGroup().trim().isEmpty())
 			acc.setJumpServerGroup( getJumpServerGroupEntityDao().findByName(account.getJumpServerGroup()) );
 		acc.setCreated(new Date());
@@ -1873,8 +1875,10 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	        }
 	        if (online)
 	        	sendPasswordNow (ae, password, temporary);
-	        else
+	        else if (ae.getCredentialType() == null || ae.getCredentialType() == CredentialTypeEnum.CT_PASSWORD)
 	    		getInternalPasswordService().storeAndForwardAccountPassword(ae, password, temporary, null);
+	        else
+	        	throw new InternalErrorException("Secret store is offline. Try again later");
 		}
 		// Now, audit
 		audit("P", ae); //$NON-NLS-1$
@@ -1883,7 +1887,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
-		if ( ! account.isDisabled() && account.getSystem().getUrl() != null)
+		if ( ! account.isDisabled() && account.getSystem().getUrl() != null || 
+				account.getCredentialType() != null && account.getCredentialType() != CredentialTypeEnum.CT_PASSWORD)
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {
@@ -3342,8 +3347,6 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	@Override
 	protected Account handleSetAccountSshPrivateKey(Account account, String privateKey) throws Exception {
 		Exception lastException = null;
-		SshKeyGenerator g = new SshKeyGenerator();
-		g.loadKey(privateKey);
 		boolean ok = false;
 		for (ServerEntity se : getServerEntityDao().loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
@@ -3371,7 +3374,14 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		if (lastException != null && !ok)
 			throw lastException;
 		
-		account.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem()));
+		if (account.getCredentialType() == null || 
+				account.getCredentialType() == CredentialTypeEnum.CT_SSHKEY ||
+				account.getCredentialType() == CredentialTypeEnum.CT_PASSWORD) {
+			SshKeyGenerator g = new SshKeyGenerator();
+			g.loadKey(privateKey);
+			account.setSshPublicKey(g.getPublicKeyString(account.getLoginName()+"@"+account.getSystem()));
+		}
+
 		return account;
 	}
 

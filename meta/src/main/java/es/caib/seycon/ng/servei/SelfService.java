@@ -77,6 +77,14 @@ public abstract class SelfService {
 		es.caib.seycon.ng.comu.Password password)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void setAccountSshKey(
+		es.caib.seycon.ng.comu.Account account, 
+		es.caib.seycon.ng.comu.Password password)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Operation(translated="setHPAccountPassword")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public boolean setHPAccountPassword(

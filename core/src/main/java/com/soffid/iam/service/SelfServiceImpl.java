@@ -565,5 +565,11 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		else
 			return acc;
 	}
+	@Override
+	protected void handleSetAccountSshKey(Account account, Password password) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
+		getAccountService().setAccountSshPrivateKey(account, password.getPassword());
+	}
 	
 }

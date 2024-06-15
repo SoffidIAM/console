@@ -8,6 +8,7 @@ package es.caib.seycon.ng.comu;
 import java.util.Map;
 
 import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.CredentialTypeEnum;
 import com.soffid.mda.annotation.*;
 
 import es.caib.seycon.ng.model.AccountEntity;
@@ -34,6 +35,11 @@ public class Account {
 	@Attribute(hidden = true)
 	public java.lang.String oldName;
 
+	@Description("Login name. Used for SSO accounts")
+	@Attribute(customUiHandler="com.soffid.iam.web.account.LoginNameHandler")
+	@Nullable
+	String loginName;
+
 	@Nullable
 	@Description("Account description")
 	public java.lang.String description;
@@ -53,6 +59,12 @@ public class Account {
 	@Nullable
 	public AccountStatus status;
 	
+	@Nullable
+	@Description("Credential type")
+	@Attribute(customUiHandler = "com.soffid.iam.web.account.CredentialTypeHandler",
+			defaultValue = "com.soffid.iam.api.CredentialTypeEnum.CT_PASSWORD")
+	public CredentialTypeEnum credentialType;
+
 	@Description("Account's user type. It is directly bound to a password policy depending on the system's password domain")
 	@JsonAttribute(hibernateAttribute="passwordPolicy.name")
 	@Attribute(type="USER_TYPE")
@@ -138,11 +150,6 @@ public class Account {
 	@Nullable
 	@Attribute(separator = "_launchProperties")
 	String loginUrl;
-
-	@Description("Login name. Used for SSO accounts")
-	@Attribute(customUiHandler="com.soffid.iam.web.account.LoginNameHandler")
-	@Nullable
-	String loginName;
 
 	@Nullable
 	com.soffid.iam.api.LaunchType launchType;

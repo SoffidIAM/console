@@ -127,12 +127,15 @@
 							</tabs>
 							<tabpanels>
 								<tabpanel>
+									<customfield3 metadata="com.soffid.iam.api.Account.vaultFolderId" 
+										if="${soffid:isUserInRole('account:query') }" id="vaultFolderId"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.name" 
 										if="${soffid:isUserInRole('account:query') }" id="name"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.description" id="description"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.system" id="system"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginName" id="loginName"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.loginUrl" id="loginUrl"/>
+									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.credentialType" id="credentialType"/>
 									<customfield3 readonly="true" metadata="com.soffid.iam.api.Account.lockedBy" id="lockedBy" />
 									<div sclass="options options-small">
 										<div sclass="menuoption" id="launch_button" onClick="ref:frame.launch"> 
@@ -271,6 +274,34 @@
 		</vbox>
 	</window>
 	
+	<window closable="false"
+		id="newKubePassword" position="top, center"
+		sizable="true" title="${c:l('accounts.setPassword.title')}"
+		visible="false" width="80%"
+		onClose="ref:frame.onCancelKubePassword">
+		<style>
+			div.highdatabox.databox div.container textarea.text {
+				height: 200px;
+			}
+		</style>
+		<div>
+			<customfield3 sclass="databox highdatabox" label="${c:l('accounts.pasteKubernetes')}" 
+				required="true" multiline="true" id="data"/>
+		</div>
+		<div align="right" width="100%" style="margin-top: 2em">
+			<uploader style="display: inline-block; float: left;"
+					multiple="false"
+					onUpload="ref:frame.onUploadKube"
+					noclose="true"/>
+			<button
+				label="${c:l('accounts.setPassword.Cancel')}"
+				onClick="ref:frame.onCancelPassword" />
+			<button id = "setButton"
+			    label="${c:l('accounts.setPassword.OK')}"
+				onClick="ref:frame.onSetKubePassword" />
+		</div>
+	</window>
+
 	<!-- Window to show the random password -->
 	<window closable="false" id="displayNewPassword" position="top,center" sizable="true"
 		title="${c:l('canviPassword.Titol')}" visible="false" width="600px"

@@ -299,9 +299,13 @@ public class VaultHandler extends FrameHandler {
 		Form2 form = (Form2) getFellow("accountProperties");
 		form.getDataSource().commit();
 		Account acc = (Account) XPathUtils.eval(form, "/.");
-		if (acc.getCredentialType() == CredentialTypeEnum.CT_KUBERNETES && !acc.isDisabled()) {
+		if (acc.getCredentialType() == CredentialTypeEnum.CT_KUBERNETES) {
 			Window w = (Window) getFellow("newKubePassword");
 			w.doHighlighted();
+			return;
+		}
+		if (acc.getCredentialType() == CredentialTypeEnum.CT_SSHKEY) {
+			setSshKey(event);
 			return;
 		}
 		if (! isPersonal() ) {

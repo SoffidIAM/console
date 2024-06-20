@@ -286,7 +286,7 @@
 		</style>
 		<div>
 			<customfield3 sclass="databox highdatabox" label="${c:l('accounts.pasteKubernetes')}" 
-				required="true" multiline="true" id="data"/>
+			multiline="true" id="data"/>
 		</div>
 		<div align="right" width="100%" style="margin-top: 2em">
 			<uploader style="display: inline-block; float: left;"
@@ -331,7 +331,7 @@
 		<div width="100%">
 			<textbox id="antipasswordsave" disabled="true" style="border: none; color: white; background-color: white"/>
 			<h:form style="display:inline">
-				<customfield3 dataType="PASSWORD" label="${c:l('accounts.setPassword.label')}" id="password" onOK="ref:frame:onPrivSetPassword();" required='true'/>
+				<customfield3 dataType="PASSWORD" label="${c:l('accounts.setPassword.label')}" id="password" onOK="ref:frame:onPrivSetPassword" required='true'/>
 			</h:form>
 			<customfield3 dataType="DATE_TIME" label="${c:l('selfService.Valid')}" id="timepwd" required="true"/>
 			<customfield3 dataType="BOOLEAN" label="${c:l('selfService.Force')}" id="checkpwd"/>

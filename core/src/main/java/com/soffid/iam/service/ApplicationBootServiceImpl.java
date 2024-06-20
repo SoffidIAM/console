@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -48,6 +51,7 @@ import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.ScheduledTask;
 import com.soffid.iam.api.ScheduledTaskHandler;
+import com.soffid.iam.api.Server;
 import com.soffid.iam.api.Tenant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.api.UserAccount;
@@ -65,6 +69,7 @@ import com.soffid.iam.service.impl.ConsoleTrustedCertificateLoader;
 import com.soffid.iam.service.impl.DatabaseParser;
 import com.soffid.iam.service.impl.DatabaseReader;
 import com.soffid.iam.ssl.ConnectionFactory;
+import com.soffid.iam.ssl.SeyconKeyStore;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TimeOutUtils;
@@ -118,6 +123,20 @@ public class ApplicationBootServiceImpl extends
 		ConfigurationCache.setProperty(
 				"soffid.ui.maxrows", Integer.toString(Integer.MAX_VALUE)); //$NON-NLS-1$
 		started = Boolean.TRUE;
+		final Config config = Config.getConfig();
+		if (config.isServer()) {
+			File file = SeyconKeyStore.getKeyStoreFile();
+			KeyStore ks = SeyconKeyStore.loadKeyStore(file);
+			X509Certificate entry = (X509Certificate) ks.getCertificate(SeyconKeyStore.MY_KEY);
+			if (entry != null &&
+				!dispatcherSvc.findValidCertificates().contains(entry)) {
+				for (Server srv: dispatcherSvc.findAllServers()) {
+					if (srv.getName().equals(config.getHostName())) {
+						dispatcherSvc.addCertificate(srv, entry);
+					}
+				}
+			}
+		}
 	}
 
 	@Override

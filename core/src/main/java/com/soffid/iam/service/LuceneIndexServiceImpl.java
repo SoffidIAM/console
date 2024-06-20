@@ -85,7 +85,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 					IndexableField contents = doc.getField("$contents");
 					if (contents != null) {
 						doc.removeField(contents.name());
-						doc.add(new Field(contents.name(), contents.stringValue(), INDEXED_STRING ));
+						doc.add(new Field(contents.name(), contents.stringValue(), FULL_TEXT_INDEXED_STRING ));
 					}
 				}
 				w.addDocument(doc);

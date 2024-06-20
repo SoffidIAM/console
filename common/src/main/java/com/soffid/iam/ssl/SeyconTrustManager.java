@@ -70,6 +70,8 @@ public class SeyconTrustManager implements X509TrustManager {
     		}
             if (trustedCert != null)
                 certs[0].verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
+            else
+            	throw new CertificateException("Untrusted certificate "+certs[0].getSubjectDN());
         } catch (Exception e) {
             throw new CertificateException(e);
         }
@@ -86,6 +88,8 @@ public class SeyconTrustManager implements X509TrustManager {
     		}
             if (trustedCert != null)
                 certs[0].verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
+            else
+            	throw new CertificateException("Untrusted certificate "+certs[0].getSubjectDN());
         } catch (Exception e) {
             throw new CertificateException(e);
         }

@@ -573,7 +573,10 @@ public class VaultHandler extends FrameHandler {
 			Object instance = ((DataNode)XPathUtils.getValue(getForm(), "/")).getInstance();
 			Account account = (Account) instance;
 			try {
-				i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+				if (account != null && account.getId() != null)
+					i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+				else
+					i.setVisible(false);
 			} catch (Exception e) {
 				i.setVisible(false);
 			}
@@ -583,7 +586,10 @@ public class VaultHandler extends FrameHandler {
 					"account".equals(((VaultElement) instance).getType())) {
 				Account account = (Account) ((VaultElement)instance).getAccount();
 				try {
-					i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+					if (account != null && account.getId() != null)
+						i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+					else
+						i.setVisible(false);
 				} catch (Exception e) {
 					i.setVisible(false);
 				}

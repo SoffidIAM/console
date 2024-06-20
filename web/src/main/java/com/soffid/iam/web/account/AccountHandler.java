@@ -99,9 +99,11 @@ public class AccountHandler extends FrameHandler {
 			if (visible == null) {
 				visible = false;
 				try {
-					System s = EJBLocator.getDispatcherService().findDispatcherByName(system);
-					if (s != null && s.getUrl() != null)
-						visible = true;
+					if (system != null && !system.trim().isEmpty()) {
+						System s = EJBLocator.getDispatcherService().findDispatcherByName(system);
+						if (s != null && s.getUrl() != null)
+							visible = true;
+					}
 				} catch (Exception e ) {
 					// Probably lack of permissions
 				}
@@ -437,7 +439,10 @@ public class AccountHandler extends FrameHandler {
 			Object instance = ((DataNode)XPathUtils.getValue(getForm(), "/")).getInstance();
 			Account account = (Account) instance;
 			try {
-				i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+				if (account != null && account.getId() != null)
+					i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+				else
+					i.setVisible(false);
 			} catch (Exception e) {
 				i.setVisible(false);
 			}
@@ -464,7 +469,10 @@ public class AccountHandler extends FrameHandler {
 					"account".equals(((VaultElement) instance).getType())) {
 				Account account = (Account) ((VaultElement)instance).getAccount();
 				try {
-					i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+					if (account != null && account.getId() != null)
+						i.setVisible(EJBLocator.getAccountService().isUpdatePending(account));
+					else
+						i.setVisible(false);
 				} catch (Exception e) {
 					i.setVisible(false);
 				}

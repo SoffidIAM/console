@@ -25,6 +25,7 @@ import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.AsyncList;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueHost;
 import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.PamAction;
@@ -440,7 +441,7 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
 				for (PamActionEntity action: actions) {
 					if (action.getType() == PamActionType.ISSUE) {
 						Issue i = new Issue();
-						i.setAccount(account.getName()+"@"+account.getSystem());
+						i.setAccount(account.getName()+"@"+account.getSystem().getName());
 						i.setRule(getPamRuleEntityDao().toPamRule(action.getRule()));
 						if (session.getUser() != null) {
 							IssueUser iu = new IssueUser();
@@ -448,6 +449,12 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
 							iu.setUserName(session.getUser().getUserName());
 							i.setUsers(Arrays.asList(iu));
 						}
+						IssueHost ih = new IssueHost();
+						if (session.getHost() != null)
+							ih.setHostId(session.getHost().getId());
+						ih.setHostIp(session.getHostAddress());
+						ih.setHostName(session.getHostName());
+						i.setHosts( Arrays.asList(new IssueHost[] {ih}));
 						i.setType("pam-violation");
 						getIssueService().createInternalIssue(i);
 					}

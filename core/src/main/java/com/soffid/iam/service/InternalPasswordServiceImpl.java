@@ -50,6 +50,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Account;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.CredentialTypeEnum;
@@ -62,6 +63,7 @@ import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.PasswordValidation;
 import com.soffid.iam.api.PolicyCheckResult;
 import com.soffid.iam.api.Task;
+import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.config.Config;
 import com.soffid.iam.interp.Evaluator;
@@ -85,6 +87,7 @@ import com.soffid.iam.sync.intf.UserMgr;
 import com.soffid.iam.sync.service.ConsoleLogonService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
+import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -929,17 +932,39 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password matches");
 		            }				
 					if (new Date().before(contra.getExpirationDate())) {
-						String userType = account.getPasswordPolicy().getName();
-						String agentName = account.getSystem().getName();
-						com.soffid.iam.api.System agent = ServiceLocator.instance().getDispatcherService().findDispatcherByName(agentName);
-						String agentPasswordDomain = agent.getPasswordsDomain();
-						PasswordPolicy passordPolicy = ServiceLocator.instance().getUserDomainService().findPolicyByTypeAndPasswordDomain(userType, agentPasswordDomain);
-						if (passordPolicy.isCheckPasswordBreached()) {
-							if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword())) {
-								(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(getUserEntityDao().toUser(user));
-								return PasswordValidation.PASSWORD_WRONG;
+
+						UserEntity ue = getUsuari(account);
+						User u = getUserEntityDao().toUser(ue);
+						Account a = getAccountEntityDao().toAccount(account);
+						final long contraId = lastContra.getId();
+						new Thread( () -> {
+							try {
+								getAsyncRunnerService().runTransaction( () -> {
+									try {
+										if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(a)) {
+											Boolean isBreached = ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword());
+											if (isBreached!=null && isBreached.booleanValue()) {
+
+												PasswordEntity pe = getPasswordEntityDao().load(contraId);
+												pe.setExpirationDate(new Date());
+												getPasswordEntityDao().update(pe);
+
+												AccountEntity ae = getAccountEntityDao().load(a.getId());
+												ae.setPasswordExpiration(new Date());
+												getAccountEntityDao().update(ae);
+
+												(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedExpired(u.getUserName(), a);
+											}
+										}
+									} catch(Exception e) {
+										log.warn("Error trying to check if a password has been breached: "+e);
+									}
+									return null;
+								});
+							} catch (InternalErrorException e) {
+								log.warn("Error when checking if a password has been breached", e);
 							}
-						}
+						}).start();
 
 						if (debugPasswords()) 
 			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD");

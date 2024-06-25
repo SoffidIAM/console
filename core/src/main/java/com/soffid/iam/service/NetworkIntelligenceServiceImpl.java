@@ -78,6 +78,8 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 	}
 
 	public Boolean handleIsPasswordBreached(String password) {
+		if (!validateLicence())
+			return Boolean.valueOf(false);
 		try {
 			String ssokmUrl = ConfigurationCache.getProperty("network-intelligence.url")+ENDPOINT_BREACHES;
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
@@ -116,6 +118,8 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 	}
 
 	public Boolean handleIsAccountBreached(String account, String system) {
+		if (!validateLicence())
+			return Boolean.valueOf(false);
 		try {
 			String ssokmUrl = ConfigurationCache.getProperty("network-intelligence.url")+ENDPOINT_BREACHES;
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
@@ -148,6 +152,8 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 	}
 
 	public String handleIsEmailBreached(String shortName, String mailDomain) {
+		if (!validateLicence())
+			return null;
 		try {
 			String ssokmUrl = ConfigurationCache.getProperty("network-intelligence.url")+ENDPOINT_BREACHES;
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
@@ -186,7 +192,9 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		if (token!=null) {
 			boolean valid = false;
 			try {
-				valid = validateToken(token)!=null;
+				NetworkIntelligence ni = handleValidateToken(token);
+				if (ni!=null && ni.getToken()!=null)
+					valid = true;
 			} catch(Exception e) {
 				out.println("It has not been possible to validate your licence, check it later.");
 			}
@@ -218,6 +226,18 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			out.println("You do not have a licence to run this process.");
 		}
 		out.println("Task finished.");
+	}
+
+	private boolean validateLicence() {
+		String token = getToken();
+		if (token!=null) {
+			try {
+				NetworkIntelligence ni = handleValidateToken(token);
+				if (ni!=null && ni.getToken()!=null)
+					return true;
+			} catch(Exception e) {}
+		}
+		return false;
 	}
 
 	private List<MailDomain> retrieveMailDomains() throws InternalErrorException {

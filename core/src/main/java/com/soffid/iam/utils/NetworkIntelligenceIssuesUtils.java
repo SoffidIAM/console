@@ -144,4 +144,27 @@ public class NetworkIntelligenceIssuesUtils {
 		IssueService is = ServiceLocator.instance().getIssueService();
 		return is.createInternalIssue(issue);
 	}
+
+	public Issue openIssuePasswordBreachedExpired(String userName, Account account) {
+		try {
+			User userAffected = ServiceLocator.instance().getUserService().findUserByUserName(userName);
+
+			Issue i = new Issue();
+			i.setCreated(new Date());
+			i.setStatus(IssueStatus.NEW);
+			i.setType("expired-breached-password");
+			IssueUser iu = new IssueUser();
+			iu.setUserId(userAffected.getId());
+			iu.setUserName(userAffected.getUserName());
+			i.setUsers(Arrays.asList(iu));
+			i.setAccount(account.getName()+"@"+account.getSystem());
+			String description = null;
+			description = "A breached password for user "+userName+" and account "+i.getAccount()+" has been detected and has expired. A new password will be requested at the next login.";
+			i.setException(description);
+			createIssue(i);
+		} catch (InternalErrorException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

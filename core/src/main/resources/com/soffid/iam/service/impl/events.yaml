@@ -325,3 +325,17 @@
   - send-email
   - disable-user
   - add-comment
+- name: expired-breached-password
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - disable-user
+  - add-comment

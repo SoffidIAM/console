@@ -278,12 +278,6 @@ public class ProfileHandler extends FrameHandler {
 		}
 		else
 		{
-			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pp1)) {
-				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-				p1.setWarning(null, Labels.getLabel("password-breached.warning"));
-				return;
-			}
-
 			p0.setWarning(null,  "");
 			p1.setWarning(null,  "");
 			p2.setWarning(null,  "");

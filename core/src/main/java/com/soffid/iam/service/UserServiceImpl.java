@@ -3017,11 +3017,6 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			String codiDominiContrasenyes, Password newPassword, boolean mustChange)
 			throws Exception {
 
-		if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(newPassword.getPassword())) {
-			(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
-			throw new InternalErrorException(Messages.getString("password-breached.warning"));
-		}
-
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
 			if (getAuthorizationService().hasPermission(

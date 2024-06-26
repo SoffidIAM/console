@@ -309,12 +309,6 @@ public class AccountHandler extends FrameHandler {
 		else if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
-
-			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getValue())) {
-				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
-			}
-
 			EJBLocator.getAccountService().setAccountPassword(account, new Password( password.getValue()) );
 			es.caib.zkib.zkiblaf.Missatgebox
 					.avis(org.zkoss.util.resource.Labels
@@ -324,11 +318,6 @@ public class AccountHandler extends FrameHandler {
 		{
 			Password nouPassword =  EJBLocator.getAccountService().generateAccountPassword(account);
 			showPasswordAssist(nouPassword.getPassword());
-
-			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(nouPassword.getPassword())) {
-				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
-			}
 		}
 
 		onCancelPassword(event );

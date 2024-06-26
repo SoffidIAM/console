@@ -45,6 +45,20 @@
 				return list;
 			</script-finder>
 		</finder>
+
+		<finder name="soffidObjectTrigger2" type="soffidObjectTrigger">
+			<script-finder>
+				import es.caib.seycon.ng.comu.*;
+				list = new java.util.LinkedList();
+				list.add (new String(""));
+				for (l: SoffidObjectTrigger.literals()) {
+					if (!l.toLowerCase().contains("password"))
+						list.add (l);
+				}
+				return list;
+			</script-finder>
+		</finder>
+
 		<finder name="agent" type="agent">
 			<ejb-finder jndi="java:/module/DispatcherService-v2"
 					method="findSystemByTextAndJsonQueryAsync" if="${query != null || text != null}">

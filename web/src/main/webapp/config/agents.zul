@@ -600,7 +600,7 @@
 									</dataitem>
 								</listbox>
 
-								<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger" 
+								<listbox bind="@trigger" mold="select" dataPath="/model:/soffidObjectTrigger2"
 									style="vertical-align: top;">
 									<dataitem bind="@value">
 										<listcell bind="@literal"/>

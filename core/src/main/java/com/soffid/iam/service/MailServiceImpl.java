@@ -421,7 +421,7 @@ public class MailServiceImpl extends MailServiceBase {
 	@Override
 	protected void handleSendHtmlMail(String to, String subject, String body, Collection mimeBodyParts)
 			throws Exception {
-		handleSendHtmlMail(to, null, subject, body);
+		handleSendHtmlMail(to, null, subject, body, mimeBodyParts);
 	}
 	
 	@Override

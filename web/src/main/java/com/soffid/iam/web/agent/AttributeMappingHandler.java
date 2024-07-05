@@ -262,6 +262,8 @@ public class AttributeMappingHandler extends DataGrid {
 	@SuppressWarnings("unchecked")
 	public void doTest (Event event) throws InternalErrorException, NamingException, CreateException
 	{
+		if (isDataModelPending())
+			return;
 		Grid g = (Grid) event.getTarget().getFellow ("attributesGrid");
 		Map<String,String> map = new HashMap<String,String>();
 		for ( Row r: (Collection<Row>) g.getRows().getChildren())
@@ -380,12 +382,8 @@ public class AttributeMappingHandler extends DataGrid {
 
 	public void doLoadTest (Event event) throws InternalErrorException, NamingException, CreateException
 	{
-		if (getDataModel().isCommitPending()) {
-			Missatgebox.avis (org.zkoss.util.resource.Labels
-				.getLabel("agents.Avis"),
-				org.zkoss.util.resource.Labels.getLabel("agents.Canvis"));
+		if (isDataModelPending())
 			return;
-		}
 		Grid g = (Grid) event.getTarget().getFellow ("attributesGrid");
 		DispatcherService svc = EJBLocator.getDispatcherService();
 		String o1 = ((Textbox)g.getFellow("testRowTextbox1")).getValue();
@@ -429,12 +427,10 @@ public class AttributeMappingHandler extends DataGrid {
 		}
 	}
 
-	private DataModel getDataModel() {
-		return (DataModel) XPathUtils.getPath(this, "/model");
-	}
-
 	public void doQueryTest (Event event) throws InternalErrorException, NamingException, CreateException
 	{
+		if (isDataModelPending())
+			return;
 		Grid g = (Grid) event.getTarget().getFellow ("attributesGrid");
 		DispatcherService svc = EJBLocator.getDispatcherService();
 		String o1 = ((Textbox)g.getFellow("testRowTextbox1")).getValue();
@@ -466,13 +462,9 @@ public class AttributeMappingHandler extends DataGrid {
 
 	public void doFullTest (Event event) throws InternalErrorException, NamingException, CreateException
 	{
-		Component g = event.getTarget();
-		if (getDataModel().isCommitPending()) {
-			Missatgebox.avis (org.zkoss.util.resource.Labels
-				.getLabel("agents.Avis"),
-				org.zkoss.util.resource.Labels.getLabel("agents.Canvis"));
+		if (isDataModelPending())
 			return;
-		}
+		Component g = event.getTarget();
 		DispatcherService svc = EJBLocator.getDispatcherService();
 		String o1 = ((Textbox)g.getFellow("testRowTextbox1")).getValue();
 		if (o1 == null || o1.trim().length() == 0)
@@ -548,5 +540,16 @@ public class AttributeMappingHandler extends DataGrid {
 		} catch (Exception e)
 		{
 		}
+	}
+
+	private boolean isDataModelPending() {
+		DataModel dm = (DataModel) XPathUtils.getPath(this, "/model");
+		if (dm!=null && dm.isCommitPending()) {
+			Missatgebox.avis (org.zkoss.util.resource.Labels
+				.getLabel("agents.Avis"),
+				org.zkoss.util.resource.Labels.getLabel("agents.Canvis"));
+			return true;
+		}
+		return false;
 	}
 }

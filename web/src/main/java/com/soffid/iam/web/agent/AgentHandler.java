@@ -228,7 +228,20 @@ public class AgentHandler extends FrameHandler {
 			gridControlAccess.setDataPath("listbox:/controlAcces");
 	}
 
+	private boolean isDataModelPending() {
+		DataModel dm = (DataModel) XPathUtils.getPath(this, "/model");
+		if (dm!=null && dm.isCommitPending()) {
+			Missatgebox.avis (org.zkoss.util.resource.Labels
+				.getLabel("agents.Avis"),
+				org.zkoss.util.resource.Labels.getLabel("agents.Canvis"));
+			return true;
+		}
+		return false;
+	}
+
 	public void propagaCanvisAgent_Usuaris() {
+		if (isDataModelPending())
+			return;
 		Object elem = listbox.getJXPathContext().getValue(".");
 		if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
 			final XmlDataNode node = (XmlDataNode) elem;
@@ -245,6 +258,8 @@ public class AgentHandler extends FrameHandler {
 	}
 
 	public void propagaCanvisAgent_Rols() {
+		if (isDataModelPending())
+			return;
 		Object elem = listbox.getJXPathContext().getValue(".");
 		if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
 			final XmlDataNode node = (XmlDataNode) elem;
@@ -261,6 +276,8 @@ public class AgentHandler extends FrameHandler {
 	}
 
 	public void propagaCanvisAgent_Groups() {
+		if (isDataModelPending())
+			return;
 		Object elem = listbox.getJXPathContext().getValue(".");
 		if (elem instanceof es.caib.zkib.datamodel.xml.XmlDataNode) {
 			final XmlDataNode node = (XmlDataNode) elem;
@@ -888,14 +905,20 @@ public class AgentHandler extends FrameHandler {
 	}
 
 	public void startReconcile() throws Exception {
+		if (isDataModelPending())
+			return;
 		prepareStartTask("reconcileTask");
 	}
 	
 	public void startImportTask() throws Exception {
+		if (isDataModelPending())
+			return;
 		prepareStartTask("importTask");
 	}
 
 	public void startImpactTask() throws Exception {
+		if (isDataModelPending())
+			return;
 		prepareStartTask("impactTask");
 	}
 

@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -153,6 +154,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 	public String handleIsEmailBreached(String shortName, String mailDomain) {
 		if (!validateLicence())
 			return null;
+
 		try {
 			String ssokmUrl = ConfigurationCache.getProperty("network-intelligence.url")+ENDPOINT_BREACHES;
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())

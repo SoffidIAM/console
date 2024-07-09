@@ -31,6 +31,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.HostService;
@@ -308,6 +309,12 @@ public class AccountHandler extends FrameHandler {
 		else if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
+
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getValue())) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+			}
+
 			EJBLocator.getAccountService().setAccountPassword(account, new Password( password.getValue()) );
 			es.caib.zkib.zkiblaf.Missatgebox
 					.avis(org.zkoss.util.resource.Labels
@@ -317,6 +324,11 @@ public class AccountHandler extends FrameHandler {
 		{
 			Password nouPassword =  EJBLocator.getAccountService().generateAccountPassword(account);
 			showPasswordAssist(nouPassword.getPassword());
+
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(nouPassword.getPassword())) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+			}
 		}
 
 		onCancelPassword(event );

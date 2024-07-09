@@ -50,6 +50,7 @@ import org.json.JSONException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.AccountStatus;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
@@ -132,6 +133,7 @@ import com.soffid.iam.sync.service.SyncStatusService;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.DateUtils;
 import com.soffid.iam.utils.LimitDates;
+import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
 import com.soffid.iam.utils.ProcesWFUsuari;
 import com.soffid.iam.utils.Security;
 import com.soffid.scimquery.EvalException;
@@ -3014,6 +3016,12 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 	protected void setPassword(String codiUsuari,
 			String codiDominiContrasenyes, Password newPassword, boolean mustChange)
 			throws Exception {
+
+		if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(newPassword.getPassword())) {
+			(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(codiUsuari);
+			throw new InternalErrorException(Messages.getString("password-breached.warning"));
+		}
+
 		UserEntity usuari = getUserEntityDao().findByUserName(codiUsuari);
 		if (usuari != null && "S".equals(usuari.getActive())) { //$NON-NLS-1$
 			if (getAuthorizationService().hasPermission(

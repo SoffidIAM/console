@@ -64,7 +64,7 @@ public class AccountBulkAction extends BulkAction {
 	
 	@Override
 	public void apply(JXPathContext ctx, String xpath, BulkActionAttribute attribute, BulkActionAttributeAction action, Object value) {
-		if (attribute.getName().equals("$roles$")) {
+		if (attribute.getName().equals("$roles$") || attribute.getName().equals("ca$$roles$")) {
 			if ( action.getName().equals("addValue")) {
 				for (String roleName: (Collection<String>) value) {
 					Role role;
@@ -76,7 +76,10 @@ public class AccountBulkAction extends BulkAction {
 					if (role != null) {
 						DataNodeCollection coll = (DataNodeCollection) ctx.getValue(xpath+"/role");
 						RoleAccount ra = new RoleAccount();
-						ra.setUserCode((String) ctx.getValue(xpath+"/userName"));
+						Collection<String> cs = (Collection<String>) ctx.getValue(xpath+"/ownerUsers");
+						if (cs!=null && !cs.isEmpty())
+							ra.setUserCode(cs.iterator().next());
+						ra.setAccountName((String) ctx.getValue(xpath+"/name"));
 						ra.setRoleName(role.getName());
 						ra.setRoleDescription(role.getDescription());
 						ra.setSystem(role.getSystem());

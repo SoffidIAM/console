@@ -198,9 +198,16 @@ public class SelectColumnsHandler extends Window implements AfterCompose {
 					mandatory = ((DynamicColumnsDatatable) c).getMandatoryColumns();
 			} catch (Exception e) {
 			}
+			int adjustment = mandatory==null ?  0 : mandatory.length;
+			for (int i = 0; i < adjustment; i++) {
+				JSONObject colDef = sourceColumns.getJSONObject(i);
+				colDef.put("enabled", true);
+				allCols.put(colDef);
+				cols.put(colDef);
+			}
 			for (int i = 0; i < positions.length; i++) 
 			{
-				JSONObject colDef = sourceColumns.getJSONObject( positions[i] );
+				JSONObject colDef = sourceColumns.getJSONObject(positions[i]+adjustment);
 				String value = colDef.optString("value", "");
 				boolean sel = isMandatory(mandatory, value) ||  
 						colDef.optBoolean("mandatory");

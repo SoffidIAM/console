@@ -24,9 +24,9 @@
 				use='com.soffid.iam.web.mail.MailDomainDatatable'>
 				<attribute name="columns">
 					<![CDATA[
-		- name: ${c:l('dominisCorreu.zul.Codi')}
+		- name: ${c:l('dominisCorreu.zul.Codi-2')}
 		  value: name
-		- name: ${c:l('dominisCorreu.zul.Descripcia')}
+		- name: ${c:l('dominisCorreu.zul.Descripcia-2')}
 		  value: description
 		- name: ${c:l('dominisCorreu.zul.Obsolet-2')}
 		  template: #{obsolete? "${c:l('mesg:org.zkoss.zul.mesg.MZul:YES' )}":  "${c:l('mesg:org.zkoss.zul.mesg.MZul:NO') }"}
@@ -52,8 +52,8 @@
 				</div>
 				<form id="form" onChangeXPath="ref:frame.onChangeForm"
 					dataPath="/listbox:/." width="100%">
-					<customfield3 dataType="STRING" bind="name" maxlength="50" required="true" label=" ${c:l('dominisCorreu.zul.Codi')}"/>
-					<customfield3 dataType="STRING" bind="description" maxlength="50" required="true" label="${c:l('dominisCorreu.zul.Descripcia')}"/>
+					<customfield3 dataType="STRING" bind="name" maxlength="50" required="true" label=" ${c:l('dominisCorreu.zul.Codi-2')}"/>
+					<customfield3 dataType="STRING" bind="description" maxlength="50" required="true" label="${c:l('dominisCorreu.zul.Descripcia-2')}"/>
 					<customfield3 dataType="BOOLEAN" bind="obsolete" label="${c:l('dominisCorreu.zul.Obsolet-2')}"/>
 				</form>
 			</div>

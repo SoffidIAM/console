@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import org.hibernate.Hibernate;
 
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;

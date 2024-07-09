@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.Locales;
 import org.zkoss.util.TimeZones;
-import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
@@ -26,12 +25,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.PasswordPolicy;
-import com.soffid.iam.api.User;
 import com.soffid.iam.service.ejb.PreferencesService;
-import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
-import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.common.ChangePass;
 import com.soffid.iam.web.component.FrameHandler;
@@ -282,14 +276,6 @@ public class ProfileHandler extends FrameHandler {
 		}
 		else
 		{
-			if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(Security.getCurrentUser())) {
-				if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pp1)) {
-					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
-					p1.setWarning(null, Labels.getLabel("password-breached.warning"));
-					return;
-				}
-			}
-
 			p0.setWarning(null,  "");
 			p1.setWarning(null,  "");
 			p2.setWarning(null,  "");

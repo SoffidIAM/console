@@ -283,7 +283,7 @@
   manual-actions:
   - send-email
   - add-comment
-- name: password-breached
+- name: breached-password
   actions:
   - send-email
   - run-script
@@ -297,7 +297,21 @@
   - send-email
   - disable-user
   - add-comment
-- name: email-breached
+- name: breached-account-password
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - disable-user
+  - add-comment
+- name: breached-email
   actions:
   - send-email
   - run-script

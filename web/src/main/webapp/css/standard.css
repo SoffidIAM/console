@@ -1501,12 +1501,6 @@ div.databox img.remove-icon:hover {
 	opacity: 1;
 }
 
-div.databox div.datahtml {
-	background: transparent;
-	width: 100%;
-	margin-top: 6px;
-	cursor: pointer;
-} 
 div.databox div.container, div.databox div.container span {
 	white-space: pre; 
 }
@@ -4158,6 +4152,7 @@ div.databox div.datahtml {
 	overflow-x: clip;
 	overflow-y: auto;
 	max-height: 125px;
+	text-wrap: wrap;
 }
 
 div.ck.ck-editor__main {

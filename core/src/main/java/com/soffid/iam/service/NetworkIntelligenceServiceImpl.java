@@ -153,7 +153,11 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
 				throw new InternalErrorException("The Network Intelligence Service is not configured correctly, contact the administrator");
 
-			URL httpURL = new URL(ssokmUrl+"/isEmailBreached?shortName="+shortName+"&mailDomain="+mailDomain);
+			String sURL = ssokmUrl+"/isEmailBreached?shortName="+shortName+"&mailDomain="+mailDomain;
+			Long lastDate = NetworkIntelligenceParamLastDateUtils.getLastDateFromParam();
+			if (lastDate!=null)
+				sURL = sURL+"lastDate="+lastDate;
+			URL httpURL = new URL(sURL);
 			HttpURLConnection conn = (HttpURLConnection) httpURL.openConnection();
 			conn.setRequestMethod("POST");
 			conn.setDoOutput(false);
@@ -177,7 +181,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 	}
 
 	public void handleVerifyDomains(PrintWriter out) {
-		out.println("Starting Verify Domains task, this is a functionality of the Network Intelligence service.");
+		out.println("Starting the task Verify Domain, this is a functionality of the Network Intelligence service.");
 		String token = getToken();
 		if (token!=null) {
 			boolean valid = false;
@@ -187,7 +191,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 				out.println("It has not been possible to validate your licence, check it later.");
 			}
 			if (valid) {
-				out.println("Validated licence.");
+				out.println("Valid licence.");
 				Long lastDate = NetworkIntelligenceParamLastDateUtils.getLastDateFromParam();
 				if (lastDate!=null)
 					out.println("Last verification "+new Date(lastDate));
@@ -195,9 +199,12 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 					for (MailDomain md : retrieveMailDomains()) {
 						out.println("Searching for "+md.getName()+"...");
 						for (String breachedEmails : requestBreachedEmails(md.getName(), lastDate)) {
-							Issue i = openIssueIfEmailBreached(md.getName(), breachedEmails);
-							if (i!=null)
-								out.println("Found email "+breachedEmails+"@"+md.getName()+" breached. An "+i.getType()+" with description \""+i.getDescription()+"\" has been opened.");
+							List<Issue> li = openIssuesIfEmailBreached(md.getName(), breachedEmails);
+							if (li!=null && li.size()==1) {
+								out.println("A breached email "+breachedEmails+"@"+md.getName()+" has been found out, a security issue has been raised.");
+							} else if (li!=null && li.size()>1) {
+								out.println("A breached email "+breachedEmails+"@"+md.getName()+" has been found out, "+li.size()+" security issues have been raised.");
+							}
 						}
 					}
 					NetworkIntelligenceParamLastDateUtils.setLastDateToParam();
@@ -210,7 +217,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		} else {
 			out.println("You do not have a licence to run this process.");
 		}
-		out.println("Finished task.");
+		out.println("Task finished.");
 	}
 
 	private List<MailDomain> retrieveMailDomains() throws InternalErrorException {
@@ -258,40 +265,31 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		return new ArrayList<String>();
 	}
 
-	private Issue openIssueIfEmailBreached(String mailDomain, String breachedEmail) {
+	private List<Issue> openIssuesIfEmailBreached(String mailDomain, String breachedEmail) {
+		List<Issue> li = new ArrayList<Issue>();
 		try {
 			UserService us = ServiceLocator.instance().getUserService();
 			List<User> lu = us.findUserByJsonQuery("emailAddress eq \""+breachedEmail+"@"+mailDomain+"\"");
 			if (!lu.isEmpty()) {
 				String response = handleIsEmailBreached(breachedEmail, mailDomain);
-				String lastBreachDecription = generateLastBreachDescription(response);
-				return (new NetworkIntelligenceIssuesUtils()).openIssueEmailBreached(mailDomain, breachedEmail, lu, lastBreachDecription);
+				JSONArray ja = new JSONArray(new JSONTokener(response));
+				for (int i=0; i<ja.length(); i++) {
+					JSONObject jo = (JSONObject) ja.get(i);
+					String breachName = jo.getString("Name");
+					String breachDecription = generateBreachDescription(jo);
+					Issue is = (new NetworkIntelligenceIssuesUtils()).openIssueEmailBreached(mailDomain, breachedEmail, lu, breachName, breachDecription);
+					li.add(is);
+				}
 			}
+			return li;
 		} catch (InternalErrorException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return li;
 	}
 
-	private String generateLastBreachDescription(String response) {
+	private String generateBreachDescription(JSONObject jo) {
 		try {
-			// Select last modified breach
-			JSONArray ja = new JSONArray(new JSONTokener(response));
-			JSONObject jo = (JSONObject) ja.get(0);
-			if (ja.length()>1) {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
-				for (int i=1; i<ja.length(); i++) {
-					String jomd = jo.getString("ModifiedDate");
-					Date joDmd = sdf.parse(jomd);
-					JSONObject jo2 = (JSONObject) ja.get(i);
-					String jo2md = jo2.getString("ModifiedDate");
-					Date jo2Dmd = sdf.parse(jo2md);
-					if (joDmd.before(jo2Dmd))
-						jo = jo2;
-				}
-			}
-
-			// Generate response
 			String name = jo.getString("Name");
 			String title = jo.getString("Title");
 			String domain = jo.getString("Domain");
@@ -304,7 +302,6 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 				sb.append("for the domain \""+domain+"\" ");
 			sb.append("had been breached at "+breachDate+" and published at "+addedDate+", ");
 			sb.append("this is the official description: "+description);
-
 			return sb.toString();
 		} catch(Exception e) {
 			log.warn("generateLastBreachDescription e="+e);

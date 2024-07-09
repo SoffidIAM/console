@@ -7,13 +7,21 @@
 	use="com.soffid.iam.web.config.NetworkIntelligenceHandler"
 	id="frame">
 
-	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame"></div>
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
+		<menu2>
+			<menu2item image="/img/trash.svg" label="${c:l('plugins.zul.Delete')}" onClick="ref:frame.delete" />
+		</menu2>
+	</div>
 
 	<form id="form" width="100%">
 		<customfield3 label="${c:l('network-intelligence.zul.title')}" dataType="SEPARATOR" />
-		<customfield3 label="${c:l('network-intelligence.zul.token')}" id="token" dataType="STRING" maxlength="100" required="true" onChange="ref:frame.validateToken" />
+		<customfield3 label="${c:l('network-intelligence.zul.token')}" id="token" dataType="STRING" maxlength="100" required="true" onChange="ref:frame.viewTokenOnly" />
 		<customfield3 label="${c:l('network-intelligence.zul.level')}" id="level" dataType="STRING" maxlength="25" readonly="true" visible="false" />
 		<customfield3 label="${c:l('network-intelligence.zul.start')}" id="start" dataType="DATE" readonly="true" visible="false" />
 		<customfield3 label="${c:l('network-intelligence.zul.end')}" id="end" dataType="DATE" readonly="true" visible="false" />
 	</form>
+
+	<div style="text-align: right; width: 100%">
+		<databutton image="/img/save-r.svg" label="${c:l('common.apply') }" onClick="ref:frame.apply" />
+	</div>
 </frame>

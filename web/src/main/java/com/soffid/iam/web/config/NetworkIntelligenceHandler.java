@@ -26,11 +26,13 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 		super.afterCompose();
 		NetworkIntelligence ni = NetworkIntelligenceParamTokenUtils.getTokenFromParam();
 		setTokenToZul(ni);
-		if (ni!=null)
-			validateToken(null);
 	}
 
-	public void validateToken(Event event) {
+	public void viewTokenOnly(Event e) {
+		clearTokenToZul();
+	}
+
+	public void apply(Event event) {
 		String token = (String) ((CustomField3) getFellow("token")).getValue();
 		if (token!=null && !token.trim().isEmpty()) {
 			NetworkIntelligence ni = null;
@@ -53,29 +55,33 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 					return;
 				} else {
 					warnTokenToZul("Token not valid");
-					try {
-						NetworkIntelligenceParamTokenUtils.removeTokenParam();
-					} catch (Exception e) {
-						warnTokenToZul("Token not valid and it has been an internal error tryint to remove it");
-					}
 				}
 			}
 		}
 	}
 
-	private void setTokenToZul(NetworkIntelligence ni) {
-		setTokenToZul(ni, null);
+	public void delete(Event event) {
+		try {
+			NetworkIntelligenceParamTokenUtils.removeTokenParam();
+			setTokenToZul(null, null, true);
+		} catch (Exception e) {
+			warnTokenToZul("Internal error tryint to remove the token");
+		}
 	}
 
-	private void setTokenToZul(NetworkIntelligence ni, String warnMessage) {
+	private void setTokenToZul(NetworkIntelligence ni) {
+		setTokenToZul(ni, null, true);
+	}
+
+	private void setTokenToZul(NetworkIntelligence ni, String warnMessage, boolean clearToken) {
 		if (ni==null) {
 			if (warnMessage!=null)
 				((CustomField3) getFellow("token")).setWarning(0, warnMessage);
-			else
-				((CustomField3) getFellow("token")).setValue(null);
-			((CustomField3) getFellow("level")).setValue(null);
-			((CustomField3) getFellow("start")).setValue(null);
-			((CustomField3) getFellow("end")).setValue(null);
+			else if (clearToken)
+				((CustomField3) getFellow("token")).setValue("");
+			((CustomField3) getFellow("level")).setValue("");
+			((CustomField3) getFellow("start")).setValue("");
+			((CustomField3) getFellow("end")).setValue("");
 
 			((CustomField3) getFellow("level")).setVisible(false);
 			((CustomField3) getFellow("start")).setVisible(false);
@@ -93,7 +99,11 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 	}
 
 	private void warnTokenToZul(String warnMessage) {
-		setTokenToZul(null, warnMessage);
+		setTokenToZul(null, warnMessage, true);
+	}
+
+	private void clearTokenToZul() {
+		setTokenToZul(null, null, false);
 	}
 
 	public static NetworkIntelligence validateLicense(String token) throws Exception {

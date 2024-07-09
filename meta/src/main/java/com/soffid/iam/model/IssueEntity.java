@@ -17,7 +17,6 @@ import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.model.AccountEntity;
 import es.caib.seycon.ng.model.DispatcherEntity;
 import es.caib.seycon.ng.model.RolAccountEntity;
-import es.caib.seycon.ng.model.UsuariEntity;
 
 @Entity(table = "SC_ISSUE")
 @Depends({Issue.class, DispatcherEntity.class})
@@ -96,6 +95,15 @@ public class IssueEntity {
 	
 	@Column(name="EVE_TIMES")
 	Integer times;
+
+	@Nullable @Column(name = "EVE_BREEMA", length = 64)
+	String breachedEmail;
+
+	@Nullable @Column(name = "EVE_DATBRE", length = 64)
+	String dataBreach;
+
+	@Nullable @Column(name = "EVE_HTMDES", length = 64000)
+	String htmlDescription;
 
 	@DaoFinder("select i from com.soffid.iam.model.IssueEntity as i "
 			+ "where (i.status = 'N' or i.status = 'A') and i.hash = :searchHash and i.type = :type and i.tenant.id=:tenantId")

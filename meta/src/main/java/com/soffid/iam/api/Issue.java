@@ -5,20 +5,13 @@ import java.util.List;
 
 import com.soffid.iam.model.IssueEntity;
 import com.soffid.mda.annotation.Attribute;
-import com.soffid.mda.annotation.Column;
-import com.soffid.mda.annotation.Entity;
-import com.soffid.mda.annotation.Identifier;
 import com.soffid.mda.annotation.JsonAttribute;
 import com.soffid.mda.annotation.JsonObject;
 import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.ValueObject;
 
-import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.SoDRisk;
-import es.caib.seycon.ng.model.AccountEntity;
-import es.caib.seycon.ng.model.DispatcherEntity;
-import es.caib.seycon.ng.model.RolAccountEntity;
 
 @ValueObject
 @JsonObject(hibernateClass = IssueEntity.class)
@@ -113,4 +106,14 @@ public class Issue {
 	@JsonAttribute(hibernateAttribute = "requester.name")
 	@Nullable @Attribute(readonly = true, type = "ACCOUNT_TYPE")
 	String requester;
+
+	@Nullable
+	String breachedEmail;
+
+	@Nullable
+	String dataBreach;
+
+	@Nullable
+	@Attribute(type="HTML")
+	String htmlDescription;
 }

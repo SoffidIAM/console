@@ -33,6 +33,7 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Host;
@@ -47,6 +48,7 @@ import com.soffid.iam.service.ejb.AuthorizationService;
 import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
+import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.CustomField3;
@@ -317,6 +319,12 @@ public class AccountHandler extends FrameHandler {
 		else if (gt.getSelectedItem() != radioRandom)
 		{
 			Textbox password = (Textbox) w.getFellow("password");
+
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getValue())) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+			}
+
 			EJBLocator.getAccountService().setAccountPassword(account, new Password( password.getValue()) );
 			es.caib.zkib.zkiblaf.Missatgebox
 					.avis(org.zkoss.util.resource.Labels
@@ -326,6 +334,11 @@ public class AccountHandler extends FrameHandler {
 		{
 			Password nouPassword =  EJBLocator.getAccountService().generateAccountPassword(account);
 			showPasswordAssist(nouPassword.getPassword());
+
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(nouPassword.getPassword())) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+				throw new InternalErrorException(Labels.getLabel("password-breached.warning"));
+			}
 		}
 
 		onCancelPassword(event );

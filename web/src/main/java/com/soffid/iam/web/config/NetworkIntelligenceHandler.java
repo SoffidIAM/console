@@ -1,17 +1,13 @@
 package com.soffid.iam.web.config;
 
-import java.util.Date;
-
 import javax.naming.InitialContext;
 
 import org.zkoss.zk.ui.event.Event;
 
-import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.NetworkIntelligence;
-import com.soffid.iam.service.ConfigurationService;
 import com.soffid.iam.service.ejb.NetworkIntelligenceService;
 import com.soffid.iam.service.ejb.NetworkIntelligenceServiceHome;
+import com.soffid.iam.utils.NetworkIntelligenceParamTokenUtils;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.FrameHandler;
 
@@ -20,7 +16,6 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 public class NetworkIntelligenceHandler extends FrameHandler {
 
 	private static final long serialVersionUID = 1L;
-	private static final String PARAM_TOKEN = "soffid.network-intelligence.token";
 
 	public NetworkIntelligenceHandler() throws InternalErrorException {
 		super();
@@ -29,7 +24,7 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 	@Override
 	public void afterCompose() {
 		super.afterCompose();
-		NetworkIntelligence ni = getTokenFromParam();
+		NetworkIntelligence ni = NetworkIntelligenceParamTokenUtils.getTokenFromParam();
 		setTokenToZul(ni);
 		if (ni!=null)
 			validateToken(null);
@@ -50,7 +45,7 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 			} else {
 				if (ni!=null) {
 					try {
-						setTokenToParam(ni);
+						NetworkIntelligenceParamTokenUtils.setTokenToParam(ni);
 						setTokenToZul(ni);
 					} catch (Exception e) {
 						warnTokenToZul("Internal error validating token, contact with the administrator");
@@ -59,7 +54,7 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 				} else {
 					warnTokenToZul("Token not valid");
 					try {
-						removeTokenParam();
+						NetworkIntelligenceParamTokenUtils.removeTokenParam();
 					} catch (Exception e) {
 						warnTokenToZul("Token not valid and it has been an internal error tryint to remove it");
 					}
@@ -101,56 +96,7 @@ public class NetworkIntelligenceHandler extends FrameHandler {
 		setTokenToZul(null, warnMessage);
 	}
 
-	private NetworkIntelligence getTokenFromParam() {
-		ConfigurationService cs = ServiceLocator.instance().getConfigurationService();
-		Configuration param = null;
-		try {
-			param = cs.findParameterByNameAndNetworkName(PARAM_TOKEN, null);
-		} catch (InternalErrorException e) {}
-		if (param==null)
-			return null;
-
-		NetworkIntelligence ni = null;
-		try {
-			String[] paramA = param.getValue().split(";");
-			ni = new NetworkIntelligence();
-			ni.setToken(paramA[0].split("=")[1]);
-			ni.setLevel(paramA[1].split("=")[1]);
-			ni.setStart(new Date(Long.parseLong(paramA[2].split("=")[1])));
-			ni.setEnd(new Date(Long.parseLong(paramA[3].split("=")[1])));
-		} catch (Exception e) {
-			ni = null;
-		}
-		return ni;
-	}
-
-	private void setTokenToParam(NetworkIntelligence ni) throws InternalErrorException {
-		ConfigurationService cs = ServiceLocator.instance().getConfigurationService();
-		Configuration param = null;
-		try {
-			param = cs.findParameterByNameAndNetworkName(PARAM_TOKEN, null);
-		} catch (InternalErrorException e) {}
-
-		String paramS = "token="+ni.getToken()+";level="+ni.getLevel()+";start="+ni.getStart().getTime()+";end="+ni.getEnd().getTime();
-		if (param==null) {
-			param = new Configuration();
-			param.setName(PARAM_TOKEN);
-			param.setValue(paramS);
-			cs.create(param);
-		} else {
-			param.setValue(paramS);
-			cs.update(param);
-		}
-	}
-
-	private void removeTokenParam() throws InternalErrorException {
-		ConfigurationService cs = ServiceLocator.instance().getConfigurationService();
-		Configuration param = cs.findParameterByNameAndNetworkName(PARAM_TOKEN, null);
-		if (param!=null)
-			cs.delete(param);
-	}
-
-	private NetworkIntelligence validateLicense(String token) throws Exception {
+	public static NetworkIntelligence validateLicense(String token) throws Exception {
 		NetworkIntelligenceService nis = (NetworkIntelligenceService) new InitialContext().lookup(NetworkIntelligenceServiceHome.JNDI_NAME);
 		NetworkIntelligence ni = nis.validateToken(token);
 		return ni;

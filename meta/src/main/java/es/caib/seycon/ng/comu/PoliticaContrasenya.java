@@ -124,4 +124,7 @@ public class PoliticaContrasenya {
 	@Description("Description of script to check password is valid")
 	@Nullable 
 	String validationScriptDescription;
+
+	@Description("Allows Soffid to check it the password has been breached if if has the network intelligence license active")
+	public boolean checkPasswordBreached;
 }

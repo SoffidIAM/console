@@ -1,9 +1,9 @@
 package com.soffid.iam.web.profile;
 
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -13,23 +13,22 @@ import java.util.TimeZone;
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.Locales;
 import org.zkoss.util.TimeZones;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
-import java.text.SimpleDateFormat;
 import com.soffid.iam.EJBLocator;
-import com.soffid.iam.api.Account;
-import com.soffid.iam.api.Password;
-import com.soffid.iam.lang.MessageFactory;
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.service.ejb.PreferencesService;
+import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.common.ChangePass;
 import com.soffid.iam.web.component.FrameHandler;
@@ -41,13 +40,13 @@ import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.InvalidPasswordException;
 import es.caib.zkib.component.Databox;
 import es.caib.zkib.component.DateFormats;
-import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datasource.CommitException;
-import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Application;
 
-
 public class ProfileHandler extends FrameHandler {
+
+	private static final long serialVersionUID = 1L;
+	protected Log log = LogFactory.getLog(getClass());
 
 	public ProfileHandler() throws InternalErrorException {
 		super();
@@ -73,7 +72,6 @@ public class ProfileHandler extends FrameHandler {
 		values = new LinkedList<>();
 		List<TimeZone> timezones = new LinkedList<>();
 		Set<String> names=new HashSet<>();
-		String current = null;
 	    for (String id: TimeZone.getAvailableIDs())
 	    {
 	    	String displayName = TimeZone.getTimeZone(id).getDisplayName();
@@ -281,6 +279,12 @@ public class ProfileHandler extends FrameHandler {
 		}
 		else
 		{
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(pp1)) {
+				(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(Security.getCurrentUser());
+				p1.setWarning(null, Labels.getLabel("password-breached.warning"));
+				return;
+			}
+
 			p0.setWarning(null,  "");
 			p1.setWarning(null,  "");
 			p2.setWarning(null,  "");
@@ -290,7 +294,6 @@ public class ProfileHandler extends FrameHandler {
 			onCancelPassword();
 		}
 	}
-
 
 	public void nextPassword() {
 		Window wnd = (Window) getFellow("newPassword");

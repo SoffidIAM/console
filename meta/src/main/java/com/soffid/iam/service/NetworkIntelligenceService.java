@@ -21,7 +21,7 @@ public class NetworkIntelligenceService {
 	public Boolean isAccountBreached(String account, String system) {return null;}
 
 	@Operation(grantees={Tothom.class})
-	public Boolean isEmailBreached(String shortName, String mailDomain) {return null;}
+	public String isEmailBreached(String shortName, String mailDomain) {return null;}
 
 	@Operation(grantees={Tothom.class})
 	public void verifyDomains(PrintWriter out) {return;}

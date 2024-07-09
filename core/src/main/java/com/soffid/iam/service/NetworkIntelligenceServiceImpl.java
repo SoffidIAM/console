@@ -8,27 +8,28 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.Account;
-import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Issue;
-import com.soffid.iam.api.IssueStatus;
-import com.soffid.iam.api.IssueUser;
+import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.NetworkIntelligence;
-import com.soffid.iam.api.System;
+import com.soffid.iam.api.User;
 import com.soffid.iam.utils.ConfigurationCache;
-import com.soffid.iam.utils.Security;
+import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
+import com.soffid.iam.utils.NetworkIntelligenceParamLastDateUtils;
+import com.soffid.iam.utils.NetworkIntelligenceParamTokenUtils;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
@@ -36,9 +37,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 
 	private static final String ENDPOINT_GEOINFORMATION = "/geo-information";
 	private static final String ENDPOINT_BREACHES = "/breaches";
-	private static final String PARAM_TOKEN = "soffid.network-intelligence.token";
-
-	Log log = LogFactory.getLog(getClass());
+	private Log log = LogFactory.getLog(getClass());
 
 	protected NetworkIntelligence handleValidateToken(String token) throws Exception {
 		try {
@@ -49,7 +48,6 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			URL httpURL = new URL(ssokmUrl);
 			HttpURLConnection conn = (HttpURLConnection) httpURL.openConnection();
 			conn.setRequestMethod("POST");
-			conn.setDoOutput(true);
 			conn.setDoOutput(false);
 			conn.addRequestProperty("token", token);
 			conn.connect();
@@ -85,12 +83,11 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
 				throw new InternalErrorException("The Network Intelligence Service is not configured correctly, contact the administrator");
 
-			URL httpURL = new URL(ssokmUrl+"/isPasswordBreached");
+			URL httpURL = new URL(ssokmUrl+"/isPasswordBreached?password="+password);
 			HttpURLConnection conn = (HttpURLConnection) httpURL.openConnection();
 			conn.setRequestMethod("POST");
+			conn.addRequestProperty("Content-Type", "application/json");
 			conn.setDoOutput(true);
-			conn.setDoOutput(false);
-			conn.addRequestProperty("password", password);
 			conn.connect();
 
 			if (conn.getResponseCode() != HttpStatus.SC_OK) {
@@ -98,8 +95,15 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			} else {
 				try {
 					InputStream in = conn.getInputStream();
-					JSONObject jo = new JSONObject(new JSONTokener(in));
-					boolean b = Boolean.parseBoolean(jo.toString());
+					StringBuilder textBuilder = new StringBuilder();
+					try (Reader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+						int c = 0;
+				        while ((c = reader.read()) != -1) {
+				        	textBuilder.append((char) c);
+				        }
+					}
+					String s = textBuilder.toString();
+					Boolean b = Boolean.valueOf(s);
 					return b;
 				} catch (Exception e) {
 					throw new InternalErrorException("Network Intelligence unexpected response error, contact the administrator");
@@ -108,7 +112,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		} catch (Exception e) {
 			log.warn("Network Intelligence generic unexpected response error, contact the administrator");
 		}
-		return new Boolean(false);
+		return Boolean.valueOf(false);
 	}
 
 	public Boolean handleIsAccountBreached(String account, String system) {
@@ -120,7 +124,6 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			URL httpURL = new URL(ssokmUrl+"/isAccountBreached");
 			HttpURLConnection conn = (HttpURLConnection) httpURL.openConnection();
 			conn.setRequestMethod("POST");
-			conn.setDoOutput(true);
 			conn.setDoOutput(false);
 			conn.addRequestProperty("account", account);
 			conn.addRequestProperty("system", system);
@@ -141,22 +144,19 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		} catch (Exception e) {
 			log.warn("Network Intelligence generic unexpected response error, contact the administrator");
 		}
-		return new Boolean(false);
+		return Boolean.valueOf(false);
 	}
 
-	public Boolean handleIsEmailBreached(String shortName, String mailDomain) {
+	public String handleIsEmailBreached(String shortName, String mailDomain) {
 		try {
 			String ssokmUrl = ConfigurationCache.getProperty("network-intelligence.url")+ENDPOINT_BREACHES;
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
 				throw new InternalErrorException("The Network Intelligence Service is not configured correctly, contact the administrator");
 
-			URL httpURL = new URL(ssokmUrl+"/isEmailBreached");
+			URL httpURL = new URL(ssokmUrl+"/isEmailBreached?shortName="+shortName+"&mailDomain="+mailDomain);
 			HttpURLConnection conn = (HttpURLConnection) httpURL.openConnection();
 			conn.setRequestMethod("POST");
-			conn.setDoOutput(true);
 			conn.setDoOutput(false);
-			conn.addRequestProperty("shortName", shortName);
-			conn.addRequestProperty("mailDomain", mailDomain);
 			conn.connect();
 
 			if (conn.getResponseCode() != HttpStatus.SC_OK) {
@@ -164,9 +164,8 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			} else {
 				try {
 					InputStream in = conn.getInputStream();
-					JSONObject jo = new JSONObject(new JSONTokener(in));
-					boolean b = Boolean.parseBoolean(jo.toString());
-					return b;
+					JSONArray ja = new JSONArray(new JSONTokener(in));
+					return ja.toString();
 				} catch (Exception e) {
 					throw new InternalErrorException("Network Intelligence unexpected response error, contact the administrator");
 				}
@@ -174,7 +173,7 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		} catch (Exception e) {
 			log.warn("Network Intelligence generic unexpected response error, contact the administrator");
 		}
-		return new Boolean(false);
+		return null;
 	}
 
 	public void handleVerifyDomains(PrintWriter out) {
@@ -189,15 +188,19 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 			}
 			if (valid) {
 				out.println("Validated licence.");
+				Long lastDate = NetworkIntelligenceParamLastDateUtils.getLastDateFromParam();
+				if (lastDate!=null)
+					out.println("Last verification "+new Date(lastDate));
 				try {
-					for (System domain : retrieveActiveDomains()) {
-						out.println("Searching for "+domain.getName()+"...");
-						for (String breachedAccount : requestBreachedAccounts(domain)) {
-							Issue i = openIssueIfAccountPawned(domain.getName(), breachedAccount);
+					for (MailDomain md : retrieveMailDomains()) {
+						out.println("Searching for "+md.getName()+"...");
+						for (String breachedEmails : requestBreachedEmails(md.getName(), lastDate)) {
+							Issue i = openIssueIfEmailBreached(md.getName(), breachedEmails);
 							if (i!=null)
-								out.println("Found account "+breachedAccount+" breached. An "+i.getType()+" with description \""+i.getDescription()+"\" has been opened.");
+								out.println("Found email "+breachedEmails+"@"+md.getName()+" breached. An "+i.getType()+" with description \""+i.getDescription()+"\" has been opened.");
 						}
 					}
+					NetworkIntelligenceParamLastDateUtils.setLastDateToParam();
 				} catch (InternalErrorException e) {
 					out.println("Error trying to check domains or accoutns: "+e.getMessage());
 				}
@@ -210,20 +213,22 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		out.println("Finished task.");
 	}
 
-	private Collection<System> retrieveActiveDomains() throws InternalErrorException {
-		return ServiceLocator.instance().getDispatcherService().findAllActiveDispatchers();
+	private List<MailDomain> retrieveMailDomains() throws InternalErrorException {
+		return ServiceLocator.instance().getMailListsService().findMailDomainsByJsonQuery("", null, null).getResources();
 	}
 
-	private ArrayList<String> requestBreachedAccounts(System domain) {
+	private ArrayList<String> requestBreachedEmails(String mailDomain, Long lastDate) {
 		try {
 			String ssokmUrl = ConfigurationCache.getProperty("network-intelligence.url")+ENDPOINT_BREACHES;
 			if (ssokmUrl==null || ssokmUrl.trim().isEmpty())
 				throw new InternalErrorException("The Network Intelligence Service is not configured correctly, contact the administrator");
 
-			URL httpURL = new URL(ssokmUrl+"/verifyDomain?domain="+domain.getName());
+			String sURL = ssokmUrl+"/verifyDomain?domain="+mailDomain;
+			if (lastDate!=null)
+				sURL = sURL+"&lastDate="+String.valueOf(lastDate);
+			URL httpURL = new URL(sURL);
 			HttpURLConnection conn = (HttpURLConnection) httpURL.openConnection();
 			conn.setRequestMethod("POST");
-			conn.setDoOutput(true);
 			conn.setDoOutput(false);
 			conn.addRequestProperty("token", getToken());
 			conn.connect();
@@ -253,24 +258,14 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		return new ArrayList<String>();
 	}
 
-	private Issue openIssueIfAccountPawned(String domain, String breachedAccount) {
+	private Issue openIssueIfEmailBreached(String mailDomain, String breachedEmail) {
 		try {
-			AccountService as = ServiceLocator.instance().getAccountService();
-			Account a = as.findAccount(breachedAccount, domain);
-			if (a!=null) {
-				Issue i = new Issue();
-				i.setCreated(new Date());
-				i.setStatus(IssueStatus.NEW);
-				i.setType("security-exception");
-				if (Security.getSoffidPrincipal().getUserId() != null) {
-					IssueUser iu = new IssueUser();
-					iu.setUserId(Security.getSoffidPrincipal().getUserId());
-					i.setUsers(Arrays.asList(iu));
-				}
-				i.setException("The account "+breachedAccount+"@"+domain+" has been found in a data breach, please check the correct action about it");
-				i.setDescription("The account "+breachedAccount+"@"+domain+" has been found in a data breach, please check the correct action about it");
-				IssueService is = ServiceLocator.instance().getIssueService();
-				return is.createInternalIssue(i);
+			UserService us = ServiceLocator.instance().getUserService();
+			List<User> lu = us.findUserByJsonQuery("emailAddress eq \""+breachedEmail+"@"+mailDomain+"\"");
+			if (!lu.isEmpty()) {
+				String response = handleIsEmailBreached(breachedEmail, mailDomain);
+				String lastBreachDecription = generateLastBreachDescription(response);
+				return (new NetworkIntelligenceIssuesUtils()).openIssueEmailBreached(mailDomain, breachedEmail, lu, lastBreachDecription);
 			}
 		} catch (InternalErrorException e) {
 			e.printStackTrace();
@@ -278,21 +273,49 @@ public class NetworkIntelligenceServiceImpl extends NetworkIntelligenceServiceBa
 		return null;
 	}
 
-	private String getToken() {
-		ConfigurationService cs = ServiceLocator.instance().getConfigurationService();
-		Configuration param = null;
+	private String generateLastBreachDescription(String response) {
 		try {
-			param = cs.findParameterByNameAndNetworkName(PARAM_TOKEN, null);
-		} catch (InternalErrorException e) {}
-		if (param==null)
-			return null;
+			// Select last modified breach
+			JSONArray ja = new JSONArray(new JSONTokener(response));
+			JSONObject jo = (JSONObject) ja.get(0);
+			if (ja.length()>1) {
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
+				for (int i=1; i<ja.length(); i++) {
+					String jomd = jo.getString("ModifiedDate");
+					Date joDmd = sdf.parse(jomd);
+					JSONObject jo2 = (JSONObject) ja.get(i);
+					String jo2md = jo2.getString("ModifiedDate");
+					Date jo2Dmd = sdf.parse(jo2md);
+					if (joDmd.before(jo2Dmd))
+						jo = jo2;
+				}
+			}
 
-		try {
-			String[] paramA = param.getValue().split(";");
-			String token = paramA[0].split("=")[1];
-			return token;
-		} catch (Exception e) {
+			// Generate response
+			String name = jo.getString("Name");
+			String title = jo.getString("Title");
+			String domain = jo.getString("Domain");
+			String breachDate = jo.getString("BreachDate");
+			String addedDate = jo.getString("AddedDate");
+			String description = jo.getString("Description");
+			StringBuffer sb = new StringBuffer();
+			sb.append("The breach \""+name+" - "+title+"\" ");
+			if (!domain.isEmpty())
+				sb.append("for the domain \""+domain+"\" ");
+			sb.append("had been breached at "+breachDate+" and published at "+addedDate+", ");
+			sb.append("this is the official description: "+description);
+
+			return sb.toString();
+		} catch(Exception e) {
+			log.warn("generateLastBreachDescription e="+e);
+			return "";
 		}
+	}
+
+	private String getToken() {
+		NetworkIntelligence ni = NetworkIntelligenceParamTokenUtils.getTokenFromParam();
+		if (ni!=null && ni.getToken()!=null)
+			return ni.getToken();
 		return null;
 	}
 }

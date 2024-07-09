@@ -135,6 +135,10 @@ public abstract class PoliticaContrasenyaEntity {
 	@Nullable 
 	String validationScriptDescription;
 
+	@Description ("Allows Soffid to check it the password has been breached if if has the network intelligence license active")
+	@Column (name="PCD_BREACH", defaultValue="false")
+	public Boolean checkPasswordBreached;
+
 	@Operation(translated="findByPasswordDomain")
 	@DaoFinder("select pol from \n"
 			+ "com.soffid.iam.model.PasswordPolicyEntity pol\n"

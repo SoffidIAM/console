@@ -59,10 +59,10 @@ public class UserBulkAction extends BulkAction {
 
 	@Override
 	public void apply(JXPathContext ctx, String xpath, BulkActionAttribute attribute, BulkActionAttributeAction action, Object value) {
-		if (attribute.getName().equals("$roles$")) {
+		if (attribute.getName().equals("$roles$") || attribute.getName().equals("ca$$roles$")) {
 			applyRoles(ctx, xpath, action, value);			
 		}
-		else if (attribute.getName().equals("$groups$")) {
+		else if (attribute.getName().equals("$groups$") || attribute.getName().equals("ca$$groups$")) {
 			applyGroups(ctx, xpath, action, value);
 		}
 		else

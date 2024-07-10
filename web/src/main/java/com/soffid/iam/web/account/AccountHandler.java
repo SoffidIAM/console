@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Path;
@@ -33,8 +31,8 @@ import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
-import com.soffid.iam.api.Configuration;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.HostService;
 import com.soffid.iam.api.Password;
@@ -42,22 +40,16 @@ import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.api.VaultElement;
-import com.soffid.iam.service.ejb.ApplicationService;
-import com.soffid.iam.service.ejb.AuthorizationService;
-import com.soffid.iam.service.ejb.ConfigurationService;
 import com.soffid.iam.service.ejb.DispatcherService;
 import com.soffid.iam.sync.engine.intf.GetObjectResults;
-import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.BulkAction;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
-import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.CsvParser;
 import com.soffid.iam.web.popup.ImportCsvHandler;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
-import com.soffid.iam.web.user.UserBulkAction;
 
 import es.caib.seycon.ng.comu.AccountType;
 import es.caib.seycon.ng.exception.BadPasswordException;

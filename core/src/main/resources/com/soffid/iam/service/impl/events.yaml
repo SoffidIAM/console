@@ -283,3 +283,59 @@
   manual-actions:
   - send-email
   - add-comment
+- name: breached-password
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - disable-user
+  - add-comment
+- name: breached-account-password
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - disable-user
+  - add-comment
+- name: breached-email
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - disable-user
+  - add-comment
+- name: expired-breached-password
+  actions:
+  - send-email
+  - run-script
+  - notify-admin
+  - notify-user
+  - auto-ack
+  - start-workflow
+  - lock-host
+  - lock-account
+  manual-actions:
+  - send-email
+  - disable-user
+  - add-comment

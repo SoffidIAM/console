@@ -13,53 +13,6 @@
  */
 package com.soffid.iam.service;
 
-import es.caib.seycon.ng.servei.*;
-
-import com.soffid.iam.api.PasswordStatus;
-import com.soffid.iam.api.Task;
-import com.soffid.iam.common.security.SoffidPrincipal;
-import com.soffid.iam.config.Config;
-import com.soffid.iam.interp.Evaluator;
-import com.soffid.iam.model.AccountEntity;
-import com.soffid.iam.model.AccountEntityDao;
-import com.soffid.iam.model.AccountPasswordEntity;
-import com.soffid.iam.model.Parameter;
-import com.soffid.iam.model.PasswordDomainEntity;
-import com.soffid.iam.model.PasswordEntity;
-import com.soffid.iam.model.PasswordPolicyEntity;
-import com.soffid.iam.model.PolicyForbiddenWordEntity;
-import com.soffid.iam.model.SystemEntity;
-import com.soffid.iam.model.SystemEntityDao;
-import com.soffid.iam.model.TaskEntity;
-import com.soffid.iam.model.UserAccountEntity;
-import com.soffid.iam.model.UserEntity;
-import com.soffid.iam.model.UserTypeEntity;
-import com.soffid.iam.sync.engine.DispatcherHandler;
-import com.soffid.iam.sync.engine.TaskHandler;
-import com.soffid.iam.sync.intf.UserMgr;
-import com.soffid.iam.sync.service.ConsoleLogonService;
-import com.soffid.iam.utils.ConfigurationCache;
-import com.soffid.iam.utils.Security;
-
-import es.caib.seycon.ng.comu.AccountType;
-
-import com.soffid.iam.ServiceLocator;
-import com.soffid.iam.api.AccountStatus;
-import com.soffid.iam.api.Audit;
-import com.soffid.iam.api.CredentialTypeEnum;
-import com.soffid.iam.api.Issue;
-import com.soffid.iam.api.IssueStatus;
-import com.soffid.iam.api.IssueUser;
-import com.soffid.iam.api.Password;
-import com.soffid.iam.api.PasswordValidation;
-import com.soffid.iam.api.PolicyCheckResult;
-
-import es.caib.seycon.ng.comu.TipusDominiUsuariEnumeration;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.remote.RemoteServiceLocator;
-import es.caib.seycon.util.Base64;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -95,6 +48,51 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.AccountStatus;
+import com.soffid.iam.api.Audit;
+import com.soffid.iam.api.CredentialTypeEnum;
+import com.soffid.iam.api.Issue;
+import com.soffid.iam.api.IssueStatus;
+import com.soffid.iam.api.IssueUser;
+import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordPolicy;
+import com.soffid.iam.api.PasswordStatus;
+import com.soffid.iam.api.PasswordValidation;
+import com.soffid.iam.api.PolicyCheckResult;
+import com.soffid.iam.api.Task;
+import com.soffid.iam.api.User;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.config.Config;
+import com.soffid.iam.interp.Evaluator;
+import com.soffid.iam.model.AccountEntity;
+import com.soffid.iam.model.AccountEntityDao;
+import com.soffid.iam.model.AccountPasswordEntity;
+import com.soffid.iam.model.Parameter;
+import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordEntity;
+import com.soffid.iam.model.PasswordPolicyEntity;
+import com.soffid.iam.model.PolicyForbiddenWordEntity;
+import com.soffid.iam.model.SystemEntity;
+import com.soffid.iam.model.SystemEntityDao;
+import com.soffid.iam.model.TaskEntity;
+import com.soffid.iam.model.UserAccountEntity;
+import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserTypeEntity;
+import com.soffid.iam.sync.engine.DispatcherHandler;
+import com.soffid.iam.sync.engine.TaskHandler;
+import com.soffid.iam.sync.intf.UserMgr;
+import com.soffid.iam.sync.service.ConsoleLogonService;
+import com.soffid.iam.utils.ConfigurationCache;
+import com.soffid.iam.utils.NetworkIntelligenceIssuesUtils;
+import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
+import com.soffid.iam.utils.Security;
+
+import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.util.Base64;
 
 /**
  * @see es.caib.seycon.ng.servei.InternalPasswordService
@@ -288,6 +286,22 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (! Boolean.TRUE.equals(o)) 
 				return PolicyCheckResult.CUSTOM_CHECK;
 		}
+
+		if (politica.getCheckPasswordBreached()) {
+			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword())) {
+				if (user!=null)
+					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(getUserEntityDao().toUser(user));
+				else if (accounts!=null) {
+					Iterator<AccountEntity> i = accounts.iterator();
+					while (i.hasNext()) {
+						AccountEntity ae = (AccountEntity) i.next();
+						(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(getAccountEntityDao().toAccount(ae));
+					}
+				}
+				return PolicyCheckResult.BREACHED;
+			}
+		}
+
 		return PolicyCheckResult.VALID;
 	}
 
@@ -918,6 +932,40 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password matches");
 		            }				
 					if (new Date().before(contra.getExpirationDate())) {
+
+						UserEntity ue = getUsuari(account);
+						User u = getUserEntityDao().toUser(ue);
+						Account a = getAccountEntityDao().toAccount(account);
+						final long contraId = lastContra.getId();
+						new Thread( () -> {
+							try {
+								getAsyncRunnerService().runTransaction( () -> {
+									try {
+										if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(a)) {
+											Boolean isBreached = ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword());
+											if (isBreached!=null && isBreached.booleanValue()) {
+
+												PasswordEntity pe = getPasswordEntityDao().load(contraId);
+												pe.setExpirationDate(new Date());
+												getPasswordEntityDao().update(pe);
+
+												AccountEntity ae = getAccountEntityDao().load(a.getId());
+												ae.setPasswordExpiration(new Date());
+												getAccountEntityDao().update(ae);
+
+												(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedExpired(u.getUserName(), a);
+											}
+										}
+									} catch(Exception e) {
+										log.warn("Error trying to check if a password has been breached: "+e);
+									}
+									return null;
+								});
+							} catch (InternalErrorException e) {
+								log.warn("Error when checking if a password has been breached", e);
+							}
+						}).start();
+
 						if (debugPasswords()) 
 			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD");
 						if (account == null)
@@ -1457,6 +1505,18 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (account != null && isOldAccountPassword(account, password))
 				return PolicyCheckResult.OLD_PASSWORD;
 
+			String userType = account.getPasswordPolicy().getName();
+			String agentName = account.getSystem().getName();
+			com.soffid.iam.api.System agent = ServiceLocator.instance().getDispatcherService().findDispatcherByName(agentName);
+			String passwordDomain = agent.getPasswordsDomain();
+			PasswordPolicy passordPolicy = ServiceLocator.instance().getUserDomainService().findPolicyByTypeAndPasswordDomain(userType, passwordDomain);
+			if (passordPolicy.isCheckPasswordBreached()) {
+				if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword())) {
+					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(getAccountEntityDao().toAccount(account));
+					return PolicyCheckResult.BREACHED;
+				}
+			}
+
 			return PolicyCheckResult.VALID;
 		}
 	}
@@ -1629,6 +1689,19 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : Current password matches");
 		            }				
 					if (new Date().before(contra.getExpirationDate())) {
+						String userType = account.getPasswordPolicy().getName();
+						String agentName = account.getSystem().getName();
+						com.soffid.iam.api.System agent = ServiceLocator.instance().getDispatcherService().findDispatcherByName(agentName);
+						String passwordDomain = agent.getPasswordsDomain();
+						PasswordPolicy passordPolicy = ServiceLocator.instance().getUserDomainService().findPolicyByTypeAndPasswordDomain(userType, passwordDomain);
+						if (passordPolicy.isCheckPasswordBreached()) {
+							if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword())) {
+								UserEntity ue = getUsuari(account);
+								(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(getUserEntityDao().toUser(ue));
+								return PasswordValidation.PASSWORD_WRONG;
+							}
+						}
+
 						resetFailures (contra, ppe);
 						if (debugPasswords()) 
 			            	log.info("CheckAccountPassword " +account.getName() + " @ " + account.getSystem().getName()+ " : GOOD");

@@ -146,6 +146,10 @@
             img: /img/menu/wheel.svg
             url: /config/wheel.zul
             permissions: ["parameter:create"]
+          - name: seu.network-intelligence
+            url: /config/network-intelligence.zul
+            img: /img/menu/network-intelligence.svg
+            permissions: ["seu:networkIntelligence:show"]
         - name: seu.integration-engine
           img: /img/menu/integration.svg
           options:

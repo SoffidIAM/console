@@ -8,6 +8,7 @@ package es.caib.seycon.ng.servei;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.model.TenantEntity;
+import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.IssueService;
 import com.soffid.iam.service.SignalService;
 import com.soffid.mda.annotation.Depends;
@@ -41,7 +42,8 @@ import es.caib.seycon.ng.sync.servei.TaskGenerator;
 	TenantEntity.class,
 	SeyconServerService.class,
 	IssueService.class,
-	SignalService.class})
+	SignalService.class,
+	AsyncRunnerService.class})
 public abstract class InternalPasswordService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

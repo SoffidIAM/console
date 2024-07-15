@@ -244,7 +244,7 @@ public class LoginServiceImpl implements LoginService {
 					}
 					
 					Long lastPass = ServiceLocator.instance().getInternalPasswordService()
-							.getLastPasswordIdForUser(userName);
+							.getLastPasswordIdForUser(account);
 					principal.setPasswordId(lastPass);
 					
 					if ("true".equals(ConfigurationCache.getProperty("soffid.auth.maintenance")) ||

@@ -2338,10 +2338,21 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	@Override
 	protected Long handleGetLastPasswordIdForUser(String user) throws Exception {
 		SystemEntity system = getSystemEntityDao().findSoffidSystem();
-		for (PasswordEntity p: getPasswordEntityDao().findLastByUserDomain(
-				getUserEntityDao().findByUserName(user), 
-				system.getPasswordDomain())) {
-			return p.getId();
+		AccountEntity account = getAccountEntityDao().findByNameAndSystem(user, system.getName());
+		if (account == null)
+			return null;
+		if (account.getType() == AccountType.USER) {
+			for (PasswordEntity p: getPasswordEntityDao().findLastByUserDomain(
+					getUserEntityDao().findByUserName(user), 
+					system.getPasswordDomain())) {
+				return p.getId();
+			}
+		} else {
+			AccountPasswordEntity p = getAccountPasswordEntityDao().findLastByAccount(
+					account.getId());
+			if (p != null) {
+				return p.getId();
+			}
 		}
 		return null;
 	}
@@ -2349,6 +2360,11 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	@Override
 	protected boolean handleIsLastPasswordIdForUser(long id) throws Exception {
 		PasswordEntity p = getPasswordEntityDao().load(id);
-		return p != null && p.getOrder().longValue() == 0;
+		if (p != null && p.getOrder().longValue() == 0) return true;
+
+		AccountPasswordEntity ap = getAccountPasswordEntityDao().load(id);
+		if (ap != null && ap.getOrder().longValue() == 0) return true;
+		
+		return false;
 	}
 }

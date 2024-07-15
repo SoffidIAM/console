@@ -56,7 +56,7 @@ public class PasswordPolicyEntityDaoImpl
 	@Override
     public void update(PasswordPolicyEntity entity) {
 		super.update(entity);
-		audit("U", entity); //$NON-NLS-1$
+//		audit("U", entity); //$NON-NLS-1$
 	}
 
 

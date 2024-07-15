@@ -346,6 +346,8 @@ public class TaskHandler
 			hash = "P " + task.getUser() + "@" + task.getPasswordDomain(); //$NON-NLS-1$ //$NON-NLS-2$
 		else if (UPDATE_ACCOUNT_PASSWORD.equals(transactionCode))
 			hash = "PA " + task.getUser() + "@" + task.getSystemName(); //$NON-NLS-1$ //$NON-NLS-2$
+		else if (UPDATE_SERVICE_PASSWORD.equals(transactionCode))
+			hash = "SP " + task.getUser() + "@" + task.getSystemName(); //$NON-NLS-1$ //$NON-NLS-2$
 		else if (CREATE_FOLDER.equals(transactionCode))
 			hash = "F " + task.getFolderType() + " " + task.getFolder(); //$NON-NLS-1$ //$NON-NLS-2$
 		else if (PURGE_HOSTS.equals(transactionCode))

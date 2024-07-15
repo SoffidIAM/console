@@ -24,11 +24,13 @@ public class TaskEntityImpl extends com.soffid.iam.model.TaskEntity {
                 || transactionCode.equals(TaskHandler.UPDATE_USER_ALIAS)
                 || transactionCode.equals(TaskHandler.EXPIRE_USER_PASSWORD)
                 || transactionCode.equals(TaskHandler.EXPIRE_USER_UNTRUSTED_PASSWORD) 
-                || transactionCode.equals(TaskHandler.RECONCILE_USER))
+                || transactionCode.equals(TaskHandler.RECONCILE_USER)
+        		|| transactionCode.equals(TaskHandler.UPDATE_SERVICE_PASSWORD)) //$NON-NLS-1$
             result = result + " " + getUser(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_ACCOUNT) ||
-        	transactionCode.equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD)) //$NON-NLS-1$
+        	transactionCode.equals(TaskHandler.UPDATE_ACCOUNT_PASSWORD) ||
+        	transactionCode.equals(TaskHandler.UPDATE_SERVICE_PASSWORD)) //$NON-NLS-1$
             result = result + "@" + getSystemName(); //$NON-NLS-1$
 
         if (transactionCode.equals(TaskHandler.UPDATE_HOST)) //$NON-NLS-1$

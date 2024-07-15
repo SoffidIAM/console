@@ -167,6 +167,13 @@ public class Auditoria {
 	@Nullable
 	public String pamSessionId;
 
+	@Nullable
+	public String oldValue;
+
+	@Nullable
+	public String newValue;
+
+	
 	@Description("Column to perfom fast searches")
 	@Nullable
 	public String searchIndex;

@@ -167,6 +167,14 @@ public abstract class AuditoriaEntity {
 	@Nullable
 	public String pamSessionId;
 
+	@Column (name="AUD_VALO")
+	@Nullable
+	public String oldValue;
+
+	@Column (name="AUD_VALN")
+	@Nullable
+	public String newValue;
+
 	@Description("Column to perfom fast searches")
 	@Column (name="AUD_INDEX")
 	@Nullable

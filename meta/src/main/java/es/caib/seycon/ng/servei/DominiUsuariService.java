@@ -18,6 +18,7 @@ import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.TipusUsuari;
+import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 
 @Service (translatedName="UserDomainService", 
@@ -32,6 +33,7 @@ import es.caib.seycon.ng.model.TipusDadaEntity;
 	es.caib.seycon.ng.model.ParaulesProhibidesEntity.class,
 	es.caib.seycon.ng.model.ParaulaProhibidaPoliticaContrasenyaEntity.class,
 	AsyncRunnerService.class,
+	AuditoriaEntity.class,
 	TipusDadaEntity.class})
 public abstract class DominiUsuariService {
 

@@ -117,7 +117,8 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     	put(TipusSessio.WSSO, new String[] {"wsso", "Soffid Web SSO"});
     	put(TipusSessio.PAM, new String[] {"PAM", "PAM Web Gateway"});
     	put(TipusSessio.PAMRDP, new String[] {"PAMRDP", "PAM RDP Gateway"});
-    	put(TipusSessio.PAMSSH, new String[] {"PA_SSH", "PAM SSH Gateway"});
+    	put(TipusSessio.PAMSSH, new String[] {"PAMSSH", "PAM SSH Gateway"});
+    	put(TipusSessio.CONSOLE, new String[] {"CONSOLE", "Soffid Console"});
     }};
     private com.soffid.iam.api.Session doCreateSession(java.lang.String codiUsuari, java.lang.String nomMaquina, java.lang.String nomMaquinaClient, TipusSessio tipus, 
     		java.lang.String url, java.lang.Long port, String key, String authenticationMethod) throws UnknownHostException, UnknownUserException {
@@ -383,9 +384,19 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
 				return false;
 			AccountAccessLevelEnum level = getAccountEntityDao().getAccessLevel(account, Security.getCurrentUser());
 			return level == AccountAccessLevelEnum.ACCESS_OWNER;
+		} else if ( sessioEntity.getUser() != null &&
+				sessioEntity.getUser().isAllowed("user:session:query")) {
+			return true;
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	protected Session handleRegisterConsoleSessio(String codiUsuari, String nomMaquina, String authenticationMethod)
+			throws Exception {
+        return doCreateSession(codiUsuari, nomMaquina, null, TipusSessio.CONSOLE, null, null, 
+        		null, authenticationMethod);
 	}
 
 }

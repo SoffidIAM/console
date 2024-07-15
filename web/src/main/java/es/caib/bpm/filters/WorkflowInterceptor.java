@@ -2,6 +2,8 @@ package es.caib.bpm.filters;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -25,6 +27,10 @@ import org.zkoss.web.Attributes;
 import org.zkoss.zk.scripting.Interpreters;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.AccessLog;
+import com.soffid.iam.api.Session;
+import com.soffid.iam.api.System;
 import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.service.ejb.SessionCacheService;
@@ -35,6 +41,8 @@ import com.soffid.iam.web.interp.RefInterpreter;
 import com.soffid.iam.web.zk.ConfigureUserSettings;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
+import es.caib.seycon.ng.exception.UnknownHostException;
+import es.caib.seycon.ng.exception.UnknownUserException;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.datamodel.xml.FunctionMapperChain;
 
@@ -51,6 +59,8 @@ public class WorkflowInterceptor implements Filter {
 	public static final String SOFFID_NESTED_TENANT = "$$SoffidNestedTenant$$";
 	public static final String SOFFID_NESTED_PERMISSIONS = "$$SoffidNestedPermissions$$";
 	public static final String SOFFID_NESTED_FULLNAME = "$$SoffidNestedFullname$$";
+	public static final String SOFFID_ACCESSLOG_SESSION_ID = "$$SoffidSessionId$$";
+	public static final String SOFFID_ACCESSLOG_PRINCIPAL = "$$SoffidPrincipal$$";
 	/*
 	 * DECLARACIONES
 	 */
@@ -104,6 +114,7 @@ public class WorkflowInterceptor implements Filter {
 				try {
 					Principal principal = ((HttpServletRequest) request)
 							.getUserPrincipal();
+					Session accessLogSessionId = (Session) sesion.getAttribute(SOFFID_ACCESSLOG_SESSION_ID);
 					if (principal != null) {
 						String sessionId = (String) sesion
 								.getAttribute(SOFFID_SESSION_CACHE_ATTR);
@@ -114,6 +125,17 @@ public class WorkflowInterceptor implements Filter {
 						} else {
 							sessionCacheService.setSession(sessionId);
 						}
+						if (accessLogSessionId == null &&
+								principal instanceof SoffidPrincipal) {
+							accessLogSessionId = generateAccessLogSessionId((SoffidPrincipal) principal, 
+									(HttpServletRequest)request);
+							sesion.setAttribute(SOFFID_ACCESSLOG_SESSION_ID, 
+									accessLogSessionId);
+						}
+					}
+					
+					if (accessLogSessionId != null) {
+						refreshAccesslogSessionId(request, accessLogSessionId);
 					}
 
 					HttpServletResponse httpServletResponse = (HttpServletResponse) response;
@@ -204,6 +226,42 @@ public class WorkflowInterceptor implements Filter {
 			}
 		} else {
 			filter.doFilter(request, response);
+		}
+	}
+
+	private void refreshAccesslogSessionId(ServletRequest request, Session accessLogSessionId) {
+		// Every two minutes
+		if (accessLogSessionId.getKeepAliveDate() == null ||
+				java.lang.System.currentTimeMillis() - accessLogSessionId.getKeepAliveDate().getTimeInMillis() > 120_000 )
+		{
+			try {
+				ServiceLocator.instance().getSessionService().sessionKeepAlive(accessLogSessionId);
+				accessLogSessionId.setKeepAliveDate(Calendar.getInstance());
+			} catch (InternalErrorException e) {
+			}
+		}
+	}
+
+	private Session generateAccessLogSessionId(SoffidPrincipal principal, HttpServletRequest request)
+	{
+		try {
+			Session s = ServiceLocator.instance().getSessionService().registerConsoleSessio(
+					principal.getUserName(),
+					request.getRemoteAddr(),
+					principal.getAuthenticationMethod());
+			request.getSession().setAttribute(SOFFID_ACCESSLOG_PRINCIPAL, principal);
+			
+			String sessionTimeout = ConfigurationCache.getProperty("soffid.auth.timeout");
+			if (sessionTimeout != null && ! sessionTimeout.trim().isEmpty()) {
+				try {
+					int sessionTimeoutNumber = Integer.parseInt(sessionTimeout.trim());
+					if (sessionTimeoutNumber < 5)
+						request.getSession().setMaxInactiveInterval(sessionTimeoutNumber*60+30);
+				} catch (NumberFormatException e) {}
+			}
+			return s;
+		} catch (Exception e ) {
+			return null;
 		}
 	}
 

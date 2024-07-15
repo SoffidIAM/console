@@ -73,6 +73,7 @@ public class LoginServiceImpl implements LoginService {
 		String masterMessage = null;
 		try {
 			boolean samlAuthorized = false;
+			String tokenType = "P";
 			if (username == null || username.trim().isEmpty())
 				return null;
 			
@@ -87,6 +88,7 @@ public class LoginServiceImpl implements LoginService {
 			{
 				samlAuthorized = true;
 				username = samlPrincipal;
+				tokenType = "SAML";
 			}
 			if (credentials.length() > 2000)
 			{
@@ -193,7 +195,8 @@ public class LoginServiceImpl implements LoginService {
 								holder, 
 								roleIds, accountIds,
 								groupIds,
-								userData == null? null: userData.getId());
+								userData == null? null: userData.getId(),
+								tokenType);
 						log.info(masterMessage = principal.getName() + " login accepted");
 
 						if (userName != null) {
@@ -213,7 +216,8 @@ public class LoginServiceImpl implements LoginService {
 								holder,
 								roleIds, accountIds,
 								groupIds,
-								userData == null ? null: userData.getId());
+								userData == null ? null: userData.getId(),
+								tokenType);
 						log.info(masterMessage = principal.getName() + " login accepted with expired password");
 						acc.setLastLogin(Calendar.getInstance());
 						as.updateAccount(acc);

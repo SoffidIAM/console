@@ -28,6 +28,12 @@ import org.zkoss.zk.ui.AbstractComponent;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.http.SimpleSession;
 
+import com.soffid.iam.ServiceLocator;
+import com.soffid.iam.api.Session;
+import com.soffid.iam.common.security.SoffidPrincipal;
+import com.soffid.iam.utils.Security;
+
+import es.caib.bpm.filters.WorkflowInterceptor;
 import es.caib.zkib.datamodel.DataModelCollection;
 
 @WebListener
@@ -57,7 +63,19 @@ public class SessionListener implements HttpSessionListener {
 		synchronized (sessions) {
 			sessions.remove(se.getSession());
 		}
-		
+    	Session sessionId = (Session) se.getSession()
+    			.getAttribute(WorkflowInterceptor.SOFFID_ACCESSLOG_SESSION_ID);
+    	SoffidPrincipal principal = (SoffidPrincipal) se.getSession()
+    			.getAttribute(WorkflowInterceptor.SOFFID_ACCESSLOG_PRINCIPAL);
+    	if (sessionId != null && principal != null) {
+    		Security.nestedLogin(principal);
+    		try {
+				ServiceLocator.instance().getSessionService().destroySession(sessionId);
+    		} catch (Exception e) {
+    		} finally {
+    			Security.nestedLogoff();
+    		}
+    	}
 	}
 }
 

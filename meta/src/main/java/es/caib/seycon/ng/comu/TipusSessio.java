@@ -19,4 +19,6 @@ public class TipusSessio {
 	public java.lang.String PAMSSH="S";
 
 	public java.lang.String PAMRDP="R";
+
+	public java.lang.String CONSOLE="C";
 }

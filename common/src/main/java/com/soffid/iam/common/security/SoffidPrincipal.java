@@ -41,4 +41,6 @@ public interface SoffidPrincipal extends Principal {
 	Long getUserId();
 
 	List<Long> getGroupIds();
+	
+	String getAuthenticationMethod();
 }

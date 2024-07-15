@@ -51,6 +51,9 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private Long userId;
 	long timestamp;
 	private String[] permissions;
+	private Long passwordId;
+	private String authenticationMethod;
+	
 	static long clearCacheTimestamp;
 	private static Executor executor = Executors.newSingleThreadExecutor();
 	private static UserService userService;
@@ -98,6 +101,37 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.userId = userId;
 		this.permissions = roles;
 		timestamp = System.currentTimeMillis();
+	}
+
+
+	public SoffidPrincipalImpl(String name,
+			String userName,
+			String fullName,
+			String holderGroup,
+			List<String> permissions,
+			List<String> groups,
+			List<String> soffidRoles,
+			Map<String, SoffidPrincipal> holderGroupMap,
+			List<Long> roleIds,
+			List<Long> accountIds,
+			List<Long> groupIds,
+			Long userId,
+			String authenticationMethod) {
+		super(name, "*", permissions);
+		init (name, 
+				groups == null ? new String[0]: groups.toArray(new String[groups.size()]), 
+				soffidRoles == null ? new String[0]: soffidRoles.toArray(new String[soffidRoles.size()]) );
+		this.holderGroup = holderGroup;
+		this.fullName = fullName;
+		this.userName = userName;
+		this.holderGroupMap = holderGroupMap;
+		this.roleIds = roleIds == null ? new LinkedList<>(): new LinkedList<>(roleIds);
+		this.accountIds = accountIds == null ? new LinkedList<>(): new LinkedList<>(accountIds);
+		this.groupIds = groupIds == null ? new LinkedList<>() : new LinkedList<>(groupIds);
+		this.userId = userId;
+		this.permissions = roles;
+		timestamp =  System.currentTimeMillis();
+		this.authenticationMethod = authenticationMethod;
 	}
 
 	public SoffidPrincipalImpl(String name,
@@ -538,5 +572,17 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	public Long getUserId() {
 		return userId;
 	}
-	
+
+	public Long getPasswordId() {
+		return passwordId;
+	}
+
+	public void setPasswordId(Long passwordId) {
+		if (this.passwordId == null)
+			this.passwordId = passwordId;
+	}
+
+	public String getAuthenticationMethod() {
+		return authenticationMethod;
+	}
 }

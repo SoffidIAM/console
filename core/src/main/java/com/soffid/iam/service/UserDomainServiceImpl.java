@@ -16,6 +16,7 @@ package com.soffid.iam.service;
 import es.caib.seycon.ng.servei.*;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.Audit;
 import com.soffid.iam.api.ForbiddenWord;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.api.PasswordDomain;
@@ -25,6 +26,7 @@ import com.soffid.iam.api.System;
 import com.soffid.iam.api.UserDomain;
 import com.soffid.iam.api.UserType;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.ForbiddenWordEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordPolicyEntity;
@@ -35,14 +37,19 @@ import com.soffid.iam.model.UserTypeEntity;
 import com.soffid.iam.model.UserTypeEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.account.AccountNameGenerator;
+import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.exception.InternalErrorException;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -358,10 +365,38 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 			throw new Exception(Messages.getString("UserDomainServiceImpl.8")); //$NON-NLS-1$
 		}
 
-		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().passwordPolicyToEntity(politicaContrasenyaDomini);
-
+		PasswordPolicyEntity entity = getPasswordPolicyEntityDao().load(politicaContrasenyaDomini.getId());
+		PasswordPolicy vo = getPasswordPolicyEntityDao().toPasswordPolicy(entity);
+		getPasswordPolicyEntityDao().passwordPolicyToEntity(politicaContrasenyaDomini, entity, true);
+		
+		auditPasswordPolicyChange(politicaContrasenyaDomini, vo);
+		
 		getPasswordPolicyEntityDao().update(entity);
 		return getPasswordPolicyEntityDao().toPasswordPolicy(entity);
+	}
+	
+	protected void auditPasswordPolicyChange(PasswordPolicy politicaContrasenyaDomini, PasswordPolicy vo) {
+		for (PropertyDescriptor prop: PropertyUtils.getPropertyDescriptors(vo)) {
+			try {
+				Object n = PropertyUtils.getProperty(politicaContrasenyaDomini, prop.getName());
+				Object o = PropertyUtils.getProperty(vo, prop.getName());
+				if (n == null ? o != null : ! n.equals(o)) {
+			        Audit auditoria = new Audit();
+			        auditoria.setAction("X");
+			        auditoria.setPasswordDomain(politicaContrasenyaDomini.getPasswordDomainCode());
+			        auditoria.setUserType(politicaContrasenyaDomini.getUserType());
+			        auditoria.setAuthor(Security.getCurrentAccount());
+			        auditoria.setNewValue(n == null ? "empty": n.toString());
+			        auditoria.setOldValue(o == null ? "empty": o.toString());
+			        auditoria.setObject("SC_POCODO"); //$NON-NLS-1$
+			        auditoria.setConfigurationParameter(prop.getName());
+			        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
+			        getAuditEntityDao().create(auditoriaEntity);
+				}
+			} catch (Exception e) {
+				// Field not reachable
+			}
+		}
 	}
 
 	@Override

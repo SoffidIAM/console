@@ -14,7 +14,7 @@
 		<location>/error.zul</location>
 	</error-page>
 	<session-config>
-  		<session-timeout>1200</session-timeout>
+  		<session-timeout>250</session-timeout>
   		<timer-keep-alive>true</timer-keep-alive> 
 	</session-config>
 	<device-config>

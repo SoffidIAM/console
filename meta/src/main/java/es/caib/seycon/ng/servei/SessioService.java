@@ -37,6 +37,16 @@ public abstract class SessioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+	
+	es.caib.seycon.ng.comu.Sessio registerConsoleSessio(
+			final java.lang.String codiUsuari, 
+			final java.lang.String nomMaquina, 
+			final java.lang.String authenticationMethod)
+	{
+		return null;
+	}
+
+	
 	@Operation (translated="registerWebSession")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Sessio registraSessioWeb(

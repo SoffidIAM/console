@@ -33,5 +33,5 @@
 	</html>
 	
 	<image src="img/wait.gif" style="display:none;visibility:hidden;"/>		
-	<timer delay="120000" repeats="true" onTimer="ref:main.onTimer"/>	
+	<timer delay="60000" repeats="true" onTimer="ref:main.onTimer"/>	
 </div> 

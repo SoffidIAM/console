@@ -90,6 +90,7 @@
     -->
     <!--
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               sslEnabledProtocols="TLSv1.3" 
                maxThreads="150" SSLEnabled="true">
         <SSLHostConfig>
             <Certificate certificateKeystoreFile="conf/localhost-rsa.jks"
@@ -105,6 +106,7 @@
     -->
     <!--
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
+               sslEnabledProtocols="TLSv1.3" 
                maxThreads="150" SSLEnabled="true" >
         <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" xpoweredBy="false" server="Apache TomEE" />
         <SSLHostConfig>

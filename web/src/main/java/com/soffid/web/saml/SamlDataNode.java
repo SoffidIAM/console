@@ -81,7 +81,7 @@ public class SamlDataNode extends SimpleDataNode {
 	private void saveAudiences(List<String> jwtAudience) throws InternalErrorException, NamingException, CreateException {
 		final ConfigurationService configurationService = EJBLocator.getConfigurationService();
 		for (Configuration cfg: configurationService.findConfigurationByFilter(
-				"soffid.webservic.auth.jwt-aud%", 
+				"soffid.webservice.auth.jwt-aud%", 
 				null, null, null)) {
 			configurationService.delete(cfg);
 		}

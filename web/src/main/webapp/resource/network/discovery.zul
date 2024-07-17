@@ -52,7 +52,7 @@
 				  expand: true
 				- path: /service
 				  template: >-
-				    #{service}: <a href="${execution.contextPath }/resource/account/account.zul?name=#{accountName}&system=#{accountSystem}" target="_blank">
+				    #{service}: <a href="${execution.contextPath }/resource/account/account.zul?name=#{c:escapeXML(accountName)}&system=#{c:escapeXML(accountSystem)}" target="_blank">
 				    #{accountName} </a>
 				  leaf: true
 				- path: /system

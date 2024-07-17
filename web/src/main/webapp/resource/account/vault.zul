@@ -74,8 +74,8 @@
 - path: /vault
   icon: #{type=='account'? "/img/account-green.svg": "/img/container-green.svg"}
   template: >-
-    #{type=='account'? (account.loginName == null ? account.name: account.loginName) : folder.name}
-    #{type=='account' && account.lockedBy != null? c:cat3("<span class='lock'>Locked by ",account.lockedBy,'</span>'): ""}
+    #{type=='account'? (account.loginName == null ? c:escapeXML(account.name): c:escapeXML(account.loginName)) : folder.name}
+    #{type=='account' && account.lockedBy != null? c:cat3("<span class='lock'>Locked by ",c:escapeXML(account.lockedBy),'</span>'): ""}
     #{type=='account' && (account.accessLevel == 'O' || account.accessLevel=='M') ?
     "<div class='tree-icon-button' style='float: right' onclick='zkDatatree2.sendClientAction(this,&quot;onViewPassword&quot;)'>
     <img class='tree-icon-button button-0' style='padding: 0px' src='${execution.contextPath }/img/search2.svg'/>
@@ -89,7 +89,7 @@
   leaf: #{type == 'account'}
   columns:
   - template: >-
-        #{type=='account'? account.description: folder.description}
+        #{type=='account'? c:escapeXML(account.description): c:escapeXML(folder.description)}
     $class: hide-vertical
 ]]>
 		</attribute>

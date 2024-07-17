@@ -998,7 +998,7 @@ public class InputField3 extends Databox
 				} else if (d == null) {
 					return new String[] {s[0], ""};
 				} else {
-					return new String[] {s[0], XMLs.encodeAttribute(d)};
+					return new String[] {s[0], XMLs.escapeXML(d)};
 				}
 			} catch (Exception e) {
 				noPermissions = true;
@@ -1015,7 +1015,7 @@ public class InputField3 extends Databox
 					else 
 						d = evaluateDescriptionExpression(o);
 
-					return new String[] { s[0],  d == null ? d : XMLs.encodeAttribute(d) };
+					return new String[] { s[0],  d == null ? d : XMLs.escapeXML(d) };
 				} finally {
 					Security.nestedLogoff();
 				}

@@ -14,8 +14,8 @@ Copyright (C) 2017 Soffid IAM. All Rights Reserved.
  <c:forEach var="child" items="${self.children}">${z:redraw(child, null)}</c:forEach>
  <button type="button" class="criteria-selector" id="${self.uuid}!button">
   <div class="criteria-wrap">
-   <span class="fieldLabel">${self.fieldLabel}</span>
-   ${self.humanExpression}
+   <span class="fieldLabel">${c:escapeXML(self.fieldLabel)}</span>
+   ${c:escapeXML(self.humanExpression)}
   </div>
  </button>
  <a href="#" class="remove-filter" title="${c:l('criterion.remove')}" id="${self.uuid}!close">

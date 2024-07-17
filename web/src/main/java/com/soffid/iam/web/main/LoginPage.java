@@ -1,13 +1,16 @@
 package com.soffid.iam.web.main;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.zkoss.xml.XMLs;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
@@ -19,6 +22,7 @@ import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.filter.TenantExtractor;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
+import com.soffid.iam.web.popup.HtmlScriptDetector;
 import com.soffid.iam.web.zk.BPMLabelLocator;
 import com.soffid.iam.web.zk.V2LabelLocator;
 
@@ -83,7 +87,8 @@ public class LoginPage extends Html {
 			boolean showTenant = "true".equals( ConfigurationCache.getMasterProperty("soffid.auth.showTenant") );
 			byte[] motd = ServiceLocator.instance().getConfigurationService().getBlob("soffid.auth.motd");
 			String motdString = motd == null ? null: new String(motd, StandardCharsets.UTF_8);
-			if (error.isEmpty() && motdString != null && ! motdString.trim().isEmpty() ) {
+			if (error.isEmpty() && motdString != null && ! motdString.trim().isEmpty() && 
+					new HtmlScriptDetector().validate(motdString)) {
 				setVariable("showMotd", true, false);
 				setVariable("motd", motdString, false);
 			} else {

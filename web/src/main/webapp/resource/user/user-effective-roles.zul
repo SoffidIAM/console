@@ -33,18 +33,18 @@
               ruleName != null ? "/img/rule.svg":
               "/img/role.svg"}
           template: >-
-             #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}
-             #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}
-             #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", ruleName): ""}
-             #{roleName != null ? c:cat4("${c:l('accounts.role')} ", roleName, " @ ",system): ""}
+             #{c:escapeXML(accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): "")}
+             #{c:escapeXML(groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): "")}
+             #{c:escapeXML(ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", ruleName): "")}
+             #{c:escapeXML(roleName != null ? c:cat4("${c:l('accounts.role')} ", roleName, " @ ",system): "")}
           columns:
           - value: system
           - value: ownerAccountName
           - template: >-
-                #{accountName != null ? accountDescription: ""}
-                #{groupName != null ? groupDescription: ""}
-                #{ruleName != null ? ruleDescription: ""}
-                #{roleName != null ? roleDescription: ""}
+                #{c:escapeXML(accountName != null ? accountDescription: "")}
+                #{c:escapeXML(groupName != null ? groupDescription: "")}
+                #{c:escapeXML(ruleName != null ? ruleDescription: "")}
+                #{c:escapeXML(roleName != null ? roleDescription: "")}
         - path: /nested
           icon: >-
             #{accountName != null ? "/img/account.png": 
@@ -52,20 +52,20 @@
             ruleName != null ? "/img/rule.svg":
             "/img/role.svg"}
           template: >-
-             #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", accountName," @ ",system): ""}
-             #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", groupName): ""}
-             #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", ruleName): ""}
-             #{roleName != null ? c:cat3("${c:l('accounts.role')} <b>", roleName, " </b> "): ""}
-             #{domainValue != null ? c:cat3(" / <b>", domainValue, " </b> "): ""}
+             #{accountName != null ? c:cat4("${c:l('auditoria.zul.account')} ", c:escapeXML(accountName)," @ ",c:escapeXML(system)): ""}
+             #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", c:escapeXML(groupName)): ""}
+             #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", c:escapeXML(ruleName)): ""}
+             #{roleName != null ? c:cat3("${c:l('accounts.role')} <b>", c:escapeXML(roleName), " </b> "): ""}
+             #{domainValue != null ? c:cat3(" / <b>", c:escapeXML(domainValue), " </b> "): ""}
           columns:
           - value: system
           - value: ownerAccountName
           - template: >-
-                #{accountName != null ? accountDescription: ""}
-                #{groupName != null ? groupDescription: ""}
+                #{accountName != null ? c:escapeXML(accountDescription): ""}
+                #{groupName != null ? c:escapeXML(groupDescription): ""}
                 #{ruleName != null ? "": ""}
-                #{roleName != null ? roleDescription: ""}
-                #{domainValue != null ? c:cat3(" / ", domainDescription, " </b> "): ""}
+                #{roleName != null ? c:escapeXML(roleDescription): ""}
+                #{domainValue != null ? c:cat3(" / ", c:escapeXML(domainDescription), " </b> "): ""}
 		]]>
 		</attribute>
 	</datatree2>

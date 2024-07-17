@@ -7,6 +7,7 @@ import org.zkforge.fckez.FCKeditor;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Page;
+import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.ext.AfterCompose;
@@ -14,6 +15,8 @@ import org.zkoss.zul.Window;
 import org.zkoss.zul.impl.InputElement;
 
 import com.soffid.ckeditor.Ckeditor;
+
+import es.caib.seycon.ng.exception.InternalErrorException;
 
 public class HtmlEditor extends Window implements AfterCompose {
 	EventListener listener;
@@ -47,9 +50,15 @@ public class HtmlEditor extends Window implements AfterCompose {
 		setVisible(false);
 	}
 
-	public void accept(Event event) {
-		textbox.setText(editor.getValue());
-		cleanWindow(event);
+	public void accept(Event event) throws InternalErrorException {
+		String s = editor.getValue();
+		if (new HtmlScriptDetector().validate(s)) {
+			textbox.setText(editor.getValue());
+			cleanWindow(event);
+		} else {
+			throw new InternalErrorException("Cannot include code in the HTML browser");
+		}
+			
 	}
 
 	@Override

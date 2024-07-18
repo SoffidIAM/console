@@ -418,6 +418,17 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 		}
 		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().passwordPolicyForbbidenWordToEntity(paraulaProhibidaContrasenyaDomini);
 		getPolicyForbiddenWordEntityDao().create(entity);
+
+        Audit auditoria = new Audit();
+        auditoria.setAction("C");
+        auditoria.setPasswordDomain(entity.getPasswordPolicy().getPasswordDomain().getName());
+        auditoria.setUserType(entity.getPasswordPolicy().getUserType().getName());
+        auditoria.setAuthor(Security.getCurrentAccount());
+        auditoria.setNewValue(entity.getForbiddenWord().getForbiddenWord());
+        auditoria.setObject("SC_BADCON"); //$NON-NLS-1$
+        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
+        getAuditEntityDao().create(auditoriaEntity);
+
 		return getPolicyForbiddenWordEntityDao().toPasswordPolicyForbbidenWord(entity);
 	}
 
@@ -432,7 +443,17 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
     protected void handleDelete(PasswordPolicyForbbidenWord paraulaProhibidaContrasenyaDomini) throws Exception {
 		PolicyForbiddenWordEntity entity = getPolicyForbiddenWordEntityDao().load(paraulaProhibidaContrasenyaDomini.getId());
 		if (entity != null) {
-			ForbiddenWordEntity word = entity.getForbiddenWord();
+	        Audit auditoria = new Audit();
+	        auditoria.setAction("D");
+	        auditoria.setPasswordDomain(entity.getPasswordPolicy().getPasswordDomain().getName());
+	        auditoria.setUserType(entity.getPasswordPolicy().getUserType().getName());
+	        auditoria.setAuthor(Security.getCurrentAccount());
+	        auditoria.setOldValue(entity.getForbiddenWord().getForbiddenWord());
+	        auditoria.setObject("SC_BADCON"); //$NON-NLS-1$
+	        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
+	        getAuditEntityDao().create(auditoriaEntity);
+
+	        ForbiddenWordEntity word = entity.getForbiddenWord();
 			Collection<PolicyForbiddenWordEntity> list = word.getPolicies();
 			getPolicyForbiddenWordEntityDao().remove(entity);
 			list.remove(entity);

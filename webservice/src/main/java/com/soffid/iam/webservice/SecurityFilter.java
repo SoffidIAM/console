@@ -103,8 +103,6 @@ public class SecurityFilter extends TenantFilter {
 			return;
 		}
     	if (checkForCachedAuthentication(httpReq, httpResp, chain, auth)) {
-    		
-    		proceed(httpReq, httpResp, chain, null);
     		return;
     	}
 		String s = new String(

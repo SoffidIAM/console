@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -1098,12 +1100,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (ppe.getUnlockAfterSeconds() != null) {
 				contra.setUnlockDate(new Date(System.currentTimeMillis() + ppe.getUnlockAfterSeconds().longValue() * 1000));
 				if (account2 != null) {
-					auditLockAccount(contra.getUser().getUserName(), account2);
+					auditLockAccount(contra.getUser().getUserName(), account2, contra.getUnlockDate());
 				}
 				else {
 					for (AccountEntity account: getAccountEntityDao().findByUserAndSystem(contra.getUser().getUserName(), 
 							handleGetDefaultDispatcher())) {
-						auditLockAccount(contra.getUser().getUserName(), account);
+						auditLockAccount(contra.getUser().getUserName(), account, contra.getUnlockDate());
 					}
 				}
 			} else {
@@ -1111,14 +1113,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				if (account2 != null) {
 					account2.setStatus(AccountStatus.LOCKED);
 					getAccountEntityDao().update(account2);
-					auditLockAccount(contra.getUser().getUserName(), account2);
+					auditLockAccount(contra.getUser().getUserName(), account2, contra.getUnlockDate());
 				}
 				else {
 					for (AccountEntity account: getAccountEntityDao().findByUserAndSystem(contra.getUser().getUserName(), 
 							handleGetDefaultDispatcher())) {
 						account.setStatus(AccountStatus.LOCKED);
 						getAccountEntityDao().update(account);
-						auditLockAccount(contra.getUser().getUserName(), account);
+						auditLockAccount(contra.getUser().getUserName(), account, contra.getUnlockDate());
 					}
 				}
 			}
@@ -1782,7 +1784,6 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	private void updateFailures(AccountPasswordEntity contra, PasswordPolicyEntity ppe) throws Exception {
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
-			auditLockAccount(null, contra.getAccount());
 			Issue issue = new Issue();
 			issue.setAccount(contra.getAccount().getName()+"@"+contra.getAccount().getSystem().getName());
 			issue.setCreated(new Date());
@@ -1797,6 +1798,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				contra.getAccount().setStatus(AccountStatus.LOCKED);
 				getAccountEntityDao().update(contra.getAccount());
 			}
+			auditLockAccount(null, contra.getAccount(), contra.getUnlockDate());
 		}
 		getAccountPasswordEntityDao().update(contra);
 	}
@@ -2321,15 +2323,20 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		return null;
 	}
 
-    private void auditLockAccount(String user, AccountEntity account) throws InternalErrorException {
+    private void auditLockAccount(String user, AccountEntity account, Date unlockDate) throws InternalErrorException {
 
     	Audit auditoria = new Audit();
-        auditoria.setAction("Y"); //$NON-NLS-1$
+        auditoria.setAction(unlockDate == null ? "Y": "T"); //$NON-NLS-1$
         auditoria.setUser(user);
         auditoria.setAccount(account.getName());
         auditoria.setDatabase(account.getSystem().getName());
         auditoria.setAuthor(null);
         auditoria.setCalendar(Calendar.getInstance());
+        if (unlockDate != null) {
+        	final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        	sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+			auditoria.setNewValue(sdf.format(unlockDate)+" UTC");
+        }
         auditoria.setObject("SC_ACCOUN"); //$NON-NLS-1$
         
         ServiceLocator.instance().getAuditService().create(auditoria);

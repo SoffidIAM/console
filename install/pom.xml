@@ -456,7 +456,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>shell-plugin</artifactId>
-			<version>1.4.13</version>
+			<version>1.4.14</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -468,7 +468,7 @@
 		<dependency>
 			<groupId>com.soffid.iam.sync.plugins</groupId>
 			<artifactId>windows-plugin</artifactId>
-			<version>5.4.4</version>
+			<version>5.4.22</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>

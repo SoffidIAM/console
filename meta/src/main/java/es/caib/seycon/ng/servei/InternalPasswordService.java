@@ -17,6 +17,7 @@ import com.soffid.mda.annotation.Nullable;
 import com.soffid.mda.annotation.Operation;
 import com.soffid.mda.annotation.Service;
 
+import es.caib.seycon.ng.model.AuditoriaEntity;
 import es.caib.seycon.ng.model.DominiContrasenyaEntity;
 import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
@@ -43,7 +44,8 @@ import es.caib.seycon.ng.sync.servei.TaskGenerator;
 	SeyconServerService.class,
 	IssueService.class,
 	SignalService.class,
-	AsyncRunnerService.class})
+	AsyncRunnerService.class,
+	AuditoriaService.class})
 public abstract class InternalPasswordService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

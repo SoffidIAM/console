@@ -72,6 +72,7 @@ import com.soffid.iam.interp.Evaluator;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.AccountEntityDao;
 import com.soffid.iam.model.AccountPasswordEntity;
+import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PasswordDomainEntity;
 import com.soffid.iam.model.PasswordEntity;
@@ -1077,6 +1078,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		if (contra == null)
 			return;
 		contra.setFails(contra.getFails() == null ? 1: contra.getFails().intValue() + 1);
+		if (contra.getFails() > 1) {
+	    	Audit auditoria = new Audit();
+	        auditoria.setAction("F"); //$NON-NLS-1$
+	        auditoria.setUser(contra.getUser().getUserName());
+	        auditoria.setAuthor(null);
+	        auditoria.setCalendar(Calendar.getInstance());
+	        auditoria.setNewValue(contra.getFails().toString());
+	        auditoria.setObject("LOGIN"); //$NON-NLS-1$
+
+	        ServiceLocator.instance().getAuditService().create(auditoria);
+		}
 		if (ppe.getMaxFailures() != null && contra.getFails() > ppe.getMaxFailures() ) {
 			Issue issue = new Issue();
 			if (account2 != null)

@@ -94,6 +94,10 @@ public abstract class SessioEntity {
 	@Column (name="SES_MONURL", length=150)
 	@Nullable
 	public String monitorUrl;
+	
+	@Nullable
+	@Column (name="SES_JITTR", length=2000)
+	public String justInTimePermissionToRemove;
 
 	@Operation(translated="findSessionByUserName")
 	@DaoFinder("select session\n"

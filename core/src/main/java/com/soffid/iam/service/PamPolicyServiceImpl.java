@@ -42,6 +42,7 @@ import com.soffid.iam.model.PamActionEntity;
 import com.soffid.iam.model.PamActionType;
 import com.soffid.iam.model.PamPolicyEntity;
 import com.soffid.iam.model.PamPolicyEntityDao;
+import com.soffid.iam.model.PamPolicyJITPermissionEntity;
 import com.soffid.iam.model.PamRuleEntity;
 import com.soffid.iam.model.PamRuleEntityDao;
 import com.soffid.iam.model.SessionEntity;
@@ -189,10 +190,26 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
         policy.setDate(new Date());
 		getPamPolicyEntityDao().pamPolicyToEntity(policy, entity, false);
 		getPamPolicyEntityDao().create(entity);
+
+		updateJustInTimePermissions(entity, policy);
 		
         sendPolicy(entity.getName(), entity);
 
 		return getPamPolicyEntityDao().toPamPolicy(entity);
+	}
+
+	private void updateJustInTimePermissions(PamPolicyEntity entity, PamPolicy policy) {
+		getPamPolicyJITPermissionEntityDao().remove(entity.getJustInTimePermissions());
+		if (policy.getJustInTimePermissions() != null) {
+			for (String jitp: policy.getJustInTimePermissions()) {
+				if (jitp != null && !jitp.trim().isEmpty()) {
+					PamPolicyJITPermissionEntity jitpEntity = getPamPolicyJITPermissionEntityDao().newPamPolicyJITPermissionEntity();
+					jitpEntity.setName(jitp);
+					jitpEntity.setPolicy(entity);
+					getPamPolicyJITPermissionEntityDao().create(jitpEntity);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -211,7 +228,9 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
         policy.setDate(new Date());
 		getPamPolicyEntityDao().pamPolicyToEntity(policy, entity, false);
 		getPamPolicyEntityDao().update(entity);
-        sendPolicy(oldName, entity);
+		updateJustInTimePermissions(entity, policy);
+
+		sendPolicy(oldName, entity);
 		return getPamPolicyEntityDao().toPamPolicy(entity);
 	}
 
@@ -267,6 +286,8 @@ public class PamPolicyServiceImpl extends PamPolicyServiceBase {
         getAuditEntityDao().create(auditoriaEntity);
 
         PamPolicyEntity entity = getPamPolicyEntityDao().load(policy.getId());
+        getPamPolicyJITPermissionEntityDao().remove(entity.getJustInTimePermissions());
+        getPamActionEntityDao().remove(entity.getActions());
 		getPamPolicyEntityDao().remove(entity);
 	}
 

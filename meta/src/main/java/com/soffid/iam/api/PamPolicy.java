@@ -38,4 +38,7 @@ public class PamPolicy {
 
 	@Nullable
 	Integer priority;
+	
+	@Nullable
+	List<String> justInTimePermissions;
 }

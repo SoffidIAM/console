@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -59,6 +60,7 @@ import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.PamPolicyEntity;
+import com.soffid.iam.model.PamPolicyJITPermissionEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.SessionEntity;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -213,7 +215,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		return null;
 	}
 
-	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, String targetUrl, String pamPolicy, 
+	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, 
+			String targetUrl, String pamPolicy, 
 			String sourceIp, TipusSessio type, String info) 
 			throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException, URISyntaxException, UnknownHostException
 	{
@@ -231,6 +234,15 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			throw new InternalErrorException("Account is locked");
 		else if (entity.isDisabled())
 			throw new InternalErrorException("Account is disabled");
+		String loginName = entity.getLoginName() == null? entity.getName(): entity.getLoginName();
+		if (!loginName.contains("\\") && targetUrl.startsWith("rdp:")) {
+			for (Entry<String, String> entry: getDispatcherService().findActiveDirectoryDomains().entrySet() ) {
+				if (entry.getValue().equals(entity.getSystem().getName())) {
+					loginName = entry.getKey()+"\\"+loginName;
+					break;
+				}
+			}
+		}
 			
 		Account account = getAccountEntityDao().toAccount(entity);
 		if ( account.getType() != AccountType.IGNORED && sshKey == null) {
@@ -255,16 +267,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			if (ss.getType() == ServerType.MASTERSERVER)
 				syncServers.add(ss.getUrl());
 		}
+		
 		data.put("syncServers", syncServers);
-		String loginName = entity.getLoginName() == null? entity.getName(): entity.getLoginName();
-		if (!loginName.contains("\\") && targetUrl.startsWith("rdp:")) {
-			for (Entry<String, String> entry: getDispatcherService().findActiveDirectoryDomains().entrySet() ) {
-				if (entry.getValue().equals(entity.getSystem().getName())) {
-					loginName = entry.getKey()+"\\"+loginName;
-					break;
-				}
-			}
-		}
 		secrets.put("accountName", loginName);
 		if (password != null) secrets.put("password", password.getPassword());
 		if (sshKey != null) secrets.put("sshKey", sshKey.getPassword());
@@ -325,6 +329,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		AuditEntity auditEntity = getAuditEntityDao().auditToEntity(audit);
 		getAuditEntityDao().create(auditEntity);
 
+		List<String> permissions = applyTemporaryPermissions(pamPolicy, targetUrl, entity);
+		
 		if (Security.getCurrentUser() != null) {
 			AccessLogEntity log = getAccessLogEntityDao().newAccessLogEntity();
 			log.setAccessType("L");
@@ -366,9 +372,41 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			session.setWebHandler(base+"/store/session/check-alive");
 			if (jumpServerUrlBase != null)
 				session.setMonitorUrl(jumpServerUrlBase  + "/launch/connect?sessionId=" + URLEncoder.encode(sessionKey,"UTF-8"));
+			session.setJustInTimePermissionToRemove(serialize(permissions));
 			getSessionEntityDao().create(session);
 		}
 		return nps;
+	}
+
+	private String serialize(List<String> permissions) {
+		if (permissions == null || permissions.isEmpty()) return null;
+		StringBuffer sb = new StringBuffer();
+		for (String l: permissions) {
+			sb.append(URLEncoder.encode(l, StandardCharsets.UTF_8)).append("&");
+		}
+		return sb.toString();
+	}
+
+	private List<String> applyTemporaryPermissions(String pamPolicy, String targetUrl, AccountEntity entity) throws InternalErrorException {
+		if (pamPolicy == null)
+			return null;
+		PamPolicyEntity pp = getPamPolicyEntityDao().findByName(pamPolicy);
+		List<String> l = new LinkedList<>();
+		for (PamPolicyJITPermissionEntity jit: pp.getJustInTimePermissions()) {
+			l.add(jit.getName());
+		}
+		if (l.isEmpty())
+			return null;
+		String agentClass = null;
+		try {
+			URI uri;
+			uri = new URI(targetUrl);
+			return getDispatcherService().assignTemporaryPermissions(uri.getHost(),  
+					entity.getName(), entity.getSystem().getName(), l);
+		} catch (URISyntaxException e) {
+			return null;
+		}
+		
 	}
 
 	private HostEntity findHost(String hostName) throws InternalErrorException, UnknownHostException {

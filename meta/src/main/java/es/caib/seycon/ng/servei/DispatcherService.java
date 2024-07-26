@@ -583,4 +583,13 @@ public abstract class DispatcherService {
 	public boolean isRegistrationTokenAlive(String token) { return false;}
 	
 	Map<String,String> findActiveDirectoryDomains() {return null;}
+
+	public List<String> assignTemporaryPermissions(String host, String accountName, String accountSystem, List<String> permissions) {
+		return null;
+	}
+
+	public void removeTemporaryPermissions(String host, String accountName, String accountSystem, List<String> permissions) {
+		
+	}
+
 }

@@ -103,6 +103,11 @@
 						javascripthelp="${c:l('com.soffid.iam.api.PamPolicy.expression_desc') }"
 						bind="expression"/>
 					<customfield3
+						label="${c:l('com.soffid.iam.api.PamPolicy.justInTimePermissions') }"
+						dataType="STRING"
+						multiValue="true"
+						bind="justInTimePermissions"/>
+					<customfield3
 						label="${c:l('com.soffid.iam.api.PamPolicy.author') }"
 						dataType="USER"
 						readonly="true"

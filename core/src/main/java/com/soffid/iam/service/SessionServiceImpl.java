@@ -21,6 +21,8 @@ import com.soffid.iam.model.AccessLogEntity;
 import com.soffid.iam.model.AccessLogEntityDao;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.HostEntity;
+import com.soffid.iam.model.PamPolicyEntity;
+import com.soffid.iam.model.PamPolicyJITPermissionEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.ServiceEntityDao;
 import com.soffid.iam.model.SessionEntity;
@@ -37,12 +39,19 @@ import es.caib.seycon.ng.exception.UnknownUserException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.logging.Log;
@@ -286,6 +295,15 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
 	        {
 	        	se.getLoginLogInfo().setEndDate(new Date());
 	        	getAccessLogEntityDao().update(se.getLoginLogInfo());
+	        }
+	        if (se.getType() == TipusSessio.PAM && se.getJustInTimePermissionToRemove() != null) {
+	        	List<String> l = new LinkedList<>();
+	        	for (String s: se.getJustInTimePermissionToRemove().split("&")) {
+	        		l.add(URLDecoder.decode(s, StandardCharsets.UTF_8));
+	        	}
+        		AccountEntity account = se.getAccount();
+    			getDispatcherService().removeTemporaryPermissions (se.getHostName(), 
+        					account.getName(), account.getSystem().getName(), l);
 	        }
 	        getSessionEntityDao().remove(se);
         }

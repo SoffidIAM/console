@@ -22,6 +22,7 @@ import es.caib.seycon.ng.model.AccountEntity;
 	es.caib.seycon.ng.model.SessioEntity.class,
 	es.caib.seycon.ng.model.MaquinaEntity.class,
 	es.caib.seycon.ng.model.UsuariEntity.class,
+	DispatcherService.class,
 	AccountEntity.class})
 public abstract class SessioService {
 

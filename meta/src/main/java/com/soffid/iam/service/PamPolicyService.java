@@ -11,6 +11,7 @@ import com.soffid.iam.model.JumpServerEntity;
 import com.soffid.iam.model.JumpServerGroupEntity;
 import com.soffid.iam.model.PamActionEntity;
 import com.soffid.iam.model.PamPolicyEntity;
+import com.soffid.iam.model.PamPolicyJITPermissionEntity;
 import com.soffid.iam.model.PamRuleEntity;
 import com.soffid.mda.annotation.Depends;
 import com.soffid.mda.annotation.Description;
@@ -30,7 +31,8 @@ import es.caib.seycon.ng.servei.AccountService;
 import es.caib.seycon.ng.servei.DispatcherService;
 
 @Service
-@Depends({JumpServerGroupEntity.class, JumpServerEntity.class, PamPolicyEntity.class, PamRuleEntity.class, PamActionEntity.class,
+@Depends({JumpServerGroupEntity.class, JumpServerEntity.class, 
+	PamPolicyEntity.class, PamRuleEntity.class, PamActionEntity.class, PamPolicyJITPermissionEntity.class,
 	AuditoriaEntity.class,
 	ServeiEntity.class,
 	RegistreAccesEntity.class, SessioEntity.class, UsuariEntity.class,

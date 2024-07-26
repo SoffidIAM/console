@@ -2256,4 +2256,20 @@ public class DispatcherServiceImpl extends
 		return svc.findActiveDirectoryDomains();
 	}
 
+	@Override
+	protected List<String> handleAssignTemporaryPermissions(String host, String accountName,
+			String accountSystem, List<String> permissions) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		return svc.assignTemporaryPermissions(host, accountName, 
+				accountSystem, permissions);
+	}
+
+	@Override
+	protected void handleRemoveTemporaryPermissions(String host, String accountName,
+			String accountSystem, List<String> permissions) throws Exception {
+		SyncStatusService svc = ( SyncStatusService ) getSyncServerService().getServerService(SyncStatusService.REMOTE_PATH);
+		svc.removeTemporaryPermissions(host, accountName, 
+				accountSystem, permissions);
+	}
+
 }

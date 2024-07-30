@@ -191,8 +191,8 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		l.sort(new Comparator<PamPolicyEntity>() {
 			@Override
 			public int compare(PamPolicyEntity o1, PamPolicyEntity o2) {
-				int i1 = o1.getPriority() == null ? 0: o1.getPriority().intValue();
-				int i2 = o2.getPriority() == null ? 0: o2.getPriority().intValue();
+				int i1 = o1.getPriority() == null ? Integer.MAX_VALUE: o1.getPriority().intValue();
+				int i2 = o2.getPriority() == null ? Integer.MAX_VALUE: o2.getPriority().intValue();
 				return i1 - i2;
 			}
 		});

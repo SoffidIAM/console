@@ -386,8 +386,8 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 			        auditoria.setPasswordDomain(politicaContrasenyaDomini.getPasswordDomainCode());
 			        auditoria.setUserType(politicaContrasenyaDomini.getUserType());
 			        auditoria.setAuthor(Security.getCurrentAccount());
-			        auditoria.setNewValue(n == null ? "empty": n.toString());
-			        auditoria.setOldValue(o == null ? "empty": o.toString());
+			        auditoria.setNewValue(truncate(n));
+			        auditoria.setOldValue(truncate(o));
 			        auditoria.setObject("SC_POCODO"); //$NON-NLS-1$
 			        auditoria.setConfigurationParameter(prop.getName());
 			        AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
@@ -397,6 +397,13 @@ public class UserDomainServiceImpl extends com.soffid.iam.service.UserDomainServ
 				// Field not reachable
 			}
 		}
+	}
+
+	protected String truncate(Object n) {
+		String s = n == null ? "empty": n.toString();
+		if (s.length() > 64)
+			s = s.substring(0, 64);
+		return s;
 	}
 
 	@Override

@@ -290,7 +290,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				return PolicyCheckResult.CUSTOM_CHECK;
 		}
 
-		if (politica.getCheckPasswordBreached()) {
+		if (Boolean.TRUE.equals(politica.getCheckPasswordBreached())) {
 			if (ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword())) {
 				if (user!=null)
 					(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedAsync(getUserEntityDao().toUser(user));

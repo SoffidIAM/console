@@ -451,7 +451,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		if ( usuari.getActive() != null && usuari.getActive().booleanValue())
 		{
 			if (!getAuthorizationService().hasPermission("user:enable", usuariEntity))
-				throw new SecurityException("Access denied. Required roles: [user:disable]");
+				throw new SecurityException("Access denied. Required roles: [user:enable]");
 			auditChange("E", usuari.getUserName(), null);
 		}
 		getRuleEvaluatorService().applyRules(usuariEntity);

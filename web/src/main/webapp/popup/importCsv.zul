@@ -18,11 +18,10 @@
 	- ${c:l("user-account-new.Finish")}
 			</attribute>
 		<div id="step1" >
-			<fileupload style="width: 600px; height: 120px; padding: 20px 0px 20px 100px"
-				id="${c:l('csvimport.upload') }" 
+			<uploader style="width: 600px; height: 120px; padding: 20px 0px 20px 100px"
+				multiple="false"
 				onUpload="ref:window.onUpload"
-				onClose ="ref:window.cancelUpload"
-				mold="compact"/>
+				onClose ="ref:window.cancelUpload" />
 		</div>
 		<div id="step2" visible="false" style="min-width: 600px; padding: 20px; width: 100%">
 			<grid class="noBorderGrid" fixedLayout="true">

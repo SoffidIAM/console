@@ -515,6 +515,12 @@ public abstract class BpmEngine {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
 
+	public void downloadParFile(
+			ProcessDefinition def,
+			java.io.OutputStream stream)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class},readOnly=true)
 	public boolean isUserInRole (String role)
 	{

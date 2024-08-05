@@ -1,8 +1,11 @@
 package es.caib.bpm.ui.admin;
 
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,6 +20,7 @@ import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.UploadEvent;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Textbox;
 
 import com.soffid.iam.bpm.api.ProcessDefinition;
@@ -33,9 +37,15 @@ import es.caib.zkib.datasource.XPathUtils;
 
 public class DespliegueUI extends FrameHandler 
 {
-	
+	File tmpFile = null;
 	public DespliegueUI() throws InternalErrorException {
 		super();
+	}
+	
+	@Override
+	public void finalize () {
+		if (tmpFile != null)
+			tmpFile.delete();
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -63,6 +73,16 @@ public class DespliegueUI extends FrameHandler
 		}
 	}
 	
+	public void onDownload(Event event) throws InternalErrorException, BPMException, CreateException, NamingException, IOException {
+		ProcessDefinition def = (ProcessDefinition) XPathUtils.eval(getListbox(), "instance");
+		if (tmpFile != null)
+			tmpFile.delete();
+		tmpFile = File.createTempFile("wf-"+def.getName().replace("/", "_").replace("\\", "_"), ".par");
+		FileOutputStream out = new FileOutputStream(tmpFile);
+		BPMApplication.getEngine().downloadParFile(def, out);
+		out.close();
+		Filedownload.save(tmpFile, "binary/octet-stream");
+	}
 	/**
 	 * Sube un archivo a la aplicación de workflow.
 	 * @throws LoginException 

@@ -26,6 +26,7 @@
 						onCheck="ref:frame.onCheck"/>
 			</div>
 			<datatable id="listbox" dataPath="model:/definition" onDisable="ref:frame.onDisable"
+				onDownload="ref:frame.onDownload"
 				use="es.caib.bpm.ui.admin.ProcessDefinitionTable"
 				sortColumn="0"
 				maxheight="calc( 50vh )">
@@ -40,8 +41,10 @@
   value: deployed
   template: #{deployed_datetime}
 - name: ${c:l('deploy.CanviarEstat')}
-  template: <input type="button" value="#{enabled? '${c:l('deploy.btnDisable') }': '${c:l('deploy.btnEnable') }' }" onclick="zkDatatable.sendClientAction(this, 'onDisable')"  >
-	]]>
+  template: >-
+    <input type="button" value="#{enabled? '${c:l('deploy.btnDisable') }': '${c:l('deploy.btnEnable') }' }" onclick="zkDatatable.sendClientAction(this, 'onDisable')"  >
+    <input type="button" value="${c:l('contenidoTarea.btnDescargar') }" onclick="zkDatatable.sendClientAction(this, 'onDownload')"  >
+  ]]>
 			</attribute>
 			</datatable>
 			<div width="100%" style="text-align: right">

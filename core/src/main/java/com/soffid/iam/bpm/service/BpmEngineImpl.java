@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -30,7 +31,9 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.commons.collections.map.LRUMap;
@@ -3774,6 +3777,30 @@ public class BpmEngineImpl extends BpmEngineBase {
 		@Override
 		protected void doSetNextReader(LeafReaderContext context) throws IOException {
 			this.ctx = context;
+		}
+	}
+
+	@Override
+	protected void handleDownloadParFile(ProcessDefinition def, OutputStream stream) throws Exception {
+		JbpmContext context = getContext();
+		try {
+			org.jbpm.graph.def.ProcessDefinition d = context.getGraphSession().getProcessDefinition(def.getId());
+			if (d == null)
+				throw new InternalErrorException("Process definition not found");
+			TenantModuleDefinition tm = (TenantModuleDefinition) d.getDefinition(TenantModuleDefinition.class);
+			if (tm == null || tm.getTenantId().longValue() != Security.getCurrentTenantId())
+				throw new InternalErrorException("Process definition not found");
+			ZipOutputStream out = new ZipOutputStream(stream);
+			FileDefinition fd = d.getFileDefinition();
+			
+			for (Object v: fd.getBytesMap().keySet()) {
+				out.putNextEntry(new ZipEntry(v.toString()));
+				out.write( (byte[])fd.getBytesMap().get(v));
+				out.closeEntry();
+			}
+			out.close();
+		} finally {
+			flushContext(context);
 		}
 	}
 }

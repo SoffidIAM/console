@@ -584,7 +584,7 @@ public abstract class DispatcherService {
 	
 	Map<String,String> findActiveDirectoryDomains() {return null;}
 
-	public List<String> assignTemporaryPermissions(String host, String accountName, String accountSystem, List<String> permissions) {
+	public List<String> assignTemporaryPermissions(@Nullable String host, String accountName, String accountSystem, List<String> permissions) {
 		return null;
 	}
 

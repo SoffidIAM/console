@@ -217,11 +217,11 @@ public abstract class SyncStatusService {
 	
 	Map<String,String> findActiveDirectoryDomains() {return null;}
 
-	public List<String> assignTemporaryPermissions(String host, String accountName, String accountSystem, List<String> permissions) {
+	public List<String> assignTemporaryPermissions(@Nullable String host, String accountName, String accountSystem, List<String> permissions) {
 		return null;
 	}
 
-	public void removeTemporaryPermissions(String host, String accountName, String accountSystem, List<String> permissions) {
+	public void removeTemporaryPermissions(@Nullable String host, String accountName, String accountSystem, List<String> permissions) {
 		
 	}
 }

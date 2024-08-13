@@ -388,7 +388,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 	}
 
 	private List<String> applyTemporaryPermissions(String pamPolicy, String targetUrl, AccountEntity entity) throws InternalErrorException {
-		if (pamPolicy == null)
+		if (pamPolicy == null || targetUrl == null)
 			return null;
 		PamPolicyEntity pp = getPamPolicyEntityDao().findByName(pamPolicy);
 		List<String> l = new LinkedList<>();
@@ -401,7 +401,10 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		try {
 			URI uri;
 			uri = new URI(targetUrl);
-			return getDispatcherService().assignTemporaryPermissions(uri.getHost(),  
+			if (uri.getHost() == null || uri.getHost().isBlank())
+				return new LinkedList<>();
+			else
+				return getDispatcherService().assignTemporaryPermissions(uri.getHost(),  
 					entity.getName(), entity.getSystem().getName(), l);
 		} catch (URISyntaxException e) {
 			return null;

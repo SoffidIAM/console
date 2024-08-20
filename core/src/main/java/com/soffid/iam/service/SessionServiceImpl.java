@@ -148,7 +148,8 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         sessio.setUser(ue);
         sessio.setKey(key.toString());
         sessio.setType(tipus);
-        sessio.setPort(port);
+        if (port > 0)
+        	sessio.setPort(port);
         sessio.setAuthenticationMethod(authenticationMethod);
         if (me == null)
         {
@@ -415,6 +416,20 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
 			throws Exception {
         return doCreateSession(codiUsuari, nomMaquina, null, TipusSessio.CONSOLE, null, null, 
         		null, authenticationMethod);
+	}
+
+	@Override
+	protected Session handleJoinEssoSession(long id, String key, int port) throws Exception {
+        SessionEntity se = getSesssioEntity(id, key);
+
+        if (se != null && se.getType() == TipusSessio.ESSO &&
+        		(se.getPort() == null || se.getPort().intValue() <= 0)) {
+        	se.setPort((long) port);
+        	getSessionEntityDao().update(se);
+            return getSessionEntityDao().toSession(se);
+        }
+        else
+            return null;
 	}
 
 }

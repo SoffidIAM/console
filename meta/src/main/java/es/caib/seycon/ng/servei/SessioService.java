@@ -67,6 +67,16 @@ public abstract class SessioService {
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Sessio joinEssoSession(
+		long id, 
+		java.lang.String key,
+		int port)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	
 	@Operation(translated="sessionKeepAlive")
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public void sessioKeepAlive(

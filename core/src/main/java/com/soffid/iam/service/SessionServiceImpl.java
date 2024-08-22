@@ -148,7 +148,7 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         sessio.setUser(ue);
         sessio.setKey(key.toString());
         sessio.setType(tipus);
-        if (port > 0)
+        if (port != null && port > 0)
         	sessio.setPort(port);
         sessio.setAuthenticationMethod(authenticationMethod);
         if (me == null)

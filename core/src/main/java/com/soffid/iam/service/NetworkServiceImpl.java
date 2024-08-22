@@ -34,6 +34,7 @@ import com.soffid.iam.api.Session;
 import com.soffid.iam.api.System;
 import com.soffid.iam.api.User;
 import com.soffid.iam.bpm.service.scim.ScimHelper;
+import com.soffid.iam.common.security.SoffidPrincipal;
 import com.soffid.iam.model.AuditEntity;
 import com.soffid.iam.model.EntryPointEntity;
 import com.soffid.iam.model.GroupAttributeEntity;
@@ -158,7 +159,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected Long handleFindAccessLevelByHostNameAndNetworkName(String nomMaquina, String codiXarxa) throws Exception {
-    	if ( Security.isUserInRole(Security.AUTO_HOST_ALL_UPDATE))
+    	SoffidPrincipal principal = Security.getSoffidPrincipal();
+    	if (principal.hasRole(Security.AUTO_HOST_ALL_UPDATE))
     		return new Long(ADMINISTRACIO);
 
     	String codiUsuari = Security.getCurrentUser();
@@ -1748,22 +1750,24 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     protected void createHostTask(HostEntity host) {
-		String status = ConfigurationCache.getProperty("soffid.task.mode");
-		if ("readonly".equals( status ) || "manual".equals( status )) {
-			TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
-	        tasque.setCustomObjectType(Host.class.getName());
-	        tasque.setPrimaryKeyValue(host.getId());
-	        getTaskEntityDao().create(tasque);
-		}
-		else {
-	        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
-	        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
-	        tasque.setTransaction(TaskHandler.UPDATE_HOST);
-	        tasque.setHost(host.getName());
-	        getTaskEntityDao().create(tasque);
-		}
+    	if (! Boolean.TRUE.equals(host.getDynamicIP())) {
+			String status = ConfigurationCache.getProperty("soffid.task.mode");
+			if ("readonly".equals( status ) || "manual".equals( status )) {
+				TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+		        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
+		        tasque.setTransaction(TaskHandler.INDEX_OBJECT);
+		        tasque.setCustomObjectType(Host.class.getName());
+		        tasque.setPrimaryKeyValue(host.getId());
+		        getTaskEntityDao().create(tasque);
+			}
+			else {
+		        TaskEntity tasque = getTaskEntityDao().newTaskEntity();
+		        tasque.setDate(new Timestamp(java.lang.System.currentTimeMillis()));
+		        tasque.setTransaction(TaskHandler.UPDATE_HOST);
+		        tasque.setHost(host.getName());
+		        getTaskEntityDao().create(tasque);
+			}
+    	}
     }
     
     @Override

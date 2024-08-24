@@ -43,14 +43,16 @@ public class ConfigEntityDaoImpl extends
 		if ( parametre != null && !parametre.contains("addon.report") && ! parametre.contains("soffid.syncserver.main"))
 		{
 			String codiUsuari = Security.getCurrentAccount();
-			Audit auditoria = new Audit();
-			auditoria.setAuthor(codiUsuari);
-			auditoria.setAction(accio);
-			auditoria.setConfigurationParameter(parametre);
-			auditoria.setObject("SC_CONFIG"); //$NON-NLS-1$
+			if (codiUsuari != null && !codiUsuari.isEmpty() || !Security.isSyncServer()) {
+				Audit auditoria = new Audit();
+				auditoria.setAuthor(codiUsuari);
+				auditoria.setAction(accio);
+				auditoria.setConfigurationParameter(parametre);
+				auditoria.setObject("SC_CONFIG"); //$NON-NLS-1$
 	
-			AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
-			getAuditEntityDao().create(auditoriaEntity);
+				AuditEntity auditoriaEntity = getAuditEntityDao().auditToEntity(auditoria);
+				getAuditEntityDao().create(auditoriaEntity);
+			}
 		}
 	}
 	

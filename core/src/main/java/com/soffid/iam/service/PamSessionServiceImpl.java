@@ -185,6 +185,35 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		return createJumpServerSession (entity, jumpServerGroup, url, pamPolicy, Security.getClientIp(), TipusSessio.PAM, null);
 	}
 
+	@Override
+	protected NewPamSession handleCreateManualJumpServerSession(String accountName, Password password, String entryPointDescriptor, 
+			String pamPolicy)
+			throws Exception {
+		String currentAccount = Security.getCurrentAccount();
+		String currentSystem = getDispatcherService().findSoffidDispatcher().getName();
+		AccountEntity entity = getAccountEntityDao().findByNameAndSystem(currentAccount, currentSystem);
+
+		getPamSecurityHandlerService().checkPermission(entity, "launch");
+		
+		Properties p = new Properties();
+		p.load(new StringReader(entryPointDescriptor));
+		String url = p.getProperty("url");
+		if (url == null || url.trim().isEmpty())
+			throw new InternalErrorException(String.format("The entry point descriptor does not have a value for url"));
+		String serverGroup = p.getProperty("serverGroup");
+		if (serverGroup == null || serverGroup.trim().isEmpty())
+			throw new InternalErrorException(String.format("The entry point descriptor does not have a value for serverGroup"));
+		JumpServerGroupEntity jumpServerGroup = getJumpServerGroupEntityDao().findByName(serverGroup);
+		if (jumpServerGroup == null)
+			throw new InternalErrorException(String.format("Cannot start session. Server group %s does not exist",serverGroup));
+
+		if (pamPolicy == null) {
+			pamPolicy = findPolicy(getAccountEntityDao().toAccount(entity), url);
+		}
+		return createJumpServerSession (entity, jumpServerGroup, url, pamPolicy, Security.getClientIp(), TipusSessio.PAM, null,
+				accountName, password );
+	}
+
 	private String findPolicy(Account account, String entryPointDescriptor) {
 		List<PamPolicyEntity> l = getPamPolicyEntityDao().loadAll();
 		
@@ -220,6 +249,15 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			String sourceIp, TipusSessio type, String info) 
 			throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException, URISyntaxException, UnknownHostException
 	{
+		return createJumpServerSession(entity, jumpServerGroup, targetUrl, pamPolicy, sourceIp, type, info, null, null);
+	}
+	
+	private NewPamSession createJumpServerSession (AccountEntity entity, JumpServerGroupEntity jumpServerGroup, 
+			String targetUrl, String pamPolicy, 
+			String sourceIp, TipusSessio type, String info,
+			String manualAccount, Password manualPassword) 
+			throws InternalErrorException, MalformedURLException, JSONException, UnsupportedEncodingException, URISyntaxException, UnknownHostException
+	{
 		Password password = getAccountService().queryAccountPasswordBypassPolicy(entity.getId(), AccountAccessLevelEnum.ACCESS_USER);
 		Password sshKey = null;
 		try {
@@ -227,29 +265,34 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		} catch (Exception e) {
 			// Ignore. Posible syncserver not updated yet
 		}
-		if (password == null && sshKey == null)
+		if (password == null && sshKey == null && manualPassword == null)
 			throw new InternalErrorException("Cannot retrieve password for account "+entity.getDescription());
 
 		if (entity.getStatus() == AccountStatus.LOCKED)
 			throw new InternalErrorException("Account is locked");
 		else if (entity.isDisabled())
 			throw new InternalErrorException("Account is disabled");
-		String loginName = entity.getLoginName() == null? entity.getName(): entity.getLoginName();
-		if (!loginName.contains("\\") && targetUrl.startsWith("rdp:")) {
-			for (Entry<String, String> entry: getDispatcherService().findActiveDirectoryDomains().entrySet() ) {
-				if (entry.getValue().equals(entity.getSystem().getName())) {
-					loginName = entry.getKey()+"\\"+loginName;
-					break;
+		String loginName;
+		if (manualAccount == null) {
+			loginName = entity.getLoginName() == null? entity.getName(): entity.getLoginName();
+			if (!loginName.contains("\\") && targetUrl.startsWith("rdp:")) {
+				for (Entry<String, String> entry: getDispatcherService().findActiveDirectoryDomains().entrySet() ) {
+					if (entry.getValue().equals(entity.getSystem().getName())) {
+						loginName = entry.getKey()+"\\"+loginName;
+						break;
+					}
 				}
 			}
+			Account account = getAccountEntityDao().toAccount(entity);
+			if ( account.getType() != AccountType.IGNORED && sshKey == null) {
+				PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
+				if (status != null && ! PasswordValidation.PASSWORD_GOOD.equals(status))
+					throw new InternalErrorException("The password stored is not accepted by the target system");
+			}
+		} else {
+			loginName = manualAccount;
 		}
 			
-		Account account = getAccountEntityDao().toAccount(entity);
-		if ( account.getType() != AccountType.IGNORED && sshKey == null) {
-			PasswordValidation status = getAccountService().checkPasswordSynchronizationStatus(account);
-			if (status != null && ! PasswordValidation.PASSWORD_GOOD.equals(status))
-				throw new InternalErrorException("The password stored is not accepted by the target system");
-		}
 		URL url2 = new URL(jumpServerGroup.getStoreUrl());
 		String base = url2.getProtocol()+"://"+url2.getHost()+
 				(url2.getPort() == -1 ? "": ":"+url2.getPort());
@@ -270,8 +313,12 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		
 		data.put("syncServers", syncServers);
 		secrets.put("accountName", loginName);
-		if (password != null) secrets.put("password", password.getPassword());
-		if (sshKey != null) secrets.put("sshKey", sshKey.getPassword());
+		if (manualPassword != null)
+			secrets.put("password", manualPassword.getPassword());
+		else {
+			if (password != null) secrets.put("password", password.getPassword());
+			if (sshKey != null) secrets.put("sshKey", sshKey.getPassword());
+		}
 
 		try {
 			response = 
@@ -349,7 +396,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 			log.setInformation(i);
 			log.setStartDate(new Date());
 			log.setClientAddress(sourceIp);
-			log.setSystem(account.getSystem());
+			log.setSystem(entity.getSystem().getName());
 			log.setUser( getUserEntityDao().findByUserName(Security.getCurrentUser()) );
 			log.setSessionId((String) map.get("sessionId"));
 			getAccessLogEntityDao().create(log);

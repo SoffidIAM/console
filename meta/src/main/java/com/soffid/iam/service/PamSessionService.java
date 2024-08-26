@@ -20,6 +20,7 @@ import com.soffid.mda.annotation.Role;
 import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.Account;
+import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.Sessio;
 import es.caib.seycon.ng.comu.TipusSessio;
 import es.caib.seycon.ng.model.AccountEntity;
@@ -68,6 +69,10 @@ public class PamSessionService {
 	@Operation(grantees = {Tothom.class})
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor, String pamPolicy) {return null;}
+
+	@Operation(grantees = {Tothom.class})
+	@Description("Creates a manual jump server session and returns the session URL")
+	NewPamSession createManualJumpServerSession (String accountName, Password accountPassword, String entryPointDescriptor, @Nullable String pamPolicy) {return null;}
 
 	@Description("Creates a jump server session and returns the session URL. Internal method for SSH and RDP proxies")
 	NewPamSession createCustomJumpServerSession (Account account, @Nullable String sourceIp, @Nullable TipusSessio type, @Nullable String info ) {return null;}

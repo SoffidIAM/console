@@ -29,7 +29,7 @@ public class PuntEntrada {
 	public boolean visible;
 
 	public boolean menu;
-
+	
 	@Nullable
 	@Attribute(translated = "columnsNumber" )
 	public Long numColumnes;

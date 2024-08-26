@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?page id="accountSelectorWindow"?>
 
 <window id="accountSelectorWindow" closable="false"
     use="com.soffid.iam.web.popup.AccountSelectorWindow"

@@ -1,5 +1,7 @@
 package com.soffid.iam.web.vault;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -8,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
@@ -39,6 +42,7 @@ import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
 import com.soffid.iam.web.launcher.ApplicationLauncher;
 import com.soffid.iam.web.popup.AccountSelectorWindow;
+import com.soffid.iam.web.popup.EnterAccountWindow;
 import com.soffid.iam.web.popup.PasswordSelectorWindow;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -204,60 +208,92 @@ public class LaunchHelper {
 		SelfService sss = EJBLocator.getSelfService();
 		com.soffid.iam.service.ejb.AccountService accountService = EJBLocator.getAccountService();
 		String url = instance.getExecutions().iterator().next().getContent();
-		for (com.soffid.iam.api.Account account: accounts)
-		{
-			if (accountService.isAccountPasswordAvailable(account.getId()))
-				r.add(account);
-		}
-		if (r.size() == 0)
-		{
-			throw new UiException("Sorry. There is no account available to open this service");
-		}
-		else if (r.size() == 1)
-		{
-			openPamEntryPoint (exe, r.get(0), directLink);
+		if (!isManual(url)) {
+			for (com.soffid.iam.api.Account account: accounts)
+			{
+				if (accountService.isAccountPasswordAvailable(account.getId()))
+					r.add(account);
+			}
+			if (r.size() == 0)
+			{
+				throw new UiException("Sorry. There is no account available to open this service");
+			}
+			else if (r.size() == 1)
+			{
+				openPamEntryPoint (exe, r.get(0), directLink, null, null);
+			} else {
+				Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
+				AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellowIfAny("accountSelectorWindow");
+				if (accountSelectorWindow == null) {
+					accountSelectorWindow = (AccountSelectorWindow) Executions.getCurrent().createComponents("/popup/select-account.zul", new HashMap()) [0];
+				}
+				DataTable lb = (DataTable) accountSelectorWindow.getDataTable();
+				Collections.sort(r, new Comparator<Account>() {
+					public int compare(Account o1, Account o2) {
+						return o1.getLoginName().compareTo(o2.getLoginName());
+					}
+					
+				});
+				JSONArray array = new JSONArray();
+				for (Account rr: r) {
+					JSONObject row = new JSONObject();
+					row.put("name", rr.getLoginName());
+					row.put("description", rr.getDescription());
+					array.put(row);
+				}
+				lb.setData(array);
+	
+				final AccountSelectorWindow w = accountSelectorWindow;
+				accountSelectorWindow.setListener((event)->{
+					int i = w.getSelectedAccount();
+					if (i >= 0 && i < r.size()) {
+						openPamEntryPoint(exe, r.get(i), directLink, null, null);
+					}
+				});
+				
+				w.doHighlighted();
+			}
 		} else {
 			Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
-			AccountSelectorWindow accountSelectorWindow = (AccountSelectorWindow) page.getFellowIfAny("accountSelectorWindow");
+			EnterAccountWindow accountSelectorWindow = (EnterAccountWindow) page.getFellowIfAny("enterAccountWindow");
 			if (accountSelectorWindow == null) {
-				accountSelectorWindow = (AccountSelectorWindow) Executions.getCurrent().createComponents("/popup/select-account.zul", new HashMap()) [0];
+				accountSelectorWindow = (EnterAccountWindow) Executions.getCurrent()
+						.createComponents("/popup/enter-account.zul", new HashMap()) [0];
 			}
-			DataTable lb = (DataTable) accountSelectorWindow.getDataTable();
-			Collections.sort(r, new Comparator<Account>() {
-				public int compare(Account o1, Account o2) {
-					return o1.getLoginName().compareTo(o2.getLoginName());
-				}
-				
-			});
-			JSONArray array = new JSONArray();
-			for (Account rr: r) {
-				JSONObject row = new JSONObject();
-				row.put("name", rr.getLoginName());
-				row.put("description", rr.getDescription());
-				array.put(row);
-			}
-			lb.setData(array);
-
-			final AccountSelectorWindow w = accountSelectorWindow;
+			final EnterAccountWindow w = accountSelectorWindow;
 			accountSelectorWindow.setListener((event)->{
-				int i = w.getSelectedAccount();
-				if (i >= 0 && i < r.size()) {
-					openPamEntryPoint(exe, r.get(i), directLink);
-				}
+				String user = w.getUserName();
+				Password password = w.getPassword();
+				openPamEntryPoint(exe, null, directLink, user, password);
 			});
 			
 			w.doHighlighted();
-		}
+		}			
 	}
 	
-	private void openPamEntryPoint(AccessTreeExecution exe, com.soffid.iam.api.Account account, boolean directLink) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
+	private boolean isManual(String url) {
+		try {
+			Properties props = new Properties();
+			props.load(new StringReader(url));
+			return "true".equalsIgnoreCase(props.getProperty("manual", "false"));
+		} catch (IOException e) {
+			return false;
+		}
+		
+	}
+
+	private void openPamEntryPoint(AccessTreeExecution exe, com.soffid.iam.api.Account account, boolean directLink,
+			String manualUser, Password manualPassword) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		NewPamSession s;
 		if (exe == null || exe.getContent() == null || exe.getContent().trim().isEmpty()) {
 			s= EJBLocator.getPamSessionService()
 					.createJumpServerSession(account);
-		} else {
+		} else if (manualUser == null) {
 			s= EJBLocator.getPamSessionService()
 					.createJumpServerSession(account, exe.getContent());
+		} else {
+			s= EJBLocator.getPamSessionService()
+					.createManualJumpServerSession(manualUser, manualPassword, exe.getContent(), null);
 		}
 		if (s == null)
 			throw new UiException("Unable to start session");

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?taglib uri="/WEB-INF/tld/web/core.dsp.tld" prefix="c" ?>
+<?page id="enterAccountWindow"?>
+
+<window id="enterAccountWindow" closable="false"
+    use="com.soffid.iam.web.popup.EnterAccountWindow"
+	position="top center" sizable="true"
+	title="${c:l('selfService.enterCredentials')}" visible="false"
+	width="600px">
+	<div style="height: 1em">
+		<textbox id="antipasswordsave" disabled="true" style="border: none; color: white;  background-color: white"/>
+	</div>
+	
+	<customfield3 style="margin-top: 1em" label="${c:l('usuaris.zul.Codi-2')}" id="user" dataType="STRING"
+				required="true" />
+
+	<customfield3 style="margin-bottom:2em" label="${c:l('accounts.setPassword.label')}:" dataType="PASSWORD"
+				required="true"
+				 id="password" />
+
+	<div align="center">
+		<button label="${c:l('accounts.setPassword.OK')}"
+			onClick="ref:enterAccountWindow.accept" />
+		<space width="1em" />
+		<button label="${c:l('accounts.setPassword.Cancel')}"
+			onClick="ref:enterAccountWindow.cancel" />
+	</div>
+</window>

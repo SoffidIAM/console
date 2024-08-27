@@ -1,24 +1,26 @@
 package com.soffid.iam.web.popup;
 
-import java.util.regex.Pattern;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+
 
 public class HtmlScriptDetector {
 	public boolean validate(String s) {
-		if (Pattern.compile("\\<\\s*script", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
-				.matcher(s)
-				.find()) 
-			return false;
-		
-		if (Pattern.compile("<[^>]*[\\s/]on", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
-				.matcher(s)
-				.find())
-			return false;
-		
-		if (Pattern.compile("[^a-zA-Z0-9]on[a-zA-Z0-9]*\\s*=", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
-				.matcher(s)
-				.find())
-			return false;
-
+		Document doc = Jsoup.parse(s);
+		for (Element element: doc.getAllElements()) {
+			String tag = element.tagName();
+			if (tag != null) {
+				if (tag.equalsIgnoreCase("script"))
+					return false;
+			}
+			for (Attribute att: element.attributes()) {
+				if (att.getKey().toLowerCase().startsWith("on"))
+					return false;
+			}
+		}
 		return true;
 	}
 }

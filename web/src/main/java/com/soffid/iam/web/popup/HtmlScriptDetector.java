@@ -15,9 +15,18 @@ public class HtmlScriptDetector {
 			if (tag != null) {
 				if (tag.equalsIgnoreCase("script"))
 					return false;
+				if (tag.equalsIgnoreCase("applet"))
+					return false;
+				if (tag.equalsIgnoreCase("iframe"))
+					return false;
+				if (tag.equalsIgnoreCase("object"))
+					return false;
 			}
 			for (Attribute att: element.attributes()) {
 				if (att.getKey().toLowerCase().startsWith("on"))
+					return false;
+				if (att.getKey().equalsIgnoreCase("href") && 
+						att.getValue().toLowerCase().contains("javascript"))
 					return false;
 			}
 		}

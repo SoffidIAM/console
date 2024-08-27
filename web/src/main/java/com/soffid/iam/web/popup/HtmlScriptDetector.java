@@ -9,11 +9,16 @@ public class HtmlScriptDetector {
 				.find()) 
 			return false;
 		
-		if (Pattern.compile("<[^>]*\\son", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
+		if (Pattern.compile("<[^>]*[\\s/]on", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
 				.matcher(s)
 				.find())
 			return false;
 		
+		if (Pattern.compile("[^a-zA-Z0-9]on[a-zA-Z0-9]*\\s*=", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
+				.matcher(s)
+				.find())
+			return false;
+
 		return true;
 	}
 }

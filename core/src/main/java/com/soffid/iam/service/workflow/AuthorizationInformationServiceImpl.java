@@ -242,8 +242,8 @@ public class AuthorizationInformationServiceImpl extends
                     if (rg.getDomainValue() == null) {
                         for (Application app : aplicacioService.findApplicationByCriteria(null, null, null, null, null, null, null, null)) {
                             apps.add(app);
-                            break;
                         }
+                        break;
                     } else {
                         apps.add(getApplicationService().findApplicationByApplicationName(rg.getDomainValue()));
                     }

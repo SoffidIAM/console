@@ -26,7 +26,7 @@ public class HtmlScriptDetector {
 				if (att.getKey().toLowerCase().startsWith("on"))
 					return false;
 				if (att.getKey().equalsIgnoreCase("href") && 
-						att.getValue().toLowerCase().contains("javascript"))
+						att.getValue().toLowerCase().contains("script:"))
 					return false;
 			}
 		}

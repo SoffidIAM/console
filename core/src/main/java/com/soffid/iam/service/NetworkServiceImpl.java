@@ -1730,14 +1730,18 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     @Override
     protected void handleSetAdministratorPassword(String nomMaquina, String adminUser, String adminPass) throws Exception {
         // Añadimos auditoría de la petición
-        auditaCanviDadesAdministradorHost(nomMaquina); // AUDITORIA
 
-        HostEntity host = getHostEntityDao().findByName(nomMaquina);
+        HostEntity host = getHostEntityDao().findBySerialNumber(nomMaquina);
+        if (host == null)
+        	host = getHostEntityDao().findByName(nomMaquina);
 
-        host.setAdministratorUser(adminUser);
-        host.setAdministratorPassword(new Password(adminPass).toString());
-        host.setAdministratorPasswordDate(new Date());
-        getHostEntityDao().update(host);
+        if (host != null) {
+        	auditaCanviDadesAdministradorHost(host.getName()); // AUDITORIA
+        	host.setAdministratorUser(adminUser);
+        	host.setAdministratorPassword(new Password(adminPass).toString());
+        	host.setAdministratorPasswordDate(new Date());
+        	getHostEntityDao().update(host);
+        }
     }
 
     @Override

@@ -34,7 +34,7 @@ public class SeyconTrustManager implements X509TrustManager {
     private X509Certificate trustedCert;
     static boolean trustAnything = false;
     
-    static void setInsecure(boolean insecure) {
+    public static void setInsecure(boolean insecure) {
     	trustAnything = insecure;
     }
     

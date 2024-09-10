@@ -32,7 +32,12 @@ import javax.net.ssl.X509TrustManager;
 public class SeyconTrustManager implements X509TrustManager {
     KeyStore ks;
     private X509Certificate trustedCert;
-
+    static boolean trustAnything = false;
+    
+    static void setInsecure(boolean insecure) {
+    	trustAnything = insecure;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -62,14 +67,16 @@ public class SeyconTrustManager implements X509TrustManager {
     public void checkServerTrusted(X509Certificate[] certs, String arg1)
             throws CertificateException {
         try {
-    		for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
-    			String alias = e.nextElement();
-    			X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
-    			if (cert != null && cert.equals(certs[0]))
-    				return; // Knwon certificate
-    		}
-            if (trustedCert != null)
-                certs[0].verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
+        	if (! trustAnything) {
+	    		for (Enumeration<String> e = ks.aliases(); e.hasMoreElements();) {
+	    			String alias = e.nextElement();
+	    			X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+	    			if (cert != null && cert.equals(certs[0]))
+	    				return; // Knwon certificate
+	    		}
+	            if (trustedCert != null)
+	                certs[0].verify(trustedCert.getPublicKey(), "BC"); //$NON-NLS-1$
+        	}
         } catch (Exception e) {
             throw new CertificateException(e);
         }

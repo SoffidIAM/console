@@ -67,4 +67,8 @@ public class Challenge {
     boolean silent;
     boolean alternativeMethodAvailable;
     boolean resendAvailable;
+    
+    @Nullable Object additionalData;
+    
+    @Nullable String identityProvider;
 }

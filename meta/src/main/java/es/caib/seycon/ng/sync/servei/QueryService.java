@@ -22,6 +22,16 @@ public abstract class QueryService {
 		java.io.Writer writer)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	}
+	
+	public void query(
+			java.lang.String path, 
+			java.lang.String contentType,
+			String ipAddress,
+			java.io.Writer writer)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		}
+
+	
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List queryHql(
 		java.lang.String path)

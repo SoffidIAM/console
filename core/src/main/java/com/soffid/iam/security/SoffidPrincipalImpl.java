@@ -527,7 +527,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			return holderGroupMap.get(holderGroup).getRoles();
 		else {
 			refresh();
-			return super.getRoles();
+			return permissions;
 		}
 	}
 

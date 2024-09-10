@@ -75,6 +75,10 @@ public class ChallengeEntity {
 	@Column(name="CHA_SILENT")
     boolean silent;
 	
+	@Nullable @Column(name="CHA_IDP")
+    String identityProvider;
+	
+
 	@Column(name="CHA_TEN_ID")
 	TenantEntity tenant;
 

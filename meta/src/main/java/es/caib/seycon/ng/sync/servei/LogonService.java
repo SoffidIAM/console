@@ -73,6 +73,20 @@ public abstract class LogonService {
 		throws es.caib.seycon.ng.exception.InternalErrorException, java.rmi.RemoteException, es.caib.seycon.ng.exception.LogonDeniedException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
 	 return null;
 	}
+
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public es.caib.seycon.ng.comu.Challenge requestIdpChallenge(
+		int type, 
+		java.lang.String user, 
+		@Nullable java.lang.String domain, 
+		java.lang.String host, 
+		@Nullable java.lang.String clientHost, 
+		int cardSupport,
+		String identityProvider)
+		throws es.caib.seycon.ng.exception.InternalErrorException, java.rmi.RemoteException, es.caib.seycon.ng.exception.LogonDeniedException, es.caib.seycon.ng.exception.InternalErrorException, es.caib.seycon.ng.exception.UnknownUserException {
+	 return null;
+	}
+
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Sessio responseChallenge(
 		es.caib.seycon.ng.comu.Challenge result)

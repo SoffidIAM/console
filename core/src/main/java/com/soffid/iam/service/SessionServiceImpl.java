@@ -283,8 +283,10 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
     @Override
     protected void handleSessionKeepAlive(Session session) throws Exception {
         SessionEntity se = getSessionEntityDao().load(session.getId());
-        se.setKeepAliveDate(new Date());
-        getSessionEntityDao().update(se);
+        if (se != null) {
+	        se.setKeepAliveDate(new Date());
+	        getSessionEntityDao().update(se);
+        }
     }
 
     @Override

@@ -509,6 +509,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 				}
 			} catch (ProcessingException e) {
 				// Ignore
+				log.info("Error querying jump server "+next, e);
 			}
 		}
 		return selected;

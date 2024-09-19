@@ -1,35 +1,19 @@
 package com.soffid.iam.web.popup;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Attribute;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-
+import java.util.regex.Pattern;
 
 public class HtmlScriptDetector {
 	public boolean validate(String s) {
-		Document doc = Jsoup.parse(s);
-		for (Element element: doc.getAllElements()) {
-			String tag = element.tagName();
-			if (tag != null) {
-				if (tag.equalsIgnoreCase("script"))
-					return false;
-				if (tag.equalsIgnoreCase("applet"))
-					return false;
-				if (tag.equalsIgnoreCase("iframe"))
-					return false;
-				if (tag.equalsIgnoreCase("object"))
-					return false;
-			}
-			for (Attribute att: element.attributes()) {
-				if (att.getKey().toLowerCase().startsWith("on"))
-					return false;
-				if (att.getKey().equalsIgnoreCase("href") && 
-						att.getValue().toLowerCase().contains("script:"))
-					return false;
-			}
-		}
+		if (Pattern.compile("\\<\\s*script", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
+				.matcher(s)
+				.find()) 
+			return false;
+		
+		if (Pattern.compile("<[^>]*\\son", Pattern.CASE_INSENSITIVE+Pattern.MULTILINE)
+				.matcher(s)
+				.find())
+			return false;
+		
 		return true;
 	}
 }

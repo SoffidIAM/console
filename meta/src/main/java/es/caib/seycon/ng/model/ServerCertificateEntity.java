@@ -5,6 +5,7 @@
 //
 
 package es.caib.seycon.ng.model;
+import java.util.Collection;
 import java.util.Date;
 
 import com.soffid.mda.annotation.*;
@@ -32,7 +33,7 @@ public abstract class ServerCertificateEntity {
 	@DaoFinder("select cert\n"
 			+ "from com.soffid.iam.model.ServerCertificateEntity as cert\n"
 			+ "where cert.server.id=:serverId ")
-	public es.caib.seycon.ng.model.ServerCertificateEntity findByServer(
+	public Collection<es.caib.seycon.ng.model.ServerCertificateEntity> findByServer(
 		long serverId) {
 	 return null;
 	}

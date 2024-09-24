@@ -94,6 +94,7 @@ import com.soffid.iam.utils.NetworkIntelligencePolicyCheckUtils;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
+import es.caib.seycon.ng.exception.BadPasswordException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.util.Base64;
 
@@ -199,7 +200,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	
 	private PolicyCheckResult internalCheckBasicPolicy(com.soffid.iam.model.PasswordPolicyEntity politica,
 			com.soffid.iam.api.Password password, Collection<AccountEntity> accounts, UserEntity user) throws InternalErrorException, IOException, Exception {
-		String uncrypted = password.getPassword();
+ 		String uncrypted = password.getPassword();
 		if (politica.getMaxLength() != null && uncrypted.length() > politica.getMaxLength().longValue()) {
 			return PolicyCheckResult.TOO_LONG;
 		}
@@ -275,9 +276,6 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			}
 		}
 
-		if (politica.getComplexPasswords() != null && politica.getComplexPasswords().booleanValue()) {
-			return checkComplexRequirements(accounts, password);
-		}
 		if (politica.getValidationScript() != null && ! politica.getValidationScript().isEmpty()) {
 			HashMap<String, Object> m = new HashMap<String,Object>();
 			if (user != null)
@@ -285,9 +283,21 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			if (! accounts.isEmpty())
 				m.put("account", getAccountEntityDao().toAccount( accounts.iterator().next() ));
 			m.put("password", password);
-			Object o = Evaluator.instance().evaluate(politica.getValidationScript(), m, "Password policy "+politica.getDescription());
-			if (! Boolean.TRUE.equals(o)) 
-				return PolicyCheckResult.CUSTOM_CHECK;
+			try {
+				Object o = Evaluator.instance().evaluate(politica.getValidationScript(), m, "Password policy "+politica.getDescription());
+				if (! Boolean.TRUE.equals(o)) {
+					if (o != null && o instanceof String)
+						return new PolicyCheckResult(PolicyCheckResult.CUSTOM_CHECK.getReasonCode(), o.toString());
+					else
+						return new PolicyCheckResult(PolicyCheckResult.CUSTOM_CHECK.getReasonCode(), politica.getValidationScriptDescription());
+				}
+			} catch (InternalErrorException e) {
+				if (e.getCause() instanceof BadPasswordException) {
+					return new PolicyCheckResult(PolicyCheckResult.CUSTOM_CHECK.getReasonCode(), e.getCause().getMessage());
+				}
+				else
+					throw e;
+			}
 		}
 
 		if (Boolean.TRUE.equals(politica.getCheckPasswordBreached())) {
@@ -303,6 +313,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				}
 				return PolicyCheckResult.BREACHED;
 			}
+		}
+
+		if (politica.getComplexPasswords() != null && politica.getComplexPasswords().booleanValue()) {
+			return checkComplexRequirements(accounts, password);
 		}
 
 		return PolicyCheckResult.VALID;

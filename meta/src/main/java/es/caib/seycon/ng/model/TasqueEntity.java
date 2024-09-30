@@ -377,3 +377,9 @@ public abstract class TasqueEntity {
 abstract class TasqueHashIndex {
 }
 
+@Index (name="SC_TAS_USER_NDX",	unique=false,
+entity=es.caib.seycon.ng.model.TasqueEntity.class,
+columns={"TAS_TEN_ID", "TAS_USUARI"})
+abstract class TasqueUserIndex {
+}
+

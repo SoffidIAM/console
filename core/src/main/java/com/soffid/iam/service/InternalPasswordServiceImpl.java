@@ -1175,6 +1175,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		int pending;
 	}
 	private boolean validateOnDispatchers(UserEntity user, PasswordDomainEntity passwordDomain, Password password) throws InternalErrorException {
+		if (! "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) 
+			return false;
+		
 		final ThreadInfo t = new ThreadInfo();
 		t.success = false;
 		t.pending = 0;
@@ -1243,6 +1246,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 	}
 
 	private boolean validateOnDispatchers(AccountEntity acc, Password password) throws InternalErrorException {
+		if (! "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) 
+			return false;
+		
 		final ThreadInfo t = new ThreadInfo();
 		t.success = false;
 		t.pending = 0;

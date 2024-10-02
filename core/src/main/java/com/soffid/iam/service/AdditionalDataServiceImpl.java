@@ -31,10 +31,14 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AttributeVisibilityEnum;
@@ -684,6 +688,9 @@ public class AdditionalDataServiceImpl extends
 					getAsyncRunnerService().runNewTransaction(()-> {
 						Security.nestedLogin(principal);
 						try {
+							SessionFactory sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+							Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
 							LuceneIndexService svc = getLuceneIndexService();
 							svc.resetIndex(obj.getName());
 							CrudHandler<Object> crud = getCrudRegistryService().getHandler(obj.getName());
@@ -695,6 +702,7 @@ public class AdditionalDataServiceImpl extends
 									svc.indexObject(obj.getName(), o);
 									step ++;
 								}
+								session.flush();
 							} while (true);
 						} finally {
 							Security.nestedLogoff();

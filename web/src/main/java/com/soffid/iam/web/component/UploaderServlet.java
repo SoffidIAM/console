@@ -67,7 +67,8 @@ public class UploaderServlet extends HttpServlet {
 				DiskFileItemFactory dif = new DiskFileItemFactory(256000, target);
 				dif.setFileCleaningTracker(tracker);
 				ServletFileUpload uf = new ServletFileUpload( dif );
-				InputStream fileIn = null;
+				uf.setFileSizeMax(400480);
+				uf.setSizeMax(400480);
 				String uuid = null;
 				String name = null;
 				String ctype = null;

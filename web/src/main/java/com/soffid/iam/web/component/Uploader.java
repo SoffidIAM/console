@@ -49,7 +49,8 @@ public class Uploader extends HtmlBasedComponent implements AfterCompose {
 		protected void process(AuRequest request) {
 			Uploader uploader = (Uploader) request.getComponent();
 			List<Media> medias = uploader.getUploaded();
-			Events.postEvent( new UploadEvent("onUpload", uploader, medias.toArray(new Media[medias.size()])));
+			if (medias != null && ! medias.isEmpty())
+				Events.postEvent( new UploadEvent("onUpload", uploader, medias.toArray(new Media[medias.size()])));
 		}
 	};
 	

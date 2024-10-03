@@ -31,11 +31,15 @@ import org.apache.commons.io.FileCleaningTracker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.zkoss.util.media.AMedia;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Session;
+import org.zkoss.zk.ui.http.WebManager;
+import org.zkoss.zk.ui.util.Configuration;
 
 public class UploaderServlet extends HttpServlet {
 	Log log = LogFactory.getLog(getClass());
 	FileCleaningTracker tracker  = new FileCleaningTracker();
-	
+	int MAX_SIZE = 100 * 1024 * 1024; // 100MB
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
 		final File f = File.createTempFile("upload", "");
@@ -51,13 +55,29 @@ public class UploaderServlet extends HttpServlet {
 				ServletInputStream in = request.getInputStream();
 				FileOutputStream out = new FileOutputStream(f);
 				String boundary = null;
+				int size = 0;
 				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 				for (int read = in.read(); read >= 0; read = in.read()) {
-					if (boundary == null) {
-						if (read == 10) boundary = buffer.toString("UTF-8").substring(2);
-						else buffer.write(read);
+					if (read == 10) {
+						boundary = buffer.toString("UTF-8").substring(2);
+						out.write(read);
+						break;
 					}
-					out.write(read);
+					else
+					{
+						buffer.write(read);
+						size ++;
+						if (size > MAX_SIZE)
+							throw new IOException("Message exceeded maximum size");
+						out.write(read);
+					}
+				}
+				byte b[] = new byte[64000];
+				for (int read = in.read(b); read >= 0; read = in.read(b)) {
+					size += read;
+					if (size > MAX_SIZE)
+						throw new IOException("Message exceeded maximum size");
+					out.write(b, 0, read);
 				}
 				buffer.close();
 				out.close();
@@ -67,8 +87,7 @@ public class UploaderServlet extends HttpServlet {
 				DiskFileItemFactory dif = new DiskFileItemFactory(256000, target);
 				dif.setFileCleaningTracker(tracker);
 				ServletFileUpload uf = new ServletFileUpload( dif );
-				uf.setFileSizeMax(400480);
-				uf.setSizeMax(400480);
+
 				String uuid = null;
 				String name = null;
 				String ctype = null;

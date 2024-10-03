@@ -87,7 +87,7 @@ public class PluginHandler extends FrameHandler {
 			} else {
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
 				InputStream is = dataSubida.getStreamData();
-				byte b[] = new byte[2048];
+				byte b[] = new byte[64000];
 				int read = is.read(b);
 				while (read > 0) {
 					os.write(b, 0, read);

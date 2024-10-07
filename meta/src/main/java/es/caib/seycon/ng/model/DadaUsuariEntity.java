@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import com.soffid.iam.api.AttributeVisibilityEnum;
 
@@ -63,6 +64,10 @@ public abstract class DadaUsuariEntity {
 	 return null;
 	}
 
+	@DaoFinder("select d from com.soffid.iam.model.UserDataEntity as d "
+			+ "where d.user.id = :userId and d.dataType.name in (:attributes)")
+	List<DadaUsuariEntity>findByUserAndAttribute(Long userId, @Nullable String[] attributes) {return null;}
+	
 	@Description ("Gets the visibility level for an attribue")
 	@Operation
 	public AttributeVisibilityEnum getAttributeVisibility() {

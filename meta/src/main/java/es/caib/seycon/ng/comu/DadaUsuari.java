@@ -47,4 +47,5 @@ public class DadaUsuari {
 	
 	@Nullable
 	public AttributeVisibilityEnum visibility;
+	
 }

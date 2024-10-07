@@ -35,6 +35,7 @@ import org.apache.lucene.search.Query;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.soffid.iam.api.CustomObject;
+import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.service.impl.LuceneIndexStatus;
@@ -105,11 +106,11 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 	}
 
 	private Document documentFromObject(Object o) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InternalErrorException {
-		CustomObjectTypeEntity type;
+		CustomObjectType type;
 		if (o instanceof CustomObject)
-			type = getCustomObjectTypeEntityDao().findByName(((CustomObject) o).getType());
+			type = getAdditionalDataService().findCustomObjectTypeByName(((CustomObject) o).getType());
 		else
-			type = getCustomObjectTypeEntityDao().findByName(o.getClass().getName());
+			type = getAdditionalDataService().findCustomObjectTypeByName(o.getClass().getName());
 		
 		if (type == null)
 			return null;

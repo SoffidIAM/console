@@ -287,6 +287,10 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
     }
 
     public void toUser(com.soffid.iam.model.UserEntity sourceEntity, com.soffid.iam.api.User targetVO) {
+    	toUser(sourceEntity, targetVO, null);
+    }
+    
+    public void toUser(com.soffid.iam.model.UserEntity sourceEntity, com.soffid.iam.api.User targetVO, String[] attributes) {
         super.toUser(sourceEntity, targetVO);
 
         // Fem les transformacions necessàries
@@ -367,15 +371,20 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
         
         targetVO.setFullName(sourceEntity.getFullName());
 
-        fetchAttributes(targetVO, sourceEntity);
+        fetchAttributes(targetVO, sourceEntity, attributes);
         
     }
 
 
-    private void fetchAttributes(User target, UserEntity source) {
+    private void fetchAttributes(User target, UserEntity source, String [] attributeNames) {
 		target.setAttributes(new HashMap<String, Object>());
 		Map<String, Object> attributes = target.getAttributes();
-		for (UserDataEntity att : source.getUserData()) {
+		final Collection<UserDataEntity> userData;
+		if (attributeNames == null) 
+			userData = source.getUserData();
+		else
+			userData = getUserDataEntityDao().findByUserAndAttribute(source.getId(), attributeNames);
+		for (UserDataEntity att : userData) {
 			if (att.getDataType().getMultiValued() != null && att.getDataType().getMultiValued().booleanValue())
 			{
 				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getDataType().getName());
@@ -1258,6 +1267,13 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		getSession().evict(su);
 		getSession().evict(tu);
 		
+	}
+
+	@Override
+	public User handleToUser(UserEntity entity, String attributes[]) throws InternalErrorException {
+		User targetVO = new User();
+		toUser(entity, targetVO, attributes);
+		return targetVO;
 	}
     
     

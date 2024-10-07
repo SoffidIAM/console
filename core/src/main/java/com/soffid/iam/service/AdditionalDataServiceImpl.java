@@ -69,6 +69,7 @@ import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.SystemEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
+import com.soffid.iam.model.UserEntityDao;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.service.impl.MetadataCache;
 import com.soffid.iam.utils.ConfigurationCache;
@@ -688,22 +689,10 @@ public class AdditionalDataServiceImpl extends
 					getAsyncRunnerService().runNewTransaction(()-> {
 						Security.nestedLogin(principal);
 						try {
-							SessionFactory sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
-							Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
-
-							LuceneIndexService svc = getLuceneIndexService();
-							svc.resetIndex(obj.getName());
-							CrudHandler<Object> crud = getCrudRegistryService().getHandler(obj.getName());
-							int step = 0;
-							do {
-								final PagedResult<Object> p = crud.read(null, null, step, 100);
-								if (p.getResources().isEmpty()) break;
-								for (Object o: p.getResources()) {
-									svc.indexObject(obj.getName(), o);
-									step ++;
-								}
-								session.flush();
-							} while (true);
+							if (obj.getName().equals(User.class.getName()))
+								reindexUser(obj);
+							else
+								reindexStandardObject(obj);
 						} finally {
 							Security.nestedLogoff();
 						}
@@ -723,6 +712,56 @@ public class AdditionalDataServiceImpl extends
 		} else {
 			getLuceneIndexService().resetIndex(obj.getName());
 		}
+	}
+
+	protected void reindexStandardObject(CustomObjectType obj) throws InternalErrorException, Exception {
+		SessionFactory sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+		LuceneIndexService svc = getLuceneIndexService();
+		svc.resetIndex(obj.getName());
+		CrudHandler<Object> crud = getCrudRegistryService().getHandler(obj.getName());
+		int step = 0;
+		do {
+			final PagedResult<Object> p = crud.read(null, null, step, 100);
+			if (p.getResources().isEmpty()) break;
+			for (Object o: p.getResources()) {
+				svc.indexObject(obj.getName(), o);
+				step ++;
+			}
+			session.flush();
+		} while (true);
+	}
+
+	protected void reindexUser(CustomObjectType obj) throws InternalErrorException, Exception {
+		SessionFactory sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+		List<String> attributes = new LinkedList();
+		for (DataType att: handleFindDataTypesByObjectTypeAndName(obj.getName(), null)) {
+			if (Boolean.TRUE.equals(att.getSearchCriteria()))
+				attributes.add(att.getName());
+		}
+		
+		String[] attributesArray = attributes.toArray(new String[attributes.size()]);
+
+		LuceneIndexService svc = getLuceneIndexService();
+		svc.resetIndex(obj.getName());
+		UserEntityDao dao = getUserEntityDao();
+		int step = 0;
+		CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+		do {
+			criteria.setFirstResult(step);
+			criteria.setMaximumResultSize(100);
+			final List<UserEntity> users = dao.query("select u from com.soffid.iam.model.UserEntityImpl as u", new Parameter[0],
+					criteria);
+			if (users.isEmpty()) break;
+			
+			for (UserEntity entity: users) {
+				svc.indexObject(obj.getName(), dao.toUser(entity, attributesArray));
+				step ++;
+			}
+			session.flush();
+		} while (true);
 	}
 
 	@Override

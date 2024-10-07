@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.hibernate.Hibernate;
 
@@ -293,6 +294,34 @@ public class UserDataEntityDaoImpl
                 this.remove(entity);
             }
         }
+	}
+
+	/**
+	 * Internal implementation
+	 */
+	public java.util.List<com.soffid.iam.model.UserDataEntity> findByUserAndAttribute(final java.lang.String queryString, com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.Long userId, java.lang.String[] attributes)
+	
+	{
+		try
+		{
+			if (attributes == null || attributes.length == 0)
+				return new LinkedList<>();
+			org.hibernate.Query queryObject = super.getSession(false).createQuery(queryString);
+			queryObject.setParameter("userId", userId, org.hibernate.Hibernate.LONG);
+			queryObject.setParameterList("attributes", attributes == null ? new String[0]: attributes);
+			if (criteria != null && criteria.getMaximumResultSize () != null) {
+				queryObject.setMaxResults (criteria.getMaximumResultSize ().intValue()); 
+			}
+			if (criteria != null && criteria.getFirstResult () != null) {
+				queryObject.setFirstResult (criteria.getFirstResult().intValue()); 
+			}
+			java.util.List results = queryObject.list();
+			return (java.util.List<com.soffid.iam.model.UserDataEntity>) results;
+		}
+		catch (org.hibernate.HibernateException ex) 
+		{
+			throw super.convertHibernateAccessException(ex);
+		}
 	}
 
 }

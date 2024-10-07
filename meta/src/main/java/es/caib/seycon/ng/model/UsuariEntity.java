@@ -297,6 +297,11 @@ public abstract class UsuariEntity {
 		return null;
 	}
 
+	@DaoOperation
+	public Usuari toUser(UsuariEntity entity, @Nullable String attributes[]) {
+		return null;
+	}
+	
 	public java.lang.String getFullName() {
 		return null;
 	}

@@ -138,9 +138,11 @@ public class LuceneIndexStatus {
 	}
 
 	public synchronized void fetchIfNeeded() throws FileNotFoundException, IOException {
-		LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
-		if (current != null && current.getTimestamp() > timestamp) {
-			fetchFromDatabase();
+		if (!dirty) {
+			LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
+			if (current != null && current.getTimestamp() > timestamp) {
+				fetchFromDatabase();
+			}
 		}
 	}
 

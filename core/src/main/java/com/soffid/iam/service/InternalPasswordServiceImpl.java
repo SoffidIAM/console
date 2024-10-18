@@ -392,14 +392,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 	private void doStorePassword(UserEntity usuari, PasswordDomainEntity dce, PasswordPolicyEntity pcd,
 			com.soffid.iam.api.Password password, String estat, boolean mustChange) throws InternalErrorException {
-		reorderOldPasswords(usuari, dce, pcd);
-
-		PasswordEntity ce = getPasswordEntityDao().newPasswordEntity();
-		ce.setDomain(dce);
-		ce.setOrder(new Long(0));
-		ce.setUser(usuari);
 		Date d = new Date();
-		ce.setDate(d);
 		Calendar c = new GregorianCalendar();
 		c.setTime(d);
 		if (!mustChange) {
@@ -414,10 +407,6 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			else
 				c.add(Calendar.DAY_OF_MONTH, 3650);
 		}
-		ce.setExpirationDate(c.getTime());
-		ce.setPassword2(getDigest2(usuari.getId(), password));
-		ce.setActive(estat);
-		getPasswordEntityDao().create(ce);
 		for (UserAccountEntity ua : usuari.getAccounts()) {
 			AccountEntity acc = ua.getAccount();
 			if (acc.getType().equals(AccountType.USER)
@@ -427,6 +416,17 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				getAccountEntityDao().update(acc, null);
 			}
 		}
+		reorderOldPasswords(usuari, dce, pcd);
+
+		PasswordEntity ce = getPasswordEntityDao().newPasswordEntity();
+		ce.setDomain(dce);
+		ce.setOrder(new Long(0));
+		ce.setUser(usuari);
+		ce.setDate(d);
+		ce.setExpirationDate(c.getTime());
+		ce.setPassword2(getDigest2(usuari.getId(), password));
+		ce.setActive(estat);
+		getPasswordEntityDao().create(ce);
 		if (mustChange)
 			getSignalService().signalUser("https://schemas.openid.net/secevent/risc/event-type/account-credential-change-required",
 				usuari.getUserName(), new String[] {});
@@ -1501,7 +1501,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 			throws Exception {
 		UserEntity usuari = getUserEntityDao().findByUserName(user);
 		PasswordDomainEntity dc = getPasswordDomainEntityDao().findByName(passwordDomain);
-		storePassword(usuari, dc, new Password(password), mustChange);
+		handleStorePassword(usuari, dc, new Password(password), mustChange);
 	}
 
 	@Override

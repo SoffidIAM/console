@@ -452,26 +452,29 @@
     <![CDATA[
       select count(*)
       from com.soffid.iam.bpm.task.BPMTaskInstance as ti
-        join ti.pooledActors pooledActor
+        join ti.pooledActors pooledActor 
       where pooledActor.actorId in ( :actorIds )
         and ti.actorId is null
         and ti.isSuspended != true
         and ti.isOpen = true
         and ti.tenantId = :tenant
+        
     ]]>
   </query>
 
   <query name="TaskMgmtSession.countPooledNewTaskInstancesByActorIds">
     <![CDATA[
-      select count(*)
+      select count(distinct ti.id)
       from com.soffid.iam.bpm.task.BPMTaskInstance as ti
         join ti.pooledActors pooledActor
+        join ti.token as token
       where pooledActor.actorId in ( :actorIds )
         and ti.actorId is null
         and ti.isSuspended != true
         and ti.isOpen = true
         and ti.start is null
         and ti.tenantId = :tenant
+        and token.end is null
     ]]>
   </query>
 
@@ -488,13 +491,15 @@
 
   <query name="TaskMgmtSession.countNewTaskInstancesByActorId">
     <![CDATA[
-      select count(*)
+      select count(ti.id)
       from com.soffid.iam.bpm.task.BPMTaskInstance as ti
+      join ti.token token
       where ti.actorId = :actorId
         and ti.isSuspended != true
         and ti.isOpen = true
         and ti.start is null
         and ti.tenantId = :tenant
+        and token.end is null
     ]]>
   </query>
 

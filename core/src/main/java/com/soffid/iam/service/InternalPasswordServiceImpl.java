@@ -954,7 +954,9 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 						User u = getUserEntityDao().toUser(ue);
 						Account a = getAccountEntityDao().toAccount(account);
 						final long contraId = lastContra.getId();
+						SoffidPrincipal p = Security.getSoffidPrincipal();
 						new Thread( () -> {
+							Security.nestedLogin(p);
 							try {
 								getAsyncRunnerService().runTransaction( () -> {
 									try {
@@ -980,6 +982,8 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 								});
 							} catch (InternalErrorException e) {
 								log.warn("Error when checking if a password has been breached", e);
+							} finally {
+								Security.nestedLogoff();
 							}
 						}).start();
 
@@ -1190,8 +1194,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 					synchronized (t) {
 						t.pending ++ ;
 					}
+					SoffidPrincipal p = Security.getSoffidPrincipal();
 					new Thread() {
 						public void run() {
+							Security.nestedLogin(p);
 							try {
 								Object agent = h.connect(false, false);
 								if ( agent instanceof es.caib.seycon.ng.sync.intf.UserMgr &&
@@ -1219,6 +1225,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 										t.notify();
 									}
 								}	
+								Security.nestedLogoff();
 							}
 						}
 					}.start();
@@ -1261,8 +1268,10 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				synchronized (t) {
 					t.pending ++ ;
 				}
+				SoffidPrincipal p = Security.getSoffidPrincipal();
 				new Thread() {
 					public void run() {
+						Security.nestedLogin(p);
 						try {
 							Object agent = h.connect(false, false);
 							if ( agent instanceof es.caib.seycon.ng.sync.intf.UserMgr &&
@@ -1290,6 +1299,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 									t.notify();
 								}
 							}	
+							Security.nestedLogoff();
 						}
 					}
 				}.start();

@@ -77,6 +77,7 @@ import com.soffid.scimquery.EvalException;
 import com.soffid.scimquery.parser.ParseException;
 import com.soffid.scimquery.parser.TokenMgrError;
 
+import es.caib.seycon.ng.ServiceLocator;
 import es.caib.seycon.ng.comu.Password;
 import es.caib.seycon.ng.comu.TypeEnumeration;
 import es.caib.seycon.ng.comu.XarxaSearchCriteria;
@@ -111,7 +112,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
+import org.hibernate.SessionFactory;
 import org.json.JSONException;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * @see es.caib.seycon.ng.servei.XarxaService
@@ -244,16 +247,32 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
      */
     protected void handleUpdate(com.soffid.iam.api.Network xarxa) throws java.lang.Exception {
         if (AutoritzacionsUsuari.canUpdateAllNetworks() || hasNetworkAuthorizations(Security.getCurrentUser(), xarxa.getCode(), new int[]{ADMINISTRACIO})) {
-            @SuppressWarnings(value = "rawtypes")
-            Collection maquines = findHostByFilter(null, null, null, null, null, null, null, null, null, xarxa.getCode(), null, new Boolean(false));
-            for (Iterator iterator = maquines.iterator(); iterator.hasNext(); ) {
-                Host maquina = (Host) (iterator.next());
-                if (maquina.getIp() != null && !maquinaCompatibleAmbXarxa(maquina.getIp(), xarxa.getIp(), xarxa.getMask())) {
-                    throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IncompatibleIPMessage"), xarxa.getIp(), xarxa.getMask(), maquina.getIp()));
-                }
-            }
+        	
+        	NetworkEntity old = getNetworkEntityDao().load(xarxa.getId());
+        	if (! sameAddress(old, xarxa)) {
+        		int count = 0;
+        		CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+        		criteria.setMaximumResultSize(500);
+				SessionFactory sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+				org.hibernate.Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+				do {
+					criteria.setFirstResult(count);
+	        		List<HostEntity> hosts = getHostEntityDao().query("select h from com.soffid.iam.model.HostEntity h where h.network.id=:networkId", 
+	        				new Parameter[] { new Parameter("networkId", xarxa.getId())}, criteria );
+	        		if (hosts.isEmpty()) break;
+	        		for (HostEntity hostEntity: hosts) {
+	        			if (hostEntity.getHostIP() != null && !maquinaCompatibleAmbXarxa(hostEntity.getHostIP(), xarxa.getIp(), xarxa.getMask())) {
+	        				throw new InternalErrorException(String.format(Messages.getString("NetworkServiceImpl.IncompatibleIPMessage"), xarxa.getIp(), xarxa.getMask(), hostEntity.getHostIP()));
+	        			}
+	        			count ++;
+	        		}
+	        		session.flush();
+	        	} while (true);
+        		
+            	old = getNetworkEntityDao().load(xarxa.getId());
+        	}
             
-            NetworkEntity old = getNetworkEntityDao().load(xarxa.getId());
             if (old != null && !old.getName().equals(xarxa.getName()))
             	getMetaDataEntityDao().renameAttributeValues(TypeEnumeration.NETWORK_TYPE, 
             			old.getName(), xarxa.getName());
@@ -265,7 +284,17 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
     }
 
-    /**
+    private boolean sameAddress(NetworkEntity old, Network xarxa) {
+    	if (old.getAddress() == null && xarxa.getIp() != null) return false;
+    	if (old.getAddress() != null && xarxa.getIp() == null) return false;
+    	if (!old.getAddress().equals(xarxa.getIp())) return false;
+    	if (old.getMask() == null && xarxa.getMask() != null) return false;
+    	if (old.getMask() != null && xarxa.getMask() == null) return false;
+    	if (!old.getMask().equals(xarxa.getMask())) return false;
+    	return true;
+	}
+
+	/**
      * @see es.caib.seycon.ng.servei.XarxaService#delete(es.caib.seycon.ng.comu.Xarxa)
      */
     protected void handleDelete(Network xarxa) throws java.lang.Exception {

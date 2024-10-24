@@ -411,7 +411,7 @@ public class ApplicationBootServiceImpl extends
 					try {
 						getAsyncRunnerService().runNewTransaction(() -> {
 							Thread.sleep(60000);
-							cfg2.setValue("104"); //$NON-NLS-1$
+							cfg2.setValue("105"); //$NON-NLS-1$
 							updateAuditLogs();
 							configSvc.update(cfg2);
 							return null;

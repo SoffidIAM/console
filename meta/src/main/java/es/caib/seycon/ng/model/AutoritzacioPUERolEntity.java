@@ -36,9 +36,3 @@ public abstract class AutoritzacioPUERolEntity {
 	}
 }
 
-@Index (name="PUE_ROL_2",	unique=false,
-entity=es.caib.seycon.ng.model.AutoritzacioPUERolEntity.class,
-columns={"RPE_IDROL"})
- abstract class AutoritzacioPUERolIndex {
-}
-

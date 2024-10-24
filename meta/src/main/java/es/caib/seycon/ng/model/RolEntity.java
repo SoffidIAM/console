@@ -347,10 +347,4 @@ columns={"ROL_NOM", "ROL_IDDISPAT"})
 abstract class RolIndex {
 }
 
-@Index (name="ROL_APL_NDX",	unique=false,
-entity=es.caib.seycon.ng.model.RolEntity.class,
-columns={"ROL_IDAPL"})
-abstract class RolApplicationIndex {
-}
-
 

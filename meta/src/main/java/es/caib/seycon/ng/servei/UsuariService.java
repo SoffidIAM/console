@@ -638,7 +638,7 @@ public abstract class UsuariService {
 	}
 
 	@Operation(translated = "getUserRoles")
-	@Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRED, isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED, rollbackForClassName = { "java.lang.Exception" }, noRollbackForClassName = { "UnknownUserException" })
+	@Transactional(rollbackForClassName = { "java.lang.Exception" }, noRollbackForClassName = { "UnknownUserException" })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> getUserRoles(
 			long userId)
 			throws es.caib.seycon.ng.exception.InternalErrorException,
@@ -648,7 +648,7 @@ public abstract class UsuariService {
 	}
 
 	@Operation(translated = "getUserExplicitRoles")
-	@Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRED, isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED, rollbackForClassName = { "java.lang.Exception" }, noRollbackForClassName = { "UnknownUserException" })
+	@Transactional(rollbackForClassName = { "java.lang.Exception" }, noRollbackForClassName = { "UnknownUserException" })
 	public java.util.Collection<es.caib.seycon.ng.comu.RolGrant> getUserExplicitRoles(
 			long userId)
 			throws es.caib.seycon.ng.exception.InternalErrorException,

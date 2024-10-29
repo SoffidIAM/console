@@ -3728,7 +3728,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 		@Override
 		public void collect(int doc) throws IOException {
-			org.apache.lucene.document.Document d = ctx.reader().document(doc, fields);
+			org.apache.lucene.document.Document d = ctx.parent.reader()
+					.storedFields().document(doc, fields);
 			IndexableField f = d.getField("_id"); //$NON-NLS-1$
 			if (f != null) {
 				long processId = Long.parseLong(f.stringValue());
@@ -3766,7 +3767,8 @@ public class BpmEngineImpl extends BpmEngineBase {
 
 		@Override
 		public void collect(int doc) throws IOException {
-			org.apache.lucene.document.Document d = ctx.reader().document(doc, fields);
+			org.apache.lucene.document.Document d = ctx.parent.reader()
+					.storedFields().document(doc, fields);
 			IndexableField f = d.getField("_id"); //$NON-NLS-1$
 			if (f != null) {
 				long processId = Long.parseLong(f.stringValue());

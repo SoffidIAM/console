@@ -53,7 +53,8 @@ public class ScimCollector extends SimpleCollector {
 	public void collect(int id) throws IOException {
 		if (cancelled) return;
 		
-		org.apache.lucene.document.Document d = context.reader().document(id, fields);
+		org.apache.lucene.document.Document d = context.parent.reader()
+				.storedFields().document(id, fields);
 		IndexableField f = d.getField("_id"); //$NON-NLS-1$
 		if (f != null) {
 			if (end) {

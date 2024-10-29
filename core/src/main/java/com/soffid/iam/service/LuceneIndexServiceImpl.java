@@ -26,12 +26,19 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.SimpleCollector;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TopFieldDocs;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.soffid.iam.api.CustomObject;
@@ -155,7 +162,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 	}
 
 	@Override
-	protected void handleSearch(String index, String query, Collector collector) throws Exception {
+	protected void handleSearch(String index, String query, SimpleCollector collector) throws Exception {
 		LuceneIndexStatus s = getStatus(index);
 		
 		s.fetchIfNeeded();
@@ -171,8 +178,26 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 			q = qp.parse(query);
 		else
 			q = new MatchAllDocsQuery();
-		is.search(q, collector); // Sense cap filtre
+		Sort sort = new Sort(SortField.FIELD_SCORE);
+		TopFieldDocs r = is.search(q, reader.maxDoc(),sort, true);
+		collect(collector, is, r);
 		reader.close();
+	}
+
+	protected void collect(SimpleCollector collector, IndexSearcher is, TopFieldDocs r) throws IOException {
+		for (ScoreDoc doc: r.scoreDocs) {
+			if (doc.score >= 0.0) {
+				LeafCollector lc = null;
+				for (LeafReaderContext leafContext : is.getLeafContexts()) {
+					if (leafContext.docBase <= doc.doc)
+						lc = collector.getLeafCollector(leafContext);
+					else
+						break;
+				}
+				if (lc != null)
+					lc.collect(doc.doc);
+			}
+		}
 	}
 	
 	private LuceneIndexStatus getStatus(String index) throws FileNotFoundException, IOException, InternalErrorException {
@@ -240,7 +265,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 	}
 
 	@Override
-	protected void handleSearch(String index, Query query, Collector collector) throws Exception {
+	protected void handleSearch(String index, Query query, SimpleCollector collector) throws Exception {
 		LuceneIndexStatus s = getStatus(index);
 		
 		s.fetchIfNeeded();
@@ -248,7 +273,10 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 		IndexReader reader = DirectoryReader.open(s.getDirectory());
 		IndexSearcher is;
 		is = new IndexSearcher(reader);
-		is.search(query, collector); // Sense cap filtre
+		Sort sort = new Sort(SortField.FIELD_SCORE);
+		TopFieldDocs r = is.search(query, reader.maxDoc(),sort);
+		collect(collector, is, r);
+
 		reader.close();
 	}
 

@@ -3,6 +3,7 @@ package com.soffid.iam.service;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.SimpleCollector;
 
 import com.soffid.iam.model.CustomObjectTypeEntity;
 import com.soffid.iam.model.LuceneIndexEntity;
@@ -21,9 +22,9 @@ import es.caib.seycon.ng.servei.DadesAddicionalsService;
 public class LuceneIndexService {
 	public void addDocument(String index, Document doc) {};
 	
-	public void search (String index, @Nullable String query, Collector collector) {}
+	public void search (String index, @Nullable String query, SimpleCollector collector) {}
 	
-	public void search (String index, @Nullable Query query, Collector collector) {}
+	public void search (String index, @Nullable Query query, SimpleCollector collector) {}
 
 	public void indexObject(String index, Object o) {}
 	

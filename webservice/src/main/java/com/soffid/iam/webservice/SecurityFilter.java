@@ -49,10 +49,14 @@ public class SecurityFilter extends TenantFilter {
 			throws IOException, ServletException {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		HttpServletResponse httpResp = (HttpServletResponse) response;
-		
-        String authorization =
-            httpReq.getHeader("authorization");
 
+		String method = httpReq.getMethod();
+		if (method!=null && "OPTIONS".equals(method.toUpperCase())) {
+			addCorsHeader(request, response, chain);
+			return;
+		}
+
+        String authorization = httpReq.getHeader("authorization");
         if (authorization != null) {
         	try {
 	        	if (authorization.toLowerCase().startsWith("bearer "))

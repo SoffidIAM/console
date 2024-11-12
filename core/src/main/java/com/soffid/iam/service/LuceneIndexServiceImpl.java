@@ -274,7 +274,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 		IndexSearcher is;
 		is = new IndexSearcher(reader);
 		Sort sort = new Sort(SortField.FIELD_SCORE);
-		TopFieldDocs r = is.search(query, reader.maxDoc(),sort);
+		TopFieldDocs r = is.search(query, reader.maxDoc(),sort, true);
 		collect(collector, is, r);
 
 		reader.close();

@@ -183,14 +183,15 @@ public class BpmJobExecutorImpl extends BpmJobExecutorBase {
 
 	@Override
 	protected void handleIndexPendingProcesses() throws Exception {
-		long newExecution = System.currentTimeMillis();
+		long newExecution = System.currentTimeMillis(); 
 		Indexer i = Indexer.getIndexer ();
 		JbpmContext ctx = getContext();
 		Long nextProcess = null;
 		do {
 			ctx = getContext();
 			try {
-				nextProcess = i.flush(ctx.getSession(), last, newExecution, nextProcess, 100);
+				// Processes updated in the last minute
+				nextProcess = i.flush(ctx.getSession(), last - 60000, newExecution, nextProcess, 100);
 				if (nextProcess == null)
 					last = newExecution;
 			} catch (Exception e) {

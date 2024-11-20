@@ -105,7 +105,7 @@ public class PasswordManagerServlet extends HttpServlet {
 						else if ("set-password".equals(action)) {
 							r.put("data",  setPassword(req, r));
 						} else {
-							r.put("success", false);
+							r.put("success", true);
 						}
 					} finally {
 						Security.nestedLogoff();

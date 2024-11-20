@@ -247,7 +247,7 @@ public class WorkflowInterceptor implements Filter {
 		try {
 			Session s = ServiceLocator.instance().getSessionService().registerConsoleSessio(
 					principal.getUserName(),
-					request.getRemoteAddr(),
+					Security.getClientIp(),
 					principal.getAuthenticationMethod());
 			request.getSession().setAttribute(SOFFID_ACCESSLOG_PRINCIPAL, principal);
 			

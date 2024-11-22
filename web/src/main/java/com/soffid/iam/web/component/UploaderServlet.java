@@ -36,10 +36,11 @@ import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.http.WebManager;
 import org.zkoss.zk.ui.util.Configuration;
 
+import com.soffid.iam.utils.ConfigurationCache;
+
 public class UploaderServlet extends HttpServlet {
 	Log log = LogFactory.getLog(getClass());
 	FileCleaningTracker tracker  = new FileCleaningTracker();
-	int MAX_SIZE = 100 * 1024 * 1024; // 100MB
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
 		final File f = File.createTempFile("upload", "");
@@ -67,7 +68,7 @@ public class UploaderServlet extends HttpServlet {
 					{
 						buffer.write(read);
 						size ++;
-						if (size > MAX_SIZE)
+						if (size > getMaxSize())
 							throw new IOException("Message exceeded maximum size");
 						out.write(read);
 					}
@@ -75,7 +76,7 @@ public class UploaderServlet extends HttpServlet {
 				byte b[] = new byte[64000];
 				for (int read = in.read(b); read >= 0; read = in.read(b)) {
 					size += read;
-					if (size > MAX_SIZE)
+					if (size > getMaxSize())
 						throw new IOException("Message exceeded maximum size");
 					out.write(b, 0, read);
 				}
@@ -128,6 +129,15 @@ public class UploaderServlet extends HttpServlet {
 		}
 	}
 	
+	private int getMaxSize() {
+		int size = 100 * 1024 * 1024; // 100MB
+		try {
+			String c = ConfigurationCache.getMasterProperty("soffid.upload.maxsize");
+			if (c != null)
+				size = Integer.parseInt(c);
+		} catch (NumberFormatException e) {}
+	}
+
 	private String readFile(FileItemStream file) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		InputStream in = file.openStream();

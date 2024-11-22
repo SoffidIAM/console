@@ -136,6 +136,7 @@ public class UploaderServlet extends HttpServlet {
 			if (c != null)
 				size = Integer.parseInt(c);
 		} catch (NumberFormatException e) {}
+		return size;
 	}
 
 	private String readFile(FileItemStream file) throws IOException {

@@ -9,21 +9,27 @@ import com.soffid.iam.web.component.InputFieldUIHandler;
 import es.caib.zkib.datasource.XPathUtils;
 
 public class SystemFieldHandler extends InputFieldUIHandler {
+	boolean recursive = false;
 	@Override
 	public boolean isVisible(InputField3 field) throws Exception {
-		try {
-			Long id = (Long) XPathUtils.getValue(field, "id");
-			String app = (String) XPathUtils.eval(field, "informationSystemName");
-			if (app != null) {
-				Application appInfo = EJBLocator.getApplicationService().findApplicationByApplicationName(app);
-				if (appInfo != null && appInfo.getType() == ApplicationType.BUSINESS)  {
-					field.setValue("business");
-					return false;
+		if (!recursive) {
+			recursive = true;
+			try {
+				Long id = (Long) XPathUtils.getValue(field, "id");
+				String app = (String) XPathUtils.eval(field, "informationSystemName");
+				if (app != null) {
+					Application appInfo = EJBLocator.getApplicationService().findApplicationByApplicationName(app);
+					if (appInfo != null && appInfo.getType() == ApplicationType.BUSINESS)  {
+						field.setValue("business");
+						return false;
+					}
 				}
+				field.setReadonly (id != null);
+			} catch (Exception e) {
+				field.setReadonly (true);
+			} finally {
+				recursive = false;
 			}
-			field.setReadonly (id != null);
-		} catch (Exception e) {
-			field.setReadonly (true);
 		}
 		return true;
 	}

@@ -29,6 +29,9 @@ public class SAMLConfig {
 	String jwtConfigurationUrl;
 	String jwtIssuer;
 	List<String> jwtAudience;
+	Integer apiUserRatio;
+	Integer apiGlobalRatio;
+	Integer apiSize;
 	
 	public boolean isClassicMethod() {
 		return classicMethod;
@@ -227,5 +230,29 @@ public class SAMLConfig {
 	
 	public void setJwtAudience(List<String> jwtAudience) {
 		this.jwtAudience = jwtAudience;
+	}
+	
+	public Integer getApiUserRatio() {
+		return apiUserRatio;
+	}
+	
+	public void setApiUserRatio(Integer apiUserRatio) {
+		this.apiUserRatio = apiUserRatio;
+	}
+	
+	public Integer getApiGlobalRatio() {
+		return apiGlobalRatio;
+	}
+	
+	public void setApiGlobalRatio(Integer apiGlobalRatio) {
+		this.apiGlobalRatio = apiGlobalRatio;
+	}
+	
+	public Integer getApiSize() {
+		return apiSize;
+	}
+	
+	public void setApiSize(Integer apiSize) {
+		this.apiSize = apiSize;
 	}
 }

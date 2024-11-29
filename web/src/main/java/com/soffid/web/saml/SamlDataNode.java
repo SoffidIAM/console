@@ -75,7 +75,14 @@ public class SamlDataNode extends SimpleDataNode {
 		updateParam("soffid.webservice.auth.jwt", c.jwtWebservice? "true": "false");
 		updateParam("soffid.webservice.auth.jwt-conf-url", c.jwtConfigurationUrl);
 		updateParam("soffid.webservice.auth.jwt-iss", c.getJwtIssuer());
+		updateParam("soffid.webservice.limit.user", c.getApiUserRatio());
+		updateParam("soffid.webservice.limit.global", c.getApiGlobalRatio());
+		updateParam("soffid.webservice.limit.size", c.getApiSize());
 		saveAudiences(c.getJwtAudience());
+	}
+
+	private void updateParam(String param, Integer value) throws InternalErrorException, NamingException, CreateException {
+		updateParam (param, value == null ? null: value.toString());
 	}
 
 	private void saveAudiences(List<String> jwtAudience) throws InternalErrorException, NamingException, CreateException {

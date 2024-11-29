@@ -107,6 +107,18 @@
 					style="display: inline-block"
 					dataType="STRING" multiValue="true" width="30em"/>
 			</div>
+			<div width="100%">
+				<label sclass="label longlabel"  value="${c:l('parametres.zul.apiuserratio')}: "/>
+				<customfield3 bind="apiUserRatio"  dataType="NUMBER" noLabel="true"  style="width: 30em; display: inline-block"/>
+			</div>
+			<div width="100%">
+				<label sclass="label longlabel"  value="${c:l('parametres.zul.apiglobalratio')}: "/>
+				<customfield3 bind="apiGlobalRatio"  dataType="NUMBER" noLabel="true"  style="width: 30em; display: inline-block"/>
+			</div>
+			<div width="100%">
+				<label sclass="label longlabel"  value="${c:l('parametres.zul.apisize')}: "/>
+				<customfield3 bind="apiSize"  dataType="NUMBER" noLabel="true"  style="width: 30em; display: inline-block"/>
+			</div>
 		</div>
 		<label  sclass="separator" value="${c:l('parametres.zul.linotpIntegration')}"/>
 		<div style="margin-left: 150px">

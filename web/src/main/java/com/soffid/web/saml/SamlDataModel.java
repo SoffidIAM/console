@@ -45,6 +45,9 @@ public class SamlDataModel extends SimpleDataNode {
 				c.jwtWebservice = "true".equals(ConfigurationCache.getProperty("soffid.webservice.auth.jwt"));
 				c.jwtConfigurationUrl = ConfigurationCache.getProperty("soffid.webservice.auth.jwt-conf-url");
 				c.jwtIssuer = ConfigurationCache.getMasterProperty("soffid.webservice.auth.jwt-iss");
+				c.apiUserRatio = readIntProperty("soffid.webservice.limit.user");
+				c.apiGlobalRatio = readIntProperty("soffid.webservice.limit.global");
+				c.apiSize = readIntProperty("soffid.webservice.limit.size");
 				c.jwtAudience = loadAudiences();
 				c.classicMethod =  ! "false".equals( ConfigurationCache.getProperty("soffid.auth.classic"));
 				c.samlMethod = "true".equals(ConfigurationCache.getProperty("soffid.auth.saml"));
@@ -88,6 +91,15 @@ public class SamlDataModel extends SimpleDataNode {
 						c.setSessionTimeout(Integer.parseInt(timeout.trim()));
 				} catch (NumberFormatException e) {}
 				return Collections.singleton(c);
+			}
+
+			private Integer readIntProperty(String string) {
+				String s = ConfigurationCache.getProperty(string);
+				try {
+					return Integer.parseInt(s);
+				} catch (Exception e) {
+				}
+				return null;
 			}
 
 			private List<String> loadAudiences() throws InternalErrorException, NamingException, CreateException {

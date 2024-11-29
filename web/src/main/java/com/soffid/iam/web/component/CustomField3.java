@@ -195,7 +195,8 @@ public class CustomField3 extends InputField3 {
 		if (readonly != isReadonly())
 		{
 			super.setReadonly(readonly);
-			updateMetadata();
+			if (readonly == isReadonly())
+				updateMetadata();
 		}
 	}
 

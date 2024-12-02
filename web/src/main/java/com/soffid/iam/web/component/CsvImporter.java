@@ -45,8 +45,8 @@ public abstract class CsvImporter<E> {
 	protected abstract CrudHandler<E> getCrudHandler() throws InternalErrorException, NamingException, CreateException ;
 	protected abstract E load(E object) throws InternalErrorException;
 
-	private DataModel model;
-	private DynamicColumnsDatatable dataTable;
+	protected DataModel model;
+	protected DynamicColumnsDatatable dataTable;
 
 	public void importCsv (FrameHandler frame) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
 		model = frame.getModel();
@@ -79,7 +79,7 @@ public abstract class CsvImporter<E> {
 				parser -> importCsv(parser));
 	}
 	
-	private void importCsv(CsvParser parser) {
+	protected void importCsv(CsvParser parser) {
 		Map<String,String> m = null;
 		int updates = 0;
 		int inserts = 0;

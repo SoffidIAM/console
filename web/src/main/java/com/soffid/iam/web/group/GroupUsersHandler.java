@@ -25,7 +25,9 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.User;
 import com.soffid.iam.service.ejb.UserService;
+import com.soffid.iam.web.application.RoleImporter;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
+import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.component.ObjectAttributesDiv;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
@@ -42,13 +44,13 @@ import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.zkiblaf.Missatgebox;
 
 
-public class GroupUsersHandler extends Div implements AfterCompose {
+public class GroupUsersHandler extends FrameHandler implements AfterCompose {
 	private static final long serialVersionUID = 1L;
 	private String listboxPath;
 	
 	private UserService userService;
 	
-	public GroupUsersHandler() throws NamingException, CreateException {
+	public GroupUsersHandler() throws Exception {
 		userService = EJBLocator.getUserService();
 	}
 	
@@ -235,4 +237,11 @@ public class GroupUsersHandler extends Div implements AfterCompose {
 		DataTable dt = (DataTable) getFellow("listbox");
 		dt.download();
 	}
+	
+	public void importCsv (Event ev) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		String name = (String) XPathUtils.eval( Path.getComponent(getSpaceOwner(), listboxPath), "name");
+
+		new GroupUserImporter( name, (DataTable) getFellow("listbox")).importCsv(this);
+	}
+
 }

@@ -1780,6 +1780,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		ServerEntityDao dao = getServerEntityDao();
 		Exception lastException = null;
+		boolean failed = true;
 		for (ServerEntity se : dao.loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
             	if (se.getInstances().isEmpty()) {
@@ -1787,6 +1788,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                    Password p = getPassword(level, usuari, acc, se.getUrl(), se.getAuth());
 	                    if (p != null)
 	                    	return p;
+	                    failed = false;
 	                } catch (Exception e) {
 	                    lastException = e;
 	                }
@@ -1796,6 +1798,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		                    Password p = getPassword(level, usuari, acc, si.getUrl(), si.getAuth());
 		                    if (p != null)
 		                    	return p;
+		                    failed = false;
 		                } catch (Exception e) {
 		                    lastException = e;
 		                }
@@ -1803,7 +1806,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
             	}
             }
         }
-		if (lastException != null)
+		if (failed && lastException != null)
 			throw lastException;
 		return null;
 	}
@@ -3431,6 +3434,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		
 		ServerEntityDao dao = getServerEntityDao();
 		Exception lastException = null;
+		boolean failed = true;
 		for (ServerEntity se : dao.loadAll()) {
             if (se.getType().equals(ServerType.MASTERSERVER)) {
             	if (se.getInstances().isEmpty()) {
@@ -3438,6 +3442,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	                    Password p = getSshKey(level, usuari, acc, se.getUrl(), se.getAuth());
 	                    if (p != null)
 	                    	return p;
+	                    failed = false;
 	                } catch (Exception e) {
 	                    lastException = e;
 	                }
@@ -3447,14 +3452,15 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 		                    Password p = getSshKey(level, usuari, acc, si.getUrl(), si.getAuth());
 		                    if (p != null)
 		                    	return p;
-  	                } catch (Exception e) {
+		                    failed = false;
+            			} catch (Exception e) {
 		                    lastException = e;
 		                }
             		}
             	}
             }
         }
-		if (lastException != null)
+		if (failed && lastException != null)
 			throw lastException;
 		return null;
 	}

@@ -93,7 +93,7 @@ public class SecurityFilter extends TenantFilter {
 			httpResp.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		} else {
 			httpResp.setHeader("WWW-Authenticate",
-					"Basic realm=\"Soffid\", charset=UTF_8");
+					"Basic realm=\"Soffid\", charset=UTF-8");
 			httpResp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}

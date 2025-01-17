@@ -86,9 +86,9 @@ public class SeyconKeyStore {
             return null;
     }
 
-    public static void sakeKeyStore (KeyStore ks, File file) throws FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException, UnrecoverableKeyException
+    public static void saveKeyStore (KeyStore ks, File file) throws FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException, UnrecoverableKeyException
     {
-        sakeKeyStore(ks, file, true);
+        saveKeyStore(ks, file, true);
     }
 
     public static void saveKeyStore (KeyStore ks, File file, boolean reloadKeys) throws FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException, UnrecoverableKeyException

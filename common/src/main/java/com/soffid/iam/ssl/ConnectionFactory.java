@@ -58,7 +58,7 @@ public class ConnectionFactory {
 
     }
 
-    private static void init() throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException {
+    private static void init(boolean reloadKeys) throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException {
         File file = SeyconKeyStore.getKeyStoreFile();
         KeyStore ks = SeyconKeyStore.loadKeyStore(file);
 
@@ -80,7 +80,7 @@ public class ConnectionFactory {
 	    			}
 	    			if (file != null) {
 	    				Password password = SeyconKeyStore.getKeyStorePassword();
-	    				SeyconKeyStore.saveKeyStore(ks, file);
+	    				SeyconKeyStore.saveKeyStore(ks, file, reloadKeys);
 	    			}
 	        	}
         	}
@@ -115,7 +115,7 @@ public class ConnectionFactory {
 
 	public static void reloadKeys () throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException
     {
-    	init ();
+    	init (false);
     }
     
     private static TrustManager[] getTrustManagers(KeyStore ks)
@@ -126,7 +126,7 @@ public class ConnectionFactory {
     
     public static SSLSocketFactory getSocketFactory() throws KeyManagementException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, FileNotFoundException, IOException {
         if (sslFactory == null) {
-            init ();
+            init (true);
         }
         return sslFactory;
             
@@ -136,7 +136,7 @@ public class ConnectionFactory {
             throws RemoteException {
         try {
             if (sslFactory == null) {
-                init();
+                init(true);
             }
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

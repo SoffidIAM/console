@@ -86,7 +86,12 @@ public class SeyconKeyStore {
             return null;
     }
 
-    public static void saveKeyStore (KeyStore ks, File file) throws FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException, UnrecoverableKeyException
+    public static void sakeKeyStore (Keystore ks, File file) throws FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException, UnrecoverableKeyException
+    {
+        sakeKeyStore(ks, file, true);
+    }
+
+    public static void saveKeyStore (KeyStore ks, File file, boolean reloadKeys) throws FileNotFoundException, IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException, UnrecoverableKeyException
     {
         if (file != null)
         {
@@ -103,7 +108,8 @@ public class SeyconKeyStore {
         		file.renameTo(old);
             Password password = getKeyStorePassword();
             ks.store( new FileOutputStream ( file ), password.getPassword().toCharArray());
-            ConnectionFactory.reloadKeys();
+            if (reloadKeys)
+                ConnectionFactory.reloadKeys();
         }
     }
 

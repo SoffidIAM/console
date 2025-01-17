@@ -21,6 +21,7 @@
 		<searchbox auto="true" id="searchBox"
 				jsonObject="com.soffid.iam.api.Group" 
 				defaultAttributes="name, description"
+				enforcedFilter="${execution.attributes.filter}"
 				preference="com.soffid.iam.api.Group"
 				style="width: calc(100% - 32px)"
 				dataPath="/window/model:/group" variableName="query" variableNameText="textQuery"></searchbox>

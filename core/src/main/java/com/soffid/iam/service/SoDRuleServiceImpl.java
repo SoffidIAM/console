@@ -11,8 +11,10 @@ package com.soffid.iam.service;
 
 import es.caib.seycon.ng.servei.*;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Application;
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.Role;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.model.CustomDialect;
@@ -44,7 +46,14 @@ import com.soffid.iam.api.SodRuleType;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -54,7 +63,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.json.JSONException;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * @author bubu
@@ -62,6 +74,8 @@ import org.json.JSONException;
  */
 public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBase
 {
+
+	private SessionFactory sessionFactory;
 
 	/**
 	 * 
@@ -641,6 +655,162 @@ public class SoDRuleServiceImpl extends com.soffid.iam.service.SoDRuleServiceBas
 				}
 			}
 		}
+	}
+
+	@Override
+	protected String handleGenerateChangesReport(SoDRule rule, Collection<SoDRole> grants,
+			Collection<SoDRuleMatrix> matrix) throws Exception {
+		if (sessionFactory == null)
+			sessionFactory = (SessionFactory) ServiceLocator.instance().getService("sessionFactory");
+		Session session = SessionFactoryUtils.getSession(sessionFactory, false) ;
+
+		File f = File.createTempFile("sodEngine", ".html");
+		PrintStream out = generateHeader(new FileOutputStream(f));
+		
+		CriteriaSearchConfiguration criteria = new CriteriaSearchConfiguration();
+		criteria.setMaximumResultSize(500);
+		criteria.setFirstResult(0);
+		do {
+			List<UserEntity> list = getUserEntityDao()
+					.query("select us from com.soffid.iam.model.UserEntity as us where us.active='S' and us.tenant.id=:tenantId", 
+							new Parameter[] { new Parameter("tenantId", Security.getCurrentTenantId())} ,
+							criteria);
+			if (list.isEmpty())
+				break;
+			SoDRuleEntity original = getSoDRuleEntityDao().load(rule.getId());
+			for (UserEntity user: list) {
+				computeChanges (user, original, rule, grants, matrix, out);
+			}
+			criteria.setFirstResult(criteria.getFirstResult().intValue()+ criteria.getMaximumResultSize().intValue());
+			session.flush();
+		} while (true);
+		out.println("</tbody></table>");
+		out.close();
+		return f.getPath();
+	}
+
+	private void computeChanges(UserEntity user, SoDRuleEntity original, SoDRule rule, Collection<SoDRole> grants,
+			Collection<SoDRuleMatrix> matrix, PrintStream out) throws InternalErrorException {
+		Collection<RoleGrant> p = getApplicationService().findEffectiveRoleGrantByUser(user.getId());
+		SoDRisk level = computeRuleLevel(original, p);
+		SoDRisk newLevel = computeRuleLevel(rule, grants, matrix, p);
+		if (level != newLevel) {
+			out.println("<tr><td>");
+			out.print(encode(user.getUserName()));
+			out.print(" ");
+			out.print(encode(user.getFullName()));
+			out.println("</td><td>");
+			out.print( toText(level));
+			out.println("</td><td>");
+			out.print( toText(newLevel));
+			out.println("</td></tr>");
+		}
+	}
+
+	private String toText(SoDRisk level) {
+		if (level == null || level == SoDRisk.SOD_NA) return "";
+		else if (level == SoDRisk.SOD_LOW) return "Low";
+		else if (level == SoDRisk.SOD_HIGH) return "High";
+		else return "Forbidden";
+	}
+
+	private String encode(String s) {
+		return s.replace("&", "&amp;")
+				.replace("<", "&lt;")
+				.replace(">", "&gt;");
+	}
+
+	private SoDRisk computeRuleLevel(SoDRule rule, Collection<SoDRole> roles, Collection<SoDRuleMatrix> matrix,
+			Collection<RoleGrant> rols) {
+		SoDRisk level = SoDRisk.SOD_NA;
+        if (rule.getType() == SodRuleType.MATCH_MATRIX) {
+            for (SoDRuleMatrix cell: matrix) {
+            	boolean found = false;
+            	// Matches row
+            	if (isHigher(cell.getRisk(), level) &&
+            			containsRoleId(rols, findRoleId(roles, cell.getRow())) &&
+	            		containsRoleId(rols, findRoleId(roles, cell.getColumn()))) {
+            		level = cell.getRisk(); 
+            	}
+            }
+        } else if (isHigher (rule.getRisk(), level)){
+        	int failures = rule.getNumber() == null ? 0 : roles.size() - rule.getNumber().intValue();
+            for (SoDRole targetSodRole : roles) {
+            	if (!containsRoleId(rols, targetSodRole.getRole().getId())) {
+            		failures --;
+            		if (failures < 0) break;
+            	}
+            	if (failures >= 0) {
+            		level = rule.getRisk();
+            	}
+            }
+        }
+        return level;
+	}
+
+	private Long findRoleId(Collection<SoDRole> roles, Long row) {
+		for (SoDRole role: roles) {
+			if (role.getId().equals(row))
+				return role.getRole().getId();
+		}
+		return Long.valueOf(0);
+	}
+
+	private SoDRisk computeRuleLevel(SoDRuleEntity rule, Collection<RoleGrant> rols) {
+		SoDRisk level = SoDRisk.SOD_NA;
+        if (rule.getType() == SodRuleType.MATCH_MATRIX) {
+            for (SoDRuleMatrixEntity cell : rule.getMatrixCells()) {
+            	boolean found = false;
+            	// Matches row
+            	if (isHigher(cell.getRisk(), level) &&
+            			containsRoleId(rols, cell.getRow().getRole().getId()) &&
+	            		containsRoleId(rols, cell.getColumn().getRole().getId())) {
+            		level = cell.getRisk(); 
+            	}
+            }
+        } else if (isHigher (rule.getRisk(), level)){
+        	int failures = rule.getNumber() == null ? 0 : rule.getRoles().size() - rule.getNumber().intValue();
+            for (SoDRoleEntity targetSodRole : rule.getRoles()) {
+            	if (!containsRoleId(rols, targetSodRole.getRole().getId())) {
+            		failures --;
+            		if (failures < 0) break;
+            	}
+            	if (failures >= 0) {
+            		level = rule.getRisk();
+            	}
+            }
+        }
+        return level;
+	}
+
+	static SoDRisk order[]  = { SoDRisk.SOD_FORBIDDEN, SoDRisk.SOD_HIGH, SoDRisk.SOD_LOW, SoDRisk.SOD_NA};
+	
+	private boolean isHigher(SoDRisk risk, SoDRisk level) {
+		if (risk == level)
+			return false;
+		for (SoDRisk c: order) {
+			if (c == risk) return true;
+			if (c == level) return false;
+		}
+		return false;
+	}
+	
+	private boolean containsRoleId(Collection<RoleGrant> rols, Long id) {
+		for (RoleGrant grant: rols) {
+			if (grant.getRoleId().equals(id)) return true;
+		}
+		return false;
+	}
+
+	protected PrintStream generateHeader(OutputStream fileOutputStream) throws FileNotFoundException, UnsupportedEncodingException {
+		PrintStream out = new PrintStream(fileOutputStream, true, "UTF-8");
+		out.print("<table class='preview-table'><thead><tr class='head'>");
+		out.print("<td>User</td>");
+		out.print("<td>Current risk</td>");
+		out.print("<td>New risk</td>");
+		out.println("</tr></thead>");
+		out.println("<tbody>");
+		return out;
 	}
 }
 

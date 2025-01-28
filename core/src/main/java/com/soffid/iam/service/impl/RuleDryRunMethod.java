@@ -3,17 +3,21 @@ package com.soffid.iam.service.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import org.hibernate.Hibernate;
 
+import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.RoleAccount;
+import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleEntity;
 import com.soffid.iam.model.RuleEntity;
 import com.soffid.iam.model.UserEntity;
 
+import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.seycon.ng.exception.NeedsAccountNameException;
@@ -24,6 +28,7 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 	private LinkedList<String> revokes;
 	private LinkedList<String> grants;
 	private LinkedList<String> toEffectiveRoles;
+	private LinkedList<String> risks;
 	private String currentUser;
 	
 	
@@ -36,6 +41,7 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 		out.print("<td>Role to grant</td>");
 		out.print("<td>Role to revoke</td>");
 		out.print("<td>Role to bind*</td>");
+		out.print("<td>Risk</td>");
 		out.println("</tr></thead>");
 		out.println("<tbody>");
 		
@@ -43,6 +49,7 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 		grants = new LinkedList<String>();
 		revokes = new LinkedList<String>();
 		toEffectiveRoles = new LinkedList<String>();
+		risks = new LinkedList<>();
 	}
 	
 	
@@ -72,11 +79,19 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 				out.print(escape(toEffectiveRole));
 				out.print("</div>");
 			}
+			out.print("</td><td>");
+			for (String risk: risks)
+			{
+				out.print("<div class='toRisks'>");
+				out.print(escape(risk));
+				out.print("</div>");
+			}
 			out.println("</td></tr>");
 			currentUser = null;
 			revokes.clear();
 			grants.clear();
 			toEffectiveRoles.clear();
+			risks.clear();
 		}
 	}
 	
@@ -104,7 +119,35 @@ public class RuleDryRunMethod implements RuleEvaluatorGrantRevokeMethod {
 		String msg = role.getName()+" @ "+role.getSystem().getName();
 		if ( domainValue != null)
 			msg = msg + " / "+domainValue;
+
+		RoleAccount ra = new RoleAccount();
+		ra.setRoleId(role.getId());
+		ra.setRoleName(role.getName());
+		ra.setSystem(role.getSystem().getName());
+		ra.setUserCode(user.getUserName());
+		if (account != null) {
+			ra.setAccountId(account.getId());
+			ra.setAccountName(account.getName());
+			ra.setAccountSystem(account.getSystem().getName());
+		}
+		Collection<SoDRule> s = ServiceLocator
+				.instance()
+				.getSoDRuleService()
+				.findAffectingRulesByRolAccount(ra);
+		if (s != null && !s.isEmpty()) {
+			for (SoDRule ss: s) {
+				risks.add(ss.getName()+" risk "+toText(ss.getRisk()));
+			}
+		}
+			
 		grants.add(msg);
+	}
+
+	private String toText(SoDRisk level) {
+		if (level == null || level == SoDRisk.SOD_NA) return "";
+		else if (level == SoDRisk.SOD_LOW) return "Low";
+		else if (level == SoDRisk.SOD_HIGH) return "High";
+		else return "Forbidden";
 	}
 
 	@Override

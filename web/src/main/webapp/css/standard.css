@@ -1486,7 +1486,8 @@ div.CodeMirror-linenumber {font-size: 12pt}
     margin-left: 8px;
 	width:1em;
 	opacity:0.2;
-	vertical-align: text-top;
+	vertical-align: top;
+	margin-top: 5px;
 	cursor: pointer;
 }
 

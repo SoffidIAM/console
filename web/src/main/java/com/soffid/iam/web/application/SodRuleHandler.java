@@ -1,6 +1,7 @@
 package com.soffid.iam.web.application;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,14 +24,18 @@ import org.zkoss.zul.Window;
 import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.MailDomain;
 import com.soffid.iam.api.Role;
+import com.soffid.iam.api.Rule;
 import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.api.SoDRole;
+import com.soffid.iam.api.SoDRule;
 import com.soffid.iam.api.SoDRuleMatrix;
 import com.soffid.iam.api.SodRuleType;
 import com.soffid.iam.service.ejb.ApplicationService;
 import com.soffid.iam.service.ejb.MailListsService;
+import com.soffid.iam.service.ejb.SoDRuleService;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DomainValueField;
+import com.soffid.iam.web.component.FileDump;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.InputField3;
 import com.soffid.iam.web.popup.CsvParser;
@@ -402,5 +407,31 @@ public class SodRuleHandler extends FrameHandler implements AfterCompose {
 	public void closePreview(Event e) {
 		Window previewWindow = (Window) getFellow("previewWindow");
 		previewWindow.setVisible(false);
+	}
+	
+	public void previewRules(Event e) throws Exception {
+		SoDRule r = (SoDRule) ((DataNode)XPathUtils.eval(getForm(), "/.")).getInstance();
+		List roles = new LinkedList();
+		List cells = new LinkedList();
+		for (DataNode dn: (Collection<DataNode>) XPathUtils.eval(getForm(),"/role"))
+		{
+			if (dn != null && dn.getInstance() != null)
+				roles.add(dn.getInstance());
+		}
+		for (DataNode dn: (Collection<DataNode>) XPathUtils.eval(getForm(),"/cell"))
+		{
+			if (dn != null && dn.getInstance() != null)
+				cells.add(dn.getInstance());
+		}
+		SoDRuleService svc = com.soffid.iam.EJBLocator.getSoDRuleService();
+		String file = svc.generateChangesReport(r, roles, cells);
+		Window previewWindow = (Window) getFellow("previewWindow");
+		((FileDump)previewWindow.getFellow("previewDiv")).setSrc(file);
+		previewWindow.doHighlighted();
+	}
+	
+	public void applyRule(Event e) throws CommitException {
+		closePreview(e);
+		applyNoClose(e);
 	}
 }

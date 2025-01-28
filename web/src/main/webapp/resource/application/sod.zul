@@ -104,7 +104,7 @@
 						]]>
 						</attribute>
 						</datatable>
-						<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('rule:admin')}" >
+						<div width="100%" style="text-align: right">
 							<div class="deleteButton" onClick="ref:frame.deleteRole" visible="false">-</div>
 							<div class="addButton" onClick="ref:frame.addNewRole">+</div>
 						</div>
@@ -112,6 +112,8 @@
 					<datatable id="matrix" sclass="datatable matrix" enablefilter="false" onChangeLevel="ref:frame.onChangeLevel" maxheight="60vh">
 					</datatable>
 					<div style="width: 100%">
+						<button label="${c:l('rules.preview')}" onClick="ref:frame.previewRules">
+						</button>
 						<div style="float: right">
 							<databutton image="/img/undo-r.svg" label="${c:l('common.undo')}" datamodel="/model" onClick="ref:frame.undo">
 							</databutton>
@@ -153,4 +155,19 @@
 	</window>
 	
 
+	<window visible="false" width="70em" title="${c:l('rules.preview') }" id="previewWindow"
+		closable="false"
+		onClose="self.setVisible(false); event.stopPropagation();">
+		<div style="max-height: 20em; overflow-y:scroll" >
+			<div use="com.soffid.iam.web.component.FileDump"
+				id="previewDiv"/>
+		</div>
+		<div style="text-align: right; margin: 2em">
+			<button label="${c:l('error.zul.Tancar')}" onClick="ref:frame.closePreview">
+			</button>
+			<button label="${c:l('rules.apply')}" onClick="ref:frame.applyRule">
+			</button>
+		</div>
+		
+	</window>
 </frame>

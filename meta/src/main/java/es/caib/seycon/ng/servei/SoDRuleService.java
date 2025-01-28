@@ -5,11 +5,13 @@
 //
 
 package es.caib.seycon.ng.servei;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.soffid.iam.api.AsyncList;
+import com.soffid.iam.api.RuleAssignedRole;
 import com.soffid.iam.api.SoDRuleMatrix;
 import com.soffid.iam.model.SoDRuleMatrixEntity;
 import com.soffid.iam.service.AsyncRunnerService;
@@ -20,6 +22,7 @@ import com.soffid.mda.annotation.Service;
 
 import es.caib.seycon.ng.comu.RolAccount;
 import es.caib.seycon.ng.comu.SoDRisk;
+import es.caib.seycon.ng.comu.SoDRole;
 import es.caib.seycon.ng.comu.SoDRule;
 
 @Service ( translatedName="SoDRuleService",
@@ -222,5 +225,12 @@ public abstract class SoDRuleService {
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;
 	}
+
+	@Operation(grantees = { roles.sod_update.class })
+	public String generateChangesReport(
+			SoDRule rule,
+			@Nullable Collection<SoDRole> grants,
+			@Nullable Collection<SoDRuleMatrix> matrix)
+			throws es.caib.seycon.ng.exception.InternalErrorException { return null; }
 
 }

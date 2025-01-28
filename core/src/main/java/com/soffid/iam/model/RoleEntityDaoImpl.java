@@ -1357,7 +1357,6 @@ public class RoleEntityDaoImpl extends com.soffid.iam.model.RoleEntityDaoBase {
         if (checkGranteeCycles) cami.append(" <= "); //$NON-NLS-1$
         else cami.append(" => "); //$NON-NLS-1$
         int len = cami.length();
-        log.info("Checking cycle "+cami.toString());
         for (Iterator<RoleDependencyEntity> it = nextGrants.iterator(); senseCicles && it.hasNext();) {
         	cami.setLength(len);
         	

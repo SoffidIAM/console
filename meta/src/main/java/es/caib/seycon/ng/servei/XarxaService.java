@@ -609,7 +609,7 @@ public abstract class XarxaService {
 	@Operation
 	public Xarxa findNetworkByIpAddress(String ipAdress) {return null;}
 
-	@Operation(grantees = { roles.host_all_query.class })
+	@Operation(grantees = { roles.host_query.class, roles.host_all_query.class })
 	public PagedResult<Maquina> findHostByTextAndJsonQuery(
 			@Nullable String text,
 			@Nullable String jsonQuery,
@@ -617,7 +617,7 @@ public abstract class XarxaService {
 		return null;
 	}
 
-	@Operation(grantees = { roles.host_all_query.class })
+	@Operation(grantees = { roles.host_query.class , roles.host_all_query.class})
 	public AsyncList<Maquina> findHostByTextAndJsonQueryAsync(
 			@Nullable String text,
 			@Nullable String jsonQuery) {

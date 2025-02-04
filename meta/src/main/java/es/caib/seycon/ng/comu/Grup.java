@@ -43,6 +43,7 @@ public abstract class Grup {
 	public java.lang.String codiPare;
 
 	@Nullable
+	@JsonAttribute(hibernateAttribute = "unitType.name")
 	@Attribute(translated = "type", type="GROUP_TYPE" )
 	public java.lang.String tipus;
 

@@ -490,6 +490,15 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>host:query</codi>
+		<descripcio>Query hosts in authorized networks</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			network:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>host:os:update</codi>
 		<descripcio>Change the OS and make as print servers machines with
 			access query</descripcio>

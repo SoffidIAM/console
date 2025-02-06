@@ -21,6 +21,8 @@ import com.soffid.iam.api.Group;
 import com.soffid.iam.api.GroupUser;
 import com.soffid.iam.api.Identity;
 import com.soffid.iam.api.NetworkAuthorization;
+import com.soffid.iam.api.Role;
+import com.soffid.iam.api.User;
 import com.soffid.iam.service.ejb.UserService;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
@@ -232,17 +234,17 @@ public class NetworkAclHandler extends Div implements AfterCompose {
 			if ("user".equals(type) && user.validate() ) {
 				i.setIdentityCode(user.getValue().toString());
 				i.setUserCode(user.getValue().toString());
-				i.setDescription(user.getDescription(user.getValue()));
+				i.setDescription(((User)user.getValueObject()).getFullName());
 			}
 			if ("group".equals(type) && group.validate() ) {
 				i.setIdentityCode(group.getValue().toString());
 				i.setGroupCode(group.getValue().toString());
-				i.setDescription(group.getDescription(group.getValue()));
+				i.setDescription(((Group)group.getValueObject()).getDescription());
 			}
 			if ("role".equals(type) && role.validate() ) {
 				i.setIdentityCode(role.getValue().toString());
 				i.setRoleName(role.getValue().toString());
-				i.setDescription(role.getDescription(role.getValue()));
+				i.setDescription(((Role)role.getValueObject()).getDescription());
 			}
 			
 			XPathUtils.createPath(networkDataSource, "/acl", na);

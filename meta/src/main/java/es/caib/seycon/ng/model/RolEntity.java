@@ -203,7 +203,7 @@ public abstract class RolEntity {
 			+ " join accounts.account as account with account.type='U'\n"
 			+ " join account.roles as roles\n"
 			+ " join roles.role as rol\n"
-			+ "where usu.userName = :userName and usu.tenant.id = :tenantId")
+			+ "where usu.userName = :userName and usu.tenant.id = :tenantId and roles.enabled is true")
 	public java.util.List<es.caib.seycon.ng.model.RolEntity> findRolsByCodiUsuari(
 			java.lang.String userName) {
 		return null;

@@ -100,6 +100,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -935,7 +936,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             Iterator iterator = networkAuthorizations.iterator();
             while (iterator.hasNext()) {
                 NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
-                xarxes.add(newtworkAuthorization);
+                if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
+                	xarxes.add(newtworkAuthorization);
             }
         } else {
             throw new InternalErrorException(
@@ -950,21 +952,26 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
             Iterator iterator = networkAuthorizations.iterator();
             while (iterator.hasNext()) {
                 NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
-                xarxes.add(newtworkAuthorization);
+                if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
+                	xarxes.add(newtworkAuthorization);
             }
         }
         // llistes d'acces per rols: filtra els rols
-        Collection<Role> rols = getApplicationService().findRolesByUserName(codiUsuari);
-
-        Iterator rolsIterator = rols.iterator();
-        while (rolsIterator.hasNext()) {
-            Role rol = (Role) rolsIterator.next();
-            Collection networkAuthorizations = findNetworkAuthorizationsByRol(rol);
-            Iterator iterator = networkAuthorizations.iterator();
-            while (iterator.hasNext()) {
-                NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
-                xarxes.add(newtworkAuthorization);
-            }
+        User u = getUserService().getCurrentUser();
+        if (u != null) {
+	        Collection<RoleGrant> rols = getApplicationService().findEffectiveRoleGrantByUser(u.getId());
+	
+	        Iterator<RoleGrant> rolsIterator = rols.iterator();
+	        while (rolsIterator.hasNext()) {
+	            RoleGrant rol = rolsIterator.next();
+	            Collection networkAuthorizations = findNetworkAuthorizationsByRolId(rol.getRoleId());
+	            Iterator iterator = networkAuthorizations.iterator();
+	            while (iterator.hasNext()) {
+	                NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
+	                if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
+	                	xarxes.add(newtworkAuthorization);
+	            }
+	        }
         }
         return (List<NetworkAuthorization>) xarxes;
     }
@@ -1289,7 +1296,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     private List<String> getCodiXarxesAmbAcces(String codiUsuari) throws Exception {
-        Collection<NetworkAuthorization> networkAuthorizations = findALLNetworkAuthorizationsByUserName(codiUsuari);
+        Collection<NetworkAuthorization> networkAuthorizations = 
+        		handleFindALLNetworkAuthorizationsByUserName(codiUsuari);
         Set<String> codiXarxes = new LinkedHashSet(); // perquè no es
                                                              // repetisquen
         Iterator iterator = networkAuthorizations.iterator();
@@ -1500,16 +1508,14 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     private List<NetworkAuthorization> findNetworkAuthorizationsByRol(Role rol) {
+    	return findNetworkAuthorizationsByRolId(rol.getId());
+    }
+
+    private List<NetworkAuthorization> findNetworkAuthorizationsByRolId(Long roleId) {
         String query = "select xarxaAC from " //$NON-NLS-1$
                 + "com.soffid.iam.model.NetworkAuthorizationEntity xarxaAC where " //$NON-NLS-1$
-                + "xarxaAC.role.name = :nom and " //$NON-NLS-1$
-                + "xarxaAC.role.system.name = :dispatcher and " //$NON-NLS-1$
-                + "xarxaAC.role.system.tenant.id = :tenantId and " //$NON-NLS-1$
-                + "xarxaAC.role.informationSystem.name = :aplicacio"; //$NON-NLS-1$
-        Parameter[] parametres = {new Parameter("nom", rol.getName()), 
-    			new Parameter("tenantId", Security.getCurrentTenantId()), 
-        			new Parameter("dispatcher", rol.getSystem()), 
-        			new Parameter("aplicacio", rol.getInformationSystemName())}; //$NON-NLS-1$
+                + "xarxaAC.role.id = :id"; //$NON-NLS-1$
+        Parameter[] parametres = {new Parameter("id", roleId)}; //$NON-NLS-1$
         Collection<NetworkAuthorizationEntity> xarxaACsTrobades = getNetworkAuthorizationEntityDao().query(query, parametres);
         if (xarxaACsTrobades != null) {
             return getNetworkAuthorizationEntityDao().toNetworkAuthorizationList(xarxaACsTrobades);
@@ -2141,7 +2147,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	
 	private PagedResult<Host> doFindHostByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
-			List<Host> result) throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+			List<Host> result) 
+		throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
 		final HostEntityDao dao = getHostEntityDao();
 		ScimHelper h = new ScimHelper(Host.class);
 		h.setPrimaryAttributes(new String[] { "name", "description", "ip"});
@@ -2150,8 +2157,18 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
 		h.setTenantFilter("tenant.id");
-		h.setGenerator((entity) -> {
-			return dao.toHost((HostEntity) entity);
+        Collection<NetworkAuthorization> networkAuthorizations = findALLNetworkAuthorizationsByUserName(Security.getCurrentUser());
+
+       	h.setGenerator((entity) -> {
+			final HostEntity hostEntity = (HostEntity) entity;
+			if (Security.isUserInRole("host:all:query"))
+				return dao.toHost(hostEntity);
+			if (Security.isUserInRole("host:query")) {
+				Host host = dao.toHost(hostEntity);
+	            if (maquinaPermesa(networkAuthorizations, host, CONSULTA)) 
+					return dao.toHost(hostEntity);
+			}
+			return null;
 		}); 
 		h.search(text, jsonQuery, (Collection) result); 
 		PagedResult<Host> pr = new PagedResult<>();

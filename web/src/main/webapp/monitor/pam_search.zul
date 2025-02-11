@@ -146,7 +146,7 @@
 			    <h:div id="videoContainer" class="min" >
 					<html><![CDATA[
 					  <video id="video" >
-						<source src="" type="video/ogg" id="videosrc">
+						<source src="" type="video/mp4" id="videosrc">
 						<track src="" kind='subtitles' id="videocaption" label='Keystrokes'  mode="hidden" language="en"> 
 							Your browser does not support the video tag. 
 					  </video>

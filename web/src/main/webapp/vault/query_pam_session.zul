@@ -64,7 +64,7 @@ display:none !important;
 		    <h:div id="videoContainer" class="min" >
 				<html><![CDATA[
 				  <video id="video" >
-					<source src="${firstVideo}" type="video/ogg" id="videosrc">
+					<source src="${firstVideo}" type="video/mp4" id="videosrc">
 					<track src="${firstCaption}" kind='subtitles' id="videocaption" label='Keystrokes'  mode="hidden" language="en"> 
 						Your browser does not support the video tag. 
 				  </video>

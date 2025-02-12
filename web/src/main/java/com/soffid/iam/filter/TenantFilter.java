@@ -40,6 +40,17 @@ public class TenantFilter implements Filter {
 			HttpServletRequest httpReq = (HttpServletRequest) request;
 			HttpServletResponse httpResp = (HttpServletResponse) response;
 			
+			String dtid = request.getParameter("dtid");
+			if (dtid != null && (dtid.contains("&") || dtid.contains("%") || dtid.contains("<")))
+			{
+				log.warn("Wrong dtid "+dtid);
+				httpResp.sendError(500);
+				return;
+			}
+					
+			httpResp.addHeader("X-Content-Type-Options", "nosniff");
+			httpResp.addHeader("Strict-Transport-Security", "max-age=31536000");
+			
 			String tenantHost;
 			try {
 				tenantHost = new TenantExtractor().getTenant(httpReq);

@@ -365,7 +365,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		audit.setAuthor(Security.getCurrentAccount());
 		audit.setAction("L");
 		audit.setObject("PAM");
-		audit.setHost(targetUrl);
+		audit.setHost(targetUrl.length() > 100 ? targetUrl.substring(0, 100): targetUrl);
 		audit.setAccount(entity.getName());
 		audit.setDatabase(entity.getSystem().getName());
 		audit.setUser(entity.getLoginName());

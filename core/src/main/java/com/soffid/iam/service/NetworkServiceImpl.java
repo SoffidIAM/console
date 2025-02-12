@@ -939,39 +939,36 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
                 	xarxes.add(newtworkAuthorization);
             }
-        } else {
-            throw new InternalErrorException(
-                    String.format(Messages.getString("NetworkServiceImpl.UserNotFound"), codiUsuari)); //$NON-NLS-1$
-        }
-        // llistes d'acces per grups
-        Collection<Group> grups = getGroupService().findGroupsByUserName(codiUsuari);
-        Iterator grupIterator = grups.iterator();
-        while (grupIterator.hasNext()) {
-            Group grup = (Group) grupIterator.next();
-            Collection networkAuthorizations = findNetworkAuthorizationsByGroupName(grup.getName());
-            Iterator iterator = networkAuthorizations.iterator();
-            while (iterator.hasNext()) {
-                NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
-                if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
-                	xarxes.add(newtworkAuthorization);
+            // llistes d'acces per grups
+            Collection<Group> grups = getGroupService().findGroupsByUserName(codiUsuari);
+            Iterator grupIterator = grups.iterator();
+            while (grupIterator.hasNext()) {
+            	Group grup = (Group) grupIterator.next();
+            	networkAuthorizations = findNetworkAuthorizationsByGroupName(grup.getName());
+            	iterator = networkAuthorizations.iterator();
+            	while (iterator.hasNext()) {
+            		NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
+            		if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
+            			xarxes.add(newtworkAuthorization);
+            	}
             }
-        }
-        // llistes d'acces per rols: filtra els rols
-        User u = getUserService().getCurrentUser();
-        if (u != null) {
-	        Collection<RoleGrant> rols = getApplicationService().findEffectiveRoleGrantByUser(u.getId());
-	
-	        Iterator<RoleGrant> rolsIterator = rols.iterator();
-	        while (rolsIterator.hasNext()) {
-	            RoleGrant rol = rolsIterator.next();
-	            Collection networkAuthorizations = findNetworkAuthorizationsByRolId(rol.getRoleId());
-	            Iterator iterator = networkAuthorizations.iterator();
-	            while (iterator.hasNext()) {
-	                NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
-	                if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
-	                	xarxes.add(newtworkAuthorization);
-	            }
-	        }
+            // llistes d'acces per rols: filtra els rols
+            User u = getUserService().getCurrentUser();
+            if (u != null) {
+            	Collection<RoleGrant> rols = getApplicationService().findEffectiveRoleGrantByUser(u.getId());
+            	
+            	Iterator<RoleGrant> rolsIterator = rols.iterator();
+            	while (rolsIterator.hasNext()) {
+            		RoleGrant rol = rolsIterator.next();
+            		networkAuthorizations = findNetworkAuthorizationsByRolId(rol.getRoleId());
+            		iterator = networkAuthorizations.iterator();
+            		while (iterator.hasNext()) {
+            			NetworkAuthorization newtworkAuthorization = (NetworkAuthorization) iterator.next();
+            			if (newtworkAuthorization.getLevel().intValue() >= CONSULTA)
+            				xarxes.add(newtworkAuthorization);
+            		}
+            	}
+            }
         }
         return (List<NetworkAuthorization>) xarxes;
     }

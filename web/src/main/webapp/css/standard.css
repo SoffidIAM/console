@@ -1577,8 +1577,10 @@ span.search-box ul li {
 	margin-bottom: 5px
 }
 
-.searchbox-addcriteria {
-	margin-bottom: 5px
+span.search-box input.searchbox-addcriteria {
+	margin-bottom: 5px;
+	margin-top: 0px;
+	vertical-align: top;
 }
 
 

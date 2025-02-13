@@ -2154,7 +2154,10 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		config.setMaximumResultSize(pageSize);
 		h.setConfig(config);
 		h.setTenantFilter("tenant.id");
-        Collection<NetworkAuthorization> networkAuthorizations = findALLNetworkAuthorizationsByUserName(Security.getCurrentUser());
+        Collection<NetworkAuthorization> networkAuthorizations =
+        		Security.getCurrentAccount() == null ?
+        		new LinkedList<>(): 
+        		findALLNetworkAuthorizationsByUserName(Security.getCurrentUser());
 
        	h.setGenerator((entity) -> {
 			final HostEntity hostEntity = (HostEntity) entity;

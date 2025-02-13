@@ -48,8 +48,11 @@ public class TenantFilter implements Filter {
 				return;
 			}
 					
-			httpResp.addHeader("X-Content-Type-Options", "nosniff");
-			httpResp.addHeader("Strict-Transport-Security", "max-age=31536000");
+			String url = ConfigurationCache.getProperty("soffid.enforceTransportSecurity");
+			if ("true".equals(url)) {
+				httpResp.addHeader("X-Content-Type-Options", "nosniff");
+				httpResp.addHeader("Strict-Transport-Security", "max-age=31536000");
+			}
 			
 			String tenantHost;
 			try {

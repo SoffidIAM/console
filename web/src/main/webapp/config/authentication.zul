@@ -19,6 +19,14 @@
 			<label sclass="separator" value="${c:l('parametres.zul.maintenance')}"/>
 		</div>
 		<div style="margin-left: 150px">
+			<div>
+				<label sclass="label longlabel" value="${c:l('parametres.zul.hostName')}: "/>
+				<textbox bind="hostName" width="30em"/>
+			</div>
+			<div>
+				<switch bind="enforceTransportSecurity"></switch>
+				<label value="${c:l('parametres.zul.enforceTls')}"   style="margin-left: 16px" />
+			</div>
 			<div width="100%">
 				<switch bind="maintenanceMode"  ></switch>
 				<label value="${c:l('parametres.zul.maintenanceMode')}"  style="margin-left: 16px" />
@@ -50,10 +58,6 @@
 			<div>
 				<switch bind="samlMethod" /> 
 				<label value="${c:l('deploy.lblEnable') }" style="margin-left: 16px" /> 
-			</div>
-			<div>
-				<label sclass="label longlabel" value="${c:l('parametres.zul.hostName')}: "/>
-				<textbox bind="hostName" width="30em"/>
 			</div>
 			<div>
 				<label sclass="label longlabel" value="${c:l('parametres.zul.metadataURL')}: "/>

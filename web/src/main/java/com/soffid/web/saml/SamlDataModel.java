@@ -41,6 +41,7 @@ public class SamlDataModel extends SimpleDataNode {
 			
 			public Collection find() throws Exception {
 				SAMLConfig c = new SAMLConfig();
+				c.enforceTransportSecurity = "true".equals(ConfigurationCache.getProperty("soffid.enforceTransportSecurity"));
 				c.userPasswordWebservice = ! "false".equals(ConfigurationCache.getProperty("soffid.webservice.auth.password"));
 				c.jwtWebservice = "true".equals(ConfigurationCache.getProperty("soffid.webservice.auth.jwt"));
 				c.jwtConfigurationUrl = ConfigurationCache.getProperty("soffid.webservice.auth.jwt-conf-url");

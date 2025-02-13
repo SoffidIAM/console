@@ -12,6 +12,7 @@ public class SAMLConfig {
 	public boolean alwaysTrust;
 	public String hostName;
 	protected boolean enableLinotp;
+	protected boolean enforceTransportSecurity;
 	protected String linotpUser;
 	protected String linotpPassword;
 	protected String linotpServer;
@@ -254,5 +255,13 @@ public class SAMLConfig {
 	
 	public void setApiSize(Integer apiSize) {
 		this.apiSize = apiSize;
+	}
+	
+	public boolean isEnforceTransportSecurity() {
+		return enforceTransportSecurity;
+	}
+	
+	public void setEnforceTransportSecurity(boolean enforceTransportSecurity) {
+		this.enforceTransportSecurity = enforceTransportSecurity;
 	}
 }

@@ -114,7 +114,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.impl.LogFactoryImpl;
 import org.hibernate.SessionFactory;
-import org.json.JSONException;
 import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
@@ -2147,7 +2146,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 	private PagedResult<Host> doFindHostByTextAndJsonQuery(String text, String jsonQuery,
 			Integer start, Integer pageSize,
 			List<Host> result) 
-		throws UnsupportedEncodingException, ClassNotFoundException, InternalErrorException, EvalException, JSONException, ParseException, TokenMgrError {
+		throws TokenMgrError, Exception {
 		final HostEntityDao dao = getHostEntityDao();
 		ScimHelper h = new ScimHelper(Host.class);
 		h.setPrimaryAttributes(new String[] { "name", "description", "ip"});

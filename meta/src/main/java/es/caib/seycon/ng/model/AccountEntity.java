@@ -118,7 +118,7 @@ public abstract class AccountEntity {
 	@Nullable
 	Boolean inheritNewPermissions;
 
-	@Column (name="ACC_URL")
+	@Column (name="ACC_URL", length = 255)
 	@Nullable
 	String loginUrl;
 

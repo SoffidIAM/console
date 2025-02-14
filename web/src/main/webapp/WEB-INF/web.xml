@@ -262,10 +262,6 @@
 	<!-- /////////// -->
 	<session-config>
 		<session-timeout>5</session-timeout>
-	    <cookie-config>
-	        <http-only>true</http-only>
-	        <secure>true</secure>
-	    </cookie-config>
 	</session-config>
 
 	<!-- MIME mapping -->

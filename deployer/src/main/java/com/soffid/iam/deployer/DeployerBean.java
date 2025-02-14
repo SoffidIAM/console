@@ -72,11 +72,11 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-@Singleton(name="SoffidDeployerBean")
-@Local({DeployerService.class})
+@Singleton(name = "SoffidDeployerBean")
+@Local({ DeployerService.class })
 @Startup
-@javax.ejb.TransactionManagement(value=javax.ejb.TransactionManagementType.CONTAINER)
-@javax.ejb.TransactionAttribute(value=javax.ejb.TransactionAttributeType.SUPPORTS)
+@javax.ejb.TransactionManagement(value = javax.ejb.TransactionManagementType.CONTAINER)
+@javax.ejb.TransactionAttribute(value = javax.ejb.TransactionAttributeType.SUPPORTS)
 public class DeployerBean implements DeployerService {
 	Log log = LogFactory.getLog(DeployerBean.class);
 	private File mainWarFile;
@@ -87,11 +87,11 @@ public class DeployerBean implements DeployerService {
 	boolean failSafe;
 	private File selfServiceWarFile;
 
-	@Resource(name="jdbc/soffid")
-	DataSource ds ;
-	
+	@Resource(name = "jdbc/soffid")
+	DataSource ds;
+
 	Deployer deployer = new DeployerEjb();
-	
+
 	@Resource
 	private SessionContext context;
 	private boolean exploded = false;
@@ -102,7 +102,7 @@ public class DeployerBean implements DeployerService {
 
 	@PostConstruct
 	public void init() throws Exception {
-		exploded  = "true".equals( System.getProperty("soffid.deploy.exploded"));
+		exploded = "true".equals(System.getProperty("soffid.deploy.exploded"));
 		if (exploded)
 			log.info("Started deployer bean using exploded mode");
 		else
@@ -142,33 +142,84 @@ public class DeployerBean implements DeployerService {
 		log.info("Deploying plugins");
 		extractPlugins(qh);
 		log.info("Setting application up");
+		updateWebXml(qh);
 		updateApplicationXml();
 		new FileOutputStream(getTimestampFile()).close();
 	}
 
-	private void updateApplicationXml() throws SAXException, IOException,
-			ParserConfigurationException, XPathExpressionException,
-			TransformerException {
-		File appXml = new File(
-				new File(deployDir(), "META-INF"), "application.xml"); //$NON-NLS-1$ //$NON-NLS-2$
+	private void updateWebXml(QueryHelper qh) throws SAXException, IOException, ParserConfigurationException,
+			XPathExpressionException, TransformerException, SQLException {
+		List<Object[]> r = qh.select("SELECT CON_VALOR "
+				+ "FROM  SC_CONFIG "
+				+ "WHERE CON_CODI='soffid.enforceTransportSecurity' "
+				+ "AND   CON_VALOR='true'");
+		if (r == null || r.isEmpty() ) // No parameter
+			return;
+		
+		/** Add
+		 *     <cookie-config>
+		 *          <http-only>true</http-only>
+		 *          <secure>true</secure>
+		 *     </cookie-config>
+		**/
+		String simpleDir = mainWarFile.getPath();
+		simpleDir = simpleDir.substring(0, simpleDir.lastIndexOf("."));
+		File webXml = new File(new File(new File(simpleDir), "WEB-INF"), "web.xml"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+		f.setValidating(false);
+
+// f.setFeature("http://xml.org/sax/features/namespaces", false);
+		f.setFeature("http://xml.org/sax/features/validation", false);
+		f.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+		f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+		DocumentBuilder builder = f.newDocumentBuilder();
+		builder.setEntityResolver(new EntityResolver() {
+			public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+				return new InputSource();
+			}
+		});
+		FileInputStream in = new FileInputStream(webXml);
+		Document doc = builder.parse(in);
+		in.close();
+
+		XPath xpath = XPathFactory.newInstance().newXPath();
+
+		Node node = (Node) xpath.evaluate("/web-app/session-config", doc, XPathConstants.NODE); //$NON-NLS-1$
+		Element cookieConfig = doc.createElement("cookie-config");
+		node.appendChild(cookieConfig);
+		Element httpOnly = doc.createElement("http-only");
+		httpOnly.setTextContent("true");
+		cookieConfig.appendChild(httpOnly);
+		Element secure = doc.createElement("secure");
+		secure.setTextContent("true");
+		cookieConfig.appendChild(secure);
+
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		FileOutputStream out = new FileOutputStream(webXml);
+		StreamResult result = new StreamResult(out);
+		transformer.transform(new DOMSource(doc), result);
+		out.close();
+	}
+
+	private void updateApplicationXml() throws SAXException, IOException, ParserConfigurationException,
+			XPathExpressionException, TransformerException {
+		File appXml = new File(new File(deployDir(), "META-INF"), "application.xml"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
 		f.setValidating(false);
 
 		// f.setFeature("http://xml.org/sax/features/namespaces", false);
 		f.setFeature("http://xml.org/sax/features/validation", false);
-		f.setFeature(
-				"http://apache.org/xml/features/nonvalidating/load-dtd-grammar",
-				false);
-		f.setFeature(
-				"http://apache.org/xml/features/nonvalidating/load-external-dtd",
-				false);
+		f.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+		f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
 		DocumentBuilder builder = f.newDocumentBuilder();
 		builder.setEntityResolver(new EntityResolver() {
 
-			public InputSource resolveEntity(String publicId, String systemId)
-					throws SAXException, IOException {
+			public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 				return new InputSource();
 			}
 		});
@@ -178,8 +229,7 @@ public class DeployerBean implements DeployerService {
 
 		XPath xpath = XPathFactory.newInstance().newXPath();
 
-		Node node = (Node) xpath.evaluate(
-				"/application", doc, XPathConstants.NODE); //$NON-NLS-1$
+		Node node = (Node) xpath.evaluate("/application", doc, XPathConstants.NODE); //$NON-NLS-1$
 		NodeList webmodules = (NodeList) xpath.evaluate("module/web", node, XPathConstants.NODESET);
 		for (int i = 0; i < webmodules.getLength(); i++) {
 			Node webmodule = webmodules.item(i);
@@ -205,8 +255,7 @@ public class DeployerBean implements DeployerService {
 			log.info("Registering ejb module " + moduleFile.getName());
 		}
 
-		TransformerFactory transformerFactory = TransformerFactory
-				.newInstance();
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		appXml.delete();
 		FileOutputStream out = new FileOutputStream(appXml);
@@ -221,8 +270,8 @@ public class DeployerBean implements DeployerService {
 		boolean isEJB = false;
 		while (!isEJB && (entry = zin.getNextEntry()) != null) {
 			if (entry.getName().equals("META-INF/ejb-jar.xml") || //$NON-NLS-1$
-					entry.getName().equals("META-INF\\ejb-jar.xml") ||
-					entry.getName().equals("META-INF/openejb-jar.xml") || //$NON-NLS-1$
+					entry.getName().equals("META-INF\\ejb-jar.xml")
+					|| entry.getName().equals("META-INF/openejb-jar.xml") || //$NON-NLS-1$
 					entry.getName().equals("META-INF\\openejb-jar.xml")) //$NON-NLS-1$
 			{
 				isEJB = true;
@@ -235,21 +284,18 @@ public class DeployerBean implements DeployerService {
 	private void extractPlugins(QueryHelper qh) throws Exception {
 		qh.select("SELECT SPM_ID, SPL_NAME, SPM_TYPE, SPM_CLASS, SPM_DATA " + //$NON-NLS-1$
 				"FROM SC_SERPLU P, SC_SEPLMO M " + //$NON-NLS-1$
-				"WHERE P.SPL_ENABLE" +
-					(qh.conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ? "": "=1")+
-					" AND P.SPL_ID=M.SPM_SPL_ID",
-				new Object[0], //$NON-NLS-1$
+				"WHERE P.SPL_ENABLE"
+				+ (qh.conn.getMetaData().getDatabaseProductName().equalsIgnoreCase("PostgreSQL") ? "" : "=1")
+				+ " AND P.SPL_ID=M.SPM_SPL_ID", new Object[0], // $NON-NLS-1$
 				new QueryAction() {
-					public void perform(ResultSet rset) throws SQLException,
-							IOException {
+					public void perform(ResultSet rset) throws SQLException, IOException {
 						long id = rset.getLong(1);
 						String name = rset.getString(2);
 						String type = rset.getString(3);
 						log.info("Parsing database addon " + name);
 						if (type.equals("W")) //$NON-NLS-1$
 						{
-							extractWarAddon(removeFileExtension(mainWarFile), name,
-									rset.getBinaryStream(5));
+							extractWarAddon(removeFileExtension(mainWarFile), name, rset.getBinaryStream(5));
 						}
 						if (type.equals("C") || type.equals("V")) //$NON-NLS-1$ //$NON-NLS-2$
 						{
@@ -257,8 +303,7 @@ public class DeployerBean implements DeployerService {
 							if (!rset.wasNull())
 								initClasses.add(clazzname);
 							try {
-								extractCoreAddon(Long.toString(id),
-										rset.getBinaryStream(5));
+								extractCoreAddon(Long.toString(id), rset.getBinaryStream(5));
 							} catch (Exception e) {
 								throw new IOException(e);
 							}
@@ -266,16 +311,14 @@ public class DeployerBean implements DeployerService {
 						if (type.equals("X")) //$NON-NLS-1$ //Web service
 						{
 							try {
-								extractWebServiceAddon(Long.toString(id), name,
-										rset.getBinaryStream(5));
+								extractWebServiceAddon(Long.toString(id), name, rset.getBinaryStream(5));
 							} catch (Exception e) {
 								throw new IOException(e);
 							}
 						}
 					}
 				});
-		File addonsDir = new File(
-				new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+		File addonsDir = new File(new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (addonsDir.isDirectory()) {
 			for (File f : addonsDir.listFiles()) {
 				String simpleName = f.getName();
@@ -285,26 +328,23 @@ public class DeployerBean implements DeployerService {
 					simpleName = simpleName.substring(0, lastDot);
 
 				if (f.getName().endsWith(".war"))
-					extractWarAddon(mainWarFile, simpleName,
-							new FileInputStream(f));
+					extractWarAddon(mainWarFile, simpleName, new FileInputStream(f));
 				else if (f.getName().endsWith(".jar"))
 					extractCoreAddon(simpleName, new FileInputStream(f));
 			}
 		}
 	}
 
-	private void pauseConnector() throws MalformedObjectNameException,
-			InstanceNotFoundException, ReflectionException, MBeanException, IntrospectionException, AttributeNotFoundException {
+	private void pauseConnector() throws MalformedObjectNameException, InstanceNotFoundException, ReflectionException,
+			MBeanException, IntrospectionException, AttributeNotFoundException {
 		final ObjectName objectNameQuery = new ObjectName("*:type=Connector,*");
 		MBeanServer mbeanServer = null;
-		for (final MBeanServer server : (List<MBeanServer>) MBeanServerFactory
-				.findMBeanServer(null)) {
-			for (ObjectName objectName: server.queryNames(objectNameQuery, null)) {
+		for (final MBeanServer server : (List<MBeanServer>) MBeanServerFactory.findMBeanServer(null)) {
+			for (ObjectName objectName : server.queryNames(objectNameQuery, null)) {
 				mbeanServer = server;
 				Object v = mbeanServer.getAttribute(objectName, "stateName");
-				log.info("MBEAN "+objectName.getCanonicalName()+ "STATUS: "+v);
-				if ("STARTED".equals (v))
-				{
+				log.info("MBEAN " + objectName.getCanonicalName() + "STATUS: " + v);
+				if ("STARTED".equals(v)) {
 					log.info("Stopping");
 					mbeanServer.invoke(objectName, "pause", null, null);
 				}
@@ -312,30 +352,27 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
-	private void resumeConnector() throws InstanceNotFoundException,
-			ReflectionException, MBeanException, MalformedObjectNameException, AttributeNotFoundException {
+	private void resumeConnector() throws InstanceNotFoundException, ReflectionException, MBeanException,
+			MalformedObjectNameException, AttributeNotFoundException {
 		final ObjectName objectNameQuery = new ObjectName("*:type=Connector,*");
 		MBeanServer mbeanServer = null;
-		for (final MBeanServer server : (List<MBeanServer>) MBeanServerFactory
-				.findMBeanServer(null)) {
-			for (ObjectName objectName: server.queryNames(objectNameQuery, null)) {
+		for (final MBeanServer server : (List<MBeanServer>) MBeanServerFactory.findMBeanServer(null)) {
+			for (ObjectName objectName : server.queryNames(objectNameQuery, null)) {
 				mbeanServer = server;
 				Object v = mbeanServer.getAttribute(objectName, "stateName");
-				log.info("MBEAN "+objectName.getCanonicalName()+ "STATUS: "+v);
+				log.info("MBEAN " + objectName.getCanonicalName() + "STATUS: " + v);
 				log.info("Resuming");
 				mbeanServer.invoke(objectName, "resume", null, null);
 			}
 		}
 	}
 
-	protected void extractWarAddon(File warFile, String name,
-			InputStream binaryStream) throws IOException {
+	protected void extractWarAddon(File warFile, String name, InputStream binaryStream) throws IOException {
 		log.info("Generating web addon " + name);
 		ZipEntry entry;
 		ZipInputStream zin = new ZipInputStream(binaryStream);
 		while ((entry = zin.getNextEntry()) != null) {
-			if (entry.getName().equals("META-INF/web.xml")
-					|| entry.getName().equals("META-INF\\web.xml")) {
+			if (entry.getName().equals("META-INF/web.xml") || entry.getName().equals("META-INF\\web.xml")) {
 				// Nothing to do with web.xml
 				consumeStream(zin);
 			} else if (entry.getName().contains("..")) {
@@ -346,25 +383,21 @@ public class DeployerBean implements DeployerService {
 					f.mkdirs();
 				} else {
 					if (f.getName().startsWith("replace-")) {
-						f = new File(f.getParentFile(), f.getName()
-								.substring(8));
+						f = new File(f.getParentFile(), f.getName().substring(8));
 						log.info("Replacing file " + f.getPath());
 						f.getParentFile().mkdirs();
 						extractFile(zin, f);
 					} else if (isXslPath(warFile, entry)) {
-						log.info("Applying XSL transformation to "
-								+ f.getPath());
+						log.info("Applying XSL transformation to " + f.getPath());
 						File patchedFile = getPatchedFile(warFile, entry);
-						File resultFile = new File(f.getPath()
-								+ ".xslt-tmpfile");
+						File resultFile = new File(f.getPath() + ".xslt-tmpfile");
 
 						extractFile(zin, f);
 
 						Source src = new StreamSource(patchedFile);
 						Source xslt = new StreamSource(f);
 						StreamResult result = new StreamResult();
-						TransformerFactory factory = TransformerFactory
-								.newInstance();
+						TransformerFactory factory = TransformerFactory.newInstance();
 						try {
 							OutputStream out = new FileOutputStream(resultFile);
 							result.setOutputStream(out);
@@ -375,23 +408,17 @@ public class DeployerBean implements DeployerService {
 							resultFile.renameTo(patchedFile);
 							f.delete();
 						} catch (TransformerConfigurationException e) {
-							log.warn(
-									"Error transforming applying "
-											+ entry.getName(), e);
+							log.warn("Error transforming applying " + entry.getName(), e);
 						} catch (TransformerException e) {
-							log.warn(
-									"Error transforming applying "
-											+ entry.getName(), e);
+							log.warn("Error transforming applying " + entry.getName(), e);
 						}
-					} else if (entry.getName().matches(
-							".*iam-label.*\\.properties")) {
+					} else if (entry.getName().matches(".*iam-label.*\\.properties")) {
 						log.info("Appending messages to " + f.getPath());
 						FileOutputStream out = new FileOutputStream(f, true);
 						out.write('\n');
 						copyStream(zin, out);
 					} else if (f.canRead()) {
-						log.warn("Module " + name + ". Ignoring file "
-								+ f.getPath());
+						log.warn("Module " + name + ". Ignoring file " + f.getPath());
 					} else {
 						f.getParentFile().mkdirs();
 						extractFile(zin, f);
@@ -401,8 +428,7 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
-	private void extractFile(ZipInputStream zin, File f)
-			throws FileNotFoundException, IOException {
+	private void extractFile(ZipInputStream zin, File f) throws FileNotFoundException, IOException {
 		FileOutputStream out = new FileOutputStream(f);
 		copyStream(zin, out);
 		out.close();
@@ -433,16 +459,13 @@ public class DeployerBean implements DeployerService {
 	}
 
 	private File getPatchedFile(File warFile, ZipEntry entry) {
-		String base = entry.getName().substring(0,
-				entry.getName().lastIndexOf('.'));
+		String base = entry.getName().substring(0, entry.getName().lastIndexOf('.'));
 		File f = new File(warFile, base);
 		return f;
 	}
 
-	protected void extractCoreAddon(String name, InputStream binaryStream)
-			throws Exception {
-		if (exploded && false)
-		{
+	protected void extractCoreAddon(String name, InputStream binaryStream) throws Exception {
+		if (exploded && false) {
 			File commonFile = new File(deployDir(), "lib/plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
 			commonFile.getParentFile().mkdirs();
 			InputStream in = binaryStream;
@@ -454,18 +477,15 @@ public class DeployerBean implements DeployerService {
 			}
 			in.close();
 			out.close();
-			if ( isEjbModule(commonFile))
-			{
-				File coreFile = new File(deployDir(), "plugin-" + name ); //$NON-NLS-1$ //$NON-NLS-2$
+			if (isEjbModule(commonFile)) {
+				File coreFile = new File(deployDir(), "plugin-" + name); //$NON-NLS-1$ //$NON-NLS-2$
 				log.info("Generating addon file " + coreFile);
 				coreFile.mkdirs();
 				uncompress(new FileInputStream(commonFile), coreFile);
 				coreModules.add(coreFile.getPath());
 				commonFile.delete();
 			}
-		}
-		else
-		{
+		} else {
 			File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
 			log.info("Generating addon file " + coreFile);
 			FileOutputStream out = new FileOutputStream(coreFile);
@@ -491,8 +511,7 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
-	protected void extractWebServiceAddon(String name, String originalName, InputStream binaryStream)
-			throws Exception {
+	protected void extractWebServiceAddon(String name, String originalName, InputStream binaryStream) throws Exception {
 		File coreFile = new File(deployDir(), "plugin-" + name + ".jar"); //$NON-NLS-1$ //$NON-NLS-2$
 		log.info("Generating web service file " + coreFile);
 
@@ -505,16 +524,15 @@ public class DeployerBean implements DeployerService {
 		}
 		out.close();
 
-		final File warDir = new File (removeExtension(webserviceWarFile.getPath()));
+		final File warDir = new File(removeExtension(webserviceWarFile.getPath()));
 		File libDir = new File(warDir, "WEB-INF/lib"); //$NON-NLS-1$ //$NON-NLS-2$
 		libDir.mkdirs();
-		File libFile = new File(libDir, "plugin-"+name+".jar");
+		File libFile = new File(libDir, "plugin-" + name + ".jar");
 		ZipOutputStream resources = new ZipOutputStream(new FileOutputStream(libFile));
-		
-		File classesDir = new File(warDir,
-					"WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		File classesDir = new File(warDir, "WEB-INF/classes"); //$NON-NLS-1$ //$NON-NLS-2$
 		log.info("Extracting to " + classesDir);
-		ZipInputStream zin = new ZipInputStream( new FileInputStream(coreFile));
+		ZipInputStream zin = new ZipInputStream(new FileInputStream(coreFile));
 		ZipEntry entry;
 		while ((entry = zin.getNextEntry()) != null) {
 			if (entry.getName().contains("..")) {
@@ -539,33 +557,27 @@ public class DeployerBean implements DeployerService {
 
 	private void uncompressEar() throws Exception {
 		File target = deployDir();
-		log.info("Exploding " + initialEarFile().getPath() + " into "
-				+ target.getPath());
+		log.info("Exploding " + initialEarFile().getPath() + " into " + target.getPath());
 		target.mkdirs();
-		ZipInputStream zin = new ZipInputStream(new FileInputStream(
-				initialEarFile()));
+		ZipInputStream zin = new ZipInputStream(new FileInputStream(initialEarFile()));
 		ZipEntry entry;
 		while ((entry = zin.getNextEntry()) != null) {
 			File f = new File(target, entry.getName());
 			if (entry.getName().contains("..")) {
 				consumeStream(zin);
-			}
-			else if (entry.isDirectory()) {
+			} else if (entry.isDirectory()) {
 				f.mkdirs();
 			} else {
 				if (entry.getName().endsWith(".war")) //$NON-NLS-1$
 					extractWar(zin, f);
 				else {
 					f.getParentFile().mkdirs();
-					if (false && exploded && ! entry.getName().startsWith("lib") && entry.getName().endsWith(".jar"))
-					{
-						log.info("Exploding "+entry.getName());
-						f = new File ( removeExtension( f.getPath() ) );
-						uncompress (zin, f);
-					}
-					else
-					{
-						log.info("Extracting "+entry.getName());
+					if (false && exploded && !entry.getName().startsWith("lib") && entry.getName().endsWith(".jar")) {
+						log.info("Exploding " + entry.getName());
+						f = new File(removeExtension(f.getPath()));
+						uncompress(zin, f);
+					} else {
+						log.info("Extracting " + entry.getName());
 						extractFile(zin, f);
 					}
 				}
@@ -589,35 +601,30 @@ public class DeployerBean implements DeployerService {
 		}
 	}
 
-	private String removeExtension (String warFile) {
-		if (warFile.toUpperCase().endsWith(".WAR") || warFile.toUpperCase().endsWith(".JAR"))
-		{
+	private String removeExtension(String warFile) {
+		if (warFile.toUpperCase().endsWith(".WAR") || warFile.toUpperCase().endsWith(".JAR")) {
 			int i = warFile.lastIndexOf('.');
-			if ( i >= 0)
-				return warFile.substring(0,i);
+			if (i >= 0)
+				return warFile.substring(0, i);
 			else
 				return warFile;
-		}
-		else
+		} else
 			return warFile;
 	}
 
-	private File removeFileExtension (File warFile) {
+	private File removeFileExtension(File warFile) {
 		String s = warFile.getPath();
-		if (s.toUpperCase().endsWith(".WAR"))
-		{
+		if (s.toUpperCase().endsWith(".WAR")) {
 			int i = s.lastIndexOf('.');
-			if ( i >= 0)
-				return new File(s.substring(0,i));
+			if (i >= 0)
+				return new File(s.substring(0, i));
 			else
 				return warFile;
-		}
-		else
+		} else
 			return warFile;
 	}
 
-	private void extractWar(InputStream in, File warFile)
-			throws FileNotFoundException, IOException {
+	private void extractWar(InputStream in, File warFile) throws FileNotFoundException, IOException {
 		log.info("Exploding war " + warFile.getPath());
 		if (warFile.getName().startsWith("iam-web-")) //$NON-NLS-1$
 			mainWarFile = warFile;
@@ -625,7 +632,7 @@ public class DeployerBean implements DeployerService {
 			selfServiceWarFile = warFile;
 		if (warFile.getName().startsWith("iam-webservice-")) //$NON-NLS-1$
 			webserviceWarFile = warFile;
-		warFile = new File (removeExtension(warFile.getPath()));
+		warFile = new File(removeExtension(warFile.getPath()));
 		warFile.mkdirs();
 		ZipEntry entry;
 		ZipInputStream zin = new ZipInputStream(in);
@@ -636,12 +643,9 @@ public class DeployerBean implements DeployerService {
 			} else if (entry.isDirectory()) {
 				f.mkdirs();
 			} else {
-				if ( exploded && canBeExploded(entry.getName()))
-				{
-					uncompress(zin, new File (warFile, "WEB-INF/classes"));
-				}
-				else
-				{
+				if (exploded && canBeExploded(entry.getName())) {
+					uncompress(zin, new File(warFile, "WEB-INF/classes"));
+				} else {
 					f.getParentFile().mkdirs();
 					extractFile(zin, f);
 				}
@@ -650,9 +654,8 @@ public class DeployerBean implements DeployerService {
 	}
 
 	private boolean canBeExploded(String name) {
-		return name.startsWith("WEB-INF/lib") && 
-				name.toLowerCase().endsWith(".jar") && 
-				(name.contains("iam-common") || name.contains("web-common") || name.contains("plugin"));
+		return name.startsWith("WEB-INF/lib") && name.toLowerCase().endsWith(".jar")
+				&& (name.contains("iam-common") || name.contains("web-common") || name.contains("plugin"));
 	}
 
 	private File tmpDir() {
@@ -709,12 +712,10 @@ public class DeployerBean implements DeployerService {
 		});
 	}
 
-	private void undeploy() throws MalformedURLException, UndeployException,
-			NoSuchApplicationException {
+	private void undeploy() throws MalformedURLException, UndeployException, NoSuchApplicationException {
 		try {
-			if (failedWarInfo != null)
-			{
-				log.info("Undeploying "+failedWarInfo.path);
+			if (failedWarInfo != null) {
+				log.info("Undeploying " + failedWarInfo.path);
 				deployer.undeploy(failedWarInfo.path);
 				failedWarInfo = null;
 			}
@@ -722,8 +723,7 @@ public class DeployerBean implements DeployerService {
 			log.warn(e2);
 		}
 
-		if (appInfo != null)
-		{
+		if (appInfo != null) {
 			deployer.undeploy(appInfo.path);
 			appInfo = null;
 		}
@@ -740,8 +740,7 @@ public class DeployerBean implements DeployerService {
 	}
 
 	private File getFailSafeFile() {
-		return new File(
-				new File(getJbossHomeDir(), "soffid"), "fail-safe"); //$NON-NLS-1$ //$NON-NLS-2$
+		return new File(new File(getJbossHomeDir(), "soffid"), "fail-safe"); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	public void setFailSafe(boolean failSafe) {
@@ -771,6 +770,7 @@ public class DeployerBean implements DeployerService {
 	private AppInfo appInfo = null;
 	private Throwable exceptionToThrow = null;
 	private static boolean ongoing = false;
+
 	private void deploy(boolean firstTime) throws Exception {
 
 		if (ongoing)
@@ -778,9 +778,9 @@ public class DeployerBean implements DeployerService {
 
 		if (System.getProperty("dbStatus") == null) // Not configured yet
 			return;
-		
-		waitForDatabase ();
-		
+
+		waitForDatabase();
+
 		ongoing = true;
 		File home = getJbossHomeDir();
 		File failedWar = new File(new File(home, "soffid"), "failed.ear");
@@ -794,7 +794,7 @@ public class DeployerBean implements DeployerService {
 			if (isFailSafe()) {
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
-				deleteCacheProperties ();
+				deleteCacheProperties();
 				recursivelyDelete(tmpDir());
 				getTimestampFile().delete();
 				uncompressEar();
@@ -809,24 +809,20 @@ public class DeployerBean implements DeployerService {
 				try {
 					List<Object[]> result = null;
 					try {
-						 result = qh.select("SELECT CON_VALOR FROM " + //$NON-NLS-1$
-							"SC_CONFIG WHERE CON_CODI='plugin.timestamp'"); //$NON-NLS-1$
+						result = qh.select("SELECT CON_VALOR FROM " + //$NON-NLS-1$
+								"SC_CONFIG WHERE CON_CODI='plugin.timestamp'"); //$NON-NLS-1$
 					} catch (SQLException e) {
 						// Maybe first execution
 					}
-					if (result == null)
-					{
+					if (result == null) {
 						// First time
 						log.info("First time deploy");
 						recursivelyDelete(tmpDir());
 						getTimestampFile().delete();
 						uncompressEar();
 						updateApplicationXml();
-					}
-					else if ( !result.isEmpty()) 
-					{
-						Long ts = Long.decode(result.iterator().next()[0]
-								.toString());
+					} else if (!result.isEmpty()) {
+						Long ts = Long.decode(result.iterator().next()[0].toString());
 						if (mustUpdate(ts)) {
 							recursivelyDelete(tmpDir());
 							generateEar(qh);
@@ -836,7 +832,7 @@ public class DeployerBean implements DeployerService {
 					} else
 						generateEar(qh);
 				} catch (SQLException e) { // Tables do not exist yet
-					log.info("Deploying simple "+deployDir().getPath());
+					log.info("Deploying simple " + deployDir().getPath());
 					failSafeDeploy();
 				} finally {
 					conn.close();
@@ -844,14 +840,12 @@ public class DeployerBean implements DeployerService {
 			}
 
 			try {
-				log.info("Deploying "+deployDir().getPath());
+				log.info("Deploying " + deployDir().getPath());
 				appInfo = deployer.deploy(deployDir().getPath());
 			} catch (Exception e) {
 				coreModules = new LinkedList<String>();
 				javaModules = new LinkedList<String>();
-				log.warn(
-						"Error generating Soffid IAM ear. Generating fail-safe console",
-						e);
+				log.warn("Error generating Soffid IAM ear. Generating fail-safe console", e);
 				System.setProperty("soffid.fail-safe", "true");
 				log.info("Deploying on fail-safe mode");
 				failSafeDeploy();
@@ -877,7 +871,7 @@ public class DeployerBean implements DeployerService {
 		getTimestampFile().delete();
 		uncompressEar();
 		updateApplicationXml();
-		log.info("Deploying "+deployDir().getPath());
+		log.info("Deploying " + deployDir().getPath());
 		exceptionToThrow = null;
 		java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
 			public Object run() {
@@ -893,14 +887,11 @@ public class DeployerBean implements DeployerService {
 			throw exceptionToThrow;
 	}
 
-
 	private void waitForDatabase() {
-		do
-		{
+		do {
 			try {
 				Connection conn = ds.getConnection();
-				if (conn.isValid(0))
-				{
+				if (conn.isValid(0)) {
 					conn.close();
 					return;
 				}
@@ -918,28 +909,20 @@ public class DeployerBean implements DeployerService {
 	private void updateCacheProperties(QueryHelper qh) throws SQLException, IOException {
 		deleteCacheProperties();
 		try {
-			for ( Object[] data: qh.select(
-					  "SELECT CON_CODI, CON_VALOR "
-					+ "FROM   SC_TENANT, SC_CONFIG "
+			for (Object[] data : qh.select("SELECT CON_CODI, CON_VALOR " + "FROM   SC_TENANT, SC_CONFIG "
 					+ "WHERE  CON_TEN_ID=TEN_ID AND CON_IDXAR IS NULL AND TEN_NAME='master' "
-					+ "AND    CON_CODI = 'soffid.cache.enable'", new Object [0]))
-			{
-				System.setProperty  ((String) data[0], (String) data[1]);
+					+ "AND    CON_CODI = 'soffid.cache.enable'", new Object[0])) {
+				System.setProperty((String) data[0], (String) data[1]);
 			}
-			
-			File f = new File ( new File (getJbossHomeDir(), "conf"), "jcs.properties");
-			if (f.canRead())
-			{
+
+			File f = new File(new File(getJbossHomeDir(), "conf"), "jcs.properties");
+			if (f.canRead()) {
 				System.setProperty("soffid.cache.configFile", f.getAbsolutePath());
-			}
-			else
-			{
+			} else {
 				System.getProperties().remove("soffid.cache.configFile");
-				for ( Object[] data: qh.select(
-						  "SELECT BCO_NAME, BCO_VALUE "
-						+ "FROM   SC_BLOCON "
-						+ "WHERE  BCO_NAME = 'soffid.cache.config'", new Object [0]))
-				{
+				for (Object[] data : qh.select(
+						"SELECT BCO_NAME, BCO_VALUE " + "FROM   SC_BLOCON " + "WHERE  BCO_NAME = 'soffid.cache.config'",
+						new Object[0])) {
 					byte b[];
 					if (data[1] instanceof Blob) {
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -951,7 +934,7 @@ public class DeployerBean implements DeployerService {
 					} else {
 						b = (byte[]) data[1];
 					}
-					System.setProperty  ((String) data[0], new String(b, "UTF-8"));
+					System.setProperty((String) data[0], new String(b, "UTF-8"));
 				}
 			}
 		} catch (Exception e) {
@@ -987,13 +970,12 @@ public class DeployerBean implements DeployerService {
 	@TransactionAttribute(TransactionAttributeType.NEVER)
 	public void timeOutHandler(Timer timer) throws Exception {
 		try {
-			if (lastModified  == 0)
-				doDeploy ();
-			else if (!ongoing)
-			{
+			if (lastModified == 0)
+				doDeploy();
+			else if (!ongoing) {
 				failSafe = false;
 				long last = calculateLastModified();
-		
+
 				if (last > lastModified) {
 					lastModified = last;
 					redeploy();
@@ -1006,17 +988,15 @@ public class DeployerBean implements DeployerService {
 
 	private long calculateLastModified() {
 		long last = initialEarFile().lastModified();
-		File addonsDir = new File(
-				new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
+		File addonsDir = new File(new File(getJbossHomeDir(), "soffid"), "addons"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		File failSafeFile = getFailSafeFile();
 		if (failSafeFile.exists() && failSafeFile.lastModified() > last)
 			last = failSafeFile.lastModified();
-		
+
 		if (addonsDir.isDirectory()) {
 			for (File f : addonsDir.listFiles()) {
-				if (f.lastModified() > last)
-				{
+				if (f.lastModified() > last) {
 					last = f.lastModified();
 				}
 			}

@@ -1293,7 +1293,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
     }
 
     private List<String> getCodiXarxesAmbAcces(String codiUsuari) throws Exception {
-        Collection<NetworkAuthorization> networkAuthorizations = 
+    	if (codiUsuari == null || codiUsuari.trim().isBlank())
+    		return new LinkedList();
+    	Collection<NetworkAuthorization> networkAuthorizations = 
         		handleFindALLNetworkAuthorizationsByUserName(codiUsuari);
         Set<String> codiXarxes = new LinkedHashSet(); // perquè no es
                                                              // repetisquen
@@ -2155,9 +2157,9 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 		h.setConfig(config);
 		h.setTenantFilter("tenant.id");
         Collection<NetworkAuthorization> networkAuthorizations =
-        		Security.getCurrentAccount() == null ?
+        		Security.getCurrentUser() == null ?
         		new LinkedList<>(): 
-        		findALLNetworkAuthorizationsByUserName(Security.getCurrentUser());
+        		handleFindALLNetworkAuthorizationsByUserName(Security.getCurrentUser());
 
        	h.setGenerator((entity) -> {
 			final HostEntity hostEntity = (HostEntity) entity;

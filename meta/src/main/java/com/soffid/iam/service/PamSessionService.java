@@ -58,19 +58,19 @@ public class PamSessionService {
 	@Operation(grantees = {JumpServer_delete.class})
 	void remove (JumpServerGroup jumpServerGroup) {}
 	
-	@Operation(grantees = {Tothom.class})
+	@Operation(grantees = {pamSession_create.class})
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account) {return null;}
 
-	@Operation(grantees = {Tothom.class})
+	@Operation(grantees = {pamSession_create.class})
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor) {return null;}
 
-	@Operation(grantees = {Tothom.class})
+	@Operation(grantees = {pamSession_create.class})
 	@Description("Creates a jump server session and returns the session URL")
 	NewPamSession createJumpServerSession (Account account, String entryPointDescriptor, String pamPolicy) {return null;}
 
-	@Operation(grantees = {Tothom.class})
+	@Operation(grantees = {pamSession_create.class})
 	@Description("Creates a manual jump server session and returns the session URL")
 	NewPamSession createManualJumpServerSession (String accountName, Password accountPassword, String entryPointDescriptor, @Nullable String pamPolicy) {return null;}
 

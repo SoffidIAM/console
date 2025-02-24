@@ -58,7 +58,6 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	private boolean standalone;
 	
 	private UserService userService;
-	private Role currentRole;
 	private Window wizardWindow;
 	private Wizard wizard;
 	private int wizardMode;
@@ -89,8 +88,6 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 	}
 	
 	public void showDetails(Event event) {
-		DataNode dn = (DataNode) getListbox().getJXPathContext().getValue("/");
-		currentRole = (Role) dn.getInstance();
 		((Window)getWindowModify()).doHighlighted();
 		displayRemoveButton(false);
 	}
@@ -197,6 +194,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 			wizard.setSelected(1);
 		} else {
 			wizard.setSelected(0);
+			Role currentRole = getCurrentRole();
 			dvf.setApplication(currentRole.getInformationSystemName());
 			dvf.setDomain(currentRole.getDomain());
 			dvf.setValue(new LinkedList<String>());
@@ -380,6 +378,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 					{
 						dvf.setVisible(false);
 					} else {
+						Role currentRole = getCurrentRole();
 						dvf.setApplication(currentRole.getInformationSystemName());
 						dvf.setDomain(currentRole.getDomain());
 						dvf.setValue(new LinkedList<String>());
@@ -738,4 +737,9 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 		this.standalone = standalone;
 	}
 
+	private Role getCurrentRole() {
+		DataNode dn = (DataNode) getListbox().getJXPathContext().getValue("/");
+		Role currentRole = (Role) dn.getInstance();
+		return currentRole;
+	}
 }

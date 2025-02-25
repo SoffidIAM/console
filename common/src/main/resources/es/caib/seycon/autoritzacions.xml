@@ -649,6 +649,7 @@
 		<codi>role:create</codi>
 		<descripcio>Create roles</descripcio>
 		<ambit>Applications</ambit>
+		<tipusDomini>APLICACIONS</tipusDomini>
 		<hereta>
 			application:query
 		</hereta>
@@ -658,6 +659,7 @@
 		<codi>role:update</codi>
 		<descripcio>Update roles</descripcio>
 		<ambit>Applications</ambit>
+		<tipusDomini>APLICACIONS</tipusDomini>
 		<hereta>
 			application:query
 		</hereta>
@@ -667,6 +669,7 @@
 		<codi>role:delete</codi>
 		<descripcio>Delete roles</descripcio>
 		<ambit>Applications</ambit>
+		<tipusDomini>APLICACIONS</tipusDomini>
 		<hereta>
 			application:query
 		</hereta>

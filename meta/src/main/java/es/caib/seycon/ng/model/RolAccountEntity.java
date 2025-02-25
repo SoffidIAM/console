@@ -140,7 +140,7 @@ public abstract class RolAccountEntity {
 			+ "inner join    account.roles as ra\n"
 			+ "inner join    ra.role as role\n"
 			+ "inner join    role.system as dispatcher\n"
-			+ "where ra.enabled = true and account.type='U' and user.userName = :userName and user.tenant.id=:tenantId\n"
+			+ "where ra.enabled is true and account.type='U' and user.userName = :userName and user.tenant.id=:tenantId\n"
 			+ "order by dispatcher.name, role.name\n")
 	@Operation(translated="findByUserName")
 	public java.util.List<es.caib.seycon.ng.model.RolAccountEntity> findByCodiUsuari(

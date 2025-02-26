@@ -19,7 +19,7 @@ import es.caib.seycon.ng.comu.Domini;
 	es.caib.seycon.ng.model.RolAccountEntity.class})
 public abstract class ValorDominiAplicacioEntity {
 
-	@Column (name="VDO_VALOR", length=30, translated="value")
+	@Column (name="VDO_VALOR", length=150, translated="value")
 	public java.lang.String valor;
 
 	@Column (name="VDO_DOM", translated="domain")

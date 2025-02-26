@@ -45,7 +45,7 @@ public class SAMLLoginRequester extends HttpServlet {
 	}
 
 	protected void initialRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, InternalErrorException, NamingException, CreateException {
-		String hostName = new TenantExtractor().getTenant(req);
+		String hostName = req.getHeader("Host");
 		String context = getContext(req);
 
 		SamlRequest saml = EJBLocator.getSamlService().generateSamlRequest(hostName, context);

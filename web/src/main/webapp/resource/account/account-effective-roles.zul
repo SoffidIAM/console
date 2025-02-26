@@ -30,6 +30,7 @@
              #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", c:escapeXML(groupName)): ""}
              #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", c:escapeXML(ruleName)): ""}
              #{roleName != null ? c:cat4("${c:l('accounts.role')} ", c:escapeXML(roleName), " @ ",c:escapeXML(system)): ""}
+             #{domainValue != null ? c:cat3(" / <b>", c:escapeXML(domainValue), " </b> "): ""}
           columns:
           - value: system
           - template: >-
@@ -37,6 +38,7 @@
                 #{groupName != null ? c:escapeXML(groupDescription): ""}
                 #{ruleName != null ? "": ""}
                 #{roleName != null ? c:escapeXML(roleDescription): ""}
+                #{domainValue != null ? c:cat3(" / ", c:escapeXML(domainDescription), " </b> "): ""}
         - path: /nested
           icon: >-
             #{accountName != null ? "/img/account-green.png": 
@@ -48,6 +50,7 @@
              #{groupName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.group')} ", c:escapeXML(groupName)): ""}
              #{ruleName != null ? c:cat("${c:l('com.soffid.iam.api.Audit.rule')} ", c:escapeXML(ruleName)): ""}
              #{roleName != null ? c:cat3("${c:l('accounts.role')} <b>", c:escapeXML(roleName), " </b> "): ""}
+             #{domainValue != null ? c:cat3(" / <b>", c:escapeXML(domainValue), " </b> "): ""}
           columns:
           - value: system
           - template: >-
@@ -55,6 +58,7 @@
                 #{groupName != null ? c:escapeXML(groupDescription): ""}
                 #{ruleName != null ? "": ""}
                 #{roleName != null ? c:escapeXML(roleDescription): ""}
+                #{domainValue != null ? c:cat3(" / ", c:escapeXML(domainDescription), " </b> "): ""}
 		]]>
 		</attribute>
 	</datatree2>

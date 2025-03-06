@@ -1051,15 +1051,19 @@ public class ApplicationServiceImpl extends
 		   				return getRoleAccountEntityDao().toRoleAccount(rg);
 		   			else
 		   			{
-		   				deleteRoleAccountEntity(rg, null, true);
-		   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
+		   				if (rg.isEnabled() &&  ! ConfigurationCache.isHistoryEnabled()) {
+		   					deleteRoleAccountEntity(rg, null, true);
+		   					rolsUsuarisEntity.getAccount().getRoles().remove(rg);
+		   				}
 		   			}
 		   		}
 		   		else if (rolsUsuarisEntity.getRole().getInformationSystem() == rg.getRole().getInformationSystem() &&
 		   			Boolean.TRUE.equals(rolsUsuarisEntity.getRole().getInformationSystem().getSingleRole()))
 		   		{
-	   				deleteRoleAccountEntity(rg, null, true);
-	   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
+		   			if (! rg.isEnabled() || ConfigurationCache.isHistoryEnabled()) {
+		   				deleteRoleAccountEntity(rg, null, true);
+		   				rolsUsuarisEntity.getAccount().getRoles().remove(rg);
+		   			}
 		   		}
 		   	}
 		   	

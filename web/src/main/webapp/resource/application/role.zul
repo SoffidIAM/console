@@ -38,9 +38,11 @@
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
 
-			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('application:create')}" visible="${!readonly }">
-				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
-				<div class="addButton" onClick="ref:frame.addNew">+</div>
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('role:delete') || soffid:isUserInRole('role:create')}" visible="${!readonly }">
+				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false"
+					if="${soffid:isUserInRole('role:delete') }">-</div>
+				<div class="addButton" onClick="ref:frame.addNew"
+					if="${soffid:isUserInRole('role:create') }">+</div>
 			</div>
 		</div>
 		

@@ -688,6 +688,7 @@
 		<codi>application:create</codi>
 		<descripcio>Create applications</descripcio>
 		<ambit>Applications</ambit>
+		<tipusDomini>APLICACIONS</tipusDomini>
 		<hereta>
 			application:query,
 			application:update,

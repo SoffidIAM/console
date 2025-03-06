@@ -14,8 +14,8 @@
 		<label bind="${arg.listbox}:/@name"></label> - <label bind="${arg.listbox}:/@description"/>
 		<menu2>
 			<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:handler.changeColumns"/>
-			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('user:group:create')}"  onClick="ref:handler.addNew"/>
-			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('user:group:create')}" onClick="ref:handler.importCsv"/>
+			<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${soffid:isUserInRole('role:create')}"  onClick="ref:handler.addNew"/>
+			<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${soffid:isUserInRole('role:create')}" onClick="ref:handler.importCsv"/>
 			<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:handler.downloadCsv"/>
 			<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:handler.bulkAction" />
 		</menu2>
@@ -30,9 +30,11 @@
 		onSelect="ref:handler.showDetails" enablefilter="true">
 	</datatable>
 
-	<div width="100%" if="${soffid:isUserInRole('application:update')}" >
-		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false">-</div>
-		<div style="float: right"  class="addButton" onClick="ref:handler.addNew">+</div>
+	<div width="100%" if="${soffid:isUserInRole('role:create') || soffid:isUserInRole('role:delete')}" >
+		<div class="deleteButton" onClick="ref:handler.deleteSelected" visible="false"
+			 if="${soffid:isUserInRole('role:delete')}">-</div>
+		<div style="float: right"  class="addButton" onClick="ref:handler.addNew"
+			 if="${soffid:isUserInRole('role:create')}">+</div>
 	</div>
 
 	<window 
@@ -46,7 +48,7 @@
 			<label bind="${arg.listbox }:/name"/> - <label bind="${arg.listbox }:/description"/> 
 			<pager datatable="../listbox"/>
 			<databutton image="/img/trash.svg" onlyIcon="true"
-					 if="${soffid:isUserInRole('user:group:delete')}" 
+					 if="${soffid:isUserInRole('role:delete')}" 
 					label="${c:l('plugins.zul.Delete') }" 
 					onClick="ref:handler.delete"/>
 		</div>
@@ -253,7 +255,7 @@
 				<tabpanel fulfill="roleusersTabe.onSelect">
 					<role_users listbox="../../listbox" readonly="${false }"/>
 				</tabpanel>
-				<tabpanel >
+				<tabpanel  if="${soffid:isUserInRole('rule:admin') }">
 					<div class="navigation-bar dummy">
 						<label bind="../listbox:/name"></label>
 						<label value = " - "/>

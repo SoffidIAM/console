@@ -109,6 +109,7 @@ public class DomainValueField extends Databox
 			{
 				dataHandler = new DomainValueDataHandler(dataType, application, domain);
 			}
+			invalidate();
 		} catch (Throwable e) {
 			log.warn(e);
 		} finally {

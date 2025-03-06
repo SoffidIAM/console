@@ -353,7 +353,7 @@ public class ApplicationRoleHandler extends Div implements AfterCompose {
 				if (role.validate()) {
 					wizardRole = (Role) role.getValueObject();
 					wizard.next();
-					DomainValueField dvf = (DomainValueField) wizardWindow.getFellow("domainValues");
+					DomainValueField dvf = (DomainValueField) wizardWindow.getFellow("sourceDomainValues");
 					if (wizardRole.getDomain() == null) {
 						dvf.setVisible(false);
 						// DO NOT BREAK -> Skip next step

@@ -106,18 +106,26 @@ public class MetadataCache {
 			boolean multiline = att.optBoolean("multiline", false);
 			boolean searchCriteria = att.optBoolean("searchCriteria", false);
 			boolean multivalue = att.optBoolean("multivalue", false);
-			String customUiHandler = att.optString("custom_ui_handler");
-			String separator = att.optString("separator");
-			String validator = att.optString("validator");
-			String length = att.optString("length");
-			String filterExpression = att.optString("filter_expression");
-			String enumeration = att.optString("enumeration");
+			String customUiHandler = att.optString("custom_ui_handler", null);
+			String separator = att.optString("separator", null);
+			String validator = att.optString("validator", null);
+			String length = att.optString("length", null);
+			String filterExpression = att.optString("filter_expression", null);
+			String enumeration = att.optString("enumeration", null);
+			JSONArray listOfValuesArray = att.optJSONArray("listOfValues");
+			
 			if (! hidden) {
 				DataType md = new DataType();
 				md.setAdminVisibility( hidden ? AttributeVisibilityEnum.HIDDEN :
 					readonly ? AttributeVisibilityEnum.READONLY :
 						AttributeVisibilityEnum.EDITABLE);
 				md.setBuiltin(true);
+				if (listOfValuesArray != null) {
+					List<String> l = new LinkedList<>();
+					for (int n = 0; n < listOfValuesArray.length(); n++)
+						l.add(listOfValuesArray.optString(n));
+					md.setValues(l);
+				}
 				md.setEnumeration(enumeration);
 				md.setFilterExpression(filterExpression);
 				md.setLetterCase(lettercase != null && lettercase.toLowerCase().startsWith("u") ? LetterCaseEnum.UPPERCASE :

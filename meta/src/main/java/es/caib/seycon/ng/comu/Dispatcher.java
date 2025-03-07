@@ -77,7 +77,7 @@ public class Dispatcher {
 	public java.lang.Long id;
 
 	@Nullable
-	@Attribute(translated = "userTypes", listOfValues = {"IAM", "PAM"} )
+	@Attribute(translated = "userTypes" )
 	public java.lang.String relacioLaboral;
 
 	@Nullable
@@ -160,7 +160,7 @@ public class Dispatcher {
 	
 	@Description("Type of dispatcher: PAM, IAM or SSE")
 	@Nullable
-	@Attribute(defaultValue = "\"IAM\"")
+	@Attribute(defaultValue = "\"IAM\"", listOfValues = {"IAM", "PAM"})
 	String usage;	
 
 	@Nullable

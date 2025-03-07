@@ -65,11 +65,9 @@ public class SearchDictionaryBuilder {
 		 add("com.soffid.iam.api.System.param9");
 		 add("com.soffid.iam.api.System.blobParam");
 	}};
-	private static Map<String, SearchDictionary> map = new HashMap<String, SearchDictionary>();
-
 	public static SearchDictionary build (String clazz) throws ClassNotFoundException, InternalErrorException, NamingException, CreateException
 	{
-		SearchDictionary sd = map.get(clazz);
+		SearchDictionary sd;
 		
 		String objectType = null;
 		if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
@@ -79,40 +77,24 @@ public class SearchDictionaryBuilder {
 		
 		AdditionalDataService ejb = EJBLocator.getAdditionalDataService();
  		CustomObjectType ot = ejb.findCustomObjectTypeByName(objectType);
-		if (ot == null) {
-			sd = generateLegacyDictionary(clazz);
-		} else {
-			sd = generateStandardDictionary(objectType);
-		}
+		sd = generateStandardDictionary(objectType);
+		sd = fixupDictionary(sd, objectType);
 		return sd;
 	}
 
-	private static SearchDictionary generateLegacyDictionary(String clazz)
+	private static SearchDictionary fixupDictionary(SearchDictionary sd, String clazz)
 			throws ClassNotFoundException, InternalErrorException, NamingException, CreateException {
-		SearchDictionary sd;
-		sd = generateDefaultBuilder(clazz);
-
-		if (sd == null)
-		{
-			if (clazz.startsWith(COM_SOFFID_IAM_API_CUSTOM_OBJECT))
-				sd = generateDefaultBuilder("com.soffid.iam.api.CustomObject");
-			else
-				sd = generateDefaultBuilder(clazz);
-			if (clazz.equals("com.soffid.iam.api.User")) {
-				addUserJoins(sd);
-			} else if (clazz.equals("com.soffid.iam.api.Role")) {
-				addRoleJoins(sd);
-			} else if (clazz.equals("com.soffid.iam.api.Application")) {
-				addApplicationJoins(sd);
-			} else if (clazz.equals("com.soffid.iam.api.Group")) {
-				addGroupJoins(sd);
-			} else if (clazz.equals("com.soffid.iam.api.Account")) {
-				addAccountsJoins(sd);
-			}
-			map.put(clazz, sd);
+		if (clazz.equals("com.soffid.iam.api.User")) {
+			addUserJoins(sd);
+		} else if (clazz.equals("com.soffid.iam.api.Role")) {
+			addRoleJoins(sd);
+		} else if (clazz.equals("com.soffid.iam.api.Application")) {
+			addApplicationJoins(sd);
+		} else if (clazz.equals("com.soffid.iam.api.Group")) {
+			addGroupJoins(sd);
+		} else if (clazz.equals("com.soffid.iam.api.Account")) {
+			addAccountsJoins(sd);
 		}
-		
-		
 		
 		// Add tenant dependent attributes
 		if (clazz.equals("com.soffid.iam.api.User")) {
@@ -351,8 +333,8 @@ public class SearchDictionaryBuilder {
 		sd2.setTimestamp(System.currentTimeMillis());
 		sd2.setAttributes( new LinkedList<SearchAttributeDefinition>());
 		final Collection<DataType> dataTypes = EJBLocator.getAdditionalDataService().findDataTypesByObjectTypeAndName2(objectType, null);
-		if (dataTypes == null || dataTypes.isEmpty())
-			return generateLegacyDictionary(objectType);
+		if (dataTypes == null || dataTypes.isEmpty()) 
+			 return generateDefaultBuilder(objectType);
 		for (DataType att: dataTypes)
 		{
 			if (!TypeEnumeration.BINARY_TYPE.equals( att.getType() ) &&

@@ -3796,9 +3796,12 @@ public class BpmEngineImpl extends BpmEngineBase {
 			FileDefinition fd = d.getFileDefinition();
 			
 			for (Object v: fd.getBytesMap().keySet()) {
-				out.putNextEntry(new ZipEntry(v.toString()));
-				out.write( (byte[])fd.getBytesMap().get(v));
-				out.closeEntry();
+				final byte[] data = (byte[])fd.getBytesMap().get(v);
+				if (data != null) {
+					out.putNextEntry(new ZipEntry(v.toString()));
+					out.write( data);
+					out.closeEntry();
+				}
 			}
 			out.close();
 		} finally {

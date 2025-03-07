@@ -987,8 +987,8 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 
 			} else {
 				// Remove rules from granted roles
-				for (RoleAccountEntity ra : ae.getRoles()) {
-                    if (ra.getRule() != null) {
+				for (RoleAccountEntity ra : new LinkedList<>( ae.getRoles())) {
+                    if (ra.getRule() != null && ra.isEnabled()) {
                         ra.setRule(null);
                         getRoleAccountEntityDao().update(ra);
                     }

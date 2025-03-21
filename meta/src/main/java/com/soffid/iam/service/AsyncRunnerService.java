@@ -15,11 +15,11 @@ import roles.Tothom;
 @Depends({AsyncRunnerService.class})
 public class AsyncRunnerService {
 	@Operation()
-	@Transactional(noRollbackFor = { java.lang.Exception.class }, readOnly=true)
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
 	public void run (Runnable runnable, AsyncList result) {	}
 
 	@Operation()
-	@Transactional(noRollbackFor = { java.lang.Exception.class }, readOnly=true)
+	@Transactional(noRollbackFor = { java.lang.Exception.class })
 	public void runInternal (Runnable runnable, AsyncList result) {	}
 
 	@Operation(grantees={Tothom.class})

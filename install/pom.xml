@@ -119,7 +119,6 @@
 										<include name="iam-tomee.jar" />
 										<include name="mariadb-java-client.jar" />
 										<include name="ojdbc10.jar" />
-										<include name="sqljdbc4.jar" />
 										<include name="postgresql.jar" />
 									</fileset>
 								</copy>

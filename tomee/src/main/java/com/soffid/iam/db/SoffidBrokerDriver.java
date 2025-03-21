@@ -27,6 +27,10 @@ public class SoffidBrokerDriver implements Driver {
     
     	user = System.getProperty("dbUser");
     	url = System.getProperty("dbDriverUrl");
+    	if (url != null &&
+    			url.startsWith("jdbc:sqlserver") &&
+    			!url.contains("trustServerCertificate"))
+    		url = url + ";trustServerCertificate=true";
     	String driverClassname = (System.getProperty("dbDriverClass"));
     	validationQuery = (System.getProperty("dbValidationQuery"));
 
@@ -59,7 +63,8 @@ public class SoffidBrokerDriver implements Driver {
 	public Connection connect(String url, Properties info) throws SQLException {
 		Driver driver = getDriver();
 		info.put("user", user);
-		info.put("password", pass);
+		if (pass != null)
+			info.put("password", pass);
 		return driver.connect(this.url, info);
 	}
 

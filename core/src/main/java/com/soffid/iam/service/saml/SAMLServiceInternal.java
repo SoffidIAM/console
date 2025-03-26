@@ -232,7 +232,7 @@ public class SAMLServiceInternal {
 		return "true".equals(ConfigurationCache.getProperty("soffid.saml.debug"));
 	}
 	
-	public String[] authenticate(String hostName, String path, String protocol, Map<String, String> response) throws Exception {
+	public String[] authenticate(String tenantName, String path, String protocol, Map<String, String> response) throws Exception {
 		String samlResponse = response.get("SAMLResponse");
 		
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -261,7 +261,7 @@ public class SAMLServiceInternal {
 			else
 				log.info("Response is not signed");
 		}
-		if (responseSigned && ! validateResponse(hostName, saml2Response))
+		if (responseSigned && ! validateResponse(tenantName, saml2Response))
 			return null;
 
 		String originalrequest = saml2Response.getInResponseTo();
@@ -283,18 +283,18 @@ public class SAMLServiceInternal {
 			if (debug()) {
 				log.info("Encrypted assertion:\n" + marshall(assertion));
 			}
-			if (validateAssertion(hostName, assertion, responseSigned))
+			if (validateAssertion(tenantName, assertion, responseSigned))
 			{
 				log.info("Encrypted assertion is valid");
-				return createAuthenticationRecord(hostName, requestEntity, assertion);
+				return createAuthenticationRecord(tenantName, requestEntity, assertion);
 			}
 		}
 		for ( Assertion assertion: saml2Response.getAssertions())
 		{
-			if (validateAssertion(hostName, assertion, responseSigned))
+			if (validateAssertion(tenantName, assertion, responseSigned))
 			{
 				log.info("Encrypted assertion is valid");
-				return createAuthenticationRecord(hostName, requestEntity, assertion);
+				return createAuthenticationRecord(tenantName, requestEntity, assertion);
 			}
 		}
 		
@@ -340,7 +340,7 @@ public class SAMLServiceInternal {
 	    return decrypter.decrypt(encryptedAssertion);
 	}
 
-	private String[] createAuthenticationRecord(String hostName, SamlRequestEntity requestEntity, Assertion assertion) {
+	private String[] createAuthenticationRecord(String tenantName, SamlRequestEntity requestEntity, Assertion assertion) {
 		Subject subject = assertion.getSubject();
 		if (subject == null)
 		{
@@ -394,7 +394,7 @@ public class SAMLServiceInternal {
 			requestEntity.setKey(sb.toString());
 			requestDao.update(requestEntity);
 			log.info("Authenticated user "+user);
-			return new String[]{ requestEntity.getHostName() + "\\"+ requestEntity.getExternalId(), sb.toString()};
+			return new String[]{ tenantName + "\\"+ requestEntity.getExternalId(), sb.toString()};
 		} 
 		else
 			return null;

@@ -531,8 +531,8 @@ public class SAMLServiceInternal {
 				return null;
 			if (!requestEntity.isFinished())
 				return null;
-			if (!requestEntity.getHostName().equals(tenant))
-				return null;
+//			if (!requestEntity.getHostName().equals(tenant))
+//				return null;
 			if (!requestEntity.getKey().equals(token[1]))
 				return null;
 			return tenant+"\\"+requestEntity.getUser();

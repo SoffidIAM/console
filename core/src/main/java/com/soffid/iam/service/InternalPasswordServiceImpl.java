@@ -571,10 +571,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 //        c.add(Calendar.DAY_OF_MONTH, -1);
 
 		Collection expired = getPasswordEntityDao().query(
-				"select contrasenya " + "from com.soffid.iam.model.PasswordEntity as contrasenya "
-						+ "where contrasenya.domain = :domini and " + "contrasenya.user.userType = :tipusUsuari and "
-						+ "contrasenya.user.active=\'S\' and " + "contrasenya.expirationDate <= :caducitat and "
-						+ "contrasenya.active in (\'S\', \'N\') ",
+				"select contrasenya " 
+						+ "from com.soffid.iam.model.PasswordEntity as contrasenya "
+						+ "where contrasenya.domain = :domini and " 
+						+ "contrasenya.user.userType = :tipusUsuari and "
+						+ "contrasenya.user.active=\'S\' and " 
+						+ "contrasenya.expirationDate <= :caducitat and "
+						+ "contrasenya.active in (\'S\', \'N\') and "
+						+ "contrasenya.order = 0 ",
 				new Parameter[] { new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserType()),
 						new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$
 		for (Iterator<PasswordEntity> it = expired.iterator(); it.hasNext();) {
@@ -586,10 +590,14 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 
 		expired = getAccountPasswordEntityDao().query(
 				"select pass " + "from com.soffid.iam.model.AccountPasswordEntity as pass "
-						+ "join pass.account as account " + "where account.system.passwordDomain = :domini and "
-						+ "  account.system.url is not null and " + "  account.passwordPolicy = :tipusUsuari and "
-						+ "  account.disabled = false and " + "  account.type != 'I' and "
-						+ "  pass.expirationDate <= :caducitat and " + "  pass.active in (\'S\', \'N\') and "
+						+ "join pass.account as account " 
+						+ "where account.system.passwordDomain = :domini and "
+						+ "  account.system.url is not null and " 
+						+ "  account.passwordPolicy = :tipusUsuari and "
+						+ "  account.disabled = false and " 
+						+ "  account.type != 'I' and "
+						+ "  pass.expirationDate <= :caducitat and " 
+						+ "  pass.active in (\'S\', \'N\') and "
 						+ "  pass.order = 0",
 				new Parameter[] { new Parameter("domini", dc), new Parameter("tipusUsuari", pc.getUserType()),
 						new Parameter("caducitat", c.getTime()) }); //$NON-NLS-1$

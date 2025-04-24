@@ -490,6 +490,16 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>host:all:support</codi>
+		<descripcio>Support hosts on any network</descripcio>
+		<ambit>Hosts</ambit>
+		<hereta>
+			host:all:query,
+			network:all:query
+		</hereta>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>host:query</codi>
 		<descripcio>Query hosts in authorized networks</descripcio>
 		<ambit>Hosts</ambit>
@@ -518,10 +528,10 @@
 
 	<autoritzacio>
 		<codi>host:support</codi>
-		<descripcio>Give VNC support for all hosts</descripcio>
+		<descripcio>Give VNC support some hosts</descripcio>
 		<ambit>Hosts</ambit>
 		<hereta>
-			host:all:query
+			host:query
 		</hereta>
 	</autoritzacio>
 	

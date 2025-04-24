@@ -142,7 +142,8 @@ public class Security {
     public static final String AUTO_OS_UPDATE = "operatingSystem:update"; //$NON-NLS-1$
     
     public static final String AUTO_HOST_QUERY_ADMINISTRATOR_ACCESS = "host:admin:query"; //$NON-NLS-1$
-    public static final String AUTO_HOST_ALL_SUPPORT_VNC = "host:support"; //$NON-NLS-1$
+    public static final String AUTO_HOST_ALL_SUPPORT_VNC = "host:all:support"; //$NON-NLS-1$
+    public static final String AUTO_HOST_SUPPORT_VNC = "host:support"; //$NON-NLS-1$
     /** Per poder veure només les màquines autoritzades */
     public static final String AUTO_HOST_QUERY = "host:query"; //$NON-NLS-1$
     /** Per poder veure TOTES les màquines */

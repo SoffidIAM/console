@@ -314,7 +314,7 @@ public class AutoritzacionsUsuari
 
 	public static boolean hasSupportHost_VNC ()
 	{
-		return Security.isUserInRole(Security.AUTO_HOST_ALL_SUPPORT_VNC);
+		return Security.isUserInRole(Security.AUTO_HOST_SUPPORT_VNC);
 	}
 
 	/*

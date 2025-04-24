@@ -1238,6 +1238,8 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         Iterator iterator = networkAuthorizations.iterator();
         // obtenim el màxim nivell d'accés
         int maximNivell = SENSE_PERMISOS;
+        if (Security.isUserInRole("host:all:support"))
+        	maximNivell = SUPORT;
         while (iterator.hasNext()) {
             NetworkAuthorization networkAuthorization = (NetworkAuthorization) iterator.next();
             if (codiXarxa.compareTo(networkAuthorization.getNetworkCode()) == 0) {

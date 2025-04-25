@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.comu;
 import java.util.Date;
+import java.util.Map;
 
 import com.soffid.mda.annotation.*;
 
@@ -18,6 +19,7 @@ import es.caib.seycon.ng.model.RolAccountEntity;
 public class RolAccount {
 
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public java.lang.Long accountId;
 
 	@Nullable
@@ -40,29 +42,31 @@ public class RolAccount {
 	public java.lang.Long roleId;
 
 	@Nullable
-	@JsonAttribute(hibernateAttribute = "role.name")
+	@JsonAttribute(hibernateAttribute = "role.category")
+	@Attribute(hidden = true)
 	public java.lang.String roleCategory;
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute = "role.informationSystem.name")
-	@Attribute(translated = "informationSystemName" )
+	@Attribute(translated = "informationSystemName", hidden=true )
 	public java.lang.String codiAplicacio;
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute = "role.description")
-	@Attribute(translated = "roleDescription" )
+	@Attribute(translated = "roleDescription", hidden = true )
 	public java.lang.String descripcioRol;
 
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public java.lang.Long id;
 
 	@Nullable
-	@Attribute(translated = "userFullName" )
+	@Attribute(translated = "userFullName", readonly = true, hidden = true )
 	public java.lang.String nomComplertUsuari;
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute = "account.users.user.primaryGroup.description")
-	@Attribute(translated = "groupDescription" )
+	@Attribute(translated = "groupDescription", readonly = true, hidden = true )
 	public java.lang.String descripcioGrup;
 
 	@Nullable
@@ -76,11 +80,11 @@ public class RolAccount {
 
 	@Nullable
 	@JsonAttribute(hibernateAttribute = "account.users.user.primaryGroup.name")
-	@Attribute(translated = "userGroupCode" )
+	@Attribute(translated = "userGroupCode", readonly = true, hidden = true )
 	public java.lang.String codiGrupUsuari;
 
 	@Nullable
-	@Attribute(translated = "bpmEnforced" )
+	@Attribute(readonly = true, hidden = true, translated = "bpmEnforced" )
 	public java.lang.String gestionableWF;
 
 	@Nullable
@@ -89,18 +93,22 @@ public class RolAccount {
 	public java.lang.String codiUsuari;
 
 	@Description("Rule that has cretaed the role assignment")
+	@Attribute(readonly = true, hidden = true)
 	@Nullable
 	@JsonAttribute(hibernateAttribute = "rule.id")
 	public java.lang.Long ruleId;
 
 	@Nullable
+	@Attribute(hidden = true)
 	@JsonAttribute(hibernateAttribute = "rule.description")
 	public java.lang.String ruleDescription;
 
 	@Nullable
+	@Attribute(hidden = true)
 	public es.caib.seycon.ng.comu.SoDRisk sodRisk;
 
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public java.util.Collection<es.caib.seycon.ng.comu.SoDRule> sodRules;
 
 	@Description ("Rol assignment start date. Null means since now")
@@ -112,13 +120,13 @@ public class RolAccount {
 	public Date endDate;
 
 	@Description ("True if the role is enabled or not. When the start/end date reaches, the flag should change")
-	@Attribute(defaultValue="true")
+	@Attribute(defaultValue="true", hidden = true)
 	public boolean enabled;
 	
-	@Attribute(defaultValue="true")
+	@Attribute(defaultValue="true", hidden = true)
 	public boolean approvalPending;
 	
-	@Attribute(defaultValue = "false")
+	@Attribute(defaultValue = "false", hidden = true)
 	@Nullable
 	public Boolean removalPending;
 	
@@ -129,6 +137,7 @@ public class RolAccount {
 
 	@Description("When an aproval process is needed to enable this rol assignment")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public Long approvalProcess;
 
 	@Description("Last certification date")
@@ -137,26 +146,37 @@ public class RolAccount {
 	
 	@Description("Parent grant id, for optinal role to role grant")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public Long parentGrant;
 
 	@Description("Delegation status")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public com.soffid.iam.api.DelegationStatus delegationStatus;
 
 	@Description("Entitled account who delegatse to delegateAccount")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public String ownerAccount;
 
 	@Description("Delegate account")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public String delegateAccount;
 
 	@Description("Delegate since date")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public Date delegateSince;
 
 	@Description("Delegate until date")
 	@Nullable
+	@Attribute(readonly = true, hidden = true)
 	public Date delegateUntil;
 
+	@Description ("Grant custom attributes")
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()", hidden = true)
+	@Nullable
+	public Map<String,Object> attributes; 
 }

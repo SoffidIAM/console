@@ -49,6 +49,7 @@ import com.soffid.iam.web.popup.SelectColumnsHandler;
 import es.caib.seycon.ng.comu.SoDRisk;
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.binder.SingletonBinder;
+import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DateFormats;
 import es.caib.zkib.component.Wizard;
@@ -268,6 +269,10 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 		List<String> domains = (List<String>) input.getValue();
 		DataTable lb = getListbox();
 		
+		DataModel dm = (DataModel) getWindowAdd().getFellow("emptyDataModel");
+		RoleAccountDataNode radn = (RoleAccountDataNode) dm.getData();
+		RoleAccount ra0 = (RoleAccount) radn.getInstance();
+		Map<String,Object> attributes = ra0.getAttributes();
 		
 		List<String> v = (List<String>) input1.getValue();
 		List<String> v2 = (List<String>) input2.getValue();
@@ -305,6 +310,7 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 				ra.setUserCode(userName);
 				ra.setUserGroupCode(group);
 				ra.setUserFullName(fullName);
+				ra.getAttributes().putAll(attributes);
 				if ( domain !=  null && domains != null && ! domains.isEmpty()) {
 					lb.delete();
 					DataTable usersListbox = getUsersListbox();

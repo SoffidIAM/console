@@ -59,6 +59,7 @@ import com.soffid.iam.api.Domain;
 import com.soffid.iam.api.DomainType;
 import com.soffid.iam.api.DomainValue;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.Host;
 import com.soffid.iam.api.Issue;
 import com.soffid.iam.api.IssueUser;
 import com.soffid.iam.api.MetadataScope;
@@ -83,6 +84,8 @@ import com.soffid.iam.model.CustomObjectEntityDao;
 import com.soffid.iam.model.DomainValueEntity;
 import com.soffid.iam.model.EntryPointRoleEntity;
 import com.soffid.iam.model.GroupEntity;
+import com.soffid.iam.model.HostAttributeEntity;
+import com.soffid.iam.model.HostEntity;
 import com.soffid.iam.model.InformationSystemEntity;
 import com.soffid.iam.model.IssueEntity;
 import com.soffid.iam.model.MetaDataEntity;
@@ -92,6 +95,7 @@ import com.soffid.iam.model.NoticeEntity;
 import com.soffid.iam.model.Parameter;
 import com.soffid.iam.model.PrinterEntity;
 import com.soffid.iam.model.QueryBuilder;
+import com.soffid.iam.model.RoleAccountAttributeEntity;
 import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.model.RoleAccountEntityDao;
 import com.soffid.iam.model.RoleAttributeEntity;
@@ -108,6 +112,7 @@ import com.soffid.iam.model.UserGroupAttributeEntity;
 import com.soffid.iam.model.UserGroupEntity;
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 import com.soffid.iam.security.SoffidPrincipalImpl;
+import com.soffid.iam.service.NetworkServiceImpl.HostAttributePersister;
 import com.soffid.iam.service.attribute.AttributePersister;
 import com.soffid.iam.service.impl.AttributeValidationService;
 import com.soffid.iam.service.impl.RolGrantDiffReport;
@@ -1084,6 +1089,8 @@ public class ApplicationServiceImpl extends
 	        }
 	        
 		   	getRoleAccountEntityDao().create(rolsUsuarisEntity);
+	        updateRoleAccountAttributes(ra, rolsUsuarisEntity);
+	        
 		    AccountEntity account = rolsUsuarisEntity.getAccount();
 		    account.getRoles().add(rolsUsuarisEntity);
 
@@ -1400,6 +1407,7 @@ public class ApplicationServiceImpl extends
 			}
 			else
 			{
+				getRoleAccountAttributeEntityDao().remove(rolsUsuarisEntity.getAttributes());
 				getRoleAccountEntityDao().remove(rolsUsuarisEntity);
 			}
 			if (Hibernate.isInitialized(rolsUsuarisEntity.getAccount().getRoles()))
@@ -1464,7 +1472,8 @@ public class ApplicationServiceImpl extends
     		if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_CREATE, roleAccountEntity))
     		{
         		getRoleAccountEntityDao().update(roleAccountEntity);
-        	
+        		updateRoleAccountAttributes(rolsUsuaris, roleAccountEntity);
+        		
 	        	// Create non mandatory role - role dependencies first time the grant is enabled
 	        	if (oldRolsUsuaris.isApprovalPending() && ! rolsUsuaris.isApprovalPending())
 	        	{
@@ -2841,6 +2850,73 @@ public class ApplicationServiceImpl extends
 		return null;
 	}
 
+
+	private boolean updateRoleAccountAttributes (RoleAccount app, RoleAccountEntity entity) throws InternalErrorException
+	{
+		return new RoleAccountAttributePersister().updateAttributes(app.getAttributes(), entity);
+	}
+
+	class RoleAccountAttributePersister extends AttributePersister<RoleAccountEntity,RoleAccountAttributeEntity> {
+		@Override
+		protected List<RoleAccountAttributeEntity> findAttributeEntityByNameAndValue(MetaDataEntity m, String v) {
+			return getRoleAccountAttributeEntityDao().findByNameAndValue(m.getName(), v);
+		}
+
+		@Override
+		protected void updateEntity(RoleAccountEntity entity) {
+//			getRoleAccountEntityDao().update(entity);
+		}
+
+		@Override
+		protected String getMetadataScope() {
+			return RoleAccount.class.getName();
+		}
+
+		@Override
+		protected Collection<RoleAccountAttributeEntity> getEntityAttributes(RoleAccountEntity entity) {
+			return entity.getAttributes();
+		}
+
+		@Override
+		protected RoleAccountAttributeEntity createNewAttribute(RoleAccountEntity entity, MetaDataEntity metadata, Object value) {
+			RoleAccountAttributeEntity aae = getRoleAccountAttributeEntityDao().newRoleAccountAttributeEntity();
+			aae.setGrant(entity);
+			aae.setMetadata(metadata);
+			aae.setObjectValue(value);
+			getRoleAccountAttributeEntityDao().create(aae);
+			return aae;
+		}
+
+		@Override
+		protected RoleAccountAttributeEntity findAttributeEntity(LinkedList<RoleAccountAttributeEntity> entities, String key,
+				Object o) {
+			for (RoleAccountAttributeEntity aae: entities)
+			{
+				if (aae.getMetadata().getName().equals(key))
+				{
+					if (aae.getObjectValue() != null && aae.getObjectValue().equals(o))
+						return aae;
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected MetaDataEntityDao getMetaDataEntityDao() {
+			return ApplicationServiceImpl.this.getMetaDataEntityDao();
+		}
+
+		@Override
+		protected AttributeValidationService getAttributeValidationService() {
+			return ApplicationServiceImpl.this.getAttributeValidationService();
+		}
+
+		@Override
+		protected void removeAttributes(Collection<RoleAccountAttributeEntity> entities) {
+			getRoleAccountAttributeEntityDao().remove(entities);
+		}
+		
+	}
 
 	private void updateRoleAttributes (Role app, RoleEntity entity) throws InternalErrorException
 	{
@@ -4465,6 +4541,29 @@ public class ApplicationServiceImpl extends
     		getTaskEntityDao().create(t);
     	}
 	}
+
+	protected RoleAccount handleUpdateAttributes(RoleAccount rolsUsuaris) throws Exception {
+        RoleAccountEntity oldRoleAccountEntity = getRoleAccountEntityDao().load(rolsUsuaris.getId());
+		if (oldRoleAccountEntity == null)
+			return rolsUsuaris;
+		if (getAuthorizationService().hasPermission(Security.AUTO_USER_ROLE_CREATE, oldRoleAccountEntity))
+		{
+	        RoleAccount oldRolsUsuaris = getRoleAccountEntityDao().toRoleAccount(oldRoleAccountEntity);
+	        String codiAplicacio = rolsUsuaris.getInformationSystemName();
+
+	        if (oldRoleAccountEntity.getApprovalProcess() != null)
+	        {
+        		throw new InternalErrorException("Cannot modify grants approved on a workflow process");
+	        }
+	        
+	        updateRoleAccountAttributes(rolsUsuaris, oldRoleAccountEntity);
+	        return getRoleAccountEntityDao().toRoleAccount(oldRoleAccountEntity);
+        }
+        else
+        	throw new SeyconAccessLocalException("aplicacioService", "create (RolAccount)", "user:role:delete", String.format( //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Messages.getString("ApplicationServiceImpl.UnableCreateRol"), 
+					oldRoleAccountEntity.getRole().getInformationSystem().getName())); //$NON-NLS-1$
+    }
 
 
 }

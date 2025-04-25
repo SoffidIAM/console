@@ -6,6 +6,7 @@
 
 package es.caib.seycon.ng.comu;
 import java.util.Date;
+import java.util.Map;
 
 import com.soffid.iam.api.RoleDependencyStatus;
 import com.soffid.mda.annotation.*;
@@ -99,4 +100,10 @@ public class RolGrant {
 	@Column (name="RRL_MANDAT", defaultValue="true")
 	@Nullable
 	public Boolean mandatory;
+
+	@Description ("Grant custom attributes")
+	@JsonAttribute(hibernateJoin="attributes")
+	@Attribute(defaultValue="new java.util.HashMap<String,Object>()", hidden = true)
+	@Nullable
+	public Map<String,Object> attributes; 
 }

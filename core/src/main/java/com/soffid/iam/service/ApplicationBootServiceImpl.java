@@ -593,6 +593,12 @@ public class ApplicationBootServiceImpl extends
 			cfg.setValue("118");
 			configSvc.update(cfg);
 		}
+		if (cfg.getValue().equals("118"))
+		{
+			getAdditionalDataService().registerStandardObject("com/soffid/iam/api/RoleAccount.ui.json", null, false);
+			cfg.setValue("119");
+			configSvc.update(cfg);
+		}
 	}
 
 	private void updateForbiddenWords() throws SQLException {
@@ -1727,6 +1733,7 @@ public class ApplicationBootServiceImpl extends
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/Account.ui.json", MetadataScope.ACCOUNT, true);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/User.ui.json", MetadataScope.USER, true);
 		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/MailList.ui.json", MetadataScope.MAIL_LIST, true);
+		getAdditionalDataService().registerStandardObject("com/soffid/iam/api/RoleAccount.ui.json", null, false);
 
 		for (CustomObjectTypeEntity entity: getCustomObjectTypeEntityDao().loadAll()) {
 			if (! entity.isBuiltin()) {

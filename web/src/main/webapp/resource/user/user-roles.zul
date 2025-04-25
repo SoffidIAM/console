@@ -137,6 +137,10 @@
 				bind="sodRisk" dataType="STRING" enumeration="es.caib.seycon.ng.comu.SoDRisk" readonly="true" id="sodRisk"/>
 			<customfield3 label="${c:l('com.soffid.iam.api.RoleAccount.sodRules') }"
 				dataType="HTML" readonly="true" id="sodRules"/>
+			<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+				hidebuiltin="true"
+				id="roleAccountAttributes"
+				objectType="com.soffid.iam.api.RoleAccount" dataPath="/." />
 		</form>
 		<div style="text-align: right; width: 100%">
 			<button image="/img/undo-r.svg" label="${c:l('error.zul.Tancar')}" 
@@ -213,6 +217,10 @@
 						dataType="HTML" readonly="true" id="sodRules"/>
 					<customfield3 label="${c:l('usuaris.zul.holderGroup') }" id="holderGroup"
 						bind="holderGroup" dataType="STRING"/>
+					<div use="com.soffid.iam.web.component.ObjectAttributesDiv"
+						hidebuiltin="true"
+						id="roleAccountAttributes"
+						objectType="com.soffid.iam.api.RoleAccount" dataPath="/." />
 				</form>
 				<div style="text-align: right; width: 100%">
 					<button image="/img/undo-r.svg" label="${c:l('task.filter.lblVolver')}" 

@@ -16,6 +16,7 @@ import com.soffid.iam.api.AsyncProcessTracker;
 import com.soffid.iam.api.PagedResult;
 import com.soffid.iam.model.ApplicationAttributeEntity;
 import com.soffid.iam.model.IssueEntity;
+import com.soffid.iam.model.RoleAccountAttributeEntity;
 import com.soffid.iam.model.RoleAttributeEntity;
 import com.soffid.iam.service.AsyncRunnerService;
 import com.soffid.iam.service.EntitlementDelegationService;
@@ -73,7 +74,8 @@ import es.caib.seycon.ng.model.ValorDominiAplicacioEntity;
 	AttributeValidationService.class,
 	AsyncRunnerService.class,
 	IssueService.class,
-	IssueEntity.class
+	IssueEntity.class,
+	RoleAccountAttributeEntity.class
 	}
 )
 public abstract class AplicacioService {
@@ -333,6 +335,14 @@ public abstract class AplicacioService {
 	@Operation(grantees = { roles.user_role_create.class }, translated = "create")
 	@Transactional(rollbackFor = { java.lang.Exception.class })
 	public es.caib.seycon.ng.comu.RolAccount create(
+			es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
+			throws es.caib.seycon.ng.exception.InternalErrorException {
+		return null;
+	}
+
+	@Operation(grantees = { roles.user_role_create.class })
+	@Transactional(rollbackFor = { java.lang.Exception.class })
+	public es.caib.seycon.ng.comu.RolAccount updateAttributes(
 			es.caib.seycon.ng.comu.RolAccount rolsUsuaris)
 			throws es.caib.seycon.ng.exception.InternalErrorException {
 		return null;

@@ -203,7 +203,7 @@
 			<delete-method method="delete" >  <!-- user:role:delete -->
 				<parameter value="${instance}" />
 			</delete-method>
-			<update-method method="update"> 
+			<update-method method="updateAttributes"> 
 				<parameter value="${instance}" />
 			</update-method>
 		</ejb-handler>

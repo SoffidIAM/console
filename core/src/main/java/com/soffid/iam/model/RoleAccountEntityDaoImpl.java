@@ -53,12 +53,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
@@ -594,6 +597,29 @@ public class RoleAccountEntityDaoImpl
 
         if (sourceEntity.getDelegateAccount() != null)
         	targetVO.setDelegateAccount(sourceEntity.getDelegateAccount().getName());
+		targetVO.setAttributes(new HashMap<String, Object>());
+		Map<String, Object> attributes = targetVO.getAttributes();
+		for (RoleAccountAttributeEntity att : sourceEntity.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
+		}
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
+		}
+
 	}
 
 	/**
@@ -1160,6 +1186,30 @@ public class RoleAccountEntityDaoImpl
 			target.setHolderGroup(null);
 		else
 			target.setHolderGroup(source.getHolderGroup().getName());
+
+		target.setAttributes(new HashMap<String, Object>());
+		Map<String, Object> attributes = target.getAttributes();
+		for (RoleAccountAttributeEntity att : source.getAttributes()) {
+			if (att.getMetadata().getMultiValued() != null && att.getMetadata().getMultiValued().booleanValue())
+			{
+				LinkedList<Object> r = (LinkedList<Object>) attributes.get(att.getMetadata().getName());
+				if (r == null)
+				{
+					r = new LinkedList<Object>();
+					attributes.put(att.getMetadata().getName(), r);
+				}
+				r.add(att.getObjectValue());
+			}
+			else
+			{
+				attributes.put(att.getMetadata().getName(),att.getObjectValue());
+			}
+		}
+		for (Object o: attributes.values())
+		{
+			if (o != null && o instanceof List) Collections.sort((List) o);
+		}
+
 	}
 
 	@Override

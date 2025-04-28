@@ -19,8 +19,10 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.CustomObjectType;
 import com.soffid.iam.api.DataType;
 import com.soffid.iam.api.MetadataScope;
+import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.SoffidObjectType;
 import com.soffid.iam.interp.Evaluator;
+import com.soffid.iam.model.RoleAccountEntity;
 import com.soffid.iam.utils.ConfigurationCache;
 
 import es.caib.seycon.ng.ServiceLocator;
@@ -183,6 +185,7 @@ public class ScriptEnviroment {
 		defineUserAttributes(c);
 		defineGroupAttributes(c);
 		defineRoleAttributes(c);
+		defineGrantAttributes(c);
 		defineCustomObjectAttributes(c);
 
 		StringBuffer sb = new StringBuffer();
@@ -289,7 +292,8 @@ public class ScriptEnviroment {
 			.append(", \"ownerUserObject\" : \"userObject\"")
 			.append(", \"ownerUser\" : \"java.lang.String\"")
 			.append(", \"ownerAccountObject\" : \"accountObject\"")
-			.append(", \"grantedRoleObject\" : \"roleObject\"");
+			.append(", \"grantedRoleObject\" : \"roleObject\"")
+			.append(", \"attributes\" : \"grantAttributes\"");
 		}
 		else if (type == SoffidObjectType.OBJECT_GROUP)
 		{
@@ -413,6 +417,32 @@ public class ScriptEnviroment {
 		}
 		Executions.getCurrent().addAuResponse(null,
 				new AuScript(null, "CodeMirrorJavaTypes[\"roleAttributes\"]={"+sb.toString()+"};")); 
+		
+	}
+
+	private void defineGrantAttributes(Component c) throws InternalErrorException, NamingException, CreateException, IOException
+	{
+		StringBuffer sb = new StringBuffer();
+		
+		for (DataType td: EJBLocator.getAdditionalDataService()
+				.findDataTypesByObjectTypeAndName(RoleAccount.class.getName(), null))
+		{
+			if ( sb.length() > 0)
+				sb.append(",");
+			sb.append(openAttribute()).append(td.getCode()).append(closeAttribute()).append(":\"");
+			TypeEnumeration t = td.getType();
+			if (t == TypeEnumeration.BINARY_TYPE || t == TypeEnumeration.PHOTO_TYPE)
+				sb.append("byte");
+			else if (t == TypeEnumeration.ATTACHMENT_TYPE)
+				sb.append("com.soffid.iam.api.BinaryData");
+			else if (t == TypeEnumeration.DATE_TYPE)
+				sb.append("java.util.Calendar");
+			else
+				sb.append("java.lang.String");
+			sb.append("\"");
+		}
+		Executions.getCurrent().addAuResponse(null,
+				new AuScript(null, "CodeMirrorJavaTypes[\"grantAttributes\"]={"+sb.toString()+"};")); 
 		
 	}
 
@@ -612,7 +642,7 @@ public class ScriptEnviroment {
 			defineRoleAttributes(null);
 			partial = "\"role\":\"com.soffid.iam.api.Role\","
 					+ "\"object\":\"com.soffid.iam.api.Role\","+ 
-					"\"attributes\":\"userAttributes\",";
+					"\"attributes\":\"roleAttributes\",";
 		}
 		else if (t.isBuiltin() && t.getScope() == MetadataScope.APPLICATION)
 		{

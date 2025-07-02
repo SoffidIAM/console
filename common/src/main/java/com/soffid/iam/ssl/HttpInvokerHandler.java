@@ -12,13 +12,19 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.mortbay.jetty.HttpHeaders;
+import org.openjdk.nashorn.api.scripting.AbstractJSObject;
+import org.openjdk.nashorn.api.scripting.JSObject;
+import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.remote.HeadersFactory;
@@ -88,7 +94,7 @@ public class HttpInvokerHandler implements InvocationHandler {
 		            
 		            for ( int i = 0; i < len; i++)
 		            {
-		                oout.writeObject (args[i]);
+		                oout.writeObject (unwrap(args[i]));
 		            }
 
 		            oout.close();
@@ -101,6 +107,7 @@ public class HttpInvokerHandler implements InvocationHandler {
 		            
 		            return result;
 				}
+
 			};
         	result = AccessController.doPrivileged(action);
         } catch (Exception e) {
@@ -130,4 +137,39 @@ public class HttpInvokerHandler implements InvocationHandler {
 		
 	}
 
+	protected Object unwrap(Object object) {
+		if (object == null)
+			return null;
+		if (object instanceof AbstractJSObject) {
+			AbstractJSObject js = (AbstractJSObject) object;
+			if (js.isFunction())
+				return null;
+			if (js.isArray())
+			{
+				List l = new LinkedList();
+				Object length = js.getMember("length");
+				if (length instanceof Number) {
+					int iLength = ((Number)length).intValue();
+					for (int i = 0; i < iLength; i++ ) {
+						Object o = js.getSlot(i);
+						l.add(unwrap(o));
+					}
+				}
+				return l;
+			}
+			else
+			{
+				HashMap m = new HashMap();
+				for (String key: js.keySet()) {
+					Object v = js.getMember(key);
+					if (v != null) {
+						m.put(key, unwrap(v));
+					}
+				}	
+				return m;
+			}
+		}
+		else
+			return object;
+	}
 }

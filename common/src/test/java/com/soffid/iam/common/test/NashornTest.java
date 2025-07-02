@@ -16,6 +16,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.soffid.iam.api.Account;
+import com.soffid.iam.ssl.HttpInvokerHandler;
 
 import junit.framework.TestCase;
 
@@ -88,4 +89,17 @@ public class NashornTest extends TestCase {
             return s.startsWith("com.soffid.iam.api.");
         }
     };
+    
+/*    public void testUnwrap() throws ScriptException {
+    	NashornScriptEngineFactory factory = new NashornScriptEngineFactory ();
+		Account acc = new Account();
+		ScriptEngine engine = factory.getScriptEngine(classFilter);
+		Bindings bindings = new SimpleBindings();
+		engine.setBindings(bindings , ScriptContext.ENGINE_SCOPE);
+		Object r = engine.eval("var x = {str:\"hola\", num: 10, complex: {str:\"adios\"}, arr: [0,1,2]}; return x;");
+		System.out.println(r.getClass().getName());
+		System.out.println(r);
+		System.out.println(HttpInvokerHandler.unwrap(r));
+    }
+    */
 }

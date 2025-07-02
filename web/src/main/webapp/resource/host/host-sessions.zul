@@ -25,6 +25,10 @@
 		  value: port
 		- name: ${c:l('maquines.zul.Data')}
 		  value: startDate
+		- name: ${c:l('registreAcces.zul.Tipus') }
+		  value: type
+		  template: #{type.value == 'P' ? 'PAM': type.value == 'W' ? 'WebSSO': type.value == 'R' ? 'PAM RDP': type.value == 'S' ? 'PAM SSH' : type.value == 'C' ? 'CONSOLE': 'ESSO' }
+		  default: true
 		]]>
 		</attribute>
 	</datatable>

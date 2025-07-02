@@ -3513,6 +3513,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
         for (TaskEntity task : coll) {
             if (task.getTransaction().equals(TaskHandler.UPDATE_USER) || 
             		task.getTransaction().equals(TaskHandler.UPDATE_USER_PASSWORD) || 
+            		task.getTransaction().equals(TaskHandler.UPDATE_PROPAGATED_PASSWORD) || 
             		task.getTransaction().equals(TaskHandler.PROPAGATE_PASSWORD)) {
             	if ("X".equals( task.getStatus()))
             	{

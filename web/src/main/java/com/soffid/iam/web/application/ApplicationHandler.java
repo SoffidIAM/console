@@ -2,6 +2,8 @@ package com.soffid.iam.web.application;
 
 import java.io.IOException;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.zkoss.util.resource.Labels;
@@ -15,12 +17,14 @@ import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
 import com.soffid.iam.web.component.SearchBox;
 import com.soffid.iam.web.popup.SelectColumnsHandler;
+import com.soffid.iam.web.user.UserImporter;
 
 import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
+import es.caib.zkib.datasource.CommitException;
 import es.caib.zkib.datasource.DataSource;
 import es.caib.zkib.datasource.XPathUtils;
 import es.caib.zkib.jxpath.Variables;
@@ -114,4 +118,9 @@ public class ApplicationHandler extends FrameHandler {
 				});
 		}
 	}
+	
+	public void importCsv (Event ev) throws IOException, CommitException, InternalErrorException, NamingException, CreateException {
+		new ApplicationImporter().importCsv(this);
+	}
+
 }

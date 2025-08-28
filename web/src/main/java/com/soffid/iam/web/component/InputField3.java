@@ -1219,7 +1219,7 @@ public class InputField3 extends Databox
 
 	@Override
 	public void onDownload(final Integer position) {
-		Object data = binder.getValue();
+		Object data = this.getValue();
 		Object value = null;
 		if (dataType.isMultiValued()) {
 			List values = (List) data;

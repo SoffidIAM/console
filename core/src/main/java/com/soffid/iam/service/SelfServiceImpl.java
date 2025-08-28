@@ -547,7 +547,7 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 	protected Password handleGenerateAccountTemporaryPassword(Account account) throws Exception {
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
 		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
-		return getAccountService().generateAccountTemporaryPassword(account);
+		return getAccountService().generateAccountPassword(account);
 	}
 	@Override
 	protected void handleCheckinHPAccount(Account account) throws Exception {

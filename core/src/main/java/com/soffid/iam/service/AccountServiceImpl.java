@@ -1890,8 +1890,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 	}
 
 	private void sendPasswordNow(AccountEntity account, Password password, boolean temporary ) throws InternalErrorException {
-		if ( ! account.isDisabled() && account.getSystem().getUrl() != null || 
-				account.getCredentialType() != null && account.getCredentialType() != CredentialTypeEnum.CT_PASSWORD)
+		if ( ! account.isDisabled() && account.getSystem().getUrl() != null && 
+				(account.getCredentialType() == null || 
+				 account.getCredentialType() == CredentialTypeEnum.CT_PASSWORD))
 		{
 			for (ServerEntity se : getServerEntityDao().loadAll()) {
 	            if (se.getType().equals(ServerType.MASTERSERVER)) {

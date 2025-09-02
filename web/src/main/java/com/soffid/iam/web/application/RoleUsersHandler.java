@@ -454,30 +454,23 @@ public class RoleUsersHandler extends Div implements AfterCompose {
 				String user = m.get("user");
 				String roleName = m.get("roleName");
 				String roleSystem = m.get("roleSystem");
-				
+
 				RoleAccount ra = new RoleAccount();
 				ra.setAccountName(name == null || name.trim().isEmpty() ? null: name);
 				ra.setAccountId(accountId == null || accountId.trim().isEmpty() ? null: Long.parseLong(accountId));
 				ra.setAccountSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
-						(roleSystem == null || roleSystem.trim().isEmpty() ? null: roleSystem): accountSystem);
+						(roleSystem == null || roleSystem.trim().isEmpty() ? role.getSystem(): roleSystem): accountSystem);
 				if (domainValue != null && ! domainValue.trim().isEmpty()) {
 					ra.setDomainValue(new DomainValue());
 					ra.getDomainValue().setValue(domainValue);
 				}
-				ra.setUserCode(user == null || user.trim().isEmpty() ? null: user);
 				ra.setStartDate(startDate == null || startDate.trim().isEmpty()? new Date(): DateFormats.getDateFormat().parse(startDate));
 				ra.setEndDate(endDate == null || endDate.trim().isEmpty()? null: DateFormats.getDateFormat().parse(endDate));
-	
-				ra.setRoleName(roleName == null || roleName.trim().isEmpty() ? role.getSystem(): roleName);
+				ra.setUserCode(user == null || user.trim().isEmpty() ? null: user);
+				ra.setRoleName(roleName == null || roleName.trim().isEmpty() ? role.getName(): roleName);
 				ra.setSystem(accountSystem == null || accountSystem.trim().isEmpty() ?
 						(roleSystem == null || roleSystem.trim().isEmpty() ? role.getSystem(): roleSystem): accountSystem);
-				
-				if (ra.getRoleName() == null) 
-					ra.setRoleName(role.getName());
-				if (ra.getSystem() == null) {
-					ra.setSystem(role.getSystem());
-					ra.setAccountSystem(role.getSystem());
-				}
+
 				if (ra.getUserCode() == null && ra.getAccountName() == null)
 					throw new UiException ("Missing user or account name at line "+line);
 				appSvc.create(ra);

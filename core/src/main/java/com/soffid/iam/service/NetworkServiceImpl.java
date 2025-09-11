@@ -1836,6 +1836,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         } else if (old.getDynamicIP().booleanValue() ) { // Serial number has changed => Register a new host
             // Autodelete
             old.setDeleted(true);
+            old.setSerialNumber(null);
             getHostEntityDao().update(old);
 			createHostTask(old);
         } else {

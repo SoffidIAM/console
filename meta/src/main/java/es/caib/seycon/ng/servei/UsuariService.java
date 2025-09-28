@@ -94,7 +94,8 @@ import es.caib.seycon.ng.model.UserAccountEntity;
 	IssueService.class,
 	IssueEntity.class,
 	IssueUserEntity.class,
-	SignalService.class})
+	SignalService.class,
+	DadesAddicionalsService.class})
 public abstract class UsuariService {
 
 	@Operation(translated = "createUser")

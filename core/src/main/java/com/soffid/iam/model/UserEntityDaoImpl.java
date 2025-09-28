@@ -1276,5 +1276,4 @@ public class UserEntityDaoImpl extends com.soffid.iam.model.UserEntityDaoBase {
 		return targetVO;
 	}
     
-    
 }

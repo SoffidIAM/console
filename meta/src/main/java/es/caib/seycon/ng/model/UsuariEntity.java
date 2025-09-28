@@ -297,6 +297,15 @@ public abstract class UsuariEntity {
 		return null;
 	}
 
+	@DaoFinder("select ue\n"
+			+ "from com.soffid.iam.model.UserEntity ue\n"
+			+ "where ue.tenant.id = :tenantId\n"
+			+ "and   ue.shortName = :shortName and ue.mailDomain.id = :mailDomainId")
+	public Collection<es.caib.seycon.ng.model.UsuariEntity> findByShortNameAndDomain(
+			java.lang.String shortName, Long mailDomainId) {
+		return null;
+	}
+
 	@DaoOperation
 	public Usuari toUser(UsuariEntity entity, @Nullable String attributes[]) {
 		return null;

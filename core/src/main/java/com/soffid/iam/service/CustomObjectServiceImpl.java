@@ -224,7 +224,20 @@ public class CustomObjectServiceImpl extends CustomObjectServiceBase {
 						for (String v: l)
 						{
 							List<CustomObjectAttributeEntity> p = getCustomObjectAttributeEntityDao().findByTypeNameAndValue(entity.getType().getName(), m.getName(), v);
-							if (p.size() > 1)
+							if (p.size() > 1) {
+								for (CustomObjectAttributeEntity pp: p) {
+									if (pp.getCustomObject() != entity) {
+										throw new InternalErrorException(
+												String.format(
+														Messages.getString("UserServiceImpl.duplicatedAttribute"),
+														m.getLabel(),
+														l,
+														pp.getCustomObject().getName()
+														));
+									}
+								}
+								
+							}
 								throw new InternalErrorException(String.format("Already exists a role with %s %s",
 										m.getLabel(), v));
 						}

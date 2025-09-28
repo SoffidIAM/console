@@ -426,6 +426,8 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 		
 
+		checkDuplicatedEmail(usuariEntity);
+		
 		getUserEntityDao().create(usuariEntity);
 
 		// Comprobamos autorización del usuario
@@ -1618,6 +1620,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		auditUserChages(usuari, previousUser);
 		UserEntity entity = getUserEntityDao().userToEntity(usuari);
 		if (entity != null) {
+			checkDuplicatedEmail(entity);
 			if (usuari.getAttributes() != null)
 				handleUpdateUserAttributes(usuari.getUserName(), usuari.getAttributes(), false);
 			getUserEntityDao().update(entity);
@@ -1638,6 +1641,34 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 
 		return null;
+	}
+
+	private void checkDuplicatedEmail(UserEntity entity) throws InternalErrorException {
+		if (entity.getShortName() != null && !entity.getShortName().trim().isEmpty() &&
+				entity.getMailDomain() != null) {
+			AdditionalDataService svc = getAdditionalDataService();
+			Collection<DataType> data = svc.findDataTypesByObjectTypeAndName2(User.class.getName(), "emailAddress");
+			if (! data.isEmpty()) {
+				DataType def = data.iterator().next();
+				if (def.getUnique() == Boolean.TRUE) {
+					for (UserEntity ue: getUserEntityDao()
+							.findByShortNameAndDomain(
+									entity.getShortName(), 
+									entity.getMailDomain().getId())) {
+						if (ue != entity && ue.getActive().equals("S")) {
+							throw new InternalErrorException(
+									String.format(
+										Messages.getString("UserServiceImpl.duplicatedAttribute"),
+										def.getLabel(),
+										entity.getShortName()+"@"+entity.getMailDomain().getName(),
+										ue.getUserName()
+									));
+						}
+					}
+				}
+			}
+			
+		}
 	}
 
 	private void auditUserChages(User usuari, User usuariAbans) throws InternalErrorException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

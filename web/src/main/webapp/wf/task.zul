@@ -12,9 +12,28 @@
 
 	<datamodel class="com.soffid.iam.web.bpm.BPMDataNode" id="model"/>
 
-	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame">
-		<label value=" &gt; " if="${arg.embed != 'true' }"/>
-		<label id="navigatorLabel" if="${arg.embed != 'true' }"/>
+	<div class="navigation-bar" if="${arg.embed != 'true' }">
+		<label value="${c:l('menu.title') }"
+			onClick="ref:frame.menu"
+			sclass="link"
+			if="${arg.embed != 'true' }"
+			>
+			<custom-attributes target=""/>
+		</label>
+		<label value=" &gt; " />
+		<label value="${c:l('seu.startWorkflow') }"
+			onClick="ref:frame.menu"
+			sclass="link">
+			<custom-attributes target="seu.startWorkflow"/>
+		</label>
+		<label value=" &gt; " />
+		<label id="navigatorLabel"/>
+		<menu2>
+			<menu2item id="btnDelegar" label="${c:l('task.btnDelegar')}" onClick="ref:frame.delegarTarea()"/>
+		</menu2>
+	</div>
+	
+	<div use="com.soffid.iam.web.component.NavigationBar" frame="frame" if="${arg.embed == 'true' }">
 		<pager datatable="/listbox" if="${arg.embed == 'true' }"/>								
 		<menu2>
 			<menu2item id="btnDelegar" label="${c:l('task.btnDelegar')}" onClick="ref:frame.delegarTarea()"/>

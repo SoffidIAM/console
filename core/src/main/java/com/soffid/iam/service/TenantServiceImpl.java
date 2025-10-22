@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -130,7 +131,7 @@ public class TenantServiceImpl extends TenantServiceBase {
 	}
 
 	
-	Map<Long, List<String>> disabledPermissions = new HashMap<Long, List<String>>();
+	Map<Long, List<String>> disabledPermissions = new Hashtable<Long, List<String>>();
 	@Override
 	protected List<String> handleGetDisabledPermissions(Tenant tenant)
 			throws Exception {

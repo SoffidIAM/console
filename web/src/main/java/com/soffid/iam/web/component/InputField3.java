@@ -487,7 +487,7 @@ public class InputField3 extends Databox
 
 			invalidate();
 		} catch (Throwable e) {
-			log.warn(e);
+			log.warn("Error generating field", e);
 		} finally {
 			disableRecursive = false;
 		}

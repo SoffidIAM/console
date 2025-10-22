@@ -106,11 +106,13 @@ public class SessionServiceImpl extends com.soffid.iam.service.SessionServiceBas
         criteria.setMaximumResultSize(1);
 
         @SuppressWarnings(value = "rawtypes")
-        Collection maquines = getHostEntityDao().findHostByCriteria(criteria , null, null, nomOrIp, null, null, null, null, null, null, null);
-        if (maquines.size() >= 1)
-            return (HostEntity) maquines.iterator().next();
-        else
-            return null;
+        HostEntity host = getHostEntityDao().findByName(nomOrIp);
+        if (host == null) {
+        	Collection<HostEntity> l = getHostEntityDao().findByIP(criteria, nomOrIp);
+        	if (! l.isEmpty())
+        		host = l.iterator().next();
+        }
+        return host;
     }
 
     /**

@@ -1000,8 +1000,15 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 						if (account == null)
 							updateAccountLastLogin(user, passwordDomain);
 						else { 
-							account.setLastLogin(new Date());
-							getAccountEntityDao().update(account);
+							Date ll = account.getLastLogin();
+							if (ll == null || 
+									System.currentTimeMillis() - ll.getTime() > 600_000) {
+								getAsyncRunnerService().runNewTransaction(() -> {
+									account.setLastLogin(new Date());
+									getAccountEntityDao().update(account);
+									return null;
+								});
+							}
 						}
 						resetFailures (contra, ppe);
 						return PasswordValidation.PASSWORD_GOOD;
@@ -1343,12 +1350,20 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				contra.getPassword2() != null && (digest2.equals(contra.getPassword2()) || digest2b.equals(contra.getPassword2()));
 	}
 
-	private void updateAccountLastLogin(UserEntity user, PasswordDomainEntity passwordDomain) {
+	private void updateAccountLastLogin(UserEntity user, PasswordDomainEntity passwordDomain) throws InternalErrorException {
 		for (UserAccountEntity uac : user.getAccounts()) {
 			SystemEntity dispatcher = uac.getAccount().getSystem();
 			if (dispatcher.isMainSystem() && dispatcher.getPasswordDomain() == passwordDomain) {
-				uac.getAccount().setLastLogin(new Date());
-				getAccountEntityDao().update(uac.getAccount());
+				Date ll = uac.getAccount().getLastLogin();
+				// Update only after ten minutes
+				if (ll == null || 
+						System.currentTimeMillis() - ll.getTime() > 600_000) {
+					getAsyncRunnerService().runNewTransaction(() -> {
+						uac.getAccount().setLastLogin(new Date());
+						getAccountEntityDao().update(uac.getAccount());
+						return null;
+					});
+				}
 			}
 		}
 	}

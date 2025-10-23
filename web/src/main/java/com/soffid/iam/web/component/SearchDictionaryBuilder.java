@@ -278,7 +278,7 @@ public class SearchDictionaryBuilder {
 	}
 
 	private static void addGroupJoins(SearchDictionary sd) {
-		addJoin(sd, "homeServer.name", "grups.zul.Servidorofimatic-2", TypeEnumeration.STRING_TYPE);
+//		addJoin(sd, "homeServer.name", "grups.zul.Servidorofimatic-2", TypeEnumeration.STRING_TYPE);
 	}
 
 	private static void addAccountsJoins(SearchDictionary sd) {

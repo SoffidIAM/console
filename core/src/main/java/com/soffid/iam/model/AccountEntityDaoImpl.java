@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ import org.apache.commons.jcs.access.exception.CacheException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
+import org.hibernate.Query;
 
 import com.soffid.iam.api.AccessControlList;
 import com.soffid.iam.api.Account;
@@ -616,6 +618,20 @@ public class AccountEntityDaoImpl extends
 	
 	public void handleRefresh(AccountEntity e) {
 		getSession().refresh(e);
+	}
+
+	@Override
+	protected void handleUpdateLastLogin(AccountEntity entity) throws Exception {
+		entity.setLastLogin(new Date());
+
+		Query q = getSession().createQuery("update com.soffid.iam.model.AccountEntityImpl "
+				+ "set lastLogin=:lastLogin "
+				+ "where id=:id");
+		q.setDate("lastLogin", entity.getLastLogin());
+		q.setLong("id", entity.getId());
+		q.executeUpdate();
+
+		removeCacheEntry(entity);
 	}
 }
 

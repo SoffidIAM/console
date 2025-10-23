@@ -1004,8 +1004,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 							if (ll == null || 
 									System.currentTimeMillis() - ll.getTime() > 600_000) {
 								getAsyncRunnerService().runNewTransaction(() -> {
-									account.setLastLogin(new Date());
-									getAccountEntityDao().update(account);
+									getAccountEntityDao().updateLastLogin(account);
 									return null;
 								});
 							}
@@ -1359,8 +1358,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 				if (ll == null || 
 						System.currentTimeMillis() - ll.getTime() > 600_000) {
 					getAsyncRunnerService().runNewTransaction(() -> {
-						uac.getAccount().setLastLogin(new Date());
-						getAccountEntityDao().update(uac.getAccount());
+						getAccountEntityDao().updateLastLogin(uac.getAccount());
 						return null;
 					});
 				}

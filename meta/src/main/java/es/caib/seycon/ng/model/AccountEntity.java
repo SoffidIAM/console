@@ -246,6 +246,12 @@ public abstract class AccountEntity {
 	}
 
 	@DaoOperation
+	public void updateLastLogin (AccountEntity entity) 
+	{
+		
+	}
+
+	@DaoOperation
 	public void refresh (AccountEntity entity) 
 	{
 		

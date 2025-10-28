@@ -38,43 +38,43 @@ public class AttributeValidationServiceImpl extends AttributeValidationServiceBa
 		if (type == TypeEnumeration.APPLICATION_TYPE)
 		{
 			if (getInformationSystemEntityDao().findByCode(value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.1"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.1"), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.CUSTOM_OBJECT_TYPE && customObjectType != null)
 		{
 			if (getCustomObjectEntityDao().findByTypeAndName( customObjectType.getName(), value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.2"), customObjectType.getDescription(), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.2"), customObjectType.getDescription(), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.EMAIL_TYPE)
 		{
 			String s = value.toString();
 			if ( ! s.contains("@")) //$NON-NLS-1$
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.4"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.4"), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.GROUP_TYPE)
 		{
 			if (getGroupEntityDao().findByName( value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.5"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.5"), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.USER_TYPE)
 		{
 			if (getUserEntityDao().findByUserName( value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.6"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.6"), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.USER_TYPE_TYPE)
 		{
 			if (getUserTypeEntityDao().findByName( value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.7"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.7"), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.HOST_TYPE)
 		{
 			if (getHostEntityDao().findByName( value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.8"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.8"), value.toString())); //$NON-NLS-1$
 		}
 		if (type == TypeEnumeration.NETWORK_TYPE)
 		{
 			if (getNetworkEntityDao().findByName( value.toString()) == null)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.9"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.9"), value.toString())); //$NON-NLS-1$
 		}
 		if (values != null && !values.trim().isEmpty()) {
 			boolean valid = false;
@@ -88,7 +88,7 @@ public class AttributeValidationServiceImpl extends AttributeValidationServiceBa
 				}
 			}
 			if (!valid)
-				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.10"), value)); //$NON-NLS-1$
+				throw new InternalErrorException ( String.format(Messages.getString("AttributeValidationServiceImpl.10"), value.toString())); //$NON-NLS-1$
 		}
 	}
 

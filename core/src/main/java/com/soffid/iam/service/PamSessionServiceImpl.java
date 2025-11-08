@@ -63,6 +63,7 @@ import com.soffid.iam.model.PamPolicyEntity;
 import com.soffid.iam.model.PamPolicyJITPermissionEntity;
 import com.soffid.iam.model.ServiceEntity;
 import com.soffid.iam.model.SessionEntity;
+import com.soffid.iam.service.impl.JumpServerMonitor;
 import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
@@ -495,24 +496,9 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		if ( jumpServerGroup.getJumpServers().size() == 1)
 			return jumpServerGroup.getJumpServers().iterator().next().getUrl();
 		
-		int selectedSessions = Integer.MAX_VALUE;
-		String selected = null;
-		JumpServerEntity[] jumpServers = jumpServerGroup.getJumpServers().toArray(new JumpServerEntity[0]);
-		int start = new SecureRandom().nextInt(jumpServers.length);
-		for (int i = 0; i < jumpServers.length; i++) {
-			String next = jumpServers[(i + start) % jumpServers.length].getUrl();
-			try {
-				Integer used = getUsedThreads(next);
-				if (used != null && used.intValue() < selectedSessions) {
-					selected = next;
-					selectedSessions = used.intValue();
-				}
-			} catch (ProcessingException e) {
-				// Ignore
-				log.info("Error querying jump server "+next, e);
-			}
-		}
-		return selected;
+		JumpServerMonitor monitor = JumpServerMonitor.getMonitor(jumpServerGroup.getName());
+		monitor.configure(jumpServerGroup.getJumpServers());
+		return monitor.select();
 	}
 
 	@Override

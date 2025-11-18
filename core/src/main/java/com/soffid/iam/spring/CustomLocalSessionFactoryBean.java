@@ -153,7 +153,7 @@ public class CustomLocalSessionFactoryBean extends LocalSessionFactoryBean imple
 		SoffidStackTrace.setTableToEntityMap(tableToEntity);
 		SoffidStackTrace.setColumnToAttributeMap(columnToAttribute);
 		new CustomDialect();
-		if (CustomDialect.isMysql())
+		if (CustomDialect.isMysql() || CustomDialect.isMariadb())
 			SoffidStackTrace.setDialect("mysql");
 		else if (CustomDialect.isOracle())
 			SoffidStackTrace.setDialect("oracle");

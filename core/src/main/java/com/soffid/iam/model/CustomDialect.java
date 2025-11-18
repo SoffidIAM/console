@@ -36,6 +36,7 @@ public class CustomDialect extends Dialect {
     static boolean mysql = false;
     static boolean sqlServer = false;
     static boolean postgresql = false;
+    static boolean mariadb = false;
     
     public CustomDialect() {
         super();
@@ -72,7 +73,7 @@ public class CustomDialect extends Dialect {
 	            proxyDialect = new MySQL5InnoDBDialect();
 	        } else if ("mariadb".equals(type))  //$NON-NLS-1$
 	        {
-	        	mysql = true;
+	        	mariadb = true;
 	            proxyDialect = new MySQL5InnoDBDialect();
 	        } else if ("oracle".equals (type)) { //$NON-NLS-1$
 	        	oracle = true;
@@ -535,6 +536,10 @@ public class CustomDialect extends Dialect {
 
 	public static boolean isPostgresql() {
 		return postgresql;
+	}
+
+	public static boolean isMariadb() {
+		return mariadb;
 	}
     
     

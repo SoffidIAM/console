@@ -412,8 +412,8 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 			if (change.getUser() != null)
 			{
 	    		User user = applyUserChange(tracker);
-	    		if (change.getAttributes() != null)
-	    			applyAttributesChange (user, tracker);
+//	    		if (change.getAttributes() != null)
+//	    			applyAttributesChange (user, tracker);
 	    		if (change.getGroups() != null)
 	    			applyGroupChange (user, tracker);
 	    		if (change.getGroups2() != null)
@@ -534,6 +534,10 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
 	private User applyUserChange(ProcessTracker tracker) throws InternalErrorException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
 		AuthoritativeChange change = tracker.change;
 		User user = change.getUser();
+		if (user.getAttributes() == null)
+			user.setAttributes(change.getAttributes());
+		else if (change.getAttributes() != null)
+			user.getAttributes().putAll(change.getAttributes());
 		User oldUser = getUserService().findUserByUserName(user.getUserName());
 		if (oldUser == null)
 		{

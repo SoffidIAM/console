@@ -118,6 +118,7 @@
 									<fileset dir="${basedir}/target/lib">
 										<include name="iam-tomee.jar" />
 										<include name="mariadb-java-client.jar" />
+										<include name="mysql-connector-java.jar" />
 										<include name="ojdbc10.jar" />
 										<include name="postgresql.jar" />
 									</fileset>
@@ -364,6 +365,11 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 			<version>1.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.16</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>

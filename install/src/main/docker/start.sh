@@ -39,7 +39,7 @@ function configure {
 		DB_DRIVER=com.microsoft.sqlserver.jdbc.SQLServerDriver
 	elif [[ "$DB_URL" == *:mysql:* ]] 
 	then
-		DB_DRIVER=com.mysql.jdbc.Driver
+		DB_DRIVER=com.mysql.cj.jdbc.Driver
 	elif [[ "$DB_URL" == *:mariadb:* ]] 
 	then
 		DB_DRIVER=org.mariadb.jdbc.Driver

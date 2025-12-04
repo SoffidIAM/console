@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.LogFactory;
@@ -578,6 +579,21 @@ public class AuthoritativeChangeServiceImpl extends AuthoritativeChangeServiceBa
                 }
             }
         }
+		
+		if (user.getAttributes() != null) {
+			if (oldUser.getAttributes() == null)
+				oldUser.setAttributes(new HashMap<String, Object>());
+			for (Entry<String, Object> entry: user.getAttributes().entrySet()) {
+				Object oldValue = oldUser.getAttributes().get(entry.getKey());
+                if (oldValue == null ? 
+                		entry.getValue() != null : 
+                		!oldValue.equals(entry.getValue())) {
+                    log.info("Received change on attribute " + entry.getKey());
+                    oldUser.getAttributes().put(entry.getKey(), entry.getValue());
+                    anyChange = true;
+                }
+			}
+		}
 		return ! anyChange;
 	}
 

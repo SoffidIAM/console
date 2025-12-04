@@ -1868,7 +1868,6 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         
         if (maquina == null) {
         	try {
-                InetAddress addr = InetAddress.getByName(ip);
                 NetworkEntity x = guessNetwork(addr.getAddress());
                 if (x == null)
                 {

@@ -1817,14 +1817,23 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         // Found a host with no serial number => Bind it
         HostEntity maquina = null;
         HostEntity old = getHostEntityDao().findByName(nomMaquina);
+        InetAddress addr = InetAddress.getByName(ip);
         if (old == null) {
             // Nothing to do
         } else if (old.getSerialNumber() == null || old.getSerialNumber().trim().isEmpty()) {
             // Replace unused host
             maquina = old;
             maquina.setSerialNumber(serialNumber);
-            if (old.getDynamicIP().booleanValue())
+            if (old.getDynamicIP().booleanValue()) {
             	maquina.setHostIP(ip);
+            	maquina.setNetwork(guessNetwork(addr.getAddress()));
+                if (maquina.getNetwork() == null)
+                {
+                	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, ip); //$NON-NLS-1$ 
+                	log.warn(msg);
+                    throw new UnknownNetworkException(msg);
+                }
+            }
             maquina.setLastSeen(new Date());
             getHostEntityDao().update(maquina);
 			createHostTask(maquina);

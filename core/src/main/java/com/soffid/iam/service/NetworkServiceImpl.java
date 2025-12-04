@@ -1817,7 +1817,14 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         // Found a host with no serial number => Bind it
         HostEntity maquina = null;
         HostEntity old = getHostEntityDao().findByName(nomMaquina);
-        InetAddress addr = InetAddress.getByName(ip);
+        InetAddress addr;
+        try {
+        	addr = InetAddress.getByName(ip);
+    	} catch (java.net.UnknownHostException e) {
+        	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, "??"); //$NON-NLS-1$ //$NON-NLS-2$ 
+        	log.warn(msg);
+            throw new UnknownNetworkException(msg); 
+    	}
         if (old == null) {
             // Nothing to do
         } else if (old.getSerialNumber() == null || old.getSerialNumber().trim().isEmpty()) {
@@ -1867,59 +1874,46 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
         }
         
         if (maquina == null) {
-        	try {
-                NetworkEntity x = guessNetwork(addr.getAddress());
-                if (x == null)
-                {
-                	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, ip); //$NON-NLS-1$ 
-                	log.warn(msg);
-                    throw new UnknownNetworkException(msg);
-                }
-                maquina = getHostEntityDao().newHostEntity();
-                maquina.setHostIP(ip);
-                maquina.setMail("N"); //$NON-NLS-1$
-                maquina.setDeleted(false);
-                DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-                maquina.setDescription(Messages.getString("NetworkServiceImpl.AutocreatedMessage") + " " + df.format(new Date())); //$NON-NLS-1$
-                maquina.setDynamicIP(new Boolean(true));
-                maquina.setName(nomMaquina);
-                maquina.setFolders("N"); //$NON-NLS-1$
-                maquina.setSerialNumber(serialNumber);
-                maquina.setPrintersServer("N"); //$NON-NLS-1$
-                maquina.setOperatingSystem(getOsTypeEntityDao().findOSTypeByName("ALT")); //$NON-NLS-1$
-                maquina.setNetwork(x);
-                getHostEntityDao().create(maquina);
-    			createHostTask(maquina);
-        	} catch (java.net.UnknownHostException e) {
-            	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, "??"); //$NON-NLS-1$ //$NON-NLS-2$ 
+            NetworkEntity x = guessNetwork(addr.getAddress());
+            if (x == null)
+            {
+            	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, ip); //$NON-NLS-1$ 
             	log.warn(msg);
-                throw new UnknownNetworkException(msg); 
-        	}
+                throw new UnknownNetworkException(msg);
+            }
+            maquina = getHostEntityDao().newHostEntity();
+            maquina.setHostIP(ip);
+            maquina.setMail("N"); //$NON-NLS-1$
+            maquina.setDeleted(false);
+            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            maquina.setDescription(Messages.getString("NetworkServiceImpl.AutocreatedMessage") + " " + df.format(new Date())); //$NON-NLS-1$
+            maquina.setDynamicIP(new Boolean(true));
+            maquina.setName(nomMaquina);
+            maquina.setFolders("N"); //$NON-NLS-1$
+            maquina.setSerialNumber(serialNumber);
+            maquina.setPrintersServer("N"); //$NON-NLS-1$
+            maquina.setOperatingSystem(getOsTypeEntityDao().findOSTypeByName("ALT")); //$NON-NLS-1$
+            maquina.setNetwork(x);
+            getHostEntityDao().create(maquina);
+			createHostTask(maquina);
         }
 
         if (!ip.equals(maquina.getHostIP()) || maquina.getNetwork() == null || !Boolean.FALSE.equals(maquina.getDeleted())) {
-        	try {
-                InetAddress addr = InetAddress.getByName(ip);
-                NetworkEntity x = guessNetwork(addr.getAddress());
-                if (x != null) {
-                	if (x.isDchpSupport()) {
-                		log.info("Register host "+maquina.getName()+" address "+ip);
-                		anyChange = true;
-                		maquina.setDeleted(Boolean.FALSE);
-    	                maquina.setHostIP(ip);
-    	                maquina.setNetwork(x);
-                	} else {
-                        throw new UnknownNetworkException(String.format(Messages.getString("NetworkServiceImpl.RequestWithoutDHCP"), nomMaquina, ip, x.getName()));
-                	}
-                } else {
-                    throw new UnknownNetworkException(String.format(
-                            Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, ip)); //$NON-NLS-1$
-                }
-        	} catch (java.net.UnknownHostException e) {
-            	String msg = String.format(Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, "??"); //$NON-NLS-1$ //$NON-NLS-2$ 
-            	log.warn(msg);
-                throw new UnknownNetworkException(msg); 
-        	}
+            NetworkEntity x = guessNetwork(addr.getAddress());
+            if (x != null) {
+            	if (x.isDchpSupport()) {
+            		log.info("Register host "+maquina.getName()+" address "+ip);
+            		anyChange = true;
+            		maquina.setDeleted(Boolean.FALSE);
+	                maquina.setHostIP(ip);
+	                maquina.setNetwork(x);
+            	} else {
+                    throw new UnknownNetworkException(String.format(Messages.getString("NetworkServiceImpl.RequestWithoutDHCP"), nomMaquina, ip, x.getName()));
+            	}
+            } else {
+                throw new UnknownNetworkException(String.format(
+                        Messages.getString("NetworkServiceImpl.RequestUnmanagedIP"), nomMaquina, ip)); //$NON-NLS-1$
+            }
         }
         if (anyChange || 
         		maquina.getLastSeen() == null ||

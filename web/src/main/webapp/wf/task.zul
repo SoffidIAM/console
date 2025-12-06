@@ -54,7 +54,7 @@
 			</row>
 		</rows>
 	</grid>
-	<tabbox id="tabTarea" onSelect="ref:frame.cambiarPestana" style="width: 100%; height: 70vh">
+	<tabbox id="tabTarea" onSelect="ref:frame.cambiarPestana" style="width: 100%; height: 70vh; overflow: auto">
 		<tabs>
 			<tab label="${c:l('inbox.lblTarea')}"/>
 			<tab label="${c:l('inbox.lblMapaProceso')}"/>

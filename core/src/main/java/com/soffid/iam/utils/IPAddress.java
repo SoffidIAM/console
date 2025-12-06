@@ -124,7 +124,8 @@ private String sMask;
     {
     	int m = mask[i];
     	int ip = hostIp.ip[i];
-    	if ( (m | ip) != 255)
+    	int join = m | ip;
+		if ( join != -1 && m != 255)
     		return false;
     }
     return true;

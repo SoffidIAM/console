@@ -298,7 +298,7 @@ public class NetworkEntityDaoImpl extends com.soffid.iam.model.NetworkEntityDaoB
                     return ip2.toString();
                 ip2.incrementa();
             }
-            return ipXarxa;
+            return null;
         } catch (Exception e) {
             throw new SeyconException(e.toString(), e);
         }

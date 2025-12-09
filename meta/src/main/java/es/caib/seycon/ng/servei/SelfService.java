@@ -21,9 +21,11 @@ import com.soffid.mda.annotation.Service;
 import es.caib.seycon.ng.comu.Account;
 import es.caib.seycon.ng.comu.DadaUsuari;
 import es.caib.seycon.ng.comu.Password;
+import es.caib.seycon.ng.comu.PoliticaContrasenya;
 import es.caib.seycon.ng.comu.PuntEntrada;
 import es.caib.seycon.ng.comu.TipusDada;
 import es.caib.seycon.ng.model.DadaUsuariEntity;
+import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
 import es.caib.seycon.ng.model.TipusDadaEntity;
 import es.caib.seycon.ng.model.UsuariEntity;
 
@@ -46,6 +48,7 @@ import es.caib.seycon.ng.model.UsuariEntity;
 	AutoritzacioService.class,
 	AuditoriaService.class,
 	EntitlementDelegationService.class,
+	PoliticaContrasenyaEntity.class,
 	PamSecurityHandlerService.class})
 public abstract class SelfService {
 
@@ -170,6 +173,12 @@ public abstract class SelfService {
 	}
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public es.caib.seycon.ng.comu.Password queryAccountSshKeyBypassPolicy(
+		es.caib.seycon.ng.comu.Account account)
+		throws es.caib.seycon.ng.exception.InternalErrorException {
+	 return null;
+	}
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public PoliticaContrasenya getPasswordPolicy (
 		es.caib.seycon.ng.comu.Account account)
 		throws es.caib.seycon.ng.exception.InternalErrorException {
 	 return null;

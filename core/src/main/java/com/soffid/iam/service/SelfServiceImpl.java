@@ -21,6 +21,7 @@ import com.soffid.iam.api.Host;
 import com.soffid.iam.api.MetadataScope;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.PasswordStatus;
 import com.soffid.iam.api.RoleAccount;
 import com.soffid.iam.api.System;
@@ -30,6 +31,7 @@ import com.soffid.iam.api.UserData;
 import com.soffid.iam.model.AccountEntity;
 import com.soffid.iam.model.MetaDataEntity;
 import com.soffid.iam.model.PasswordDomainEntity;
+import com.soffid.iam.model.PasswordPolicyEntity;
 import com.soffid.iam.model.UserAccountEntity;
 import com.soffid.iam.model.UserDataEntity;
 import com.soffid.iam.model.UserEntity;
@@ -571,5 +573,15 @@ public class SelfServiceImpl extends com.soffid.iam.service.SelfServiceBase
 		getPamSecurityHandlerService().checkPermission(entity, "setPassword");
 		getAccountService().setAccountSshPrivateKey(account, password.getPassword());
 	}
-	
+
+	protected PasswordPolicy handleGetPasswordPolicy(Account account) throws Exception {
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		if (entity == null)
+			return null;
+		PasswordPolicyEntity pp =  getPasswordPolicyEntityDao().findByAccount(entity.getId());
+		if (pp == null)
+			return null;
+		else
+			return getPasswordPolicyEntityDao().toPasswordPolicy(pp);
+	}
 }

@@ -114,6 +114,11 @@ public class PoliticaContrasenya {
 	@Description("Enables users to change password value")
 	public boolean allowPasswordChange;
 
+	@Description("Store user passwords in password vault")
+	@Attribute(defaultValue = "true")
+	@Nullable
+	public java.lang.Boolean storeUserPasswords;
+
 	@Description ("Enable complex password just like MS AD")
 	public boolean complexPasswords;
 	

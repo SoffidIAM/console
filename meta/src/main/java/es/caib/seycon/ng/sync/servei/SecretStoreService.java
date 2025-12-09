@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.soffid.mda.annotation.*;
 
+import es.caib.seycon.ng.model.PoliticaContrasenyaEntity;
 import es.caib.seycon.ng.servei.DispatcherService;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 	es.caib.seycon.ng.model.DominiContrasenyaEntity.class,
 	es.caib.seycon.ng.servei.DominiUsuariService.class,
 	es.caib.seycon.ng.servei.InternalPasswordService.class,
-	DispatcherService.class})
+	DispatcherService.class,
+	PoliticaContrasenyaEntity.class})
 public abstract class SecretStoreService {
 
 	@Transactional(rollbackFor={java.lang.Exception.class})

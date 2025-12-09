@@ -1269,6 +1269,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                             if ( acc.getStatus() != AccountStatus.FORCED_ACTIVE &&
                             		acc.getStatus() != AccountStatus.FORCED_DISABLED &&
                             		acc.getStatus() != AccountStatus.ACTIVE ) {
+                            	acc.setPasswordPolicy(ue.getUserType());
                                 acc.setDisabled(false);
                                 acc.setDescription(description);
     							acc.setStatus(AccountStatus.ACTIVE);
@@ -1276,7 +1277,9 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                                 audit("E", acc); //$NON-NLS-1$
                                 SoffidPrincipalImpl.clearCache();
                             }
-                            if (!description.equals(acc.getDescription())) {
+                            if (!description.equals(acc.getDescription()) || 
+                            		acc.getPasswordPolicy() != ue.getUserType()) {
+                            	acc.setPasswordPolicy(ue.getUserType());
                                 acc.setDescription(description);
                                 getAccountEntityDao().update(acc);
                             }
@@ -1288,13 +1291,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                     			acc.getStatus() == AccountStatus.ACTIVE )
                     	{
                             acc.setDisabled(true);
+                        	acc.setPasswordPolicy(ue.getUserType());
     						acc.setStatus(AccountStatus.DISABLED);
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
                             audit("e", acc); //$NON-NLS-1$
                             SoffidPrincipalImpl.clearCache();
                    		}
-                        if (! description.equals(acc.getDescription())) {
+                    	else if (! description.equals(acc.getDescription())  || 
+                        		acc.getPasswordPolicy() != ue.getUserType()) {
+                        	acc.setPasswordPolicy(ue.getUserType());
                             acc.setDescription(description);
                             getAccountEntityDao().update(acc);
                         }
@@ -1307,11 +1313,16 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
                 			(account.getStatus() == AccountStatus.FORCED_ACTIVE || account.getStatus() == AccountStatus.ACTIVE ))
                 	{
                         account.setDisabled(true);
+                        account.setPasswordPolicy(ue.getUserType());
 						account.setStatus(AccountStatus.DISABLED);
                         getAccountEntityDao().update(account);
                         audit("e", account); //$NON-NLS-1$
                         SoffidPrincipalImpl.clearCache();
                		}
+                	else if (account.getPasswordPolicy() != ue.getUserType()) {
+                		account.setPasswordPolicy(ue.getUserType());
+                        getAccountEntityDao().update(account);
+                	}
                 }
             }
         }
@@ -1329,6 +1340,7 @@ public class AccountServiceImpl extends com.soffid.iam.service.AccountServiceBas
 				})) {
             account.setDisabled(true);
 			account.setStatus(AccountStatus.DISABLED);
+    		account.setPasswordPolicy(ue.getUserType());
             getAccountEntityDao().update(account);
             audit("e", account); //$NON-NLS-1$
             SoffidPrincipalImpl.clearCache();

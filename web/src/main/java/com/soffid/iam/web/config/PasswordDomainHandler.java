@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.xel.fn.CommonFns;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.event.Event;
@@ -36,6 +37,7 @@ import es.caib.zkib.component.DataModel;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.component.DataTree2;
 import es.caib.zkib.component.Select;
+import es.caib.zkib.component.Switch;
 import es.caib.zkib.datamodel.DataModelNode;
 import es.caib.zkib.datamodel.DataNode;
 import es.caib.zkib.datamodel.DataNodeCollection;
@@ -96,6 +98,7 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 			onSetPasswordType(event);
 			fillBadWords();
 		}
+		onStoreUserPasswords(event);
 	}
 	
 	public void importCsv () throws IOException, CommitException {
@@ -344,5 +347,11 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 				
 			}
 		}
+	}
+	
+	public void onStoreUserPasswords(Event ev) {
+		Boolean v = (Boolean) XPathUtils.eval(getForm(), "storeUserPasswords");
+		Component s = getFellow("allowPasswordQuery");
+		s.setVisible(Boolean.TRUE.equals(v));
 	}
 }

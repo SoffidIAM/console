@@ -75,6 +75,7 @@ public class PasswordPolicyEntityDaoImpl
         super.toPasswordPolicy(source, target);
         target.setAllowPasswordChange(source.getAllowPasswordChange() == null ? true: source.getAllowPasswordChange().booleanValue());
         target.setAllowPasswordQuery(source.getAllowPasswordQuery() == null ? true: source.getAllowPasswordQuery().booleanValue());
+        target.setStoreUserPasswords(source.getStoreUserPasswords() == null ? true: source.getStoreUserPasswords().booleanValue());
         // Fem les conversions 
         if (source.getUserType() != null) {
         	UserTypeEntity tipusUsuariE = source.getUserType();

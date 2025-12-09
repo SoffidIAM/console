@@ -62,9 +62,9 @@
   className: small
   template: >-
     <span #{disabled?'style="display:none"': ''}>
-  	<button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)">
+  	<button class="small-button" #{canChange?"":"style='display:none'"} onclick="zkDatatable.sendClientAction(this, &quot;onSetPassword&quot;)">
     <img src="${execution.contextPath }/img/password-r.svg"/>${c:l('self_account.setPassword')}</button> 
-    <button class="small-button" onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)">
+    <button class="small-button" #{canView?"":"style='display:none'"} onclick="zkDatatable.sendClientAction(this, &quot;onQueryPassword&quot;)">
     <img src="${execution.contextPath }/img/search2-r.svg"/>${c:l('self_account.queryPassword')}</button>
     </span>
 			]]></attribute>

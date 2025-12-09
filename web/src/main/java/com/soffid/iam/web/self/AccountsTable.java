@@ -1,10 +1,17 @@
 package com.soffid.iam.web.self;
 
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.soffid.iam.EJBLocator;
+import com.soffid.iam.api.Account;
+import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.api.User;
 
+import es.caib.seycon.ng.exception.InternalErrorException;
 import es.caib.zkib.component.DataTable;
 import es.caib.zkib.datamodel.DataModelCollection;
 import es.caib.zkib.datamodel.DataNode;
@@ -25,6 +32,15 @@ public class AccountsTable extends DataTable {
 			s.put("$class", "dashed");
 		else
 			s.put("$class", "std");
+		
+		PasswordPolicy pp;
+		try {
+			pp = EJBLocator.getSelfService().getPasswordPolicy((Account) sdn.getInstance());
+			s.put("canView", pp != null && pp.isAllowPasswordQuery() && 
+					Boolean.TRUE.equals(pp.getStoreUserPasswords()));
+			s.put("canChange", pp != null && pp.isAllowPasswordChange());
+		} catch (InternalErrorException | NamingException | CreateException e) {
+		}
 		return s;
 
 	}

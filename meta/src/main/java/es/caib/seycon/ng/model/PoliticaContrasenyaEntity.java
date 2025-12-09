@@ -111,6 +111,10 @@ public abstract class PoliticaContrasenyaEntity {
 	@Nullable
 	public java.lang.Boolean allowPasswordChange;
 
+	@Column (name="PCD_PASSTO")
+	@Nullable
+	public java.lang.Boolean storeUserPasswords;
+
 	@Description ("Enable complex password just like MS AD")
 	@Column (name="PCD_COMPLEX", defaultValue="false")
 	public Boolean complexPasswords;
@@ -164,4 +168,19 @@ public abstract class PoliticaContrasenyaEntity {
 		java.lang.String userType) {
 		return null;
 	}
+
+	@Operation(translated="findByAccount")
+	@DaoFinder("select pp from \n"
+			+ "com.soffid.iam.model.AccountEntity as acc, "
+			+ "com.soffid.iam.model.PasswordPolicyEntity as pp, "
+			+ "com.soffid.iam.model.SystemEntity as sys "
+			+ "where acc.id=:id "
+			+ " and  acc.system.id = sys.id "
+			+ " and  acc.passwordPolicy.id = pp.userType.id"
+			+ " and  sys.passwordDomain.id = pp.passwordDomain.id ")
+	public es.caib.seycon.ng.model.PoliticaContrasenyaEntity findByAccountId(
+		Long id) {
+		return null;
+	}
+
 }

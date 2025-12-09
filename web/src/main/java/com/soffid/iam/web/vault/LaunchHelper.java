@@ -291,7 +291,7 @@ public class LaunchHelper {
 			String manualUser, Password manualPassword) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		NewPamSession s;
 		
-		if (account != null && manualPassword != null) {
+		if (account != null && manualPassword == null) {
 			PasswordPolicy pp = EJBLocator.getSelfService().getPasswordPolicy(account);
 			if (Boolean.FALSE.equals(pp.getStoreUserPasswords())) {
 				openManualEntryPoint(exe, directLink);

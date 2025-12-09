@@ -37,6 +37,7 @@ import com.soffid.iam.api.Account;
 import com.soffid.iam.api.LaunchType;
 import com.soffid.iam.api.NewPamSession;
 import com.soffid.iam.api.Password;
+import com.soffid.iam.api.PasswordPolicy;
 import com.soffid.iam.service.ejb.SelfService;
 import com.soffid.iam.utils.Security;
 import com.soffid.iam.utils.TipusAutoritzacioPuntEntrada;
@@ -254,21 +255,25 @@ public class LaunchHelper {
 				w.doHighlighted();
 			}
 		} else {
-			Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
-			EnterAccountWindow accountSelectorWindow = (EnterAccountWindow) page.getFellowIfAny("enterAccountWindow");
-			if (accountSelectorWindow == null) {
-				accountSelectorWindow = (EnterAccountWindow) Executions.getCurrent()
-						.createComponents("/popup/enter-account.zul", new HashMap()) [0];
-			}
-			final EnterAccountWindow w = accountSelectorWindow;
-			accountSelectorWindow.setListener((event)->{
-				String user = w.getUserName();
-				Password password = w.getPassword();
-				openPamEntryPoint(exe, null, directLink, user, password);
-			});
-			
-			w.doHighlighted();
+			openManualEntryPoint(exe, directLink);
 		}			
+	}
+
+	private void openManualEntryPoint(final AccessTreeExecution exe, boolean directLink) {
+		Page page = ((ExecutionCtrl) Executions.getCurrent()).getCurrentPage();
+		EnterAccountWindow accountSelectorWindow = (EnterAccountWindow) page.getFellowIfAny("enterAccountWindow");
+		if (accountSelectorWindow == null) {
+			accountSelectorWindow = (EnterAccountWindow) Executions.getCurrent()
+					.createComponents("/popup/enter-account.zul", new HashMap()) [0];
+		}
+		final EnterAccountWindow w = accountSelectorWindow;
+		accountSelectorWindow.setListener((event)->{
+			String user = w.getUserName();
+			Password password = w.getPassword();
+			openPamEntryPoint(exe, null, directLink, user, password);
+		});
+		
+		w.doHighlighted();
 	}
 	
 	private boolean isManual(String url) {
@@ -285,6 +290,15 @@ public class LaunchHelper {
 	private void openPamEntryPoint(AccessTreeExecution exe, com.soffid.iam.api.Account account, boolean directLink,
 			String manualUser, Password manualPassword) throws UnsupportedEncodingException, InternalErrorException, NamingException, CreateException {
 		NewPamSession s;
+		
+		if (account != null && manualPassword != null) {
+			PasswordPolicy pp = EJBLocator.getSelfService().getPasswordPolicy(account);
+			if (Boolean.FALSE.equals(pp.getStoreUserPasswords())) {
+				openManualEntryPoint(exe, directLink);
+				return;
+			}
+		}
+		
 		if (exe == null || exe.getContent() == null || exe.getContent().trim().isEmpty()) {
 			s= EJBLocator.getPamSessionService()
 					.createJumpServerSession(account);

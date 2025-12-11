@@ -1929,12 +1929,11 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
 
     private NetworkEntity guessNetwork(byte[] b) throws InternalErrorException {
         NetworkEntityDao dao = getNetworkEntityDao();
-        NetworkEntity xarxa = null;
         byte maskAddress[] = new byte [b.length];
         Arrays.fill(maskAddress, (byte) -1);
-        for (int bc = b.length - 1; xarxa == null && bc >= 0; bc--) {
+        for (int bc = b.length - 1; bc >= 0; bc--) {
             byte mascara = (byte) 255;
-            for (int bits = 0; xarxa == null && bits < 8; bits++) {
+            for (int bits = 0; bits < 8; bits++) {
                 mascara = (byte) (mascara << 1);
                 b[bc] = (byte) (b[bc] & mascara);
                 maskAddress[bc] = (byte) mascara;
@@ -1943,6 +1942,7 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                     addr2 = InetAddress.getByAddress(b);
                     String addrText = addr2.getHostAddress();
                     String maskText = InetAddress.getByAddress(maskAddress).getHostAddress();
+                    NetworkEntity xarxa = null;
                     xarxa = dao.findByAddress(addrText);
                     if (xarxa != null && xarxa.getMask().equals(maskText))
                     	return xarxa;
@@ -1951,27 +1951,25 @@ public class NetworkServiceImpl extends com.soffid.iam.service.NetworkServiceBas
                 }
             }
         }
-        if (xarxa == null)
-        {
-        	String defaultNetwork = ConfigurationCache.getProperty("soffid.network.internet"); //$NON-NLS-1$
-        	if (defaultNetwork == null)
-        		defaultNetwork = "internet";
-        	if (! "disabled".equals(defaultNetwork))
-        	{
-        		xarxa = dao.findByName(defaultNetwork);
-        		if (xarxa == null)
-        		{
-        			xarxa = dao.newNetworkEntity();
-        			xarxa.setName(defaultNetwork);
-        			xarxa.setAddress("0.0.0.0"); //$NON-NLS-1$
-        			xarxa.setMask("0.0.0.0"); //$NON-NLS-1$
-        			xarxa.setDchpSupport(true);
-        			xarxa.setDescription("Autocreated network for unknown IP adresses"); //$NON-NLS-1$
-        			xarxa.setNormalized("N"); //$NON-NLS-1$
-        			dao.create(xarxa);
-        		}
-        	}
-       	}
+        NetworkEntity xarxa = null;
+    	String defaultNetwork = ConfigurationCache.getProperty("soffid.network.internet"); //$NON-NLS-1$
+    	if (defaultNetwork == null)
+    		defaultNetwork = "internet";
+    	if (! "disabled".equals(defaultNetwork))
+    	{
+    		xarxa = dao.findByName(defaultNetwork);
+    		if (xarxa == null)
+    		{
+    			xarxa = dao.newNetworkEntity();
+    			xarxa.setName(defaultNetwork);
+    			xarxa.setAddress("0.0.0.0"); //$NON-NLS-1$
+    			xarxa.setMask("0.0.0.0"); //$NON-NLS-1$
+    			xarxa.setDchpSupport(true);
+    			xarxa.setDescription("Autocreated network for unknown IP adresses"); //$NON-NLS-1$
+    			xarxa.setNormalized("N"); //$NON-NLS-1$
+    			dao.create(xarxa);
+    		}
+    	}
         return xarxa;
     }
 

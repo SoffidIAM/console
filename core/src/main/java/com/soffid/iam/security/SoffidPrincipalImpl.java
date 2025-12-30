@@ -19,6 +19,8 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import com.soffid.iam.ServiceLocator;
 import com.soffid.iam.api.Account;
 import com.soffid.iam.api.Group;
+import com.soffid.iam.api.GroupUser;
+import com.soffid.iam.api.OUType;
 import com.soffid.iam.api.RoleGrant;
 import com.soffid.iam.api.User;
 import com.soffid.iam.common.security.Obligation;
@@ -29,6 +31,7 @@ import com.soffid.iam.service.AuthorizationService;
 import com.soffid.iam.service.DispatcherService;
 import com.soffid.iam.service.GroupService;
 import com.soffid.iam.service.UserService;
+import com.soffid.iam.utils.ConfigurationCache;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.comu.AccountType;
@@ -44,7 +47,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private String[] groupsAndRoles;
 	private String userName;
 	List<Obligation> obligations = new LinkedList<>();
-	private Map<String, SoffidPrincipal> holderGroupMap;
 	private List<Long> roleIds;
 	private List<Long> accountIds;
 	private List<Long> groupIds;
@@ -53,6 +55,8 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	private String[] permissions;
 	private Long passwordId;
 	private String authenticationMethod;
+	private List<String> holderGroups;
+	private User user;
 	
 	static long clearCacheTimestamp;
 	private static Executor executor = Executors.newSingleThreadExecutor();
@@ -124,7 +128,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.holderGroup = holderGroup;
 		this.fullName = fullName;
 		this.userName = userName;
-		this.holderGroupMap = holderGroupMap;
 		this.roleIds = roleIds == null ? new LinkedList<>(): new LinkedList<>(roleIds);
 		this.accountIds = accountIds == null ? new LinkedList<>(): new LinkedList<>(accountIds);
 		this.groupIds = groupIds == null ? new LinkedList<>() : new LinkedList<>(groupIds);
@@ -153,7 +156,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.holderGroup = holderGroup;
 		this.fullName = fullName;
 		this.userName = userName;
-		this.holderGroupMap = holderGroupMap;
 		this.roleIds = roleIds == null ? new LinkedList<>(): new LinkedList<>(roleIds);
 		this.accountIds = accountIds == null ? new LinkedList<>(): new LinkedList<>(accountIds);
 		this.groupIds = groupIds == null ? new LinkedList<>() : new LinkedList<>(groupIds);
@@ -225,8 +227,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	public void refresh() {
 		if (Security.isSyncProxy() || Security.isSyncServer())
 			return;
-		if (holderGroup != null && holderGroupMap != null)
-			return;
 		if ( userId != null && 
 				clearCacheTimestamp < System.currentTimeMillis() &&
 				(timestamp < clearCacheTimestamp ||
@@ -244,7 +244,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 
 	protected void fetchPrincipalProperties() {
 		timestamp = System.currentTimeMillis();
-		User user = null;
 		Security.nestedLogin(tenant, "anonymous", Security.ALL_PERMISSIONS);
 		try {
 			user = userService.findUserByUserId(userId);
@@ -272,6 +271,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			updatePermissions(acc);
 			// Update account ids
 			accountIds = new LinkedList<Long>(accountService.getUserGrantedAccountIds(user));
+			
+			// UpdateHolderGroups
+			updateHolderGroups(acc);
+			if (! holderGroups.isEmpty() && ! holderGroups.contains(holderGroup))
+				holderGroup = holderGroups.get(0);
 			// UdpateGroups
 			updateGroups(acc);
 			// update roles
@@ -283,6 +287,33 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		} finally {
 			Security.nestedLogoff();
 		}
+	}
+
+	private void updateHolderGroups(Account acc) throws InternalErrorException {
+		holderGroups = new LinkedList<String>();
+		
+    	if (! "true".equals(ConfigurationCache.getProperty("soffid.selfservice.groupHolderFilter")))
+    		return;
+	    	
+	    	
+    	if (isHolderGroup(user.getPrimaryGroup())) {
+    		holderGroups.add(user.getPrimaryGroup());
+    	}
+    	
+		for (GroupUser ug: ServiceLocator.instance().getGroupService().findUsersGroupByUserName(user.getUserName())) {
+    		if (! holderGroups.contains(ug.getGroup()) && isHolderGroup(ug.getGroup())) {
+    			holderGroups.add(ug.getGroup());
+    		}
+    	}
+		
+	}
+
+	private boolean isHolderGroup(String groupName) throws InternalErrorException {
+		Group g = ServiceLocator.instance().getGroupService().findGroupByGroupName(groupName);
+		if (g == null || g.getType() == null)
+			return false;
+		OUType gc = ServiceLocator.instance().getOrganizationalUnitTypeService().findOUTypeByName(g.getType());
+		return gc != null && gc.isRoleHolder();
 	}
 
 	private void updateGroupsAndRoles() {
@@ -378,31 +409,19 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 	}
 
 	public String[] getGroups() {
-		if (holderGroup != null && holderGroupMap != null)
-			return holderGroupMap.get(holderGroup).getGroups();
-		else {
-			refresh();
-			return groups.clone();
-		}
+		refresh();
+		return groups.clone();
 	}
 
 
 	public String[] getSoffidRoles() {
-		if (holderGroup != null && holderGroupMap != null)
-			return holderGroupMap.get(holderGroup).getSoffidRoles();
-		else {
-			refresh();
-			return soffidRoles.clone();
-		}
+		refresh();
+		return soffidRoles.clone();
 	}
 
 	public String[] getGroupsAndRoles() {
-		if (holderGroup != null && holderGroupMap != null)
-			return holderGroupMap.get(holderGroup).getGroupsAndRoles();
-		else {
-			refresh();
-			return groupsAndRoles.clone();
-		}
+		refresh();
+		return groupsAndRoles.clone();
 	}
 
 	@Override
@@ -496,45 +515,50 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		this.holderGroup = holderGroup;
 		this.fullName = fullName;
 		this.userName = userName;
-		this.holderGroupMap = new HashMap<>();
 		this.roleIds = new LinkedList<>();
 		this.accountIds = new LinkedList<>();
 		this.groupIds = new LinkedList<>();
 		this.userId = null;
 	}
 
+	public SoffidPrincipalImpl(String name, Long userId, String tokenType) {
+		super(name, "*", new LinkedList<>());
+		this.userId = userId;
+		int i = name.indexOf("\\");
+		if (i > 0)
+		{
+			tenant = name.substring(0, i);
+		}
+		else
+			tenant = "master";
+		authenticationMethod = tokenType;
+		fetchPrincipalProperties();
+		
+	}
+
 	@Override
 	public List<String> getHolderGroups() {
-		if (holderGroupMap == null && holderGroupMap != null)
-			return null;
-		else
-			return new LinkedList<String>( holderGroupMap.keySet() );
+		return new LinkedList<String>( holderGroups );
 	}
 
 	@Override
 	public void setHolderGroup(String holderGroup) {
-		if (holderGroupMap == null && holderGroupMap != null)
-			throw new SecurityException("Not authorized to change holder group");
-		else if (holderGroupMap.containsKey(holderGroup))
+		if (holderGroups.contains(holderGroup)) {
 			this.holderGroup = holderGroup;
+			fetchPrincipalProperties();
+		}
 		else
 			throw new SecurityException("Not authorized to set holder group "+holderGroup);
 	}
 
 	@Override
 	public String[] getRoles() {
-		if (holderGroup != null && holderGroupMap != null)
-			return holderGroupMap.get(holderGroup).getRoles();
-		else {
-			refresh();
-			return permissions;
-		}
+		refresh();
+		return permissions;
 	}
 
 	@Override
 	public boolean hasRole(String role) {
-		if (holderGroup != null && holderGroupMap != null) 
-			return holderGroupMap.get(holderGroup).hasRole(role);
 		if ("*".equals(role)) { // Special 2.4 role meaning everyone
 			return true;
 		}

@@ -180,36 +180,18 @@ public class LoginServiceImpl implements LoginService {
 	
 					SoffidPrincipalImpl principal;
 					String passwordDomain = ps.getDefaultDispatcher();
-					List<Long> groupIds = new LinkedList<Long>();
-					List<String> groups = getUserGroups (acc, null, groupIds);
-					List<Long> roleIds = new LinkedList<Long>();
-					List<String> soffidRoles = getUserRoles(acc, null, roleIds);
-					List<String> roles = getRoles(acc, null);
-					Map<String, SoffidPrincipal> holder =  new HashMap<String, SoffidPrincipal>();
 					
 					String userName = acc.getType().equals( AccountType.USER) ? acc.getOwnerUsers().iterator().next() : null;
 					String fullName = acc.getDescription();
-					List<Long> accountIds = new LinkedList<Long>();
 					User userData = null;
 					if (userName != null) {
 						userData = us.findUserByUserName(userName);
-						if (userData != null) {
-							fullName = userData.getFullName();
-							accountIds = getAccounts(acc, userData);
-						}
 					}
 					
 					if (tokenAuthorized ||
 							ps.checkPassword(account, passwordDomain, new Password(
 							credentials), true, false)) {
-						roles.add("PASSWORD:VALID");
-						holderGroup = getHolderGroups(acc, userData, holder, "PASSWORD:VALID");
 						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account,
-								userName, fullName, holderGroup,
-								roles, groups, soffidRoles,
-								holder, 
-								roleIds, accountIds,
-								groupIds,
 								userData == null? null: userData.getId(),
 								tokenType);
 						log.info(masterMessage = principal.getName() + " login accepted");
@@ -222,16 +204,8 @@ public class LoginServiceImpl implements LoginService {
 						as.updateAccount(acc);
 					} else if (ps.checkPassword(account, passwordDomain, new Password(
 							credentials), false, true)) {
-						roles.add("PASSWORD:EXPIRED");
-						holderGroup = getHolderGroups(acc, userData, holder, "PASSWORD:EXPIRED");
-						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account, 
-								userName, fullName, holderGroup,
-								roles,
-								groups, soffidRoles,
-								holder,
-								roleIds, accountIds,
-								groupIds,
-								userData == null ? null: userData.getId(),
+						principal = new SoffidPrincipalImpl(tenant.getName()+ "\\" + account,
+								userData == null? null: userData.getId(),
 								tokenType);
 						log.info(masterMessage = principal.getName() + " login accepted with expired password");
 						acc.setLastLogin(Calendar.getInstance());
@@ -264,8 +238,6 @@ public class LoginServiceImpl implements LoginService {
 				exitWebapp(state);
 			}
 		} catch (AccountAlreadyExistsException e) {
-			throw new SecurityException ("Error during login process", e);
-		} catch (UnknownUserException e) {
 			throw new SecurityException ("Error during login process", e);
 		} catch (InternalErrorException e) {
 			throw new SecurityException ("Error during login process", e);

@@ -267,15 +267,21 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			
 			userName = user.getUserName();
 			fullName = user.getFullName();
+			
+			// UpdateHolderGroups
+			updateHolderGroups(acc);
+			if (! holderGroups.contains(holderGroup)) {
+				if (holderGroups.isEmpty())
+					holderGroup = null;
+				else
+					holderGroup = holderGroups.get(0);
+			}
+
 			// Update authorizations
 			updatePermissions(acc);
 			// Update account ids
 			accountIds = new LinkedList<Long>(accountService.getUserGrantedAccountIds(user));
 			
-			// UpdateHolderGroups
-			updateHolderGroups(acc);
-			if (! holderGroups.isEmpty() && ! holderGroups.contains(holderGroup))
-				holderGroup = holderGroups.get(0);
 			// UdpateGroups
 			updateGroups(acc);
 			// update roles

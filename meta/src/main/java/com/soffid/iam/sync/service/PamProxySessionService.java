@@ -46,6 +46,8 @@ public class PamProxySessionService {
 	
 	public List<Account> findAccounts(String userName, String url, String accountName) {return null;}
 	
+	public Account findAccount(String userName, String accountName, String system) {return null;}
+
 	public ProcessInstance startWorkflow(String workflow, String userName, Account account, @Nullable int hours, @Nullable String comments) {return null;}
 
 	public NewPamSession openSession (String userName, Account account,
@@ -53,5 +55,14 @@ public class PamProxySessionService {
 			@Nullable TipusSessio type, @Nullable String info, @Nullable Map<String,Map<String,String>> obligations)
 		{return null;}
 	
+	public boolean isPasswordAvailable (Account account)
+		{return false;}
+
+	public NewPamSession openSession (String userName, Account account,
+			@Nullable String sourceIp,
+			@Nullable TipusSessio type, @Nullable String info, @Nullable Map<String,Map<String,String>> obligations,
+			@Nullable Password password)
+		{return null;}
+
 	public void sendEmailNotification(Map<String, String> obligationDetails) {}
 }

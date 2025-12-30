@@ -77,6 +77,11 @@ public class PamSessionService {
 	@Description("Creates a jump server session and returns the session URL. Internal method for SSH and RDP proxies")
 	NewPamSession createCustomJumpServerSession (Account account, @Nullable String sourceIp, @Nullable TipusSessio type, @Nullable String info ) {return null;}
 
+	@Description("Creates a jump server session and returns the session URL. Internal method for SSH and RDP proxies")
+	NewPamSession createCustomJumpServerSession (Account account, @Nullable String sourceIp, 
+			@Nullable TipusSessio type, @Nullable String info,
+			String loginName, Password password) {return null;}
+
 	@Description("Checks a server session is up")
 	boolean checkJumpServerSession (Sessio sessio) {return false;}
 	

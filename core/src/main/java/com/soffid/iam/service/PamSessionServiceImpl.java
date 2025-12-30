@@ -931,4 +931,27 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl(), 
 				policyName, sourceIp, type, info);
 	}
+
+	@Override
+	protected NewPamSession handleCreateCustomJumpServerSession(Account account, String sourceIp, 
+			TipusSessio type, String info,
+			String user, Password password)
+			throws Exception {
+		if (type == null) type = TipusSessio.PAM;
+		if (sourceIp == null) sourceIp = Security.getClientIp();
+		
+		AccountEntity entity = getAccountEntityDao().load(account.getId());
+		JumpServerGroupEntity jumpServerGroup = entity.getJumpServerGroup();
+		if (jumpServerGroup == null)
+			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
+		getPamSecurityHandlerService().checkPermission(entity, "launch");
+		String policyName = findPolicy(account, account.getLoginUrl());
+		if (policyName == null &&
+				entity.getFolder() != null && 
+				entity.getFolder().getPamPolicy() != null )
+			policyName = entity.getFolder().getPamPolicy().getName();
+		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl(), 
+				policyName, sourceIp, type, info,
+				user, password);
+	}
 }

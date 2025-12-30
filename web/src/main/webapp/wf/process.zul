@@ -24,7 +24,7 @@
 			<tab id="tabAnexos" label="${c:l('inbox.lblAnexos')}"/>
 			<tab label="${c:l('task.comentari')}"/>
 		</tabs>
-		<tabpanels width="100%">
+		<tabpanels width="100%; height: calc(100% - 40px)">
 			<tabpanel id="proceso" style="min-height:30em;overflow:auto" width="100%">
 				<form2 dataPath="model:/processInstance/variables"  style="width:100%; height: calc( 100vh - 340px )">
 					 
@@ -75,10 +75,10 @@
 					]]></attribute>
 				</datatree2>
 			</tabpanel>
-			<tabpanel style="overflow:auto;min-height:30em;" width="100%">
+			<tabpanel style="overflow:auto; height: 100%" width="100%">
 				<processInfo/>
 			</tabpanel>
-			<tabpanel style="overflow:auto;min-height:30em;" width="100%">
+			<tabpanel style="overflow:auto; height: 100%;" width="100%">
 			<!-- 
 				 -->
 				<attachments/>

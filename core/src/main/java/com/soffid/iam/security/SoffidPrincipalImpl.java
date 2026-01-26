@@ -246,7 +246,11 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 		timestamp = System.currentTimeMillis();
 		Security.nestedLogin(tenant, "anonymous", Security.ALL_PERMISSIONS);
 		try {
-			user = userService.findUserByUserId(userId);
+			if (userId != null) {
+				user = userService.findUserByUserId(userId);
+				userName = user.getUserName();
+				fullName = user.getFullName();
+			}
 			int i = name.indexOf('\\');
 			String account;
 			if (i < 0) {
@@ -257,7 +261,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 
 			Account acc = accountService.findAccount(account, dispatcherService.findSoffidDispatcher().getName());
 			if (acc == null || acc.isDisabled() ||
-					user == null || Boolean.FALSE.equals( user.getActive())) {
+					(user != null && Boolean.FALSE.equals( user.getActive()))) {
 				permissions = new String[0];
 				soffidRoles = new String[0];
 				groups = new String[0];
@@ -265,8 +269,6 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 				return;
 			}
 			
-			userName = user.getUserName();
-			fullName = user.getFullName();
 			
 			// UpdateHolderGroups
 			updateHolderGroups(acc);

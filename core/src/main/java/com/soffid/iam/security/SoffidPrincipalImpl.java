@@ -282,7 +282,8 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			// Update authorizations
 			updatePermissions(acc);
 			// Update account ids
-			accountIds = new LinkedList<Long>(accountService.getUserGrantedAccountIds(user));
+			if (user!=null)
+				accountIds = new LinkedList<Long>(accountService.getUserGrantedAccountIds(user));
 			
 			// UdpateGroups
 			updateGroups(acc);
@@ -303,17 +304,18 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
     	if (! "true".equals(ConfigurationCache.getProperty("soffid.selfservice.groupHolderFilter")))
     		return;
 	    	
+	    if (user!=null) {
+
+	    	if (isHolderGroup(user.getPrimaryGroup())) {
+	    		holderGroups.add(user.getPrimaryGroup());
+	    	}
 	    	
-    	if (isHolderGroup(user.getPrimaryGroup())) {
-    		holderGroups.add(user.getPrimaryGroup());
-    	}
-    	
-		for (GroupUser ug: ServiceLocator.instance().getGroupService().findUsersGroupByUserName(user.getUserName())) {
-    		if (! holderGroups.contains(ug.getGroup()) && isHolderGroup(ug.getGroup())) {
-    			holderGroups.add(ug.getGroup());
-    		}
-    	}
-		
+			for (GroupUser ug: ServiceLocator.instance().getGroupService().findUsersGroupByUserName(user.getUserName())) {
+	    		if (! holderGroups.contains(ug.getGroup()) && isHolderGroup(ug.getGroup())) {
+	    			holderGroups.add(ug.getGroup());
+	    		}
+	    	}
+	    }
 	}
 
 	private boolean isHolderGroup(String groupName) throws InternalErrorException {

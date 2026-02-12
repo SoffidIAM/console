@@ -202,7 +202,7 @@ public class AuditEntityDaoImpl extends
 			        SSLContext ctx;
 			        ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 			        ctx.init(new KeyManager[0], new TrustManager[] { new AlwaysTrustManager() }, null);
-					SSLSocket s = (SSLSocket) ctx.getSocketFactory().createSocket(syslogServer, 514);
+					SSLSocket s = (SSLSocket) ctx.getSocketFactory().createSocket(syslogServer, 6514);
 					s.getOutputStream().write(buf);
 					s.getOutputStream().write(10);
 					s.close();

@@ -212,7 +212,8 @@ public class LaunchHelper {
 		if (!isManual(url)) {
 			for (com.soffid.iam.api.Account account: accounts)
 			{
-				if (accountService.isAccountPasswordAvailable(account.getId()))
+				if (account.getType() == AccountType.USER ||
+					accountService.isAccountPasswordAvailable(account.getId()))
 					r.add(account);
 			}
 			if (r.size() == 0)

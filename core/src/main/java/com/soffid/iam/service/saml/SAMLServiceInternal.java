@@ -98,6 +98,7 @@ import org.opensaml.saml.metadata.resolver.impl.AbstractMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.AbstractReloadingMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.FilesystemMetadataResolver;
 import org.opensaml.saml.metadata.resolver.impl.HTTPMetadataResolver;
+import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.saml.saml2.assertion.ConditionValidator;
 import org.opensaml.saml.saml2.assertion.SAML20AssertionValidator;
 import org.opensaml.saml.saml2.assertion.SAML2AssertionValidationParameters;
@@ -111,6 +112,7 @@ import org.opensaml.saml.saml2.core.AttributeValue;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.EncryptedAssertion;
 import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.LogoutRequest;
 import org.opensaml.saml.saml2.core.NameID;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
@@ -694,7 +696,7 @@ public class SAMLServiceInternal {
 		return (X509Certificate)certFactory.generateCertificate(inputStream);
 	}
 
-	private Element sign(XMLObjectBuilderFactory builderFactory, AuthnRequest req) throws InvalidKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, UnrecoverableKeyException, MarshallingException, org.opensaml.xmlsec.signature.support.SignatureException, UnmarshallingException {
+	private Element sign(XMLObjectBuilderFactory builderFactory, RequestAbstractType req) throws InvalidKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, UnrecoverableKeyException, MarshallingException, org.opensaml.xmlsec.signature.support.SignatureException, UnmarshallingException {
 
 		
 		KeyStore ks = getKeyStore();
@@ -716,7 +718,7 @@ public class SAMLServiceInternal {
 		Element element = marshaller.marshall(req);
 		Signer.signObject(signature);
 		
-		req = (AuthnRequest) unmarshallerFactory.getUnmarshaller(req.getDOM()).unmarshall(req.getDOM());
+		req = (RequestAbstractType) unmarshallerFactory.getUnmarshaller(req.getDOM()).unmarshall(req.getDOM());
 		return marshallerFactory.getMarshaller(req).marshall(req);
 
 	}
@@ -1332,4 +1334,97 @@ public class SAMLServiceInternal {
 		BigInteger b = new BigInteger(+1, data);
 		return b;
 	}
+	
+	/**
+	 * <samlp:LogoutRequest ID="S00505693-2427-1fd1-80cd-d7bb778d7bb2" Version="2.0" IssueInstant="2026-02-05T08:43:28Z" 
+	 *  Destination="https://access2.groupfcc.com:443/profile/SAML2/Redirect/SLO" 
+	 *  xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+	 *  
+	 *  <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">SAP_Fiori_FEP</saml:Issuer>
+	 *  <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" NameQualifier="access2.groupfcc.com/virtual" SPNameQualifier="SAP_Fiori_FEP" 
+	 *    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">_aaae56d83160550f1873b2b3dfaf2a05</saml:NameID>
+	 *  <samlp:SessionIndex>_93d617edeca7e1c7e1e04993ec8d7640</samlp:SessionIndex></samlp:LogoutRequest>
+	 * 
+	 * @return
+	 * @throws InternalErrorException
+	 */
+	public SamlRequest generateLogoutRequest(String hostName) throws InternalErrorException {
+		try {
+			RandomIdentifierGenerationStrategy idGenerator = new RandomIdentifierGenerationStrategy();
+			// Get the assertion builder based on the assertion element name
+			SAMLObjectBuilder<LogoutRequest> builder = (SAMLObjectBuilder<LogoutRequest>) builderFactory
+					.getBuilder(LogoutRequest.DEFAULT_ELEMENT_NAME);
+			 
+			EntityDescriptor idp = getIdpMetadata(hostName);
+			if (idp == null)
+				throw new InternalErrorException(String.format("Unable to find Identity Provider metadata"));
+			IDPSSODescriptor idpssoDescriptor = idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
+
+			// Create the assertion
+			
+			LogoutRequest req = builder.buildObject( );
+			
+			String newID = idGenerator.generateIdentifier();
+			
+			SamlRequest r = new SamlRequest();
+			r.setParameters(new HashMap<String, String>());
+			boolean compress = false;
+			for (SingleLogoutService sss : idpssoDescriptor.getSingleLogoutServices()) {
+				if (sss.getBinding().equals(SAMLConstants.SAML2_REDIRECT_BINDING_URI)) {
+					r.setMethod(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
+					r.setUrl(sss.getLocation());
+					req.setDestination(sss.getLocation());
+					compress = true;
+					break;
+				}
+				if (sss.getBinding().equals(SAMLConstants.SAML2_POST_BINDING_URI)) {
+					r.setMethod(SAMLConstants.SAML2_POST_BINDING_URI);
+					r.setUrl(sss.getLocation());
+					req.setDestination(sss.getLocation());
+					break;
+				}
+			}
+			if (r.getUrl() == null)
+				throw new InternalErrorException(String.format("Unable to find a suitable endpoint for IdP %s"), idp.getEntityID());
+
+			req.setID(newID);
+			req.setIssueInstant(new DateTime ());
+			Issuer issuer = ( (SAMLObjectBuilder<Issuer>) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME)).buildObject();
+			issuer.setValue(getEntityId(hostName, true));
+			
+			req.setIssuer( issuer );
+			
+			NameID nameid = ( (SAMLObjectBuilder<NameID>) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME)).buildObject();
+			nameid.setFormat( NameID.PERSISTENT );
+			nameid.setValue(Security.getCurrentAccount());
+			req.setNameID(nameid);
+			
+			Element xml = sign (builderFactory, req);
+			
+			String xmlString = generateString(xml, false);
+			
+			r.getParameters().put("RelayState", newID);
+			if (compress) {
+				ByteArrayOutputStream ba = new ByteArrayOutputStream();
+				DeflaterOutputStream out = new DeflaterOutputStream(ba, new Deflater(Deflater.DEFAULT_COMPRESSION, true));
+				out.write(xmlString.getBytes("UTF-8"));
+				out.flush();
+				out.close();
+				r.getParameters().put("SAMLRequest", Base64.encodeBytes(ba.toByteArray()));
+			}
+			else 
+			{
+				r.getParameters().put("SAMLRequest", Base64.encodeBytes(xmlString.getBytes("UTF-8")));
+			}
+			
+			return r;
+		} catch (Exception e) {
+			if (e instanceof InternalErrorException)
+				throw (InternalErrorException) e;
+			else
+				throw new InternalErrorException(e.getMessage(), e);
+		}
+
+	}
+
 }

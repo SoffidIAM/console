@@ -23,6 +23,9 @@ public class SamlService {
 	@Description("Generates a SAML request to formard to the IdP")
 	SamlRequest generateSamlRequest (String hostName, @Nullable String app) {return null;}
 	
+	@Description("Generates a SAML logout request to formard to the IdP")
+	SamlRequest generateSamlLogout (String hostName) {return null;}
+
 	@Description("Generates SAML metadata to publish to SAML federation discovery database")
 	String generateMetadata (String hostName) {return null;}
 			

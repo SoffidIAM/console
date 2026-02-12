@@ -106,4 +106,9 @@ public class SamlServiceImpl extends SamlServiceBase {
 		return getDelegate().validateOpenidToken(token);
 	}
 
+	@Override
+	protected SamlRequest handleGenerateSamlLogout(String hostName) throws Exception {
+		return getDelegate().generateLogoutRequest(hostName);
+	}
+
 }

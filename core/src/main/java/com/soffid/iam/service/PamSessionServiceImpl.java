@@ -920,7 +920,12 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
 		JumpServerGroupEntity jumpServerGroup = entity.getJumpServerGroup();
-		if (jumpServerGroup == null)
+		if (jumpServerGroup == null) {
+			List<JumpServerGroupEntity> list = getJumpServerGroupEntityDao().loadAll();
+			if (! list.isEmpty())
+				jumpServerGroup = list.iterator().next();
+		}
+		if (jumpServerGroup == null) 
 			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
 		getPamSecurityHandlerService().checkPermission(entity, "launch");
 		String policyName = findPolicy(account, account.getLoginUrl());
@@ -934,7 +939,7 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 
 	@Override
 	protected NewPamSession handleCreateCustomJumpServerSession(Account account, String sourceIp, 
-			TipusSessio type, String info,
+			TipusSessio type, String targetUrl,
 			String user, Password password)
 			throws Exception {
 		if (type == null) type = TipusSessio.PAM;
@@ -942,6 +947,11 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 		
 		AccountEntity entity = getAccountEntityDao().load(account.getId());
 		JumpServerGroupEntity jumpServerGroup = entity.getJumpServerGroup();
+		if (jumpServerGroup == null) {
+			List<JumpServerGroupEntity> list = getJumpServerGroupEntityDao().loadAll();
+			if (! list.isEmpty())
+				jumpServerGroup = list.iterator().next();
+		}
 		if (jumpServerGroup == null)
 			throw new InternalErrorException("Cannot start session. Please, assign a jump server group to account "+account.getDescription());
 		getPamSecurityHandlerService().checkPermission(entity, "launch");
@@ -950,8 +960,11 @@ public class PamSessionServiceImpl extends PamSessionServiceBase {
 				entity.getFolder() != null && 
 				entity.getFolder().getPamPolicy() != null )
 			policyName = entity.getFolder().getPamPolicy().getName();
-		return createJumpServerSession (entity, jumpServerGroup, account.getLoginUrl(), 
-				policyName, sourceIp, type, info,
+		return createJumpServerSession (entity, jumpServerGroup, 
+				targetUrl == null || targetUrl.isBlank() ? 
+						account.getLoginUrl() :
+						targetUrl, 
+				policyName, sourceIp, type, null,
 				user, password);
 	}
 }

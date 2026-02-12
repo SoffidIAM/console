@@ -52,7 +52,9 @@ public class PamProxySessionService {
 
 	public NewPamSession openSession (String userName, Account account,
 			@Nullable String sourceIp,
-			@Nullable TipusSessio type, @Nullable String info, @Nullable Map<String,Map<String,String>> obligations)
+			@Nullable TipusSessio type, 
+			@Nullable String info, 
+			@Nullable Map<String,Map<String,String>> obligations)
 		{return null;}
 	
 	public boolean isPasswordAvailable (Account account)

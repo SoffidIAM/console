@@ -34,6 +34,7 @@ import es.caib.seycon.ng.utils.Security;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -203,8 +204,10 @@ public class AuditEntityDaoImpl extends
 			        ctx = SSLContext.getInstance("TLS"); //$NON-NLS-1$
 			        ctx.init(new KeyManager[0], new TrustManager[] { new AlwaysTrustManager() }, null);
 					SSLSocket s = (SSLSocket) ctx.getSocketFactory().createSocket(syslogServer, 6514);
-					s.getOutputStream().write(buf);
-					s.getOutputStream().write(10);
+					OutputStream outputStream = s.getOutputStream();
+					outputStream.write(Integer.toString(buf.length).getBytes());
+					outputStream.write(32);
+					outputStream.write(buf);
 					s.close();
 				} catch (Exception e) {
 					log.warn("Error sending syslog message: "+SoffidStackTrace.generateShortDescription(e));
@@ -215,9 +218,17 @@ public class AuditEntityDaoImpl extends
 		else if ("tcp".equals(protocol)) {
 			new Thread(() -> {
 				try {
+					String framing = ConfigurationCache.getProperty ("soffid.syslog.framing");
 					Socket s =  new Socket(syslogServer, 514);
-					s.getOutputStream().write(buf);
-					s.getOutputStream().write(10);
+					OutputStream outputStream = s.getOutputStream();
+					if ("true".equals(framing)) {
+						outputStream.write(Integer.toString(buf.length).getBytes());
+						outputStream.write(32);
+						outputStream.write(buf);
+					} else {
+						outputStream.write(buf);
+						outputStream.write(10);
+					}
 					s.close();
 				} catch (Exception e) {
 					log.warn("Error sending syslog message: "+SoffidStackTrace.generateShortDescription(e));

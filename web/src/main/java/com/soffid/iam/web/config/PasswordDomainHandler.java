@@ -96,9 +96,9 @@ public class PasswordDomainHandler extends FrameHandler implements AfterCompose 
 			getFellow("passwordPolicy").setVisible(true);
 			getFellow("passwordDomain").setVisible(false);
 			onSetPasswordType(event);
+			onStoreUserPasswords(event);
 			fillBadWords();
 		}
-		onStoreUserPasswords(event);
 	}
 	
 	public void importCsv () throws IOException, CommitException {

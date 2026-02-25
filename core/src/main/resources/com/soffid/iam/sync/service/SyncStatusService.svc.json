@@ -1,0 +1,127 @@
+{
+  "class": "com.soffid.iam.sync.service.SyncStatusService",
+  "methods": [
+    {"name":"getTasksGrid", "return":"com.soffid.iam.base.api.TasksGrid", "arguments":[
+    ]},
+    {"name":"findLogs", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"config","type":"com.soffid.iam.sync.api.LogConfiguration","required": true},
+       {"name":"firstRow","type":"long","required": true},
+       {"name":"numRows","type":"long","required": true}    ]},
+    {"name":"getTasks", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.SyncAgentTaskLog>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"getServerLogs", "return":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"findActiveDirectoryDomains", "return":"java.util.Map<java.lang.String,java.lang.String>", "arguments":[
+    ]},
+    {"name":"getMazingerRules", "return":"byte[]", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"getAccountPassword", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"accountId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getAccountPassword", "comments":"Method user for SSO. Provides the password if the user has the right access level on the account", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"accountId","type":"java.lang.Long","required": true},
+       {"name":"level","type":"com.soffid.iam.base.api.AccountAccessLevelEnum","required": true}    ]},
+    {"name":"getAccountSshKey", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"accountId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getAccountSshKey", "comments":"Method user for SSO. Provides the password if the user has the right access level on the account", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"accountId","type":"java.lang.Long","required": true},
+       {"name":"level","type":"com.soffid.iam.base.api.AccountAccessLevelEnum","required": true}    ]},
+    {"name":"checkPasswordSynchronizationStatus", "return":"com.soffid.iam.am.api.PasswordValidation", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"serverName","type":"java.lang.String","required": true}    ]},
+    {"name":"testPropagateObject", "return":"com.soffid.iam.sync.api.DebugTaskResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"getNativeObject", "return":"com.soffid.iam.sync.api.GetObjectResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"getSoffidObject", "return":"com.soffid.iam.sync.api.GetObjectResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"reconcile", "return":"com.soffid.iam.sync.api.GetObjectResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"accountName","type":"java.lang.String","required": true}    ]},
+    {"name":"getSyncServerInfo", "return":"com.soffid.iam.sync.api.SyncServerInfo", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"getSyncServerInfo", "return":"com.soffid.iam.sync.api.SyncServerInfo", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"getSyncServerStatus", "return":"com.soffid.iam.sync.api.SyncServerInfo", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"getSyncServerStatus", "return":"com.soffid.iam.sync.api.SyncServerInfo", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"getDBConnectionStatus", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"resetAllServer", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"resetServerAgents", "return":"java.lang.String", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"tailServerLog", "return":"java.lang.String[]", "arguments":[
+       {"name":"urlServer","type":"java.lang.String","required": true}    ]},
+    {"name":"getServerAgentHostsURL", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>", "arguments":[
+    ]},
+    {"name":"getSyncAgentsInfo", "return":"java.util.Collection<com.soffid.iam.base.api.AgentStatusInfo>", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"invoke", "comments":"Invokes a custom method", "return":"java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"verb","type":"java.lang.String","required": true},
+       {"name":"object","type":"java.lang.String","required":false},
+       {"name":"attributes","type":"java.util.Map<java.lang.String,java.lang.Object>","required":false}    ]},
+    {"name":"assignTemporaryPermissions", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"host","type":"java.lang.String","required":false},
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountSystem","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+    {"name":"testObjectMapping", "return":"java.util.Map<java.lang.String,java.lang.Object>", "arguments":[
+       {"name":"sentences","type":"java.util.Map<java.lang.String,java.lang.String>","required": true},
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"boostTask", "return":"void", "arguments":[
+       {"name":"taskId","type":"long","required": true}    ]},
+    {"name":"cancelTask", "return":"void", "arguments":[
+       {"name":"taskId","type":"long","required": true}    ]},
+    {"name":"checkConnectivity", "return":"void", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"reconfigureDispatchers", "return":"void", "arguments":[
+    ]},
+    {"name":"removeTemporaryPermissions", "return":"void", "arguments":[
+       {"name":"host","type":"java.lang.String","required":false},
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountSystem","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+    {"name":"resendAccountPassword", "return":"void", "arguments":[
+       {"name":"accountId","type":"java.lang.Long","required": true}    ]},
+    {"name":"resendUserPassword", "return":"void", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true}    ]},
+    {"name":"setAccountPassword", "return":"void", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"serverName","type":"java.lang.String","required": true},
+       {"name":"password","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"mustChange","type":"boolean","required": true}    ]},
+    {"name":"setAccountSshPrivateKey", "return":"void", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"serverName","type":"java.lang.String","required": true},
+       {"name":"privateKey","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"startScheduledTask", "return":"void", "arguments":[
+       {"name":"t","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"stopScheduledTask", "return":"void", "arguments":[
+       {"name":"t","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"configureLog", "return":"void", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"config","type":"com.soffid.iam.sync.api.LogConfiguration","required": true}    ]}
+  ]
+}

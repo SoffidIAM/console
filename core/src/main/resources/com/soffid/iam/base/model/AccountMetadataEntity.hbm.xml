@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.AccountMetadataEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ACCMET' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='AME_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='AME_NAME' not-null='true' length='50' />
+		</property>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCMET_AME_DIS_ID'>
+			<column name='AME_DIS_ID' not-null='true'/>
+		</many-to-one>
+		<property name='order' type='java.lang.Long'>
+			<column name='AME_ORDER' not-null='true' />
+		</property>
+		<set name='data' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCATT_AAT_AME_ID'>
+				<column name='AAT_AME_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountAttributeEntityImpl'/>
+		</set>
+		<property name='type' type='com.soffid.iam.base.api.TypeEnumerationEnum'>
+			<column name='AME_TYPE' not-null='false' length='50' />
+		</property>
+		<property name='size' type='java.lang.Integer'>
+			<column name='AME_SIZE' not-null='false' />
+		</property>
+		<property name='required' type='java.lang.Boolean'>
+			<column name='AME_REQUIR' not-null='false' />
+		</property>
+		<property name='multiValued' type='java.lang.Boolean'>
+			<column name='AME_MULTIV' not-null='false' />
+		</property>
+		<property name='multiValuedRows' type='java.lang.Integer'>
+			<column name='AME_MVROWS' not-null='false' />
+		</property>
+		<property name='values' type='java.lang.String' lazy='true'>
+			<column name='AME_VALUE' not-null='false' length='64000' />
+		</property>
+		<property name='label' type='java.lang.String'>
+			<column name='AME_LABEL' not-null='false' length='64' />
+		</property>
+		<property name='adminVisibility' type='com.soffid.iam.base.api.AttributeVisibilityEnumEnum'>
+			<column name='AME_ADMVIS' not-null='false' length='1' />
+		</property>
+		<property name='operatorVisibility' type='com.soffid.iam.base.api.AttributeVisibilityEnumEnum'>
+			<column name='AME_OPEVIS' not-null='false' length='1' />
+		</property>
+		<property name='userVisibility' type='com.soffid.iam.base.api.AttributeVisibilityEnumEnum'>
+			<column name='AME_USEVIS' not-null='false' length='1' />
+		</property>
+		<property name='unique' type='java.lang.Boolean'>
+			<column name='AME_UNIQUE' not-null='false' length='1' />
+		</property>
+		<many-to-one name='dataObjectType' class='com.soffid.iam.iga.model.CustomObjectTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCMET_TDA_COT_ID'>
+			<column name='TDA_COT_ID' not-null='false'/>
+		</many-to-one>
+		<property name='visibilityExpression' type='java.lang.String'>
+			<column name='AME_VISEXP' not-null='false' length='2048' />
+		</property>
+		<property name='validationExpression' type='java.lang.String'>
+			<column name='AME_VALEXP' not-null='false' length='2048' />
+		</property>
+		<property name='filterExpression' type='java.lang.String'>
+			<column name='AME_FILEXP' not-null='false' />
+		</property>
+		<property name='onLoadTrigger' type='java.lang.String' lazy='true'>
+			<column name='AME_LOATRI' not-null='false' length='4096' />
+		</property>
+		<property name='onChangeTrigger' type='java.lang.String' lazy='true'>
+			<column name='AME_CHATRI' not-null='false' length='4096' />
+		</property>
+		<property name='onFocusTrigger' type='java.lang.String' lazy='true'>
+			<column name='AME_FOCTRI' not-null='false' length='4096' />
+		</property>
+		<set name='translations' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_TRALAB_TLA_AME_ID'>
+				<column name='TLA_AME_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.TranslatedLabelEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

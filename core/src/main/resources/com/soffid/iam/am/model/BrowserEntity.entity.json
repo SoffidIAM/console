@@ -1,0 +1,9 @@
+{
+  "joins": [
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"browsers"},
+    {"name":"lastUser","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"browsers"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"sessions","targetClass":"com.soffid.iam.am.model.SessionEntity","multiple":true,"reverse":"browser"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueBrowserEntity","multiple":true,"reverse":"browser"}
+  ]
+}

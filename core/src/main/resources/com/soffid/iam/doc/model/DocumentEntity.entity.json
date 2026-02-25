@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"signs","targetClass":"com.soffid.iam.doc.model.DocSign","multiple":true,"reverse":"bpmDocument"}
+  ]
+}

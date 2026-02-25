@@ -1,0 +1,11 @@
+{
+  "class": "com.soffid.iam.am.service.AccessLogService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.am.api.AccessLog", "arguments":[
+       {"name":"registre","type":"com.soffid.iam.am.api.AccessLog","required": true}    ]},
+    {"name":"findAccessLogById", "return":"com.soffid.iam.am.api.AccessLog", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"findAccessLogs", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.AccessLog>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]}
+  ]
+}

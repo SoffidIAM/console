@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.JumpServerGroupEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_JUSEGR' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='JSG_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_JUSEGR_JSG_TEN_ID'>
+			<column name='JSG_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='name' type='java.lang.String'>
+			<column name='JSG_NAME' not-null='true' length='50' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='JSG_DESCRI' not-null='false' length='250' />
+		</property>
+		<property name='storeUrl' type='java.lang.String'>
+			<column name='JSG_STORE' not-null='true' length='100' />
+		</property>
+		<property name='storeUserName' type='java.lang.String'>
+			<column name='JSG_USER' not-null='true' length='100' />
+		</property>
+		<property name='password' type='java.lang.String'>
+			<column name='JSG_PASSWD' not-null='true' length='100' />
+		</property>
+		<set name='jumpServers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_JUMSER_JSE_JSG_ID'>
+				<column name='JSE_JSG_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.JumpServerEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

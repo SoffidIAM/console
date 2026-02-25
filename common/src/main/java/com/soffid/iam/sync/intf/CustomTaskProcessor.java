@@ -7,9 +7,8 @@ package com.soffid.iam.sync.intf;
 
 import java.rmi.RemoteException;
 
-import com.soffid.iam.api.Task;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.sync.api.Task;
+import com.soffid.iam.exception.InternalErrorException;
 
 /** 
  * Interfaz remoto de gestión de usuarios (y contraseñas)

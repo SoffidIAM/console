@@ -2,7 +2,7 @@ package com.soffid.iam.sync.intf;
 
 import java.io.Serializable;
 
-import es.caib.seycon.ng.comu.Password;
+import com.soffid.iam.am.api.Password;
 
 public class KerberosPrincipalInfo implements Serializable {
     /**

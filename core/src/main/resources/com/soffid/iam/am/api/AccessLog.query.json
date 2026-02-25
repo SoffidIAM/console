@@ -1,0 +1,30 @@
+{
+  "hibernateClass": "com.soffid.iam.am.model.AccessLogEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"sessionId", "hibernateName":"sessionId"},
+    {"name":"startDate", "hibernateName":"startDate"},
+    {"name":"endDate", "hibernateName":"endDate"},
+    {"name":"codeAge"},
+    {"name":"information", "hibernateName":"information"},
+    {"name":"userName",  "hibernateName":"user.userName"},
+    {"name":"serverName",  "hibernateName":"server.name"},
+    {"name":"clientName",  "hibernateName":"client.name"},
+    {"name":"clientAddress",  "hibernateName":"clientAddress"},
+    {"name":"country", "hibernateName":"country"},
+    {"name":"accessType", "hibernateName":"accessType"},
+    {"name":"accessProtocol",  "hibernateName":"protocol.name"},
+    {"name":"userFullName"},
+    {"name":"jumpServerGroup", "hibernateName":"jumpServerGroup"},
+    {"name":"accountName", "hibernateName":"accountName"},
+    {"name":"targetApplication", "hibernateName":"targetApplication"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

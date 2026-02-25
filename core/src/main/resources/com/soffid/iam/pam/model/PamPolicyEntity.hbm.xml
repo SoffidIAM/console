@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.PamPolicyEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_PAMPOL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PPO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='PPO_NAME' not-null='true' length='100' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='PPO_DESCR' not-null='false' length='150' />
+		</property>
+		<property name='author' type='java.lang.String'>
+			<column name='PPO_AUTHOR' not-null='false' length='100' />
+		</property>
+		<property name='date' type='java.util.Date'>
+			<column name='PPO_DATE' not-null='false' />
+		</property>
+		<property name='recordingDuration' type='java.lang.Integer'>
+			<column name='PPO_RECDUR' not-null='false' />
+		</property>
+		<property name='expression' type='java.lang.String' lazy='true'>
+			<column name='PPO_EXPRES' not-null='false' length='16000' />
+		</property>
+		<property name='priority' type='java.lang.Integer'>
+			<column name='PPO_PRIORI' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PAMPOL_PPO_TEN_ID'>
+			<column name='PPO_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='vaultFolders' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_VAUFOL_VAF_PPO_ID'>
+				<column name='VAF_PPO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.VaultFolderEntityImpl'/>
+		</set>
+		<set name='actions' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PAMACT_PAC_PPO_ID'>
+				<column name='PAC_PPO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.PamActionEntityImpl'/>
+		</set>
+		<set name='justInTimePermissions' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PPOJTP_PJT_PPO_ID'>
+				<column name='PJT_PPO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.PamPolicyJITPermissionEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='PPO_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='PPO_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='PPO_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='PPO_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='PPO_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='PPO_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

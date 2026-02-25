@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.ScheduledTaskHandlerEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SCTAHA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='STH_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='STH_NAME' not-null='true' length='100' />
+		</property>
+		<property name='className' type='java.lang.String'>
+			<column name='STH_CLANAM' not-null='true' length='250' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SCTAHA_STH_TEN_ID'>
+			<column name='STH_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='tasks' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SCHTAS_SCT_HANDLE'>
+				<column name='SCT_HANDLE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.ScheduledTaskEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

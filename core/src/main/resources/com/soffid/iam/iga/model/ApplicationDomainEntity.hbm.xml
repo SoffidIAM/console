@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ApplicationDomainEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_DOMAPP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='DOM_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<set name='values' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_VALOR_DOMINI_VDO_DOM'>
+				<column name='VDO_DOM'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.DomainValueEntityImpl'/>
+		</set>
+		<set name='roles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLES_ROL_DOMAPP'>
+				<column name='ROL_DOMAPP'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleEntityImpl'/>
+		</set>
+		<property name='name' type='java.lang.String'>
+			<column name='DOM_NOM' not-null='true' length='30' />
+		</property>
+		<many-to-one name='informationSystem' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DOMAPP_DOM_APP'>
+			<column name='DOM_APP' not-null='false'/>
+		</many-to-one>
+		<property name='description' type='java.lang.String'>
+			<column name='DOM_DESC' not-null='false' length='50' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DOMAPP_DOM_TEN_ID'>
+			<column name='DOM_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

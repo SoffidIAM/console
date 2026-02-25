@@ -1,12 +1,22 @@
 {
-  "hibernateClass": "org.jbpm.graph.exe.ProcessInstance",
+  "hibernateClass": "com.soffid.iam.base.model.ConfigEntity",
+  "start": "createdOn",
   "attributes": [
     {"name":"id", "hibernateName":"id"},
-    {"name":"processDefinition", "hibernateName":"processDefinition.name"},
-    {"name":"start", "hibernateName":"start"},
-    {"name":"end", "hibernateName":"end"},
+    {"name":"processClassLoader"},
+    {"name":"processNumber",  "hibernateName":"com.soffid.iam.bpm.model.TenantModule.processNumber#processInstance"},
+    {"name":"tenantId",  "hibernateName":"com.soffid.iam.bpm.model.TenantModule.tenantId#processInstance"},
+    {"name":"description",  "hibernateName":"org.jbpm.context.exe.variableinstance.StringInstance.value#processInstance and _.name='$title'"},
+    {"name":"start",  "hibernateName":"start"},
+    {"name":"end",  "hibernateName":"end"},
     {"name":"variables"},
     {"name":"currentTask"},
-    {"name":"description"}
+    {"name":"comments"},
+    {"name":"processDefinition"},
+    {"name":"dummyProcess"},
+    {"name":"initiator"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"},
+    {"name":"createdOn", "hibernateName":"createdOn"}
   ]
 }

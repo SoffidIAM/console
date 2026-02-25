@@ -1,6 +1,6 @@
 package com.soffid.iam.sync.intf.discovery;
 
-import com.soffid.iam.api.Account;
+import com.soffid.iam.base.api.Account;
 
 public class SystemDiscoveryEvent extends DiscoveryEvent {
 	String hostName;

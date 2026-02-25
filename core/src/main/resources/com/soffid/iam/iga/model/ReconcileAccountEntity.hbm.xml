@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ReconcileAccountEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_RECACO' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RAC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='accountName' type='java.lang.String'>
+			<column name='RAC_ACNAME' not-null='true' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='RAC_DESC' not-null='true' />
+		</property>
+		<property name='processId' type='java.lang.Long'>
+			<column name='RAC_PROCID' not-null='true' />
+		</property>
+		<property name='newAccount' type='java.lang.Boolean'>
+			<column name='RAC_ISNEW' not-null='true' />
+		</property>
+		<property name='deletedAccount' type='java.lang.Boolean'>
+			<column name='RAC_DELETED' not-null='true' />
+		</property>
+		<property name='proposedAction' type='com.soffid.iam.iga.api.AccountProposedActionEnum'>
+			<column name='RAC_ACTION' not-null='true' />
+		</property>
+		<property name='dispatcher' type='java.lang.String'>
+			<column name='RAC_DISPAT' not-null='true' />
+		</property>
+		<property name='userCode' type='java.lang.String'>
+			<column name='RAC_USUCOD' not-null='false' />
+		</property>
+		<property name='primaryGroup' type='java.lang.String'>
+			<column name='RAC_GROUP' not-null='false' />
+		</property>
+		<property name='userType' type='java.lang.String'>
+			<column name='RAC_USUTYP' not-null='false' />
+		</property>
+		<property name='userFullName' type='java.lang.String'>
+			<column name='RAC_USUNAM' not-null='false' />
+		</property>
+		<property name='accountType' type='com.soffid.iam.base.api.AccountTypeEnum'>
+			<column name='RAC_ACTYPE' not-null='false' />
+		</property>
+		<property name='active' type='boolean'>
+			<column name='RAC_ACTIVE' not-null='true' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_RECACO_RAC_TEN_ID'>
+			<column name='RAC_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_RECATT_RAA_RAC_ID'>
+				<column name='RAA_RAC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ReconcileAccountAttributesEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

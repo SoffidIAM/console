@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"entryPoint","targetClass":"com.soffid.iam.am.model.EntryPointEntity","multiple":false,"reverse":"executionMethod"}
+  ]
+}

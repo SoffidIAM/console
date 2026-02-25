@@ -1,0 +1,7 @@
+{
+  "class": "com.soffid.iam.rc.service.GeoInformationService",
+  "methods": [
+    {"name":"getGeoInformation", "return":"com.soffid.iam.rc.api.GeoInformation", "arguments":[
+       {"name":"ip","type":"java.lang.String","required": true}    ]}
+  ]
+}

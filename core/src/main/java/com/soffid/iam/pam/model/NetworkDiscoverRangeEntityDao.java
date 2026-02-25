@@ -1,0 +1,79 @@
+//
+// (C) 2013 Soffid
+//
+//
+
+package com.soffid.iam.pam.model;
+/**
+ * DAO for Entity NetworkDiscoverRangeEntity
+ * @see com.soffid.iam.pam.model.NetworkDiscoverRangeEntity
+ */
+public interface NetworkDiscoverRangeEntityDao
+
+{
+	/**
+	 * Creates an instance of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} .
+	 */
+	public com.soffid.iam.pam.model.NetworkDiscoverRangeEntity newNetworkDiscoverRangeEntity();
+
+	/**
+	 * Adds an instance of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} to the persistent store.
+	 */
+	public void create (com.soffid.iam.pam.model.NetworkDiscoverRangeEntity entity);
+
+	/**
+	 * Updates an instance of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} at the persistent store.
+	 */
+	public void update (com.soffid.iam.pam.model.NetworkDiscoverRangeEntity entity);
+
+	/**
+	 * Removes an instance of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 */
+	public void remove (com.soffid.iam.pam.model.NetworkDiscoverRangeEntity entity);
+
+	/**
+	 * Loads an instance of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 */
+	public com.soffid.iam.pam.model.NetworkDiscoverRangeEntity load(java.lang.Long id);
+
+	/**
+	 * Loads all instances of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 */
+	public java.util.List<com.soffid.iam.pam.model.NetworkDiscoverRangeEntity> loadAll();
+
+	/**
+	 * Creates a collection of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} and adds it to the persistent store.
+	 */
+	public void create (java.util.Collection<? extends com.soffid.iam.pam.model.NetworkDiscoverRangeEntity> entities);
+
+	/**
+	 * Updates a collection of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} in the persistent store.
+	 */
+	public void update (java.util.Collection<? extends com.soffid.iam.pam.model.NetworkDiscoverRangeEntity> entities);
+
+	/**
+	 * Removes a collection of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 */
+	public void remove (java.util.Collection<? extends com.soffid.iam.pam.model.NetworkDiscoverRangeEntity> entities);
+
+	/**
+	 * Removes an instance of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 */
+	public void remove (java.lang.Long id);
+
+	/**
+	 * Query of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 * parameter query HQL Query String
+	 * parameter parameters HQL Parameters
+	 */
+	public java.util.List<com.soffid.iam.pam.model.NetworkDiscoverRangeEntity> query (String query, com.soffid.iam.model.Parameter[] parameters);
+
+	/**
+	 * Query of {@link com.soffid.iam.pam.model.NetworkDiscoverRangeEntity} from the persistent store.
+	 * parameter query HQL Query String
+	 * parameter parameters HQL Parameters
+	 * parameter maxResults max number of rows to return
+	 */
+	public java.util.List<com.soffid.iam.pam.model.NetworkDiscoverRangeEntity> query (String query, com.soffid.iam.model.Parameter[] parameters, com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria);
+
+}

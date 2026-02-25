@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"pendingAuthoritativeChanges"},
+    {"name":"dispatcher","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"pendingChanges"}
+  ]
+}

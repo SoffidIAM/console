@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"accessHostAsAdministratorAuthorization"},
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"administratorAuthorizationAccess"}
+  ]
+}

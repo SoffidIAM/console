@@ -1,0 +1,20 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.AttributeTranslationEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"domain", "hibernateName":"domain"},
+    {"name":"column1", "hibernateName":"column1"},
+    {"name":"column2", "hibernateName":"column2"},
+    {"name":"column3", "hibernateName":"column3"},
+    {"name":"column4", "hibernateName":"column4"},
+    {"name":"column5", "hibernateName":"column5"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

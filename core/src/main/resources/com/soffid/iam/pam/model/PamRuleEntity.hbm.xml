@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.PamRuleEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_PAMRUL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PRU_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='PRU_NAME' not-null='true' length='100' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='PRU_DESCRIPTION' not-null='false' length='100' />
+		</property>
+		<property name='author' type='java.lang.String'>
+			<column name='PRU_AUTHOR' not-null='false' length='100' />
+		</property>
+		<property name='date' type='java.util.Date'>
+			<column name='PRU_DATE' not-null='false' />
+		</property>
+		<property name='type' type='com.soffid.iam.pam.api.PamRuleTypeEnum'>
+			<column name='PRU_TYPE' not-null='true' length='20' />
+		</property>
+		<property name='content' type='java.lang.String'>
+			<column name='PRU_CONTEN' not-null='false' length='500' />
+		</property>
+		<property name='blob' type='java.lang.String' lazy='true'>
+			<column name='PRU_BLOB' not-null='false' length='50000' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PAMRUL_PRU_TEN_ID'>
+			<column name='PRU_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='actions' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PAMACT_PAC_PRU_ID'>
+				<column name='PAC_PRU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.PamActionEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ISSUE_EVE_PRU_ID'>
+				<column name='EVE_PRU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='PRU_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='PRU_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='PRU_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='PRU_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='PRU_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='PRU_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

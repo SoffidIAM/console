@@ -1,0 +1,17 @@
+{
+  "class": "com.soffid.iam.rc.api.IssuePolicyAction",
+  "attributes": [
+    {"name":"status", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "enumeration":"com.soffid.iam.rc.api.IssueStatus"},
+    {"name":"action", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"50"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"subject", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"body", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"64000"},
+    {"name":"emailAddress", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"processDefinition", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.issue.ProcessDefinitionFieldHandler", "length":"64000"},
+    {"name":"script", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"128000"},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

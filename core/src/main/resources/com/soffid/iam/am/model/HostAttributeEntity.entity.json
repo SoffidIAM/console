@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"attributes"},
+    {"name":"metadata","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":false}
+  ]
+}

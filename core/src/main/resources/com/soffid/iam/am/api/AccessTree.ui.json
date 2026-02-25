@@ -1,0 +1,20 @@
+{
+  "class": "com.soffid.iam.am.api.AccessTree",
+  "attributes": [
+    {"name":"code", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"50"},
+    {"name":"name", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"128"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"512"},
+    {"name":"visible", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"1"},
+    {"name":"menu", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"1"},
+    {"name":"columnsNumber", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"publicAccess", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"1"},
+    {"name":"menuType", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"1"},
+    {"name":"informationSystem", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"order", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"system", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

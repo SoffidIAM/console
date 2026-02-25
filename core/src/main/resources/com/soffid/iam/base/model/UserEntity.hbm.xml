@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.UserEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_USUARI' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='USU_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='userName' type='java.lang.String'>
+			<column name='USU_CODI' not-null='true' length='150' />
+		</property>
+		<property name='firstName' type='java.lang.String'>
+			<column name='USU_NOM' not-null='true' length='100' />
+		</property>
+		<property name='lastName' type='java.lang.String'>
+			<column name='USU_PRILLI' not-null='true' length='100' />
+		</property>
+		<property name='middleName' type='java.lang.String'>
+			<column name='USU_SEGLLI' not-null='false' length='100' />
+		</property>
+		<property name='fullName' type='java.lang.String'>
+			<column name='USU_FULNAM' not-null='true' length='150' />
+		</property>
+		<property name='shortName' type='java.lang.String'>
+			<column name='USU_NOMCUR' not-null='false' length='100' />
+		</property>
+		<property name='emailAddress' type='java.lang.String'>
+			<column name='USU_EMAIL' not-null='false' length='150' />
+		</property>
+		<property name='modifiedBy' type='java.lang.String'>
+			<column name='USU_USUMOD' not-null='false' length='50' />
+		</property>
+		<property name='modifiedOn' type='java.util.Date'>
+			<column name='USU_DATMOD' not-null='false' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='USU_DATCRE' not-null='true' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='USU_USUCRE' not-null='false' length='50' />
+		</property>
+		<property name='active' type='boolean'>
+			<column name='USU_ACTIVE' not-null='true' />
+		</property>
+		<property name='comments' type='java.lang.String'>
+			<column name='USU_COMENT' not-null='false' length='1024' />
+		</property>
+		<set name='ACNetwork' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AUTXAR_AXA_IDUSU'>
+				<column name='AXA_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.NetworkAuthorizationEntityImpl'/>
+		</set>
+		<many-to-one name='mailServer' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_IDMACO'>
+			<column name='USU_IDMACO' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='homeServer' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_IDMAQ'>
+			<column name='USU_IDMAQ' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='mailDomain' class='com.soffid.iam.iga.model.MailDomainEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_IDDCO'>
+			<column name='USU_IDDCO' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='profileServer' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_IDMAPR'>
+			<column name='USU_IDMAPR' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='primaryGroup' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_IDGRU'>
+			<column name='USU_IDGRU' not-null='false'/>
+		</many-to-one>
+		<set name='attributes' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_DADUSU_DUS_IDUSU'>
+				<column name='DUS_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserDataEntityImpl'/>
+		</set>
+		<set name='secondaryGroups' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUGRU_UGR_IDUSU'>
+				<column name='UGR_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.UserGroupEntityImpl'/>
+		</set>
+		<set name='printers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUIMP_UIM_IDUSU'>
+				<column name='UIM_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.UserPrinterEntityImpl'/>
+		</set>
+		<set name='sessions' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SESSIO_SES_IDUSU'>
+				<column name='SES_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.SessionEntityImpl'/>
+		</set>
+		<set name='userMailList' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USULCO_ULC_IDUSU'>
+				<column name='ULC_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.UserMailEntityImpl'/>
+		</set>
+		<property name='multiSession' type='java.lang.Boolean'>
+			<column name='USU_MULSESS' not-null='false' length='1' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_TEN_ID'>
+			<column name='USU_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='ApplicationResponsible' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_APLICA_APL_IDCONTACT'>
+				<column name='APL_IDCONTACT'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.InformationSystemEntityImpl'/>
+		</set>
+		<set name='accessHostAsAdministratorAuthorization' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ADMMAQ_ADM_USUID'>
+				<column name='ADM_USUID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostAdminEntityImpl'/>
+		</set>
+		<many-to-one name='userType' class='com.soffid.iam.base.model.UserTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUARI_USU_TUS_ID'>
+			<column name='USU_TUS_ID' not-null='true'/>
+		</many-to-one>
+		<set name='secrets' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SECRET_SEC_IDUSU'>
+				<column name='SEC_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.SecretEntityImpl'/>
+		</set>
+		<set name='accounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUACC_UAC_USU_ID'>
+				<column name='UAC_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserAccountEntityImpl'/>
+		</set>
+		<set name='accountAccess' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_ACCACC_AAC_USU_ID'>
+				<column name='AAC_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.AccountAccessEntityImpl'/>
+		</set>
+		<set name='passwords' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_CONTRA_CTR_IDUSU'>
+				<column name='CTR_IDUSU'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.PasswordEntityImpl'/>
+		</set>
+		<set name='pendingAuthoritativeChanges' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AUTCHA_PAU_USU_ID'>
+				<column name='PAU_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.AuthoritativeChangeEntityImpl'/>
+		</set>
+		<set name='browsers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_BROWSE_BRO_USU_ID'>
+				<column name='BRO_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.BrowserEntityImpl'/>
+		</set>
+		<set name='passwordManagerToken' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PAMATO_PMT_USU_ID'>
+				<column name='PMT_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.PasswordManagerTokenEntityImpl'/>
+		</set>
+		<set name='vaultFolders' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_VAFCACC_VFA_USU_ID'>
+				<column name='VFA_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.VaultFolderAccessEntityImpl'/>
+		</set>
+		<set name='preferences' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USEPRE_USP_USU_ID'>
+				<column name='USP_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserPreferenceEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USEEVE_UVE_USU_ID'>
+				<column name='UVE_USU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueUserEntityImpl'/>
+		</set>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='USU_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='USU_DELUSE' not-null='false' />
+		</property>
+		<property name='deleted' type='java.lang.Boolean'>
+			<column name='USU_DELETED' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

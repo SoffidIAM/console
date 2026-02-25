@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"object","targetClass":"com.soffid.iam.iga.model.ObjectMappingEntity","multiple":false,"reverse":"properties"}
+  ]
+}

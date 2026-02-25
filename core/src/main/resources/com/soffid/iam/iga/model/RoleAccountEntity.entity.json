@@ -1,0 +1,19 @@
+{
+  "since": "startDate",
+  "until": "endDate",
+  "joins": [
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"usersRoles"},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"accounts"},
+    {"name":"domainValue","targetClass":"com.soffid.iam.iga.model.DomainValueEntity","multiple":false},
+    {"name":"informationSystem","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"roles"},
+    {"name":"rule","targetClass":"com.soffid.iam.iga.model.RuleEntity","multiple":false,"reverse":"generated"},
+    {"name":"holderGroup","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"holdedRoleAssignments"},
+    {"name":"parent","targetClass":"com.soffid.iam.iga.model.RoleAccountEntity","multiple":false,"reverse":"children"},
+    {"name":"ownerAccount","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false},
+    {"name":"delegateAccount","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.RoleAccountAttributeEntity","multiple":true,"reverse":"grant"},
+    {"name":"children","targetClass":"com.soffid.iam.iga.model.RoleAccountEntity","multiple":true,"reverse":"parent"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":true,"reverse":"roleAccount"}
+  ]
+}

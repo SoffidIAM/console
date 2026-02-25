@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.DefaultObjectMappingEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_DEOBMA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='DOM_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='systemObject' type='java.lang.String'>
+			<column name='DOM_SYSOBJ' not-null='true' length='50' />
+		</property>
+		<many-to-one name='agentDescriptor' class='com.soffid.iam.base.model.AgentDescriptorEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DEOBMA_DAM_ADE_ID'>
+			<column name='DAM_ADE_ID' not-null='true'/>
+		</many-to-one>
+		<property name='soffidObject' type='com.soffid.iam.iga.api.SoffidObjectTypeEnum'>
+			<column name='DOM_SOFOBJ' not-null='true' length='50' />
+		</property>
+		<property name='condition' type='java.lang.String'>
+			<column name='DOM_CONDIT' not-null='false' length='2000' />
+		</property>
+		<set name='properties' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_DEOBPR_DOP_DOM_ID'>
+				<column name='DOP_DOM_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.DefaultObjectMappingPropertyEntityImpl'/>
+		</set>
+		<set name='defaultAttributeMappings' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_DEATMA_DAM_DOM_ID'>
+				<column name='DAM_DOM_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.DefaultAttributeMappingEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

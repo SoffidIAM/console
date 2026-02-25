@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.UserGroupEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_USUGRU' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='UGR_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUGRU_UGR_IDUSU'>
+			<column name='UGR_IDUSU' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUGRU_UGR_IDGRU'>
+			<column name='UGR_IDGRU' not-null='false'/>
+		</many-to-one>
+		<property name='start' type='java.util.Date'>
+			<column name='UGR_START' not-null='false' />
+		</property>
+		<property name='end' type='java.util.Date'>
+			<column name='UGR_END' not-null='false' />
+		</property>
+		<property name='disabled' type='java.lang.Boolean'>
+			<column name='UGR_DISABLED' not-null='false' />
+		</property>
+		<property name='primaryGroup' type='java.lang.Boolean'>
+			<column name='UGR_PRIGRP' not-null='false' />
+		</property>
+		<set name='attributes' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_UGRATT_UGA_UGR_ID'>
+				<column name='UGA_UGR_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.UserGroupAttributeEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='UGR_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='UGR_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='UGR_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='UGR_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='UGR_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='UGR_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

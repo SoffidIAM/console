@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"server","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"printers"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"groups","targetClass":"com.soffid.iam.iga.model.PrinterGroupEntity","multiple":true,"reverse":"printer"},
+    {"name":"users","targetClass":"com.soffid.iam.iga.model.UserPrinterEntity","multiple":true,"reverse":"printer"}
+  ]
+}

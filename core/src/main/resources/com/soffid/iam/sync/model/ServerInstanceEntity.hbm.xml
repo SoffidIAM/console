@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.ServerInstanceEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SERINS' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SRE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='SRE_NOM' not-null='true' length='100' />
+		</property>
+		<property name='url' type='java.lang.String'>
+			<column name='SRE_URL' not-null='false' length='128' />
+		</property>
+		<many-to-one name='server' class='com.soffid.iam.sync.model.ServerEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SERINS_SRE_SRV_ID'>
+			<column name='SRE_SRV_ID' not-null='true'/>
+		</many-to-one>
+		<property name='lastSeen' type='java.util.Date'>
+			<column name='SRE_LASSEE' not-null='true' />
+		</property>
+		<property name='auth' type='java.lang.String'>
+			<column name='SRE_TOKEN' not-null='false' />
+		</property>
+		<property name='tasks' type='int'>
+			<column name='SRE_TASKS' not-null='true' />
+		</property>
+	</class>
+</hibernate-mapping>

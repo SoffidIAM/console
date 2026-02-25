@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false},
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false},
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"vaultFolders"},
+    {"name":"vault","targetClass":"com.soffid.iam.am.model.VaultFolderEntity","multiple":false,"reverse":"acl"}
+  ]
+}

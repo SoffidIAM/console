@@ -7,10 +7,9 @@ package com.soffid.iam.sync.intf;
 
 import java.rmi.RemoteException;
 
-import com.soffid.iam.api.Account;
-import com.soffid.iam.api.User;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.base.api.Account;
+import com.soffid.iam.base.api.User;
+import com.soffid.iam.exception.InternalErrorException;
 
 /** 
  * Interfaz remoto de gestión de usuarios (y contraseñas)
@@ -27,7 +26,7 @@ public interface UserMgr extends java.rmi.Remote {
    * @throws java.rmi.RemoteException error de comunicaciones
    * @throws InternalErrorException cualquier otra causa
    */
-  public void updateUser (com.soffid.iam.api.Account account, User user) 
+  public void updateUser (com.soffid.iam.base.api.Account account, User user) 
     throws java.rmi.RemoteException, 
             InternalErrorException;
   /** 
@@ -37,7 +36,7 @@ public interface UserMgr extends java.rmi.Remote {
    * @throws java.rmi.RemoteException error de comunicaciones
    * @throws InternalErrorException cualquier otra causa
    */
-  public void updateUser (com.soffid.iam.api.Account account) 
+  public void updateUser (com.soffid.iam.base.api.Account account) 
     throws java.rmi.RemoteException, 
             InternalErrorException;
   /**
@@ -47,7 +46,7 @@ public interface UserMgr extends java.rmi.Remote {
    * @throws RemoteException
    * @throws InternalErrorException
    */
-  public void removeUser (String userName) throws RemoteException, InternalErrorException;
+  public void removeUser (String userName, String externalId) throws RemoteException, InternalErrorException;
   /** 
    * Updates account password.
    * 
@@ -58,7 +57,7 @@ public interface UserMgr extends java.rmi.Remote {
    * @throws java.rmi.RemoteException error de comunicaciones
    * @throws InternalErrorException cualquier otra causa
    */
-  public void updateUserPassword (String userName, User userData, com.soffid.iam.api.Password password, boolean mustchange)
+  public void updateUserPassword (String userName, User userData, com.soffid.iam.am.api.Password password, boolean mustchange)
     throws java.rmi.RemoteException, 
             InternalErrorException;
 
@@ -73,7 +72,7 @@ public interface UserMgr extends java.rmi.Remote {
    * @throws java.rmi.RemoteException error de comunicaciones
    * @throws InternalErrorException cualquier otra causa
    */
-  public boolean validateUserPassword (String userName, com.soffid.iam.api.Password password)
+  public boolean validateUserPassword (String userName, com.soffid.iam.am.api.Password password)
     throws java.rmi.RemoteException,
             InternalErrorException;
   

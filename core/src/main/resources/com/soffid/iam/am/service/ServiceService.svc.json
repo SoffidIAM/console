@@ -1,0 +1,17 @@
+{
+  "class": "com.soffid.iam.am.service.ServiceService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.am.api.Service", "arguments":[
+       {"name":"servei","type":"com.soffid.iam.am.api.Service","required": true}    ]},
+    {"name":"findServiceByName", "return":"com.soffid.iam.am.api.Service", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.Service", "arguments":[
+       {"name":"servei","type":"com.soffid.iam.am.api.Service","required": true}    ]},
+    {"name":"findServices", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Service>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"getServices", "return":"java.util.Collection<com.soffid.iam.am.api.Service>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"servei","type":"com.soffid.iam.am.api.Service","required": true}    ]}
+  ]
+}

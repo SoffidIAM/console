@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"policy","targetClass":"com.soffid.iam.pam.model.PamPolicyEntity","multiple":false,"reverse":"actions"},
+    {"name":"rule","targetClass":"com.soffid.iam.pam.model.PamRuleEntity","multiple":false,"reverse":"actions"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

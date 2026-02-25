@@ -5,8 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.soffid.iam.config.Config;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public class URLManager {
     String url;

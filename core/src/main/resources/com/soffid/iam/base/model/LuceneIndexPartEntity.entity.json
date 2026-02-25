@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"index","targetClass":"com.soffid.iam.base.model.LuceneIndexEntity","multiple":false,"reverse":"parts"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

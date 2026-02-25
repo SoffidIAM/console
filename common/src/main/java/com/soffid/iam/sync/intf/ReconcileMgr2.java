@@ -6,12 +6,11 @@ package com.soffid.iam.sync.intf;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import com.soffid.iam.api.Account;
-import com.soffid.iam.api.HostService;
-import com.soffid.iam.api.Role;
-import com.soffid.iam.api.RoleGrant;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.base.api.Account;
+import com.soffid.iam.pam.api.HostService;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.iga.api.Role;
+import com.soffid.iam.iga.api.RoleGrant;
 
 /**
  * Interface to reconcile information.
@@ -54,7 +53,7 @@ public interface ReconcileMgr2 extends java.rmi.Remote
 	 * @throws InternalErrorException
 	 *             Manage errors produced by another causes.
 	 */
-	public com.soffid.iam.api.Account getAccountInfo(String userAccount) throws RemoteException,
+	public com.soffid.iam.base.api.Account getAccountInfo(String userAccount) throws RemoteException,
 			InternalErrorException;
 
 	/**
@@ -100,7 +99,7 @@ public interface ReconcileMgr2 extends java.rmi.Remote
 	 * Implements the functionality to obtain the full list of roles assigned to
 	 * reconcile account.
 	 * 
-	 * @param userAccount
+	 * @param account
 	 *            Account to get roles.
 	 * @return List of roles assigned to account.
 	 * 
@@ -109,7 +108,7 @@ public interface ReconcileMgr2 extends java.rmi.Remote
 	 * @throws InternalErrorException
 	 *             Manage errors produced by another causes.
 	 */
-	public List<RoleGrant> getAccountGrants(String userAccount)
+	public List<RoleGrant> getAccountGrants(Account account)
 			throws RemoteException, InternalErrorException;
 
 

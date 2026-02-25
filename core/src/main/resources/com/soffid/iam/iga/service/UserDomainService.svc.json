@@ -1,0 +1,64 @@
+{
+  "class": "com.soffid.iam.iga.service.UserDomainService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.am.api.ForbiddenWord", "arguments":[
+       {"name":"paraulaProhibida","type":"com.soffid.iam.am.api.ForbiddenWord","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.ForbiddenWord", "arguments":[
+       {"name":"paraulaProhibida","type":"com.soffid.iam.am.api.ForbiddenWord","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.PasswordDomain", "arguments":[
+       {"name":"dominiContrasenya","type":"com.soffid.iam.am.api.PasswordDomain","required": true}    ]},
+    {"name":"findPasswordDomainByName", "return":"com.soffid.iam.am.api.PasswordDomain", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.PasswordDomain", "arguments":[
+       {"name":"dominiContrasenya","type":"com.soffid.iam.am.api.PasswordDomain","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.PasswordPolicy", "arguments":[
+       {"name":"politicaContrasenyaDomini","type":"com.soffid.iam.am.api.PasswordPolicy","required": true}    ]},
+    {"name":"findPolicyByTypeAndPasswordDomain", "return":"com.soffid.iam.am.api.PasswordPolicy", "arguments":[
+       {"name":"tipus","type":"java.lang.String","required": true},
+       {"name":"domini","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.PasswordPolicy", "arguments":[
+       {"name":"politicaContrasenyaDomini","type":"com.soffid.iam.am.api.PasswordPolicy","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.PasswordPolicyForbbidenWord", "arguments":[
+       {"name":"paraulaProhibidaContrasenya","type":"com.soffid.iam.am.api.PasswordPolicyForbbidenWord","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.PasswordPolicyForbbidenWord", "arguments":[
+       {"name":"paraulaProhibidaContrasenya","type":"com.soffid.iam.am.api.PasswordPolicyForbbidenWord","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.UserDomain", "arguments":[
+       {"name":"dominiUsuari","type":"com.soffid.iam.iga.api.UserDomain","required": true}    ]},
+    {"name":"findUserDomainByName", "return":"com.soffid.iam.iga.api.UserDomain", "arguments":[
+       {"name":"codiDominiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.UserDomain", "arguments":[
+       {"name":"dominiUsuari","type":"com.soffid.iam.iga.api.UserDomain","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.UserType", "arguments":[
+       {"name":"tipusUsuari","type":"com.soffid.iam.iga.api.UserType","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.UserType", "arguments":[
+       {"name":"tipusUsuari","type":"com.soffid.iam.iga.api.UserType","required": true}    ]},
+    {"name":"findUserTypes", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserType>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findAllPasswordDomain", "return":"java.util.Collection<com.soffid.iam.am.api.PasswordDomain>", "arguments":[
+    ]},
+    {"name":"findAllUserDomain", "return":"java.util.Collection<com.soffid.iam.iga.api.UserDomain>", "arguments":[
+    ]},
+    {"name":"findAllForbiddenWords", "return":"java.util.Collection<com.soffid.iam.am.api.ForbiddenWord>", "arguments":[
+    ]},
+    {"name":"findAllPasswordPolicyDomain", "return":"java.util.Collection<com.soffid.iam.am.api.PasswordPolicy>", "arguments":[
+       {"name":"codiDominiContrasenya","type":"java.lang.String","required": true}    ]},
+    {"name":"findAllUserType", "return":"java.util.Collection<com.soffid.iam.iga.api.UserType>", "arguments":[
+    ]},
+    {"name":"findNameGenerators", "return":"java.util.Collection<java.lang.String>", "arguments":[
+    ]},
+    {"name":"findForbiddenWordsPasswordPolicy", "return":"java.util.Collection<com.soffid.iam.am.api.PasswordPolicyForbbidenWord>", "arguments":[
+       {"name":"politicaContrasenya","type":"com.soffid.iam.am.api.PasswordPolicy","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"paraulaProhibida","type":"com.soffid.iam.am.api.ForbiddenWord","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"dominiContrasenya","type":"com.soffid.iam.am.api.PasswordDomain","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"politicaContrasenyaDomini","type":"com.soffid.iam.am.api.PasswordPolicy","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"paraulaProhibidaContrasenya","type":"com.soffid.iam.am.api.PasswordPolicyForbbidenWord","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"dominiUsuari","type":"com.soffid.iam.iga.api.UserDomain","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"tipusUsuari","type":"com.soffid.iam.iga.api.UserType","required": true}    ]}
+  ]
+}

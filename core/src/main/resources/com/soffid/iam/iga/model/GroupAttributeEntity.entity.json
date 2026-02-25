@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"attributes"},
+    {"name":"metadata","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":false}
+  ]
+}

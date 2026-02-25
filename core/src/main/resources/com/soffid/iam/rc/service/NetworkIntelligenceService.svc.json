@@ -1,0 +1,21 @@
+{
+  "class": "com.soffid.iam.rc.service.NetworkIntelligenceService",
+  "methods": [
+    {"name":"getConfiguration", "return":"com.soffid.iam.rc.api.NetworkIntelligence", "arguments":[
+    ]},
+    {"name":"saveConfiguration", "return":"com.soffid.iam.rc.api.NetworkIntelligence", "arguments":[
+       {"name":"ni","type":"com.soffid.iam.rc.api.NetworkIntelligence","required":false}    ]},
+    {"name":"validateToken", "return":"com.soffid.iam.rc.api.NetworkIntelligence", "arguments":[
+       {"name":"token","type":"java.lang.String","required": true}    ]},
+    {"name":"isAccountBreached", "return":"java.lang.Boolean", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"system","type":"java.lang.String","required": true}    ]},
+    {"name":"isPasswordBreached", "return":"java.lang.Boolean", "arguments":[
+       {"name":"password","type":"java.lang.String","required": true}    ]},
+    {"name":"isEmailBreached", "return":"java.lang.String", "arguments":[
+       {"name":"shortName","type":"java.lang.String","required": true},
+       {"name":"mailDomain","type":"java.lang.String","required": true}    ]},
+    {"name":"verifyDomains", "return":"void", "arguments":[
+       {"name":"out","type":"java.io.PrintWriter","required": true}    ]}
+  ]
+}

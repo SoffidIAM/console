@@ -1,0 +1,70 @@
+{
+  "class": "com.soffid.iam.sync.service.SyncServerService",
+  "methods": [
+    {"name":"findLogs", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"config","type":"com.soffid.iam.sync.api.LogConfiguration","required": true},
+       {"name":"firstRow","type":"long","required": true},
+       {"name":"numRows","type":"long","required": true}    ]},
+    {"name":"getServerLogs", "return":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"getAgentTasks", "return":"com.soffid.iam.sync.api.SyncAgentTaskLog", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true},
+       {"name":"agentName","type":"java.lang.String","required": true},
+       {"name":"taskId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getSyncServerInfo", "return":"com.soffid.iam.sync.api.SyncServerInfo", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true}    ]},
+    {"name":"getSeyconServerLog", "return":"java.io.InputStream", "arguments":[
+       {"name":"urlServer","type":"java.lang.String","required": true}    ]},
+    {"name":"getServerService", "comments":"Gets a remote interface for any server, using the console specific authorization key", "return":"java.lang.Object", "arguments":[
+       {"name":"servicePath","type":"java.lang.String","required": true}    ]},
+    {"name":"tailServerLog", "return":"java.lang.String[]", "arguments":[
+       {"name":"urlServer","type":"java.lang.String","required": true}    ]},
+    {"name":"findUnscheduledTasks", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncserverTask>", "arguments":[
+    ]},
+    {"name":"getAgentTasks", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncAgentTaskLog>", "arguments":[
+       {"name":"url","type":"java.lang.String","required":false},
+       {"name":"agentCodi","type":"java.lang.String","required": true}    ]},
+    {"name":"getPendingTasksInfo", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>", "arguments":[
+    ]},
+    {"name":"getServerAgentStatus", "return":"java.util.Collection<com.soffid.iam.base.api.AgentStatusInfo>", "arguments":[
+    ]},
+    {"name":"getServerAgentStatus", "return":"java.util.Collection<com.soffid.iam.base.api.AgentStatusInfo>", "arguments":[
+       {"name":"url","type":"java.lang.String","required":false}    ]},
+    {"name":"getServerTasks", "return":"java.util.Collection<java.lang.Object>", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true}    ]},
+    {"name":"getSyncServersStatus", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>", "arguments":[
+    ]},
+    {"name":"getSyncServerInstances", "return":"java.util.Collection<com.soffid.iam.sync.api.Server>", "arguments":[
+    ]},
+    {"name":"getSyncServers", "return":"java.util.Collection<com.soffid.iam.sync.api.Server>", "arguments":[
+    ]},
+    {"name":"getPendingTasksStats", "comments":"Returns a map with a list of pairs date - long for each agent. The key is the agent name. An special agent named 'Unscheduled' holds the not scheduled tasks", "return":"java.util.Map<java.lang.String,java.util.Vector<java.lang.Object[]>>", "arguments":[
+    ]},
+    {"name":"getStats", "return":"java.util.Map<java.lang.String,int[]>", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"metric","type":"java.lang.String","required": true},
+       {"name":"seconds","type":"int","required": true},
+       {"name":"step","type":"int","required": true}    ]},
+    {"name":"boostTask", "return":"void", "arguments":[
+       {"name":"taskId","type":"long","required": true}    ]},
+    {"name":"cancelTask", "return":"void", "arguments":[
+       {"name":"taskId","type":"long","required": true}    ]},
+    {"name":"cancelUnscheduledTasks", "return":"void", "arguments":[
+    ]},
+    {"name":"releaseAllTasks", "return":"void", "arguments":[
+    ]},
+    {"name":"releaseTask", "return":"void", "arguments":[
+       {"name":"taskId","type":"long","required": true}    ]},
+    {"name":"resetSyncServer", "return":"void", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true},
+       {"name":"server","type":"java.lang.String","required":false}    ]},
+    {"name":"updateDispatcherConfiguration", "comments":"Calls synchronization servers to notify dispatcher configuration changes", "return":"void", "arguments":[
+    ]},
+    {"name":"updatePendingTasks", "return":"void", "arguments":[
+    ]},
+    {"name":"configureLog", "return":"void", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true},
+       {"name":"config","type":"com.soffid.iam.sync.api.LogConfiguration","required": true}    ]}
+  ]
+}

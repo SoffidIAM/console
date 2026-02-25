@@ -6,10 +6,8 @@
  
 package com.soffid.iam.sync.intf;
 
-import com.soffid.iam.api.Host;
-
-import es.caib.seycon.ng.comu.Maquina;
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.am.api.Host;
+import com.soffid.iam.exception.InternalErrorException;
 
 
 /** 
@@ -58,7 +56,7 @@ public interface HostMgr extends java.rmi.Remote {
    * @throws java.rmi.RemoteException error de comunicaciones
    * @throws InternalErrorException cualquier otro error
    */
-  public void removeHost (String name) 
+  public void removeHost (String name, String externalId) 
     throws java.rmi.RemoteException, 
             InternalErrorException;
 }

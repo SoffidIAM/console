@@ -1,0 +1,58 @@
+{
+  "class": "com.soffid.iam.pam.service.NetworkDiscoveryService",
+  "methods": [
+    {"name":"createSystemCandidate", "comments":"Generates a candidate system definiton", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true},
+       {"name":"type","type":"java.lang.String","required": true},
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"password","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"instance","type":"java.lang.String","required":false}    ]},
+    {"name":"createHostService", "comments":"Method to register a manual host service", "return":"com.soffid.iam.pam.api.HostService", "arguments":[
+       {"name":"service","type":"com.soffid.iam.pam.api.HostService","required": true}    ]},
+    {"name":"updateHostService", "comments":"Method to register a manual host service", "return":"com.soffid.iam.pam.api.HostService", "arguments":[
+       {"name":"service","type":"com.soffid.iam.pam.api.HostService","required": true}    ]},
+    {"name":"findNetworkDiscoveryScheduledTask", "comments":"Internal method to get the discovery schedule", "return":"com.soffid.iam.sync.api.ScheduledTask", "arguments":[
+       {"name":"network","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"findHostEntryPoints", "comments":"Gets the entry points for a host", "return":"java.util.List<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"findHostPorts", "comments":"Gets the open ports for a host", "return":"java.util.List<com.soffid.iam.pam.api.HostPort>", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"findHostServices", "comments":"Gets the account protected services for a host", "return":"java.util.List<com.soffid.iam.pam.api.HostService>", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"findHostSystems", "comments":"Gets the account protected services for a host", "return":"java.util.List<com.soffid.iam.iga.api.System>", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"findNetworkAccount", "comments":"Retrieves account for network discovery", "return":"java.util.List<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"network","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"findSystemHosts", "comments":"Gets the account protected services for a host", "return":"java.util.List<com.soffid.iam.am.api.Host>", "arguments":[
+       {"name":"system","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"createNetworkAccount", "comments":"Register account for network discovery", "return":"void", "arguments":[
+       {"name":"network","type":"com.soffid.iam.am.api.Network","required": true},
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"deleteHostService", "comments":"Method to register a manual host service", "return":"void", "arguments":[
+       {"name":"service","type":"com.soffid.iam.pam.api.HostService","required": true}    ]},
+    {"name":"disconnectSystemFromHost", "comments":"Removes a candidate system definiton", "return":"void", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true},
+       {"name":"system","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"enableNetworkDiscoveryScheduledTask", "comments":"Enable network discovery", "return":"void", "arguments":[
+       {"name":"network","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"registerHostEntryPoint", "comments":"Method to register an entry point", "return":"void", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true},
+       {"name":"entryPoint","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"registerHostPorts", "comments":"Internal method to register the host open ports", "return":"void", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true},
+       {"name":"ports","type":"java.util.List<com.soffid.iam.pam.api.HostPort>","required": true}    ]},
+    {"name":"registerHostServices", "comments":"Internal method to register the account protected services", "return":"void", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true},
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true},
+       {"name":"services","type":"java.util.List<com.soffid.iam.pam.api.HostService>","required": true},
+       {"name":"domainToSystemMap","type":"java.util.Map<java.lang.String,java.lang.String>","required": true}    ]},
+    {"name":"registerHostSystem", "comments":"Method to register a accounts repository", "return":"void", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true},
+       {"name":"system","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"removeNetworkAccount", "comments":"Removes account for network discovery", "return":"void", "arguments":[
+       {"name":"network","type":"com.soffid.iam.am.api.Network","required": true},
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"startDiscovery", "comments":"Internal method to scan a network", "return":"void", "arguments":[
+       {"name":"network","type":"com.soffid.iam.am.api.Network","required": true}    ]}
+  ]
+}

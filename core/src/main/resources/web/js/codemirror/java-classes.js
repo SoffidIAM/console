@@ -1,0 +1,10342 @@
+//
+// (C) 2017 Soffid
+//
+//
+
+CodeMirrorJavaTypes["E"]={
+
+};
+CodeMirrorJavaTypes["boolean"]={
+
+};
+CodeMirrorJavaTypes["byte"]={
+
+};
+CodeMirrorJavaTypes["byte[]"]={
+	"length":"int"
+};
+CodeMirrorJavaTypes["int[]"]={
+	"length":"int"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.ProcessLog[]"]={
+	"length":"int",
+	"processId":"long",
+	"date":"java.util.Date",
+	"action":"java.lang.String",
+	"user":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.Token[]"]={
+	"length":"int",
+	"tokenName":"java.lang.String",
+	"processId":"long",
+	"nodeName":"java.lang.String",
+	"finished":"boolean",
+	"locked":"boolean",
+	"suspended":"boolean"
+};
+CodeMirrorJavaTypes["java.lang.Object[]"]={
+	"length":"int",
+	"clone":"java.lang.Object",
+	"finalize":"void",
+	"equals":"boolean",
+	"getClass":"java.lang.Class<?>",
+	"notify":"void",
+	"notifyAll":"void",
+	"wait":"void",
+	"toString":"java.lang.String",
+	"hashCode":"int"
+};
+CodeMirrorJavaTypes["java.lang.String[]"]={
+	"length":"int",
+	"isLatin1":"boolean",
+	"coder":"byte",
+	"value":"byte[]",
+	"nonSyncContentEquals":"boolean",
+	"indexOfNonWhitespace":"int",
+	"lastIndexOfNonWhitespace":"int",
+	"isASCII":"boolean",
+	"isMalformed3":"boolean",
+	"isMalformed3_2":"boolean",
+	"isMalformed4":"boolean",
+	"isMalformed4_2":"boolean",
+	"isMalformed4_3":"boolean",
+	"isNotContinuation":"boolean",
+	"encode":"byte[]",
+	"encode8859_1":"byte[]",
+	"encodeASCII":"byte[]",
+	"encodeUTF8":"byte[]",
+	"encodeUTF8_UTF16":"byte[]",
+	"encodeWithEncoder":"byte[]",
+	"getBytesNoRepl1":"byte[]",
+	"safeTrim":"byte[]",
+	"decode2":"char",
+	"decode3":"char",
+	"decode4":"int",
+	"decodeUTF8_UTF16":"int",
+	"decodeWithDecoder":"int",
+	"malformed3":"int",
+	"malformed4":"int",
+	"outdent":"int",
+	"scale":"int",
+	"lambda$indent$0":"java.lang.String",
+	"lambda$indent$1":"java.lang.String",
+	"lambda$indent$2":"java.lang.String",
+	"lambda$stripIndent$3":"java.lang.String",
+	"newStringNoRepl1":"java.lang.String",
+	"rangeCheck":"java.lang.Void",
+	"lookupCharset":"java.nio.charset.Charset",
+	"throwMalformed":"void",
+	"throwUnmappable":"void",
+	"contains":"boolean",
+	"contentEquals":"boolean",
+	"endsWith":"boolean",
+	"equals":"boolean",
+	"equalsIgnoreCase":"boolean",
+	"isBlank":"boolean",
+	"isEmpty":"boolean",
+	"matches":"boolean",
+	"regionMatches":"boolean",
+	"startsWith":"boolean",
+	"getBytes":"byte[]",
+	"charAt":"char",
+	"toCharArray":"char[]",
+	"codePointAt":"int",
+	"codePointBefore":"int",
+	"codePointCount":"int",
+	"compareTo":"int",
+	"compareToIgnoreCase":"int",
+	"hashCode":"int",
+	"indexOf":"int",
+	"lastIndexOf":"int",
+	"length":"int",
+	"offsetByCodePoints":"int",
+	"subSequence":"java.lang.CharSequence",
+	"resolveConstantDesc":"java.lang.Object",
+	"transform":"R",
+	"concat":"java.lang.String",
+	"formatted":"java.lang.String",
+	"indent":"java.lang.String",
+	"repeat":"java.lang.String",
+	"replace":"java.lang.String",
+	"replaceAll":"java.lang.String",
+	"replaceFirst":"java.lang.String",
+	"strip":"java.lang.String",
+	"stripIndent":"java.lang.String",
+	"stripLeading":"java.lang.String",
+	"stripTrailing":"java.lang.String",
+	"substring":"java.lang.String",
+	"toLowerCase":"java.lang.String",
+	"toString":"java.lang.String",
+	"toUpperCase":"java.lang.String",
+	"translateEscapes":"java.lang.String",
+	"trim":"java.lang.String",
+	"split":"java.lang.String[]",
+	"describeConstable":"java.util.Optional<java.lang.String>",
+	"chars":"java.util.stream.IntStream",
+	"codePoints":"java.util.stream.IntStream",
+	"lines":"java.util.stream.Stream<java.lang.String>",
+	"intern":"java.lang.String",
+	"copyValueOf":"java.lang.String",
+	"format":"java.lang.String",
+	"join":"java.lang.String",
+	"valueOf":"java.lang.String",
+	"getChars":"void",
+	"getBytesNoRepl":"byte[]",
+	"getBytesUTF8NoRepl":"byte[]",
+	"decodeASCII":"int",
+	"newStringNoRepl":"java.lang.String",
+	"newStringUTF8NoRepl":"java.lang.String",
+	"valueOfCodePoint":"java.lang.String",
+	"checkBoundsBeginEnd":"void",
+	"checkBoundsOffCount":"void",
+	"checkIndex":"void",
+	"checkOffset":"void",
+	"hash":"int",
+	"hashIsZero":"boolean",
+	"serialVersionUID":"long",
+	"COMPACT_STRINGS":"boolean",
+	"serialPersistentFields":"java.io.ObjectStreamField[]",
+	"REPL":"char",
+	"CASE_INSENSITIVE_ORDER":"java.util.Comparator<java.lang.String>",
+	"LATIN1":"byte",
+	"UTF16":"byte"
+};
+CodeMirrorJavaTypes["java.security.cert.X509Certificate[]"]={
+	"length":"int",
+	"getIssuerUniqueID":"boolean[]",
+	"getKeyUsage":"boolean[]",
+	"getSubjectUniqueID":"boolean[]",
+	"getSigAlgParams":"byte[]",
+	"getSignature":"byte[]",
+	"getTBSCertificate":"byte[]",
+	"getBasicConstraints":"int",
+	"getVersion":"int",
+	"getSigAlgName":"java.lang.String",
+	"getSigAlgOID":"java.lang.String",
+	"getSerialNumber":"java.math.BigInteger",
+	"getIssuerDN":"java.security.Principal",
+	"getSubjectDN":"java.security.Principal",
+	"getNotAfter":"java.util.Date",
+	"getNotBefore":"java.util.Date",
+	"checkValidity":"void",
+	"getIssuerAlternativeNames":"java.util.Collection<java.util.List<?>>",
+	"getSubjectAlternativeNames":"java.util.Collection<java.util.List<?>>",
+	"getExtendedKeyUsage":"java.util.List<java.lang.String>",
+	"getIssuerX500Principal":"javax.security.auth.x500.X500Principal",
+	"getSubjectX500Principal":"javax.security.auth.x500.X500Principal",
+	"verify":"void",
+	"serialVersionUID":"long",
+	"type":"java.lang.String",
+	"hash":"int",
+	"subjectX500Principal":"javax.security.auth.x500.X500Principal",
+	"issuerX500Principal":"javax.security.auth.x500.X500Principal"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.AccessLog"]={
+	"id":"java.lang.Long",
+	"sessionId":"java.lang.String",
+	"startDate":"java.util.Calendar",
+	"endDate":"java.util.Calendar",
+	"codeAge":"java.lang.String",
+	"information":"java.lang.String",
+	"userName":"java.lang.String",
+	"serverName":"java.lang.String",
+	"clientName":"java.lang.String",
+	"clientAddress":"java.lang.String",
+	"country":"java.lang.String",
+	"accessType":"java.lang.String",
+	"accessProtocol":"java.lang.String",
+	"userFullName":"java.lang.String",
+	"jumpServerGroup":"java.lang.String",
+	"accountName":"java.lang.String",
+	"targetApplication":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.AccessTree"]={
+	"id":"java.lang.Long",
+	"code":"java.lang.String",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"visible":"boolean",
+	"menu":"boolean",
+	"columnsNumber":"java.lang.Long",
+	"publicAccess":"boolean",
+	"menuType":"java.lang.String",
+	"authorizations":"java.util.Collection<com.soffid.iam.am.api.AccessTreeAuthorization>",
+	"executions":"java.util.Collection<com.soffid.iam.am.api.AccessTreeExecution>",
+	"icon1Image":"byte[]",
+	"icon2Image":"byte[]",
+	"informationSystem":"java.lang.String",
+	"parentId":"java.lang.Long",
+	"order":"java.lang.String",
+	"icon1Id":"java.lang.Long",
+	"icon2Id":"java.lang.Long",
+	"xmlAccessTree":"java.lang.String",
+	"system":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.AccessTreeAuthorization"]={
+	"id":"java.lang.Long",
+	"authorizationLevelDescription":"java.lang.String",
+	"accessTreeId":"java.lang.Long",
+	"authorizationEntityType":"java.lang.String",
+	"authorizationEntityId":"java.lang.Long",
+	"authorizedEntityDescription":"java.lang.String",
+	"authorizedEntityCode":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.AccessTreeExecution"]={
+	"id":"java.lang.Long",
+	"scope":"java.lang.String",
+	"content":"java.lang.String",
+	"executionTypeCode":"java.lang.String",
+	"typeMimeExecution":"java.lang.String",
+	"AccessTreeId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.AccessTreeExecutionType"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"mimeType":"java.lang.String",
+	"template":"java.lang.String",
+	"javaClass":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.ApplicationAccessTree"]={
+	"id":"java.lang.Long",
+	"ordre":"java.lang.String",
+	"parentId":"java.lang.Long",
+	"parentName":"java.lang.String",
+	"childId":"java.lang.Long",
+	"childName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Browser"]={
+	"id":"java.lang.Long",
+	"serialNumber":"java.lang.String",
+	"deviceType":"java.lang.String",
+	"operatingSystem":"java.lang.String",
+	"browser":"java.lang.String",
+	"cpu":"java.lang.String",
+	"ip":"java.lang.String",
+	"lastUser":"java.lang.String",
+	"hostName":"java.lang.String",
+	"lastSeen":"java.util.Date",
+	"created":"java.util.Date",
+	"deleted":"java.lang.Boolean",
+	"locked":"java.lang.Boolean",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Challenge"]={
+	"CARD_REQUIRED":"int",
+	"CARD_IFABLE":"int",
+	"CARD_IFNEEDED":"int",
+	"CARD_DISABLED":"int",
+	"TYPE_RMI":"int",
+	"TYPE_KERBEROS":"int",
+	"TYPE_CERT":"int",
+	"TYPE_PASSWORD":"int",
+	"password":"com.soffid.iam.am.api.Password",
+	"type":"int",
+	"user":"com.soffid.iam.base.api.User",
+	"account":"com.soffid.iam.base.api.Account",
+	"userKey":"java.lang.String",
+	"host":"com.soffid.iam.am.api.Host",
+	"clientHost":"com.soffid.iam.am.api.Host",
+	"centinelPort":"int",
+	"otpHandler":"java.lang.String",
+	"cardNumber":"java.lang.String",
+	"cell":"java.lang.String",
+	"value":"java.lang.String",
+	"timeStamp":"java.sql.Timestamp",
+	"clientVersion":"int",
+	"kerberosDomain":"java.lang.String",
+	"challengeId":"java.lang.String",
+	"kerberosContext":"org.ietf.jgss.GSSContext",
+	"domain":"java.lang.String",
+	"closeOldSessions":"boolean",
+	"silent":"boolean",
+	"alternativeMethodAvailable":"boolean",
+	"resendAvailable":"boolean",
+	"additionalData":"java.lang.Object",
+	"identityProvider":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.ExtranetCard"]={
+	"id":"java.lang.Long",
+	"userCode":"java.lang.String",
+	"code":"java.lang.String",
+	"outputDate":"java.util.Calendar",
+	"expirationDate":"java.util.Calendar",
+	"active":"java.lang.String",
+	"content":"java.util.Collection<com.soffid.iam.am.api.ExtranetCardContent>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.ExtranetCardContent"]={
+	"rowColumn":"java.lang.String",
+	"value":"java.lang.String",
+	"lastUsedDate":"java.util.Calendar",
+	"row":"java.lang.String",
+	"column":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.ForbiddenWord"]={
+	"id":"java.lang.Long",
+	"forbiddenWord":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Host"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"network":"java.lang.String",
+	"ip":"java.lang.String",
+	"dynamicIp":"java.lang.Boolean",
+	"mail":"java.lang.Boolean",
+	"folders":"java.lang.Boolean",
+	"mac":"java.lang.String",
+	"printersServer":"java.lang.Boolean",
+	"serialNumber":"java.lang.String",
+	"os":"java.lang.String",
+	"hostAlias":"java.util.List<java.lang.String>",
+	"dhcp":"java.lang.String",
+	"lastSeen":"java.util.Calendar",
+	"created":"java.util.Calendar",
+	"locked":"java.lang.Boolean",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"deleted":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.HostAlias"]={
+	"id":"java.lang.Long",
+	"alias":"java.lang.String",
+	"hostId":"java.lang.Long",
+	"hostName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.LaunchType"]={
+	"LAUNCH_TYPE_SIMPLE":"java.lang.String",
+	"LAUNCH_TYPE_WEBSSO":"java.lang.String",
+	"LAUNCH_TYPE_PAM":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Network"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"ip":"java.lang.String",
+	"description":"java.lang.String",
+	"mask":"java.lang.String",
+	"type":"com.soffid.iam.am.api.NetworkType",
+	"lanAccess":"java.lang.Boolean",
+	"dhcp":"java.lang.String",
+	"dhcpSupport":"boolean",
+	"loginRestriction":"java.lang.Boolean",
+	"discovery":"java.lang.Boolean",
+	"discoveryServer":"java.lang.String",
+	"discoveryRanges":"java.util.List<java.lang.String>",
+	"countryCode":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.NetworkAuthorization"]={
+	"identity":"com.soffid.iam.base.api.Identity",
+	"level":"java.lang.Integer",
+	"mask":"java.lang.String",
+	"networkCode":"java.lang.String",
+	"id":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.NetworkType"]={
+	"LAN":"java.lang.String",
+	"WAN":"java.lang.String",
+	"EXT":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.OsType"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.OtpChallengeProxy"]={
+	"user":"com.soffid.iam.base.api.User",
+	"account":"com.soffid.iam.base.api.Account",
+	"otpHandler":"java.lang.String",
+	"cardNumber":"java.lang.String",
+	"cell":"java.lang.String",
+	"value":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Password"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordDomain"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordDomainStatus"]={
+	"domainName":"java.lang.String",
+	"lockedUntil":"java.util.Date",
+	"failures":"java.lang.Integer"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordPolicy"]={
+	"id":"java.lang.Long",
+	"description":"java.lang.String",
+	"type":"java.lang.String",
+	"renewalTime":"java.lang.Long",
+	"maximumPeriod":"java.lang.Long",
+	"maximumPeriodExpired":"java.lang.Long",
+	"minimumPeriod":"java.lang.Long",
+	"minimumLength":"java.lang.Long",
+	"maximumLength":"java.lang.Long",
+	"regularExpression":"java.lang.String",
+	"minimumUppercase":"java.lang.Long",
+	"maximumUppercase":"java.lang.Long",
+	"minimumLowercase":"java.lang.Long",
+	"maximumLowercase":"java.lang.Long",
+	"minimumNumbers":"java.lang.Long",
+	"maximumNumbers":"java.lang.Long",
+	"minimumSymbols":"java.lang.Long",
+	"maximumSymbols":"java.lang.Long",
+	"maximumHistorical":"java.lang.Long",
+	"userType":"java.lang.String",
+	"userTypeDescription":"java.lang.String",
+	"usersDomainCode":"java.lang.String",
+	"passwordDomainCode":"java.lang.String",
+	"maxFailures":"java.lang.Integer",
+	"unlockAfterSeconds":"java.lang.Integer",
+	"allowPasswordQuery":"boolean",
+	"allowPasswordChange":"boolean",
+	"complexPasswords":"boolean",
+	"validationScript":"java.lang.String",
+	"validationScriptDescription":"java.lang.String",
+	"checkPasswordBreached":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordPolicyForbbidenWord"]={
+	"id":"java.lang.Long",
+	"forbiddenWord":"com.soffid.iam.am.api.ForbiddenWord",
+	"passwordDomainPolicy":"com.soffid.iam.am.api.PasswordPolicy"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordStatus"]={
+	"user":"java.lang.String",
+	"PasswordDomain":"java.lang.String",
+	"dispatcher":"java.lang.String",
+	"accountName":"java.lang.String",
+	"date":"java.util.Calendar",
+	"expirationDate":"java.util.Calendar",
+	"expired":"java.lang.Boolean",
+	"passwordPolicyType":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordValidation"]={
+	"PASSWORD_GOOD":"java.lang.String",
+	"PASSWORD_WRONG":"java.lang.String",
+	"PASSWORD_GOOD_EXPIRED":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.PolicyCheckResult"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.SamlRequest"]={
+	"url":"java.lang.String",
+	"method":"java.lang.String",
+	"parameters":"java.util.Map<java.lang.String,java.lang.String>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Service"]={
+	"code":"java.lang.String",
+	"description":"java.lang.String",
+	"id":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.Session"]={
+	"userName":"java.lang.String",
+	"serverHostName":"java.lang.String",
+	"clientHostName":"java.lang.String",
+	"browser":"java.lang.Long",
+	"country":"java.lang.String",
+	"port":"java.lang.Long",
+	"id":"java.lang.Long",
+	"userFullName":"java.lang.String",
+	"startDate":"java.util.Calendar",
+	"key":"java.lang.String",
+	"keepAliveDate":"java.util.Calendar",
+	"temporaryKey":"java.lang.String",
+	"accessLogId":"java.lang.Long",
+	"url":"java.lang.String",
+	"authenticationMethod":"java.lang.String",
+	"type":"com.soffid.iam.am.api.SessionType",
+	"monitorUrl":"java.lang.String",
+	"sessionUrl":"java.lang.String",
+	"accountName":"java.lang.String",
+	"serviceProvider":"java.lang.String",
+	"tenantName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.SessionType"]={
+	"WSSO":"java.lang.String",
+	"ESSO":"java.lang.String",
+	"PAM":"java.lang.String",
+	"PAMSSH":"java.lang.String",
+	"PAMRDP":"java.lang.String",
+	"CONSOLE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.VaultElement"]={
+	"id":"java.lang.Long",
+	"parentId":"java.lang.Long",
+	"type":"java.lang.String",
+	"account":"com.soffid.iam.base.api.Account",
+	"folder":"com.soffid.iam.am.api.VaultFolder"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.VaultFolder"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"personal":"boolean",
+	"description":"java.lang.String",
+	"parentId":"java.lang.Long",
+	"parentFolder":"java.lang.String",
+	"grantedGroups":"java.util.Collection<java.lang.String>",
+	"grantedUsers":"java.util.Collection<java.lang.String>",
+	"grantedRoles":"java.util.Collection<java.lang.String>",
+	"managerGroups":"java.util.Collection<java.lang.String>",
+	"managerUsers":"java.util.Collection<java.lang.String>",
+	"managerRoles":"java.util.Collection<java.lang.String>",
+	"ownerGroups":"java.util.Collection<java.lang.String>",
+	"ownerUsers":"java.util.Collection<java.lang.String>",
+	"ownerRoles":"java.util.Collection<java.lang.String>",
+	"navigateGroups":"java.util.Collection<java.lang.String>",
+	"navigateUsers":"java.util.Collection<java.lang.String>",
+	"navigateRoles":"java.util.Collection<java.lang.String>",
+	"accessLevel":"com.soffid.iam.base.api.AccountAccessLevelEnum",
+	"pamPolicy":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.VaultFolderAccountPermissions"]={
+	"account":"com.soffid.iam.base.api.Account",
+	"permissions":"java.util.Vector<com.soffid.iam.base.api.AccountAccessLevelEnum>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.api.VaultFolderPermissions"]={
+	"vaultId":"java.lang.Long",
+	"grantee":"java.util.Vector<java.lang.Object>",
+	"accounts":"java.util.Vector<com.soffid.iam.am.api.VaultFolderAccountPermissions>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.AccpwdIdOrderIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.AutoritzacioPUERolIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.BrowserSerialIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.ContrasenyaEntityOrderUK"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.DominiContrasenyEntityIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.MaquinaIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.MaquinaNameIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.MaquinaSerialIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.SecretUserServerIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.PasswordManagerTokenEntityByToken"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.PuntEntradaCodeIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.PuntEntradaIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.RegistreAccesDataIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.RegistreAccesIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.RegistreAccesMaquinaIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.RegistreAccesNomesDataIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.SAMLAssertionEntityIndexByExternalId"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.SAMLRequestEntityIndexByExternalId"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.ServeiIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.XarxesAdressIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.model.XarxesIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.AccessLogService"]={
+	"create":"com.soffid.iam.am.api.AccessLog",
+	"findAccessLogById":"com.soffid.iam.am.api.AccessLog",
+	"findAccessLogs":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.AccessLog>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.BrowserService"]={
+	"create":"com.soffid.iam.am.api.Browser",
+	"findByHost":"com.soffid.iam.am.api.Browser",
+	"findBySerialNumber":"com.soffid.iam.am.api.Browser",
+	"registerBrowser":"com.soffid.iam.am.api.Browser",
+	"update":"com.soffid.iam.am.api.Browser",
+	"findBrowsers":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Browser>",
+	"handleFindSessionsByBrowserId":"java.util.List<com.soffid.iam.am.api.Session>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.CertificateValidationService"]={
+	"validateCertificate":"boolean",
+	"getCertificateAccount":"com.soffid.iam.base.api.Account",
+	"getCertificateUser":"com.soffid.iam.base.api.User",
+	"getRootCertificateList":"java.util.Collection<java.security.cert.X509Certificate>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.EntryPointService"]={
+	"canAdmin":"boolean",
+	"canExecute":"boolean",
+	"canQuery":"boolean",
+	"canView":"boolean",
+	"copyApplicationAccessLink":"boolean",
+	"copyApplicationAccess":"boolean",
+	"isAuthorized":"boolean",
+	"applicationAccessTreeHasAnyACL":"boolean",
+	"moveApplicationAccessTreeMenu":"boolean",
+	"reorderApplicationAccess":"boolean",
+	"create":"com.soffid.iam.am.api.AccessTree",
+	"findApplicationAccessById":"com.soffid.iam.am.api.AccessTree",
+	"findRoot":"com.soffid.iam.am.api.AccessTree",
+	"update":"com.soffid.iam.am.api.AccessTree",
+	"createAuthorization":"com.soffid.iam.am.api.AccessTreeAuthorization",
+	"createExecution":"com.soffid.iam.am.api.AccessTreeExecution",
+	"updateExecution":"com.soffid.iam.am.api.AccessTreeExecution",
+	"findAccessTrees":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.AccessTree>",
+	"getScopeForAddress":"java.lang.String",
+	"validateXMLApplicationAccess":"java.lang.String",
+	"findChildren":"java.util.Collection<com.soffid.iam.am.api.AccessTree>",
+	"findMenuChildren":"java.util.Collection<com.soffid.iam.am.api.AccessTree>",
+	"findApplicationAccessByFilter":"java.util.Collection<com.soffid.iam.am.api.AccessTree>",
+	"getAllMimeTypeExecution":"java.util.Collection<com.soffid.iam.am.api.AccessTreeExecutionType>",
+	"getReverseApplicationAccessTree":"java.util.Collection<java.lang.String>",
+	"getAuthorizationsApplicationAcessTree":"java.util.Collection<com.soffid.iam.am.api.AccessTreeAuthorization>",
+	"getExecutions":"java.util.Collection<com.soffid.iam.am.api.AccessTreeExecution>",
+	"delete":"void",
+	"deleteAuthorization":"void",
+	"deleteExecution":"void",
+	"sortChildren":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.NetworkService"]={
+	"canLogin":"boolean",
+	"create":"com.soffid.iam.am.api.Host",
+	"findHostById":"com.soffid.iam.am.api.Host",
+	"findHostByIp":"com.soffid.iam.am.api.Host",
+	"findHostByName":"com.soffid.iam.am.api.Host",
+	"findHostBySerialNumber":"com.soffid.iam.am.api.Host",
+	"registerDynamicIP":"com.soffid.iam.am.api.Host",
+	"findNetworkByIpAddress":"com.soffid.iam.am.api.Network",
+	"findNetworkByName":"com.soffid.iam.am.api.Network",
+	"findNetworkAuthorizationsByNetworkNameAndIdentityName":"com.soffid.iam.am.api.NetworkAuthorization",
+	"update":"com.soffid.iam.am.api.NetworkAuthorization",
+	"findOSTypeById":"com.soffid.iam.am.api.OsType",
+	"findOSTypeByName":"com.soffid.iam.am.api.OsType",
+	"findIdentityByName":"com.soffid.iam.base.api.Identity",
+	"revokeAdministratorAccessHost":"com.soffid.iam.pam.api.HostAdmin",
+	"findHosts":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Host>",
+	"findNetworks":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Network>",
+	"isManaged":"java.lang.Boolean",
+	"hasAnyACLNetworks":"java.lang.Boolean",
+	"launchVNC":"java.lang.Boolean",
+	"hasNetworkAccess":"java.lang.Boolean",
+	"hasManagedNetwork":"java.lang.Boolean",
+	"findAccessLevelByHostNameAndNetworkName":"java.lang.Long",
+	"getAvailableIPs":"java.lang.Long",
+	"getNotAvailableIPs":"java.lang.Long",
+	"getFirstAvailableIP":"java.lang.String",
+	"getTasks":"java.lang.String[]",
+	"getHostAdminUserAndPassword":"java.lang.String[]",
+	"findAllNetworkAuthorizationsByUserName":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>",
+	"findAliasByHostName":"java.util.List<com.soffid.iam.am.api.HostAlias>",
+	"findAllOSTypes":"java.util.List<com.soffid.iam.am.api.OsType>",
+	"findAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate":"java.util.List<com.soffid.iam.pam.api.HostAdmin>",
+	"findHostsByNetwork_Discovery":"java.util.List<com.soffid.iam.am.api.Host>",
+	"findIdentitiesByName":"java.util.List<com.soffid.iam.base.api.Identity>",
+	"findNetworkAuthorizationsByGroupName":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>",
+	"findNetworkAuthorizationsByUserName":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>",
+	"findNetworkAuthorizationsByRoleName":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>",
+	"findNetworkByText_Discovery":"java.util.List<com.soffid.iam.am.api.Network>",
+	"findSessionsByHostName":"java.util.List<com.soffid.iam.am.api.Session>",
+	"getACL":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>",
+	"getNetworks":"java.util.List<com.soffid.iam.am.api.Network>",
+	"delete":"void",
+	"setAdministratorPassword":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.PasswordManagerService"]={
+	"findUserByToken":"java.lang.String",
+	"generateToken":"java.lang.String",
+	"renewToken":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.PasswordService"]={
+	"checkPassword":"boolean",
+	"checkExpiredPassword":"boolean",
+	"checkPin":"boolean",
+	"checkPolicy":"com.soffid.iam.am.api.PolicyCheckResult",
+	"getDefaultDispatcher":"java.lang.String",
+	"getPolicyDescription":"java.lang.String",
+	"getPasswordExpiredDate":"java.util.Calendar",
+	"changePassword":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.ServiceService"]={
+	"create":"com.soffid.iam.am.api.Service",
+	"findServiceByName":"com.soffid.iam.am.api.Service",
+	"update":"com.soffid.iam.am.api.Service",
+	"findServices":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Service>",
+	"getServices":"java.util.Collection<com.soffid.iam.am.api.Service>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.SessionService"]={
+	"getSessionByHost":"com.soffid.iam.am.api.Session",
+	"getSession":"com.soffid.iam.am.api.Session",
+	"joinEssoSession":"com.soffid.iam.am.api.Session",
+	"registerBrowserSession":"com.soffid.iam.am.api.Session",
+	"registerSession":"com.soffid.iam.am.api.Session",
+	"updateTransientKey":"java.lang.String",
+	"findActiveSessions":"java.util.Collection<com.soffid.iam.am.api.Session>",
+	"getActiveSessions":"java.util.Collection<com.soffid.iam.am.api.Session>",
+	"cleanTransientKey":"void",
+	"destroySession":"void",
+	"sessionKeepAlive":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.SignalService"]={
+	"signal":"void",
+	"signalAccount":"void",
+	"signalUser":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.am.service.VaultService"]={
+	"create":"com.soffid.iam.am.api.VaultElement",
+	"findVaultElement":"com.soffid.iam.am.api.VaultElement",
+	"update":"com.soffid.iam.am.api.VaultElement",
+	"findFolder":"com.soffid.iam.am.api.VaultFolder",
+	"getPersonalFolder":"com.soffid.iam.am.api.VaultFolder",
+	"getFolderPermissions":"com.soffid.iam.am.api.VaultFolderPermissions",
+	"addToFolder":"com.soffid.iam.base.api.Account",
+	"findFolders":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.VaultFolder>",
+	"findAccounts":"java.util.List<com.soffid.iam.base.api.Account>",
+	"findVaultElementByText":"java.util.List<com.soffid.iam.am.api.VaultElement>",
+	"getChildren":"java.util.List<com.soffid.iam.am.api.VaultElement>",
+	"getPublicRootFolders":"java.util.List<com.soffid.iam.am.api.VaultFolder>",
+	"getRootFolders":"java.util.List<com.soffid.iam.am.api.VaultFolder>",
+	"list":"java.util.List<com.soffid.iam.base.api.Account>",
+	"applyFolderPermissions":"void",
+	"remove":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.Account"]={
+	"id":"java.lang.Long",
+	"system":"java.lang.String",
+	"name":"java.lang.String",
+	"key":"java.lang.String",
+	"oldName":"java.lang.String",
+	"loginName":"java.lang.String",
+	"description":"java.lang.String",
+	"type":"com.soffid.iam.base.api.AccountType",
+	"disabled":"boolean",
+	"status":"com.soffid.iam.base.api.AccountStatus",
+	"credentialType":"com.soffid.iam.base.api.CredentialTypeEnum",
+	"passwordPolicy":"java.lang.String",
+	"ownerGroups":"java.util.Collection<java.lang.String>",
+	"ownerUsers":"java.util.Collection<java.lang.String>",
+	"ownerRoles":"java.util.Collection<java.lang.String>",
+	"managerGroups":"java.util.Collection<java.lang.String>",
+	"managerUsers":"java.util.Collection<java.lang.String>",
+	"managerRoles":"java.util.Collection<java.lang.String>",
+	"grantedGroups":"java.util.Collection<java.lang.String>",
+	"grantedUsers":"java.util.Collection<java.lang.String>",
+	"grantedRoles":"java.util.Collection<java.lang.String>",
+	"accessLevel":"com.soffid.iam.base.api.AccountAccessLevelEnum",
+	"serverType":"java.lang.String",
+	"serverName":"java.lang.String",
+	"sshPublicKey":"java.lang.String",
+	"vaultFolderId":"java.lang.Long",
+	"vaultFolder":"java.lang.String",
+	"inheritNewPermissions":"boolean",
+	"loginUrl":"java.lang.String",
+	"launchType":"com.soffid.iam.am.api.LaunchType",
+	"jumpServerGroup":"java.lang.String",
+	"externalId":"java.lang.String",
+	"lastLogin":"java.util.Calendar",
+	"lastUpdated":"java.util.Calendar",
+	"lastPasswordSet":"java.util.Calendar",
+	"passwordExpiration":"java.util.Calendar",
+	"lockedBy":"java.lang.String",
+	"passwordStatus":"com.soffid.iam.am.api.PasswordValidation",
+	"created":"java.util.Date",
+	"lastChange":"java.util.Date",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"hasSnapshot":"boolean",
+	"createdBy":"java.lang.String",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"deleted":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AccountAccessLevelEnum"]={
+	"ACCESS_NAVIGATE":"java.lang.String",
+	"ACCESS_USER":"java.lang.String",
+	"ACCESS_MANAGER":"java.lang.String",
+	"ACCESS_OWNER":"java.lang.String",
+	"ACCESS_NONE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AccountStatus"]={
+	"ACTIVE":"java.lang.String",
+	"FORCED_ACTIVE":"java.lang.String",
+	"LOCKED":"java.lang.String",
+	"DISABLED":"java.lang.String",
+	"FORCED_DISABLED":"java.lang.String",
+	"REMOVED":"java.lang.String",
+	"ARCHIVED":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AccountType"]={
+	"USER":"java.lang.String",
+	"SHARED":"java.lang.String",
+	"PRIVILEGED":"java.lang.String",
+	"IGNORED":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AgentDescriptor"]={
+	"id":"java.lang.Long",
+	"description":"java.lang.String",
+	"className":"java.lang.String",
+	"userInterface":"byte[]",
+	"enableAccessControl":"boolean",
+	"authoritativeSource":"boolean",
+	"enableAttributeMapping":"boolean",
+	"enableObjectTriggers":"boolean",
+	"service":"boolean",
+	"properties":"java.util.List<com.soffid.iam.base.api.AgentProperty>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AgentDescriptorWorkflow"]={
+	"name":"java.lang.String",
+	"image":"byte[]"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AgentProperty"]={
+	"template":"java.lang.String",
+	"type":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AgentStatusInfo"]={
+	"agentName":"java.lang.String",
+	"className":"java.lang.String",
+	"pendingTasks":"java.lang.Integer",
+	"status":"java.lang.String",
+	"url":"java.lang.String",
+	"statusMessage":"java.lang.String",
+	"stackTrace":"java.lang.String",
+	"version":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AsyncProcessTracker"]={
+	"id":"java.lang.Long",
+	"progress":"float",
+	"report":"java.lang.String",
+	"finished":"boolean",
+	"cancelled":"boolean",
+	"errorMessage":"java.lang.String",
+	"start":"java.util.Date",
+	"end":"java.util.Date",
+	"current":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AttributeVisibilityEnum"]={
+	"HIDDEN":"java.lang.String",
+	"READONLY":"java.lang.String",
+	"EDITABLE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.AuthorizationRole"]={
+	"id":"java.lang.Long",
+	"authorization":"java.lang.String",
+	"role":"com.soffid.iam.iga.api.Role",
+	"userRoleValueDomain":"java.util.Collection<com.soffid.iam.iga.api.DomainValue>",
+	"description":"java.lang.String",
+	"domainType":"java.lang.String",
+	"businessGroupScope":"java.lang.String",
+	"scope":"java.lang.String",
+	"inherit":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.Configuration"]={
+	"name":"java.lang.String",
+	"value":"java.lang.String",
+	"networkName":"java.lang.String",
+	"description":"java.lang.String",
+	"hidden":"java.lang.Boolean",
+	"id":"java.lang.Long",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.CredentialTypeEnum"]={
+	"CT_PASSWORD":"java.lang.String",
+	"CT_SSHKEY":"java.lang.String",
+	"CT_KUBERNETES":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.DataType"]={
+	"name":"java.lang.String",
+	"order":"java.lang.Long",
+	"id":"java.lang.Long",
+	"scope":"com.soffid.iam.base.api.MetadataScope",
+	"objectType":"java.lang.String",
+	"dataObjectType":"java.lang.String",
+	"type":"com.soffid.iam.base.api.TypeEnumeration",
+	"size":"java.lang.Integer",
+	"required":"boolean",
+	"readOnly":"boolean",
+	"multiLine":"boolean",
+	"multiValued":"boolean",
+	"searchCriteria":"java.lang.Boolean",
+	"multiValuedRows":"java.lang.Integer",
+	"label":"java.lang.String",
+	"hint":"java.lang.String",
+	"nlsLabel":"java.lang.String",
+	"nlsLabels":"java.util.Map<java.lang.String,java.lang.String>",
+	"description":"java.lang.String",
+	"values":"java.util.List<java.lang.String>",
+	"adminVisibility":"com.soffid.iam.base.api.AttributeVisibilityEnum",
+	"operatorVisibility":"com.soffid.iam.base.api.AttributeVisibilityEnum",
+	"userVisibility":"com.soffid.iam.base.api.AttributeVisibilityEnum",
+	"systemName":"java.lang.String",
+	"unique":"java.lang.Boolean",
+	"visibilityExpression":"java.lang.String",
+	"validationExpression":"java.lang.String",
+	"filterExpression":"java.lang.String",
+	"onLoadTrigger":"java.lang.String",
+	"onChangeTrigger":"java.lang.String",
+	"onFocusTrigger":"java.lang.String",
+	"validator":"java.lang.String",
+	"enumeration":"java.lang.String",
+	"builtin":"java.lang.Boolean",
+	"builtinHandler":"java.lang.String",
+	"letterCase":"com.soffid.iam.base.api.LetterCaseEnum"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.DisableObjectRule"]={
+	"criteria":"java.lang.String",
+	"parameter":"java.lang.Integer",
+	"action":"java.lang.String",
+	"emailCopy":"java.lang.String",
+	"emailSubject":"java.lang.String",
+	"emailBody":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.Identity"]={
+	"userCode":"java.lang.String",
+	"groupCode":"java.lang.String",
+	"roleName":"java.lang.String",
+	"description":"java.lang.String",
+	"identityCode":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.LetterCaseEnum"]={
+	"UPPERCASE":"java.lang.String",
+	"LOWERCASE":"java.lang.String",
+	"MIXEDCASE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.MetadataScope"]={
+	"ROLE":"java.lang.String",
+	"USER":"java.lang.String",
+	"APPLICATION":"java.lang.String",
+	"GROUP":"java.lang.String",
+	"ACCOUNT":"java.lang.String",
+	"CUSTOM":"java.lang.String",
+	"MAIL_LIST":"java.lang.String",
+	"GROUP_MEMBERSHIP":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.ServerPlugin"]={
+	"id":"java.lang.Long",
+	"version":"java.lang.String",
+	"name":"java.lang.String",
+	"enabled":"boolean",
+	"author":"java.lang.String",
+	"deployed":"java.util.Date",
+	"modules":"java.util.Collection<com.soffid.iam.base.api.ServerPluginModule>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.ServerPluginModule"]={
+	"name":"java.lang.String",
+	"type":"com.soffid.iam.base.api.ServerPluginModuleType",
+	"initClass":"java.lang.String",
+	"agents":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>",
+	"resourceName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.ServerPluginModuleType"]={
+	"MODULE_WEB":"java.lang.String",
+	"MODULE_CORE":"java.lang.String",
+	"MODULE_SYNCSERVER":"java.lang.String",
+	"MODULE_AGENT":"java.lang.String",
+	"MODULE_COMMON":"java.lang.String",
+	"MODULE_WEBSERVICE":"java.lang.String",
+	"MODULE_SELFSERVICE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.Stats"]={
+	"name":"java.lang.String",
+	"tags":"java.util.List<java.lang.String>",
+	"series":"java.util.HashMap<java.lang.String,java.util.List<com.soffid.iam.base.api.StatsSample>>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.StatsSample"]={
+	"min":"long",
+	"max":"long",
+	"sum":"long",
+	"average":"long",
+	"instances":"long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.TasksGrid"]={
+	"agents":"java.util.List<java.lang.String>",
+	"tasks":"java.util.List<com.soffid.iam.sync.api.SyncserverTask>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.TasksGridRow"]={
+	"agents":"java.util.List<java.lang.String>",
+	"tasks":"java.util.List<com.soffid.iam.sync.api.SyncserverTask>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.Tenant"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"enabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.TranslatedLabel"]={
+	"id":"java.lang.Long",
+	"language":"java.lang.String",
+	"label":"java.lang.String",
+	"customObjectType":"java.lang.Long",
+	"metadata":"java.lang.Long",
+	"accountMetadata":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.TypeEnumeration"]={
+	"stringType":"java.lang.String",
+	"numberType":"java.lang.String",
+	"passwordType":"java.lang.String",
+	"binaryType":"java.lang.String",
+	"booleanType":"java.lang.String",
+	"photoType":"java.lang.String",
+	"dateType":"java.lang.String",
+	"emailType":"java.lang.String",
+	"accountType":"java.lang.String",
+	"userType":"java.lang.String",
+	"groupType":"java.lang.String",
+	"groupTypeType":"java.lang.String",
+	"roleType":"java.lang.String",
+	"applicationType":"java.lang.String",
+	"hostType":"java.lang.String",
+	"networkType":"java.lang.String",
+	"userTypeType":"java.lang.String",
+	"customObjectType":"java.lang.String",
+	"mailDomainType":"java.lang.String",
+	"mailListType":"java.lang.String",
+	"ssoFormType":"java.lang.String",
+	"html":"java.lang.String",
+	"separator":"java.lang.String",
+	"dateTimeType":"java.lang.String",
+	"osType":"java.lang.String",
+	"printerType":"java.lang.String",
+	"attachmentType":"java.lang.String",
+	"systemType":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.User"]={
+	"id":"java.lang.Long",
+	"userName":"java.lang.String",
+	"firstName":"java.lang.String",
+	"lastName":"java.lang.String",
+	"middleName":"java.lang.String",
+	"fullName":"java.lang.String",
+	"userType":"java.lang.String",
+	"primaryGroup":"java.lang.String",
+	"primaryGroupDescription":"java.lang.String",
+	"homeServer":"java.lang.String",
+	"profileServer":"java.lang.String",
+	"emailAddress":"java.lang.String",
+	"mailAlias":"java.lang.String",
+	"mailServer":"java.lang.String",
+	"shortName":"java.lang.String",
+	"mailDomain":"java.lang.String",
+	"active":"java.lang.Boolean",
+	"multiSession":"java.lang.Boolean",
+	"comments":"java.lang.String",
+	"createdBy":"java.lang.String",
+	"createdOn":"java.util.Calendar",
+	"modifiedBy":"java.lang.String",
+	"modifiedOn":"java.util.Calendar",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"deleted":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.UserAccount"]={
+	"id":"java.lang.Long",
+	"system":"java.lang.String",
+	"name":"java.lang.String",
+	"key":"java.lang.String",
+	"oldName":"java.lang.String",
+	"loginName":"java.lang.String",
+	"description":"java.lang.String",
+	"type":"com.soffid.iam.base.api.AccountType",
+	"disabled":"boolean",
+	"status":"com.soffid.iam.base.api.AccountStatus",
+	"credentialType":"com.soffid.iam.base.api.CredentialTypeEnum",
+	"passwordPolicy":"java.lang.String",
+	"ownerGroups":"java.util.Collection<java.lang.String>",
+	"ownerUsers":"java.util.Collection<java.lang.String>",
+	"ownerRoles":"java.util.Collection<java.lang.String>",
+	"managerGroups":"java.util.Collection<java.lang.String>",
+	"managerUsers":"java.util.Collection<java.lang.String>",
+	"managerRoles":"java.util.Collection<java.lang.String>",
+	"grantedGroups":"java.util.Collection<java.lang.String>",
+	"grantedUsers":"java.util.Collection<java.lang.String>",
+	"grantedRoles":"java.util.Collection<java.lang.String>",
+	"accessLevel":"com.soffid.iam.base.api.AccountAccessLevelEnum",
+	"serverType":"java.lang.String",
+	"serverName":"java.lang.String",
+	"sshPublicKey":"java.lang.String",
+	"vaultFolderId":"java.lang.Long",
+	"vaultFolder":"java.lang.String",
+	"inheritNewPermissions":"boolean",
+	"loginUrl":"java.lang.String",
+	"launchType":"com.soffid.iam.am.api.LaunchType",
+	"jumpServerGroup":"java.lang.String",
+	"externalId":"java.lang.String",
+	"lastLogin":"java.util.Calendar",
+	"lastUpdated":"java.util.Calendar",
+	"lastPasswordSet":"java.util.Calendar",
+	"passwordExpiration":"java.util.Calendar",
+	"lockedBy":"java.lang.String",
+	"passwordStatus":"com.soffid.iam.am.api.PasswordValidation",
+	"created":"java.util.Date",
+	"lastChange":"java.util.Date",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"hasSnapshot":"boolean",
+	"createdBy":"java.lang.String",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"deleted":"java.lang.Boolean",
+	"user":"java.lang.String",
+	"createdOn":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.UserAccountHistory"]={
+	"id":"java.lang.Long",
+	"user":"java.lang.String",
+	"account":"java.lang.String",
+	"system":"java.lang.String",
+	"untilDate":"java.util.Date",
+	"workflowId":"java.lang.Long",
+	"approved":"java.lang.Boolean",
+	"entryPoint":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.api.UserData"]={
+	"attribute":"java.lang.String",
+	"value":"java.lang.String",
+	"user":"java.lang.String",
+	"accountName":"java.lang.String",
+	"systemName":"java.lang.String",
+	"id":"java.lang.Long",
+	"blobDataValue":"byte[]",
+	"dateValue":"java.util.Calendar",
+	"dataLabel":"java.lang.String",
+	"visibility":"com.soffid.iam.base.api.AttributeVisibilityEnum"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.AccountExternalIdIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.AccountIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.AccountMetadataNameIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.AutoritzacioRolIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.DadaUsuariIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.DadaUsuariValueIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.LucenIndexUniqueKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.Parameter"]={
+	"name":"java.lang.String",
+	"value":"java.lang.Object"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.StatsEntityNameIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.TenantEntityUK"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.UserPreferenceUk"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.UsuariIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.model.UsuariNomCurtIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.AccountService"]={
+	"hasAccountSshKey":"boolean",
+	"isAccountPasswordAvailable":"boolean",
+	"isUpdatePending":"boolean",
+	"needsAccount":"boolean",
+	"setHPAccountPassword":"boolean",
+	"generateAccountPassword":"com.soffid.iam.am.api.Password",
+	"generateAccountTemporaryPassword":"com.soffid.iam.am.api.Password",
+	"queryAccountPassword":"com.soffid.iam.am.api.Password",
+	"queryAccountPasswordBypassPolicy":"com.soffid.iam.am.api.Password",
+	"queryAccountSshKey":"com.soffid.iam.am.api.Password",
+	"queryAccountSshKeyBypassPolicy":"com.soffid.iam.am.api.Password",
+	"setAccountPassword":"com.soffid.iam.am.api.Password",
+	"checkPasswordSynchronizationStatus":"com.soffid.iam.am.api.PasswordValidation",
+	"createAccount":"com.soffid.iam.base.api.Account",
+	"createAccount2":"com.soffid.iam.base.api.Account",
+	"findAccount":"com.soffid.iam.base.api.Account",
+	"findAccountByExternalId":"com.soffid.iam.base.api.Account",
+	"findAccountById":"com.soffid.iam.base.api.Account",
+	"generateAccountSshPrivateKey":"com.soffid.iam.base.api.Account",
+	"load":"com.soffid.iam.base.api.Account",
+	"removeAccountSnapshot":"com.soffid.iam.base.api.Account",
+	"setAccountSshPrivateKey":"com.soffid.iam.base.api.Account",
+	"updateAccount":"com.soffid.iam.base.api.Account",
+	"updateAccount2":"com.soffid.iam.base.api.Account",
+	"disableAccounts":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"disableAccountsPreview":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"getHPAccountOwner":"com.soffid.iam.base.api.User",
+	"createAccountAttribute":"com.soffid.iam.base.api.UserData",
+	"updateAccountAttribute":"com.soffid.iam.base.api.UserData",
+	"findAccounts":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.Account>",
+	"isUpdatePendingExtended":"int",
+	"guessAccountName":"java.lang.String",
+	"guessAccountNameForDomain":"java.lang.String",
+	"predictAccountName":"java.lang.String",
+	"findAccountNames":"java.util.Collection<java.lang.String>",
+	"findAccountServices":"java.util.Collection<com.soffid.iam.pam.api.HostService>",
+	"getAccountUsers":"java.util.Collection<java.lang.String>",
+	"getActiveTasks":"java.util.Collection<com.soffid.iam.sync.api.SyncAgentTaskLog>",
+	"getUserAccounts":"java.util.Collection<com.soffid.iam.base.api.UserAccount>",
+	"getUserGrantedAccountIds":"java.util.Collection<java.lang.Long>",
+	"getUserGrantedAccounts":"java.util.Collection<com.soffid.iam.base.api.Account>",
+	"findAccountsNearToExpire":"java.util.List<com.soffid.iam.base.api.Account>",
+	"findSharedAccountsByUser":"java.util.List<com.soffid.iam.base.api.Account>",
+	"findSharedAccountsHistoryByUser":"java.util.List<com.soffid.iam.iga.api.AccountHistory>",
+	"findUsersAccounts":"java.util.List<com.soffid.iam.base.api.UserAccount>",
+	"findUserAccountsByDomain":"java.util.List<com.soffid.iam.base.api.UserAccount>",
+	"getAccountAttributes":"java.util.List<com.soffid.iam.base.api.UserData>",
+	"listAccountGrants":"java.util.List<com.soffid.iam.base.api.UserAccountHistory>",
+	"listNonUserAccounts":"java.util.List<com.soffid.iam.base.api.Account>",
+	"listUserAccounts":"java.util.List<com.soffid.iam.base.api.UserAccount>",
+	"checkinHPAccount":"void",
+	"checkinHPAccounts":"void",
+	"generateUserAccounts":"void",
+	"removeAccount":"void",
+	"removeAccountAttribute":"void",
+	"removeAccountGrant":"void",
+	"renameAccount":"void",
+	"sendAccountPassword":"void",
+	"setAccountTemporaryPassword":"void",
+	"synchronizeAccount":"void",
+	"updateAccountLastUpdate":"void",
+	"updateAccountPasswordDate":"void",
+	"updateAccountPasswordDate2":"void",
+	"grantAcccountToUser":"void",
+	"registerAccountReservationProcess":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.AdditionalDataService"]={
+	"getAccessLevel":"com.soffid.iam.base.api.AccountAccessLevelEnum",
+	"create":"com.soffid.iam.base.api.DataType",
+	"findSystemDataType":"com.soffid.iam.base.api.DataType",
+	"findDataTypeByName":"com.soffid.iam.base.api.DataType",
+	"update":"com.soffid.iam.base.api.DataType",
+	"createCustomObjectType":"com.soffid.iam.iga.api.CustomObjectType",
+	"findCustomObjectTypeByName":"com.soffid.iam.iga.api.CustomObjectType",
+	"updateCustomObjectType":"com.soffid.iam.iga.api.CustomObjectType",
+	"findExtensibleObjectRegister":"com.soffid.iam.iga.api.ExtensibleObjectRegister",
+	"findCustomObjectType":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.CustomObjectType>",
+	"findDataTypes":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"findDataTypes2":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"findDataTypesByObjectTypeAndName":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"findDataTypesByObjectTypeAndName2":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"findDataTypesByName":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"findDataTypesByScopeAndName":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"getDataTypes":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"findExtensibleObjectRegisters":"java.util.List<com.soffid.iam.iga.api.ExtensibleObjectRegister>",
+	"findSystemDataTypes":"java.util.List<com.soffid.iam.base.api.DataType>",
+	"findSystemDataTypes2":"java.util.List<com.soffid.iam.base.api.DataType>",
+	"getGenAIMetadata":"java.util.List<java.lang.String>",
+	"delete":"void",
+	"deleteCustomObjectType":"void",
+	"registerExtensibleObject":"void",
+	"registerStandardObject":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.AuthorizationService"]={
+	"hasPermission":"boolean",
+	"create":"com.soffid.iam.base.api.AuthorizationRole",
+	"getCurrentPrincipal":"com.soffid.iam.common.security.SoffidPrincipal",
+	"getUserAuthorizationString":"java.lang.String[]",
+	"getUserAuthorizationsString":"java.lang.String[]",
+	"getUserGroupAuthorizationString":"java.lang.String[]",
+	"findAuthorizations":"java.util.Collection",
+	"getDescriptionUserAuthorizations":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>",
+	"getAuthorizationInfo":"java.util.Collection<java.lang.Object>",
+	"getAuthorizationRoles":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>",
+	"getUserAuthorization":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>",
+	"getUserAuthorizations":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>",
+	"getScopeList":"java.util.List",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.ConfigurationService"]={
+	"getBlob":"byte[]",
+	"create":"com.soffid.iam.base.api.Configuration",
+	"findMasterParameterByNameAndNetwork":"com.soffid.iam.base.api.Configuration",
+	"findParameterByNameAndNetworkName":"com.soffid.iam.base.api.Configuration",
+	"update":"com.soffid.iam.base.api.Configuration",
+	"findConfigurations":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.Configuration>",
+	"findTenantParameter":"java.lang.String",
+	"getBlobVersion":"java.lang.String",
+	"getParameters":"java.util.Collection<com.soffid.iam.base.api.Configuration>",
+	"delete":"void",
+	"deleteBlob":"void",
+	"updateBlob":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.GenAIProviderService"]={
+	"getGenAIMetadata":"java.util.List<java.lang.String>",
+	"getGenAISentences":"java.util.List<java.lang.String>",
+	"clearCache":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.LicenseService"]={
+	"getApplicationToken":"java.lang.String",
+	"getExpirationDate":"java.util.Date",
+	"findEnabledProducts":"java.util.List<java.lang.String>",
+	"installLicense":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.PreferencesService"]={
+	"findMyPreference":"java.lang.String",
+	"findUserPreferences":"java.util.Map<java.lang.String,java.lang.String>",
+	"setUserPreferences":"java.util.Map<java.lang.String,java.lang.String>",
+	"setUserPreference":"void",
+	"updateMyPreference":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.RecycleBeanService"]={
+	"purge":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.ServerPluginService"]={
+	"deployPlugin":"boolean",
+	"getAgentDescriptor":"com.soffid.iam.base.api.AgentDescriptor",
+	"getServerVersion":"java.lang.String",
+	"findAgentDescriptorWorkflows":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptorWorkflow>",
+	"getAgentDescriptors":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>",
+	"getAllAgentDescriptorsInfo":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>",
+	"getPluginAgentDescriptors":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>",
+	"listServerPlugins":"java.util.Collection<com.soffid.iam.base.api.ServerPlugin>",
+	"deletePlugin":"void",
+	"enablePlugin":"void",
+	"updatePlugin":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.StatsService"]={
+	"findStats":"com.soffid.iam.base.api.Stats",
+	"purge":"void",
+	"updateStats":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.TenantService"]={
+	"importTenant":"com.soffid.iam.base.api.Tenant",
+	"create":"com.soffid.iam.base.api.Tenant",
+	"getMasterTenant":"com.soffid.iam.base.api.Tenant",
+	"getTenant":"com.soffid.iam.base.api.Tenant",
+	"update":"com.soffid.iam.base.api.Tenant",
+	"listTenants":"java.util.Collection<com.soffid.iam.base.api.Tenant>",
+	"getDisabledPermissions":"java.util.List<java.lang.String>",
+	"getTenantServers":"java.util.List<java.lang.String>",
+	"addTenantServer":"void",
+	"disablePermission":"void",
+	"enablePermission":"void",
+	"remove":"void",
+	"removeTenantServer":"void",
+	"exportTenant":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.base.service.UserService"]={
+	"getESSORules":"byte[]",
+	"createExtranetCard":"com.soffid.iam.am.api.ExtranetCard",
+	"findExtranetCardByUserNameAndCardName":"com.soffid.iam.am.api.ExtranetCard",
+	"update":"com.soffid.iam.am.api.ExtranetCard",
+	"findMailServerByUserName":"com.soffid.iam.am.api.Host",
+	"findHomeServerByUserName":"com.soffid.iam.am.api.Host",
+	"findProfileServerByUserName":"com.soffid.iam.am.api.Host",
+	"disableUsers":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"disableUsersPreview":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"disableUser":"com.soffid.iam.base.api.User",
+	"create":"com.soffid.iam.base.api.User",
+	"findUserByDataTypeNameAndDataTypeValue":"com.soffid.iam.base.api.User",
+	"findUserByUserName":"com.soffid.iam.base.api.User",
+	"findUserByUserId":"com.soffid.iam.base.api.User",
+	"findUserByUserNif":"com.soffid.iam.base.api.User",
+	"getCurrentUser":"com.soffid.iam.base.api.User",
+	"getUserInfo":"com.soffid.iam.base.api.User",
+	"setServersToUser":"com.soffid.iam.base.api.User",
+	"findDataByUserAndCode":"com.soffid.iam.base.api.UserData",
+	"findUsers":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.User>",
+	"isUpdatePendingExtended":"int",
+	"setTemporaryPassword":"java.lang.String",
+	"createNewUserProcess":"java.lang.String",
+	"generateRandomPassword":"java.lang.String",
+	"getFollowingName":"java.lang.String",
+	"setPassword":"java.lang.String",
+	"getTasks":"java.lang.String[]",
+	"refreshChanges":"java.lang.String[]",
+	"findUserDataByUserName":"java.util.Collection<com.soffid.iam.base.api.UserData>",
+	"findPrintersByUserName":"java.util.Collection<com.soffid.iam.iga.api.Printer>",
+	"findUserRolesHierachyByUserName":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findBpmUserProcessInstanceByUserName":"java.util.Collection<com.soffid.iam.bpm.api.ProcessInstance>",
+	"findBpmUserProcessByUserName":"java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>",
+	"findBpmUserProcessByProcessId":"java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>",
+	"findBpmUserProcessByUserNif":"java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>",
+	"findSessionByUserName":"java.util.Collection<com.soffid.iam.am.api.Session>",
+	"findExtranetCardsByUserName":"java.util.Collection<com.soffid.iam.am.api.ExtranetCard>",
+	"findUserNames":"java.util.Collection<java.lang.String>",
+	"findUserPrintersByUserName":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>",
+	"findNetworksACByUserName":"java.util.Collection<com.soffid.iam.am.api.NetworkAuthorization>",
+	"getActiveTasks":"java.util.Collection<com.soffid.iam.sync.api.SyncAgentTaskLog>",
+	"getApplicationsByUserName":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>",
+	"getBpmEnabledApplicationsByUserName":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>",
+	"getPasswordsUserType":"java.util.Collection<com.soffid.iam.am.api.PasswordStatus>",
+	"getApplicationRolesByuserNameAndApplicationName":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"getDataType":"java.util.Collection<com.soffid.iam.base.api.DataType>",
+	"getUserExplicitRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getUserGroups":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getUserGroupsHierarchy":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getUserRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getBpmUserProcessList":"java.util.Collection<com.soffid.iam.iga.api.BpmProcess>",
+	"findPasswordDomainStatus":"java.util.List<com.soffid.iam.am.api.PasswordDomainStatus>",
+	"findUserAttributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"delete":"void",
+	"merge":"void",
+	"sendPassword":"void",
+	"unlockPasswordDomain":"void",
+	"updateUserAttributes":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.BPMUser"]={
+	"userName":"java.lang.String",
+	"givenName":"java.lang.String",
+	"surName":"java.lang.String",
+	"group":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.Comment"]={
+	"message":"java.lang.String",
+	"actor":"java.lang.String",
+	"node":"java.lang.String",
+	"time":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.ConfigParameterVO"]={
+	"id":"java.lang.Long",
+	"app":"java.lang.String",
+	"key":"java.lang.String",
+	"value":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.FilteredGroupVO"]={
+	"name":"java.lang.String",
+	"ignored":"java.lang.Boolean",
+	"userName":"java.lang.String",
+	"type":"java.lang.Integer",
+	"pooledActorsStyleName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.FilteredGroupVO.FilteredGroupVoNameComparator"]={
+	"compare":"int"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.Job"]={
+	"name":"java.lang.String",
+	"id":"long",
+	"dueDate":"java.util.Date",
+	"locked":"boolean",
+	"errorMessage":"java.lang.String",
+	"error":"boolean",
+	"failures":"int",
+	"paused":"boolean",
+	"processId":"long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.DeployToken"]={
+	"id":"int"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.PredefinedProcessType"]={
+	"ROLE_GRANT_APPROVAL":"java.lang.String",
+	"ROLE_DEFINITION_APPROVAL":"java.lang.String",
+	"AUTHORITATIVE_CHANGE":"java.lang.String",
+	"PRIVILEGED_ACCOUNT":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.ProcessDefinition"]={
+	"version":"int",
+	"tag":"java.lang.String",
+	"name":"java.lang.String",
+	"id":"long",
+	"enabled":"boolean",
+	"appliesTo":"java.lang.String",
+	"type":"com.soffid.iam.bpm.api.PredefinedProcessType",
+	"deployed":"java.util.Date",
+	"author":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.ProcessInstance"]={
+	"id":"long",
+	"processClassLoader":"com.soffid.iam.bpm.api.UIClassLoader",
+	"processNumber":"java.lang.Long",
+	"tenantId":"java.lang.Long",
+	"description":"java.lang.String",
+	"start":"java.util.Date",
+	"end":"java.util.Date",
+	"variables":"java.util.Map<java.lang.String,java.lang.Object>",
+	"currentTask":"java.lang.String",
+	"comments":"java.util.List<com.soffid.iam.bpm.api.Comment>",
+	"processDefinition":"long",
+	"dummyProcess":"boolean",
+	"initiator":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"createdOn":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.ProcessLog"]={
+	"processId":"long",
+	"date":"java.util.Date",
+	"action":"java.lang.String",
+	"user":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.RolGrup"]={
+	"rol":"java.lang.String",
+	"grup":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.TaskDefinition"]={
+	"PRIORITY_HIGHEST":"int",
+	"PRIORITY_HIGH":"int",
+	"PRIORITY_NORMAL":"int",
+	"PRIORITY_LOW":"int",
+	"PRIORITY_LOWEST":"int",
+	"id":"long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"blocking":"boolean",
+	"signalling":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.TaskInstance"]={
+	"id":"long",
+	"processClassLoader":"com.soffid.iam.bpm.api.UIClassLoader",
+	"processName":"java.lang.String",
+	"processId":"long",
+	"processNumber":"java.lang.Long",
+	"processDefinition":"long",
+	"dummyTask":"boolean",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"actorId":"java.lang.String",
+	"create":"java.util.Date",
+	"start":"java.util.Date",
+	"end":"java.util.Date",
+	"dueDate":"java.util.Date",
+	"priority":"int",
+	"cancelled":"boolean",
+	"open":"boolean",
+	"signalling":"boolean",
+	"blocking":"boolean",
+	"swimlane":"java.lang.String",
+	"pooledActors":"java.util.Set<java.lang.String>",
+	"variables":"java.util.Map",
+	"transitions":"java.lang.String[]"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.Token"]={
+	"tokenName":"java.lang.String",
+	"processId":"long",
+	"nodeName":"java.lang.String",
+	"finished":"boolean",
+	"locked":"boolean",
+	"suspended":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.api.UIClassLoader"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.exception.BPMException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.service.BpmJobExecutor"]={
+	"lockJob":"boolean",
+	"getNextDueDate":"java.util.Date",
+	"getJobs":"java.util.List",
+	"anotateFailure":"void",
+	"executeJob":"void",
+	"indexPendingProcesses":"void",
+	"unlockOverdueJobs":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.service.BpmConfigService"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.bpm.service.BpmEngine"]={
+	"downloadParFile":"void",
+	"canAdmin":"boolean",
+	"isUserInRole":"boolean",
+	"getProcessDefinitionIcon":"byte[]",
+	"getProcessDefinitionImage":"byte[]",
+	"openDeployParDefinitionTransfer":"com.soffid.iam.bpm.api.DeployToken",
+	"disableProcessDefinition":"com.soffid.iam.bpm.api.ProcessDefinition",
+	"enableProcessDefinition":"com.soffid.iam.bpm.api.ProcessDefinition",
+	"getDefinition":"com.soffid.iam.bpm.api.ProcessDefinition",
+	"getProcessDefinition":"com.soffid.iam.bpm.api.ProcessDefinition",
+	"cancel":"com.soffid.iam.bpm.api.ProcessInstance",
+	"getProcess":"com.soffid.iam.bpm.api.ProcessInstance",
+	"getProcessInstance":"com.soffid.iam.bpm.api.ProcessInstance",
+	"getProcessLightweight":"com.soffid.iam.bpm.api.ProcessInstance",
+	"newProcess":"com.soffid.iam.bpm.api.ProcessInstance",
+	"getProcessLog":"com.soffid.iam.bpm.api.ProcessLog[]",
+	"getTaskLog":"com.soffid.iam.bpm.api.ProcessLog[]",
+	"addComment":"com.soffid.iam.bpm.api.TaskInstance",
+	"createDummyTask":"com.soffid.iam.bpm.api.TaskInstance",
+	"delegateTaskToUser":"com.soffid.iam.bpm.api.TaskInstance",
+	"executeTask":"com.soffid.iam.bpm.api.TaskInstance",
+	"getTask":"com.soffid.iam.bpm.api.TaskInstance",
+	"reserveTask":"com.soffid.iam.bpm.api.TaskInstance",
+	"startTask":"com.soffid.iam.bpm.api.TaskInstance",
+	"update":"com.soffid.iam.bpm.api.TaskInstance",
+	"getTokens":"com.soffid.iam.bpm.api.Token[]",
+	"findProcessDefinitionByTextAndJsonQuery":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessDefinition>",
+	"findProcessInstance":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessInstance>",
+	"findProcessInstanceByTextAndJsonQuery":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessInstance>",
+	"findTasksByTextAndJsonQuery":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.TaskInstance>",
+	"countMyTasks":"int",
+	"countNewTasks":"int",
+	"getCoordinates":"int[]",
+	"getResourceAsStream":"java.io.InputStream",
+	"getUI":"java.lang.String",
+	"getDeployMessages":"java.lang.String[]",
+	"upgradeProcess":"java.lang.String[]",
+	"findChildProcesses":"java.util.Collection<java.lang.Long>",
+	"findParentProceeses":"java.util.Collection<java.lang.Long>",
+	"findUsers":"java.util.Collection<com.soffid.iam.bpm.api.BPMUser>",
+	"findAllProcessDefinitions":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>",
+	"findGroupTasks":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>",
+	"findInitiatorProcessDefinitions":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>",
+	"findMyProcesses":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>",
+	"findMyTasks":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>",
+	"findMyTasksLightweight":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>",
+	"findObserverProcessDefinitions":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>",
+	"findProcessDefinitions":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>",
+	"findProcessInstances":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>",
+	"findSupervisorProcessDefinitions":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>",
+	"findTaskDefinitions":"java.util.List<com.soffid.iam.bpm.api.TaskDefinition>",
+	"findTasks":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>",
+	"getActiveJobs":"java.util.List<com.soffid.iam.bpm.api.Job>",
+	"getActiveTasks":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>",
+	"getAllJobs":"java.util.List<com.soffid.iam.bpm.api.Job>",
+	"getPendingTasks":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>",
+	"searchProcessInstances":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>",
+	"getUIClassesForTask":"java.util.Map",
+	"getJBpmConfiguration":"org.jbpm.JbpmConfiguration",
+	"getContext":"org.jbpm.JbpmContext",
+	"endDeployParDefinitionTransfer":"void",
+	"linkProcesses":"void",
+	"nextDeployParDefinitionPackage":"void",
+	"pauseJob":"void",
+	"ping":"void",
+	"reindex":"void",
+	"resumeJob":"void",
+	"retryJob":"void",
+	"signal":"void",
+	"startProcess":"void",
+	"updateSwimlane":"void",
+	"upgradeParFile":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.common.security.SoffidPrincipal"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.doc.api.DocumentReference"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.doc.exception.DocumentBeanException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.doc.exception.NASException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.doc.model.DocumentBlockEntityUniqueIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.doc.model.DocumentEntityUniqueIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.doc.service.DocumentService"]={
+	"nextDownloadPackage":"byte[]",
+	"getReference":"com.soffid.iam.doc.api.DocumentReference",
+	"getExternalName":"java.lang.String",
+	"getFsPath":"java.lang.String",
+	"getMimeType":"java.lang.String",
+	"closeDocument":"void",
+	"createDocument":"void",
+	"deleteDocument":"void",
+	"endDownloadTransfer":"void",
+	"endUploadTransfer":"void",
+	"exportDocuments":"void",
+	"importDocuments":"void",
+	"nextUploadPackage":"void",
+	"openDocument":"void",
+	"openDownloadTransfer":"void",
+	"openUploadTransfer":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.AccountAlreadyExistsException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.BadPasswordException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.CertificateEnrollDenied"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.CertificateEnrollWaitingForAproval"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.DuplicatedClassException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.InternalErrorException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.InvalidPasswordException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.LogonDeniedException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.NeedsAccountNameException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.ServerRedirectException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.UnknownGroupException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.UnknownHostException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.UnknownMailListException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.UnknownNetworkException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.UnknownRoleException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.exception.UnknownUserException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AccountProposedAction"]={
+	"IGNORE":"java.lang.String",
+	"CREATE_NEW_USER":"java.lang.String",
+	"BIND_TO_EXISTING_USER":"java.lang.String",
+	"SHARED":"java.lang.String",
+	"UPDATE_ACCOUNT":"java.lang.String",
+	"DELETE_ACCOUNT":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AccessControl"]={
+	"id":"java.lang.Long",
+	"agentId":"java.lang.Long",
+	"agentName":"java.lang.String",
+	"roleDescription":"java.lang.String",
+	"roleId":"java.lang.Long",
+	"hostName":"java.lang.String",
+	"hostId":"java.lang.Long",
+	"program":"java.lang.String",
+	"genericUser":"java.lang.String",
+	"genericHost":"java.lang.String",
+	"remoteIp":"java.lang.String",
+	"comments":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AccessControlList"]={
+	"users":"java.util.Set<java.lang.Long>",
+	"roles":"java.util.Set<java.lang.Long>",
+	"groups":"java.util.Set<java.lang.Long>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AccountHistory"]={
+	"account":"com.soffid.iam.base.api.Account",
+	"level":"com.soffid.iam.base.api.AccountAccessLevelEnum",
+	"start":"java.util.Date",
+	"end":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ApplicationType"]={
+	"CONTAINER":"java.lang.String",
+	"APPLICATION":"java.lang.String",
+	"BUSINESS":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AttributeDirection"]={
+	"INPUT":"java.lang.String",
+	"OUTPUT":"java.lang.String",
+	"INPUTOUTPUT":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AttributeMapping"]={
+	"id":"java.lang.Long",
+	"soffidAttribute":"java.lang.String",
+	"systemAttribute":"java.lang.String",
+	"direction":"com.soffid.iam.iga.api.AttributeDirection",
+	"objectId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.AttributeTranslation"]={
+	"id":"java.lang.Long",
+	"domain":"java.lang.String",
+	"column1":"java.lang.String",
+	"column2":"java.lang.String",
+	"column3":"java.lang.String",
+	"column4":"java.lang.String",
+	"column5":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.BpmProcess"]={
+	"processName":"java.lang.String",
+	"description":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.BpmUserProcess"]={
+	"id":"java.lang.Long",
+	"processId":"java.lang.Long",
+	"userName":"java.lang.String",
+	"finished":"java.lang.Boolean",
+	"userNationalId":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.CustomObject"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"type":"java.lang.String",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"deleted":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.CustomObjectType"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"nlsDescription":"java.util.Map<java.lang.String,java.lang.String>",
+	"scope":"com.soffid.iam.base.api.MetadataScope",
+	"builtin":"boolean",
+	"textIndex":"boolean",
+	"extensibleObjectClass":"java.lang.String",
+	"publicAccess":"java.lang.Boolean",
+	"managerRoles":"java.util.List<java.lang.String>",
+	"userRoles":"java.util.List<java.lang.String>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.DelegationStatus"]={
+	"DELEGATION_PENDING":"java.lang.String",
+	"DELEGATION_ACTIVE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.Domain"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"informationSystem":"java.lang.String",
+	"description":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.DomainUsersMember"]={
+	"code":"java.lang.String",
+	"type":"java.lang.String",
+	"description":"java.lang.String",
+	"descriptionType":"java.lang.String",
+	"userDomain":"com.soffid.iam.iga.api.UserDomain",
+	"passwordDomain":"com.soffid.iam.am.api.PasswordDomain",
+	"passwordPolicy":"com.soffid.iam.am.api.PasswordPolicy"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.DomainValue"]={
+	"id":"java.lang.Long",
+	"value":"java.lang.String",
+	"description":"java.lang.String",
+	"domainName":"java.lang.String",
+	"informationSystemName":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.EventUserAction"]={
+	"MASTER_USER":"java.lang.String",
+	"DUPLICATED":"java.lang.String",
+	"DIFFERENT_USER":"java.lang.String",
+	"LOCK":"java.lang.String",
+	"UNLOCK":"java.lang.String",
+	"DISABLE":"java.lang.String",
+	"UNKNOWN":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ExtensibleObjectRegister"]={
+	"name":"java.lang.String",
+	"descsription":"java.lang.String",
+	"className":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ExternalName"]={
+	"email":"java.lang.String",
+	"mailListName":"java.lang.String",
+	"domainCode":"java.lang.String",
+	"id":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.Group"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"quota":"java.lang.String",
+	"driveLetter":"java.lang.String",
+	"parentGroup":"java.lang.String",
+	"type":"java.lang.String",
+	"driveServerName":"java.lang.String",
+	"obsolete":"java.lang.Boolean",
+	"startDate":"java.util.Date",
+	"endDate":"java.util.Date",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.GroupRoles"]={
+	"id":"java.lang.Long",
+	"roleName":"java.lang.String",
+	"roleDescription":"java.lang.String",
+	"roleDatabases":"java.lang.String",
+	"applicationCode":"java.lang.String",
+	"groupCode":"java.lang.String",
+	"groupDescription":"java.lang.String",
+	"domainValue":"com.soffid.iam.iga.api.DomainValue"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.GroupType"]={
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"id":"java.lang.Long",
+	"roleHolder":"boolean",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.InformationSystem"]={
+	"id":"java.lang.Long",
+	"type":"com.soffid.iam.iga.api.ApplicationType",
+	"parent":"java.lang.String",
+	"relativeName":"java.lang.String",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"owner":"java.lang.String",
+	"sourceDir":"java.lang.String",
+	"targetDir":"java.lang.String",
+	"database":"java.lang.String",
+	"bpmEnabled":"java.lang.Boolean",
+	"notificationEmails":"java.lang.String",
+	"approvalProcess":"java.lang.String",
+	"roleDefinitionProcess":"java.lang.String",
+	"singleRole":"boolean",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.MailDomain"]={
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"id":"java.lang.Long",
+	"obsolete":"java.lang.Boolean",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.MailList"]={
+	"name":"java.lang.String",
+	"domainName":"java.lang.String",
+	"description":"java.lang.String",
+	"id":"java.lang.Long",
+	"lists":"java.util.List<java.lang.String>",
+	"externalList":"java.util.List<java.lang.String>",
+	"roleMembers":"java.util.List<java.lang.String>",
+	"groupMembers":"java.util.List<java.lang.String>",
+	"usersList":"java.util.List<java.lang.String>",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"listsBelong":"java.lang.String",
+	"explodedUsersList":"java.util.List<java.lang.String>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"deleted":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.MailListRelationship"]={
+	"mailListNameBelong":"java.lang.String",
+	"mailListNameIncluded":"java.lang.String",
+	"mailDomainBelongCode":"java.lang.String",
+	"mailDomainAccountCode":"java.lang.String",
+	"id":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.MailListRoleMember"]={
+	"roleName":"java.lang.String",
+	"dispatcherName":"java.lang.String",
+	"scope":"java.lang.String",
+	"roleDescription":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.Notice"]={
+	"applicationName":"java.lang.String",
+	"roleName":"java.lang.String",
+	"userName":"java.lang.String",
+	"userFullName":"java.lang.String",
+	"information":"java.lang.String",
+	"assignmentDate":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ObjectMapping"]={
+	"id":"java.lang.Long",
+	"systemObject":"java.lang.String",
+	"soffidObject":"com.soffid.iam.iga.api.SoffidObjectType",
+	"soffidCustomObject":"java.lang.String",
+	"condition":"java.lang.String",
+	"dispatcherId":"java.lang.Long",
+	"authoritative":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ObjectMappingProperty"]={
+	"id":"java.lang.Long",
+	"property":"java.lang.String",
+	"value":"java.lang.String",
+	"objectId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ObjectMappingTrigger"]={
+	"id":"java.lang.Long",
+	"trigger":"com.soffid.iam.iga.api.SoffidObjectTrigger",
+	"script":"java.lang.String",
+	"objectId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.Printer"]={
+	"model":"java.lang.String",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"hostName":"java.lang.String",
+	"local":"java.lang.Boolean",
+	"id":"java.lang.Long",
+	"users":"java.util.List<java.lang.String>",
+	"groups":"java.util.List<java.lang.String>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.PrinterGroup"]={
+	"enabledByDefault":"java.lang.Boolean",
+	"groupCode":"java.lang.String",
+	"printerCode":"java.lang.String",
+	"id":"java.lang.Long",
+	"printerServerName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.PrinterUser"]={
+	"printer":"java.lang.String",
+	"user":"java.lang.String",
+	"enabledByDefault":"java.lang.Boolean",
+	"id":"java.lang.Long",
+	"fullName":"java.lang.String",
+	"printerServerName":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ReconcileTrigger"]={
+	"id":"java.lang.Long",
+	"objectType":"com.soffid.iam.iga.api.SoffidObjectType",
+	"trigger":"com.soffid.iam.iga.api.SoffidObjectTrigger",
+	"script":"java.lang.String",
+	"system":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.Role"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"key":"java.lang.String",
+	"description":"java.lang.String",
+	"system":"java.lang.String",
+	"category":"java.lang.String",
+	"enableByDefault":"java.lang.Boolean",
+	"password":"java.lang.Boolean",
+	"informationSystemName":"java.lang.String",
+	"domainType":"java.lang.String",
+	"ownerRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"ownerGroups":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"granteeGroups":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"ownedRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"bpmEnabled":"java.lang.Boolean",
+	"externalId":"java.lang.String",
+	"approvalStart":"java.util.Date",
+	"approvalEnd":"java.util.Date",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"deleted":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.RoleAccount"]={
+	"id":"java.lang.Long",
+	"accountId":"java.lang.Long",
+	"accountName":"java.lang.String",
+	"accountSystem":"java.lang.String",
+	"roleName":"java.lang.String",
+	"roleId":"java.lang.Long",
+	"roleCategory":"java.lang.String",
+	"informationSystemName":"java.lang.String",
+	"roleDescription":"java.lang.String",
+	"userFullName":"java.lang.String",
+	"groupDescription":"java.lang.String",
+	"domainValue":"com.soffid.iam.iga.api.DomainValue",
+	"system":"java.lang.String",
+	"userGroupCode":"java.lang.String",
+	"bpmEnabled":"java.lang.String",
+	"userName":"java.lang.String",
+	"ruleId":"java.lang.Long",
+	"ruleDescription":"java.lang.String",
+	"sodRisk":"com.soffid.iam.rc.api.SoDRisk",
+	"sodRules":"java.util.Collection<com.soffid.iam.rc.api.SoDRule>",
+	"startDate":"java.util.Date",
+	"endDate":"java.util.Date",
+	"enabled":"boolean",
+	"approvalPending":"boolean",
+	"removalPending":"java.lang.Boolean",
+	"holderGroup":"java.lang.String",
+	"approvalProcess":"java.lang.Long",
+	"certificationDate":"java.util.Date",
+	"parentGrant":"java.lang.Long",
+	"delegationStatus":"com.soffid.iam.iga.api.DelegationStatus",
+	"ownerAccount":"java.lang.String",
+	"delegateAccount":"java.lang.String",
+	"delegateSince":"java.util.Date",
+	"delegateUntil":"java.util.Date",
+	"externalId":"java.lang.String",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.RoleDependencyStatus"]={
+	"STATUS_ACTIVE":"java.lang.String",
+	"STATUS_TOAPPROVE":"java.lang.String",
+	"STATUS_TOREMOVE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.RoleGrant"]={
+	"id":"java.lang.Long",
+	"roleId":"java.lang.Long",
+	"roleName":"java.lang.String",
+	"roleDescription":"java.lang.String",
+	"system":"java.lang.String",
+	"informationSystem":"java.lang.String",
+	"hasDomain":"boolean",
+	"domainValue":"java.lang.String",
+	"domainDescription":"java.lang.String",
+	"ownerAccountName":"java.lang.String",
+	"ownerInformationSystem":"java.lang.String",
+	"ownerSystem":"java.lang.String",
+	"ownerGroup":"java.lang.String",
+	"ownerRole":"java.lang.Long",
+	"ownerRolDomainValue":"java.lang.String",
+	"ownerRoleName":"java.lang.String",
+	"ownerRoleDescription":"java.lang.String",
+	"user":"java.lang.String",
+	"startDate":"java.util.Date",
+	"endDate":"java.util.Date",
+	"enabled":"boolean",
+	"holderGroup":"java.lang.String",
+	"status":"com.soffid.iam.iga.api.RoleDependencyStatus",
+	"mandatory":"java.lang.Boolean",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.RoleGrantHierarchy"]={
+	"id":"java.lang.Long",
+	"roleId":"java.lang.Long",
+	"roleName":"java.lang.String",
+	"roleDescription":"java.lang.String",
+	"system":"java.lang.String",
+	"informationSystem":"java.lang.String",
+	"hasDomain":"boolean",
+	"domainValue":"java.lang.String",
+	"domainDescription":"java.lang.String",
+	"ownerAccountName":"java.lang.String",
+	"ownerInformationSystem":"java.lang.String",
+	"ownerSystem":"java.lang.String",
+	"ownerGroup":"java.lang.String",
+	"ownerRole":"java.lang.Long",
+	"ownerRolDomainValue":"java.lang.String",
+	"ownerRoleName":"java.lang.String",
+	"ownerRoleDescription":"java.lang.String",
+	"user":"java.lang.String",
+	"startDate":"java.util.Date",
+	"endDate":"java.util.Date",
+	"enabled":"boolean",
+	"holderGroup":"java.lang.String",
+	"status":"com.soffid.iam.iga.api.RoleDependencyStatus",
+	"mandatory":"java.lang.Boolean",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"ruleName":"java.lang.String",
+	"ruleDescription":"java.lang.String",
+	"groupName":"java.lang.String",
+	"groupDescription":"java.lang.String",
+	"accountName":"java.lang.String",
+	"accountDescription":"java.lang.String",
+	"nested":"java.util.List<com.soffid.iam.iga.api.RoleGrantHierarchy>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.Rule"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"bshExpression":"java.lang.String",
+	"bshRoles":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.RuleAssignedRole"]={
+	"id":"java.lang.Long",
+	"bshDomainValueExpression":"java.lang.String",
+	"domainValue":"java.lang.String",
+	"roleId":"java.lang.Long",
+	"ruleId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.SoffidObjectTrigger"]={
+	"PRE_INSERT":"java.lang.String",
+	"PRE_UPDATE":"java.lang.String",
+	"PRE_DELETE":"java.lang.String",
+	"POST_INSERT":"java.lang.String",
+	"POST_UPDATE":"java.lang.String",
+	"POST_DELETE":"java.lang.String",
+	"PRE_SET_PASSWORD":"java.lang.String",
+	"POST_SET_PASSWORD":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.SoffidObjectType"]={
+	"OBJECT_USER":"java.lang.String",
+	"OBJECT_ACCOUNT":"java.lang.String",
+	"OBJECT_ROLE":"java.lang.String",
+	"OBJECT_GRANT":"java.lang.String",
+	"OBJECT_GROUP":"java.lang.String",
+	"OBJECT_GRANTED_ROLE":"java.lang.String",
+	"OBJECT_ALL_GRANTED_ROLES":"java.lang.String",
+	"OBJECT_GRANTED_GROUP":"java.lang.String",
+	"OBJECT_ALL_GRANTED_GROUP":"java.lang.String",
+	"OBJECT_AUTHORITATIVE_CHANGE":"java.lang.String",
+	"OBJECT_MAIL_LIST":"java.lang.String",
+	"OBJECT_CUSTOM":"java.lang.String",
+	"OBJECT_HOST":"java.lang.String",
+	"OBJECT_NETWORK":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.System"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"className":"java.lang.String",
+	"url":"java.lang.String",
+	"url2":"java.lang.String",
+	"rolebased":"java.lang.Boolean",
+	"trusted":"java.lang.Boolean",
+	"userTypes":"java.util.List<java.lang.String>",
+	"manualAccountCreation":"java.lang.Boolean",
+	"fullReconciliation":"boolean",
+	"generateTasksOnLoad":"boolean",
+	"groupsList":"java.util.List<java.lang.String>",
+	"accessControl":"java.lang.Boolean",
+	"passwordsDomainId":"java.lang.Long",
+	"passwordsDomain":"java.lang.String",
+	"usersDomain":"java.lang.String",
+	"readOnly":"boolean",
+	"pause":"boolean",
+	"authoritative":"boolean",
+	"timeStamp":"java.util.Calendar",
+	"created":"java.util.Calendar",
+	"authoritativeProcess":"java.lang.String",
+	"sharedDispatcher":"java.lang.Boolean",
+	"threads":"java.lang.Long",
+	"timeout":"java.lang.Long",
+	"longTimeout":"java.lang.Long",
+	"usage":"java.lang.String",
+	"deltaChanges":"java.lang.Boolean",
+	"removeRolesFromDisabledAccounts":"java.lang.Boolean",
+	"createDisabledAccounts":"java.lang.Boolean",
+	"tenant":"java.lang.String",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"createdOn":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.SystemAccessControl"]={
+	"system":"java.lang.String",
+	"enabled":"java.lang.Boolean",
+	"controlAcces":"java.util.List<com.soffid.iam.iga.api.AccessControl>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.SystemGroup"]={
+	"id":"java.lang.Long",
+	"systemCode":"java.lang.String",
+	"groupCode":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.UserDomain"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"type":"com.soffid.iam.iga.api.UserDomainType",
+	"bshExpr":"java.lang.String",
+	"bshExprCreate":"java.lang.String",
+	"beanGenerator":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.UserDomainType"]={
+	"PRINCIPAL":"java.lang.String",
+	"OPERADOR":"java.lang.String",
+	"SHELL":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.UserGroup"]={
+	"user":"java.lang.String",
+	"group":"java.lang.String",
+	"groupDescription":"java.lang.String",
+	"groupId":"java.lang.Long",
+	"id":"java.lang.Long",
+	"userId":"java.lang.Long",
+	"fullName":"java.lang.String",
+	"start":"java.util.Date",
+	"end":"java.util.Date",
+	"disabled":"java.lang.Boolean",
+	"primaryGroup":"java.lang.Boolean",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.UserMailList"]={
+	"mailListName":"java.lang.String",
+	"mailListDescription":"java.lang.String",
+	"userCode":"java.lang.String",
+	"fullName":"java.lang.String",
+	"domainCode":"java.lang.String",
+	"id":"java.lang.Long",
+	"start":"java.util.Date",
+	"end":"java.util.Date",
+	"disabled":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.UserType"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"managed":"boolean",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.UserTypeDispatcher"]={
+	"id":"java.lang.Long",
+	"type":"java.lang.String",
+	"dispatcherCode":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ProposedAction"]={
+	"LOAD":"java.lang.String",
+	"IGNORE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ReconcileAccount"]={
+	"id":"java.lang.Long",
+	"accountName":"java.lang.String",
+	"description":"java.lang.String",
+	"processId":"java.lang.Long",
+	"proposedAction":"com.soffid.iam.iga.api.AccountProposedAction",
+	"dispatcher":"java.lang.String",
+	"primaryGroup":"java.lang.String",
+	"userCode":"java.lang.String",
+	"userType":"java.lang.String",
+	"userFullName":"java.lang.String",
+	"accountType":"com.soffid.iam.base.api.AccountType",
+	"active":"boolean",
+	"newAccount":"java.lang.Boolean",
+	"deletedAccount":"java.lang.Boolean",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ReconcileAssignment"]={
+	"id":"java.lang.Long",
+	"assignmentName":"java.lang.String",
+	"processId":"java.lang.Long",
+	"accountName":"java.lang.String",
+	"roleName":"java.lang.String",
+	"proposedAction":"com.soffid.iam.iga.api.ProposedAction",
+	"dispatcher":"java.lang.String",
+	"domainValue":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.ReconcileRole"]={
+	"id":"java.lang.Long",
+	"roleName":"java.lang.String",
+	"description":"java.lang.String",
+	"processId":"java.lang.Long",
+	"proposedAction":"com.soffid.iam.iga.api.ProposedAction",
+	"dispatcher":"java.lang.String",
+	"appName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.api.SharedAccountPrivileges"]={
+	"LOW_PRIVILEGED":"java.lang.String",
+	"HIGH_PRIVILEGED":"java.lang.String",
+	"UNMANAGED":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.AplicacioIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.AttributeTranslationColumn1Index"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.AttributeTranslationColumn2Index"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.ChildProcessIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.CustomObjectEntityKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.CustomObjectTypeEntityKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.DispatcherIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.DominiAplicacioIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.DominiCorreuIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.GrupIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.ImpressoraIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.LlistaCorreuIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.ParentProcessIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.RolApplicationIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.RolExternalIdIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.RolGrupRolGrupIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.RolIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.RoleAcountExternalIdIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.TipusDadaCodiIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.TipusDadaOrdreIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.TipusUnitatOrganitzativaIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.UsuariImpressoraIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.model.ValorDominiUniqueIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.AuthoritativeChangeService"]={
+	"startAuthoritativeChange":"boolean",
+	"cancelAuthoritativeChange":"void",
+	"finishAuthoritativeChange":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.ApplicationService"]={
+	"findDomainValueByText":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>",
+	"findDomainValueByTextAsync":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>",
+	"findRoleNames":"java.util.Collection<java.lang.String>",
+	"removeRedundantRoles":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"create":"com.soffid.iam.iga.api.InformationSystem",
+	"findApplicationByApplicationNameUnrestricted":"com.soffid.iam.iga.api.InformationSystem",
+	"findApplicationByApplicationName":"com.soffid.iam.iga.api.InformationSystem",
+	"findApplicationById":"com.soffid.iam.iga.api.InformationSystem",
+	"approveRoleDefinition":"com.soffid.iam.iga.api.Role",
+	"create2":"com.soffid.iam.iga.api.Role",
+	"denyRoleDefinition":"com.soffid.iam.iga.api.Role",
+	"findRoleById":"com.soffid.iam.iga.api.Role",
+	"findRoleByRoleNameAndApplicationNameAndDispatcherName":"com.soffid.iam.iga.api.Role",
+	"findRoleByNameAndSystem":"com.soffid.iam.iga.api.Role",
+	"findRoleByShortName":"com.soffid.iam.iga.api.Role",
+	"update":"com.soffid.iam.iga.api.Role",
+	"update2":"com.soffid.iam.iga.api.Role",
+	"enableOrDisableOnDates":"com.soffid.iam.iga.api.RoleAccount",
+	"findRoleAccountById":"com.soffid.iam.iga.api.RoleAccount",
+	"updateAttributes":"com.soffid.iam.iga.api.RoleAccount",
+	"findApplications":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.InformationSystem>",
+	"findDomainValues":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>",
+	"findRedundantRoles":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.RoleAccount>",
+	"findRoleAccounts":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.RoleAccount>",
+	"findRoles":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Role>",
+	"generateChangesReport":"java.lang.String",
+	"findNetworkACLRolesByRoleNameAndApplicationNameAndDispatcherName":"java.util.Collection<com.soffid.iam.am.api.NetworkAuthorization>",
+	"findApplicationChildren":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>",
+	"findApplicationManagementRoles":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findApplicationManagers":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findRoleAuthorizationsByRoleNameAndApplicationNameAndDispatcherName":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>",
+	"findEffectiveRoleGrantByAccount":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findEffectiveRoleGrantByUser":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findEffectiveRoleGrantByUserAndHolderGroup":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findEffectiveRoleGrantsByRoleId":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findEffectiveUserRolesByInformationSystem":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findGroupManagementRoles":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findGroupManagers":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findRoleHoldersGroupsByRole":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findApplicationAccessTreeRolesByRoleNameAndRoleApplicationNameAndDispatcherName":"java.util.Collection<com.soffid.iam.am.api.AccessTreeAuthorization>",
+	"findRoleAccountByAccount":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findRoleGrantByAccount":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findRoleGrantByRole":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findRoleAccountByAccountNoRule":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findRoleGrantHierarchyByAccount":"java.util.Collection<com.soffid.iam.iga.api.RoleGrantHierarchy>",
+	"findRoleGrantHierarchyByUser":"java.util.Collection<com.soffid.iam.iga.api.RoleGrantHierarchy>",
+	"findRoleGrantsByGroup":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"findRolesByApplicationName":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findRolesByApplicationNameUnrestricted":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findRolesByUserName":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findRolesByDomainNameAndApplicationName":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findGrantedRolesToGroupByGroup":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUserRolesByUserName":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUserRolesHistoryByUserName":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUserRolesByUserNameNoSoD":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUserRolesByInformationSystem":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUserRolesByUserNameNoRules":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUsersByRoleNameAndRoleApplicationNameAndDispatcherName":"java.util.Collection<com.soffid.iam.base.api.User>",
+	"getPendingAlerts":"java.util.Collection<java.lang.Object>",
+	"getRoles":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"approveDelete":"void",
+	"delete":"void",
+	"deleteByRuleEvaluation":"void",
+	"removeSentAlerts":"void",
+	"denyApproval":"void",
+	"denyDelete":"void",
+	"enableOrDisableAllOnDates":"void",
+	"revokeRolesHoldedOnGroup":"void",
+	"synchronizeRole":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.AttributeTranslationService"]={
+	"create":"com.soffid.iam.iga.api.AttributeTranslation",
+	"update":"com.soffid.iam.iga.api.AttributeTranslation",
+	"findByQuery":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.AttributeTranslation>",
+	"findByColumn1":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
+	"findByColumn2":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
+	"findByExample":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
+	"findDomains":"java.util.Collection<java.lang.String>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.CustomObjectService"]={
+	"createCustomObject":"com.soffid.iam.iga.api.CustomObject",
+	"findCustomObjectByTypeAndName":"com.soffid.iam.iga.api.CustomObject",
+	"load":"com.soffid.iam.iga.api.CustomObject",
+	"updateCustomObject":"com.soffid.iam.iga.api.CustomObject",
+	"findCustomObjects":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.CustomObject>",
+	"findCustomObjectNames":"java.util.Collection<java.lang.String>",
+	"deleteCustomObject":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.DispatcherService"]={
+	"createRemoteServer":"java.lang.String",
+	"findActiveDirectoryDomains":"java.util.Map<java.lang.String,java.lang.String>",
+	"startVirtualSourceTransaction":"java.lang.String",
+	"finishVirtualSourceTransaction":"void",
+	"isGroupAllowed":"boolean",
+	"isRegistrationTokenAlive":"boolean",
+	"isUserAllowed":"boolean",
+	"applyConfigurationAsync":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"queryProcessStatus":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"create":"com.soffid.iam.iga.api.AccessControl",
+	"update":"com.soffid.iam.iga.api.AccessControl",
+	"findDispatcherByName":"com.soffid.iam.iga.api.System",
+	"findSoffidDispatcher":"com.soffid.iam.iga.api.System",
+	"testPropagateObject":"com.soffid.iam.sync.api.DebugTaskResults",
+	"getNativeObject":"com.soffid.iam.sync.api.GetObjectResults",
+	"getSoffidObject":"com.soffid.iam.sync.api.GetObjectResults",
+	"reconcile":"com.soffid.iam.sync.api.GetObjectResults",
+	"consumeRegistrationToken":"com.soffid.iam.sync.api.ServerRegistrationToken",
+	"findSystems":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.System>",
+	"invokeAsync":"java.lang.Long",
+	"generateChangesReport":"java.lang.String",
+	"preRegisterServer":"java.lang.String",
+	"getServerTenants":"java.lang.String[]",
+	"findAllActiveDispatchers":"java.util.Collection<com.soffid.iam.iga.api.System>",
+	"findAllServers":"java.util.Collection<com.soffid.iam.sync.api.Server>",
+	"findAttributeMappingsByObject":"java.util.Collection<com.soffid.iam.iga.api.AttributeMapping>",
+	"findAccessControlByDispatcherName":"java.util.Collection<com.soffid.iam.iga.api.AccessControl>",
+	"findObjectMappingPropertiesByObject":"java.util.Collection<com.soffid.iam.iga.api.ObjectMappingProperty>",
+	"findObjectMappingTriggersByObject":"java.util.Collection<com.soffid.iam.iga.api.ObjectMappingTrigger>",
+	"findObjectMappingsByDispatcher":"java.util.Collection<com.soffid.iam.iga.api.ObjectMapping>",
+	"findReconcileTriggersByDispatcher":"java.util.Collection<com.soffid.iam.iga.api.ReconcileTrigger>",
+	"findScheduledTasksByDispatcher":"java.util.Collection<com.soffid.iam.sync.api.ScheduledTask>",
+	"findTenantServers":"java.util.Collection<com.soffid.iam.sync.api.Server>",
+	"getAccessControl":"java.util.Collection<com.soffid.iam.iga.api.AccessControl>",
+	"getDispatcherGroups":"java.util.Collection<com.soffid.iam.iga.api.SystemGroup>",
+	"getDispatcherUserTypes":"java.util.Collection<com.soffid.iam.iga.api.UserTypeDispatcher>",
+	"invoke":"java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>",
+	"assignTemporaryPermissions":"java.util.List<java.lang.String>",
+	"findValidCertificates":"java.util.List<java.security.cert.X509Certificate>",
+	"testObjectMapping":"java.util.Map<java.lang.String,java.lang.Object>",
+	"addCertificate":"void",
+	"applyConfiguration":"void",
+	"checkConnectivity":"void",
+	"delete":"void",
+	"propagateGroupsForSystem":"void",
+	"propagateRolesForSystem":"void",
+	"propagateUsersForSystem":"void",
+	"removeTemporaryPermissions":"void",
+	"renameAccounts":"void",
+	"setDefaultMappingsByDispatcher":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.DomainService"]={
+	"create":"com.soffid.iam.iga.api.Domain",
+	"findDomainByApplicationAndName":"com.soffid.iam.iga.api.Domain",
+	"findApplicationDomainByDomianNameAndApplicationName":"com.soffid.iam.iga.api.Domain",
+	"findGroupsDomain":"com.soffid.iam.iga.api.Domain",
+	"findUserDomainGroup":"com.soffid.iam.iga.api.Domain",
+	"update":"com.soffid.iam.iga.api.Domain",
+	"findApplicationDomainValueByDomainNameAndDomainApplicationNameAndValue":"com.soffid.iam.iga.api.DomainValue",
+	"findDomainValues":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>",
+	"findApplicationDomainsByApplicationName":"java.util.Collection<com.soffid.iam.iga.api.Domain>",
+	"findDomainsByApplicationName":"java.util.Collection<com.soffid.iam.iga.api.Domain>",
+	"findDomainValuesByDomain":"java.util.List<com.soffid.iam.iga.api.DomainValue>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.EntitlementDelegationService"]={
+	"acceptDelegation":"com.soffid.iam.iga.api.RoleAccount",
+	"cancelDelegation":"com.soffid.iam.iga.api.RoleAccount",
+	"delegate":"com.soffid.iam.iga.api.RoleAccount",
+	"findAccountsToDelegate":"java.util.List<java.lang.String>",
+	"findActiveDelegations":"java.util.List<com.soffid.iam.iga.api.RoleAccount>",
+	"findDelegationsToAccept":"java.util.List<com.soffid.iam.iga.api.RoleAccount>",
+	"revertExpiredDelegations":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.GroupService"]={
+	"findGroupMembers":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>",
+	"getOfficeServer":"com.soffid.iam.am.api.Host",
+	"create":"com.soffid.iam.iga.api.Group",
+	"createHistoric":"com.soffid.iam.iga.api.Group",
+	"findGroupByGroupNameAndDate":"com.soffid.iam.iga.api.Group",
+	"findGroupByGroupName":"com.soffid.iam.iga.api.Group",
+	"findGroupById":"com.soffid.iam.iga.api.Group",
+	"findPrimaryGroupByUserName":"com.soffid.iam.iga.api.Group",
+	"getSuperGroup":"com.soffid.iam.iga.api.Group",
+	"update":"com.soffid.iam.iga.api.Group",
+	"findUserGroupByUserNameAndGroupName":"com.soffid.iam.iga.api.UserGroup",
+	"findGroupUserByJsonQuery":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>",
+	"findGroups":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Group>",
+	"findUserGroup":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>",
+	"findUsersBelongtoGroupByGroupName":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>",
+	"findGroupNames":"java.util.Collection<java.lang.String>",
+	"findGroupsByUserName":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findGroupsByGroupsType":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findGroupsFromRolesByUserName":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findGroupsFromUsersByUserName":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findUsersRolesWithGroupByUserName":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUsersRolesDomainTypeAndUserGroups":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findSubgroupsByGroupName":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findSubgroupsByGroupNameAndDate":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findUserGroupHistoryByUserName":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>",
+	"findUsersGroupByUserName":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>",
+	"getGroups":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getParentList":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getRolesFromGroup":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"getRolesFromGroupAndParentGroup":"java.util.Collection<com.soffid.iam.iga.api.GroupRoles>",
+	"addGroupToUser":"void",
+	"delete":"void",
+	"propagateRolsChangesToDispatcher":"void",
+	"removeGroupFormUser":"void",
+	"setSuperGroup":"void",
+	"synchronize":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.GroupTypeService"]={
+	"create":"com.soffid.iam.iga.api.GroupType",
+	"findGroupTypeByName":"com.soffid.iam.iga.api.GroupType",
+	"update":"com.soffid.iam.iga.api.GroupType",
+	"findGroupTypes":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.GroupType>",
+	"findAllGroupTypes":"java.util.List<com.soffid.iam.iga.api.GroupType>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.MailListsService"]={
+	"create":"com.soffid.iam.iga.api.ExternalName",
+	"finExternalMailByEmail":"com.soffid.iam.iga.api.ExternalName",
+	"findMailDomainByName":"com.soffid.iam.iga.api.MailDomain",
+	"update":"com.soffid.iam.iga.api.MailDomain",
+	"findMailListByNameAndDomainName":"com.soffid.iam.iga.api.MailList",
+	"findRelationsMailListByNameAndBelongsMailListNameAndNameAndContainsMailListName":"com.soffid.iam.iga.api.MailListRelationship",
+	"subscribeRole":"com.soffid.iam.iga.api.MailListRoleMember",
+	"findUserMailListByListNameAndDomainNameAndUserName":"com.soffid.iam.iga.api.UserMailList",
+	"findMailDomains":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.MailDomain>",
+	"findMailLists":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.MailList>",
+	"findExternalMailsByNameListAndDomainName":"java.util.Collection<com.soffid.iam.iga.api.ExternalName>",
+	"findGroupMembers":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"findUserMailListByUserName":"java.util.Collection<com.soffid.iam.iga.api.UserMailList>",
+	"findUserMailListByListNameAndDomainName":"java.util.Collection<com.soffid.iam.iga.api.UserMailList>",
+	"findUserMailListHistoryByUserName":"java.util.Collection<com.soffid.iam.iga.api.UserMailList>",
+	"findMailListsByData":"java.util.Collection<com.soffid.iam.iga.api.MailList>",
+	"findRelationsMailListByNameContainsMailListAndDomainName":"java.util.Collection<com.soffid.iam.iga.api.MailListRelationship>",
+	"findRelationsMailListByNameBelongsMailListAndDomainName":"java.util.Collection<com.soffid.iam.iga.api.MailListRelationship>",
+	"findRoleMembers":"java.util.Collection<com.soffid.iam.iga.api.MailListRoleMember>",
+	"findUsersByMailListNameAndDomainName":"java.util.Collection<com.soffid.iam.base.api.User>",
+	"getDomainMails":"java.util.Collection<com.soffid.iam.iga.api.MailDomain>",
+	"getMailLists":"java.util.Collection<com.soffid.iam.iga.api.MailList>",
+	"delete":"void",
+	"deleteUserMailList":"void",
+	"deleteAtomic":"void",
+	"checkEmptyMailList":"void",
+	"subscribeGroup":"void",
+	"unsubscribeGroup":"void",
+	"unsubscribeRole":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.MailService"]={
+	"sendHtmlMail":"void",
+	"sendHtmlMailToActors":"void",
+	"sendTextMail":"void",
+	"sendTextMailToActors":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.PrinterService"]={
+	"create":"com.soffid.iam.iga.api.Printer",
+	"findPrinterByPrinterName":"com.soffid.iam.iga.api.Printer",
+	"update":"com.soffid.iam.iga.api.Printer",
+	"findPrinterGroupByGroupNameAndPrinterName":"com.soffid.iam.iga.api.PrinterGroup",
+	"findPrinterUserByUserNameAndPrinterName":"com.soffid.iam.iga.api.PrinterUser",
+	"findPrinterUsers":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.PrinterUser>",
+	"findPrinters":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Printer>",
+	"findPrintersGroupByGroupName":"java.util.Collection<com.soffid.iam.iga.api.PrinterGroup>",
+	"findPrintersByPrinterName":"java.util.Collection<com.soffid.iam.iga.api.Printer>",
+	"findPrintersByFilter":"java.util.Collection<com.soffid.iam.iga.api.Printer>",
+	"getPrintersGroupByPrinterName":"java.util.Collection",
+	"getPrinters":"java.util.Collection<com.soffid.iam.iga.api.Printer>",
+	"getUserPrintersByPrinterName":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.RulesService"]={
+	"applyAsync":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"queryProcessStatus":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"create":"com.soffid.iam.iga.api.Rule",
+	"update":"com.soffid.iam.iga.api.Rule",
+	"generateChangesReport":"java.lang.String",
+	"findRuleAssignments":"java.util.Collection<com.soffid.iam.iga.api.RuleAssignedRole>",
+	"findRules":"java.util.Collection<com.soffid.iam.iga.api.Rule>",
+	"findRulesByRole":"java.util.Collection<com.soffid.iam.iga.api.Rule>",
+	"apply":"void",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.SelfService"]={
+	"setHPAccountPassword":"boolean",
+	"findRoot":"com.soffid.iam.am.api.AccessTree",
+	"generateAccountTemporaryPassword":"com.soffid.iam.am.api.Password",
+	"queryAccountPassword":"com.soffid.iam.am.api.Password",
+	"queryAccountPasswordBypassPolicy":"com.soffid.iam.am.api.Password",
+	"queryAccountSshKey":"com.soffid.iam.am.api.Password",
+	"queryAccountSshKeyBypassPolicy":"com.soffid.iam.am.api.Password",
+	"passwordsStatus":"com.soffid.iam.am.api.PasswordStatus",
+	"getAccountById":"com.soffid.iam.base.api.Account",
+	"updateSharedAccount":"com.soffid.iam.base.api.Account",
+	"getDataTypeDescription":"com.soffid.iam.base.api.DataType",
+	"getCurrentUser":"com.soffid.iam.base.api.User",
+	"createSharedAccountData":"com.soffid.iam.base.api.UserData",
+	"updateSharedAccountData":"com.soffid.iam.base.api.UserData",
+	"updateUserAttribute":"com.soffid.iam.base.api.UserData",
+	"getDispatcherInformation":"com.soffid.iam.iga.api.System",
+	"getClientHost":"java.lang.String",
+	"queryOtherAffectedAccounts":"java.lang.String",
+	"findChildren":"java.util.Collection<com.soffid.iam.am.api.AccessTree>",
+	"findEntryPoints":"java.util.Collection<com.soffid.iam.am.api.AccessTree>",
+	"findRoleAccounts":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>",
+	"findUserGroupsByUserName":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>",
+	"getUserAccounts":"java.util.Collection<com.soffid.iam.base.api.Account>",
+	"getUserAttributes":"java.util.Collection<com.soffid.iam.base.api.UserData>",
+	"getAccountAttributes":"java.util.List<com.soffid.iam.base.api.UserData>",
+	"getSharedAccounts":"java.util.List<com.soffid.iam.base.api.Account>",
+	"checkCanSetAccountPassword":"void",
+	"checkinHPAccount":"void",
+	"setAccountPassword":"void",
+	"setAccountSshKey":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.UserDomainService"]={
+	"create":"com.soffid.iam.am.api.ForbiddenWord",
+	"update":"com.soffid.iam.am.api.ForbiddenWord",
+	"findPasswordDomainByName":"com.soffid.iam.am.api.PasswordDomain",
+	"findPolicyByTypeAndPasswordDomain":"com.soffid.iam.am.api.PasswordPolicy",
+	"findUserDomainByName":"com.soffid.iam.iga.api.UserDomain",
+	"findUserTypes":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserType>",
+	"findAllPasswordDomain":"java.util.Collection<com.soffid.iam.am.api.PasswordDomain>",
+	"findAllUserDomain":"java.util.Collection<com.soffid.iam.iga.api.UserDomain>",
+	"findAllForbiddenWords":"java.util.Collection<com.soffid.iam.am.api.ForbiddenWord>",
+	"findAllPasswordPolicyDomain":"java.util.Collection<com.soffid.iam.am.api.PasswordPolicy>",
+	"findAllUserType":"java.util.Collection<com.soffid.iam.iga.api.UserType>",
+	"findNameGenerators":"java.util.Collection<java.lang.String>",
+	"findForbiddenWordsPasswordPolicy":"java.util.Collection<com.soffid.iam.am.api.PasswordPolicyForbbidenWord>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.api.UpgradeStatus"]={
+	"upgradeNeeded":"boolean",
+	"upgradeInProgress":"boolean",
+	"error":"boolean",
+	"upgradeProcessStatus":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.AccountNameGenerator"]={
+	"needsAccount":"boolean",
+	"getAccountName":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.AsyncRunnable"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.ACLService"]={
+	"isAccountIncluded":"boolean",
+	"isCurrentUserIncluded":"boolean",
+	"isUserIncluded":"boolean",
+	"expandACL":"com.soffid.iam.iga.api.AccessControlList",
+	"expandUser":"com.soffid.iam.iga.api.AccessControlList",
+	"expandACLAccounts":"java.util.Collection<java.lang.String>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.ApplicationBootService"]={
+	"doUpgrade":"com.soffid.iam.impl.api.UpgradeStatus",
+	"getUpgradeStatus":"com.soffid.iam.impl.api.UpgradeStatus",
+	"consoleBoot":"void",
+	"doSyncUpgrade":"void",
+	"syncServerBoot":"void",
+	"tenantBoot":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.ApplicationShutdownService"]={
+	"consoleShutdown":"void",
+	"syncServerShutdown":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.AsyncRunnerService"]={
+	"runNewTransaction":"java.lang.Object",
+	"runTransaction":"java.lang.Object",
+	"run":"void",
+	"runInternal":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.AuthorizationInformationService"]={
+	"interventionNeeded":"boolean",
+	"findApplicationByApplicationCode":"com.soffid.iam.iga.api.InformationSystem",
+	"getSystemsRoles":"com.soffid.iam.iga.api.Role",
+	"isApplicationManager":"java.lang.Boolean",
+	"findApplicationManagersByApplicationCode":"java.util.Collection<com.soffid.iam.base.api.User>",
+	"findManagedApplicationsByUserCode":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>",
+	"findRolesByApplicationCode":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findRolesByApplicationCodeUnrestricted":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"findRolesByUserCode":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"getApplicationsByUserCode":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>",
+	"getApplicationRolesByUserCodeAndApplicationCode":"java.util.Collection<com.soffid.iam.iga.api.Role>",
+	"getRolesByUserCode":"java.util.Collection<com.soffid.iam.iga.api.Role>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.CreateDisableUserService"]={
+	"disableUser":"com.soffid.iam.base.api.User",
+	"findUserByShortName":"com.soffid.iam.base.api.User",
+	"setServersToUser":"com.soffid.iam.base.api.User",
+	"getSuperGroup":"com.soffid.iam.iga.api.Group",
+	"getAdministratorRoleByGroup":"com.soffid.iam.iga.api.Role",
+	"existShortName":"java.lang.Boolean",
+	"setInitialPasswordToUser":"java.lang.String",
+	"findGroupsByUserCode":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getManagedGroups":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getContractTypesUserCreate":"java.util.Collection<java.lang.String>",
+	"getOUDependent":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getUsersByNIF":"java.util.Collection<com.soffid.iam.base.api.User>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.CrudRegistryService"]={
+	"getHandler":"com.soffid.zkdb.api.CrudHandler<E>",
+	"registerDefaultHandlers":"void",
+	"registerHandler":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.InternalPasswordService"]={
+	"checkPin":"boolean",
+	"existsAccountPassword":"boolean",
+	"existsPassword":"boolean",
+	"isAccountPasswordExpired":"boolean",
+	"isLastPasswordIdForUser":"boolean",
+	"isOldAccountPassword":"boolean",
+	"isOldPassword":"boolean",
+	"isPasswordExpired":"boolean",
+	"updateExpiredPasswords":"boolean",
+	"generateFakeAccountPassword":"com.soffid.iam.am.api.Password",
+	"generateFakePassword":"com.soffid.iam.am.api.Password",
+	"generateNewAccountPassword":"com.soffid.iam.am.api.Password",
+	"generateNewPassword":"com.soffid.iam.am.api.Password",
+	"getAccountPasswordsStatus":"com.soffid.iam.am.api.PasswordStatus",
+	"getAccountPasswordsStatusById":"com.soffid.iam.am.api.PasswordStatus",
+	"getPasswordsStatus":"com.soffid.iam.am.api.PasswordStatus",
+	"getPasswordsStatusById":"com.soffid.iam.am.api.PasswordStatus",
+	"checkAccountPassword":"com.soffid.iam.am.api.PasswordValidation",
+	"checkPassword":"com.soffid.iam.am.api.PasswordValidation",
+	"checkAccountPolicy":"com.soffid.iam.am.api.PolicyCheckResult",
+	"checkPolicy":"com.soffid.iam.am.api.PolicyCheckResult",
+	"getLastPasswordIdForUser":"java.lang.Long",
+	"getDefaultDispatcher":"java.lang.String",
+	"getPolicyDescription":"java.lang.String",
+	"getPasswordExpiredDate":"java.util.Calendar",
+	"enumExpiredPasswords":"java.util.Collection<com.soffid.iam.am.model.PasswordDomainEntity>",
+	"getExpiredPasswords":"java.util.Collection<com.soffid.iam.am.api.PasswordStatus>",
+	"confirmAccountPassword":"void",
+	"confirmPassword":"void",
+	"disableExpiredPassword":"void",
+	"disableUntrustedPasswords":"void",
+	"storeAccountPassword":"void",
+	"storeAndForwardAccountPassword":"void",
+	"storeAndForwardAccountPasswordById":"void",
+	"storeAndForwardPassword":"void",
+	"storeAndForwardPasswordById":"void",
+	"storeAndSynchronizeAccountPassword":"void",
+	"storeAndSynchronizePassword":"void",
+	"storePassword":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.LuceneIndexService"]={
+	"addDocument":"void",
+	"indexObject":"void",
+	"resetIndex":"void",
+	"search":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.OTPValidationService"]={
+	"hasToken":"boolean",
+	"resetFailCount":"boolean",
+	"validatePin":"boolean",
+	"resendToken":"com.soffid.iam.am.api.Challenge",
+	"selectToken":"com.soffid.iam.am.api.Challenge",
+	"generateTypeForAudit":"java.lang.String",
+	"registerOTPHandler":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.RuleEvaluatorService"]={
+	"applyAsync":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"queryProcessStatus":"com.soffid.iam.base.api.AsyncProcessTracker",
+	"dryRun":"java.io.File",
+	"apply":"void",
+	"applyRules":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.service.SoffidEventListener"]={
+	"onGrant":"void",
+	"onRevoke":"void",
+	"onUserChange":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.HostAdmin"]={
+	"id":"java.lang.Long",
+	"userCode":"java.lang.String",
+	"hostName":"java.lang.String",
+	"authorizationAccessExpirationDate":"java.util.Calendar",
+	"bpmProcessId":"java.lang.Long",
+	"userName":"java.lang.String",
+	"userEmail":"java.lang.String",
+	"hostIp":"java.lang.String",
+	"hostNetwork":"java.lang.String",
+	"hostDescription":"java.lang.String",
+	"requestDate":"java.util.Calendar"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.HostEventAction"]={
+	"LOCK":"java.lang.String",
+	"UNLOCK":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.HostPort"]={
+	"id":"java.lang.Long",
+	"hostId":"java.lang.Long",
+	"hostName":"java.lang.String",
+	"port":"java.lang.String",
+	"description":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.HostService"]={
+	"id":"java.lang.Long",
+	"hostId":"java.lang.Long",
+	"hostName":"java.lang.String",
+	"service":"java.lang.String",
+	"command":"java.lang.String",
+	"accountId":"java.lang.Long",
+	"accountName":"java.lang.String",
+	"accountSystem":"java.lang.String",
+	"manual":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.JumpServerGroup"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"storeUrl":"java.lang.String",
+	"storeUserName":"java.lang.String",
+	"password":"java.lang.String",
+	"jumpServers":"java.util.List<java.lang.String>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.NewPamSession"]={
+	"sessionId":"java.lang.String",
+	"jumpServerGroup":"java.lang.String",
+	"url":"java.net.URL"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.PamAction"]={
+	"policyName":"java.lang.String",
+	"ruleName":"java.lang.String",
+	"actions":"java.util.List<com.soffid.iam.pam.model.PamActionType>",
+	"author":"java.lang.String",
+	"date":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.PamPolicy"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"author":"java.lang.String",
+	"date":"java.util.Date",
+	"recordingDuration":"java.lang.Integer",
+	"expression":"java.lang.String",
+	"priority":"java.lang.Integer",
+	"justInTimePermissions":"java.util.List<java.lang.String>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.PamRule"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"description":"java.lang.String",
+	"type":"com.soffid.iam.pam.api.PamRuleType",
+	"content":"java.lang.String",
+	"author":"java.lang.String",
+	"date":"java.util.Date",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.PamRuleType"]={
+	"KEYBOARD":"java.lang.String",
+	"SCREEN":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.PamSecurityCheck"]={
+	"allowed":"boolean",
+	"obligations":"java.util.List<com.soffid.iam.rc.api.RequestedObligation>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.api.PamSession"]={
+	"id":"java.lang.String",
+	"user":"java.lang.String",
+	"accountName":"java.lang.String",
+	"jumpServerGroup":"java.lang.String",
+	"serverUrl":"java.lang.String",
+	"path":"java.lang.String",
+	"chapters":"java.util.List<java.lang.Long>",
+	"serverStart":"java.util.Date",
+	"serverEnd":"java.util.Date",
+	"bookmarks":"java.util.List<java.lang.Long>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.model.JumpServerGroupUniqueKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.model.PamActionType"]={
+	"CLOSE_SESSION":"java.lang.String",
+	"LOCK_ACCOUNT":"java.lang.String",
+	"NOTIFY":"java.lang.String",
+	"ISSUE":"java.lang.String",
+	"NONE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.model.PamPolicyEntityUniqueKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.model.PamRuelEntityUniqueKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.JumpServer_create"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.JumpServer_delete"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.JumpServer_query"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.JumpServer_update"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.NetworkDiscoveryService"]={
+	"createSystemCandidate":"com.soffid.iam.iga.api.System",
+	"createHostService":"com.soffid.iam.pam.api.HostService",
+	"updateHostService":"com.soffid.iam.pam.api.HostService",
+	"findNetworkDiscoveryScheduledTask":"com.soffid.iam.sync.api.ScheduledTask",
+	"findHostEntryPoints":"java.util.List<com.soffid.iam.am.api.AccessTree>",
+	"findHostPorts":"java.util.List<com.soffid.iam.pam.api.HostPort>",
+	"findHostServices":"java.util.List<com.soffid.iam.pam.api.HostService>",
+	"findHostSystems":"java.util.List<com.soffid.iam.iga.api.System>",
+	"findNetworkAccount":"java.util.List<com.soffid.iam.base.api.Account>",
+	"findSystemHosts":"java.util.List<com.soffid.iam.am.api.Host>",
+	"createNetworkAccount":"void",
+	"deleteHostService":"void",
+	"disconnectSystemFromHost":"void",
+	"enableNetworkDiscoveryScheduledTask":"void",
+	"registerHostEntryPoint":"void",
+	"registerHostPorts":"void",
+	"registerHostServices":"void",
+	"registerHostSystem":"void",
+	"removeNetworkAccount":"void",
+	"startDiscovery":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamPolicyService"]={
+	"updateAction":"com.soffid.iam.pam.api.PamAction",
+	"createPolicy":"com.soffid.iam.pam.api.PamPolicy",
+	"updatePolicy":"com.soffid.iam.pam.api.PamPolicy",
+	"createRule":"com.soffid.iam.pam.api.PamRule",
+	"updateRule":"com.soffid.iam.pam.api.PamRule",
+	"findPolicies":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api.PamPolicy>",
+	"findRules":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api.PamRule>",
+	"findPolicyActions":"java.util.List<com.soffid.iam.pam.api.PamAction>",
+	"applyRule":"void",
+	"deletePolicy":"void",
+	"deleteRule":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamSecurityHandlerService"]={
+	"checkPermissionImpl":"com.soffid.iam.pam.api.PamSecurityCheck",
+	"getObligations":"com.soffid.iam.pam.api.PamSecurityCheck",
+	"checkPermission":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamSessionService"]={
+	"checkJumpServerSession":"boolean",
+	"create":"com.soffid.iam.pam.api.JumpServerGroup",
+	"update":"com.soffid.iam.pam.api.JumpServerGroup",
+	"createCustomJumpServerSession":"com.soffid.iam.pam.api.NewPamSession",
+	"createJumpServerSession":"com.soffid.iam.pam.api.NewPamSession",
+	"createManualJumpServerSession":"com.soffid.iam.pam.api.NewPamSession",
+	"findSession":"com.soffid.iam.pam.api.PamSession",
+	"getActiveSessions":"java.lang.Integer",
+	"getConsoleFreeSpace":"java.lang.Long",
+	"getConsoleUsedSpace":"java.lang.Long",
+	"findJumpServerGroups":"java.util.List<com.soffid.iam.pam.api.JumpServerGroup>",
+	"search":"java.util.List<com.soffid.iam.pam.api.PamSession>",
+	"getVideoSize":"long",
+	"generateKeystrokes":"void",
+	"generateVideo":"void",
+	"remove":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamPolicy_create"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamPolicy_delete"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamPolicy_query"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamPolicy_update"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamRule_create"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamRule_delete"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamRule_query"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.PamRule_update"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.Soffid_PamSessionConfigure"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.Soffid_pamSessionAudit"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.pamSession_create"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.pam.service.pamSession_query"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.Audit"]={
+	"object":"java.lang.String",
+	"action":"java.lang.String",
+	"description":"java.lang.String",
+	"author":"java.lang.String",
+	"role":"java.lang.String",
+	"database":"java.lang.String",
+	"id":"java.lang.Long",
+	"printer":"java.lang.String",
+	"application":"java.lang.String",
+	"mailList":"java.lang.String",
+	"group":"java.lang.String",
+	"user":"java.lang.String",
+	"mailDomain":"java.lang.String",
+	"host":"java.lang.String",
+	"network":"java.lang.String",
+	"file":"java.lang.Long",
+	"domainValue":"java.lang.String",
+	"domain":"java.lang.String",
+	"configurationParameter":"java.lang.String",
+	"primaryGroupAuthor":"java.lang.String",
+	"authorFullName":"java.lang.String",
+	"authorization":"java.lang.String",
+	"fileName":"java.lang.String",
+	"identityFederation":"java.lang.String",
+	"mailListBelong":"java.lang.String",
+	"mailDomainBelogns":"java.lang.String",
+	"account":"java.lang.String",
+	"comment":"java.lang.String",
+	"message":"java.lang.String",
+	"passwordDomain":"java.lang.String",
+	"userDomain":"java.lang.String",
+	"userType":"java.lang.String",
+	"rule":"java.lang.String",
+	"scheduledTask":"java.lang.String",
+	"calendar":"java.util.Calendar",
+	"customObjectName":"java.lang.String",
+	"customObjectType":"java.lang.String",
+	"sourceIp":"java.lang.String",
+	"jumpServerGroup":"java.lang.String",
+	"pamSessionId":"java.lang.String",
+	"oldValue":"java.lang.String",
+	"newValue":"java.lang.String",
+	"searchIndex":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.GeoInformation"]={
+	"ip":"java.lang.String",
+	"date":"java.util.Date",
+	"country":"java.lang.String",
+	"countryDivision1":"java.lang.String",
+	"countryDivision2":"java.lang.String",
+	"city":"java.lang.String",
+	"latitude":"java.lang.Double",
+	"longitude":"java.lang.Double",
+	"accuracy":"java.lang.Double",
+	"domain":"java.lang.String",
+	"isp":"java.lang.String",
+	"userType":"java.lang.String",
+	"anonymous":"java.lang.Double"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.Issue"]={
+	"id":"java.lang.Long",
+	"number":"java.lang.Long",
+	"requester":"java.lang.String",
+	"type":"java.lang.String",
+	"description":"java.lang.String",
+	"times":"java.lang.Integer",
+	"status":"com.soffid.iam.rc.api.IssueStatus",
+	"failedLoginPct":"java.lang.Double",
+	"humanConfidence":"java.lang.Double",
+	"system":"java.lang.String",
+	"otpDevice":"java.lang.String",
+	"exception":"java.lang.String",
+	"risk":"com.soffid.iam.rc.api.SoDRisk",
+	"roleAccount":"com.soffid.iam.iga.api.RoleAccount",
+	"rule":"com.soffid.iam.pam.api.PamRule",
+	"jobName":"java.lang.String",
+	"ip":"java.lang.String",
+	"country":"java.lang.String",
+	"account":"java.lang.String",
+	"loginName":"java.lang.String",
+	"hash":"java.lang.String",
+	"hosts":"java.util.List<com.soffid.iam.rc.api.IssueHost>",
+	"browsers":"java.util.List<com.soffid.iam.rc.api.IssueBrowser>",
+	"users":"java.util.List<com.soffid.iam.rc.api.IssueUser>",
+	"breachedEmail":"java.lang.String",
+	"dataBreach":"java.lang.String",
+	"htmlDescription":"java.lang.String",
+	"created":"java.util.Date",
+	"acknowledged":"java.util.Date",
+	"solved":"java.util.Date",
+	"actor":"java.lang.String",
+	"performedActions":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String",
+	"createdOn":"java.util.Date"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssueActionDefinition"]={
+	"name":"java.lang.String",
+	"label":"java.lang.String",
+	"parameters":"java.util.List<com.soffid.iam.base.api.DataType>",
+	"issueTypes":"java.util.List<java.lang.String>",
+	"handler":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssueBrowser"]={
+	"action":"com.soffid.iam.pam.api.HostEventAction",
+	"browserId":"java.lang.Long",
+	"type":"java.lang.String",
+	"hostIp":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssueHost"]={
+	"action":"com.soffid.iam.pam.api.HostEventAction",
+	"hostId":"java.lang.Long",
+	"hostName":"java.lang.String",
+	"hostIp":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssuePolicy"]={
+	"id":"java.lang.Long",
+	"type":"java.lang.String",
+	"description":"java.lang.String",
+	"actor":"java.lang.String",
+	"status":"com.soffid.iam.rc.api.IssuePolicyStatus",
+	"actions":"java.util.List<com.soffid.iam.rc.api.IssuePolicyAction>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssuePolicyAction"]={
+	"id":"java.lang.Long",
+	"status":"com.soffid.iam.rc.api.IssueStatus",
+	"action":"java.lang.String",
+	"description":"java.lang.String",
+	"subject":"java.lang.String",
+	"body":"java.lang.String",
+	"emailAddress":"java.lang.String",
+	"processDefinition":"java.lang.String",
+	"script":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssuePolicyStatus"]={
+	"IGNORE":"java.lang.String",
+	"RECORD":"java.lang.String",
+	"MANAGE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssueStatus"]={
+	"NEW":"java.lang.String",
+	"ACKNOWLEDGED":"java.lang.String",
+	"SOLVED":"java.lang.String",
+	"SOLVED_NOTADUPLICATE":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.IssueUser"]={
+	"action":"com.soffid.iam.iga.api.EventUserAction",
+	"userId":"java.lang.Long",
+	"userName":"java.lang.String",
+	"externalId":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.NetworkIntelligence"]={
+	"id":"java.lang.Long",
+	"token":"java.lang.String",
+	"level":"java.lang.String",
+	"start":"java.util.Date",
+	"end":"java.util.Date",
+	"enabled":"java.lang.Boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.RequestedObligation"]={
+	"obligation":"java.lang.String",
+	"attributes":"java.util.Map<java.lang.String,java.lang.String>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.RequestedObligationEnum"]={
+	"OTP":"java.lang.String",
+	"MESSAGE":"java.lang.String",
+	"WORKFLOW":"java.lang.String",
+	"SESSION_RECORDING":"java.lang.String",
+	"NOTIFY_OWNER":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.SoDRisk"]={
+	"SOD_LOW":"java.lang.String",
+	"SOD_HIGH":"java.lang.String",
+	"SOD_FORBIDDEN":"java.lang.String",
+	"SOD_NA":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.SoDRole"]={
+	"id":"java.lang.Long",
+	"role":"com.soffid.iam.iga.api.Role",
+	"ruleId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.SoDRule"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"number":"java.lang.Integer",
+	"risk":"com.soffid.iam.rc.api.SoDRisk",
+	"type":"com.soffid.iam.rc.api.SodRuleType",
+	"application":"java.lang.String",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.SoDRuleMatrix"]={
+	"id":"java.lang.Long",
+	"ruleId":"java.lang.Long",
+	"risk":"com.soffid.iam.rc.api.SoDRisk",
+	"row":"java.lang.Long",
+	"column":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.api.SodRuleType"]={
+	"MATCH_ALL":"java.lang.String",
+	"MATCH_SOME":"java.lang.String",
+	"MATCH_MATRIX":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.AuditoriaDataIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.AuditoriaIndexIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.AuditoriaUserIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.GeoInformationEntityUniqueKey"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.IssueHashIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.IssueNumberIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.model.IssueStatusIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.AuditService"]={
+	"create":"com.soffid.iam.rc.api.Audit",
+	"findAuditById":"com.soffid.iam.rc.api.Audit",
+	"findAudits":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Audit>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.GeoInformationService"]={
+	"getGeoInformation":"com.soffid.iam.rc.api.GeoInformation"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.IssuePolicyService"]={
+	"update":"com.soffid.iam.rc.api.IssuePolicy",
+	"findIssuePolicies":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.IssuePolicy>",
+	"listAutomaticActions":"java.util.List<com.soffid.iam.rc.api.IssueActionDefinition>",
+	"createPolicies":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.IssueService"]={
+	"create":"com.soffid.iam.rc.api.Issue",
+	"createInternalIssue":"com.soffid.iam.rc.api.Issue",
+	"notify":"com.soffid.iam.rc.api.Issue",
+	"registerAction":"com.soffid.iam.rc.api.Issue",
+	"update":"com.soffid.iam.rc.api.Issue",
+	"findIssues":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Issue>",
+	"findMyIssues":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Issue>",
+	"countMyIssues":"int",
+	"findIssuesByUser":"java.util.List<com.soffid.iam.rc.api.Issue>",
+	"listManualActions":"java.util.List<com.soffid.iam.rc.api.IssueActionDefinition>",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.NetworkIntelligenceService"]={
+	"getConfiguration":"com.soffid.iam.rc.api.NetworkIntelligence",
+	"saveConfiguration":"com.soffid.iam.rc.api.NetworkIntelligence",
+	"validateToken":"com.soffid.iam.rc.api.NetworkIntelligence",
+	"isAccountBreached":"java.lang.Boolean",
+	"isPasswordBreached":"java.lang.Boolean",
+	"isEmailBreached":"java.lang.String",
+	"verifyDomains":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.SamlService"]={
+	"generateSamlRequest":"com.soffid.iam.am.api.SamlRequest",
+	"checkAuthenticationToken":"java.lang.String",
+	"generateMetadata":"java.lang.String",
+	"validateOpenidToken":"java.lang.String",
+	"authenticate":"java.lang.String[]",
+	"findIdentityProviders":"java.util.List<java.lang.String>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.SoDRuleService"]={
+	"isGreater":"boolean",
+	"qualifyUser":"com.soffid.iam.rc.api.SoDRisk",
+	"create":"com.soffid.iam.rc.api.SoDRole",
+	"getRuleById":"com.soffid.iam.rc.api.SoDRule",
+	"isAllowed":"com.soffid.iam.rc.api.SoDRule",
+	"update":"com.soffid.iam.rc.api.SoDRule",
+	"findSodRules":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.SoDRule>",
+	"generateChangesReport":"java.lang.String",
+	"findAffectingRulesByRolAccount":"java.util.Collection<com.soffid.iam.rc.api.SoDRule>",
+	"findMatrixByRule":"java.util.Collection<com.soffid.iam.rc.api.SoDRuleMatrix>",
+	"findRolesByRule":"java.util.Collection<com.soffid.iam.rc.api.SoDRole>",
+	"findRuleByApplication":"java.util.Collection<com.soffid.iam.rc.api.SoDRule>",
+	"findViolotions":"java.util.List<com.soffid.iam.iga.api.RoleAccount>",
+	"internalRemovingRole":"void",
+	"qualifyRolAccountList":"void",
+	"remove":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.rc.service.NetworkIntelligence_Manager"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.reconcile.service.ReconcileService"]={
+	"isPendingTasks":"boolean",
+	"addUser":"com.soffid.iam.iga.api.ReconcileAccount",
+	"findReconAccountById":"com.soffid.iam.iga.api.ReconcileAccount",
+	"addAssignment":"com.soffid.iam.iga.api.ReconcileAssignment",
+	"findReconAssignmentById":"com.soffid.iam.iga.api.ReconcileAssignment",
+	"addRole":"com.soffid.iam.iga.api.ReconcileRole",
+	"findReconRoleById":"com.soffid.iam.iga.api.ReconcileRole",
+	"findAllReconAccounts":"java.util.List<com.soffid.iam.iga.api.ReconcileAccount>",
+	"findAllReconAssignment":"java.util.List<com.soffid.iam.iga.api.ReconcileAssignment>",
+	"findAllReconRole":"java.util.List<com.soffid.iam.iga.api.ReconcileRole>",
+	"createReconcileTask":"void",
+	"reconcileAssignment":"void",
+	"reconcileData":"void",
+	"reconcileRoles":"void",
+	"reconcileUsers":"void",
+	"updateAssignment":"void",
+	"updateRole":"void",
+	"updateUser":"void",
+	"validateReconcileAccount":"void",
+	"validateReconcileRole":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.service.impl.AttributeValidationService"]={
+	"validate":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.agent.AgentManager"]={
+	"findLogs":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>",
+	"getServerLogs":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>",
+	"getSyncServerInfo":"com.soffid.iam.sync.api.SyncServerInfo",
+	"createLocalAgent":"java.lang.Object",
+	"createLocalAgentDebug":"java.lang.Object",
+	"createAgent":"java.lang.String",
+	"createAgentDebug":"java.lang.String",
+	"tailServerLog":"java.lang.String[]",
+	"generateNewKey":"java.security.PublicKey",
+	"getCertificateValidityDate":"java.util.Date",
+	"reset":"void",
+	"storeNewCertificate":"void",
+	"configureLog":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.agent.Plugin"]={
+	"name":"java.lang.String",
+	"version":"java.lang.String",
+	"content":"byte[]"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.DebugTaskResults"]={
+	"status":"java.lang.String",
+	"log":"java.lang.String",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.GetObjectResults"]={
+	"status":"java.lang.String",
+	"log":"java.lang.String",
+	"object":"java.util.Map<java.lang.String,java.lang.Object>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.AuthoritativeChange"]={
+	"id":"com.soffid.iam.sync.api.AuthoritativeChangeIdentifier",
+	"objectType":"com.soffid.iam.iga.api.SoffidObjectType",
+	"sourceSystem":"java.lang.String",
+	"user":"com.soffid.iam.base.api.User",
+	"attributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"groups":"java.util.Set<java.lang.String>",
+	"groups2":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>",
+	"group":"com.soffid.iam.iga.api.Group",
+	"object":"com.soffid.iam.iga.api.CustomObject"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.AuthoritativeChangeIdentifier"]={
+	"employeeId":"java.lang.Object",
+	"date":"java.util.Date",
+	"changeId":"java.lang.Object",
+	"internalId":"java.lang.Long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.LogConfiguration"]={
+	"name":"java.lang.String",
+	"debug":"boolean",
+	"numRows":"long",
+	"maxFiles":"long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.LogFileEntry"]={
+	"hour":"java.lang.String",
+	"level":"java.lang.String",
+	"thread":"java.lang.String",
+	"source":"java.lang.String",
+	"message":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.ScheduledTask"]={
+	"id":"java.lang.Long",
+	"tenant":"java.lang.String",
+	"name":"java.lang.String",
+	"params":"java.lang.String",
+	"handlerName":"java.lang.String",
+	"nextExecution":"java.util.Calendar",
+	"lastExecution":"java.util.Calendar",
+	"lastEnd":"java.util.Calendar",
+	"logReferenceID":"java.lang.String",
+	"dayPattern":"java.lang.String",
+	"hoursPattern":"java.lang.String",
+	"monthsPattern":"java.lang.String",
+	"dayOfWeekPattern":"java.lang.String",
+	"minutesPattern":"java.lang.String",
+	"error":"boolean",
+	"active":"boolean",
+	"enabled":"boolean",
+	"status":"java.lang.String",
+	"percentageDone":"java.lang.Double",
+	"stop":"java.lang.Boolean",
+	"serverName":"java.lang.String",
+	"logs":"java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.ScheduledTaskHandler"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"className":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.ScheduledTaskLog"]={
+	"id":"java.lang.Long",
+	"time":"java.util.Date",
+	"end":"java.util.Date",
+	"logReferenceID":"java.lang.String",
+	"error":"boolean"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.Server"]={
+	"id":"java.lang.Long",
+	"name":"java.lang.String",
+	"pk":"byte[]",
+	"auth":"java.lang.String",
+	"publicKey":"java.security.PublicKey",
+	"useMasterDatabase":"java.lang.Boolean",
+	"backupDatabase":"java.lang.Long",
+	"type":"com.soffid.iam.sync.api.ServerType",
+	"url":"java.lang.String",
+	"publicUrl":"java.lang.String",
+	"javaOptions":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.ServerRegistrationToken"]={
+	"step":"int"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.ServerType"]={
+	"MASTERSERVER":"java.lang.String",
+	"PROXYSERVER":"java.lang.String",
+	"PAMPROXY":"java.lang.String",
+	"GATEWAY":"java.lang.String",
+	"REMOTESERVER":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.SyncAgentTaskLog"]={
+	"taskId":"java.lang.Long",
+	"taskDescription":"java.lang.String",
+	"agentCode":"java.lang.String",
+	"complete":"java.lang.String",
+	"message":"java.lang.String",
+	"creationDate":"java.util.Calendar",
+	"lastExecution":"java.lang.Long",
+	"lastExecutionDate":"java.util.Calendar",
+	"nextExecution":"java.lang.Long",
+	"nextExecutionDate":"java.util.Calendar",
+	"executionsNumber":"java.lang.Long",
+	"priority":"java.lang.Long",
+	"stackTrace":"java.lang.String",
+	"server":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.SyncServerInfo"]={
+	"url":"java.lang.String",
+	"description":"java.lang.String",
+	"version":"java.lang.String",
+	"status":"java.lang.String",
+	"numberOfAgents":"java.lang.Integer",
+	"connectedAgents":"java.lang.Integer",
+	"numberOfPendingTasks":"long",
+	"sso":"java.lang.String",
+	"jetty":"java.lang.String",
+	"ssoDaemon":"java.lang.String",
+	"taskGenerator":"java.lang.String",
+	"expirationRootCertificate":"java.util.Calendar",
+	"expirationMainCertificate":"java.util.Calendar",
+	"currentServerDate":"java.util.Calendar",
+	"databaseConnections":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.SyncserverTask"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.Task"]={
+	"id":"java.lang.Long",
+	"user":"java.lang.String",
+	"password":"java.lang.String",
+	"passwordChange":"java.lang.String",
+	"folder":"java.lang.String",
+	"folderType":"java.lang.String",
+	"printer":"java.lang.String",
+	"host":"java.lang.String",
+	"subnet":"java.lang.String",
+	"message":"java.lang.String",
+	"status":"java.lang.String",
+	"taskDate":"java.util.Calendar",
+	"transaction":"java.lang.String",
+	"group":"java.lang.String",
+	"alias":"java.lang.String",
+	"mailDomain":"java.lang.String",
+	"role":"java.lang.String",
+	"database":"java.lang.String",
+	"systemName":"java.lang.String",
+	"server":"java.lang.String",
+	"serverInstance":"java.lang.String",
+	"userDomain":"java.lang.String",
+	"passwordDomain":"java.lang.String",
+	"hash":"java.lang.String",
+	"expirationDate":"java.util.Calendar",
+	"entity":"java.lang.String",
+	"primaryKeyValue":"java.lang.Long",
+	"customObjectType":"java.lang.String",
+	"customObjectName":"java.lang.String",
+	"externalId":"java.lang.String",
+	"customTaskName":"java.lang.String",
+	"parameters":"java.lang.String"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.api.Secret"]={
+	"name":"java.lang.String",
+	"value":"com.soffid.iam.am.api.Password"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.engine.ChangePasswordNotification"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.engine.DispatcherHandler"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.engine.TaskHandler"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.ScheduledTaskEntityHandlerIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.ScheduledTaskEntityNameIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.ServerIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.ServerInstanceNameIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.SheculedTaskHandlerNameIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.TasqueHashIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.model.TasqueUserIndex"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.CertificateEnrollService"]={
+	"getServerPort":"int",
+	"getServerList":"java.lang.String",
+	"getCertificate":"java.security.cert.X509Certificate",
+	"getRootCertificate":"java.security.cert.X509Certificate",
+	"getCertificates":"java.util.List<java.security.cert.X509Certificate>",
+	"createRequest":"long"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.ChangePasswordNotificationQueue"]={
+	"peekNotification":"com.soffid.iam.sync.engine.ChangePasswordNotification",
+	"addNotification":"void",
+	"endNotificationThread":"void",
+	"sendNotification":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.ConsoleLogonService"]={
+	"validatePassword":"com.soffid.iam.am.api.PasswordValidation"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.LogCollectorService"]={
+	"getLastLogEntryDate":"java.util.Date",
+	"registerFailedLogon":"void",
+	"registerLogoff":"void",
+	"registerLogon":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.LogonService"]={
+	"mustChangePassword":"boolean",
+	"validatePIN":"boolean",
+	"getChallenge":"com.soffid.iam.am.api.Challenge",
+	"requestChallenge":"com.soffid.iam.am.api.Challenge",
+	"requestIdpChallenge":"com.soffid.iam.am.api.Challenge",
+	"validatePassword":"com.soffid.iam.am.api.PasswordValidation",
+	"responseChallenge":"com.soffid.iam.am.api.Session",
+	"getPasswordPolicy":"java.lang.String",
+	"changePassword":"void",
+	"propagatePassword":"void",
+	"purgeChallenges":"void",
+	"registerChallenge":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.PamProxySessionService"]={
+	"validatePin":"boolean",
+	"validateSshKey":"boolean",
+	"generateOtp":"com.soffid.iam.am.api.OtpChallengeProxy",
+	"validatePassword":"com.soffid.iam.am.api.PasswordValidation",
+	"startWorkflow":"com.soffid.iam.bpm.api.ProcessInstance",
+	"openSession":"com.soffid.iam.pam.api.NewPamSession",
+	"findAccounts":"java.util.List<com.soffid.iam.base.api.Account>",
+	"sendEmailNotification":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.QueryService"]={
+	"queryHql":"java.util.List",
+	"query":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.ScheduledTaskService"]={
+	"isStopping":"boolean",
+	"create":"com.soffid.iam.sync.api.ScheduledTask",
+	"findById":"com.soffid.iam.sync.api.ScheduledTask",
+	"findScheduledTaskByHandlerAndParams":"com.soffid.iam.sync.api.ScheduledTask",
+	"load":"com.soffid.iam.sync.api.ScheduledTask",
+	"update":"com.soffid.iam.sync.api.ScheduledTask",
+	"listEnabledTasks":"java.util.List<com.soffid.iam.sync.api.ScheduledTask>",
+	"listHandlers":"java.util.List<com.soffid.iam.sync.api.ScheduledTaskHandler>",
+	"listServerTasks":"java.util.List<com.soffid.iam.sync.api.ScheduledTask>",
+	"listTasks":"java.util.List<com.soffid.iam.sync.api.ScheduledTask>",
+	"registerEndTask":"void",
+	"registerStartTask":"void",
+	"remove":"void",
+	"startNow":"void",
+	"stop":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.SecretConfigurationService"]={
+	"validateAuthToken":"boolean",
+	"getCurrentServer":"com.soffid.iam.sync.api.Server",
+	"getPrivateKey":"java.security.PrivateKey",
+	"getAllServers":"java.util.Collection<com.soffid.iam.sync.api.Server>",
+	"changeAuthToken":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.SecretStoreService"]={
+	"getPassword":"com.soffid.iam.am.api.Password",
+	"getSecret":"com.soffid.iam.am.api.Password",
+	"getSshPrivateKey":"com.soffid.iam.am.api.Password",
+	"getAccountsWithPassword":"java.util.Collection<com.soffid.iam.base.api.Account>",
+	"getUsersWithSecrets":"java.util.Collection<com.soffid.iam.base.api.User>",
+	"getAllSecrets":"java.util.List<com.soffid.iam.sync.api.Secret>",
+	"getSecrets":"java.util.List<com.soffid.iam.sync.api.Secret>",
+	"putSecret":"void",
+	"reencode":"void",
+	"removeSecret":"void",
+	"setPassword":"void",
+	"setPasswordAndUpdateAccount":"void",
+	"setSshPrivateKey":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.ServerService"]={
+	"findRemoteServerByUrl":"com.soffid.iam.sync.api.Server",
+	"invoke":"java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>",
+	"hasSupportAccessHost":"boolean",
+	"updateExpiredPasswords":"boolean",
+	"getAddonJar":"byte[]",
+	"getPluginJar":"byte[]",
+	"getUserMazingerRules":"byte[]",
+	"getHostInfo":"com.soffid.iam.am.api.Host",
+	"getHostInfoByIP":"com.soffid.iam.am.api.Host",
+	"getNetworkInfo":"com.soffid.iam.am.api.Network",
+	"generateFakePassword":"com.soffid.iam.am.api.Password",
+	"getAccountPassword":"com.soffid.iam.am.api.Password",
+	"getOrGenerateUserPassword":"com.soffid.iam.am.api.Password",
+	"getUserPolicy":"com.soffid.iam.am.api.PasswordPolicy",
+	"validatePassword":"com.soffid.iam.am.api.PasswordValidation",
+	"findAccountByLoginNameAndSystem":"com.soffid.iam.base.api.Account",
+	"getAccountInfo":"com.soffid.iam.base.api.Account",
+	"getAccountInfoByExternalId":"com.soffid.iam.base.api.Account",
+	"parseKerberosToken":"com.soffid.iam.base.api.Account",
+	"getUserInfo":"com.soffid.iam.base.api.User",
+	"getUserData":"com.soffid.iam.base.api.UserData",
+	"getCustomObject":"com.soffid.iam.iga.api.CustomObject",
+	"getGroupInfo":"com.soffid.iam.iga.api.Group",
+	"getMailList":"com.soffid.iam.iga.api.MailList",
+	"getMailListById":"com.soffid.iam.iga.api.MailList",
+	"getRoleInfo":"com.soffid.iam.iga.api.Role",
+	"getRoleInfoByExternalId":"com.soffid.iam.iga.api.Role",
+	"getDispatcherInfo":"com.soffid.iam.iga.api.System",
+	"updateSystem":"com.soffid.iam.iga.api.System",
+	"getDispatcherAccessControl":"com.soffid.iam.iga.api.SystemAccessControl",
+	"registerIssue":"com.soffid.iam.rc.api.Issue",
+	"getPlugin":"com.soffid.iam.sync.agent.Plugin",
+	"getConfig":"java.lang.String",
+	"getDefaultDispatcher":"java.lang.String",
+	"reverseTranslate":"java.lang.String",
+	"translate":"java.lang.String",
+	"getAccountExplicitRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getAccountRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getExpiredPasswordDomains":"java.util.Collection<com.soffid.iam.am.api.PasswordDomain>",
+	"getGroupChildren":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getGroupExplicitRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getGroupUsers":"java.util.Collection<com.soffid.iam.base.api.User>",
+	"getHostsFromNetwork":"java.util.Collection<com.soffid.iam.am.api.Host>",
+	"getMailListMembers":"java.util.Collection<java.lang.Object>",
+	"getNetworksList":"java.util.Collection<com.soffid.iam.am.api.Network>",
+	"getRoleAccounts":"java.util.Collection<com.soffid.iam.base.api.Account>",
+	"getRoleActiveAccounts":"java.util.Collection<com.soffid.iam.base.api.Account>",
+	"getRoleExplicitRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getServices":"java.util.Collection<com.soffid.iam.iga.api.System>",
+	"getUserAccounts":"java.util.Collection<com.soffid.iam.base.api.UserAccount>",
+	"getUserExplicitRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getUserGroups":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getUserGroupsHierarchy":"java.util.Collection<com.soffid.iam.iga.api.Group>",
+	"getUserMemberships":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>",
+	"getUserPrinters":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>",
+	"getUserRoles":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>",
+	"getUserSecrets":"java.util.Collection<com.soffid.iam.sync.api.Secret>",
+	"reverseTranslate2":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
+	"translate2":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
+	"getAddonList":"java.util.List<java.lang.String>",
+	"getUserAttributes":"java.util.Map<java.lang.String,java.lang.Object>",
+	"propagateOBUser":"java.util.Map",
+	"getMyConfig":"java.util.Properties",
+	"addCertificate":"void",
+	"cancelTask":"void",
+	"changePassword":"void",
+	"changePasswordSync":"void",
+	"clientAgentStarted":"void",
+	"getMainJar":"void",
+	"reconcileAccount":"void",
+	"processAuthoritativeChange":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.SyncServerService"]={
+	"findLogs":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>",
+	"getServerLogs":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>",
+	"getAgentTasks":"com.soffid.iam.sync.api.SyncAgentTaskLog",
+	"getSyncServerInfo":"com.soffid.iam.sync.api.SyncServerInfo",
+	"getSeyconServerLog":"java.io.InputStream",
+	"getServerService":"java.lang.Object",
+	"tailServerLog":"java.lang.String[]",
+	"findUnscheduledTasks":"java.util.Collection<com.soffid.iam.sync.api.SyncserverTask>",
+	"getPendingTasksInfo":"java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>",
+	"getServerAgentStatus":"java.util.Collection<com.soffid.iam.base.api.AgentStatusInfo>",
+	"getServerTasks":"java.util.Collection<java.lang.Object>",
+	"getSyncServersStatus":"java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>",
+	"getSyncServerInstances":"java.util.Collection<com.soffid.iam.sync.api.Server>",
+	"getSyncServers":"java.util.Collection<com.soffid.iam.sync.api.Server>",
+	"getPendingTasksStats":"java.util.Map<java.lang.String,java.util.Vector<java.lang.Object[]>>",
+	"getStats":"java.util.Map<java.lang.String,int[]>",
+	"boostTask":"void",
+	"cancelTask":"void",
+	"cancelUnscheduledTasks":"void",
+	"releaseAllTasks":"void",
+	"releaseTask":"void",
+	"resetSyncServer":"void",
+	"updateDispatcherConfiguration":"void",
+	"updatePendingTasks":"void",
+	"configureLog":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.SyncServerStatsService"]={
+	"getStats":"java.util.Map<java.lang.String,int[]>",
+	"register":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.SyncStatusService"]={
+	"getTasksGrid":"com.soffid.iam.base.api.TasksGrid",
+	"findLogs":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>",
+	"getTasks":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.SyncAgentTaskLog>",
+	"getServerLogs":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>",
+	"findActiveDirectoryDomains":"java.util.Map<java.lang.String,java.lang.String>",
+	"getMazingerRules":"byte[]",
+	"getAccountPassword":"com.soffid.iam.am.api.Password",
+	"getAccountSshKey":"com.soffid.iam.am.api.Password",
+	"checkPasswordSynchronizationStatus":"com.soffid.iam.am.api.PasswordValidation",
+	"testPropagateObject":"com.soffid.iam.sync.api.DebugTaskResults",
+	"getNativeObject":"com.soffid.iam.sync.api.GetObjectResults",
+	"getSoffidObject":"com.soffid.iam.sync.api.GetObjectResults",
+	"reconcile":"com.soffid.iam.sync.api.GetObjectResults",
+	"getSyncServerInfo":"com.soffid.iam.sync.api.SyncServerInfo",
+	"getSyncServerStatus":"com.soffid.iam.sync.api.SyncServerInfo",
+	"getDBConnectionStatus":"java.lang.String",
+	"resetAllServer":"java.lang.String",
+	"resetServerAgents":"java.lang.String",
+	"tailServerLog":"java.lang.String[]",
+	"getServerAgentHostsURL":"java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>",
+	"getSyncAgentsInfo":"java.util.Collection<com.soffid.iam.base.api.AgentStatusInfo>",
+	"invoke":"java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>",
+	"assignTemporaryPermissions":"java.util.List<java.lang.String>",
+	"testObjectMapping":"java.util.Map<java.lang.String,java.lang.Object>",
+	"boostTask":"void",
+	"cancelTask":"void",
+	"checkConnectivity":"void",
+	"reconfigureDispatchers":"void",
+	"removeTemporaryPermissions":"void",
+	"resendAccountPassword":"void",
+	"resendUserPassword":"void",
+	"setAccountPassword":"void",
+	"setAccountSshPrivateKey":"void",
+	"startScheduledTask":"void",
+	"stopScheduledTask":"void",
+	"configureLog":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.TaskGenerator"]={
+	"canGetLog":"boolean",
+	"isEnabled":"boolean",
+	"isMainServer":"boolean",
+	"getDispatcher":"com.soffid.iam.sync.engine.DispatcherHandler",
+	"getStatus":"java.lang.String",
+	"startVirtualSourceTransaction":"java.lang.String",
+	"getAllTenantsDispatchers":"java.util.Collection<com.soffid.iam.sync.engine.DispatcherHandler>",
+	"getDispatchers":"java.util.Collection<com.soffid.iam.sync.engine.DispatcherHandler>",
+	"getActiveTenants":"java.util.Set<java.lang.Long>",
+	"finishGetLog":"void",
+	"finishVirtualSourceTransaction":"void",
+	"loadTasks":"void",
+	"purgeServerInstances":"void",
+	"setEnabled":"void",
+	"shutDown":"void",
+	"updateAgents":"void",
+	"updateClusterStatus":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.sync.service.TaskQueue"]={
+	"getTasksGrid":"com.soffid.iam.base.api.TasksGrid",
+	"getTasks":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.SyncAgentTaskLog>",
+	"isBestServer":"boolean",
+	"addTask":"com.soffid.iam.sync.engine.TaskHandler",
+	"findTaskHandlerById":"com.soffid.iam.sync.engine.TaskHandler",
+	"getNextPendingTask":"com.soffid.iam.sync.engine.TaskHandler",
+	"getPendingTask":"com.soffid.iam.sync.engine.TaskHandler",
+	"peekTaskToPersist":"com.soffid.iam.sync.engine.TaskHandler",
+	"countErrorTasks":"int",
+	"countTasks":"int",
+	"debugTask":"java.util.Map<java.lang.String,com.soffid.iam.sync.api.DebugTaskResults>",
+	"processOBTask":"java.util.Map<java.lang.String,java.lang.Exception>",
+	"cancelTask":"void",
+	"expireTasks":"void",
+	"notifyTaskStatus":"void",
+	"notifyTaskStatusNewTransaction":"void",
+	"persistTask":"void",
+	"pushTaskToPersist":"void",
+	"registerServerInstance":"void",
+	"removeTask":"void",
+	"updateServerInstanceTasks":"void",
+	"updateTask":"void",
+	"cleanupCompletedTasks":"void"
+};
+CodeMirrorJavaTypes["com.soffid.iam.web.SearchAttributeDefinition"]={
+	"name":"java.lang.String",
+	"localizedName":"java.lang.String",
+	"labelName":"java.lang.String",
+	"type":"com.soffid.iam.base.api.TypeEnumeration",
+	"javaType":"java.lang.Class",
+	"values":"java.util.List<java.lang.String>",
+	"labels":"java.util.List<java.lang.String>"
+};
+CodeMirrorJavaTypes["com.soffid.iam.web.SearchDictionary"]={
+	"attributes":"java.util.List<com.soffid.iam.web.SearchAttributeDefinition>",
+	"timestamp":"long"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.Query"]={
+	"isAsynchronous":"boolean",
+	"isShowDeleted":"boolean",
+	"withAsynchronuous":"com.soffid.zkdb.api.Query",
+	"withFilter":"com.soffid.zkdb.api.Query",
+	"withPageSize":"com.soffid.zkdb.api.Query",
+	"withSelect":"com.soffid.zkdb.api.Query",
+	"withSortBy":"com.soffid.zkdb.api.Query",
+	"withStartIndex":"com.soffid.zkdb.api.Query",
+	"withTextSearch":"com.soffid.zkdb.api.Query",
+	"withTextSearchFields":"com.soffid.zkdb.api.Query",
+	"getPageSize":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getFilter":"java.lang.String",
+	"getSortBy":"java.lang.String",
+	"getTextSearch":"java.lang.String",
+	"getTextSearchFields":"java.lang.String[]",
+	"getSelect":"java.util.List<java.lang.String>",
+	"setAsynchronous":"void",
+	"setFilter":"void",
+	"setPageSize":"void",
+	"setSelect":"void",
+	"setShowDeleted":"void",
+	"setSortBy":"void",
+	"setStartIndex":"void",
+	"setTextSearch":"void",
+	"setTextSearchFields":"void",
+	"select":"java.util.List<java.lang.String>",
+	"filter":"java.lang.String",
+	"sortBy":"java.lang.String",
+	"textSearch":"java.lang.String",
+	"textSearchFields":"java.lang.String[]",
+	"startIndex":"java.lang.Integer",
+	"pageSize":"java.lang.Integer",
+	"asynchronous":"boolean",
+	"showDeleted":"boolean"
+};
+CodeMirrorJavaTypes["java.io.File"]={
+	"isInvalid":"boolean",
+	"getPrefixLength":"int",
+	"normalizedList":"java.lang.String[]",
+	"slashify":"java.lang.String",
+	"readObject":"void",
+	"writeObject":"void",
+	"canExecute":"boolean",
+	"canRead":"boolean",
+	"canWrite":"boolean",
+	"createNewFile":"boolean",
+	"delete":"boolean",
+	"equals":"boolean",
+	"exists":"boolean",
+	"isAbsolute":"boolean",
+	"isDirectory":"boolean",
+	"isFile":"boolean",
+	"isHidden":"boolean",
+	"mkdir":"boolean",
+	"mkdirs":"boolean",
+	"renameTo":"boolean",
+	"setExecutable":"boolean",
+	"setLastModified":"boolean",
+	"setReadOnly":"boolean",
+	"setReadable":"boolean",
+	"setWritable":"boolean",
+	"compareTo":"int",
+	"hashCode":"int",
+	"getAbsoluteFile":"java.io.File",
+	"getCanonicalFile":"java.io.File",
+	"getParentFile":"java.io.File",
+	"listFiles":"java.io.File[]",
+	"getAbsolutePath":"java.lang.String",
+	"getCanonicalPath":"java.lang.String",
+	"getName":"java.lang.String",
+	"getParent":"java.lang.String",
+	"getPath":"java.lang.String",
+	"toString":"java.lang.String",
+	"list":"java.lang.String[]",
+	"toURI":"java.net.URI",
+	"toURL":"java.net.URL",
+	"toPath":"java.nio.file.Path",
+	"getFreeSpace":"long",
+	"getTotalSpace":"long",
+	"getUsableSpace":"long",
+	"lastModified":"long",
+	"length":"long",
+	"createTempFile":"java.io.File",
+	"listRoots":"java.io.File[]",
+	"deleteOnExit":"void",
+	"fs":"java.io.FileSystem",
+	"path":"java.lang.String",
+	"status":"java.io.File.PathStatus",
+	"prefixLength":"int",
+	"separatorChar":"char",
+	"separator":"java.lang.String",
+	"pathSeparatorChar":"char",
+	"pathSeparator":"java.lang.String",
+	"UNSAFE":"jdk.internal.misc.Unsafe",
+	"PATH_OFFSET":"long",
+	"PREFIX_LENGTH_OFFSET":"long",
+	"serialVersionUID":"long",
+	"filePath":"java.nio.file.Path",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["java.io.FileNotFoundException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["java.io.IOException"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["java.io.InputStream"]={
+	"read":"int",
+	"markSupported":"boolean",
+	"readAllBytes":"byte[]",
+	"readNBytes":"byte[]",
+	"available":"int",
+	"skip":"long",
+	"transferTo":"long",
+	"nullInputStream":"java.io.InputStream",
+	"mark":"void",
+	"reset":"void",
+	"close":"void",
+	"skipNBytes":"void",
+	"MAX_SKIP_BUFFER_SIZE":"int",
+	"DEFAULT_BUFFER_SIZE":"int",
+	"MAX_BUFFER_SIZE":"int"
+};
+CodeMirrorJavaTypes["java.io.OutputStream"]={
+	"write":"void",
+	"nullOutputStream":"java.io.OutputStream",
+	"close":"void",
+	"flush":"void"
+};
+CodeMirrorJavaTypes["java.io.PrintWriter"]={
+	"toCharset":"java.nio.charset.Charset",
+	"ensureOpen":"void",
+	"newLine":"void",
+	"clearError":"void",
+	"setError":"void",
+	"checkError":"boolean",
+	"append":"java.io.PrintWriter",
+	"format":"java.io.PrintWriter",
+	"printf":"java.io.PrintWriter",
+	"close":"void",
+	"flush":"void",
+	"print":"void",
+	"println":"void",
+	"write":"void",
+	"writeBuffer":"char[]",
+	"WRITE_BUFFER_SIZE":"int",
+	"lock":"java.lang.Object",
+	"out":"java.io.Writer",
+	"autoFlush":"boolean",
+	"trouble":"boolean",
+	"formatter":"java.util.Formatter",
+	"psOut":"java.io.PrintStream"
+};
+CodeMirrorJavaTypes["java.io.Writer"]={
+	"close":"void",
+	"flush":"void",
+	"write":"void",
+	"append":"java.io.Writer",
+	"nullWriter":"java.io.Writer",
+	"writeBuffer":"char[]",
+	"WRITE_BUFFER_SIZE":"int",
+	"lock":"java.lang.Object"
+};
+CodeMirrorJavaTypes["java.lang.Boolean"]={
+	"booleanValue":"boolean",
+	"equals":"boolean",
+	"compareTo":"int",
+	"hashCode":"int",
+	"toString":"java.lang.String",
+	"describeConstable":"java.util.Optional<java.lang.constant.DynamicConstantDesc<java.lang.Boolean>>",
+	"getBoolean":"boolean",
+	"logicalAnd":"boolean",
+	"logicalOr":"boolean",
+	"logicalXor":"boolean",
+	"parseBoolean":"boolean",
+	"compare":"int",
+	"valueOf":"java.lang.Boolean",
+	"TRUE":"java.lang.Boolean",
+	"FALSE":"java.lang.Boolean",
+	"TYPE":"java.lang.Class<java.lang.Boolean>",
+	"value":"boolean",
+	"serialVersionUID":"long"
+};
+CodeMirrorJavaTypes["java.lang.Class"]={
+	"casAnnotationType":"boolean",
+	"getClassLoader0":"java.lang.ClassLoader",
+	"getClassData":"java.lang.Object",
+	"getEnumConstantsShared":"T[]",
+	"protectionDomain":"java.security.ProtectionDomain",
+	"getDeclaredPublicMethods":"java.util.List<java.lang.reflect.Method>",
+	"enumConstantDirectory":"java.util.Map<java.lang.String,T>",
+	"getDeclaredAnnotationMap":"java.util.Map<java.lang.Class<? extends java.lang.annotation.Annotation>,java.lang.annotation.Annotation>",
+	"getRawAnnotations":"byte[]",
+	"getRawTypeAnnotations":"byte[]",
+	"getConstantPool":"jdk.internal.reflect.ConstantPool",
+	"setSigners":"void",
+	"hasEnclosingMethodInfo":"boolean",
+	"isDirectSubType":"boolean",
+	"isLocalOrAnonymousClass":"boolean",
+	"isOpenToCaller":"boolean",
+	"isTopLevelClass":"boolean",
+	"lambda$getPermittedSubclasses$1":"boolean",
+	"elementType":"java.lang.Class<?>",
+	"annotationData":"java.lang.Class.AnnotationData",
+	"createAnnotationData":"java.lang.Class.AnnotationData",
+	"getEnclosingMethodInfo":"java.lang.Class.EnclosingMethodInfo",
+	"newReflectionData":"java.lang.Class.ReflectionData<T>",
+	"reflectionData":"java.lang.Class.ReflectionData<T>",
+	"getInterfaces":"java.lang.Class<?>[]",
+	"getMethodsRecursive":"java.lang.PublicMethods.MethodList",
+	"cannotCastMsg":"java.lang.String",
+	"getCanonicalName0":"java.lang.String",
+	"getSimpleBinaryName":"java.lang.String",
+	"getSimpleName0":"java.lang.String",
+	"methodToString":"java.lang.String",
+	"resolveName":"java.lang.String",
+	"getConstructor0":"java.lang.reflect.Constructor<T>",
+	"privateGetDeclaredConstructors":"java.lang.reflect.Constructor<T>[]",
+	"getField0":"java.lang.reflect.Field",
+	"privateGetDeclaredFields":"java.lang.reflect.Field[]",
+	"privateGetPublicFields":"java.lang.reflect.Field[]",
+	"getMethod0":"java.lang.reflect.Method",
+	"privateGetDeclaredMethods":"java.lang.reflect.Method[]",
+	"privateGetPublicMethods":"java.lang.reflect.Method[]",
+	"isRecord0":"boolean",
+	"getDeclaringClass0":"java.lang.Class<?>",
+	"getNestHost0":"java.lang.Class<?>",
+	"getDeclaredClasses0":"java.lang.Class<?>[]",
+	"getInterfaces0":"java.lang.Class<?>[]",
+	"getNestMembers0":"java.lang.Class<?>[]",
+	"getPermittedSubclasses0":"java.lang.Class<?>[]",
+	"getEnclosingMethod0":"java.lang.Object[]",
+	"getGenericSignature0":"java.lang.String",
+	"getSimpleBinaryName0":"java.lang.String",
+	"initClassName":"java.lang.String",
+	"getDeclaredConstructors0":"java.lang.reflect.Constructor<T>[]",
+	"getDeclaredFields0":"java.lang.reflect.Field[]",
+	"getDeclaredMethods0":"java.lang.reflect.Method[]",
+	"getRecordComponents0":"java.lang.reflect.RecordComponent[]",
+	"getProtectionDomain0":"java.security.ProtectionDomain",
+	"arrayContentsEq":"boolean",
+	"toClass":"java.lang.Class<?>",
+	"lambda$getPermittedSubclasses$2":"java.lang.Class[]",
+	"lambda$methodToString$0":"java.lang.String",
+	"copyConstructors":"java.lang.reflect.Constructor<U>[]",
+	"searchFields":"java.lang.reflect.Field",
+	"copyFields":"java.lang.reflect.Field[]",
+	"searchMethods":"java.lang.reflect.Method",
+	"copyMethods":"java.lang.reflect.Method[]",
+	"getReflectionFactory":"jdk.internal.reflect.ReflectionFactory",
+	"desiredAssertionStatus0":"boolean",
+	"forName0":"java.lang.Class<?>",
+	"registerNatives":"void",
+	"addAll":"void",
+	"checkPackageAccessForPermittedSubclasses":"void",
+	"getFactory":"sun.reflect.generics.factory.GenericsFactory",
+	"getGenericInfo":"sun.reflect.generics.repository.ClassRepository",
+	"checkMemberAccess":"void",
+	"checkPackageAccess":"void",
+	"desiredAssertionStatus":"boolean",
+	"isAnnotation":"boolean",
+	"isAnnotationPresent":"boolean",
+	"isAnonymousClass":"boolean",
+	"isEnum":"boolean",
+	"isLocalClass":"boolean",
+	"isMemberClass":"boolean",
+	"isNestmateOf":"boolean",
+	"isRecord":"boolean",
+	"isSealed":"boolean",
+	"isSynthetic":"boolean",
+	"getResourceAsStream":"java.io.InputStream",
+	"arrayType":"java.lang.Class<?>",
+	"asSubclass":"java.lang.Class<? extends U>",
+	"componentType":"java.lang.Class<?>",
+	"getComponentType":"java.lang.Class<?>",
+	"getDeclaringClass":"java.lang.Class<?>",
+	"getEnclosingClass":"java.lang.Class<?>",
+	"getNestHost":"java.lang.Class<?>",
+	"getClassLoader":"java.lang.ClassLoader",
+	"getClasses":"java.lang.Class<?>[]",
+	"getDeclaredClasses":"java.lang.Class<?>[]",
+	"getNestMembers":"java.lang.Class<?>[]",
+	"getPermittedSubclasses":"java.lang.Class<?>[]",
+	"getModule":"java.lang.Module",
+	"cast":"T",
+	"newInstance":"T",
+	"getEnumConstants":"T[]",
+	"getPackage":"java.lang.Package",
+	"descriptorString":"java.lang.String",
+	"getCanonicalName":"java.lang.String",
+	"getName":"java.lang.String",
+	"getPackageName":"java.lang.String",
+	"getSimpleName":"java.lang.String",
+	"getTypeName":"java.lang.String",
+	"toGenericString":"java.lang.String",
+	"toString":"java.lang.String",
+	"getAnnotation":"A",
+	"getDeclaredAnnotation":"A",
+	"getAnnotations":"java.lang.annotation.Annotation[]",
+	"getAnnotationsByType":"A[]",
+	"getDeclaredAnnotations":"java.lang.annotation.Annotation[]",
+	"getDeclaredAnnotationsByType":"A[]",
+	"getAnnotatedSuperclass":"java.lang.reflect.AnnotatedType",
+	"getAnnotatedInterfaces":"java.lang.reflect.AnnotatedType[]",
+	"getConstructor":"java.lang.reflect.Constructor<T>",
+	"getDeclaredConstructor":"java.lang.reflect.Constructor<T>",
+	"getEnclosingConstructor":"java.lang.reflect.Constructor<?>",
+	"getConstructors":"java.lang.reflect.Constructor<?>[]",
+	"getDeclaredConstructors":"java.lang.reflect.Constructor<?>[]",
+	"getDeclaredField":"java.lang.reflect.Field",
+	"getField":"java.lang.reflect.Field",
+	"getDeclaredFields":"java.lang.reflect.Field[]",
+	"getFields":"java.lang.reflect.Field[]",
+	"getDeclaredMethod":"java.lang.reflect.Method",
+	"getEnclosingMethod":"java.lang.reflect.Method",
+	"getMethod":"java.lang.reflect.Method",
+	"getDeclaredMethods":"java.lang.reflect.Method[]",
+	"getMethods":"java.lang.reflect.Method[]",
+	"getRecordComponents":"java.lang.reflect.RecordComponent[]",
+	"getGenericSuperclass":"java.lang.reflect.Type",
+	"getTypeParameters":"java.lang.reflect.TypeVariable<java.lang.Class<T>>[]",
+	"getGenericInterfaces":"java.lang.reflect.Type[]",
+	"getResource":"java.net.URL",
+	"getProtectionDomain":"java.security.ProtectionDomain",
+	"describeConstable":"java.util.Optional<java.lang.constant.ClassDesc>",
+	"isArray":"boolean",
+	"isAssignableFrom":"boolean",
+	"isHidden":"boolean",
+	"isInstance":"boolean",
+	"isInterface":"boolean",
+	"isPrimitive":"boolean",
+	"getModifiers":"int",
+	"getSuperclass":"java.lang.Class<? super T>",
+	"getSigners":"java.lang.Object[]",
+	"forName":"java.lang.Class<?>",
+	"getExecutableTypeAnnotationBytes":"byte[]",
+	"typeVarBounds":"java.lang.String",
+	"getPrimitiveClass":"java.lang.Class<?>",
+	"getAnnotationType":"sun.reflect.annotation.AnnotationType",
+	"ANNOTATION":"int",
+	"ENUM":"int",
+	"SYNTHETIC":"int",
+	"cachedConstructor":"java.lang.reflect.Constructor<T>",
+	"name":"java.lang.String",
+	"module":"java.lang.Module",
+	"packageName":"java.lang.String",
+	"allPermDomain":"java.security.ProtectionDomain",
+	"classRedefinedCount":"int",
+	"genericInfo":"sun.reflect.generics.repository.ClassRepository",
+	"EMPTY_CLASS_ARRAY":"java.lang.Class<?>[]",
+	"serialVersionUID":"long",
+	"serialPersistentFields":"java.io.ObjectStreamField[]",
+	"reflectionFactory":"jdk.internal.reflect.ReflectionFactory",
+	"enumConstants":"T[]",
+	"annotationType":"sun.reflect.annotation.AnnotationType",
+	"classValueMap":"java.lang.ClassValue.ClassValueMap"
+};
+CodeMirrorJavaTypes["java.lang.Double"]={
+	"equals":"boolean",
+	"isInfinite":"boolean",
+	"isNaN":"boolean",
+	"byteValue":"byte",
+	"doubleValue":"double",
+	"floatValue":"float",
+	"compareTo":"int",
+	"hashCode":"int",
+	"intValue":"int",
+	"resolveConstantDesc":"java.lang.Double",
+	"toString":"java.lang.String",
+	"describeConstable":"java.util.Optional<java.lang.Double>",
+	"longValue":"long",
+	"shortValue":"short",
+	"isFinite":"boolean",
+	"max":"double",
+	"min":"double",
+	"parseDouble":"double",
+	"sum":"double",
+	"compare":"int",
+	"valueOf":"java.lang.Double",
+	"toHexString":"java.lang.String",
+	"doubleToLongBits":"long",
+	"longBitsToDouble":"double",
+	"doubleToRawLongBits":"long",
+	"serialVersionUID":"long",
+	"POSITIVE_INFINITY":"double",
+	"NEGATIVE_INFINITY":"double",
+	"NaN":"double",
+	"MAX_VALUE":"double",
+	"MIN_NORMAL":"double",
+	"MIN_VALUE":"double",
+	"MAX_EXPONENT":"int",
+	"MIN_EXPONENT":"int",
+	"SIZE":"int",
+	"BYTES":"int",
+	"TYPE":"java.lang.Class<java.lang.Double>",
+	"value":"double"
+};
+CodeMirrorJavaTypes["java.lang.Exception"]={
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["java.lang.Integer"]={
+	"toStringUTF16":"java.lang.String",
+	"toUnsignedString0":"java.lang.String",
+	"formatUnsignedInt":"void",
+	"formatUnsignedIntUTF16":"void",
+	"equals":"boolean",
+	"byteValue":"byte",
+	"doubleValue":"double",
+	"floatValue":"float",
+	"compareTo":"int",
+	"hashCode":"int",
+	"intValue":"int",
+	"resolveConstantDesc":"java.lang.Integer",
+	"toString":"java.lang.String",
+	"describeConstable":"java.util.Optional<java.lang.Integer>",
+	"longValue":"long",
+	"shortValue":"short",
+	"bitCount":"int",
+	"compare":"int",
+	"compareUnsigned":"int",
+	"divideUnsigned":"int",
+	"highestOneBit":"int",
+	"lowestOneBit":"int",
+	"max":"int",
+	"min":"int",
+	"numberOfLeadingZeros":"int",
+	"numberOfTrailingZeros":"int",
+	"parseInt":"int",
+	"parseUnsignedInt":"int",
+	"remainderUnsigned":"int",
+	"reverse":"int",
+	"reverseBytes":"int",
+	"rotateLeft":"int",
+	"rotateRight":"int",
+	"signum":"int",
+	"sum":"int",
+	"decode":"java.lang.Integer",
+	"getInteger":"java.lang.Integer",
+	"valueOf":"java.lang.Integer",
+	"toBinaryString":"java.lang.String",
+	"toHexString":"java.lang.String",
+	"toOctalString":"java.lang.String",
+	"toUnsignedString":"java.lang.String",
+	"toUnsignedLong":"long",
+	"getChars":"int",
+	"stringSize":"int",
+	"serialVersionUID":"long",
+	"MIN_VALUE":"int",
+	"MAX_VALUE":"int",
+	"TYPE":"java.lang.Class<java.lang.Integer>",
+	"digits":"char[]",
+	"DigitTens":"byte[]",
+	"DigitOnes":"byte[]",
+	"sizeTable":"int[]",
+	"value":"int",
+	"SIZE":"int",
+	"BYTES":"int"
+};
+CodeMirrorJavaTypes["java.lang.Long"]={
+	"toStringUTF16":"java.lang.String",
+	"toUnsignedBigInteger":"java.math.BigInteger",
+	"formatUnsignedLong0":"void",
+	"formatUnsignedLong0UTF16":"void",
+	"equals":"boolean",
+	"byteValue":"byte",
+	"doubleValue":"double",
+	"floatValue":"float",
+	"compareTo":"int",
+	"hashCode":"int",
+	"intValue":"int",
+	"resolveConstantDesc":"java.lang.Long",
+	"toString":"java.lang.String",
+	"describeConstable":"java.util.Optional<java.lang.Long>",
+	"longValue":"long",
+	"shortValue":"short",
+	"bitCount":"int",
+	"compare":"int",
+	"compareUnsigned":"int",
+	"numberOfLeadingZeros":"int",
+	"numberOfTrailingZeros":"int",
+	"signum":"int",
+	"decode":"java.lang.Long",
+	"getLong":"java.lang.Long",
+	"valueOf":"java.lang.Long",
+	"toBinaryString":"java.lang.String",
+	"toHexString":"java.lang.String",
+	"toOctalString":"java.lang.String",
+	"toUnsignedString":"java.lang.String",
+	"divideUnsigned":"long",
+	"highestOneBit":"long",
+	"lowestOneBit":"long",
+	"max":"long",
+	"min":"long",
+	"parseLong":"long",
+	"parseUnsignedLong":"long",
+	"remainderUnsigned":"long",
+	"reverse":"long",
+	"reverseBytes":"long",
+	"rotateLeft":"long",
+	"rotateRight":"long",
+	"sum":"long",
+	"getChars":"int",
+	"stringSize":"int",
+	"fastUUID":"java.lang.String",
+	"toUnsignedString0":"java.lang.String",
+	"serialVersionUID":"long",
+	"MIN_VALUE":"long",
+	"MAX_VALUE":"long",
+	"TYPE":"java.lang.Class<java.lang.Long>",
+	"value":"long",
+	"SIZE":"int",
+	"BYTES":"int"
+};
+CodeMirrorJavaTypes["java.lang.Number"]={
+	"doubleValue":"double",
+	"floatValue":"float",
+	"intValue":"int",
+	"longValue":"long",
+	"byteValue":"byte",
+	"shortValue":"short",
+	"serialVersionUID":"long"
+};
+CodeMirrorJavaTypes["java.lang.Object"]={
+	"clone":"java.lang.Object",
+	"finalize":"void",
+	"equals":"boolean",
+	"getClass":"java.lang.Class<?>",
+	"notify":"void",
+	"notifyAll":"void",
+	"wait":"void",
+	"toString":"java.lang.String",
+	"hashCode":"int"
+};
+CodeMirrorJavaTypes["java.lang.String"]={
+	"isLatin1":"boolean",
+	"coder":"byte",
+	"value":"byte[]",
+	"nonSyncContentEquals":"boolean",
+	"indexOfNonWhitespace":"int",
+	"lastIndexOfNonWhitespace":"int",
+	"isASCII":"boolean",
+	"isMalformed3":"boolean",
+	"isMalformed3_2":"boolean",
+	"isMalformed4":"boolean",
+	"isMalformed4_2":"boolean",
+	"isMalformed4_3":"boolean",
+	"isNotContinuation":"boolean",
+	"encode":"byte[]",
+	"encode8859_1":"byte[]",
+	"encodeASCII":"byte[]",
+	"encodeUTF8":"byte[]",
+	"encodeUTF8_UTF16":"byte[]",
+	"encodeWithEncoder":"byte[]",
+	"getBytesNoRepl1":"byte[]",
+	"safeTrim":"byte[]",
+	"decode2":"char",
+	"decode3":"char",
+	"decode4":"int",
+	"decodeUTF8_UTF16":"int",
+	"decodeWithDecoder":"int",
+	"malformed3":"int",
+	"malformed4":"int",
+	"outdent":"int",
+	"scale":"int",
+	"lambda$indent$0":"java.lang.String",
+	"lambda$indent$1":"java.lang.String",
+	"lambda$indent$2":"java.lang.String",
+	"lambda$stripIndent$3":"java.lang.String",
+	"newStringNoRepl1":"java.lang.String",
+	"rangeCheck":"java.lang.Void",
+	"lookupCharset":"java.nio.charset.Charset",
+	"throwMalformed":"void",
+	"throwUnmappable":"void",
+	"contains":"boolean",
+	"contentEquals":"boolean",
+	"endsWith":"boolean",
+	"equals":"boolean",
+	"equalsIgnoreCase":"boolean",
+	"isBlank":"boolean",
+	"isEmpty":"boolean",
+	"matches":"boolean",
+	"regionMatches":"boolean",
+	"startsWith":"boolean",
+	"getBytes":"byte[]",
+	"charAt":"char",
+	"toCharArray":"char[]",
+	"codePointAt":"int",
+	"codePointBefore":"int",
+	"codePointCount":"int",
+	"compareTo":"int",
+	"compareToIgnoreCase":"int",
+	"hashCode":"int",
+	"indexOf":"int",
+	"lastIndexOf":"int",
+	"length":"int",
+	"offsetByCodePoints":"int",
+	"subSequence":"java.lang.CharSequence",
+	"resolveConstantDesc":"java.lang.Object",
+	"transform":"R",
+	"concat":"java.lang.String",
+	"formatted":"java.lang.String",
+	"indent":"java.lang.String",
+	"repeat":"java.lang.String",
+	"replace":"java.lang.String",
+	"replaceAll":"java.lang.String",
+	"replaceFirst":"java.lang.String",
+	"strip":"java.lang.String",
+	"stripIndent":"java.lang.String",
+	"stripLeading":"java.lang.String",
+	"stripTrailing":"java.lang.String",
+	"substring":"java.lang.String",
+	"toLowerCase":"java.lang.String",
+	"toString":"java.lang.String",
+	"toUpperCase":"java.lang.String",
+	"translateEscapes":"java.lang.String",
+	"trim":"java.lang.String",
+	"split":"java.lang.String[]",
+	"describeConstable":"java.util.Optional<java.lang.String>",
+	"chars":"java.util.stream.IntStream",
+	"codePoints":"java.util.stream.IntStream",
+	"lines":"java.util.stream.Stream<java.lang.String>",
+	"intern":"java.lang.String",
+	"copyValueOf":"java.lang.String",
+	"format":"java.lang.String",
+	"join":"java.lang.String",
+	"valueOf":"java.lang.String",
+	"getChars":"void",
+	"getBytesNoRepl":"byte[]",
+	"getBytesUTF8NoRepl":"byte[]",
+	"decodeASCII":"int",
+	"newStringNoRepl":"java.lang.String",
+	"newStringUTF8NoRepl":"java.lang.String",
+	"valueOfCodePoint":"java.lang.String",
+	"checkBoundsBeginEnd":"void",
+	"checkBoundsOffCount":"void",
+	"checkIndex":"void",
+	"checkOffset":"void",
+	"hash":"int",
+	"hashIsZero":"boolean",
+	"serialVersionUID":"long",
+	"COMPACT_STRINGS":"boolean",
+	"serialPersistentFields":"java.io.ObjectStreamField[]",
+	"REPL":"char",
+	"CASE_INSENSITIVE_ORDER":"java.util.Comparator<java.lang.String>",
+	"LATIN1":"byte",
+	"UTF16":"byte"
+};
+CodeMirrorJavaTypes["java.lang.Throwable"]={
+	"setCause":"void",
+	"validateSuppressedExceptionsList":"int",
+	"fillInStackTrace":"java.lang.Throwable",
+	"getOurStackTrace":"java.lang.StackTraceElement[]",
+	"writeObject":"void",
+	"printEnclosedStackTrace":"void",
+	"printStackTrace":"void",
+	"readObject":"void",
+	"getSuppressed":"java.lang.Throwable[]",
+	"addSuppressed":"void",
+	"getStackTrace":"java.lang.StackTraceElement[]",
+	"getLocalizedMessage":"java.lang.String",
+	"getMessage":"java.lang.String",
+	"toString":"java.lang.String",
+	"getCause":"java.lang.Throwable",
+	"initCause":"java.lang.Throwable",
+	"setStackTrace":"void",
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["java.net.URL"]={
+	"isBuiltinStreamHandler":"boolean",
+	"isValidProtocol":"boolean",
+	"readResolve":"java.lang.Object",
+	"fabricateNewURL":"java.net.URL",
+	"setDeserializedFields":"java.net.URL",
+	"lookupViaProperty":"java.net.URLStreamHandler",
+	"lookupViaProviders":"java.net.URLStreamHandler",
+	"providers":"java.util.Iterator<java.net.spi.URLStreamHandlerProvider>",
+	"readObject":"void",
+	"writeObject":"void",
+	"checkSpecifyHandler":"void",
+	"resetState":"void",
+	"setSerializedHashCode":"void",
+	"equals":"boolean",
+	"sameFile":"boolean",
+	"openStream":"java.io.InputStream",
+	"getContent":"java.lang.Object",
+	"getDefaultPort":"int",
+	"getPort":"int",
+	"getAuthority":"java.lang.String",
+	"getFile":"java.lang.String",
+	"getHost":"java.lang.String",
+	"getPath":"java.lang.String",
+	"getProtocol":"java.lang.String",
+	"getQuery":"java.lang.String",
+	"getRef":"java.lang.String",
+	"getUserInfo":"java.lang.String",
+	"toExternalForm":"java.lang.String",
+	"toString":"java.lang.String",
+	"toURI":"java.net.URI",
+	"openConnection":"java.net.URLConnection",
+	"setURLStreamHandlerFactory":"void",
+	"hashCode":"int",
+	"isOverrideable":"boolean",
+	"toLowerCase":"java.lang.String",
+	"fromURI":"java.net.URL",
+	"getURLStreamHandler":"java.net.URLStreamHandler",
+	"getHostAddress":"java.net.InetAddress",
+	"set":"void",
+	"BUILTIN_HANDLERS_PREFIX":"java.lang.String",
+	"serialVersionUID":"long",
+	"protocolPathProp":"java.lang.String",
+	"protocol":"java.lang.String",
+	"host":"java.lang.String",
+	"port":"int",
+	"file":"java.lang.String",
+	"query":"java.lang.String",
+	"authority":"java.lang.String",
+	"path":"java.lang.String",
+	"userInfo":"java.lang.String",
+	"ref":"java.lang.String",
+	"hostAddress":"java.net.InetAddress",
+	"handler":"java.net.URLStreamHandler",
+	"tempState":"java.net.UrlDeserializedState",
+	"factory":"java.net.URLStreamHandlerFactory",
+	"defaultFactory":"java.net.URLStreamHandlerFactory",
+	"gate":"java.lang.ThreadLocal<java.lang.Object>",
+	"handlers":"java.util.Hashtable<java.lang.String,java.net.URLStreamHandler>",
+	"streamHandlerLock":"java.lang.Object",
+	"serialPersistentFields":"java.io.ObjectStreamField[]"
+};
+CodeMirrorJavaTypes["java.rmi.RemoteException"]={
+	"getMessage":"java.lang.String",
+	"getCause":"java.lang.Throwable",
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean",
+	"detail":"java.lang.Throwable"
+};
+CodeMirrorJavaTypes["java.security.cert.X509Certificate"]={
+	"getIssuerUniqueID":"boolean[]",
+	"getKeyUsage":"boolean[]",
+	"getSubjectUniqueID":"boolean[]",
+	"getSigAlgParams":"byte[]",
+	"getSignature":"byte[]",
+	"getTBSCertificate":"byte[]",
+	"getBasicConstraints":"int",
+	"getVersion":"int",
+	"getSigAlgName":"java.lang.String",
+	"getSigAlgOID":"java.lang.String",
+	"getSerialNumber":"java.math.BigInteger",
+	"getIssuerDN":"java.security.Principal",
+	"getSubjectDN":"java.security.Principal",
+	"getNotAfter":"java.util.Date",
+	"getNotBefore":"java.util.Date",
+	"checkValidity":"void",
+	"getIssuerAlternativeNames":"java.util.Collection<java.util.List<?>>",
+	"getSubjectAlternativeNames":"java.util.Collection<java.util.List<?>>",
+	"getExtendedKeyUsage":"java.util.List<java.lang.String>",
+	"getIssuerX500Principal":"javax.security.auth.x500.X500Principal",
+	"getSubjectX500Principal":"javax.security.auth.x500.X500Principal",
+	"verify":"void",
+	"serialVersionUID":"long",
+	"type":"java.lang.String",
+	"hash":"int",
+	"subjectX500Principal":"javax.security.auth.x500.X500Principal",
+	"issuerX500Principal":"javax.security.auth.x500.X500Principal"
+};
+CodeMirrorJavaTypes["java.sql.SQLException"]={
+	"getErrorCode":"int",
+	"getSQLState":"java.lang.String",
+	"getNextException":"java.sql.SQLException",
+	"iterator":"java.util.Iterator<java.lang.Throwable>",
+	"setNextException":"void",
+	"serialVersionUID":"long",
+	"backtrace":"java.lang.Object",
+	"detailMessage":"java.lang.String",
+	"UNASSIGNED_STACK":"java.lang.StackTraceElement[]",
+	"cause":"java.lang.Throwable",
+	"stackTrace":"java.lang.StackTraceElement[]",
+	"depth":"int",
+	"SUPPRESSED_SENTINEL":"java.util.List<java.lang.Throwable>",
+	"suppressedExceptions":"java.util.List<java.lang.Throwable>",
+	"NULL_CAUSE_MESSAGE":"java.lang.String",
+	"SELF_SUPPRESSION_MESSAGE":"java.lang.String",
+	"CAUSE_CAPTION":"java.lang.String",
+	"SUPPRESSED_CAPTION":"java.lang.String",
+	"EMPTY_THROWABLE_ARRAY":"java.lang.Throwable[]",
+	"$assertionsDisabled":"boolean",
+	"SQLState":"java.lang.String",
+	"vendorCode":"int",
+	"next":"java.sql.SQLException",
+	"nextUpdater":"java.util.concurrent.atomic.AtomicReferenceFieldUpdater<java.sql.SQLException,java.sql.SQLException>"
+};
+CodeMirrorJavaTypes["java.sql.Timestamp"]={
+	"after":"boolean",
+	"before":"boolean",
+	"equals":"boolean",
+	"compareTo":"int",
+	"getNanos":"int",
+	"hashCode":"int",
+	"toString":"java.lang.String",
+	"toInstant":"java.time.Instant",
+	"toLocalDateTime":"java.time.LocalDateTime",
+	"getTime":"long",
+	"from":"java.sql.Timestamp",
+	"valueOf":"java.sql.Timestamp",
+	"setNanos":"void",
+	"setTime":"void",
+	"gcal":"sun.util.calendar.BaseCalendar",
+	"jcal":"sun.util.calendar.BaseCalendar",
+	"fastTime":"long",
+	"cdate":"sun.util.calendar.BaseCalendar.Date",
+	"defaultCenturyStart":"int",
+	"serialVersionUID":"long",
+	"wtb":"java.lang.String[]",
+	"ttb":"int[]",
+	"nanos":"int",
+	"MILLIS_PER_SECOND":"int"
+};
+CodeMirrorJavaTypes["java.util.Calendar"]={
+	"checkDisplayNameParams":"boolean",
+	"isExternallySet":"boolean",
+	"isFullyNormalized":"boolean",
+	"isPartiallyNormalized":"boolean",
+	"getSetStateFields":"int",
+	"selectFields":"int",
+	"internalSet":"void",
+	"setFieldsComputed":"void",
+	"setFieldsNormalized":"void",
+	"setUnnormalized":"void",
+	"getBaseStyle":"int",
+	"getZone":"java.util.TimeZone",
+	"isNarrowFormatStyle":"boolean",
+	"isNarrowStyle":"boolean",
+	"isStandaloneStyle":"boolean",
+	"compareTo":"int",
+	"toStandaloneStyle":"int",
+	"getFieldStrings":"java.lang.String[]",
+	"getDisplayNamesImpl":"java.util.Map<java.lang.String,java.lang.Integer>",
+	"aggregateStamp":"int",
+	"createCalendar":"java.util.Calendar",
+	"defaultTimeZone":"java.util.TimeZone",
+	"getMillisOf":"long",
+	"appendValue":"void",
+	"writeObject":"void",
+	"adjustStamp":"void",
+	"invalidateWeekFields":"void",
+	"readObject":"void",
+	"setWeekCountData":"void",
+	"updateTime":"void",
+	"computeFields":"void",
+	"computeTime":"void",
+	"internalGet":"int",
+	"complete":"void",
+	"getGreatestMinimum":"int",
+	"getLeastMaximum":"int",
+	"getMaximum":"int",
+	"getMinimum":"int",
+	"add":"void",
+	"roll":"void",
+	"after":"boolean",
+	"before":"boolean",
+	"equals":"boolean",
+	"isLenient":"boolean",
+	"isWeekDateSupported":"boolean",
+	"isSet":"boolean",
+	"toInstant":"java.time.Instant",
+	"getTime":"java.util.Date",
+	"clear":"void",
+	"set":"void",
+	"setTime":"void",
+	"get":"int",
+	"getActualMaximum":"int",
+	"getActualMinimum":"int",
+	"getFirstDayOfWeek":"int",
+	"getMinimalDaysInFirstWeek":"int",
+	"getWeekYear":"int",
+	"getWeeksInWeekYear":"int",
+	"hashCode":"int",
+	"clone":"java.lang.Object",
+	"getCalendarType":"java.lang.String",
+	"getDisplayName":"java.lang.String",
+	"toString":"java.lang.String",
+	"getDisplayNames":"java.util.Map<java.lang.String,java.lang.Integer>",
+	"getTimeZone":"java.util.TimeZone",
+	"getTimeInMillis":"long",
+	"getInstance":"java.util.Calendar",
+	"getAvailableCalendarTypes":"java.util.Set<java.lang.String>",
+	"getAvailableLocales":"java.util.Locale[]",
+	"setFirstDayOfWeek":"void",
+	"setLenient":"void",
+	"setMinimalDaysInFirstWeek":"void",
+	"setTimeInMillis":"void",
+	"setTimeZone":"void",
+	"setWeekDate":"void",
+	"isFieldSet":"boolean",
+	"getFieldName":"java.lang.String",
+	"setZoneShared":"void",
+	"ERA":"int",
+	"YEAR":"int",
+	"MONTH":"int",
+	"WEEK_OF_YEAR":"int",
+	"WEEK_OF_MONTH":"int",
+	"DATE":"int",
+	"DAY_OF_MONTH":"int",
+	"DAY_OF_YEAR":"int",
+	"DAY_OF_WEEK":"int",
+	"DAY_OF_WEEK_IN_MONTH":"int",
+	"AM_PM":"int",
+	"HOUR":"int",
+	"HOUR_OF_DAY":"int",
+	"MINUTE":"int",
+	"SECOND":"int",
+	"MILLISECOND":"int",
+	"ZONE_OFFSET":"int",
+	"DST_OFFSET":"int",
+	"FIELD_COUNT":"int",
+	"SUNDAY":"int",
+	"MONDAY":"int",
+	"TUESDAY":"int",
+	"WEDNESDAY":"int",
+	"THURSDAY":"int",
+	"FRIDAY":"int",
+	"SATURDAY":"int",
+	"JANUARY":"int",
+	"FEBRUARY":"int",
+	"MARCH":"int",
+	"APRIL":"int",
+	"MAY":"int",
+	"JUNE":"int",
+	"JULY":"int",
+	"AUGUST":"int",
+	"SEPTEMBER":"int",
+	"OCTOBER":"int",
+	"NOVEMBER":"int",
+	"DECEMBER":"int",
+	"UNDECIMBER":"int",
+	"AM":"int",
+	"PM":"int",
+	"ALL_STYLES":"int",
+	"STANDALONE_MASK":"int",
+	"SHORT":"int",
+	"LONG":"int",
+	"NARROW_FORMAT":"int",
+	"NARROW_STANDALONE":"int",
+	"SHORT_FORMAT":"int",
+	"LONG_FORMAT":"int",
+	"SHORT_STANDALONE":"int",
+	"LONG_STANDALONE":"int",
+	"fields":"int[]",
+	"stamp":"int[]",
+	"time":"long",
+	"isTimeSet":"boolean",
+	"areFieldsSet":"boolean",
+	"areAllFieldsSet":"boolean",
+	"lenient":"boolean",
+	"zone":"java.util.TimeZone",
+	"sharedZone":"boolean",
+	"firstDayOfWeek":"int",
+	"minimalDaysInFirstWeek":"int",
+	"cachedLocaleData":"java.util.concurrent.ConcurrentMap<java.util.Locale,int[]>",
+	"UNSET":"int",
+	"COMPUTED":"int",
+	"MINIMUM_USER_STAMP":"int",
+	"ALL_FIELDS":"int",
+	"nextStamp":"int",
+	"currentSerialVersion":"int",
+	"serialVersionOnStream":"int",
+	"serialVersionUID":"long",
+	"ERA_MASK":"int",
+	"YEAR_MASK":"int",
+	"MONTH_MASK":"int",
+	"WEEK_OF_YEAR_MASK":"int",
+	"WEEK_OF_MONTH_MASK":"int",
+	"DAY_OF_MONTH_MASK":"int",
+	"DATE_MASK":"int",
+	"DAY_OF_YEAR_MASK":"int",
+	"DAY_OF_WEEK_MASK":"int",
+	"DAY_OF_WEEK_IN_MONTH_MASK":"int",
+	"AM_PM_MASK":"int",
+	"HOUR_MASK":"int",
+	"HOUR_OF_DAY_MASK":"int",
+	"MINUTE_MASK":"int",
+	"SECOND_MASK":"int",
+	"MILLISECOND_MASK":"int",
+	"ZONE_OFFSET_MASK":"int",
+	"DST_OFFSET_MASK":"int",
+	"FIELD_NAME":"java.lang.String[]",
+	"$assertionsDisabled":"boolean"
+};
+CodeMirrorJavaTypes["java.util.Date"]={
+	"getTimeImpl":"long",
+	"getCalendarDate":"sun.util.calendar.BaseCalendar.Date",
+	"normalize":"sun.util.calendar.BaseCalendar.Date",
+	"convertToAbbr":"java.lang.StringBuilder",
+	"getCalendarSystem":"sun.util.calendar.BaseCalendar",
+	"getJulianCalendar":"sun.util.calendar.BaseCalendar",
+	"readObject":"void",
+	"writeObject":"void",
+	"after":"boolean",
+	"before":"boolean",
+	"equals":"boolean",
+	"compareTo":"int",
+	"getDate":"int",
+	"getDay":"int",
+	"getHours":"int",
+	"getMinutes":"int",
+	"getMonth":"int",
+	"getSeconds":"int",
+	"getTimezoneOffset":"int",
+	"getYear":"int",
+	"hashCode":"int",
+	"clone":"java.lang.Object",
+	"toGMTString":"java.lang.String",
+	"toLocaleString":"java.lang.String",
+	"toString":"java.lang.String",
+	"toInstant":"java.time.Instant",
+	"getTime":"long",
+	"from":"java.util.Date",
+	"UTC":"long",
+	"parse":"long",
+	"setDate":"void",
+	"setHours":"void",
+	"setMinutes":"void",
+	"setMonth":"void",
+	"setSeconds":"void",
+	"setTime":"void",
+	"setYear":"void",
+	"getMillisOf":"long",
+	"gcal":"sun.util.calendar.BaseCalendar",
+	"jcal":"sun.util.calendar.BaseCalendar",
+	"fastTime":"long",
+	"cdate":"sun.util.calendar.BaseCalendar.Date",
+	"defaultCenturyStart":"int",
+	"serialVersionUID":"long",
+	"wtb":"java.lang.String[]",
+	"ttb":"int[]"
+};
+CodeMirrorJavaTypes["java.util.Properties"]={
+	"getFormattedTimestamp":"java.lang.String",
+	"loadConvert":"java.lang.String",
+	"saveConvert":"java.lang.String",
+	"writeComments":"void",
+	"enumerate":"void",
+	"enumerateStringProperties":"void",
+	"load0":"void",
+	"store0":"void",
+	"rehash":"void",
+	"contains":"boolean",
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"isEmpty":"boolean",
+	"size":"int",
+	"get":"java.lang.Object",
+	"getOrDefault":"java.lang.Object",
+	"getProperty":"java.lang.String",
+	"values":"java.util.Collection<java.lang.Object>",
+	"elements":"java.util.Enumeration<java.lang.Object>",
+	"keys":"java.util.Enumeration<java.lang.Object>",
+	"propertyNames":"java.util.Enumeration<?>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<java.lang.Object,java.lang.Object>>",
+	"keySet":"java.util.Set<java.lang.Object>",
+	"stringPropertyNames":"java.util.Set<java.lang.String>",
+	"equals":"boolean",
+	"remove":"boolean",
+	"replace":"boolean",
+	"hashCode":"int",
+	"clone":"java.lang.Object",
+	"compute":"java.lang.Object",
+	"computeIfAbsent":"java.lang.Object",
+	"computeIfPresent":"java.lang.Object",
+	"merge":"java.lang.Object",
+	"put":"java.lang.Object",
+	"putIfAbsent":"java.lang.Object",
+	"setProperty":"java.lang.Object",
+	"toString":"java.lang.String",
+	"clear":"void",
+	"forEach":"void",
+	"load":"void",
+	"loadFromXML":"void",
+	"putAll":"void",
+	"replaceAll":"void",
+	"list":"void",
+	"save":"void",
+	"store":"void",
+	"storeToXML":"void",
+	"readHashtable":"void",
+	"writeHashtable":"void",
+	"table":"java.util.Hashtable.Entry<?,?>[]",
+	"count":"int",
+	"threshold":"int",
+	"loadFactor":"float",
+	"modCount":"int",
+	"serialVersionUID":"long",
+	"MAX_ARRAY_SIZE":"int",
+	"KEYS":"int",
+	"VALUES":"int",
+	"ENTRIES":"int",
+	"UNSAFE":"jdk.internal.misc.Unsafe",
+	"defaults":"java.util.Properties",
+	"map":"java.util.concurrent.ConcurrentHashMap<java.lang.Object,java.lang.Object>"
+};
+CodeMirrorJavaTypes["org.apache.lucene.document.Document"]={
+	"get":"java.lang.String",
+	"toString":"java.lang.String",
+	"getValues":"java.lang.String[]",
+	"getFields":"java.util.List<org.apache.lucene.index.IndexableField>",
+	"getField":"org.apache.lucene.index.IndexableField",
+	"getBinaryValue":"org.apache.lucene.util.BytesRef",
+	"getBinaryValues":"org.apache.lucene.util.BytesRef[]",
+	"add":"void",
+	"removeField":"void",
+	"removeFields":"void",
+	"iterator":"java.util.Iterator<org.apache.lucene.index.IndexableField>",
+	"clear":"void",
+	"fields":"java.util.List<org.apache.lucene.index.IndexableField>",
+	"NO_STRINGS":"java.lang.String[]"
+};
+CodeMirrorJavaTypes["org.apache.lucene.search.Query"]={
+	"sameClassAs":"boolean",
+	"classHash":"int",
+	"equals":"boolean",
+	"hashCode":"int",
+	"toString":"java.lang.String",
+	"visit":"void",
+	"rewrite":"org.apache.lucene.search.Query",
+	"createWeight":"org.apache.lucene.search.Weight",
+	"CLASS_NAME_HASH":"int"
+};
+CodeMirrorJavaTypes["org.apache.lucene.search.SimpleCollector"]={
+	"doSetNextReader":"void",
+	"collect":"void",
+	"getLeafCollector":"org.apache.lucene.search.LeafCollector",
+	"setScorer":"void"
+};
+CodeMirrorJavaTypes["org.jbpm.JbpmConfiguration"]={
+	"getJbpmContextStack":"java.util.Stack",
+	"getHideStaleObjectExceptions":"boolean",
+	"createJbpmConfiguration":"org.jbpm.JbpmConfiguration",
+	"parseObjectFactory":"org.jbpm.configuration.ObjectFactory",
+	"createJbpmContext":"org.jbpm.JbpmContext",
+	"getCurrentJbpmContext":"org.jbpm.JbpmContext",
+	"getServiceFactory":"org.jbpm.svc.ServiceFactory",
+	"hasInstance":"boolean",
+	"getProcessClassLoader":"java.lang.ClassLoader",
+	"getInstance":"org.jbpm.JbpmConfiguration",
+	"parseInputStream":"org.jbpm.JbpmConfiguration",
+	"parseResource":"org.jbpm.JbpmConfiguration",
+	"parseXmlString":"org.jbpm.JbpmConfiguration",
+	"getJobExecutor":"org.jbpm.job.executor.JobExecutor",
+	"cleanSchema":"void",
+	"close":"void",
+	"createSchema":"void",
+	"dropSchema":"void",
+	"startJobExecutor":"void",
+	"getCurrentJbpmConfiguration":"org.jbpm.JbpmConfiguration",
+	"access$000":"org.jbpm.configuration.ObjectFactory",
+	"getJbpmConfigurationStack":"java.util.Stack",
+	"popJbpmConfiguration":"void",
+	"pushJbpmConfiguration":"void",
+	"jbpmContextClosed":"void",
+	"jbpmContextCreated":"void",
+	"popJbpmContext":"void",
+	"pushJbpmContext":"void",
+	"serialVersionUID":"long",
+	"defaultObjectFactory":"org.jbpm.configuration.ObjectFactory",
+	"instances":"java.util.Map",
+	"jbpmConfigurationsStacks":"java.lang.ThreadLocal",
+	"objectFactory":"org.jbpm.configuration.ObjectFactory",
+	"jbpmContextStacks":"java.lang.ThreadLocal",
+	"jobExecutor":"org.jbpm.job.executor.JobExecutor",
+	"log":"org.apache.commons.logging.Log"
+};
+CodeMirrorJavaTypes["org.jbpm.JbpmContext"]={
+	"getPersistenceService":"org.jbpm.persistence.PersistenceService",
+	"getActorId":"java.lang.String",
+	"getConnection":"java.sql.Connection",
+	"getGroupTaskList":"java.util.List",
+	"getTaskList":"java.util.List",
+	"getSession":"org.hibernate.Session",
+	"getSessionFactory":"org.hibernate.SessionFactory",
+	"getJbpmConfiguration":"org.jbpm.JbpmConfiguration",
+	"getObjectFactory":"org.jbpm.configuration.ObjectFactory",
+	"getContextSession":"org.jbpm.db.ContextSession",
+	"getGraphSession":"org.jbpm.db.GraphSession",
+	"getJobSession":"org.jbpm.db.JobSession",
+	"getLoggingSession":"org.jbpm.db.LoggingSession",
+	"getTaskMgmtSession":"org.jbpm.db.TaskMgmtSession",
+	"getProcessInstance":"org.jbpm.graph.exe.ProcessInstance",
+	"getProcessInstanceForUpdate":"org.jbpm.graph.exe.ProcessInstance",
+	"loadProcessInstance":"org.jbpm.graph.exe.ProcessInstance",
+	"loadProcessInstanceForUpdate":"org.jbpm.graph.exe.ProcessInstance",
+	"newProcessInstance":"org.jbpm.graph.exe.ProcessInstance",
+	"newProcessInstanceForUpdate":"org.jbpm.graph.exe.ProcessInstance",
+	"getToken":"org.jbpm.graph.exe.Token",
+	"getTokenForUpdate":"org.jbpm.graph.exe.Token",
+	"loadToken":"org.jbpm.graph.exe.Token",
+	"loadTokenForUpdate":"org.jbpm.graph.exe.Token",
+	"getServiceFactory":"org.jbpm.svc.ServiceFactory",
+	"getServices":"org.jbpm.svc.Services",
+	"getTaskInstance":"org.jbpm.taskmgmt.exe.TaskInstance",
+	"getTaskInstanceForUpdate":"org.jbpm.taskmgmt.exe.TaskInstance",
+	"loadTaskInstance":"org.jbpm.taskmgmt.exe.TaskInstance",
+	"loadTaskInstanceForUpdate":"org.jbpm.taskmgmt.exe.TaskInstance",
+	"getCurrentJbpmContext":"org.jbpm.JbpmContext",
+	"addAutoSaveProcessInstance":"void",
+	"addAutoSaveTaskInstance":"void",
+	"addAutoSaveToken":"void",
+	"close":"void",
+	"deployProcessDefinition":"void",
+	"save":"void",
+	"setActorId":"void",
+	"setConnection":"void",
+	"setRollbackOnly":"void",
+	"setSession":"void",
+	"setSessionFactory":"void",
+	"autoSave":"void",
+	"serialVersionUID":"long",
+	"DEFAULT_JBPM_CONTEXT_NAME":"java.lang.String",
+	"currentContextsStack":"java.lang.ThreadLocal",
+	"objectFactory":"org.jbpm.configuration.ObjectFactory",
+	"services":"org.jbpm.svc.Services",
+	"autoSaveProcessInstances":"java.util.List",
+	"jbpmConfiguration":"org.jbpm.JbpmConfiguration",
+	"log":"org.apache.commons.logging.Log"
+};
+CodeMirrorJavaTypes["roles.ALL"]={
+
+};
+CodeMirrorJavaTypes["roles.AttributeTranslationCreate"]={
+
+};
+CodeMirrorJavaTypes["roles.AttributeTranslationDelete"]={
+
+};
+CodeMirrorJavaTypes["roles.AttributeTranslationQuery"]={
+
+};
+CodeMirrorJavaTypes["roles.AttributeTranslationUpdate"]={
+
+};
+CodeMirrorJavaTypes["roles.Ciutada"]={
+
+};
+CodeMirrorJavaTypes["roles.DirectorContracte"]={
+
+};
+CodeMirrorJavaTypes["roles.EmpleatEmpresaPublica"]={
+
+};
+CodeMirrorJavaTypes["roles.Funcionari"]={
+
+};
+CodeMirrorJavaTypes["roles.Habilitant"]={
+
+};
+CodeMirrorJavaTypes["roles.Iniciador"]={
+
+};
+CodeMirrorJavaTypes["roles.IssueCreate"]={
+
+};
+CodeMirrorJavaTypes["roles.IssueDelete"]={
+
+};
+CodeMirrorJavaTypes["roles.IssuePolicyCreate"]={
+
+};
+CodeMirrorJavaTypes["roles.IssuePolicyDelete"]={
+
+};
+CodeMirrorJavaTypes["roles.IssuePolicyQuery"]={
+
+};
+CodeMirrorJavaTypes["roles.IssuePolicyUpdate"]={
+
+};
+CodeMirrorJavaTypes["roles.IssueQuery"]={
+
+};
+CodeMirrorJavaTypes["roles.IssueUpdate"]={
+
+};
+CodeMirrorJavaTypes["roles.Personal"]={
+
+};
+CodeMirrorJavaTypes["roles.Proveidor"]={
+
+};
+CodeMirrorJavaTypes["roles.ResponsableAplicacio"]={
+
+};
+CodeMirrorJavaTypes["roles.Tothom"]={
+
+};
+CodeMirrorJavaTypes["roles.Usuari"]={
+
+};
+CodeMirrorJavaTypes["roles.UsuariDGTIC"]={
+
+};
+CodeMirrorJavaTypes["roles.Workflow"]={
+
+};
+CodeMirrorJavaTypes["roles.accessRegister_query"]={
+
+};
+CodeMirrorJavaTypes["roles.account_attribute_query"]={
+
+};
+CodeMirrorJavaTypes["roles.account_attribute_update"]={
+
+};
+CodeMirrorJavaTypes["roles.account_create"]={
+
+};
+CodeMirrorJavaTypes["roles.account_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.account_query"]={
+
+};
+CodeMirrorJavaTypes["roles.account_update"]={
+
+};
+CodeMirrorJavaTypes["roles.actor_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_accessControl_create"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_accessControl_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_accessControl_set"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_accessControl_update"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_create"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_invoke"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_query"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_queryObjects"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_refreshGroups"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_refreshRoles"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_refreshUsers"]={
+
+};
+CodeMirrorJavaTypes["roles.agent_update"]={
+
+};
+CodeMirrorJavaTypes["roles.anonymous"]={
+
+};
+CodeMirrorJavaTypes["roles.application_create"]={
+
+};
+CodeMirrorJavaTypes["roles.application_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.application_query"]={
+
+};
+CodeMirrorJavaTypes["roles.application_update"]={
+
+};
+CodeMirrorJavaTypes["roles.audit_custom_query"]={
+
+};
+CodeMirrorJavaTypes["roles.audit_query"]={
+
+};
+CodeMirrorJavaTypes["roles.authorization_query"]={
+
+};
+CodeMirrorJavaTypes["roles.authorization_rol_create"]={
+
+};
+CodeMirrorJavaTypes["roles.authorization_rol_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.base_log_query"]={
+
+};
+CodeMirrorJavaTypes["roles.browser_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.browser_query"]={
+
+};
+CodeMirrorJavaTypes["roles.browser_update"]={
+
+};
+CodeMirrorJavaTypes["roles.customObjectType_create"]={
+
+};
+CodeMirrorJavaTypes["roles.customObjectType_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.customObjectType_query"]={
+
+};
+CodeMirrorJavaTypes["roles.customObjectType_update"]={
+
+};
+CodeMirrorJavaTypes["roles.customObject_create"]={
+
+};
+CodeMirrorJavaTypes["roles.customObject_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.customObject_query"]={
+
+};
+CodeMirrorJavaTypes["roles.customObject_update"]={
+
+};
+CodeMirrorJavaTypes["roles.group_create"]={
+
+};
+CodeMirrorJavaTypes["roles.group_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.group_printer_create"]={
+
+};
+CodeMirrorJavaTypes["roles.group_printer_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.group_query"]={
+
+};
+CodeMirrorJavaTypes["roles.group_role_query"]={
+
+};
+CodeMirrorJavaTypes["roles.group_update"]={
+
+};
+CodeMirrorJavaTypes["roles.group_user_query"]={
+
+};
+CodeMirrorJavaTypes["roles.host_admin_query"]={
+
+};
+CodeMirrorJavaTypes["roles.host_all_create"]={
+
+};
+CodeMirrorJavaTypes["roles.host_all_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.host_all_query"]={
+
+};
+CodeMirrorJavaTypes["roles.host_all_update"]={
+
+};
+CodeMirrorJavaTypes["roles.host_query"]={
+
+};
+CodeMirrorJavaTypes["roles.host_update_os"]={
+
+};
+CodeMirrorJavaTypes["roles.intranetMenus_admin"]={
+
+};
+CodeMirrorJavaTypes["roles.lopd_create"]={
+
+};
+CodeMirrorJavaTypes["roles.lopd_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.lopd_query"]={
+
+};
+CodeMirrorJavaTypes["roles.lopd_update"]={
+
+};
+CodeMirrorJavaTypes["roles.mail_create"]={
+
+};
+CodeMirrorJavaTypes["roles.mail_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.mail_query"]={
+
+};
+CodeMirrorJavaTypes["roles.mail_update"]={
+
+};
+CodeMirrorJavaTypes["roles.metadata_create"]={
+
+};
+CodeMirrorJavaTypes["roles.metadata_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.metadata_query"]={
+
+};
+CodeMirrorJavaTypes["roles.metadata_update"]={
+
+};
+CodeMirrorJavaTypes["roles.monitor_agent_list"]={
+
+};
+CodeMirrorJavaTypes["roles.monitor_server_list"]={
+
+};
+CodeMirrorJavaTypes["roles.networkDiscovery_query"]={
+
+};
+CodeMirrorJavaTypes["roles.networkDiscovery_schedule"]={
+
+};
+CodeMirrorJavaTypes["roles.network_all_create"]={
+
+};
+CodeMirrorJavaTypes["roles.network_all_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.network_all_query"]={
+
+};
+CodeMirrorJavaTypes["roles.network_all_update"]={
+
+};
+CodeMirrorJavaTypes["roles.operatingSystem_create"]={
+
+};
+CodeMirrorJavaTypes["roles.operatingSystem_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.operatingSystem_update"]={
+
+};
+CodeMirrorJavaTypes["roles.organizationalUnit_create"]={
+
+};
+CodeMirrorJavaTypes["roles.organizationalUnit_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.organizationalUnit_query"]={
+
+};
+CodeMirrorJavaTypes["roles.organizationalUnit_update"]={
+
+};
+CodeMirrorJavaTypes["roles.parameter_create"]={
+
+};
+CodeMirrorJavaTypes["roles.parameter_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.parameter_query"]={
+
+};
+CodeMirrorJavaTypes["roles.parameter_update"]={
+
+};
+CodeMirrorJavaTypes["roles.passwordDomain_create"]={
+
+};
+CodeMirrorJavaTypes["roles.passwordDomain_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.passwordDomain_query"]={
+
+};
+CodeMirrorJavaTypes["roles.passwordDomain_update"]={
+
+};
+CodeMirrorJavaTypes["roles.plugins_query"]={
+
+};
+CodeMirrorJavaTypes["roles.plugins_update"]={
+
+};
+CodeMirrorJavaTypes["roles.printer_acl_query"]={
+
+};
+CodeMirrorJavaTypes["roles.printer_create"]={
+
+};
+CodeMirrorJavaTypes["roles.printer_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.printer_query"]={
+
+};
+CodeMirrorJavaTypes["roles.printer_update"]={
+
+};
+CodeMirrorJavaTypes["roles.pupil_create"]={
+
+};
+CodeMirrorJavaTypes["roles.role_create"]={
+
+};
+CodeMirrorJavaTypes["roles.role_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.role_query"]={
+
+};
+CodeMirrorJavaTypes["roles.role_update"]={
+
+};
+CodeMirrorJavaTypes["roles.rule_admin"]={
+
+};
+CodeMirrorJavaTypes["roles.rule_query"]={
+
+};
+CodeMirrorJavaTypes["roles.schedule_admin"]={
+
+};
+CodeMirrorJavaTypes["roles.schedule_query"]={
+
+};
+CodeMirrorJavaTypes["roles.server_manage_proxy"]={
+
+};
+CodeMirrorJavaTypes["roles.server_manage_server"]={
+
+};
+CodeMirrorJavaTypes["roles.server_query"]={
+
+};
+CodeMirrorJavaTypes["roles.service_create"]={
+
+};
+CodeMirrorJavaTypes["roles.service_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.service_query"]={
+
+};
+CodeMirrorJavaTypes["roles.service_update"]={
+
+};
+CodeMirrorJavaTypes["roles.sod_create"]={
+
+};
+CodeMirrorJavaTypes["roles.sod_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.sod_query"]={
+
+};
+CodeMirrorJavaTypes["roles.sod_update"]={
+
+};
+CodeMirrorJavaTypes["roles.sso_manage"]={
+
+};
+CodeMirrorJavaTypes["roles.tenantCreate"]={
+
+};
+CodeMirrorJavaTypes["roles.tenantQuery"]={
+
+};
+CodeMirrorJavaTypes["roles.tenantRemove"]={
+
+};
+CodeMirrorJavaTypes["roles.tenantUpdate"]={
+
+};
+CodeMirrorJavaTypes["roles.userType_create"]={
+
+};
+CodeMirrorJavaTypes["roles.userType_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.userType_query"]={
+
+};
+CodeMirrorJavaTypes["roles.userType_update"]={
+
+};
+CodeMirrorJavaTypes["roles.user_accessRegister_query"]={
+
+};
+CodeMirrorJavaTypes["roles.user_create"]={
+
+};
+CodeMirrorJavaTypes["roles.user_custom_update"]={
+
+};
+CodeMirrorJavaTypes["roles.user_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.user_group_create"]={
+
+};
+CodeMirrorJavaTypes["roles.user_group_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.user_merge"]={
+
+};
+CodeMirrorJavaTypes["roles.user_metadata_update"]={
+
+};
+CodeMirrorJavaTypes["roles.user_password_set"]={
+
+};
+CodeMirrorJavaTypes["roles.user_password_update"]={
+
+};
+CodeMirrorJavaTypes["roles.user_printer_acl_create"]={
+
+};
+CodeMirrorJavaTypes["roles.user_printer_acl_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.user_printer_create"]={
+
+};
+CodeMirrorJavaTypes["roles.user_printer_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.user_query"]={
+
+};
+CodeMirrorJavaTypes["roles.user_reconcile"]={
+
+};
+CodeMirrorJavaTypes["roles.user_refresh"]={
+
+};
+CodeMirrorJavaTypes["roles.user_role_create"]={
+
+};
+CodeMirrorJavaTypes["roles.user_role_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.user_role_query"]={
+
+};
+CodeMirrorJavaTypes["roles.user_session_query"]={
+
+};
+CodeMirrorJavaTypes["roles.user_update"]={
+
+};
+CodeMirrorJavaTypes["roles.usersDomain_create"]={
+
+};
+CodeMirrorJavaTypes["roles.usersDomain_delete"]={
+
+};
+CodeMirrorJavaTypes["roles.usersDomain_query"]={
+
+};
+CodeMirrorJavaTypes["roles.usersDomain_update"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.CrudHandler<E>"]={
+	"query":"com.soffid.zkdb.api.PagedResult<E>",
+	"create":"E",
+	"getById":"E",
+	"getByName":"E",
+	"update":"E",
+	"delete":"void"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.AccessLog>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.AccessTree>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Browser>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Host>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Network>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Service>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.VaultFolder>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.Account>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.Configuration>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.User>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessDefinition>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessInstance>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.TaskInstance>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.AttributeTranslation>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.CustomObject>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.CustomObjectType>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Group>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.GroupType>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.InformationSystem>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.MailDomain>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.MailList>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Printer>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.PrinterUser>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Role>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.RoleAccount>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.System>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserType>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api.PamPolicy>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api.PamRule>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Audit>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Issue>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.IssuePolicy>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.SoDRule>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.SyncAgentTaskLog>"]={
+	"isAsynchronous":"boolean",
+	"isCancelled":"boolean",
+	"isFailed":"boolean",
+	"isFinished":"boolean",
+	"getException":"java.lang.Exception",
+	"getItemsPerPage":"java.lang.Integer",
+	"getStartIndex":"java.lang.Integer",
+	"getTotalResults":"java.lang.Integer",
+	"getResources":"java.util.List<E>",
+	"setAsynchronous":"void",
+	"setCancelled":"void",
+	"setException":"void",
+	"setFailed":"void",
+	"setFinished":"void",
+	"setItemsPerPage":"void",
+	"setResources":"void",
+	"setStartIndex":"void",
+	"setTotalResults":"void",
+	"serialVersionUID":"long",
+	"startIndex":"java.lang.Integer",
+	"itemsPerPage":"java.lang.Integer",
+	"totalResults":"java.lang.Integer",
+	"resources":"java.util.List<E>",
+	"asynchronous":"boolean",
+	"failed":"boolean",
+	"cancelled":"boolean",
+	"finished":"boolean",
+	"exception":"java.lang.Exception"
+};
+CodeMirrorJavaTypes["float"]={
+
+};
+CodeMirrorJavaTypes["int"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.impl.TransactionalTask"]={
+
+};
+CodeMirrorJavaTypes["com.soffid.iam.service.impl.OTPHandler"]={
+	"resetFailCount":"boolean",
+	"validatePin":"boolean",
+	"selectToken":"com.soffid.iam.am.api.Challenge"
+};
+CodeMirrorJavaTypes["java.lang.Runnable"]={
+	"run":"void"
+};
+CodeMirrorJavaTypes["java.security.PrivateKey"]={
+	"serialVersionUID":"long"
+};
+CodeMirrorJavaTypes["java.security.PublicKey"]={
+	"serialVersionUID":"long"
+};
+CodeMirrorJavaTypes["java.sql.Blob"]={
+	"getBytes":"byte[]",
+	"setBytes":"int",
+	"getBinaryStream":"java.io.InputStream",
+	"setBinaryStream":"java.io.OutputStream",
+	"length":"long",
+	"position":"long",
+	"free":"void",
+	"truncate":"void"
+};
+CodeMirrorJavaTypes["java.util.Collection"]={
+	"add":"boolean",
+	"addAll":"boolean",
+	"contains":"boolean",
+	"containsAll":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"remove":"boolean",
+	"removeAll":"boolean",
+	"retainAll":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"toArray":"java.lang.Object[]",
+	"iterator":"java.util.Iterator<E>",
+	"clear":"void",
+	"removeIf":"boolean",
+	"spliterator":"java.util.Spliterator<E>",
+	"parallelStream":"java.util.stream.Stream<E>",
+	"stream":"java.util.stream.Stream<E>"
+};
+CodeMirrorJavaTypes["java.util.List"]={
+	"add":"boolean",
+	"addAll":"boolean",
+	"contains":"boolean",
+	"containsAll":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"remove":"boolean",
+	"removeAll":"boolean",
+	"retainAll":"boolean",
+	"hashCode":"int",
+	"indexOf":"int",
+	"lastIndexOf":"int",
+	"size":"int",
+	"get":"E",
+	"set":"E",
+	"toArray":"java.lang.Object[]",
+	"iterator":"java.util.Iterator<E>",
+	"subList":"java.util.List<E>",
+	"listIterator":"java.util.ListIterator<E>",
+	"clear":"void",
+	"spliterator":"java.util.Spliterator<E>",
+	"replaceAll":"void",
+	"sort":"void",
+	"copyOf":"java.util.List<E>",
+	"of":"java.util.List<E>"
+};
+CodeMirrorJavaTypes["java.util.Map"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["org.ietf.jgss.GSSContext"]={
+	"getAnonymityState":"boolean",
+	"getConfState":"boolean",
+	"getCredDelegState":"boolean",
+	"getIntegState":"boolean",
+	"getMutualAuthState":"boolean",
+	"getReplayDetState":"boolean",
+	"getSequenceDetState":"boolean",
+	"isEstablished":"boolean",
+	"isInitiator":"boolean",
+	"isProtReady":"boolean",
+	"isTransferable":"boolean",
+	"acceptSecContext":"byte[]",
+	"export":"byte[]",
+	"getMIC":"byte[]",
+	"initSecContext":"byte[]",
+	"unwrap":"byte[]",
+	"wrap":"byte[]",
+	"getLifetime":"int",
+	"getWrapSizeLimit":"int",
+	"getDelegCred":"org.ietf.jgss.GSSCredential",
+	"getSrcName":"org.ietf.jgss.GSSName",
+	"getTargName":"org.ietf.jgss.GSSName",
+	"getMech":"org.ietf.jgss.Oid",
+	"dispose":"void",
+	"requestAnonymity":"void",
+	"requestConf":"void",
+	"requestCredDeleg":"void",
+	"requestInteg":"void",
+	"requestLifetime":"void",
+	"requestMutualAuth":"void",
+	"requestReplayDet":"void",
+	"requestSequenceDet":"void",
+	"setChannelBinding":"void",
+	"verifyMIC":"void",
+	"DEFAULT_LIFETIME":"int",
+	"INDEFINITE_LIFETIME":"int"
+};
+CodeMirrorJavaTypes["java.lang.Class<E>"]={
+	"casAnnotationType":"boolean",
+	"getClassLoader0":"java.lang.ClassLoader",
+	"getClassData":"java.lang.Object",
+	"getEnumConstantsShared":"T[]",
+	"protectionDomain":"java.security.ProtectionDomain",
+	"getDeclaredPublicMethods":"java.util.List<java.lang.reflect.Method>",
+	"enumConstantDirectory":"java.util.Map<java.lang.String,T>",
+	"getDeclaredAnnotationMap":"java.util.Map<java.lang.Class<? extends java.lang.annotation.Annotation>,java.lang.annotation.Annotation>",
+	"getRawAnnotations":"byte[]",
+	"getRawTypeAnnotations":"byte[]",
+	"getConstantPool":"jdk.internal.reflect.ConstantPool",
+	"setSigners":"void",
+	"hasEnclosingMethodInfo":"boolean",
+	"isDirectSubType":"boolean",
+	"isLocalOrAnonymousClass":"boolean",
+	"isOpenToCaller":"boolean",
+	"isTopLevelClass":"boolean",
+	"lambda$getPermittedSubclasses$1":"boolean",
+	"elementType":"java.lang.Class<?>",
+	"annotationData":"java.lang.Class.AnnotationData",
+	"createAnnotationData":"java.lang.Class.AnnotationData",
+	"getEnclosingMethodInfo":"java.lang.Class.EnclosingMethodInfo",
+	"newReflectionData":"java.lang.Class.ReflectionData<T>",
+	"reflectionData":"java.lang.Class.ReflectionData<T>",
+	"getInterfaces":"java.lang.Class<?>[]",
+	"getMethodsRecursive":"java.lang.PublicMethods.MethodList",
+	"cannotCastMsg":"java.lang.String",
+	"getCanonicalName0":"java.lang.String",
+	"getSimpleBinaryName":"java.lang.String",
+	"getSimpleName0":"java.lang.String",
+	"methodToString":"java.lang.String",
+	"resolveName":"java.lang.String",
+	"getConstructor0":"java.lang.reflect.Constructor<T>",
+	"privateGetDeclaredConstructors":"java.lang.reflect.Constructor<T>[]",
+	"getField0":"java.lang.reflect.Field",
+	"privateGetDeclaredFields":"java.lang.reflect.Field[]",
+	"privateGetPublicFields":"java.lang.reflect.Field[]",
+	"getMethod0":"java.lang.reflect.Method",
+	"privateGetDeclaredMethods":"java.lang.reflect.Method[]",
+	"privateGetPublicMethods":"java.lang.reflect.Method[]",
+	"isRecord0":"boolean",
+	"getDeclaringClass0":"java.lang.Class<?>",
+	"getNestHost0":"java.lang.Class<?>",
+	"getDeclaredClasses0":"java.lang.Class<?>[]",
+	"getInterfaces0":"java.lang.Class<?>[]",
+	"getNestMembers0":"java.lang.Class<?>[]",
+	"getPermittedSubclasses0":"java.lang.Class<?>[]",
+	"getEnclosingMethod0":"java.lang.Object[]",
+	"getGenericSignature0":"java.lang.String",
+	"getSimpleBinaryName0":"java.lang.String",
+	"initClassName":"java.lang.String",
+	"getDeclaredConstructors0":"java.lang.reflect.Constructor<T>[]",
+	"getDeclaredFields0":"java.lang.reflect.Field[]",
+	"getDeclaredMethods0":"java.lang.reflect.Method[]",
+	"getRecordComponents0":"java.lang.reflect.RecordComponent[]",
+	"getProtectionDomain0":"java.security.ProtectionDomain",
+	"arrayContentsEq":"boolean",
+	"toClass":"java.lang.Class<?>",
+	"lambda$getPermittedSubclasses$2":"java.lang.Class[]",
+	"lambda$methodToString$0":"java.lang.String",
+	"copyConstructors":"java.lang.reflect.Constructor<U>[]",
+	"searchFields":"java.lang.reflect.Field",
+	"copyFields":"java.lang.reflect.Field[]",
+	"searchMethods":"java.lang.reflect.Method",
+	"copyMethods":"java.lang.reflect.Method[]",
+	"getReflectionFactory":"jdk.internal.reflect.ReflectionFactory",
+	"desiredAssertionStatus0":"boolean",
+	"forName0":"java.lang.Class<?>",
+	"registerNatives":"void",
+	"addAll":"void",
+	"checkPackageAccessForPermittedSubclasses":"void",
+	"getFactory":"sun.reflect.generics.factory.GenericsFactory",
+	"getGenericInfo":"sun.reflect.generics.repository.ClassRepository",
+	"checkMemberAccess":"void",
+	"checkPackageAccess":"void",
+	"desiredAssertionStatus":"boolean",
+	"isAnnotation":"boolean",
+	"isAnnotationPresent":"boolean",
+	"isAnonymousClass":"boolean",
+	"isEnum":"boolean",
+	"isLocalClass":"boolean",
+	"isMemberClass":"boolean",
+	"isNestmateOf":"boolean",
+	"isRecord":"boolean",
+	"isSealed":"boolean",
+	"isSynthetic":"boolean",
+	"getResourceAsStream":"java.io.InputStream",
+	"arrayType":"java.lang.Class<?>",
+	"asSubclass":"java.lang.Class<? extends U>",
+	"componentType":"java.lang.Class<?>",
+	"getComponentType":"java.lang.Class<?>",
+	"getDeclaringClass":"java.lang.Class<?>",
+	"getEnclosingClass":"java.lang.Class<?>",
+	"getNestHost":"java.lang.Class<?>",
+	"getClassLoader":"java.lang.ClassLoader",
+	"getClasses":"java.lang.Class<?>[]",
+	"getDeclaredClasses":"java.lang.Class<?>[]",
+	"getNestMembers":"java.lang.Class<?>[]",
+	"getPermittedSubclasses":"java.lang.Class<?>[]",
+	"getModule":"java.lang.Module",
+	"cast":"T",
+	"newInstance":"T",
+	"getEnumConstants":"T[]",
+	"getPackage":"java.lang.Package",
+	"descriptorString":"java.lang.String",
+	"getCanonicalName":"java.lang.String",
+	"getName":"java.lang.String",
+	"getPackageName":"java.lang.String",
+	"getSimpleName":"java.lang.String",
+	"getTypeName":"java.lang.String",
+	"toGenericString":"java.lang.String",
+	"toString":"java.lang.String",
+	"getAnnotation":"A",
+	"getDeclaredAnnotation":"A",
+	"getAnnotations":"java.lang.annotation.Annotation[]",
+	"getAnnotationsByType":"A[]",
+	"getDeclaredAnnotations":"java.lang.annotation.Annotation[]",
+	"getDeclaredAnnotationsByType":"A[]",
+	"getAnnotatedSuperclass":"java.lang.reflect.AnnotatedType",
+	"getAnnotatedInterfaces":"java.lang.reflect.AnnotatedType[]",
+	"getConstructor":"java.lang.reflect.Constructor<T>",
+	"getDeclaredConstructor":"java.lang.reflect.Constructor<T>",
+	"getEnclosingConstructor":"java.lang.reflect.Constructor<?>",
+	"getConstructors":"java.lang.reflect.Constructor<?>[]",
+	"getDeclaredConstructors":"java.lang.reflect.Constructor<?>[]",
+	"getDeclaredField":"java.lang.reflect.Field",
+	"getField":"java.lang.reflect.Field",
+	"getDeclaredFields":"java.lang.reflect.Field[]",
+	"getFields":"java.lang.reflect.Field[]",
+	"getDeclaredMethod":"java.lang.reflect.Method",
+	"getEnclosingMethod":"java.lang.reflect.Method",
+	"getMethod":"java.lang.reflect.Method",
+	"getDeclaredMethods":"java.lang.reflect.Method[]",
+	"getMethods":"java.lang.reflect.Method[]",
+	"getRecordComponents":"java.lang.reflect.RecordComponent[]",
+	"getGenericSuperclass":"java.lang.reflect.Type",
+	"getTypeParameters":"java.lang.reflect.TypeVariable<java.lang.Class<T>>[]",
+	"getGenericInterfaces":"java.lang.reflect.Type[]",
+	"getResource":"java.net.URL",
+	"getProtectionDomain":"java.security.ProtectionDomain",
+	"describeConstable":"java.util.Optional<java.lang.constant.ClassDesc>",
+	"isArray":"boolean",
+	"isAssignableFrom":"boolean",
+	"isHidden":"boolean",
+	"isInstance":"boolean",
+	"isInterface":"boolean",
+	"isPrimitive":"boolean",
+	"getModifiers":"int",
+	"getSuperclass":"java.lang.Class<? super T>",
+	"getSigners":"java.lang.Object[]",
+	"forName":"java.lang.Class<?>",
+	"getExecutableTypeAnnotationBytes":"byte[]",
+	"typeVarBounds":"java.lang.String",
+	"getPrimitiveClass":"java.lang.Class<?>",
+	"getAnnotationType":"sun.reflect.annotation.AnnotationType",
+	"ANNOTATION":"int",
+	"ENUM":"int",
+	"SYNTHETIC":"int",
+	"cachedConstructor":"java.lang.reflect.Constructor<T>",
+	"name":"java.lang.String",
+	"module":"java.lang.Module",
+	"packageName":"java.lang.String",
+	"allPermDomain":"java.security.ProtectionDomain",
+	"classRedefinedCount":"int",
+	"genericInfo":"sun.reflect.generics.repository.ClassRepository",
+	"EMPTY_CLASS_ARRAY":"java.lang.Class<?>[]",
+	"serialVersionUID":"long",
+	"serialPersistentFields":"java.io.ObjectStreamField[]",
+	"reflectionFactory":"jdk.internal.reflect.ReflectionFactory",
+	"enumConstants":"T[]",
+	"annotationType":"sun.reflect.annotation.AnnotationType",
+	"classValueMap":"java.lang.ClassValue.ClassValueMap"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.AccessTree>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.AccessTree"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.AccessTreeAuthorization>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.AccessTreeAuthorization"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.AccessTreeExecution>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.AccessTreeExecution"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.AccessTreeExecutionType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.AccessTreeExecutionType"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.ExtranetCard>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.ExtranetCard"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.ExtranetCardContent>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.ExtranetCardContent"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.ForbiddenWord>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.ForbiddenWord"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.Host>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Host"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.Network>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Network"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.NetworkAuthorization>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.NetworkAuthorization"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.PasswordDomain>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.PasswordDomain"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.PasswordPolicy>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.PasswordPolicy"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.PasswordPolicyForbbidenWord>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.PasswordPolicyForbbidenWord"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.PasswordStatus>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.PasswordStatus"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.Service>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Service"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.api.Session>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Session"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.AccountPasswordEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.AccountPasswordEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.ChallengeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.ChallengeEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.EntryPointAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.EntryPointExecutableEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointExecutableEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.EntryPointGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.EntryPointRoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointRoleEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.EntryPointTreeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointTreeEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.EntryPointUserEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointUserEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.HostEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.HostEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.NetworkAuthorizationEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.NetworkAuthorizationEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.PasswordDomainEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PasswordDomainEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.PasswordEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PasswordEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.PasswordPolicyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PasswordPolicyEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.PolicyForbiddenWordEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PolicyForbiddenWordEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.SamlAssertionEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.SamlAssertionEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.SamlRequestEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.SamlRequestEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.SecretEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.SecretEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.am.model.SessionEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.SessionEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.Account>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.Account"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.AccountType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.AccountType"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.AgentDescriptor"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.AgentDescriptorWorkflow>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.AgentDescriptorWorkflow"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.AgentStatusInfo>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.AgentStatusInfo"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.AuthorizationRole"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.Configuration>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.Configuration"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.DataType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.DataType"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.ServerPlugin>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.ServerPlugin"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.ServerPluginModule>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.ServerPluginModule"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.Tenant>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.Tenant"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.User>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.User"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.UserAccount>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.UserAccount"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.api.UserData>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.UserData"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AccountAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AccountAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AccountEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AgentDescriptorEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AgentDescriptorEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AuthorizationEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AuthorizationEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.DefaultAttributeMappingEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.DefaultAttributeMappingEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.DefaultObjectMappingEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.DefaultObjectMappingEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.DefaultObjectMappingPropertyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.DefaultObjectMappingPropertyEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.LuceneIndexPartEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.LuceneIndexPartEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.ServerPluginModuleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.ServerPluginModuleEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.StatsEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.StatsEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.UserAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.UserDataEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserDataEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.UserEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.UserPreferenceEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserPreferenceEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.bpm.api.BPMUser>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.BPMUser"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.bpm.api.ProcessInstance>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.ProcessInstance"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.AccessControl>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.AccessControl"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.AttributeMapping>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.AttributeMapping"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.AttributeTranslation"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.BpmProcess>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.BpmProcess"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.BpmUserProcess"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.Domain>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.Domain"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.DomainValue>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.DomainValue"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.ExternalName>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ExternalName"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.Group>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.Group"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.GroupRoles>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.GroupRoles"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.InformationSystem>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.InformationSystem"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.MailDomain>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.MailDomain"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.MailList>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.MailList"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.MailListRelationship>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.MailListRelationship"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.MailListRoleMember>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.MailListRoleMember"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.ObjectMapping>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ObjectMapping"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.ObjectMappingProperty>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ObjectMappingProperty"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.ObjectMappingTrigger>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ObjectMappingTrigger"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.Printer>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.Printer"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.PrinterGroup>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.PrinterGroup"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.PrinterUser>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.PrinterUser"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.ReconcileTrigger>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ReconcileTrigger"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.Role>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.Role"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.RoleAccount>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.RoleAccount"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.RoleGrant>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.RoleGrant"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.RoleGrantHierarchy>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.RoleGrantHierarchy"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.Rule>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.Rule"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.RuleAssignedRole>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.RuleAssignedRole"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.System>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.System"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.SystemGroup>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.SystemGroup"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.UserDomain>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.UserDomain"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.UserGroup>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.UserGroup"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.UserMailList>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.UserMailList"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.UserType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.UserType"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.api.UserTypeDispatcher>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.UserTypeDispatcher"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.AccessControlEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.AccessControlEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.AttributeMappingEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.AttributeMappingEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.AttributeTranslationEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.AttributeTranslationEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.AuthoritativeChangeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.AuthoritativeChangeEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.DomainValueEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.DomainValueEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.ExternalNameEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ExternalNameEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.GroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.GroupEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.HostAliasEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.HostAliasEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.InformationSystemEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.InformationSystemEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.MailListContainerEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MailListContainerEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.MailListEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MailListEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.MailListGroupMemberEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MailListGroupMemberEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.NoticeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.NoticeEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.ObjectMappingEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ObjectMappingEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.ObjectMappingPropertyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ObjectMappingPropertyEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.PrinterEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.PrinterEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.PrinterGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.PrinterGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.RoleAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.RoleDependencyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleDependencyEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.RoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.RoleGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.RuleAssignedRoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RuleAssignedRoleEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.SystemEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.SystemEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.SystemGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.SystemGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.UserGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.UserMailEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserMailEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.UserPrinterEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserPrinterEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.UserProcessEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserProcessEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.iga.model.UserTypeSystemEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserTypeSystemEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.pam.api.HostService>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.HostService"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.pam.model.AccountAccessEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.model.AccountAccessEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.pam.model.HostAdminEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.model.HostAdminEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.api.SoDRole>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.SoDRole"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.api.SoDRule>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.SoDRule"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.api.SoDRuleMatrix>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.SoDRuleMatrix"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.model.AuditEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.model.AuditEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.model.IssueEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.model.IssueEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.model.IssuePolicyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.model.IssuePolicyEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.model.SoDRoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.model.SoDRoleEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.rc.model.SoDRuleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.model.SoDRuleEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.LogConfiguration"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.ScheduledTask>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.ScheduledTask"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.Server>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.Server"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.SyncAgentTaskLog>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.SyncAgentTaskLog"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.SyncServerInfo>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.SyncServerInfo"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.SyncserverTask>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.SyncserverTask"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.api.Secret>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.Secret"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.engine.DispatcherHandler>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.engine.DispatcherHandler"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.model.ScheduledTaskEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.ScheduledTaskEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.model.ServerCertificateEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.ServerCertificateEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.model.ServerEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.ServerEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.model.ServerInstanceEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.ServerInstanceEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.sync.model.TaskLogEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.TaskLogEntity"
+};
+CodeMirrorJavaTypes["java.util.Collection<java.lang.Long>"]={
+	"size": "int",
+	"get": "java.lang.Long"
+};
+CodeMirrorJavaTypes["java.util.Collection<java.lang.Object>"]={
+	"size": "int",
+	"get": "java.lang.Object"
+};
+CodeMirrorJavaTypes["java.util.Collection<java.lang.Object[]>"]={
+	"size": "int",
+	"get": "java.lang.Object[]"
+};
+CodeMirrorJavaTypes["java.util.Collection<java.lang.String>"]={
+	"size": "int",
+	"get": "java.lang.String"
+};
+CodeMirrorJavaTypes["java.util.Collection<java.security.cert.X509Certificate>"]={
+	"size": "int",
+	"get": "java.security.cert.X509Certificate"
+};
+CodeMirrorJavaTypes["java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>"]={
+	"size": "int",
+	"get": "java.util.Map<java.lang.String,java.lang.Object>"
+};
+CodeMirrorJavaTypes["java.util.HashMap<java.lang.String,java.util.List<com.soffid.iam.base.api.StatsSample>>"]={
+	"loadFactor":"float",
+	"capacity":"int",
+	"putVal":"V",
+	"prepareArray":"T[]",
+	"getNode":"java.util.HashMap.Node<K,V>",
+	"removeNode":"java.util.HashMap.Node<K,V>",
+	"resize":"java.util.HashMap.Node<K,V>[]",
+	"putMapEntries":"void",
+	"treeifyBin":"void",
+	"keysToArray":"T[]",
+	"valuesToArray":"T[]",
+	"newNode":"java.util.HashMap.Node<K,V>",
+	"replacementNode":"java.util.HashMap.Node<K,V>",
+	"newTreeNode":"java.util.HashMap.TreeNode<K,V>",
+	"replacementTreeNode":"java.util.HashMap.TreeNode<K,V>",
+	"readObject":"void",
+	"writeObject":"void",
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"isEmpty":"boolean",
+	"remove":"boolean",
+	"replace":"boolean",
+	"size":"int",
+	"clone":"java.lang.Object",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"get":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"put":"V",
+	"putIfAbsent":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"forEach":"void",
+	"putAll":"void",
+	"replaceAll":"void",
+	"hash":"int",
+	"tableSizeFor":"int",
+	"compareComparables":"int",
+	"comparableClassFor":"java.lang.Class<?>",
+	"afterNodeAccess":"void",
+	"afterNodeInsertion":"void",
+	"afterNodeRemoval":"void",
+	"internalWriteEntries":"void",
+	"reinitialize":"void",
+	"serialVersionUID":"long",
+	"DEFAULT_INITIAL_CAPACITY":"int",
+	"MAXIMUM_CAPACITY":"int",
+	"DEFAULT_LOAD_FACTOR":"float",
+	"TREEIFY_THRESHOLD":"int",
+	"UNTREEIFY_THRESHOLD":"int",
+	"MIN_TREEIFY_CAPACITY":"int",
+	"table":"java.util.HashMap.Node<K,V>[]",
+	"modCount":"int",
+	"threshold":"int"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.AccessTree>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.AccessTree"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.Host>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Host"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.HostAlias>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.HostAlias"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.Network>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Network"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.NetworkAuthorization>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.NetworkAuthorization"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.OsType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.OsType"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.PasswordDomainStatus>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.PasswordDomainStatus"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.Session>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.Session"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.VaultElement>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.VaultElement"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.api.VaultFolder>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.api.VaultFolder"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.AccessLogEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.AccessLogEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.EntryPointAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.EntryPointEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.EntryPointExecutableEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointExecutableEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.EntryPointRoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointRoleEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.EntryPointTreeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.EntryPointTreeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.HostAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.HostAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.HostEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.HostEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.NetworkAuthorizationEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.NetworkAuthorizationEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.PasswordDomainEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PasswordDomainEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.PasswordEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PasswordEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.PasswordPolicyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PasswordPolicyEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.PolicyForbiddenWordEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.PolicyForbiddenWordEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.SecretEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.SecretEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.ServiceEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.ServiceEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.SessionEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.SessionEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.am.model.VaultFolderEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.am.model.VaultFolderEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.Account>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.Account"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.AgentProperty>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.AgentProperty"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.DataType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.DataType"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.DisableObjectRule>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.DisableObjectRule"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.Identity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.Identity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.StatsSample>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.StatsSample"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.UserAccount>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.UserAccount"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.UserAccountHistory>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.UserAccountHistory"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.api.UserData>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.api.UserData"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.AccountAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AccountAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.AccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AccountEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.AccountMetadataEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AccountMetadataEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.AgentDescriptorEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AgentDescriptorEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.AuthorizationEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AuthorizationEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.BlobConfigurationEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.BlobConfigurationEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.ConfigEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.ConfigEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.ServerPluginEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.ServerPluginEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.ServerPluginModuleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.ServerPluginModuleEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.TenantEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.TenantEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.UserAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.UserDataEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserDataEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.base.model.UserEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.UserEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.bpm.api.Comment>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.Comment"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.bpm.api.Job>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.Job"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.ProcessDefinition"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.bpm.api.ProcessInstance>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.ProcessInstance"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.bpm.api.TaskDefinition>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.TaskDefinition"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.bpm.api.TaskInstance>"]={
+	"size": "int",
+	"get": "com.soffid.iam.bpm.api.TaskInstance"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.doc.model.DocumentBlockEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.doc.model.DocumentBlockEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.AccessControl>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.AccessControl"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.AccountHistory>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.AccountHistory"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.DomainValue>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.DomainValue"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.ExtensibleObjectRegister>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ExtensibleObjectRegister"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.GroupType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.GroupType"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.RoleAccount>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.RoleAccount"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.RoleGrantHierarchy>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.RoleGrantHierarchy"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.System>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.System"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.ReconcileAccount>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ReconcileAccount"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.ReconcileAssignment>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ReconcileAssignment"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.api.ReconcileRole>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.api.ReconcileRole"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.ApplicationDomainEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ApplicationDomainEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.CustomObjectAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.CustomObjectAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.DomainValueEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.DomainValueEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.ExternalNameEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ExternalNameEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.GroupAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.GroupAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.GroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.GroupEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.GroupTypeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.GroupTypeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.HostAliasEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.HostAliasEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.InformationSystemAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.InformationSystemAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.InformationSystemEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.InformationSystemEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.MailListAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MailListAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.MailListContainerEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MailListContainerEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.MailListEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MailListEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.MetaDataEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.MetaDataEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.NoticeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.NoticeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.PrinterEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.PrinterEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.PrinterGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.PrinterGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.ProcessHierarchyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ProcessHierarchyEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RoleAccountAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleAccountAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RoleAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RoleAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RoleDependencyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleDependencyEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RoleGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RoleGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.RuleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.RuleEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.SystemEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.SystemEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.UserGroupAttributeEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserGroupAttributeEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.UserGroupEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserGroupEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.UserMailEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserMailEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.UserPrinterEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.UserPrinterEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.ReconcileAccountEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ReconcileAccountEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.ReconcileAssignmentEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ReconcileAssignmentEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.iga.model.ReconcileRoleEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.iga.model.ReconcileRoleEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.api.HostAdmin>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.HostAdmin"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.api.HostPort>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.HostPort"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.api.HostService>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.HostService"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.api.JumpServerGroup>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.JumpServerGroup"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.api.PamAction>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.PamAction"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.api.PamSession>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.api.PamSession"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.model.HostAdminEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.model.HostAdminEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.model.PamActionEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.model.PamActionEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.pam.model.PamActionType>"]={
+	"size": "int",
+	"get": "com.soffid.iam.pam.model.PamActionType"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.Issue>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.Issue"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.IssueActionDefinition>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.IssueActionDefinition"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.IssueBrowser>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.IssueBrowser"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.IssueHost>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.IssueHost"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.IssuePolicyAction>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.IssuePolicyAction"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.IssueUser>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.IssueUser"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.rc.api.RequestedObligation>"]={
+	"size": "int",
+	"get": "com.soffid.iam.rc.api.RequestedObligation"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.api.ScheduledTask>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.ScheduledTask"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.api.ScheduledTaskHandler>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.ScheduledTaskHandler"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.ScheduledTaskLog"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.api.SyncserverTask>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.SyncserverTask"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.api.Secret>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.api.Secret"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.model.ServerInstanceEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.ServerInstanceEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.model.TaskEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.TaskEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.sync.model.TaskLogEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.sync.model.TaskLogEntity"
+};
+CodeMirrorJavaTypes["java.util.List<com.soffid.iam.web.SearchAttributeDefinition>"]={
+	"size": "int",
+	"get": "com.soffid.iam.web.SearchAttributeDefinition"
+};
+CodeMirrorJavaTypes["java.util.List<java.lang.Long>"]={
+	"size": "int",
+	"get": "java.lang.Long"
+};
+CodeMirrorJavaTypes["java.util.List<java.lang.Object[]>"]={
+	"size": "int",
+	"get": "java.lang.Object[]"
+};
+CodeMirrorJavaTypes["java.util.List<java.lang.String>"]={
+	"size": "int",
+	"get": "java.lang.String"
+};
+CodeMirrorJavaTypes["java.util.List<java.security.cert.X509Certificate>"]={
+	"size": "int",
+	"get": "java.security.cert.X509Certificate"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,com.soffid.iam.sync.api.DebugTaskResults>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,int[]>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,java.lang.Exception>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,java.lang.Object>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,java.lang.String>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Map<java.lang.String,java.util.Vector<java.lang.Object[]>>"]={
+	"containsKey":"boolean",
+	"containsValue":"boolean",
+	"equals":"boolean",
+	"isEmpty":"boolean",
+	"hashCode":"int",
+	"size":"int",
+	"get":"V",
+	"put":"V",
+	"remove":"V",
+	"values":"java.util.Collection<V>",
+	"entrySet":"java.util.Set<java.util.Map.Entry<K,V>>",
+	"keySet":"java.util.Set<K>",
+	"clear":"void",
+	"putAll":"void",
+	"replace":"boolean",
+	"compute":"V",
+	"computeIfAbsent":"V",
+	"computeIfPresent":"V",
+	"getOrDefault":"V",
+	"merge":"V",
+	"putIfAbsent":"V",
+	"forEach":"void",
+	"replaceAll":"void",
+	"copyOf":"java.util.Map<K,V>",
+	"of":"java.util.Map<K,V>",
+	"ofEntries":"java.util.Map<K,V>",
+	"entry":"java.util.Map.Entry<K,V>"
+};
+CodeMirrorJavaTypes["java.util.Set<java.lang.Long>"]={
+	"size": "int",
+	"get": "java.lang.Long"
+};
+CodeMirrorJavaTypes["java.util.Set<java.lang.String>"]={
+	"size": "int",
+	"get": "java.lang.String"
+};
+CodeMirrorJavaTypes["java.util.Vector<com.soffid.iam.am.api.VaultFolderAccountPermissions>"]={
+
+};
+CodeMirrorJavaTypes["java.util.Vector<com.soffid.iam.base.api.AccountAccessLevelEnum>"]={
+
+};
+CodeMirrorJavaTypes["java.util.Vector<java.lang.Object>"]={
+
+};
+CodeMirrorJavaTypes["java.util.Vector<java.lang.Object[]>"]={
+
+};
+CodeMirrorJavaTypes["long"]={
+
+};
+CodeMirrorJavaTypes["void"]={
+
+};
+CodeMirrorJavaTypes["es.caib.seycon.ng.ServiceLocator"]={
+	"getAccessLogService":"com.soffid.iam.am.service.AccessLogService",
+	"getBrowserService":"com.soffid.iam.am.service.BrowserService",
+	"getCertificateValidationService":"com.soffid.iam.am.service.CertificateValidationService",
+	"getEntryPointService":"com.soffid.iam.am.service.EntryPointService",
+	"getNetworkService":"com.soffid.iam.am.service.NetworkService",
+	"getPasswordManagerService":"com.soffid.iam.am.service.PasswordManagerService",
+	"getPasswordService":"com.soffid.iam.am.service.PasswordService",
+	"getServiceService":"com.soffid.iam.am.service.ServiceService",
+	"getSessionService":"com.soffid.iam.am.service.SessionService",
+	"getSignalService":"com.soffid.iam.am.service.SignalService",
+	"getVaultService":"com.soffid.iam.am.service.VaultService",
+	"getAccountService":"com.soffid.iam.base.service.AccountService",
+	"getAdditionalDataService":"com.soffid.iam.base.service.AdditionalDataService",
+	"getAuthorizationService":"com.soffid.iam.base.service.AuthorizationService",
+	"getConfigurationService":"com.soffid.iam.base.service.ConfigurationService",
+	"getGenAIProviderService":"com.soffid.iam.base.service.GenAIProviderService",
+	"getLicenseService":"com.soffid.iam.base.service.LicenseService",
+	"getPreferencesService":"com.soffid.iam.base.service.PreferencesService",
+	"getRecycleBeanService":"com.soffid.iam.base.service.RecycleBeanService",
+	"getServerPluginService":"com.soffid.iam.base.service.ServerPluginService",
+	"getStatsService":"com.soffid.iam.base.service.StatsService",
+	"getTenantService":"com.soffid.iam.base.service.TenantService",
+	"getUserService":"com.soffid.iam.base.service.UserService",
+	"getBpmConfigService":"com.soffid.iam.bpm.service.BpmConfigService",
+	"getBpmEngine":"com.soffid.iam.bpm.service.BpmEngine",
+	"getBpmJobExecutor":"com.soffid.iam.bpm.service.BpmJobExecutor",
+	"getDocumentService":"com.soffid.iam.doc.service.DocumentService",
+	"getApplicationService":"com.soffid.iam.iga.service.ApplicationService",
+	"getAttributeTranslationService":"com.soffid.iam.iga.service.AttributeTranslationService",
+	"getAuthoritativeChangeService":"com.soffid.iam.iga.service.AuthoritativeChangeService",
+	"getCustomObjectService":"com.soffid.iam.iga.service.CustomObjectService",
+	"getDispatcherService":"com.soffid.iam.iga.service.DispatcherService",
+	"getDomainService":"com.soffid.iam.iga.service.DomainService",
+	"getEntitlementDelegationService":"com.soffid.iam.iga.service.EntitlementDelegationService",
+	"getGroupService":"com.soffid.iam.iga.service.GroupService",
+	"getGroupTypeService":"com.soffid.iam.iga.service.GroupTypeService",
+	"getMailListsService":"com.soffid.iam.iga.service.MailListsService",
+	"getMailService":"com.soffid.iam.iga.service.MailService",
+	"getPrinterService":"com.soffid.iam.iga.service.PrinterService",
+	"getRulesService":"com.soffid.iam.iga.service.RulesService",
+	"getSelfService":"com.soffid.iam.iga.service.SelfService",
+	"getUserDomainService":"com.soffid.iam.iga.service.UserDomainService",
+	"getACLService":"com.soffid.iam.impl.service.ACLService",
+	"getAccountNameGenerator":"com.soffid.iam.impl.service.AccountNameGenerator",
+	"getApplicationBootService":"com.soffid.iam.impl.service.ApplicationBootService",
+	"getApplicationShutdownService":"com.soffid.iam.impl.service.ApplicationShutdownService",
+	"getAsyncRunnerService":"com.soffid.iam.impl.service.AsyncRunnerService",
+	"getAuthorizationInformationService":"com.soffid.iam.impl.service.AuthorizationInformationService",
+	"getCreateDisableUserService":"com.soffid.iam.impl.service.CreateDisableUserService",
+	"getCrudRegistryService":"com.soffid.iam.impl.service.CrudRegistryService",
+	"getInternalPasswordService":"com.soffid.iam.impl.service.InternalPasswordService",
+	"getLuceneIndexService":"com.soffid.iam.impl.service.LuceneIndexService",
+	"getOTPValidationService":"com.soffid.iam.impl.service.OTPValidationService",
+	"getRuleEvaluatorService":"com.soffid.iam.impl.service.RuleEvaluatorService",
+	"getSoffidEventListener":"com.soffid.iam.impl.service.SoffidEventListener",
+	"getNetworkDiscoveryService":"com.soffid.iam.pam.service.NetworkDiscoveryService",
+	"getPamPolicyService":"com.soffid.iam.pam.service.PamPolicyService",
+	"getPamSecurityHandlerService":"com.soffid.iam.pam.service.PamSecurityHandlerService",
+	"getPamSessionService":"com.soffid.iam.pam.service.PamSessionService",
+	"getAuditService":"com.soffid.iam.rc.service.AuditService",
+	"getGeoInformationService":"com.soffid.iam.rc.service.GeoInformationService",
+	"getIssuePolicyService":"com.soffid.iam.rc.service.IssuePolicyService",
+	"getIssueService":"com.soffid.iam.rc.service.IssueService",
+	"getNetworkIntelligenceService":"com.soffid.iam.rc.service.NetworkIntelligenceService",
+	"getSamlService":"com.soffid.iam.rc.service.SamlService",
+	"getSoDRuleService":"com.soffid.iam.rc.service.SoDRuleService",
+	"getReconcileService":"com.soffid.iam.reconcile.service.ReconcileService",
+	"getAttributeValidationService":"com.soffid.iam.service.impl.AttributeValidationService",
+	"getAgentManager":"com.soffid.iam.sync.agent.AgentManager",
+	"getCertificateEnrollService":"com.soffid.iam.sync.service.CertificateEnrollService",
+	"getChangePasswordNotificationQueue":"com.soffid.iam.sync.service.ChangePasswordNotificationQueue",
+	"getConsoleLogonService":"com.soffid.iam.sync.service.ConsoleLogonService",
+	"getLogCollectorService":"com.soffid.iam.sync.service.LogCollectorService",
+	"getLogonService":"com.soffid.iam.sync.service.LogonService",
+	"getPamProxySessionService":"com.soffid.iam.sync.service.PamProxySessionService",
+	"getQueryService":"com.soffid.iam.sync.service.QueryService",
+	"getScheduledTaskService":"com.soffid.iam.sync.service.ScheduledTaskService",
+	"getSecretConfigurationService":"com.soffid.iam.sync.service.SecretConfigurationService",
+	"getSecretStoreService":"com.soffid.iam.sync.service.SecretStoreService",
+	"getServerService":"com.soffid.iam.sync.service.ServerService",
+	"getSyncServerService":"com.soffid.iam.sync.service.SyncServerService",
+	"getSyncServerStatsService":"com.soffid.iam.sync.service.SyncServerStatsService",
+	"getSyncStatusService":"com.soffid.iam.sync.service.SyncStatusService",
+	"getTaskGenerator":"com.soffid.iam.sync.service.TaskGenerator",
+	"getTaskQueue":"com.soffid.iam.sync.service.TaskQueue",
+	"instance":"java.lang.Object",
+	"getService":"java.lang.Object"
+};
+CodeMirrorJavaTypes["com.soffid.iam.ServiceLocator"]={
+	"getAccessLogService":"com.soffid.iam.am.service.AccessLogService",
+	"getBrowserService":"com.soffid.iam.am.service.BrowserService",
+	"getCertificateValidationService":"com.soffid.iam.am.service.CertificateValidationService",
+	"getEntryPointService":"com.soffid.iam.am.service.EntryPointService",
+	"getNetworkService":"com.soffid.iam.am.service.NetworkService",
+	"getPasswordManagerService":"com.soffid.iam.am.service.PasswordManagerService",
+	"getPasswordService":"com.soffid.iam.am.service.PasswordService",
+	"getServiceService":"com.soffid.iam.am.service.ServiceService",
+	"getSessionService":"com.soffid.iam.am.service.SessionService",
+	"getSignalService":"com.soffid.iam.am.service.SignalService",
+	"getVaultService":"com.soffid.iam.am.service.VaultService",
+	"getAccountService":"com.soffid.iam.base.service.AccountService",
+	"getAdditionalDataService":"com.soffid.iam.base.service.AdditionalDataService",
+	"getAuthorizationService":"com.soffid.iam.base.service.AuthorizationService",
+	"getConfigurationService":"com.soffid.iam.base.service.ConfigurationService",
+	"getGenAIProviderService":"com.soffid.iam.base.service.GenAIProviderService",
+	"getLicenseService":"com.soffid.iam.base.service.LicenseService",
+	"getPreferencesService":"com.soffid.iam.base.service.PreferencesService",
+	"getRecycleBeanService":"com.soffid.iam.base.service.RecycleBeanService",
+	"getServerPluginService":"com.soffid.iam.base.service.ServerPluginService",
+	"getStatsService":"com.soffid.iam.base.service.StatsService",
+	"getTenantService":"com.soffid.iam.base.service.TenantService",
+	"getUserService":"com.soffid.iam.base.service.UserService",
+	"getBpmConfigService":"com.soffid.iam.bpm.service.BpmConfigService",
+	"getBpmEngine":"com.soffid.iam.bpm.service.BpmEngine",
+	"getBpmJobExecutor":"com.soffid.iam.bpm.service.BpmJobExecutor",
+	"getDocumentService":"com.soffid.iam.doc.service.DocumentService",
+	"getApplicationService":"com.soffid.iam.iga.service.ApplicationService",
+	"getAttributeTranslationService":"com.soffid.iam.iga.service.AttributeTranslationService",
+	"getAuthoritativeChangeService":"com.soffid.iam.iga.service.AuthoritativeChangeService",
+	"getCustomObjectService":"com.soffid.iam.iga.service.CustomObjectService",
+	"getDispatcherService":"com.soffid.iam.iga.service.DispatcherService",
+	"getDomainService":"com.soffid.iam.iga.service.DomainService",
+	"getEntitlementDelegationService":"com.soffid.iam.iga.service.EntitlementDelegationService",
+	"getGroupService":"com.soffid.iam.iga.service.GroupService",
+	"getGroupTypeService":"com.soffid.iam.iga.service.GroupTypeService",
+	"getMailListsService":"com.soffid.iam.iga.service.MailListsService",
+	"getMailService":"com.soffid.iam.iga.service.MailService",
+	"getPrinterService":"com.soffid.iam.iga.service.PrinterService",
+	"getRulesService":"com.soffid.iam.iga.service.RulesService",
+	"getSelfService":"com.soffid.iam.iga.service.SelfService",
+	"getUserDomainService":"com.soffid.iam.iga.service.UserDomainService",
+	"getACLService":"com.soffid.iam.impl.service.ACLService",
+	"getAccountNameGenerator":"com.soffid.iam.impl.service.AccountNameGenerator",
+	"getApplicationBootService":"com.soffid.iam.impl.service.ApplicationBootService",
+	"getApplicationShutdownService":"com.soffid.iam.impl.service.ApplicationShutdownService",
+	"getAsyncRunnerService":"com.soffid.iam.impl.service.AsyncRunnerService",
+	"getAuthorizationInformationService":"com.soffid.iam.impl.service.AuthorizationInformationService",
+	"getCreateDisableUserService":"com.soffid.iam.impl.service.CreateDisableUserService",
+	"getCrudRegistryService":"com.soffid.iam.impl.service.CrudRegistryService",
+	"getInternalPasswordService":"com.soffid.iam.impl.service.InternalPasswordService",
+	"getLuceneIndexService":"com.soffid.iam.impl.service.LuceneIndexService",
+	"getOTPValidationService":"com.soffid.iam.impl.service.OTPValidationService",
+	"getRuleEvaluatorService":"com.soffid.iam.impl.service.RuleEvaluatorService",
+	"getSoffidEventListener":"com.soffid.iam.impl.service.SoffidEventListener",
+	"getNetworkDiscoveryService":"com.soffid.iam.pam.service.NetworkDiscoveryService",
+	"getPamPolicyService":"com.soffid.iam.pam.service.PamPolicyService",
+	"getPamSecurityHandlerService":"com.soffid.iam.pam.service.PamSecurityHandlerService",
+	"getPamSessionService":"com.soffid.iam.pam.service.PamSessionService",
+	"getAuditService":"com.soffid.iam.rc.service.AuditService",
+	"getGeoInformationService":"com.soffid.iam.rc.service.GeoInformationService",
+	"getIssuePolicyService":"com.soffid.iam.rc.service.IssuePolicyService",
+	"getIssueService":"com.soffid.iam.rc.service.IssueService",
+	"getNetworkIntelligenceService":"com.soffid.iam.rc.service.NetworkIntelligenceService",
+	"getSamlService":"com.soffid.iam.rc.service.SamlService",
+	"getSoDRuleService":"com.soffid.iam.rc.service.SoDRuleService",
+	"getReconcileService":"com.soffid.iam.reconcile.service.ReconcileService",
+	"getAttributeValidationService":"com.soffid.iam.service.impl.AttributeValidationService",
+	"getAgentManager":"com.soffid.iam.sync.agent.AgentManager",
+	"getCertificateEnrollService":"com.soffid.iam.sync.service.CertificateEnrollService",
+	"getChangePasswordNotificationQueue":"com.soffid.iam.sync.service.ChangePasswordNotificationQueue",
+	"getConsoleLogonService":"com.soffid.iam.sync.service.ConsoleLogonService",
+	"getLogCollectorService":"com.soffid.iam.sync.service.LogCollectorService",
+	"getLogonService":"com.soffid.iam.sync.service.LogonService",
+	"getPamProxySessionService":"com.soffid.iam.sync.service.PamProxySessionService",
+	"getQueryService":"com.soffid.iam.sync.service.QueryService",
+	"getScheduledTaskService":"com.soffid.iam.sync.service.ScheduledTaskService",
+	"getSecretConfigurationService":"com.soffid.iam.sync.service.SecretConfigurationService",
+	"getSecretStoreService":"com.soffid.iam.sync.service.SecretStoreService",
+	"getServerService":"com.soffid.iam.sync.service.ServerService",
+	"getSyncServerService":"com.soffid.iam.sync.service.SyncServerService",
+	"getSyncServerStatsService":"com.soffid.iam.sync.service.SyncServerStatsService",
+	"getSyncStatusService":"com.soffid.iam.sync.service.SyncStatusService",
+	"getTaskGenerator":"com.soffid.iam.sync.service.TaskGenerator",
+	"getTaskQueue":"com.soffid.iam.sync.service.TaskQueue",
+	"instance":"java.lang.Object",
+	"getService":"java.lang.Object"
+};
+CodeMirrorJavaPackages[""]=[
+
+	"com",
+	"boolean",
+	"java",
+	"void",
+	"E",
+	"org",
+	"byte",
+	"roles",
+	"float",
+	"int",
+	"long"];
+CodeMirrorJavaPackages["com.soffid.iam.impl"]=[
+
+	"service",
+	"TransactionalTask",
+	"api"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api"]=[
+
+	"AccessLog>",
+	"VaultFolder>",
+	"Network>",
+	"Browser>",
+	"Service>",
+	"AccessTree>",
+	"Host>"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util"]=[
+
+	"Vector<java",
+	"Map<java"];
+CodeMirrorJavaPackages["java.security.cert"]=[
+
+	"X509Certificate"];
+CodeMirrorJavaPackages["com.soffid.iam.iga"]=[
+
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["java.util.Vector<com.soffid.iam.base.api"]=[
+
+	"AccountAccessLevelEnum>"];
+CodeMirrorJavaPackages["java"]=[
+
+	"security",
+	"util",
+	"io",
+	"lang",
+	"net",
+	"rmi",
+	"sql"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util.Map<java.lang"]=[
+
+	"String,java"];
+CodeMirrorJavaPackages["org.ietf.jgss"]=[
+
+	"GSSContext"];
+CodeMirrorJavaPackages["java.util.Vector<java.lang"]=[
+
+	"Object>",
+	"Object[]>"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api"]=[
+
+	"RoleAccount>",
+	"System>",
+	"CustomObjectType>",
+	"MailList>",
+	"UserGroup>",
+	"InformationSystem>",
+	"MailDomain>",
+	"GroupType>",
+	"UserType>",
+	"DomainValue>",
+	"Printer>",
+	"PrinterUser>",
+	"AttributeTranslation>",
+	"CustomObject>",
+	"Group>",
+	"Role>"];
+CodeMirrorJavaPackages["com.soffid.iam.impl.service"]=[
+
+	"AuthorizationInformationService",
+	"AsyncRunnable",
+	"OTPValidationService",
+	"CrudRegistryService",
+	"LuceneIndexService",
+	"ACLService",
+	"ApplicationBootService",
+	"InternalPasswordService",
+	"CreateDisableUserService",
+	"RuleEvaluatorService",
+	"SoffidEventListener",
+	"ApplicationShutdownService",
+	"AccountNameGenerator",
+	"AsyncRunnerService"];
+CodeMirrorJavaPackages["java.security"]=[
+
+	"PrivateKey",
+	"PublicKey",
+	"cert"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,com.soffid"]=[
+
+	"iam"];
+CodeMirrorJavaPackages["com.soffid.iam.reconcile"]=[
+
+	"service"];
+CodeMirrorJavaPackages["com.soffid.iam.bpm.api.FilteredGroupVO"]=[
+
+	"FilteredGroupVoNameComparator"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util.Vector<java.lang"]=[
+
+	"Object[]>>"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java"]=[
+
+	"util",
+	"lang"];
+CodeMirrorJavaPackages["com.soffid.iam.service.impl"]=[
+
+	"AttributeValidationService",
+	"OTPHandler"];
+CodeMirrorJavaPackages["com.soffid.iam.base.service"]=[
+
+	"TenantService",
+	"AuthorizationService",
+	"StatsService",
+	"UserService",
+	"GenAIProviderService",
+	"LicenseService",
+	"RecycleBeanService",
+	"ServerPluginService",
+	"ConfigurationService",
+	"AccountService",
+	"AdditionalDataService",
+	"PreferencesService"];
+CodeMirrorJavaPackages["java.util.Vector<com.soffid.iam"]=[
+
+	"am",
+	"base"];
+CodeMirrorJavaPackages["com.soffid.iam.doc.exception"]=[
+
+	"NASException",
+	"DocumentBeanException"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync"]=[
+
+	"api"];
+CodeMirrorJavaPackages["java.lang"]=[
+
+	"Integer",
+	"Class<E>",
+	"Number",
+	"Runnable",
+	"Long",
+	"Throwable",
+	"Object",
+	"Class",
+	"String",
+	"Boolean",
+	"Double",
+	"Exception"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api"]=[
+
+	"SoDRule>",
+	"Audit>",
+	"Issue>",
+	"IssuePolicy>"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java.util"]=[
+
+	"List<com"];
+CodeMirrorJavaPackages["com.soffid.iam.rc.model"]=[
+
+	"AuditoriaDataIndex",
+	"IssueStatusIndex",
+	"AuditoriaIndexIndex",
+	"AuditoriaUserIndex",
+	"GeoInformationEntityUniqueKey",
+	"IssueHashIndex",
+	"IssueNumberIndex"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.lang"]=[
+
+	"String>",
+	"Exception>",
+	"Object>"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang"]=[
+
+	"String>>"];
+CodeMirrorJavaPackages["com.soffid.iam.doc"]=[
+
+	"exception",
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.bpm.exception"]=[
+
+	"BPMException"];
+CodeMirrorJavaPackages["com.soffid.iam.pam.model"]=[
+
+	"PamRuelEntityUniqueKey",
+	"PamPolicyEntityUniqueKey",
+	"JumpServerGroupUniqueKey",
+	"PamActionType"];
+CodeMirrorJavaPackages["java.sql"]=[
+
+	"Blob",
+	"SQLException",
+	"Timestamp"];
+CodeMirrorJavaPackages["java.util"]=[
+
+	"Vector<java",
+	"Map<java",
+	"Calendar",
+	"Vector<com",
+	"Collection",
+	"List",
+	"Properties",
+	"Map",
+	"Date",
+	"HashMap<java"];
+CodeMirrorJavaPackages["com.soffid.iam.base"]=[
+
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["java.util.Map<java"]=[
+
+	"lang"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.am"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.bpm"]=[
+
+	"exception",
+	"service",
+	"api"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,com.soffid.iam.sync"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.doc.api"]=[
+
+	"DocumentReference"];
+CodeMirrorJavaPackages["com.soffid.iam.iga.api"]=[
+
+	"RoleGrant",
+	"SystemAccessControl",
+	"ReconcileRole",
+	"Printer",
+	"AccessControl",
+	"UserGroup",
+	"RuleAssignedRole",
+	"DomainUsersMember",
+	"Notice",
+	"DelegationStatus",
+	"AccountHistory",
+	"GroupRoles",
+	"RoleGrantHierarchy",
+	"InformationSystem",
+	"ReconcileAccount",
+	"ReconcileAssignment",
+	"MailDomain",
+	"CustomObject",
+	"RoleDependencyStatus",
+	"SharedAccountPrivileges",
+	"MailList",
+	"AttributeDirection",
+	"ReconcileTrigger",
+	"Role",
+	"ApplicationType",
+	"GroupType",
+	"BpmProcess",
+	"ExternalName",
+	"Rule",
+	"Domain",
+	"UserType",
+	"AccessControlList",
+	"Group",
+	"PrinterGroup",
+	"ObjectMappingProperty",
+	"SoffidObjectType",
+	"CustomObjectType",
+	"System",
+	"ObjectMapping",
+	"AccountProposedAction",
+	"MailListRelationship",
+	"ExtensibleObjectRegister",
+	"UserDomain",
+	"EventUserAction",
+	"UserMailList",
+	"SystemGroup",
+	"RoleAccount",
+	"ObjectMappingTrigger",
+	"ProposedAction",
+	"MailListRoleMember",
+	"UserDomainType",
+	"DomainValue",
+	"AttributeTranslation",
+	"SoffidObjectTrigger",
+	"AttributeMapping",
+	"BpmUserProcess",
+	"PrinterUser",
+	"UserTypeDispatcher"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util.Vector<java"]=[
+
+	"lang"];
+CodeMirrorJavaPackages["com.soffid.iam.sync.api"]=[
+
+	"ServerType",
+	"GetObjectResults",
+	"Task",
+	"Server",
+	"SyncserverTask",
+	"AuthoritativeChangeIdentifier",
+	"ScheduledTask",
+	"LogConfiguration",
+	"LogFileEntry",
+	"SyncAgentTaskLog",
+	"DebugTaskResults",
+	"ServerRegistrationToken",
+	"Secret",
+	"ScheduledTaskLog",
+	"ScheduledTaskHandler",
+	"AuthoritativeChange",
+	"SyncServerInfo"];
+CodeMirrorJavaPackages["org.jbpm"]=[
+
+	"JbpmConfiguration",
+	"JbpmContext"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api"]=[
+
+	"Query",
+	"PagedResult<com",
+	"CrudHandler<E>",
+	"PagedResult"];
+CodeMirrorJavaPackages["java.util.Vector<java"]=[
+
+	"lang"];
+CodeMirrorJavaPackages["com.soffid.iam.base.model"]=[
+
+	"UsuariIndex",
+	"AccountExternalIdIndex",
+	"AccountIndex",
+	"LucenIndexUniqueKey",
+	"AutoritzacioRolIndex",
+	"DadaUsuariValueIndex",
+	"UsuariNomCurtIndex",
+	"DadaUsuariIndex",
+	"TenantEntityUK",
+	"Parameter",
+	"UserPreferenceUk",
+	"AccountMetadataNameIndex",
+	"StatsEntityNameIndex"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.pam.api"]=[
+
+	"PamPolicy",
+	"PamSession",
+	"HostService",
+	"NewPamSession",
+	"PamSecurityCheck",
+	"PamAction",
+	"HostAdmin",
+	"JumpServerGroup",
+	"HostPort",
+	"PamRule",
+	"HostEventAction",
+	"PamRuleType"];
+CodeMirrorJavaPackages["com.soffid.iam.am.api"]=[
+
+	"AccessLog",
+	"AccessTree",
+	"NetworkAuthorization",
+	"SessionType",
+	"PasswordDomain",
+	"VaultFolderPermissions",
+	"ApplicationAccessTree",
+	"PasswordValidation",
+	"LaunchType",
+	"Challenge",
+	"PasswordPolicyForbbidenWord",
+	"PasswordDomainStatus",
+	"ForbiddenWord",
+	"OsType",
+	"NetworkType",
+	"Network",
+	"PasswordPolicy",
+	"OtpChallengeProxy",
+	"Password",
+	"AccessTreeExecution",
+	"PolicyCheckResult",
+	"SamlRequest",
+	"VaultElement",
+	"VaultFolder",
+	"Service",
+	"AccessTreeExecutionType",
+	"Host",
+	"ExtranetCard",
+	"HostAlias",
+	"ExtranetCardContent",
+	"PasswordStatus",
+	"AccessTreeAuthorization",
+	"Browser",
+	"Session",
+	"VaultFolderAccountPermissions"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util.Map<java"]=[
+
+	"lang"];
+CodeMirrorJavaPackages["com.soffid.iam.sync.engine"]=[
+
+	"DispatcherHandler",
+	"ChangePasswordNotification",
+	"TaskHandler"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java.util.List<com.soffid.iam.base"]=[
+
+	"api"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,com"]=[
+
+	"soffid"];
+CodeMirrorJavaPackages["com.soffid.iam.doc.model"]=[
+
+	"DocumentEntityUniqueIndex",
+	"DocumentBlockEntityUniqueIndex"];
+CodeMirrorJavaPackages["java.util.Vector<com.soffid"]=[
+
+	"iam"];
+CodeMirrorJavaPackages["com.soffid.iam.sync"]=[
+
+	"agent",
+	"engine",
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,com.soffid.iam"]=[
+
+	"sync"];
+CodeMirrorJavaPackages["com.soffid.iam.iga.model"]=[
+
+	"DispatcherIndex",
+	"RoleAcountExternalIdIndex",
+	"RolApplicationIndex",
+	"ParentProcessIndex",
+	"TipusDadaCodiIndex",
+	"DominiCorreuIndex",
+	"RolGrupRolGrupIndex",
+	"ChildProcessIndex",
+	"TipusDadaOrdreIndex",
+	"AplicacioIndex",
+	"AttributeTranslationColumn1Index",
+	"CustomObjectEntityKey",
+	"RolExternalIdIndex",
+	"ValorDominiUniqueIndex",
+	"AttributeTranslationColumn2Index",
+	"LlistaCorreuIndex",
+	"RolIndex",
+	"UsuariImpressoraIndex",
+	"ImpressoraIndex",
+	"TipusUnitatOrganitzativaIndex",
+	"CustomObjectTypeEntityKey",
+	"DominiAplicacioIndex",
+	"GrupIndex"];
+CodeMirrorJavaPackages["com.soffid.iam.reconcile.service"]=[
+
+	"ReconcileService"];
+CodeMirrorJavaPackages["com.soffid.iam.iga.service"]=[
+
+	"DomainService",
+	"PrinterService",
+	"GroupService",
+	"GroupTypeService",
+	"CustomObjectService",
+	"EntitlementDelegationService",
+	"AttributeTranslationService",
+	"MailService",
+	"RulesService",
+	"DispatcherService",
+	"MailListsService",
+	"SelfService",
+	"AuthoritativeChangeService",
+	"ApplicationService",
+	"UserDomainService"];
+CodeMirrorJavaPackages["com"]=[
+
+	"soffid"];
+CodeMirrorJavaPackages["java.rmi"]=[
+
+	"RemoteException"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api"]=[
+
+	"PamPolicy>",
+	"PamRule>"];
+CodeMirrorJavaPackages["com.soffid.iam.rc.api"]=[
+
+	"GeoInformation",
+	"Issue",
+	"SoDRisk",
+	"NetworkIntelligence",
+	"IssuePolicyAction",
+	"SoDRole",
+	"SodRuleType",
+	"IssuePolicy",
+	"IssueStatus",
+	"SoDRule",
+	"SoDRuleMatrix",
+	"Audit",
+	"IssueActionDefinition",
+	"IssueHost",
+	"IssueUser",
+	"RequestedObligation",
+	"RequestedObligationEnum",
+	"IssuePolicyStatus",
+	"IssueBrowser"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java"]=[
+
+	"util"];
+CodeMirrorJavaPackages["com.soffid.iam.am.model"]=[
+
+	"MaquinaIndex",
+	"SAMLRequestEntityIndexByExternalId",
+	"MaquinaNameIndex",
+	"ServeiIndex",
+	"PuntEntradaIndex",
+	"PasswordManagerTokenEntityByToken",
+	"MaquinaSerialIndex",
+	"RegistreAccesIndex",
+	"AccpwdIdOrderIndex",
+	"RegistreAccesDataIndex",
+	"BrowserSerialIndex",
+	"DominiContrasenyEntityIndex",
+	"PuntEntradaCodeIndex",
+	"XarxesIndex",
+	"XarxesAdressIndex",
+	"RegistreAccesMaquinaIndex",
+	"SAMLAssertionEntityIndexByExternalId",
+	"ContrasenyaEntityOrderUK",
+	"AutoritzacioPUERolIndex",
+	"RegistreAccesNomesDataIndex",
+	"SecretUserServerIndex"];
+CodeMirrorJavaPackages["java.net"]=[
+
+	"URL"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.am.service"]=[
+
+	"BrowserService",
+	"SessionService",
+	"AccessLogService",
+	"PasswordManagerService",
+	"CertificateValidationService",
+	"NetworkService",
+	"ServiceService",
+	"EntryPointService",
+	"VaultService",
+	"PasswordService",
+	"SignalService"];
+CodeMirrorJavaPackages["java.util.Map<java.lang"]=[
+
+	"String,com",
+	"String,int[]>",
+	"String,java"];
+CodeMirrorJavaPackages["com.soffid.iam.pam.service"]=[
+
+	"JumpServer_delete",
+	"JumpServer_update",
+	"PamPolicy_query",
+	"PamRule_delete",
+	"PamSessionService",
+	"pamSession_create",
+	"NetworkDiscoveryService",
+	"PamPolicy_delete",
+	"PamPolicy_update",
+	"PamRule_query",
+	"PamSecurityHandlerService",
+	"Soffid_PamSessionConfigure",
+	"JumpServer_query",
+	"Soffid_pamSessionAudit",
+	"PamRule_create",
+	"PamPolicy_create",
+	"pamSession_query",
+	"PamPolicyService",
+	"JumpServer_create",
+	"PamRule_update"];
+CodeMirrorJavaPackages["org.apache.lucene.search"]=[
+
+	"SimpleCollector",
+	"Query"];
+CodeMirrorJavaPackages["com.soffid.iam.pam"]=[
+
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java.util.List<com.soffid.iam.base.api"]=[
+
+	"StatsSample>>"];
+CodeMirrorJavaPackages["com.soffid.iam"]=[
+
+	"exception",
+	"iga",
+	"am",
+	"sync",
+	"impl",
+	"rc",
+	"reconcile",
+	"common",
+	"web",
+	"service",
+	"doc",
+	"pam",
+	"bpm",
+	"base"];
+CodeMirrorJavaPackages["java.util.Vector<com"]=[
+
+	"soffid"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java.util.List<com.soffid"]=[
+
+	"iam"];
+CodeMirrorJavaPackages["com.soffid.iam.sync.model"]=[
+
+	"TasqueHashIndex",
+	"ScheduledTaskEntityNameIndex",
+	"ScheduledTaskEntityHandlerIndex",
+	"ServerIndex",
+	"SheculedTaskHandlerNameIndex",
+	"ServerInstanceNameIndex",
+	"TasqueUserIndex"];
+CodeMirrorJavaPackages["com.soffid"]=[
+
+	"iam",
+	"zkdb"];
+CodeMirrorJavaPackages["com.soffid.iam.bpm.api"]=[
+
+	"Comment",
+	"TaskInstance",
+	"RolGrup",
+	"Token",
+	"ProcessDefinition",
+	"UIClassLoader",
+	"ProcessLog",
+	"BPMUser",
+	"PredefinedProcessType",
+	"TaskDefinition",
+	"FilteredGroupVO",
+	"DeployToken",
+	"ProcessInstance",
+	"ConfigParameterVO",
+	"Job"];
+CodeMirrorJavaPackages["com.soffid.iam.service"]=[
+
+	"impl"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.rc.service"]=[
+
+	"IssueService",
+	"SamlService",
+	"NetworkIntelligenceService",
+	"IssuePolicyService",
+	"NetworkIntelligence_Manager",
+	"SoDRuleService",
+	"AuditService",
+	"GeoInformationService"];
+CodeMirrorJavaPackages["org.apache.lucene"]=[
+
+	"search",
+	"document"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api"]=[
+
+	"User>",
+	"Account>",
+	"Configuration>"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid"]=[
+
+	"iam"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc"]=[
+
+	"api"];
+CodeMirrorJavaPackages["java.util.Vector<com.soffid.iam.am.api"]=[
+
+	"VaultFolderAccountPermissions>"];
+CodeMirrorJavaPackages["org.apache.lucene.document"]=[
+
+	"Document"];
+CodeMirrorJavaPackages["com.soffid.iam.common"]=[
+
+	"security"];
+CodeMirrorJavaPackages["org.apache"]=[
+
+	"lucene"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,java.util.Map<java.lang.String,java"]=[
+
+	"lang"];
+CodeMirrorJavaPackages["java.util.Map<java.lang.String,com.soffid.iam.sync.api"]=[
+
+	"DebugTaskResults>"];
+CodeMirrorJavaPackages["com.soffid.iam.rc"]=[
+
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api"]=[
+
+	"ProcessInstance>",
+	"ProcessDefinition>",
+	"TaskInstance>"];
+CodeMirrorJavaPackages["com.soffid.zkdb"]=[
+
+	"api"];
+CodeMirrorJavaPackages["roles"]=[
+
+	"user_delete",
+	"agent_accessControl_update",
+	"intranetMenus_admin",
+	"user_printer_create",
+	"user_session_query",
+	"customObjectType_create",
+	"agent_accessControl_set",
+	"browser_delete",
+	"metadata_query",
+	"userType_update",
+	"host_all_delete",
+	"server_manage_proxy",
+	"usersDomain_query",
+	"application_update",
+	"authorization_rol_delete",
+	"Usuari",
+	"accessRegister_query",
+	"account_update",
+	"user_role_delete",
+	"usersDomain_create",
+	"lopd_delete",
+	"printer_acl_query",
+	"Personal",
+	"application_create",
+	"passwordDomain_delete",
+	"printer_create",
+	"service_update",
+	"IssuePolicyCreate",
+	"parameter_update",
+	"Workflow",
+	"account_create",
+	"host_update_os",
+	"mail_delete",
+	"operatingSystem_create",
+	"schedule_query",
+	"customObjectType_update",
+	"group_user_query",
+	"audit_custom_query",
+	"UsuariDGTIC",
+	"user_merge",
+	"group_printer_delete",
+	"tenantRemove",
+	"sod_delete",
+	"user_metadata_update",
+	"rule_admin",
+	"IssuePolicyQuery",
+	"customObject_delete",
+	"authorization_rol_create",
+	"parameter_query",
+	"plugins_query",
+	"audit_query",
+	"user_role_create",
+	"customObject_update",
+	"network_all_delete",
+	"agent_accessControl_create",
+	"metadata_update",
+	"organizationalUnit_delete",
+	"tenantCreate",
+	"application_query",
+	"metadata_delete",
+	"usersDomain_update",
+	"network_all_update",
+	"user_group_create",
+	"DirectorContracte",
+	"customObjectType_delete",
+	"authorization_query",
+	"user_password_set",
+	"AttributeTranslationUpdate",
+	"host_all_create",
+	"host_admin_query",
+	"user_query",
+	"account_attribute_query",
+	"role_update",
+	"IssuePolicyUpdate",
+	"IssueCreate",
+	"service_delete",
+	"agent_invoke",
+	"agent_update",
+	"user_create",
+	"sod_update",
+	"account_attribute_update",
+	"passwordDomain_create",
+	"customObject_query",
+	"group_create",
+	"AttributeTranslationQuery",
+	"user_printer_acl_delete",
+	"anonymous",
+	"mail_query",
+	"networkDiscovery_schedule",
+	"role_query",
+	"ALL",
+	"organizationalUnit_create",
+	"group_printer_create",
+	"user_update",
+	"user_custom_update",
+	"schedule_admin",
+	"agent_queryObjects",
+	"browser_update",
+	"application_delete",
+	"monitor_server_list",
+	"agent_refreshRoles",
+	"lopd_create",
+	"sod_query",
+	"Habilitant",
+	"userType_delete",
+	"agent_refreshGroups",
+	"service_query",
+	"account_delete",
+	"Funcionari",
+	"printer_delete",
+	"operatingSystem_delete",
+	"IssueQuery",
+	"base_log_query",
+	"group_query",
+	"mail_create",
+	"parameter_delete",
+	"agent_accessControl_delete",
+	"rule_query",
+	"group_delete",
+	"Proveidor",
+	"server_manage_server",
+	"agent_refreshUsers",
+	"monitor_agent_list",
+	"pupil_create",
+	"role_delete",
+	"passwordDomain_query",
+	"account_query",
+	"network_all_query",
+	"AttributeTranslationCreate",
+	"agent_delete",
+	"host_all_update",
+	"group_role_query",
+	"IssueDelete",
+	"user_group_delete",
+	"organizationalUnit_query",
+	"tenantUpdate",
+	"user_reconcile",
+	"networkDiscovery_query",
+	"userType_create",
+	"Tothom",
+	"user_refresh",
+	"browser_query",
+	"EmpleatEmpresaPublica",
+	"user_printer_acl_create",
+	"Ciutada",
+	"parameter_create",
+	"sso_manage",
+	"usersDomain_delete",
+	"userType_query",
+	"IssuePolicyDelete",
+	"organizationalUnit_update",
+	"printer_query",
+	"user_printer_delete",
+	"agent_query",
+	"service_create",
+	"tenantQuery",
+	"role_create",
+	"passwordDomain_update",
+	"host_all_query",
+	"metadata_create",
+	"server_query",
+	"agent_create",
+	"actor_delete",
+	"mail_update",
+	"operatingSystem_update",
+	"lopd_query",
+	"sod_create",
+	"user_role_query",
+	"AttributeTranslationDelete",
+	"Iniciador",
+	"plugins_update",
+	"group_update",
+	"customObject_create",
+	"printer_update",
+	"IssueUpdate",
+	"user_accessRegister_query",
+	"user_password_update",
+	"host_query",
+	"lopd_update",
+	"network_all_create",
+	"customObjectType_query",
+	"ResponsableAplicacio"];
+CodeMirrorJavaPackages["java.util.Vector<com.soffid.iam.base"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam"]=[
+
+	"rc",
+	"iga",
+	"am",
+	"pam",
+	"sync",
+	"bpm",
+	"base"];
+CodeMirrorJavaPackages["com.soffid.iam.am"]=[
+
+	"service",
+	"model",
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.sync.service"]=[
+
+	"SyncServerService",
+	"SecretConfigurationService",
+	"ChangePasswordNotificationQueue",
+	"ScheduledTaskService",
+	"TaskGenerator",
+	"SecretStoreService",
+	"SyncStatusService",
+	"LogonService",
+	"QueryService",
+	"ConsoleLogonService",
+	"PamProxySessionService",
+	"ServerService",
+	"TaskQueue",
+	"CertificateEnrollService",
+	"SyncServerStatsService",
+	"LogCollectorService"];
+CodeMirrorJavaPackages["com.soffid.iam.web"]=[
+
+	"SearchAttributeDefinition",
+	"SearchDictionary"];
+CodeMirrorJavaPackages["com.soffid.iam.bpm.service"]=[
+
+	"BpmJobExecutor",
+	"BpmConfigService",
+	"BpmEngine"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang"]=[
+
+	"String,java"];
+CodeMirrorJavaPackages["org"]=[
+
+	"apache",
+	"jbpm",
+	"ietf"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com"]=[
+
+	"soffid"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java.util.List<com"]=[
+
+	"soffid"];
+CodeMirrorJavaPackages["com.soffid.iam.doc.service"]=[
+
+	"DocumentService"];
+CodeMirrorJavaPackages["com.soffid.iam.base.api"]=[
+
+	"Account",
+	"LetterCaseEnum",
+	"User",
+	"Configuration",
+	"AttributeVisibilityEnum",
+	"UserData",
+	"DisableObjectRule",
+	"TypeEnumeration",
+	"ServerPluginModuleType",
+	"AccountStatus",
+	"Tenant",
+	"TasksGrid",
+	"AgentDescriptorWorkflow",
+	"ServerPluginModule",
+	"CredentialTypeEnum",
+	"DataType",
+	"Identity",
+	"TranslatedLabel",
+	"MetadataScope",
+	"UserAccountHistory",
+	"AuthorizationRole",
+	"AgentDescriptor",
+	"AccountAccessLevelEnum",
+	"ServerPlugin",
+	"AgentProperty",
+	"AgentStatusInfo",
+	"TasksGridRow",
+	"AccountType",
+	"AsyncProcessTracker",
+	"StatsSample",
+	"Stats",
+	"UserAccount"];
+CodeMirrorJavaPackages["com.soffid.iam.impl.api"]=[
+
+	"UpgradeStatus"];
+CodeMirrorJavaPackages["com.soffid.iam.sync.agent"]=[
+
+	"AgentManager",
+	"Plugin"];
+CodeMirrorJavaPackages["java.util.Vector<com.soffid.iam.am"]=[
+
+	"api"];
+CodeMirrorJavaPackages["com.soffid.iam.exception"]=[
+
+	"LogonDeniedException",
+	"AccountAlreadyExistsException",
+	"UnknownHostException",
+	"BadPasswordException",
+	"UnknownMailListException",
+	"UnknownRoleException",
+	"UnknownUserException",
+	"InternalErrorException",
+	"CertificateEnrollWaitingForAproval",
+	"DuplicatedClassException",
+	"CertificateEnrollDenied",
+	"UnknownGroupException",
+	"InvalidPasswordException",
+	"ServerRedirectException",
+	"UnknownNetworkException",
+	"NeedsAccountNameException"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.base"]=[
+
+	"api"];
+CodeMirrorJavaPackages["java.util.HashMap<java.lang.String,java.util.List<com.soffid.iam"]=[
+
+	"base"];
+CodeMirrorJavaPackages["java.io"]=[
+
+	"InputStream",
+	"OutputStream",
+	"FileNotFoundException",
+	"IOException",
+	"File",
+	"Writer",
+	"PrintWriter"];
+CodeMirrorJavaPackages["com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api"]=[
+
+	"LogFileEntry>",
+	"SyncAgentTaskLog>"];
+CodeMirrorJavaPackages["java.util.HashMap<java"]=[
+
+	"lang"];
+CodeMirrorJavaPackages["com.soffid.iam.common.security"]=[
+
+	"SoffidPrincipal"];
+CodeMirrorJavaPackages["org.ietf"]=[
+
+	"jgss"];

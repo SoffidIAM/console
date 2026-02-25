@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.AccessLogEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_REGACC' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RAC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='sessionId' type='java.lang.String'>
+			<column name='RAC_IDSES' not-null='false' length='200' />
+		</property>
+		<property name='startDate' type='java.util.Date'>
+			<column name='RAC_DATINI' not-null='false' />
+		</property>
+		<property name='endDate' type='java.util.Date'>
+			<column name='RAC_DATFI' not-null='false' />
+		</property>
+		<property name='system' type='java.lang.String'>
+			<column name='RAC_CODAGE' not-null='false' length='50' />
+		</property>
+		<property name='information' type='java.lang.String'>
+			<column name='RAC_INFO' not-null='false' length='1024' />
+		</property>
+		<many-to-one name='server' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_REGACC_RAC_IDMAQ'>
+			<column name='RAC_IDMAQ' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='client' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_REGACC_RAC_IDMAOR'>
+			<column name='RAC_IDMAOR' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='browser' class='com.soffid.iam.am.model.BrowserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_REGACC_RAC_IDBRO'>
+			<column name='RAC_IDBRO' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='protocol' class='com.soffid.iam.am.model.ServiceEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_REGACC_RAC_IDSER'>
+			<column name='RAC_IDSER' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_REGACC_RAC_IDUSU'>
+			<column name='RAC_IDUSU' not-null='false'/>
+		</many-to-one>
+		<property name='accessType' type='java.lang.String'>
+			<column name='RAC_TIPUSACC' not-null='false' length='1' />
+		</property>
+		<property name='clientAddress' type='java.lang.String'>
+			<column name='RAC_CLIADR' not-null='false' length='128' />
+		</property>
+		<property name='clientHostName' type='java.lang.String'>
+			<column name='RAC_CLINAM' not-null='false' length='128' />
+		</property>
+		<property name='hostAddress' type='java.lang.String'>
+			<column name='RAC_HOSADR' not-null='false' length='128' />
+		</property>
+		<property name='hostName' type='java.lang.String'>
+			<column name='RAC_HOSNAM' not-null='false' length='128' />
+		</property>
+		<property name='country' type='java.lang.String'>
+			<column name='RAC_COUNTR' not-null='false' length='128' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_REGACC_RAC_TEN_ID'>
+			<column name='RAC_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='jumpServerGroup' type='java.lang.String'>
+			<column name='RAC_JUSEGR' not-null='false' length='128' />
+		</property>
+		<property name='accountName' type='java.lang.String'>
+			<column name='RAC_ACCNAM' not-null='false' length='128' />
+		</property>
+		<property name='targetApplication' type='java.lang.String'>
+			<column name='RAC_TARAPP' not-null='false' length='128' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='RAC_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='RAC_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='RAC_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='RAC_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='RAC_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='RAC_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

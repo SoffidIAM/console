@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.HostPortEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_MAQPOR' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='MPO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='host' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_MAQPOR_MPO_MAQ_ID'>
+			<column name='MPO_MAQ_ID' not-null='true'/>
+		</many-to-one>
+		<property name='port' type='java.lang.String'>
+			<column name='MPO_PORT' not-null='true' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='MPO_PORDES' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

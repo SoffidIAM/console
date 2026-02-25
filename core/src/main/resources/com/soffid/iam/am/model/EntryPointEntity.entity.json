@@ -1,0 +1,15 @@
+{
+  "joins": [
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"entryPoints"},
+    {"name":"authorizedRoles","targetClass":"com.soffid.iam.am.model.EntryPointRoleEntity","multiple":true,"reverse":"entryPoint"},
+    {"name":"authorizedUsers","targetClass":"com.soffid.iam.am.model.EntryPointUserEntity","multiple":true,"reverse":"entryPoint"},
+    {"name":"authorizedGroups","targetClass":"com.soffid.iam.am.model.EntryPointGroupEntity","multiple":true,"reverse":"entryPoint"},
+    {"name":"executionMethod","targetClass":"com.soffid.iam.am.model.EntryPointExecutableEntity","multiple":true,"reverse":"entryPoint"},
+    {"name":"authorizedAccounts","targetClass":"com.soffid.iam.am.model.EntryPointAccountEntity","multiple":true,"reverse":"entryPoint"},
+    {"name":"informationSystem","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false},
+    {"name":"parentEntryPointTree","targetClass":"com.soffid.iam.am.model.EntryPointTreeEntity","multiple":true,"reverse":"child"},
+    {"name":"childrenEntryPointTree","targetClass":"com.soffid.iam.am.model.EntryPointTreeEntity","multiple":true,"reverse":"parent"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"hosts","targetClass":"com.soffid.iam.am.model.HostEntryPointEntity","multiple":true,"reverse":"entryPoint"}
+  ]
+}

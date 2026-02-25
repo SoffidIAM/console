@@ -1,0 +1,17 @@
+{
+  "class": "com.soffid.iam.iga.service.GroupTypeService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.iga.api.GroupType", "arguments":[
+       {"name":"tipus","type":"com.soffid.iam.iga.api.GroupType","required": true}    ]},
+    {"name":"findGroupTypeByName", "return":"com.soffid.iam.iga.api.GroupType", "arguments":[
+       {"name":"CodiTipusUnitatOrganitzativa","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.GroupType", "arguments":[
+       {"name":"tipus","type":"com.soffid.iam.iga.api.GroupType","required": true}    ]},
+    {"name":"findGroupTypes", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.GroupType>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findAllGroupTypes", "return":"java.util.List<com.soffid.iam.iga.api.GroupType>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"tipus","type":"com.soffid.iam.iga.api.GroupType","required": true}    ]}
+  ]
+}

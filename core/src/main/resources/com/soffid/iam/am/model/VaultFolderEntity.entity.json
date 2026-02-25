@@ -1,0 +1,10 @@
+{
+  "joins": [
+    {"name":"parent","targetClass":"com.soffid.iam.am.model.VaultFolderEntity","multiple":false,"reverse":"children"},
+    {"name":"pamPolicy","targetClass":"com.soffid.iam.pam.model.PamPolicyEntity","multiple":false,"reverse":"vaultFolders"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"acl","targetClass":"com.soffid.iam.am.model.VaultFolderAccessEntity","multiple":true,"reverse":"vault"},
+    {"name":"children","targetClass":"com.soffid.iam.am.model.VaultFolderEntity","multiple":true,"reverse":"parent"},
+    {"name":"accounts","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":true,"reverse":"folder"}
+  ]
+}

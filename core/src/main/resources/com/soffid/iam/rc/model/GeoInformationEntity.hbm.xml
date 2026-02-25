@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.GeoInformationEntityImpl' dynamic-insert='false' dynamic-update='false' table='SCF_GEOIP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='GEO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='ip' type='java.lang.String'>
+			<column name='GEO_IP' not-null='true' length='40' />
+		</property>
+		<property name='date' type='java.util.Date'>
+			<column name='GEO_DATE' not-null='true' />
+		</property>
+		<property name='country' type='java.lang.String'>
+			<column name='GEO_COUNTRY' not-null='false' length='2' />
+		</property>
+		<property name='countryDivision1' type='java.lang.String'>
+			<column name='GEO_COUDIV' not-null='false' length='100' />
+		</property>
+		<property name='countryDivision2' type='java.lang.String'>
+			<column name='GEO_COUDI2' not-null='false' length='100' />
+		</property>
+		<property name='city' type='java.lang.String'>
+			<column name='GEO_CITY' not-null='false' length='100' />
+		</property>
+		<property name='latitude' type='java.lang.Double'>
+			<column name='GEO_LATITU' not-null='false' />
+		</property>
+		<property name='longitude' type='java.lang.Double'>
+			<column name='GEO_LONGIT' not-null='false' />
+		</property>
+		<property name='accuracy' type='java.lang.Double'>
+			<column name='GEO_ACCURA' not-null='false' />
+		</property>
+		<property name='domain' type='java.lang.String'>
+			<column name='GEO_DOMAIN' not-null='false' length='150' />
+		</property>
+		<property name='isp' type='java.lang.String'>
+			<column name='GEO_ISP' not-null='false' length='150' />
+		</property>
+		<property name='userType' type='java.lang.String'>
+			<column name='GEO_USETYP' not-null='false' length='50' />
+		</property>
+		<property name='anonymous' type='java.lang.Double'>
+			<column name='GEO_ANONYM' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SCF_GEOIP_GEO_TEN_ID'>
+			<column name='GEO_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

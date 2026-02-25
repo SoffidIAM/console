@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"mailList","targetClass":"com.soffid.iam.iga.model.MailListEntity","multiple":false,"reverse":"attributes"},
+    {"name":"metadata","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":false}
+  ]
+}

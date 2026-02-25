@@ -1,0 +1,29 @@
+{
+  "class": "com.soffid.iam.pam.service.PamPolicyService",
+  "methods": [
+    {"name":"updateAction", "return":"com.soffid.iam.pam.api.PamAction", "arguments":[
+       {"name":"action","type":"com.soffid.iam.pam.api.PamAction","required": true}    ]},
+    {"name":"createPolicy", "return":"com.soffid.iam.pam.api.PamPolicy", "arguments":[
+       {"name":"policy","type":"com.soffid.iam.pam.api.PamPolicy","required": true}    ]},
+    {"name":"updatePolicy", "return":"com.soffid.iam.pam.api.PamPolicy", "arguments":[
+       {"name":"policy","type":"com.soffid.iam.pam.api.PamPolicy","required": true}    ]},
+    {"name":"createRule", "return":"com.soffid.iam.pam.api.PamRule", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.pam.api.PamRule","required": true}    ]},
+    {"name":"updateRule", "return":"com.soffid.iam.pam.api.PamRule", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.pam.api.PamRule","required": true}    ]},
+    {"name":"findPolicies", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api.PamPolicy>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findRules", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.pam.api.PamRule>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findPolicyActions", "return":"java.util.List<com.soffid.iam.pam.api.PamAction>", "arguments":[
+       {"name":"policy","type":"com.soffid.iam.pam.api.PamPolicy","required": true}    ]},
+    {"name":"applyRule", "comments":"Method invoked from PAM session", "return":"void", "arguments":[
+       {"name":"sessionKey","type":"java.lang.String","required": true},
+       {"name":"policyName","type":"java.lang.String","required": true},
+       {"name":"ruleName","type":"java.lang.String","required": true}    ]},
+    {"name":"deletePolicy", "return":"void", "arguments":[
+       {"name":"policy","type":"com.soffid.iam.pam.api.PamPolicy","required": true}    ]},
+    {"name":"deleteRule", "return":"void", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.pam.api.PamRule","required": true}    ]}
+  ]
+}

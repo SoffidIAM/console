@@ -6,14 +6,13 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Map;
 
-import com.soffid.iam.api.PasswordValidation;
-import com.soffid.iam.api.ScheduledTask;
-import com.soffid.iam.api.SoffidObjectType;
-import com.soffid.iam.sync.engine.intf.GetObjectResults;
+import com.soffid.iam.am.api.PasswordValidation;
+import com.soffid.iam.sync.api.ScheduledTask;
+import com.soffid.iam.iga.api.SoffidObjectType;
+import com.soffid.iam.exception.AccountAlreadyExistsException;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.sync.api.GetObjectResults;
 import com.soffid.iam.sync.intf.KerberosAgent;
-
-import es.caib.seycon.ng.exception.AccountAlreadyExistsException;
-import es.caib.seycon.ng.exception.InternalErrorException;
 
 public abstract class DispatcherHandler {
     public int getInternalId() {
@@ -24,16 +23,16 @@ public abstract class DispatcherHandler {
         this.internalId = internalId;
     }
 
-    public com.soffid.iam.api.System getSystem() {
+    public com.soffid.iam.iga.api.System getSystem() {
         return system;
     }
 
-    public void setSystem(com.soffid.iam.api.System dispatcher) throws InternalErrorException {
+    public void setSystem(com.soffid.iam.iga.api.System dispatcher) throws InternalErrorException {
         this.system = dispatcher;
     }
 
     int internalId;
-    com.soffid.iam.api.System system;
+    com.soffid.iam.iga.api.System system;
     
     public abstract boolean applies (TaskHandler task);
 
@@ -59,7 +58,7 @@ public abstract class DispatcherHandler {
     
     public abstract void processOBTask (TaskHandler task) throws InternalErrorException;
 
-    public abstract com.soffid.iam.sync.engine.intf.DebugTaskResults debugTask (TaskHandler task) throws InternalErrorException;
+    public abstract com.soffid.iam.sync.api.DebugTaskResults debugTask (TaskHandler task) throws InternalErrorException;
 
 	public abstract void doReconcile (ScheduledTask task, PrintWriter out);
 

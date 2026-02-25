@@ -1,0 +1,17 @@
+{
+  "hibernateClass": "com.soffid.iam.base.model.UserTypeEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"managed", "hibernateName":"managed"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

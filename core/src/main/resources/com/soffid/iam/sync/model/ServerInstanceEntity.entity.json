@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"server","targetClass":"com.soffid.iam.sync.model.ServerEntity","multiple":false,"reverse":"instances"}
+  ]
+}

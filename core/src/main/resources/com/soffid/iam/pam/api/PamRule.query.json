@@ -1,0 +1,20 @@
+{
+  "hibernateClass": "com.soffid.iam.pam.model.PamRuleEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"type", "hibernateName":"type"},
+    {"name":"content", "hibernateName":"content"},
+    {"name":"author", "hibernateName":"author"},
+    {"name":"date", "hibernateName":"date"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

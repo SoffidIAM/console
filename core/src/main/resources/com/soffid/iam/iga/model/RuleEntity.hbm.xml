@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.RuleEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_RULE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RUL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='RUL_DESCRI' not-null='true' length='150' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='RUL_COMMEN' not-null='false' length='1500' />
+		</property>
+		<property name='bshExpression' type='java.lang.String' lazy='true'>
+			<column name='RUL_EXPRES' not-null='true' length='10000' />
+		</property>
+		<property name='bshRoles' type='java.lang.String' lazy='true'>
+			<column name='RUL_BSHROL' not-null='false' length='10000' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_RULE_RUL_TEN_ID'>
+			<column name='RUL_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='roles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_RULROL_RUR_RUL_ID'>
+				<column name='RUR_RUL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RuleAssignedRoleEntityImpl'/>
+		</set>
+		<set name='generated' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLUSU_RLU_RUL_ID'>
+				<column name='RLU_RUL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleAccountEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

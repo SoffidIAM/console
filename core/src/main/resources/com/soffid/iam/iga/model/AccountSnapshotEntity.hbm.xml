@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.AccountSnapshotEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ACCSNA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ASN_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='data' type='java.sql.Blob' lazy='true'>
+			<column name='ASN_DATA' not-null='true' length='128000' />
+		</property>
+		<set name='accounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCOUN_ACC_ASN_ID'>
+				<column name='ACC_ASN_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

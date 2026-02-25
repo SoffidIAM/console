@@ -19,7 +19,7 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import es.caib.seycon.util.Base64;
+import com.soffid.iam.util.Base64;
 
 public class AlwaysTrustManager implements X509TrustManager {
 

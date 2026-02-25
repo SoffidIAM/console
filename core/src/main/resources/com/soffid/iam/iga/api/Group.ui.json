@@ -1,0 +1,18 @@
+{
+  "class": "com.soffid.iam.iga.api.Group",
+  "attributes": [
+    {"name":"name", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "separator":"__data", "length":"150"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"250"},
+    {"name":"driveLetter", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"2"},
+    {"name":"parentGroup", "type":"GROUP", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"type", "type":"GROUP_TYPE", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"driveServerName", "type":"HOST", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"obsolete", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "separator":"__audit"},
+    {"name":"startDate", "type":"DATE_TIME", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"endDate", "type":"DATE_TIME", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

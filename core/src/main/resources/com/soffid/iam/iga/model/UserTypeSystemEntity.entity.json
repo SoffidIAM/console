@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"userType"},
+    {"name":"userType","targetClass":"com.soffid.iam.base.model.UserTypeEntity","multiple":false}
+  ]
+}

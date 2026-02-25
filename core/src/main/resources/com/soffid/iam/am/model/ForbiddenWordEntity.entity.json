@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"policies","targetClass":"com.soffid.iam.am.model.PolicyForbiddenWordEntity","multiple":true,"reverse":"forbiddenWord"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

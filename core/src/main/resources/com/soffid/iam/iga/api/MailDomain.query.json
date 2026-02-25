@@ -1,0 +1,18 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.MailDomainEntity",
+  "start": "createdOn",
+  "deleted": "obsolete",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"id", "hibernateName":"id"},
+    {"name":"obsolete", "hibernateName":"obsolete"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

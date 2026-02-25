@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.jbpm.context.exe.ContextInstance;
 
-import es.caib.bpm.vo.Deserializer;
-
 public class AttachmentManager extends AbstractAttachmentManager {
     private ContextInstance ctx;
 

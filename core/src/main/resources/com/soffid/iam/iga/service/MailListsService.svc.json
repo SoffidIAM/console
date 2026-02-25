@@ -1,0 +1,108 @@
+{
+  "class": "com.soffid.iam.iga.service.MailListsService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.iga.api.ExternalName", "arguments":[
+       {"name":"correuExtern","type":"com.soffid.iam.iga.api.ExternalName","required": true}    ]},
+    {"name":"finExternalMailByEmail", "return":"com.soffid.iam.iga.api.ExternalName", "arguments":[
+       {"name":"adreca","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.MailDomain", "arguments":[
+       {"name":"dominiCorreu","type":"com.soffid.iam.iga.api.MailDomain","required": true}    ]},
+    {"name":"findMailDomainByName", "return":"com.soffid.iam.iga.api.MailDomain", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.MailDomain", "arguments":[
+       {"name":"dominiCorreu","type":"com.soffid.iam.iga.api.MailDomain","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.MailList", "arguments":[
+       {"name":"llistaCorreu","type":"com.soffid.iam.iga.api.MailList","required": true}    ]},
+    {"name":"findMailListByNameAndDomainName", "return":"com.soffid.iam.iga.api.MailList", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.MailList", "arguments":[
+       {"name":"llistaCorreu","type":"com.soffid.iam.iga.api.MailList","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.MailListRelationship", "arguments":[
+       {"name":"relacioLlistaCorreu","type":"com.soffid.iam.iga.api.MailListRelationship","required": true}    ]},
+    {"name":"findRelationsMailListByNameAndBelongsMailListNameAndNameAndContainsMailListName", "return":"com.soffid.iam.iga.api.MailListRelationship", "arguments":[
+       {"name":"nomPertany","type":"java.lang.String","required": true},
+       {"name":"dominiCorreuPertany","type":"java.lang.String","required":false},
+       {"name":"nomConte","type":"java.lang.String","required": true},
+       {"name":"dominiCorreuConte","type":"java.lang.String","required":false}    ]},
+    {"name":"subscribeRole", "return":"com.soffid.iam.iga.api.MailListRoleMember", "arguments":[
+       {"name":"mailListName","type":"java.lang.String","required": true},
+       {"name":"mailListDomain","type":"java.lang.String","required": true},
+       {"name":"roleMember","type":"com.soffid.iam.iga.api.MailListRoleMember","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.UserMailList", "arguments":[
+       {"name":"llistaCorreuUsuari","type":"com.soffid.iam.iga.api.UserMailList","required": true}    ]},
+    {"name":"findUserMailListByListNameAndDomainNameAndUserName", "return":"com.soffid.iam.iga.api.UserMailList", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false},
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findMailDomains", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.MailDomain>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findMailLists", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.MailList>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findExternalMailsByNameListAndDomainName", "return":"java.util.Collection<com.soffid.iam.iga.api.ExternalName>", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"findGroupMembers", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"findUserMailListByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.UserMailList>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserMailListByListNameAndDomainName", "return":"java.util.Collection<com.soffid.iam.iga.api.UserMailList>", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"findUserMailListHistoryByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.UserMailList>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findMailListsByData", "return":"java.util.Collection<com.soffid.iam.iga.api.MailList>", "arguments":[
+       {"name":"nom","type":"java.lang.String","required":false},
+       {"name":"domini","type":"java.lang.String","required":false},
+       {"name":"descripcio","type":"java.lang.String","required":false},
+       {"name":"membres","type":"java.lang.String","required":false}    ]},
+    {"name":"findRelationsMailListByNameContainsMailListAndDomainName", "return":"java.util.Collection<com.soffid.iam.iga.api.MailListRelationship>", "arguments":[
+       {"name":"nomLlistaCorreuConte","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"findRelationsMailListByNameBelongsMailListAndDomainName", "return":"java.util.Collection<com.soffid.iam.iga.api.MailListRelationship>", "arguments":[
+       {"name":"nomLlistaCorreuPertany","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"findRoleMembers", "return":"java.util.Collection<com.soffid.iam.iga.api.MailListRoleMember>", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"findUsersByMailListNameAndDomainName", "return":"java.util.Collection<com.soffid.iam.base.api.User>", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"getDomainMails", "return":"java.util.Collection<com.soffid.iam.iga.api.MailDomain>", "arguments":[
+    ]},
+    {"name":"getMailLists", "return":"java.util.Collection<com.soffid.iam.iga.api.MailList>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"correuExtern","type":"com.soffid.iam.iga.api.ExternalName","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"dominiCorreu","type":"com.soffid.iam.iga.api.MailDomain","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"llistaCorreu","type":"com.soffid.iam.iga.api.MailList","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"relacioLlistaCorreu","type":"com.soffid.iam.iga.api.MailListRelationship","required": true}    ]},
+    {"name":"deleteUserMailList", "return":"void", "arguments":[
+       {"name":"llistaCorreuUsuari","type":"com.soffid.iam.iga.api.UserMailList","required": true}    ]},
+    {"name":"deleteAtomic", "return":"void", "arguments":[
+       {"name":"correuExtern","type":"com.soffid.iam.iga.api.ExternalName","required": true}    ]},
+    {"name":"deleteAtomic", "return":"void", "arguments":[
+       {"name":"relacioLlistaCorreu","type":"com.soffid.iam.iga.api.MailListRelationship","required": true}    ]},
+    {"name":"deleteAtomic", "return":"void", "arguments":[
+       {"name":"llistaCorreuUsuari","type":"com.soffid.iam.iga.api.UserMailList","required": true}    ]},
+    {"name":"checkEmptyMailList", "return":"void", "arguments":[
+       {"name":"nomLlistaCorreu","type":"java.lang.String","required": true},
+       {"name":"codiDomini","type":"java.lang.String","required":false}    ]},
+    {"name":"subscribeGroup", "return":"void", "arguments":[
+       {"name":"mailListName","type":"java.lang.String","required": true},
+       {"name":"mailListDomain","type":"java.lang.String","required": true},
+       {"name":"groupName","type":"java.lang.String","required": true}    ]},
+    {"name":"unsubscribeGroup", "return":"void", "arguments":[
+       {"name":"mailListName","type":"java.lang.String","required": true},
+       {"name":"mailListDomain","type":"java.lang.String","required": true},
+       {"name":"groupName","type":"java.lang.String","required": true}    ]},
+    {"name":"unsubscribeRole", "return":"void", "arguments":[
+       {"name":"mailListName","type":"java.lang.String","required": true},
+       {"name":"mailListDomain","type":"java.lang.String","required": true},
+       {"name":"roleMember","type":"com.soffid.iam.iga.api.MailListRoleMember","required": true}    ]}
+  ]
+}

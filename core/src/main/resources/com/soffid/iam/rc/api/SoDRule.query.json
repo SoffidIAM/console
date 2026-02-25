@@ -1,0 +1,19 @@
+{
+  "hibernateClass": "com.soffid.iam.rc.model.SoDRuleEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"number", "hibernateName":"number"},
+    {"name":"risk", "hibernateName":"risk"},
+    {"name":"type", "hibernateName":"type"},
+    {"name":"application",  "hibernateName":"application.name"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

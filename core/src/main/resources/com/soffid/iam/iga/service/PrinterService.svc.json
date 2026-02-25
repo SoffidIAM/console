@@ -1,0 +1,50 @@
+{
+  "class": "com.soffid.iam.iga.service.PrinterService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.iga.api.Printer", "arguments":[
+       {"name":"impressora","type":"com.soffid.iam.iga.api.Printer","required": true}    ]},
+    {"name":"findPrinterByPrinterName", "return":"com.soffid.iam.iga.api.Printer", "arguments":[
+       {"name":"codiImpressora","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.Printer", "arguments":[
+       {"name":"impressora","type":"com.soffid.iam.iga.api.Printer","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.PrinterGroup", "arguments":[
+       {"name":"grupImpressora","type":"com.soffid.iam.iga.api.PrinterGroup","required": true}    ]},
+    {"name":"findPrinterGroupByGroupNameAndPrinterName", "return":"com.soffid.iam.iga.api.PrinterGroup", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true},
+       {"name":"codiImpressora","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.PrinterGroup", "arguments":[
+       {"name":"grupImpressora","type":"com.soffid.iam.iga.api.PrinterGroup","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.PrinterUser", "arguments":[
+       {"name":"usuariImpressora","type":"com.soffid.iam.iga.api.PrinterUser","required": true}    ]},
+    {"name":"findPrinterUserByUserNameAndPrinterName", "return":"com.soffid.iam.iga.api.PrinterUser", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiImpressora","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.PrinterUser", "arguments":[
+       {"name":"usuariImpressora","type":"com.soffid.iam.iga.api.PrinterUser","required": true}    ]},
+    {"name":"findPrinterUsers", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.PrinterUser>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findPrinters", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Printer>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findPrintersGroupByGroupName", "return":"java.util.Collection<com.soffid.iam.iga.api.PrinterGroup>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"findPrintersByPrinterName", "return":"java.util.Collection<com.soffid.iam.iga.api.Printer>", "arguments":[
+       {"name":"codiImpressora","type":"java.lang.String","required":false}    ]},
+    {"name":"findPrintersByFilter", "return":"java.util.Collection<com.soffid.iam.iga.api.Printer>", "arguments":[
+       {"name":"codi","type":"java.lang.String","required":false},
+       {"name":"model","type":"java.lang.String","required":false},
+       {"name":"local","type":"java.lang.String","required":false},
+       {"name":"maquina","type":"java.lang.String","required":false}    ]},
+    {"name":"getPrintersGroupByPrinterName", "return":"java.util.Collection", "arguments":[
+       {"name":"codiImpressora","type":"java.lang.String","required": true}    ]},
+    {"name":"getPrinters", "return":"java.util.Collection<com.soffid.iam.iga.api.Printer>", "arguments":[
+    ]},
+    {"name":"getUserPrintersByPrinterName", "return":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>", "arguments":[
+       {"name":"codiImpressora","type":"java.lang.String","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"impressora","type":"com.soffid.iam.iga.api.Printer","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"grupImpressora","type":"com.soffid.iam.iga.api.PrinterGroup","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"usuariImpressora","type":"com.soffid.iam.iga.api.PrinterUser","required": true}    ]}
+  ]
+}

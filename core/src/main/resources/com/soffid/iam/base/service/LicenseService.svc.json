@@ -1,0 +1,13 @@
+{
+  "class": "com.soffid.iam.base.service.LicenseService",
+  "methods": [
+    {"name":"getApplicationToken", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"getExpirationDate", "return":"java.util.Date", "arguments":[
+    ]},
+    {"name":"findEnabledProducts", "return":"java.util.List<java.lang.String>", "arguments":[
+    ]},
+    {"name":"installLicense", "return":"void", "arguments":[
+       {"name":"license","type":"java.lang.String","required": true}    ]}
+  ]
+}

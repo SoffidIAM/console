@@ -1,0 +1,19 @@
+{
+  "class": "com.soffid.iam.iga.api.Role", "comments":"A role object represents any kind of permission that can be granted to anyone. It can be mapped to security group in active directory, a database role or another kind of authorizations.",
+  "attributes": [
+    {"name":"name", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "separator":"_basic", "length":"150"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"system", "type":"SYSTEM", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"category", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"informationSystemName", "type":"APPLICATION", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"domainType", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.application.RoleDomainFieldHandler", "length":"50"},
+    {"name":"bpmEnabled", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"externalId", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "separator":"_auditProperties", "length":"100"},
+    {"name":"approvalStart", "type":"DATE_TIME", "comments":"Last modification date", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "custom_ui_handler":"com.soffid.iam.web.application.ApprovalFieldHandler"},
+    {"name":"approvalEnd", "type":"DATE_TIME", "comments":"Approval date", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "custom_ui_handler":"com.soffid.iam.web.application.ApprovalFieldHandler"},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

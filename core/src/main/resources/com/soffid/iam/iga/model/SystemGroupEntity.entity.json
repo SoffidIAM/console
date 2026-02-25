@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"systemGroup"},
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"systemGroup"}
+  ]
+}

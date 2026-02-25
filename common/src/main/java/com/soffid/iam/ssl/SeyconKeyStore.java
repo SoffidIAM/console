@@ -17,10 +17,9 @@ import java.util.Random;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import com.soffid.iam.api.Password;
+import com.soffid.iam.am.api.Password;
 import com.soffid.iam.config.Config;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public class SeyconKeyStore {
     

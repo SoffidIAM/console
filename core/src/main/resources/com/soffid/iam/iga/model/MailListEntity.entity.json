@@ -1,0 +1,13 @@
+{
+  "joins": [
+    {"name":"externals","targetClass":"com.soffid.iam.iga.model.ExternalNameEntity","multiple":true,"reverse":"mailList"},
+    {"name":"domain","targetClass":"com.soffid.iam.iga.model.MailDomainEntity","multiple":false,"reverse":"mailLists"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"userMailLists","targetClass":"com.soffid.iam.iga.model.UserMailEntity","multiple":true,"reverse":"mailList"},
+    {"name":"mailListPertain","targetClass":"com.soffid.iam.iga.model.MailListContainerEntity","multiple":true,"reverse":"contains"},
+    {"name":"mailListContent","targetClass":"com.soffid.iam.iga.model.MailListContainerEntity","multiple":true,"reverse":"pertains"},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.MailListAttributeEntity","multiple":true,"reverse":"mailList"},
+    {"name":"groups","targetClass":"com.soffid.iam.iga.model.MailListGroupMemberEntity","multiple":true,"reverse":"mailList"},
+    {"name":"roles","targetClass":"com.soffid.iam.iga.model.MailListRoleMemberEntity","multiple":true,"reverse":"mailList"}
+  ]
+}

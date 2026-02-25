@@ -1,0 +1,26 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.UserGroupEntity",
+  "start": "start",
+  "end": "end",
+  "tenantFilter": "user.tenant.id",
+  "attributes": [
+    {"name":"user",  "hibernateName":"user.userName"},
+    {"name":"group",  "hibernateName":"group.name"},
+    {"name":"groupDescription",  "hibernateName":"group.description"},
+    {"name":"groupId",  "hibernateName":"group.id"},
+    {"name":"id", "hibernateName":"id"},
+    {"name":"userId",  "hibernateName":"user.id"},
+    {"name":"fullName",  "hibernateName":"user.fullName"},
+    {"name":"start", "hibernateName":"start"},
+    {"name":"end", "hibernateName":"end"},
+    {"name":"disabled", "hibernateName":"disabled"},
+    {"name":"primaryGroup",  "hibernateName":"group.name"},
+    {"name":"attributes", "hibernateName":"attributes"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

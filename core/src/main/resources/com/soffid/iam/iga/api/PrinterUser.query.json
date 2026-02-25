@@ -1,0 +1,19 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.UserPrinterEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"printer",  "hibernateName":"printer.name"},
+    {"name":"user",  "hibernateName":"user.userName"},
+    {"name":"enabledByDefault"},
+    {"name":"id", "hibernateName":"id"},
+    {"name":"fullName"},
+    {"name":"printerServerName",  "hibernateName":"printer.server.name"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

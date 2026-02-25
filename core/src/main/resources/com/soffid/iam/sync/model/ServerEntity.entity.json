@@ -1,0 +1,10 @@
+{
+  "joins": [
+    {"name":"secrets","targetClass":"com.soffid.iam.am.model.SecretEntity","multiple":true,"reverse":"server"},
+    {"name":"scheduledTasks","targetClass":"com.soffid.iam.sync.model.ScheduledTaskEntity","multiple":true,"reverse":"server"},
+    {"name":"networks","targetClass":"com.soffid.iam.am.model.NetworkEntity","multiple":true,"reverse":"discoveryServer"},
+    {"name":"tenants","targetClass":"com.soffid.iam.base.model.TenantServerEntity","multiple":true,"reverse":"tenantServer"},
+    {"name":"certificates","targetClass":"com.soffid.iam.sync.model.ServerCertificateEntity","multiple":true,"reverse":"server"},
+    {"name":"instances","targetClass":"com.soffid.iam.sync.model.ServerInstanceEntity","multiple":true,"reverse":"server"}
+  ]
+}

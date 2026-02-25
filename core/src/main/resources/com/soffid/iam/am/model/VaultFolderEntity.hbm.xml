@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.VaultFolderEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_VAUFOL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='VAF_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='VAF_NAME' not-null='true' length='256' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='VAF_DESCRI' not-null='true' length='1024' />
+		</property>
+		<many-to-one name='parent' class='com.soffid.iam.am.model.VaultFolderEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_VAUFOL_VAF_PARENT'>
+			<column name='VAF_PARENT' not-null='false'/>
+		</many-to-one>
+		<property name='personal' type='java.lang.Boolean'>
+			<column name='VAF_PERSON' not-null='false' />
+		</property>
+		<many-to-one name='pamPolicy' class='com.soffid.iam.pam.model.PamPolicyEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_VAUFOL_VAF_PPO_ID'>
+			<column name='VAF_PPO_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_VAUFOL_VAF_TEN_ID'>
+			<column name='VAF_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='acl' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_VAFCACC_VFA_VAF_ID'>
+				<column name='VFA_VAF_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.VaultFolderAccessEntityImpl'/>
+		</set>
+		<set name='children' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_VAUFOL_VAF_PARENT'>
+				<column name='VAF_PARENT'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.VaultFolderEntityImpl'/>
+		</set>
+		<set name='accounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCOUN_ACC_VAF_ID'>
+				<column name='ACC_VAF_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='VAF_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='VAF_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='VAF_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='VAF_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='VAF_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='VAF_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

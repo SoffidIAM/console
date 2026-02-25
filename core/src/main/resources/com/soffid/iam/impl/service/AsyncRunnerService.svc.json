@@ -1,0 +1,15 @@
+{
+  "class": "com.soffid.iam.impl.service.AsyncRunnerService",
+  "methods": [
+    {"name":"runNewTransaction", "return":"java.lang.Object", "arguments":[
+       {"name":"runnable","type":"com.soffid.iam.impl.TransactionalTask","required": true}    ]},
+    {"name":"runTransaction", "return":"java.lang.Object", "arguments":[
+       {"name":"runnable","type":"com.soffid.iam.impl.TransactionalTask","required": true}    ]},
+    {"name":"run", "return":"void", "arguments":[
+       {"name":"runnable","type":"java.lang.Runnable","required": true},
+       {"name":"result","type":"com.soffid.zkdb.api.PagedResult","required": true}    ]},
+    {"name":"runInternal", "return":"void", "arguments":[
+       {"name":"runnable","type":"java.lang.Runnable","required": true},
+       {"name":"result","type":"com.soffid.zkdb.api.PagedResult","required": true}    ]}
+  ]
+}

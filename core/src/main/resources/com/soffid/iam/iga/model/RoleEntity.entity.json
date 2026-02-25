@@ -1,0 +1,21 @@
+{
+  "joins": [
+    {"name":"informationSystem","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false,"reverse":"roles"},
+    {"name":"accounts","targetClass":"com.soffid.iam.iga.model.RoleAccountEntity","multiple":true,"reverse":"role"},
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"role"},
+    {"name":"applicationDomain","targetClass":"com.soffid.iam.iga.model.ApplicationDomainEntity","multiple":false,"reverse":"roles"},
+    {"name":"ownerRoles","targetClass":"com.soffid.iam.iga.model.RoleDependencyEntity","multiple":true,"reverse":"contained"},
+    {"name":"ownedRoles","targetClass":"com.soffid.iam.iga.model.RoleDependencyEntity","multiple":true,"reverse":"container"},
+    {"name":"containerGroups","targetClass":"com.soffid.iam.iga.model.RoleGroupEntity","multiple":true,"reverse":"grantedRole"},
+    {"name":"networkAuthorization","targetClass":"com.soffid.iam.am.model.NetworkAuthorizationEntity","multiple":true,"reverse":"role"},
+    {"name":"accessControl","targetClass":"com.soffid.iam.iga.model.AccessControlEntity","multiple":true,"reverse":"role"},
+    {"name":"notificationEntities","targetClass":"com.soffid.iam.iga.model.NoticeEntity","multiple":true,"reverse":"role"},
+    {"name":"authorizations","targetClass":"com.soffid.iam.base.model.AuthorizationEntity","multiple":true,"reverse":"role"},
+    {"name":"accountAccess","targetClass":"com.soffid.iam.pam.model.AccountAccessEntity","multiple":true,"reverse":"role"},
+    {"name":"rules","targetClass":"com.soffid.iam.iga.model.RuleAssignedRoleEntity","multiple":true,"reverse":"role"},
+    {"name":"sodRules","targetClass":"com.soffid.iam.rc.model.SoDRoleEntity","multiple":true,"reverse":"role"},
+    {"name":"customObjects","targetClass":"com.soffid.iam.iga.model.CustomObjectRoleEntity","multiple":true,"reverse":"role"},
+    {"name":"mailLists","targetClass":"com.soffid.iam.iga.model.MailListRoleMemberEntity","multiple":true,"reverse":"role"},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.RoleAttributeEntity","multiple":true,"reverse":"role"}
+  ]
+}

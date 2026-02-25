@@ -1,0 +1,23 @@
+{
+  "class": "com.soffid.iam.am.service.BrowserService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.am.api.Browser", "arguments":[
+       {"name":"browser","type":"com.soffid.iam.am.api.Browser","required": true}    ]},
+    {"name":"findByHost", "return":"com.soffid.iam.am.api.Browser", "arguments":[
+       {"name":"host","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"findBySerialNumber", "return":"com.soffid.iam.am.api.Browser", "arguments":[
+       {"name":"serialNumber","type":"java.lang.String","required": true}    ]},
+    {"name":"registerBrowser", "return":"com.soffid.iam.am.api.Browser", "arguments":[
+       {"name":"serialNumber","type":"java.lang.String","required":false},
+       {"name":"ipAddress","type":"java.lang.String","required":false},
+       {"name":"userAgent","type":"java.lang.String","required":false}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.Browser", "arguments":[
+       {"name":"browser","type":"com.soffid.iam.am.api.Browser","required": true}    ]},
+    {"name":"findBrowsers", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Browser>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"handleFindSessionsByBrowserId", "return":"java.util.List<com.soffid.iam.am.api.Session>", "arguments":[
+       {"name":"browserId","type":"java.lang.Long","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"browser","type":"com.soffid.iam.am.api.Browser","required": true}    ]}
+  ]
+}

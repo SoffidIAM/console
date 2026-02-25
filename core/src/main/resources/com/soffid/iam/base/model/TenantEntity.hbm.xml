@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.TenantEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TENANT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TEN_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='TEN_NAME' not-null='true' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='TEN_DESCRI' not-null='true' />
+		</property>
+		<property name='enabled' type='boolean'>
+			<column name='TEN_ENABLE' not-null='true' />
+		</property>
+		<set name='disabledPermissions' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_TEDIPE_TDP_TEN_ID'>
+				<column name='TDP_TEN_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.TenantDisabledPermissionEntityImpl'/>
+		</set>
+		<set name='servers' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_TENSER_TNS_TEN_ID'>
+				<column name='TNS_TEN_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.TenantServerEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

@@ -7,8 +7,7 @@ import java.util.Arrays;
 
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.DocumentService;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public class DocumentOutputStream extends OutputStream {
 	byte buffer[] = new byte [4096];

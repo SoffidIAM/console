@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.UserProcessEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_USUPRO' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='UPR_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='userName' type='java.lang.String'>
+			<column name='UPR_USUCOD' not-null='false' length='150' />
+		</property>
+		<property name='processId' type='java.lang.Long'>
+			<column name='UPR_IDPROC' not-null='true' />
+		</property>
+		<property name='finished' type='java.lang.Boolean'>
+			<column name='UPR_END' not-null='true' />
+		</property>
+		<property name='nationalId' type='java.lang.String'>
+			<column name='UPR_USUNIF' not-null='false' length='50' />
+		</property>
+	</class>
+</hibernate-mapping>

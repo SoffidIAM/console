@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.GroupTypeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TIPUSUO' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TUO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='TUO_CODI' not-null='true' length='20' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='TUO_DESC' not-null='false' length='50' />
+		</property>
+		<property name='roleHolder' type='boolean'>
+			<column name='TUO_ROLHOL' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TIPUSUO_TUO_TEN_ID'>
+			<column name='TUO_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='groupEntities' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_GRUPS_GRU_TIPUS'>
+				<column name='GRU_TIPUS'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.GroupEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='TUO_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='TUO_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='TUO_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='TUO_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='TUO_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='TUO_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

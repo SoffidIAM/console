@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.MailDomainEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_DOMCOR' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='DCO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='description' type='java.lang.String'>
+			<column name='DCO_DESCRI' not-null='false' length='50' />
+		</property>
+		<property name='name' type='java.lang.String'>
+			<column name='DCO_CODI' not-null='true' length='50' />
+		</property>
+		<set name='users' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUARI_USU_IDDCO'>
+				<column name='USU_IDDCO'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserEntityImpl'/>
+		</set>
+		<set name='mailLists' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LLICOR_LCO_IDDCO'>
+				<column name='LCO_IDDCO'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListEntityImpl'/>
+		</set>
+		<property name='obsolete' type='java.lang.Boolean'>
+			<column name='DCO_ISOLD' not-null='true' length='5' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DOMCOR_DCO_TEN_ID'>
+			<column name='DCO_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='DCO_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='DCO_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='DCO_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='DCO_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='DCO_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='DCO_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

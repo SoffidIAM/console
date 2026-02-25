@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.NoticeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_NOTIFICA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='NTF_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='modificationDate' type='java.util.Date'>
+			<column name='NTF_DATA' not-null='true' />
+		</property>
+		<property name='information' type='java.lang.String'>
+			<column name='NTF_INFO' not-null='true' length='512' />
+		</property>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_NOTIFICA_NTF_USU'>
+			<column name='NTF_USU' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='role' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_NOTIFICA_NTF_ROL'>
+			<column name='NTF_ROL' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='application' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_NOTIFICA_NTF_APL'>
+			<column name='NTF_APL' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

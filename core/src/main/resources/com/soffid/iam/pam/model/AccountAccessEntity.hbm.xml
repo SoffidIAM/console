@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.AccountAccessEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ACCACC' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='AAC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='role' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCACC_AAC_ROL_ID'>
+			<column name='AAC_ROL_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCACC_AAC_GRU_ID'>
+			<column name='AAC_GRU_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCACC_AAC_USU_ID'>
+			<column name='AAC_USU_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='account' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCACC_AAC_ACC_ID'>
+			<column name='AAC_ACC_ID' not-null='true'/>
+		</many-to-one>
+		<property name='level' type='com.soffid.iam.base.api.AccountAccessLevelEnumEnum'>
+			<column name='AAC_LEVEL' not-null='true' />
+		</property>
+		<property name='start' type='java.util.Date'>
+			<column name='AAC_START' not-null='false' />
+		</property>
+		<property name='end' type='java.util.Date'>
+			<column name='AAC_END' not-null='false' />
+		</property>
+		<property name='disabled' type='java.lang.Boolean'>
+			<column name='AAC_DISABLED' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

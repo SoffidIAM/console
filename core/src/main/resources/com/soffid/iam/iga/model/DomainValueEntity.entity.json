@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"domain","targetClass":"com.soffid.iam.iga.model.ApplicationDomainEntity","multiple":false,"reverse":"values"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"roleScopeMailLists","targetClass":"com.soffid.iam.iga.model.MailListRoleMemberEntity","multiple":true,"reverse":"domainValueScope"}
+  ]
+}

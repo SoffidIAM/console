@@ -1,0 +1,9 @@
+{
+  "class": "com.soffid.iam.sync.service.ConsoleLogonService",
+  "methods": [
+    {"name":"validatePassword", "return":"com.soffid.iam.am.api.PasswordValidation", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required":false},
+       {"name":"password","type":"java.lang.String","required": true}    ]}
+  ]
+}

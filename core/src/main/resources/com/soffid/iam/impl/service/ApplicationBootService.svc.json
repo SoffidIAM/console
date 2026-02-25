@@ -1,0 +1,17 @@
+{
+  "class": "com.soffid.iam.impl.service.ApplicationBootService",
+  "methods": [
+    {"name":"doUpgrade", "return":"com.soffid.iam.impl.api.UpgradeStatus", "arguments":[
+    ]},
+    {"name":"getUpgradeStatus", "return":"com.soffid.iam.impl.api.UpgradeStatus", "arguments":[
+    ]},
+    {"name":"consoleBoot", "return":"void", "arguments":[
+    ]},
+    {"name":"doSyncUpgrade", "return":"void", "arguments":[
+    ]},
+    {"name":"syncServerBoot", "return":"void", "arguments":[
+    ]},
+    {"name":"tenantBoot", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]}
+  ]
+}

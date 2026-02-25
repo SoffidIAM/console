@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.IssuePolicyActionEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_EVPOAC' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='EPA_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='issuePolicy' class='com.soffid.iam.rc.model.IssuePolicyEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_EVPOAC_EPA_EVP_ID'>
+			<column name='EPA_EVP_ID' not-null='true'/>
+		</many-to-one>
+		<property name='status' type='com.soffid.iam.rc.api.IssueStatusEnum'>
+			<column name='EPA_STATUS' not-null='true' />
+		</property>
+		<property name='action' type='java.lang.String'>
+			<column name='EPA_ACTION' not-null='true' length='50' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='EPA_DESCRI' not-null='true' length='150' />
+		</property>
+		<property name='subject' type='java.lang.String'>
+			<column name='EPA_SUBJEC' not-null='false' length='150' />
+		</property>
+		<property name='body' type='java.lang.String' lazy='true'>
+			<column name='EPA_BODY' not-null='false' length='64000' />
+		</property>
+		<property name='emailAddress' type='java.lang.String'>
+			<column name='EPA_ADDRES' not-null='false' length='150' />
+		</property>
+		<property name='processDefinition' type='java.lang.String' lazy='true'>
+			<column name='EPA_PRODEF' not-null='false' length='64000' />
+		</property>
+		<property name='script' type='java.lang.String' lazy='true'>
+			<column name='EPA_SCRIPT' not-null='false' length='128000' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='EPA_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='EPA_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='EPA_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='EPA_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='EPA_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='EPA_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

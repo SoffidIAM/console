@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"notificationEntities"},
+    {"name":"application","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false}
+  ]
+}

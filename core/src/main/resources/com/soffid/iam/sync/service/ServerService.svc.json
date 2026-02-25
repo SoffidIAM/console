@@ -1,0 +1,214 @@
+{
+  "class": "com.soffid.iam.sync.service.ServerService",
+  "methods": [
+    {"name":"findRemoteServerByUrl", "return":"com.soffid.iam.sync.api.Server", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true}    ]},
+    {"name":"invoke", "return":"java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>", "arguments":[
+       {"name":"agent","type":"java.lang.String","required": true},
+       {"name":"verb","type":"java.lang.String","required":false},
+       {"name":"command","type":"java.lang.String","required":false},
+       {"name":"params","type":"java.util.Map<java.lang.String,java.lang.Object>","required":false}    ]},
+    {"name":"hasSupportAccessHost", "return":"boolean", "arguments":[
+       {"name":"hostId","type":"long","required": true},
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"updateExpiredPasswords", "return":"boolean", "arguments":[
+       {"name":"usuari","type":"com.soffid.iam.base.api.User","required": true},
+       {"name":"externalAuth","type":"boolean","required": true}    ]},
+    {"name":"getAddonJar", "return":"byte[]", "arguments":[
+       {"name":"addon","type":"java.lang.String","required": true}    ]},
+    {"name":"getPluginJar", "return":"byte[]", "arguments":[
+       {"name":"classname","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserMazingerRules", "return":"byte[]", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"version","type":"java.lang.String","required": true}    ]},
+    {"name":"getHostInfo", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"hostName","type":"java.lang.String","required": true}    ]},
+    {"name":"getHostInfoByIP", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"ip","type":"java.lang.String","required": true}    ]},
+    {"name":"getNetworkInfo", "return":"com.soffid.iam.am.api.Network", "arguments":[
+       {"name":"network","type":"java.lang.String","required": true}    ]},
+    {"name":"generateFakePassword", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"passwordDomain","type":"java.lang.String","required": true}    ]},
+    {"name":"generateFakePassword", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"getAccountPassword", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"getOrGenerateUserPassword", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserPolicy", "return":"com.soffid.iam.am.api.PasswordPolicy", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"validatePassword", "return":"com.soffid.iam.am.api.PasswordValidation", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false},
+       {"name":"p","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"findAccountByLoginNameAndSystem", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"loginName","type":"java.lang.String","required": true},
+       {"name":"system","type":"java.lang.String","required": true}    ]},
+    {"name":"getAccountInfo", "comments":"Retrieves an account from soffid database", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"getAccountInfoByExternalId", "comments":"Retrieves an account from soffid database", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"externalId","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"parseKerberosToken", "comments":"Parses a kerberos token.", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"serviceName","type":"java.lang.String","required": true},
+       {"name":"keytab","type":"byte[]","required": true},
+       {"name":"token","type":"byte[]","required": true}    ]},
+    {"name":"getUserInfo", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserInfo", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"certs","type":"java.security.cert.X509Certificate[]","required": true}    ]},
+    {"name":"getUserInfo", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"getUserData", "return":"com.soffid.iam.base.api.UserData", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"data","type":"java.lang.String","required": true}    ]},
+    {"name":"getCustomObject", "return":"com.soffid.iam.iga.api.CustomObject", "arguments":[
+       {"name":"type","type":"java.lang.String","required": true},
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"getGroupInfo", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getMailList", "return":"com.soffid.iam.iga.api.MailList", "arguments":[
+       {"name":"list","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required": true}    ]},
+    {"name":"getMailListById", "return":"com.soffid.iam.iga.api.MailList", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"getRoleInfo", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"role","type":"java.lang.String","required": true},
+       {"name":"bd","type":"java.lang.String","required": true}    ]},
+    {"name":"getRoleInfoByExternalId", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"externalId","type":"java.lang.String","required": true},
+       {"name":"bd","type":"java.lang.String","required": true}    ]},
+    {"name":"getDispatcherInfo", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"updateSystem", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"s","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"getDispatcherAccessControl", "return":"com.soffid.iam.iga.api.SystemAccessControl", "arguments":[
+       {"name":"dispatcherId","type":"java.lang.Long","required": true}    ]},
+    {"name":"registerIssue", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"e","type":"com.soffid.iam.rc.api.Issue","required": true}    ]},
+    {"name":"getPlugin", "return":"com.soffid.iam.sync.agent.Plugin", "arguments":[
+       {"name":"className","type":"java.lang.String","required": true}    ]},
+    {"name":"getConfig", "return":"java.lang.String", "arguments":[
+       {"name":"param","type":"java.lang.String","required": true}    ]},
+    {"name":"getDefaultDispatcher", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"reverseTranslate", "return":"java.lang.String", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"column2","type":"java.lang.String","required": true}    ]},
+    {"name":"translate", "return":"java.lang.String", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"column1","type":"java.lang.String","required": true}    ]},
+    {"name":"getAccountExplicitRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"getAccountRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true}    ]},
+    {"name":"getExpiredPasswordDomains", "return":"java.util.Collection<com.soffid.iam.am.api.PasswordDomain>", "arguments":[
+       {"name":"usuari","type":"com.soffid.iam.base.api.User","required": true}    ]},
+    {"name":"getGroupChildren", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"groupId","type":"long","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getGroupExplicitRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"groupId","type":"long","required": true}    ]},
+    {"name":"getGroupUsers", "return":"java.util.Collection<com.soffid.iam.base.api.User>", "arguments":[
+       {"name":"groupId","type":"long","required": true},
+       {"name":"nomesUsuarisActius","type":"boolean","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getHostsFromNetwork", "return":"java.util.Collection<com.soffid.iam.am.api.Host>", "arguments":[
+       {"name":"networkId","type":"long","required": true}    ]},
+    {"name":"getMailListMembers", "return":"java.util.Collection<java.lang.Object>", "arguments":[
+       {"name":"mail","type":"java.lang.String","required": true},
+       {"name":"domainName","type":"java.lang.String","required": true}    ]},
+    {"name":"getNetworksList", "return":"java.util.Collection<com.soffid.iam.am.api.Network>", "arguments":[
+    ]},
+    {"name":"getRoleAccounts", "return":"java.util.Collection<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"roleId","type":"long","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getRoleActiveAccounts", "return":"java.util.Collection<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"roleId","type":"long","required": true},
+       {"name":"dispatcher","type":"java.lang.String","required":false}    ]},
+    {"name":"getRoleExplicitRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"roleId","type":"long","required": true}    ]},
+    {"name":"getServices", "return":"java.util.Collection<com.soffid.iam.iga.api.System>", "arguments":[
+    ]},
+    {"name":"getUserAccounts", "return":"java.util.Collection<com.soffid.iam.base.api.UserAccount>", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserData", "return":"java.util.Collection<com.soffid.iam.base.api.UserData>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"getUserExplicitRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"userId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getUserGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserGroupsHierarchy", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"userId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getUserGroupsHierarchy", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserMemberships", "return":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserPrinters", "return":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>", "arguments":[
+       {"name":"userId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getUserRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"dispatcherid","type":"java.lang.String","required":false}    ]},
+    {"name":"getUserSecrets", "return":"java.util.Collection<com.soffid.iam.sync.api.Secret>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"reverseTranslate2", "return":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"column2","type":"java.lang.String","required": true}    ]},
+    {"name":"translate2", "return":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"column1","type":"java.lang.String","required": true}    ]},
+    {"name":"getAddonList", "return":"java.util.List<java.lang.String>", "arguments":[
+    ]},
+    {"name":"getUserAttributes", "return":"java.util.Map<java.lang.String,java.lang.Object>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"propagateOBUser", "return":"java.util.Map", "arguments":[
+       {"name":"usuari","type":"com.soffid.iam.base.api.User","required": true}    ]},
+    {"name":"getMyConfig", "return":"java.util.Properties", "arguments":[
+    ]},
+    {"name":"addCertificate", "return":"void", "arguments":[
+       {"name":"cert","type":"java.security.cert.X509Certificate","required": true}    ]},
+    {"name":"cancelTask", "return":"void", "arguments":[
+       {"name":"taskid","type":"long","required": true},
+       {"name":"taskHash","type":"java.lang.String","required": true}    ]},
+    {"name":"changePassword", "return":"void", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true},
+       {"name":"p","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"mustChange","type":"boolean","required": true}    ]},
+    {"name":"changePasswordSync", "return":"void", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true},
+       {"name":"dispatcherId","type":"java.lang.String","required": true},
+       {"name":"p","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"mustChange","type":"boolean","required": true}    ]},
+    {"name":"clientAgentStarted", "return":"void", "arguments":[
+       {"name":"serverName","type":"java.lang.String","required": true}    ]},
+    {"name":"getMainJar", "return":"void", "arguments":[
+    ]},
+    {"name":"reconcileAccount", "comments":"Updates Soffid image of the reconciled account. Only triggers a UpdateUser for user accounts with new or removed roles.", "return":"void", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"grants","type":"java.util.List<com.soffid.iam.iga.api.RoleAccount>","required":false}    ]},
+    {"name":"processAuthoritativeChange", "return":"void", "arguments":[
+       {"name":"change","type":"com.soffid.iam.sync.api.AuthoritativeChange","required": true},
+       {"name":"remove","type":"boolean","required": true}    ]},
+    {"name":"reconcileAccount", "return":"void", "arguments":[
+       {"name":"system","type":"java.lang.String","required": true},
+       {"name":"account","type":"java.lang.String","required": true}    ]}
+  ]
+}

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.soffid.iam.base.api.User;
+
 public interface SoffidPrincipal extends Principal {
 	public String getFullName();
 
@@ -43,4 +45,8 @@ public interface SoffidPrincipal extends Principal {
 	List<Long> getGroupIds();
 	
 	String getAuthenticationMethod();
+	
+	public User getUser();
+	
+	public boolean hasElevatedPrivileges();
 }

@@ -1,0 +1,20 @@
+{
+  "class": "com.soffid.iam.iga.api.CustomObjectType",
+  "attributes": [
+    {"name":"id", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"name", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"250"},
+    {"name":"nlsDescription", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"scope", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "enumeration":"com.soffid.iam.base.api.MetadataScope"},
+    {"name":"builtin", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"textIndex", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"extensibleObjectClass", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"publicAccess", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"managerRoles", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"userRoles", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

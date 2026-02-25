@@ -1,0 +1,14 @@
+{
+  "class": "com.soffid.iam.impl.service.CrudRegistryService",
+  "methods": [
+    {"name":"getHandler", "return":"com.soffid.zkdb.api.CrudHandler<E>", "arguments":[
+       {"name":"cl","type":"java.lang.Class<E>","required": true}    ]},
+    {"name":"getHandler", "return":"com.soffid.zkdb.api.CrudHandler<E>", "arguments":[
+       {"name":"className","type":"java.lang.String","required": true}    ]},
+    {"name":"registerDefaultHandlers", "return":"void", "arguments":[
+    ]},
+    {"name":"registerHandler", "return":"void", "arguments":[
+       {"name":"cl","type":"java.lang.Class<E>","required": true},
+       {"name":"handler","type":"com.soffid.zkdb.api.CrudHandler<E>","required": true}    ]}
+  ]
+}

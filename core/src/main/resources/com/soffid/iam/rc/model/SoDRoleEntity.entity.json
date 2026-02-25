@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"sodRules"},
+    {"name":"rule","targetClass":"com.soffid.iam.rc.model.SoDRuleEntity","multiple":false,"reverse":"roles"},
+    {"name":"columns","targetClass":"com.soffid.iam.rc.model.SoDRuleMatrixEntity","multiple":true,"reverse":"row"},
+    {"name":"rows","targetClass":"com.soffid.iam.rc.model.SoDRuleMatrixEntity","multiple":true,"reverse":"column"}
+  ]
+}

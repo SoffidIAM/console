@@ -6,9 +6,8 @@
  
 package com.soffid.iam.sync.intf;
 
-import com.soffid.iam.api.Group;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.iga.api.Group;
 
 
 public interface GroupMgr extends java.rmi.Remote {
@@ -32,7 +31,7 @@ public interface GroupMgr extends java.rmi.Remote {
    *    * @throws java.rmi.RemoteException error de comunicaciones
    * @throws InternalErrorException cualquier otro error
    */
-  public void removeGroup (String group)
+  public void removeGroup (String group, String externalId)
     throws java.rmi.RemoteException,
             InternalErrorException;
 

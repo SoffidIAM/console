@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"printers"},
+    {"name":"printer","targetClass":"com.soffid.iam.iga.model.PrinterEntity","multiple":false,"reverse":"groups"}
+  ]
+}

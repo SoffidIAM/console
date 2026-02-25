@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.TranslatedLabelEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TRALAB' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TLA_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='language' type='java.lang.String'>
+			<column name='TLA_LANG' not-null='true' length='5' />
+		</property>
+		<property name='label' type='java.lang.String'>
+			<column name='TLA_LABEL' not-null='false' length='1024' />
+		</property>
+		<many-to-one name='customObjectType' class='com.soffid.iam.iga.model.CustomObjectTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TRALAB_TLA_COT_ID'>
+			<column name='TLA_COT_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='metadata' class='com.soffid.iam.iga.model.MetaDataEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TRALAB_TLA_TDA_ID'>
+			<column name='TLA_TDA_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='accountMetadata' class='com.soffid.iam.base.model.AccountMetadataEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TRALAB_TLA_AME_ID'>
+			<column name='TLA_AME_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TRALAB_TLA_TEN_ID'>
+			<column name='TLA_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

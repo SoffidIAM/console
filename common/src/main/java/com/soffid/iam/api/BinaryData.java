@@ -17,9 +17,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.CharBuffer;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Calendar;
-
-import es.caib.seycon.util.Base64;
 
 public class BinaryData implements Comparable<Object>, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -179,14 +178,14 @@ public class BinaryData implements Comparable<Object>, Serializable {
 		int i = s.indexOf(":");
 		if (i >= 0) {
 			String name = null;
-			byte[] data = Base64.decode(s.substring(i+1).trim());
+			byte[] data = Base64.getDecoder().decode(s.substring(i+1).trim());
 			try {
 				name = URLDecoder.decode(s.substring(0, i), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 			}
 			return new BinaryData(name, data);
 		} else {
-			return new BinaryData(null, Base64.decode(s));
+			return new BinaryData(null, Base64.getDecoder().decode(s));
 		}
 	}
 
@@ -199,7 +198,7 @@ public class BinaryData implements Comparable<Object>, Serializable {
 			InputStream in = getInputStream();
 			byte buffer[] = new byte[64000];
 			for (int read = in.read(buffer); read > 0; read = in.read(buffer))
-				sb.append(Base64.encodeBytes(buffer, 0, read, Base64.DONT_BREAK_LINES));
+				sb.append(Base64.getEncoder().encodeToString(buffer));
 			return sb.toString();
 		} catch (IOException e) {
 			throw new RuntimeException(e);

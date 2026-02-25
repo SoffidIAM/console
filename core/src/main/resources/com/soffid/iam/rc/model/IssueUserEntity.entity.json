@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"issue","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":false,"reverse":"users"},
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"events"}
+  ]
+}

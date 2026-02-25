@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"agentDescriptor","targetClass":"com.soffid.iam.base.model.AgentDescriptorEntity","multiple":false,"reverse":"defaultObjectMappings"},
+    {"name":"properties","targetClass":"com.soffid.iam.base.model.DefaultObjectMappingPropertyEntity","multiple":true,"reverse":"object"},
+    {"name":"defaultAttributeMappings","targetClass":"com.soffid.iam.base.model.DefaultAttributeMappingEntity","multiple":true,"reverse":"defaultObjectMapping"}
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "class": "com.soffid.iam.base.service.TenantService",
+  "methods": [
+    {"name":"importTenant", "comments":"Ipmorts a tenant to a file", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
+       {"name":"in","type":"java.io.InputStream","required": true}    ]},
+    {"name":"create", "comments":"Create a new tenant", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]},
+    {"name":"getMasterTenant", "comments":"Gets master tenant", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
+    ]},
+    {"name":"getTenant", "comments":"Finds a tenant by name. Used mainly internally", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"getTenant", "comments":"Finds a tenant by name. Used mainly internally", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "comments":"Updates a tenant", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]},
+    {"name":"listTenants", "comments":"List allowed tenant. Open to anybody, as everybody can query its own tenant, at least", "return":"java.util.Collection<com.soffid.iam.base.api.Tenant>", "arguments":[
+    ]},
+    {"name":"getDisabledPermissions", "comments":"Gets the list of disabled permissions for a tenant", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]},
+    {"name":"getTenantServers", "comments":"Gets the list of servers for a tenant", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]},
+    {"name":"addTenantServer", "comments":"Adds a server to a tenant", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true},
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"disablePermission", "comments":"Disables a permission on a tenant", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true},
+       {"name":"permission","type":"java.lang.String","required": true}    ]},
+    {"name":"enablePermission", "comments":"Enables a permission on a tenant", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true},
+       {"name":"permission","type":"java.lang.String","required": true}    ]},
+    {"name":"remove", "comments":"Remove at tenant", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]},
+    {"name":"removeTenantServer", "comments":"Removes a server for a tenant", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true},
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"exportTenant", "comments":"Exports tenant to a file", "return":"void", "arguments":[
+       {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true},
+       {"name":"out","type":"java.io.OutputStream","required": true}    ]}
+  ]
+}

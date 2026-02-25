@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"services"},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"services"}
+  ]
+}

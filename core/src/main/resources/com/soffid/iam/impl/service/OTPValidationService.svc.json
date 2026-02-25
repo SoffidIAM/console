@@ -1,0 +1,21 @@
+{
+  "class": "com.soffid.iam.impl.service.OTPValidationService",
+  "methods": [
+    {"name":"hasToken", "return":"boolean", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"resetFailCount", "return":"boolean", "arguments":[
+       {"name":"account","type":"java.lang.String","required": true}    ]},
+    {"name":"validatePin", "return":"boolean", "arguments":[
+       {"name":"challenge","type":"com.soffid.iam.am.api.Challenge","required": true},
+       {"name":"pin","type":"java.lang.String","required": true}    ]},
+    {"name":"resendToken", "return":"com.soffid.iam.am.api.Challenge", "arguments":[
+       {"name":"challenge","type":"com.soffid.iam.am.api.Challenge","required": true},
+       {"name":"alternativeMethod","type":"boolean","required": true}    ]},
+    {"name":"selectToken", "return":"com.soffid.iam.am.api.Challenge", "arguments":[
+       {"name":"challenge","type":"com.soffid.iam.am.api.Challenge","required": true}    ]},
+    {"name":"generateTypeForAudit", "return":"java.lang.String", "arguments":[
+       {"name":"challenge","type":"com.soffid.iam.am.api.Challenge","required": true}    ]},
+    {"name":"registerOTPHandler", "return":"void", "arguments":[
+       {"name":"handler","type":"com.soffid.iam.service.impl.OTPHandler","required": true}    ]}
+  ]
+}

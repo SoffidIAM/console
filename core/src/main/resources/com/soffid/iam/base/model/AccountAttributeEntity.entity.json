@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"attributes"},
+    {"name":"systemMetadata","targetClass":"com.soffid.iam.base.model.AccountMetadataEntity","multiple":false,"reverse":"data"},
+    {"name":"metadata","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":false}
+  ]
+}

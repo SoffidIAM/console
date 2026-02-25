@@ -2,7 +2,9 @@ package com.soffid.iam.sync.intf;
 
 import java.util.Collection;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.sync.api.AuthoritativeChange;
+import com.soffid.iam.sync.api.AuthoritativeChangeIdentifier;
 
 /**
  * Enables authoritative data sources

@@ -1,0 +1,33 @@
+{
+  "hibernateClass": "com.soffid.iam.am.model.HostEntity",
+  "start": "createdOn",
+  "deleted": "deleted",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"network",  "hibernateName":"network.name"},
+    {"name":"ip",  "hibernateName":"ip"},
+    {"name":"dynamicIp", "hibernateName":"dynamicIp"},
+    {"name":"mail", "hibernateName":"mail"},
+    {"name":"folders", "hibernateName":"folders"},
+    {"name":"mac", "hibernateName":"mac"},
+    {"name":"printersServer", "hibernateName":"printersServer"},
+    {"name":"serialNumber", "hibernateName":"serialNumber"},
+    {"name":"os",  "hibernateName":"operatingSystem.name"},
+    {"name":"hostAlias",  "hibernateName":"hostAlias.alias"},
+    {"name":"dhcp", "hibernateName":"dhcp"},
+    {"name":"lastSeen", "hibernateName":"lastSeen"},
+    {"name":"created", "hibernateName":"created"},
+    {"name":"locked", "hibernateName":"locked"},
+    {"name":"attributes", "hibernateName":"attributes"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"deleted", "hibernateName":"deleted"}
+  ]
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.PolicyForbiddenWordEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_BADCON' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='BDC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='forbiddenWord' class='com.soffid.iam.am.model.ForbiddenWordEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BADCON_BDC_BDW_ID'>
+			<column name='BDC_BDW_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='passwordPolicy' class='com.soffid.iam.am.model.PasswordPolicyEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BADCON_BDC_PCD_ID'>
+			<column name='BDC_PCD_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

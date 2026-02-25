@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.EntryPointExecutionTypeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TIPEXE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='EXE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='EXE_CODI' not-null='true' length='10' />
+		</property>
+		<property name='mimeType' type='java.lang.String'>
+			<column name='EXE_MIME' not-null='true' length='50' />
+		</property>
+		<property name='template' type='java.lang.String'>
+			<column name='EXE_PLANTI' not-null='false' length='2000' />
+		</property>
+		<property name='javaClass' type='java.lang.String'>
+			<column name='EXE_JAVCLA' not-null='false' length='150' />
+		</property>
+	</class>
+</hibernate-mapping>

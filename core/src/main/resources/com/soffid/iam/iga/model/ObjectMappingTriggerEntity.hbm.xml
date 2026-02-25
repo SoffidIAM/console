@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ObjectMappingTriggerEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_OBMATR' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='OMT_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='trigger' type='com.soffid.iam.iga.api.SoffidObjectTriggerEnum'>
+			<column name='OMT_TRIGGER' not-null='true' />
+		</property>
+		<property name='script' type='java.lang.String' lazy='true'>
+			<column name='OMT_SCRIPT' not-null='true' length='20000' />
+		</property>
+		<many-to-one name='object' class='com.soffid.iam.iga.model.ObjectMappingEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_OBMATR_OMT_OBM_ID'>
+			<column name='OMT_OBM_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

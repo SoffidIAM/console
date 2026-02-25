@@ -1,0 +1,27 @@
+{
+  "hibernateClass": "com.soffid.iam.am.model.NetworkEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"ip", "hibernateName":"ip"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"mask", "hibernateName":"mask"},
+    {"name":"type", "hibernateName":"type"},
+    {"name":"lanAccess", "hibernateName":"lanAccess"},
+    {"name":"dhcp", "hibernateName":"dhcp"},
+    {"name":"dhcpSupport"},
+    {"name":"loginRestriction", "hibernateName":"loginRestriction"},
+    {"name":"discovery", "hibernateName":"discovery"},
+    {"name":"discoveryServer",  "hibernateName":"discoveryServer.name"},
+    {"name":"discoveryRanges"},
+    {"name":"countryCode", "hibernateName":"countryCode"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

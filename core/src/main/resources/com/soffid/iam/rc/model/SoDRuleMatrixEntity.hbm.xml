@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.SoDRuleMatrixEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SODMAT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='id'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='rule' class='com.soffid.iam.rc.model.SoDRuleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SODMAT_SMA_SOD_ID'>
+			<column name='SMA_SOD_ID' not-null='true'/>
+		</many-to-one>
+		<property name='risk' type='com.soffid.iam.rc.api.SoDRiskEnum'>
+			<column name='SOD_RISK' not-null='true' />
+		</property>
+		<many-to-one name='row' class='com.soffid.iam.rc.model.SoDRoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SODMAT_SOD_SOR_ROW'>
+			<column name='SOD_SOR_ROW' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='column' class='com.soffid.iam.rc.model.SoDRoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SODMAT_SOD_SOR_COL'>
+			<column name='SOD_SOR_COL' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

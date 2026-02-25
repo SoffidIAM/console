@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"forbiddenWord","targetClass":"com.soffid.iam.am.model.ForbiddenWordEntity","multiple":false,"reverse":"policies"},
+    {"name":"passwordPolicy","targetClass":"com.soffid.iam.am.model.PasswordPolicyEntity","multiple":false,"reverse":"forbiddenWords"}
+  ]
+}

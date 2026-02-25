@@ -1,0 +1,21 @@
+{
+  "class": "com.soffid.iam.iga.service.CustomObjectService",
+  "methods": [
+    {"name":"createCustomObject", "return":"com.soffid.iam.iga.api.CustomObject", "arguments":[
+       {"name":"obj","type":"com.soffid.iam.iga.api.CustomObject","required": true}    ]},
+    {"name":"findCustomObjectByTypeAndName", "return":"com.soffid.iam.iga.api.CustomObject", "arguments":[
+       {"name":"objectType","type":"java.lang.String","required": true},
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"load", "return":"com.soffid.iam.iga.api.CustomObject", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"updateCustomObject", "return":"com.soffid.iam.iga.api.CustomObject", "arguments":[
+       {"name":"obj","type":"com.soffid.iam.iga.api.CustomObject","required": true}    ]},
+    {"name":"findCustomObjects", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.CustomObject>", "arguments":[
+       {"name":"objectType","type":"java.lang.String","required": true},
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findCustomObjectNames", "return":"java.util.Collection<java.lang.String>", "arguments":[
+       {"name":"objectType","type":"java.lang.String","required": true}    ]},
+    {"name":"deleteCustomObject", "return":"void", "arguments":[
+       {"name":"obj","type":"com.soffid.iam.iga.api.CustomObject","required": true}    ]}
+  ]
+}

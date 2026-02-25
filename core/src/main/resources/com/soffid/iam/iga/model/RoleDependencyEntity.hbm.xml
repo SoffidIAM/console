@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.RoleDependencyEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ROLROL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RRL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='contained' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_CONTINGUT'>
+			<column name='RRL_CONTINGUT' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='container' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_CONTENIDOR'>
+			<column name='RRL_CONTENIDOR' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='granteeApplicationDomain' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_APLICA2'>
+			<column name='RRL_APLICA2' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='granteeGroupDomain' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_GRUP2'>
+			<column name='RRL_GRUP2' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='granteeDomainValue' class='com.soffid.iam.iga.model.DomainValueEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_VALDOM2'>
+			<column name='RRL_VALDOM2' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='domainApplication' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_APLICA'>
+			<column name='RRL_APLICA' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='domainGroup' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_GRUP'>
+			<column name='RRL_GRUP' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='domainApplicationValue' class='com.soffid.iam.iga.model.DomainValueEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLROL_RRL_VALDOM'>
+			<column name='RRL_VALDOM' not-null='false'/>
+		</many-to-one>
+		<property name='status' type='com.soffid.iam.iga.api.RoleDependencyStatusEnum'>
+			<column name='RRL_STATUS' not-null='false' />
+		</property>
+		<property name='mandatory' type='java.lang.Boolean'>
+			<column name='RRL_MANDAT' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

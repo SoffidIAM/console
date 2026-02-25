@@ -3,10 +3,10 @@ package com.soffid.iam.sync.intf;
 import java.util.Collection;
 import java.util.Map;
 
-import com.soffid.iam.api.AttributeMapping;
-import com.soffid.iam.api.ObjectMapping;
-import com.soffid.iam.api.ObjectMappingTrigger;
-import com.soffid.iam.api.SoffidObjectType;
+import com.soffid.iam.iga.api.AttributeMapping;
+import com.soffid.iam.iga.api.ObjectMapping;
+import com.soffid.iam.iga.api.ObjectMappingTrigger;
+import com.soffid.iam.iga.api.SoffidObjectType;
 
 public class ExtensibleObjectMapping extends ObjectMapping
 {
@@ -68,31 +68,6 @@ public class ExtensibleObjectMapping extends ObjectMapping
 		super(systemObject, soffidObject, dispatcherId, false); 
 	}
 	
-	public static ExtensibleObjectMapping toExtensibleObjectMapping (es.caib.seycon.ng.sync.intf.ExtensibleObjectMapping other)
-	{
-		ExtensibleObjectMapping eom = new ExtensibleObjectMapping();
-		eom.attributes = AttributeMapping.toAttributeMappingList(other.getAttributes());
-		eom.properties = other.getProperties();
-		eom.triggers = ObjectMappingTrigger.toObjectMappingTriggerList( other.getTriggers() );
-		ObjectMapping.toObjectMapping(other, eom);
-		return eom;
-	}
-
-	/**
-	 * Creates a User list on a Usuari collection.
-	 */
-	public static java.util.List<ExtensibleObjectMapping> toExtensibleObjectMappingList (java.util.Collection<es.caib.seycon.ng.sync.intf.ExtensibleObjectMapping> source)
-	{
-		if (source == null) return null;
-
-		java.util.List<ExtensibleObjectMapping> target = new java.util.LinkedList<ExtensibleObjectMapping> ();
-		for (es.caib.seycon.ng.sync.intf.ExtensibleObjectMapping obj: source) 
-		{
-				target.add ( toExtensibleObjectMapping(obj));
-		}
-		return target;
-	}
-
 	public Collection<ObjectMappingTrigger> getTriggers()
 	{
 		return triggers;

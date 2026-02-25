@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"serverTenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false,"reverse":"servers"},
+    {"name":"tenantServer","targetClass":"com.soffid.iam.sync.model.ServerEntity","multiple":false,"reverse":"tenants"}
+  ]
+}

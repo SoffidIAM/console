@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.doc.model.DocSignImpl' dynamic-insert='false' dynamic-update='false' table='BPM_SIGN' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SIG_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='signType' type='java.lang.String'>
+			<column name='SIG_SIGN_TYPE' not-null='true' />
+		</property>
+		<property name='fsPath' type='java.lang.String'>
+			<column name='SIG_FS_PATH' not-null='true' length='512' />
+		</property>
+		<property name='timestamp' type='java.util.Date'>
+			<column name='SIG_TIMESTAMP' not-null='true' />
+		</property>
+		<many-to-one name='bpmDocument' class='com.soffid.iam.doc.model.DocumentEntityImpl' lazy='proxy' fetch='select' foreign-key='BPM_SIGN_SIG_DOC_ID'>
+			<column name='SIG_DOC_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

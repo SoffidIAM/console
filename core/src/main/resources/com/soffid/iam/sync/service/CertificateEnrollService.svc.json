@@ -1,0 +1,42 @@
+{
+  "class": "com.soffid.iam.sync.service.CertificateEnrollService",
+  "methods": [
+    {"name":"getServerPort", "return":"int", "arguments":[
+    ]},
+    {"name":"getServerList", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"getCertificate", "return":"java.security.cert.X509Certificate", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required":false},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"password","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"request","type":"java.lang.Long","required": true}    ]},
+    {"name":"getCertificate", "return":"java.security.cert.X509Certificate", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required":false},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"password","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"request","type":"java.lang.Long","required": true},
+       {"name":"remote","type":"boolean","required": true}    ]},
+    {"name":"getRootCertificate", "return":"java.security.cert.X509Certificate", "arguments":[
+    ]},
+    {"name":"getCertificates", "return":"java.util.List<java.security.cert.X509Certificate>", "arguments":[
+    ]},
+    {"name":"createRequest", "return":"long", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required":false},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"password","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"key","type":"java.security.PublicKey","required": true}    ]},
+    {"name":"createRequest", "return":"long", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required":false},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"password","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"cert","type":"java.security.cert.X509Certificate","required": true}    ]}
+  ]
+}

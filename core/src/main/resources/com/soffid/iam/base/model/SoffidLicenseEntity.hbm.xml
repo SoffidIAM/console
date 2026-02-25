@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.SoffidLicenseEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SOFLIC' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SLI_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='license' type='java.lang.String' lazy='true'>
+			<column name='SLI_LICENSE' not-null='true' length='128000' />
+		</property>
+	</class>
+</hibernate-mapping>

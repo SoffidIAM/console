@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.ReconcileAccountAttributesEntity","multiple":true,"reverse":"account"}
+  ]
+}

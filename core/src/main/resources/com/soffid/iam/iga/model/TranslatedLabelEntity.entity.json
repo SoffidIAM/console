@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"customObjectType","targetClass":"com.soffid.iam.iga.model.CustomObjectTypeEntity","multiple":false,"reverse":"translations"},
+    {"name":"metadata","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":false,"reverse":"translations"},
+    {"name":"accountMetadata","targetClass":"com.soffid.iam.base.model.AccountMetadataEntity","multiple":false,"reverse":"translations"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

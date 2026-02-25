@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.ConfigEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_CONFIG' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='CON_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='CON_CODI' not-null='true' length='100' />
+		</property>
+		<property name='value' type='java.lang.String'>
+			<column name='CON_VALOR' not-null='true' length='500' />
+		</property>
+		<many-to-one name='network' class='com.soffid.iam.am.model.NetworkEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_CONFIG_CON_IDXAR'>
+			<column name='CON_IDXAR' not-null='false'/>
+		</many-to-one>
+		<property name='description' type='java.lang.String'>
+			<column name='CON_DESC' not-null='false' length='255' />
+		</property>
+		<property name='hidden' type='java.lang.Boolean'>
+			<column name='CON_HIDDEN' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_CONFIG_CON_TEN_ID'>
+			<column name='CON_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='CON_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='CON_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='CON_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='CON_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='CON_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='CON_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

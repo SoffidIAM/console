@@ -536,6 +536,24 @@
 	</autoritzacio>
 	
 	<autoritzacio>
+		<codi>browser:query</codi>
+		<descripcio>Query browsers information</descripcio>
+		<ambit>Browsers</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>browser:update</codi>
+		<descripcio>Update browsers information</descripcio>
+		<ambit>Browsers</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>browser:delete</codi>
+		<descripcio>Remove browsers information</descripcio>
+		<ambit>Browsers</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>operatingSystem:create</codi>
 		<descripcio>Create new OS types</descripcio>
 		<ambit>Operating systems</ambit>
@@ -715,11 +733,7 @@
 		<tipusDomini>APLICACIONS</tipusDomini>
 		<ambit>Applications</ambit>
 		<hereta>
-			application:query,
-			role:query,
-			role:update,
-			role:create,
-			role:delete
+			application:query
 		</hereta>
 	</autoritzacio>
 
@@ -1160,6 +1174,12 @@
 	</autoritzacio>
 
 	<autoritzacio>
+		<codi>license:manage</codi>
+		<descripcio>Manage Soffid licenses</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
 		<codi>plugins:update</codi>
 		<descripcio>Install, update and enable or disable plugins</descripcio>
 		<ambit>Agents</ambit>
@@ -1342,6 +1362,12 @@
 	<autoritzacio>
 		<codi>seu:hosts:show</codi>
 		<descripcio>Access to hosts page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>seu:browsers:show</codi>
+		<descripcio>Access to browsers page</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 
@@ -1619,6 +1645,12 @@
 	<autoritzacio>
 		<codi>selfservice:directory</codi>
 		<descripcio>Browse corporate directory</descripcio>
+		<ambit>SelfService</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>selfservice:ai</codi>
+		<descripcio>Access natural language interface</descripcio>
 		<ambit>SelfService</ambit>
 	</autoritzacio>
 
@@ -1989,6 +2021,18 @@
 	<autoritzacio>
 		<codi>seu:networkIntelligence:show</codi>
 		<descripcio>Access to network intelligence page</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>networkIntelligence:configure</codi>
+		<descripcio>Configure the network intelligence page</descripcio>
+		<ambit>Network intelligence</ambit>
+	</autoritzacio>
+
+	<autoritzacio>
+		<codi>genai:user</codi>
+		<descripcio>Use the Generative AI tool</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
 </autoritzacions>

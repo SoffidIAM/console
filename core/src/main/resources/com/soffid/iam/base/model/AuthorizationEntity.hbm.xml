@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.AuthorizationEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_AUTROL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='AUR_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='authorization' type='java.lang.String'>
+			<column name='AUR_AUTCOD' not-null='true' length='100' />
+		</property>
+		<many-to-one name='role' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUTROL_AUR_ROL'>
+			<column name='AUR_ROL' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUTROL_AUR_TEN_ID'>
+			<column name='AUR_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

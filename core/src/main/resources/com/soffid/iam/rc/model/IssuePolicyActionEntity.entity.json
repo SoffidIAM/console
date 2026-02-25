@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"issuePolicy","targetClass":"com.soffid.iam.rc.model.IssuePolicyEntity","multiple":false,"reverse":"actions"}
+  ]
+}

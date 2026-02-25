@@ -1,16 +1,28 @@
+//
+// (C) 2013 Soffid
+//
+//
+
 package com.soffid.iam.doc.model;
+/**
+ * Entity DocumentEntity implementation
+ */
+public class DocumentEntityImpl extends com.soffid.iam.doc.model.DocumentEntity {
 
-public class DocumentEntityImpl extends DocumentEntity {
-
-	@Override
-	public String getApplication() {
-		return getFsPath().split("/")[2];
-	}
-
-	@Override
+	/**
+	 * Operation getYear
+	 * @return
+	**/
 	public int getYear() {
-		String s = getFsPath().split("/")[3];
-		return Integer.parseInt(s);
+		//TODO: Add custom implementaion
+		return 0;
 	}
-
+	/**
+	 * Operation getApplication
+	 * @return
+	**/
+	public java.lang.String getApplication() {
+		//TODO: Add custom implementaion
+		return null;
+	}
 }

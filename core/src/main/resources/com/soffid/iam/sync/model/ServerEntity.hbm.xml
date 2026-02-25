@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.ServerEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SERVER' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SRV_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='SRV_NOM' not-null='true' length='100' />
+		</property>
+		<property name='pk' type='org.springframework.orm.hibernate3.support.BlobByteArrayType'>
+			<column name='SRV_PK' not-null='false' />
+		</property>
+		<property name='auth' type='java.lang.String'>
+			<column name='SRV_AUTH' not-null='false' length='50' />
+		</property>
+		<property name='type' type='com.soffid.iam.sync.api.ServerTypeEnum'>
+			<column name='SRV_TYPE' not-null='false' length='10' />
+		</property>
+		<property name='useMasterDatabase' type='java.lang.Boolean'>
+			<column name='SRV_USEMDB' not-null='false' />
+		</property>
+		<property name='url' type='java.lang.String'>
+			<column name='SRV_URL' not-null='false' />
+		</property>
+		<property name='javaOptions' type='java.lang.String'>
+			<column name='SRV_JVMOPT' not-null='false' length='1024' />
+		</property>
+		<set name='secrets' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SECRET_SEC_IDSRV'>
+				<column name='SEC_IDSRV'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.SecretEntityImpl'/>
+		</set>
+		<set name='scheduledTasks' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SCHTAS_SCT_SERVER'>
+				<column name='SCT_SERVER'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.ScheduledTaskEntityImpl'/>
+		</set>
+		<set name='networks' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_XARXES_XAR_SER_ID'>
+				<column name='XAR_SER_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.NetworkEntityImpl'/>
+		</set>
+		<set name='tenants' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_TENSER_TNS_SRV_ID'>
+				<column name='TNS_SRV_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.TenantServerEntityImpl'/>
+		</set>
+		<set name='certificates' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SRVCER_SCR_SER_ID'>
+				<column name='SCR_SER_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.ServerCertificateEntityImpl'/>
+		</set>
+		<set name='instances' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SERINS_SRE_SRV_ID'>
+				<column name='SRE_SRV_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.ServerInstanceEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

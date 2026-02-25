@@ -2,7 +2,7 @@ package com.soffid.iam.common.security;
 
 import java.util.List;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public class ObserveObligationException extends InternalErrorException {
 	/**

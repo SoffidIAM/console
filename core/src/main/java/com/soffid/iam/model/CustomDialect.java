@@ -61,8 +61,10 @@ public class CustomDialect extends Dialect {
 	        if (type == null) {
 	            try {
 	                String driver = Config.getConfig().getDB();
-	                driver = driver.substring(driver.indexOf(":")+1); //$NON-NLS-1$
-	                type = driver.substring(0, driver.indexOf(":")); //$NON-NLS-1$
+	                if (driver != null)  {
+		                driver = driver.substring(driver.indexOf(":")+1); //$NON-NLS-1$
+		                type = driver.substring(0, driver.indexOf(":")); //$NON-NLS-1$
+	                }
 	            } catch (Exception e) {
 	                throw new RuntimeException("Unable to get dialect for database", e); //$NON-NLS-1$
 	            }
@@ -118,7 +120,7 @@ public class CustomDialect extends Dialect {
     }
 
     public Class getNativeIdentifierGeneratorClass() {
-        return com.soffid.iam.model.identity.IdentityGenerator.class;
+      return null;
     }
 
     public boolean supportsIdentityColumns() {

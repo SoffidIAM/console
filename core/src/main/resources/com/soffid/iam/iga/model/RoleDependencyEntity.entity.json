@@ -1,0 +1,12 @@
+{
+  "joins": [
+    {"name":"contained","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"ownerRoles"},
+    {"name":"container","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"ownedRoles"},
+    {"name":"granteeApplicationDomain","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false},
+    {"name":"granteeGroupDomain","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false},
+    {"name":"granteeDomainValue","targetClass":"com.soffid.iam.iga.model.DomainValueEntity","multiple":false},
+    {"name":"domainApplication","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false},
+    {"name":"domainGroup","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false},
+    {"name":"domainApplicationValue","targetClass":"com.soffid.iam.iga.model.DomainValueEntity","multiple":false}
+  ]
+}

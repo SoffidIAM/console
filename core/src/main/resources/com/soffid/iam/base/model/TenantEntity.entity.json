@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"disabledPermissions","targetClass":"com.soffid.iam.base.model.TenantDisabledPermissionEntity","multiple":true,"reverse":"appliesTo"},
+    {"name":"servers","targetClass":"com.soffid.iam.base.model.TenantServerEntity","multiple":true,"reverse":"serverTenant"}
+  ]
+}

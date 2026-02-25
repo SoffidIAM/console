@@ -1,0 +1,3617 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<database name='Soffid'>
+	<index name='SC_ACCPWD_UK1' table='SC_ACCPWD' unique='true'>
+		<column name='APW_ORDER'/>
+		<column name='APW_ACC_ID'/>
+	</index>
+	<index name='PUE_ROL_2' table='SC_ROLPUE' unique='false'>
+		<column name='RPE_IDROL'/>
+	</index>
+	<index name='BRO_UK_SERIAL' table='SC_BROWSE' unique='true'>
+		<column name='BRO_TEN_ID'/>
+		<column name='BRO_SERIAL'/>
+	</index>
+	<index name='SC_CONTRA_ORDRE_UK' table='SC_CONTRA' unique='true'>
+		<column name='CTR_IDUSU'/>
+		<column name='CTR_DCN_ID'/>
+		<column name='CTR_ORDRE'/>
+	</index>
+	<index name='SC_DOMCON_TEN_NDX' table='SC_DOMCON' unique='true'>
+		<column name='DCN_TEN_ID'/>
+		<column name='DCN_CODI'/>
+	</index>
+	<index name='MAQ_UK_IP' table='SC_MAQUIN' unique='false'>
+		<column name='MAQ_TEN_ID'/>
+		<column name='MAQ_ADRIP'/>
+	</index>
+	<index name='MAQ_NDX_NAME' table='SC_MAQUIN' unique='false'>
+		<column name='MAQ_TEN_ID'/>
+		<column name='MAQ_NOM'/>
+	</index>
+	<index name='MAQ_UK_SERIAL' table='SC_MAQUIN' unique='false'>
+		<column name='MAQ_TEN_ID'/>
+		<column name='MAQ_SERIAL'/>
+	</index>
+
+	<!-- com.soffid.iam.am.model.AccessLogEntity -->
+
+	<table name='SC_REGACC'>
+		<column name='RAC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RAC_IDSES' type='VARCHAR' length='200' notNull='false'/>
+		<column name='RAC_DATINI' type='DATE' notNull='false'/>
+		<column name='RAC_DATFI' type='DATE' notNull='false'/>
+		<column name='RAC_CODAGE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='RAC_INFO' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='RAC_IDMAQ' type='BIGINT' notNull='false'/>
+		<column name='RAC_IDMAOR' type='BIGINT' notNull='false'/>
+		<column name='RAC_IDBRO' type='BIGINT' notNull='false'/>
+		<column name='RAC_IDSER' type='BIGINT' notNull='false'/>
+		<column name='RAC_IDUSU' type='BIGINT' notNull='false'/>
+		<column name='RAC_TIPUSACC' type='VARCHAR' length='1' notNull='false'/>
+		<column name='RAC_CLIADR' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_CLINAM' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_HOSADR' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_HOSNAM' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_COUNTR' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='RAC_JUSEGR' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_ACCNAM' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_TARAPP' type='VARCHAR' length='128' notNull='false'/>
+		<column name='RAC_CREDAT' type='DATE' notNull='false'/>
+		<column name='RAC_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_UPDDAT' type='DATE' notNull='false'/>
+		<column name='RAC_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_DELDAT' type='DATE' notNull='false'/>
+		<column name='RAC_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_REGACC_FK_RAC_IDMAQ' table='SC_REGACC' foreignTable='SC_MAQUIN'> 
+		<column name='RAC_IDMAQ'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_REGACC_FK_RAC_IDMAOR' table='SC_REGACC' foreignTable='SC_MAQUIN'> 
+		<column name='RAC_IDMAOR'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_REGACC_FK_RAC_IDBRO' table='SC_REGACC' foreignTable='SC_BROWSE'> 
+		<column name='RAC_IDBRO'/>
+		<foreignColumn name='BRO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_REGACC_FK_RAC_IDSER' table='SC_REGACC' foreignTable='SC_SERVEI'> 
+		<column name='RAC_IDSER'/>
+		<foreignColumn name='SER_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_REGACC_FK_RAC_IDUSU' table='SC_REGACC' foreignTable='SC_USUARI'> 
+		<column name='RAC_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_REGACC_FK_RAC_TEN_ID' table='SC_REGACC' foreignTable='SC_TENANT'> 
+		<column name='RAC_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.AccountPasswordEntity -->
+
+	<table name='SC_ACCPWD'>
+		<column name='APW_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='APW_PASSWD' type='VARCHAR' length='255' notNull='false'/>
+		<column name='APW_PASSWD2' type='VARCHAR' length='255' notNull='false'/>
+		<column name='APW_ORDER' type='BIGINT' notNull='true'/>
+		<column name='APW_DATE' type='DATE' notNull='true'/>
+		<column name='APW_EXPDAT' type='DATE' notNull='true'/>
+		<column name='APW_ACTIVE' type='VARCHAR' length='255' notNull='true'/>
+		<column name='APW_ACC_ID' type='BIGINT' notNull='true'/>
+		<column name='APW_FAILS' type='INTEGER' notNull='false'/>
+		<column name='APW_UNLOCK' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ACCPWD_FK_APW_ACC_ID' table='SC_ACCPWD' foreignTable='SC_ACCOUN'> 
+		<column name='APW_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.BrowserEntity -->
+
+	<table name='SC_BROWSE'>
+		<column name='BRO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='BRO_IP' type='VARCHAR' length='60' notNull='false'/>
+		<column name='BRO_MAQ_ID' type='BIGINT' notNull='false'/>
+		<column name='BRO_SERIAL' type='VARCHAR' length='255' notNull='false'/>
+		<column name='BRO_LASTSEEN' type='DATE' notNull='false'/>
+		<column name='BRO_CREATED' type='DATE' notNull='false'/>
+		<column name='BRO_DELETED' type='BIT' notNull='false'/>
+		<column name='BRO_LOCKED' type='BIT' notNull='false'/>
+		<column name='BRO_DEVICE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BRO_OS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BRO_BROWSER' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BRO_CPU' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BRO_USU_ID' type='BIGINT' notNull='false'/>
+		<column name='BRO_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='BRO_CREDAT' type='DATE' notNull='false'/>
+		<column name='BRO_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BRO_UPDDAT' type='DATE' notNull='false'/>
+		<column name='BRO_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BRO_DELDAT' type='DATE' notNull='false'/>
+		<column name='BRO_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_BROWSE_FK_BRO_MAQ_ID' table='SC_BROWSE' foreignTable='SC_MAQUIN'> 
+		<column name='BRO_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_BROWSE_FK_BRO_USU_ID' table='SC_BROWSE' foreignTable='SC_USUARI'> 
+		<column name='BRO_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_BROWSE_FK_BRO_TEN_ID' table='SC_BROWSE' foreignTable='SC_TENANT'> 
+		<column name='BRO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.ChallengeEntity -->
+
+	<table name='SC_CHALLE'>
+		<column name='CHA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='CHA_TYPE' type='INTEGER' notNull='true'/>
+		<column name='CHA_USU_ID' type='BIGINT' notNull='false'/>
+		<column name='CHA_ACC_ID' type='BIGINT' notNull='false'/>
+		<column name='CHA_USEKEY' type='VARCHAR' length='100' notNull='false'/>
+		<column name='CHA_MAQ_ID' type='BIGINT' notNull='false'/>
+		<column name='CHA_CL_MAQ_ID' type='BIGINT' notNull='false'/>
+		<column name='CHA_CENTINEL' type='INTEGER' notNull='false'/>
+		<column name='CHA_OTPHAN' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_CARNUM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_CELL' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_VALUE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_DATE' type='DATE' notNull='false'/>
+		<column name='CHA_CLIVER' type='INTEGER' notNull='false'/>
+		<column name='CHA_KERBER' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_CHAID' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_DOMAIN' type='VARCHAR' length='100' notNull='false'/>
+		<column name='CHA_CLOSES' type='BIT' notNull='true'/>
+		<column name='CHA_SILENT' type='BIT' notNull='true'/>
+		<column name='CHA_IDP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CHA_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_CHALLE_FK_CHA_USU_ID' table='SC_CHALLE' foreignTable='SC_USUARI'> 
+		<column name='CHA_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CHALLE_FK_CHA_ACC_ID' table='SC_CHALLE' foreignTable='SC_ACCOUN'> 
+		<column name='CHA_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CHALLE_FK_CHA_MAQ_ID' table='SC_CHALLE' foreignTable='SC_MAQUIN'> 
+		<column name='CHA_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CHALLE_FK_CHA_CL_MAQ_ID' table='SC_CHALLE' foreignTable='SC_MAQUIN'> 
+		<column name='CHA_CL_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CHALLE_FK_CHA_TEN_ID' table='SC_CHALLE' foreignTable='SC_TENANT'> 
+		<column name='CHA_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointAccountEntity -->
+
+	<table name='SC_ACCPUE'>
+		<column name='CPE_IDPUE' type='BIGINT' notNull='true'/>
+		<column name='RPC_NIVAUT' type='VARCHAR' length='1' notNull='true'/>
+		<column name='RPC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RPC_IDROL' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_ACCPUE_FK_CPE_IDPUE' table='SC_ACCPUE' foreignTable='SC_PUNENT'> 
+		<column name='CPE_IDPUE'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCPUE_FK_RPC_IDROL' table='SC_ACCPUE' foreignTable='SC_ACCOUN'> 
+		<column name='RPC_IDROL'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointEntity -->
+
+	<table name='SC_PUNENT'>
+		<column name='PUE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='PUE_CODI' type='VARCHAR' length='50' notNull='false'/>
+		<column name='PUE_NOM' type='VARCHAR' length='128' notNull='true'/>
+		<column name='PUE_DESCRI' type='VARCHAR' length='512' notNull='false'/>
+		<column name='PUE_VISIBL' type='VARCHAR' length='1' notNull='true'/>
+		<column name='PUE_MENU' type='VARCHAR' length='1' notNull='true'/>
+		<column name='PUE_NUMCOL' type='BIGINT' notNull='false'/>
+		<column name='PUE_PUBLIC' type='VARCHAR' length='1' notNull='false'/>
+		<column name='PUE_TIPMEN' type='VARCHAR' length='1' notNull='false'/>
+		<column name='PUE_DIS_ID' type='BIGINT' notNull='false'/>
+		<column name='PUE_ICON' type='BIGINT' notNull='false'/>
+		<column name='PUE_ICON2' type='BIGINT' notNull='false'/>
+		<column name='PUE_IDAPL' type='BIGINT' notNull='false'/>
+		<column name='PUE_XML' type='CLOB' length='64000' notNull='false'/>
+		<column name='PUE_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='PUE_CREDAT' type='DATE' notNull='false'/>
+		<column name='PUE_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PUE_UPDDAT' type='DATE' notNull='false'/>
+		<column name='PUE_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PUE_DELDAT' type='DATE' notNull='false'/>
+		<column name='PUE_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_PUNENT_FK_PUE_DIS_ID' table='SC_PUNENT' foreignTable='SC_DISPAT'> 
+		<column name='PUE_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_PUNENT_FK_PUE_IDAPL' table='SC_PUNENT' foreignTable='SC_APLICA'> 
+		<column name='PUE_IDAPL'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_PUNENT_FK_PUE_TEN_ID' table='SC_PUNENT' foreignTable='SC_TENANT'> 
+		<column name='PUE_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointExecutableEntity -->
+
+	<table name='SC_EXEPUE'>
+		<column name='EPE_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='EPE_AMBIT' type='VARCHAR' length='1' notNull='true'/>
+		<column name='EPE_CONTIN' type='CLOB' length='4000' notNull='false'/>
+		<column name='EPE_IDPUE' type='BIGINT' notNull='true'/>
+		<column name='EPE_CODEXE' type='VARCHAR' length='10' notNull='false'/>
+	</table>
+	<foreignKey name='SC_EXEPUE_FK_EPE_IDPUE' table='SC_EXEPUE' foreignTable='SC_PUNENT'> 
+		<column name='EPE_IDPUE'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointExecutionTypeEntity -->
+
+	<table name='SC_TIPEXE'>
+		<column name='EXE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='EXE_CODI' type='VARCHAR' length='10' notNull='true'/>
+		<column name='EXE_MIME' type='VARCHAR' length='50' notNull='true'/>
+		<column name='EXE_PLANTI' type='VARCHAR' length='2000' notNull='false'/>
+		<column name='EXE_JAVCLA' type='VARCHAR' length='150' notNull='false'/>
+	</table>
+
+	<!-- com.soffid.iam.am.model.EntryPointGroupEntity -->
+
+	<table name='SC_GRUPUE'>
+		<column name='GPE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='GPE_NIVAUT' type='VARCHAR' length='1' notNull='true'/>
+		<column name='GPE_IDPUE' type='BIGINT' notNull='true'/>
+		<column name='GPE_IDGRU' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_GRUPUE_FK_GPE_IDPUE' table='SC_GRUPUE' foreignTable='SC_PUNENT'> 
+		<column name='GPE_IDPUE'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUPUE_FK_GPE_IDGRU' table='SC_GRUPUE' foreignTable='SC_GRUPS'> 
+		<column name='GPE_IDGRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointIconEntity -->
+
+	<table name='SC_ICONES'>
+		<column name='ICO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ICO_ICONA' type='BLOB' length='20000' notNull='true'/>
+	</table>
+
+	<!-- com.soffid.iam.am.model.EntryPointRoleEntity -->
+
+	<table name='SC_ROLPUE'>
+		<column name='RPE_IDPUE' type='BIGINT' notNull='true'/>
+		<column name='RPE_NIVAUT' type='VARCHAR' length='1' notNull='true'/>
+		<column name='RPE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RPE_IDROL' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_ROLPUE_FK_RPE_IDPUE' table='SC_ROLPUE' foreignTable='SC_PUNENT'> 
+		<column name='RPE_IDPUE'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLPUE_FK_RPE_IDROL' table='SC_ROLPUE' foreignTable='SC_ROLES'> 
+		<column name='RPE_IDROL'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointTreeEntity -->
+
+	<table name='SC_PUEPUE'>
+		<column name='PPE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='PPE_ORDRE' type='INTEGER' notNull='true'/>
+		<column name='PPE_IDPEPA' type='BIGINT' notNull='true'/>
+		<column name='PPE_IDPEFI' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_PUEPUE_FK_PPE_IDPEPA' table='SC_PUEPUE' foreignTable='SC_PUNENT'> 
+		<column name='PPE_IDPEPA'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_PUEPUE_FK_PPE_IDPEFI' table='SC_PUEPUE' foreignTable='SC_PUNENT'> 
+		<column name='PPE_IDPEFI'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.EntryPointUserEntity -->
+
+	<table name='SC_USUPUE'>
+		<column name='UPE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='UPE_NIVAUT' type='VARCHAR' length='1' notNull='true'/>
+		<column name='UPE_IDPUE' type='BIGINT' notNull='true'/>
+		<column name='UPE_IDUSU' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_USUPUE_FK_UPE_IDPUE' table='SC_USUPUE' foreignTable='SC_PUNENT'> 
+		<column name='UPE_IDPUE'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUPUE_FK_UPE_IDUSU' table='SC_USUPUE' foreignTable='SC_USUARI'> 
+		<column name='UPE_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.ForbiddenWordEntity -->
+
+	<table name='SC_BADWORD'>
+		<column name='BDW_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='BDW_WORD' type='VARCHAR' length='200' notNull='true'/>
+		<column name='BDW_TEN_ID' type='BIGINT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_BADWORD_FK_BDW_TEN_ID' table='SC_BADWORD' foreignTable='SC_TENANT'> 
+		<column name='BDW_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.HostAttributeEntity -->
+
+	<table name='SC_HOSATT'>
+		<column name='HAT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='HAT_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='HAT_MAQ_ID' type='BIGINT' notNull='true'/>
+		<column name='HAT_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='HAT_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_HOSATT_FK_HAT_MAQ_ID' table='SC_HOSATT' foreignTable='SC_MAQUIN'> 
+		<column name='HAT_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_HOSATT_FK_HAT_TDA_ID' table='SC_HOSATT' foreignTable='SC_TIPDAD'> 
+		<column name='HAT_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.HostEntity -->
+
+	<table name='SC_MAQUIN'>
+		<column name='MAQ_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='MAQ_NOM' type='VARCHAR' length='75' notNull='true'/>
+		<column name='MAQ_ADRIP' type='VARCHAR' length='60' notNull='false'/>
+		<column name='MAQ_DESCRI' type='VARCHAR' length='250' notNull='false'/>
+		<column name='MAQ_PARDHC' type='VARCHAR' length='150' notNull='false'/>
+		<column name='MAQ_MAIL' type='BIT' notNull='true'/>
+		<column name='MAQ_FOLDER' type='BIT' notNull='true'/>
+		<column name='MAQ_IDXAR' type='BIGINT' notNull='false'/>
+		<column name='MAQ_PRINTER' type='BIT' notNull='true'/>
+		<column name='MAQ_ADRMAC' type='VARCHAR' length='25' notNull='false'/>
+		<column name='MAQ_USUADM' type='VARCHAR' length='50' notNull='false'/>
+		<column name='MAQ_CONTRA' type='VARCHAR' length='150' notNull='false'/>
+		<column name='MAQ_DATCON' type='DATE' notNull='false'/>
+		<column name='MAQ_SERIAL' type='VARCHAR' length='255' notNull='false'/>
+		<column name='MAQ_DYNIP' type='BIT' notNull='false'/>
+		<column name='MAQ_LASTSEEN' type='DATE' notNull='false'/>
+		<column name='MAQ_CREATED' type='DATE' notNull='false'/>
+		<column name='MAQ_DELETED' type='BIT' notNull='false'/>
+		<column name='MAQ_LOCKED' type='BIT' notNull='false'/>
+		<column name='MAQ_OST_ID' type='BIGINT' notNull='false'/>
+		<column name='MAQ_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='MAQ_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='MAQ_UPDDAT' type='DATE' notNull='false'/>
+		<column name='MAQ_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='MAQ_DELDAT' type='DATE' notNull='false'/>
+		<column name='MAQ_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='MAQ_START' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_MAQUIN_FK_MAQ_IDXAR' table='SC_MAQUIN' foreignTable='SC_XARXES'> 
+		<column name='MAQ_IDXAR'/>
+		<foreignColumn name='XAR_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_MAQUIN_FK_MAQ_OST_ID' table='SC_MAQUIN' foreignTable='SC_OSTYPE'> 
+		<column name='MAQ_OST_ID'/>
+		<foreignColumn name='OST_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_MAQUIN_FK_MAQ_TEN_ID' table='SC_MAQUIN' foreignTable='SC_TENANT'> 
+		<column name='MAQ_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.HostEntryPointEntity -->
+
+	<table name='SC_MAQPUE'>
+		<column name='MAP_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='MAP_MAQ_ID' type='BIGINT' notNull='true'/>
+		<column name='MAP_PUE_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_MAQPUE_FK_MAP_MAQ_ID' table='SC_MAQPUE' foreignTable='SC_MAQUIN'> 
+		<column name='MAP_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_MAQPUE_FK_MAP_PUE_ID' table='SC_MAQPUE' foreignTable='SC_PUNENT'> 
+		<column name='MAP_PUE_ID'/>
+		<foreignColumn name='PUE_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.NetworkAuthorizationEntity -->
+
+	<table name='SC_AUTXAR'>
+		<column name='AXA_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='AXA_NIVELL' type='INTEGER' notNull='true'/>
+		<column name='AXA_MASMAQ' type='VARCHAR' length='50' notNull='false'/>
+		<column name='AXA_IDXAR' type='BIGINT' notNull='true'/>
+		<column name='AXA_IDROL' type='BIGINT' notNull='false'/>
+		<column name='AXA_IDGRU' type='BIGINT' notNull='false'/>
+		<column name='AXA_IDUSU' type='BIGINT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_AUTXAR_FK_AXA_IDXAR' table='SC_AUTXAR' foreignTable='SC_XARXES'> 
+		<column name='AXA_IDXAR'/>
+		<foreignColumn name='XAR_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUTXAR_FK_AXA_IDROL' table='SC_AUTXAR' foreignTable='SC_ROLES'> 
+		<column name='AXA_IDROL'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUTXAR_FK_AXA_IDGRU' table='SC_AUTXAR' foreignTable='SC_GRUPS'> 
+		<column name='AXA_IDGRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUTXAR_FK_AXA_IDUSU' table='SC_AUTXAR' foreignTable='SC_USUARI'> 
+		<column name='AXA_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.NetworkEntity -->
+
+	<table name='SC_XARXES'>
+		<column name='XAR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='XAR_CODI' type='VARCHAR' length='10' notNull='true'/>
+		<column name='XAR_ADRIP' type='VARCHAR' length='50' notNull='true'/>
+		<column name='XAR_DESCRI' type='VARCHAR' length='50' notNull='false'/>
+		<column name='XAR_MASIP' type='VARCHAR' length='50' notNull='false'/>
+		<column name='XAR_TYPE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='XAR_LAN' type='BIT' notNull='true'/>
+		<column name='XAR_PARDHC' type='VARCHAR' length='50' notNull='false'/>
+		<column name='XAR_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='XAR_DHCPSUP' type='BIT' notNull='true'/>
+		<column name='XAR_LOGREC' type='BIT' notNull='false'/>
+		<column name='XAR_DISCOV' type='BIT' notNull='false'/>
+		<column name='XAR_SER_ID' type='BIGINT' notNull='false'/>
+		<column name='XAR_COUNTRY' type='VARCHAR' length='256' notNull='false'/>
+		<column name='XAR_CREDAT' type='DATE' notNull='false'/>
+		<column name='XAR_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='XAR_UPDDAT' type='DATE' notNull='false'/>
+		<column name='XAR_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='XAR_DELDAT' type='DATE' notNull='false'/>
+		<column name='XAR_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_XARXES_FK_XAR_TEN_ID' table='SC_XARXES' foreignTable='SC_TENANT'> 
+		<column name='XAR_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_XARXES_FK_XAR_SER_ID' table='SC_XARXES' foreignTable='SC_SERVER'> 
+		<column name='XAR_SER_ID'/>
+		<foreignColumn name='SRV_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.OsTypeEntity -->
+
+	<table name='SC_OSTYPE'>
+		<column name='OST_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='OST_NAME' type='VARCHAR' length='20' notNull='true'/>
+		<column name='OST_DESC' type='VARCHAR' length='50' notNull='false'/>
+		<column name='OST_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_OSTYPE_FK_OST_TEN_ID' table='SC_OSTYPE' foreignTable='SC_TENANT'> 
+		<column name='OST_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.PasswordDomainEntity -->
+
+	<table name='SC_DOMCON'>
+		<column name='DCN_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='DCN_CODI' type='VARCHAR' length='50' notNull='true'/>
+		<column name='DCN_DESC' type='VARCHAR' length='100' notNull='false'/>
+		<column name='DCN_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_DOMCON_FK_DCN_TEN_ID' table='SC_DOMCON' foreignTable='SC_TENANT'> 
+		<column name='DCN_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.PasswordEntity -->
+
+	<table name='SC_CONTRA'>
+		<column name='CTR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='CTR_CONTRA' type='VARCHAR' length='50' notNull='false'/>
+		<column name='CTR_PASSWD' type='VARCHAR' length='150' notNull='false'/>
+		<column name='CTR_ACTIU' type='VARCHAR' length='1' notNull='false'/>
+		<column name='CTR_ORDRE' type='BIGINT' notNull='true'/>
+		<column name='CTR_DATA' type='DATE' notNull='false'/>
+		<column name='CTR_DATCAD' type='DATE' notNull='false'/>
+		<column name='CTR_DCN_ID' type='BIGINT' notNull='true'/>
+		<column name='CTR_IDUSU' type='BIGINT' notNull='true'/>
+		<column name='CTR_FAILS' type='INTEGER' notNull='false'/>
+		<column name='CTR_UNLOCK' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_CONTRA_FK_CTR_DCN_ID' table='SC_CONTRA' foreignTable='SC_DOMCON'> 
+		<column name='CTR_DCN_ID'/>
+		<foreignColumn name='DCN_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CONTRA_FK_CTR_IDUSU' table='SC_CONTRA' foreignTable='SC_USUARI'> 
+		<column name='CTR_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.PasswordManagerTokenEntity -->
+
+	<table name='SC_PAMATO'>
+		<column name='PMT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='PMT_USU_ID' type='BIGINT' notNull='true'/>
+		<column name='PMT_CREATE' type='DATE' notNull='true'/>
+		<column name='PMT_EXPIRE' type='DATE' notNull='true'/>
+		<column name='PMT_RENEW' type='DATE' notNull='true'/>
+		<column name='PMT_TOKEN' type='VARCHAR' length='256' notNull='true'/>
+		<column name='PMT_OLDTOK' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_PAMATO_FK_PMT_USU_ID' table='SC_PAMATO' foreignTable='SC_USUARI'> 
+		<column name='PMT_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.PasswordPolicyEntity -->
+
+	<table name='SC_POCODO'>
+		<column name='PCD_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='PCD_DESC' type='VARCHAR' length='100' notNull='false'/>
+		<column name='PCD_TUS_ID' type='BIGINT' notNull='true'/>
+		<column name='PCD_TIPUS' type='VARCHAR' length='1' notNull='true'/>
+		<column name='PCD_RENAGE' type='BIGINT' notNull='false'/>
+		<column name='PCD_AGE' type='BIGINT' notNull='false'/>
+		<column name='PCD_GRACE' type='BIGINT' notNull='false'/>
+		<column name='PCD_MINAGE' type='BIGINT' notNull='false'/>
+		<column name='PCD_MINLEN' type='BIGINT' notNull='false'/>
+		<column name='PCD_MAXLEN' type='BIGINT' notNull='false'/>
+		<column name='PCD_REGEX' type='VARCHAR' length='100' notNull='false'/>
+		<column name='PCD_MINUPP' type='BIGINT' notNull='false'/>
+		<column name='PCD_MAXUPP' type='BIGINT' notNull='false'/>
+		<column name='PCD_MINLOW' type='BIGINT' notNull='false'/>
+		<column name='PCD_MAXLOW' type='BIGINT' notNull='false'/>
+		<column name='PCD_MINNUM' type='BIGINT' notNull='false'/>
+		<column name='PCD_MAXNUM' type='BIGINT' notNull='false'/>
+		<column name='PCD_MINPUN' type='BIGINT' notNull='false'/>
+		<column name='PCD_MAXPUN' type='BIGINT' notNull='false'/>
+		<column name='PCD_MAXHIST' type='BIGINT' notNull='false'/>
+		<column name='PCD_DCN_ID' type='BIGINT' notNull='false'/>
+		<column name='PCD_PASQRY' type='BIT' notNull='false'/>
+		<column name='PCD_PASCHG' type='BIT' notNull='false'/>
+		<column name='PCD_COMPLEX' type='BIT' notNull='true'/>
+		<column name='PCD_MAXFAI' type='INTEGER' notNull='false'/>
+		<column name='PCD_UNLSEC' type='INTEGER' notNull='false'/>
+		<column name='PCD_PACHSC' type='CLOB' length='5000' notNull='false'/>
+		<column name='PCD_PACHDE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PCD_BREACH' type='BIT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_POCODO_FK_PCD_TUS_ID' table='SC_POCODO' foreignTable='SC_TIPUSU'> 
+		<column name='PCD_TUS_ID'/>
+		<foreignColumn name='TUS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_POCODO_FK_PCD_DCN_ID' table='SC_POCODO' foreignTable='SC_DOMCON'> 
+		<column name='PCD_DCN_ID'/>
+		<foreignColumn name='DCN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.PolicyForbiddenWordEntity -->
+
+	<table name='SC_BADCON'>
+		<column name='BDC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='BDC_BDW_ID' type='BIGINT' notNull='false'/>
+		<column name='BDC_PCD_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_BADCON_FK_BDC_BDW_ID' table='SC_BADCON' foreignTable='SC_BADWORD'> 
+		<column name='BDC_BDW_ID'/>
+		<foreignColumn name='BDW_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_BADCON_FK_BDC_PCD_ID' table='SC_BADCON' foreignTable='SC_POCODO'> 
+		<column name='BDC_PCD_ID'/>
+		<foreignColumn name='PCD_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.SamlAssertionEntity -->
+
+	<table name='SC_SAMLASS'>
+		<column name='ASS_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='ASS_EXTID' type='VARCHAR' length='256' notNull='true'/>
+		<column name='ASS_DATE' type='DATE' notNull='true'/>
+		<column name='ASS_ISSUER' type='VARCHAR' length='256' notNull='true'/>
+		<column name='ASS_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SAMLASS_FK_ASS_TEN_ID' table='SC_SAMLASS' foreignTable='SC_TENANT'> 
+		<column name='ASS_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.SamlRequestEntity -->
+
+	<table name='SC_SAMLREQ'>
+		<column name='REQ_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='REQ_EXTID' type='VARCHAR' length='256' notNull='true'/>
+		<column name='REQ_DATE' type='DATE' notNull='true'/>
+		<column name='REQ_EXPDAT' type='DATE' notNull='true'/>
+		<column name='REQ_FINISHED' type='BIT' notNull='true'/>
+		<column name='REQ_HOST' type='VARCHAR' length='256' notNull='true'/>
+		<column name='REQ_USER' type='VARCHAR' length='256' notNull='false'/>
+		<column name='REQ_KEY' type='VARCHAR' length='256' notNull='false'/>
+		<column name='REQ_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SAMLREQ_FK_REQ_TEN_ID' table='SC_SAMLREQ' foreignTable='SC_TENANT'> 
+		<column name='REQ_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.SecretEntity -->
+
+	<table name='SC_SECRET'>
+		<column name='SEC_IDSRV' type='BIGINT' notNull='true'/>
+		<column name='SEC_IDUSU' type='BIGINT' notNull='true'/>
+		<column name='SEC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SEC_VALOR' type='BLOB' length='64000' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SECRET_FK_SEC_IDSRV' table='SC_SECRET' foreignTable='SC_SERVER'> 
+		<column name='SEC_IDSRV'/>
+		<foreignColumn name='SRV_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SECRET_FK_SEC_IDUSU' table='SC_SECRET' foreignTable='SC_USUARI'> 
+		<column name='SEC_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<index name='SC_SEC_USUSERUK' table='SC_SECRET' unique='true'>
+		<column name='SEC_IDUSU'/>
+		<column name='SEC_IDSRV'/>
+	</index>
+
+	<!-- com.soffid.iam.am.model.ServiceEntity -->
+
+	<table name='SC_SERVEI'>
+		<column name='SER_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SER_CODI' type='VARCHAR' length='50' notNull='true'/>
+		<column name='SER_DESCRI' type='VARCHAR' length='50' notNull='false'/>
+		<column name='SER_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SERVEI_FK_SER_TEN_ID' table='SC_SERVEI' foreignTable='SC_TENANT'> 
+		<column name='SER_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.SessionEntity -->
+
+	<table name='SC_SESSIO'>
+		<column name='SES_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SES_PORT' type='BIGINT' notNull='false'/>
+		<column name='SES_IDUSU' type='BIGINT' notNull='true'/>
+		<column name='SES_ACC_ID' type='BIGINT' notNull='false'/>
+		<column name='SES_IDMACL' type='BIGINT' notNull='false'/>
+		<column name='SES_IDMAQ' type='BIGINT' notNull='false'/>
+		<column name='SES_IDBRO' type='BIGINT' notNull='false'/>
+		<column name='SES_DATA' type='DATE' notNull='true'/>
+		<column name='SES_DAKEAL' type='DATE' notNull='false'/>
+		<column name='SES_EXCLIP' type='VARCHAR' length='60' notNull='false'/>
+		<column name='SES_KEY2' type='VARCHAR' length='50' notNull='false'/>
+		<column name='SES_TIPUS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SES_WEBURL' type='CLOB' length='4000' notNull='false'/>
+		<column name='SES_KEY' type='VARCHAR' length='50' notNull='false'/>
+		<column name='SES_IDRAC' type='BIGINT' notNull='false'/>
+		<column name='SES_CLIADR' type='VARCHAR' length='128' notNull='false'/>
+		<column name='SES_CLINAM' type='VARCHAR' length='128' notNull='false'/>
+		<column name='SES_HOSNAM' type='VARCHAR' length='128' notNull='false'/>
+		<column name='SES_HOSADR' type='VARCHAR' length='128' notNull='false'/>
+		<column name='SES_AUTHMT' type='VARCHAR' length='4' notNull='false'/>
+		<column name='SES_MONURL' type='VARCHAR' length='150' notNull='false'/>
+		<column name='SES_JITTR' type='VARCHAR' length='2000' notNull='false'/>
+		<column name='SES_TEN_ID' type='BIGINT' notNull='false'/>
+		<column name='SES_SERPRO' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_SESSIO_FK_SES_IDUSU' table='SC_SESSIO' foreignTable='SC_USUARI'> 
+		<column name='SES_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SESSIO_FK_SES_ACC_ID' table='SC_SESSIO' foreignTable='SC_ACCOUN'> 
+		<column name='SES_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SESSIO_FK_SES_IDMACL' table='SC_SESSIO' foreignTable='SC_MAQUIN'> 
+		<column name='SES_IDMACL'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SESSIO_FK_SES_IDMAQ' table='SC_SESSIO' foreignTable='SC_MAQUIN'> 
+		<column name='SES_IDMAQ'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SESSIO_FK_SES_IDBRO' table='SC_SESSIO' foreignTable='SC_BROWSE'> 
+		<column name='SES_IDBRO'/>
+		<foreignColumn name='BRO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SESSIO_FK_SES_IDRAC' table='SC_SESSIO' foreignTable='SC_REGACC'> 
+		<column name='SES_IDRAC'/>
+		<foreignColumn name='RAC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SESSIO_FK_SES_TEN_ID' table='SC_SESSIO' foreignTable='SC_TENANT'> 
+		<column name='SES_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.VaultFolderAccessEntity -->
+
+	<table name='SC_VAFCACC'>
+		<column name='VFA_ROL_ID' type='BIGINT' notNull='false'/>
+		<column name='VFA_GRU_ID' type='BIGINT' notNull='false'/>
+		<column name='VFA_USU_ID' type='BIGINT' notNull='false'/>
+		<column name='VFA_VAF_ID' type='BIGINT' notNull='true'/>
+		<column name='VFA_LEVEL' type='VARCHAR' length='256' notNull='true'/>
+		<column name='VFA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+	</table>
+	<foreignKey name='SC_VAFCACC_FK_VFA_ROL_ID' table='SC_VAFCACC' foreignTable='SC_ROLES'> 
+		<column name='VFA_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_VAFCACC_FK_VFA_GRU_ID' table='SC_VAFCACC' foreignTable='SC_GRUPS'> 
+		<column name='VFA_GRU_ID'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_VAFCACC_FK_VFA_USU_ID' table='SC_VAFCACC' foreignTable='SC_USUARI'> 
+		<column name='VFA_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_VAFCACC_FK_VFA_VAF_ID' table='SC_VAFCACC' cascade='delete' foreignTable='SC_VAUFOL'> 
+		<column name='VFA_VAF_ID'/>
+		<foreignColumn name='VAF_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.am.model.VaultFolderEntity -->
+
+	<table name='SC_VAUFOL'>
+		<column name='VAF_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='VAF_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='VAF_DESCRI' type='VARCHAR' length='1024' notNull='true'/>
+		<column name='VAF_PARENT' type='BIGINT' notNull='false'/>
+		<column name='VAF_PERSON' type='BIT' notNull='false'/>
+		<column name='VAF_PPO_ID' type='BIGINT' notNull='false'/>
+		<column name='VAF_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='VAF_CREDAT' type='DATE' notNull='false'/>
+		<column name='VAF_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='VAF_UPDDAT' type='DATE' notNull='false'/>
+		<column name='VAF_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='VAF_DELDAT' type='DATE' notNull='false'/>
+		<column name='VAF_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_VAUFOL_FK_VAF_PARENT' table='SC_VAUFOL' foreignTable='SC_VAUFOL'> 
+		<column name='VAF_PARENT'/>
+		<foreignColumn name='VAF_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_VAUFOL_FK_VAF_PPO_ID' table='SC_VAUFOL' foreignTable='SC_PAMPOL'> 
+		<column name='VAF_PPO_ID'/>
+		<foreignColumn name='PPO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_VAUFOL_FK_VAF_TEN_ID' table='SC_VAUFOL' foreignTable='SC_TENANT'> 
+		<column name='VAF_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<index name='SC_PAMATO_UK' table='SC_PAMATO' unique='false'>
+		<column name='PMT_TOKEN'/>
+	</index>
+	<index name='PUE_CODE' table='SC_PUNENT' unique='false'>
+		<column name='PUE_TEN_ID'/>
+		<column name='PUE_CODI'/>
+	</index>
+	<index name='PUE_APL_1' table='SC_PUNENT' unique='false'>
+		<column name='PUE_TEN_ID'/>
+		<column name='PUE_IDAPL'/>
+	</index>
+	<index name='RAC_AGE_DAT_I' table='SC_REGACC' unique='false'>
+		<column name='RAC_TEN_ID'/>
+		<column name='RAC_CODAGE'/>
+		<column name='RAC_DATINI'/>
+	</index>
+	<index name='RAC_AGE_I' table='SC_REGACC' unique='false'>
+		<column name='RAC_TEN_ID'/>
+		<column name='RAC_IDSES'/>
+		<column name='RAC_CODAGE'/>
+	</index>
+	<index name='RAC_MAQ_ORI_P_I' table='SC_REGACC' unique='false'>
+		<column name='RAC_TEN_ID'/>
+		<column name='RAC_DATINI'/>
+		<column name='RAC_IDMAOR'/>
+	</index>
+	<index name='RAC_DATAINI_P_I' table='SC_REGACC' unique='false'>
+		<column name='RAC_TEN_ID'/>
+		<column name='RAC_DATINI'/>
+	</index>
+	<index name='SC_SAMLASS_EXTID_UK' table='SC_SAMLASS' unique='true'>
+		<column name='ASS_EXTID'/>
+	</index>
+	<index name='SC_SAMLREQ_EXTID_UK' table='SC_SAMLREQ' unique='true'>
+		<column name='REQ_EXTID'/>
+	</index>
+	<index name='SER_UK_CODI' table='SC_SERVEI' unique='true'>
+		<column name='SER_TEN_ID'/>
+		<column name='SER_CODI'/>
+	</index>
+	<index name='XAR_UK_ADRIP' table='SC_XARXES' unique='true'>
+		<column name='XAR_TEN_ID'/>
+		<column name='XAR_ADRIP'/>
+	</index>
+	<index name='XAR_UK_CODI' table='SC_XARXES' unique='true'>
+		<column name='XAR_TEN_ID'/>
+		<column name='XAR_CODI'/>
+	</index>
+	<index name='SC_ACCOUN_EXTID_NDX' table='SC_ROLES' unique='false'>
+		<column name='ACC_EXTID'/>
+	</index>
+	<index name='SC_ACCOUN_NAME' table='SC_ACCOUN' unique='true'>
+		<column name='ACC_NAME'/>
+		<column name='ACC_DIS_ID'/>
+	</index>
+	<index name='SC_ATTMET_NAME_NDX' table='SC_ACCMET' unique='true'>
+		<column name='AME_DIS_ID'/>
+		<column name='AME_NAME'/>
+	</index>
+	<index name='SC_AUTROL_UK1' table='SC_AUTROL' unique='true'>
+		<column name='AUR_AUTCOD'/>
+		<column name='AUR_ROL'/>
+	</index>
+	<index name='SC_DADUSU_USU_UK' table='SC_DADUSU' unique='false'>
+		<column name='DUS_IDUSU'/>
+		<column name='DUS_TDAID'/>
+	</index>
+	<index name='SC_DADUSU_VAL_NDX' table='SC_DADUSU' unique='false'>
+		<column name='DUS_VALOR'/>
+	</index>
+	<index name='SC_LUNIND_UK' table='SC_LUNIND' unique='true'>
+		<column name='LIP_TEN_ID'/>
+		<column name='LIP_NAME'/>
+	</index>
+
+	<!-- com.soffid.iam.base.model.AccountAttributeEntity -->
+
+	<table name='SC_ACCATT'>
+		<column name='AAT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='AAT_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='AAT_ACC_ID' type='BIGINT' notNull='true'/>
+		<column name='AAT_AME_ID' type='BIGINT' notNull='false'/>
+		<column name='AAT_TDA_ID' type='BIGINT' notNull='false'/>
+		<column name='AAT_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ACCATT_FK_AAT_ACC_ID' table='SC_ACCATT' foreignTable='SC_ACCOUN'> 
+		<column name='AAT_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCATT_FK_AAT_AME_ID' table='SC_ACCATT' foreignTable='SC_ACCMET'> 
+		<column name='AAT_AME_ID'/>
+		<foreignColumn name='AME_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCATT_FK_AAT_TDA_ID' table='SC_ACCATT' foreignTable='SC_TIPDAD'> 
+		<column name='AAT_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.AccountEntity -->
+
+	<table name='SC_ACCOUN'>
+		<column name='ACC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ACC_TYPE' type='VARCHAR' length='1' notNull='true'/>
+		<column name='ACC_NAME' type='VARCHAR' length='128' notNull='false'/>
+		<column name='ACC_KEY' type='VARCHAR' length='256' notNull='true'/>
+		<column name='ACC_DIS_ID' type='BIGINT' notNull='true'/>
+		<column name='ACC_OLDNAM' type='VARCHAR' length='128' notNull='false'/>
+		<column name='ACC_DESCRI' type='VARCHAR' length='255' notNull='false'/>
+		<column name='ACC_CREATE' type='DATE' notNull='false'/>
+		<column name='ACC_LASCHG' type='DATE' notNull='false'/>
+		<column name='ACC_LASUPD' type='DATE' notNull='false'/>
+		<column name='ACC_LASPAS' type='DATE' notNull='false'/>
+		<column name='ACC_PASEXP' type='DATE' notNull='false'/>
+		<column name='ACC_LASLOG' type='DATE' notNull='false'/>
+		<column name='ACC_SECRET' type='CLOB' length='65000' notNull='false'/>
+		<column name='ACC_SSHPKY' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='ACC_DISABL' type='BIT' notNull='true'/>
+		<column name='ACC_STATUS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_VAF_ID' type='BIGINT' notNull='false'/>
+		<column name='ACC_INHPER' type='BIT' notNull='false'/>
+		<column name='ACC_URL' type='VARCHAR' length='255' notNull='false'/>
+		<column name='ACC_LOGNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_LAUTYP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_SRVTYP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_SRVNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_JSG_ID' type='BIGINT' notNull='false'/>
+		<column name='ACC_TUS_ID' type='BIGINT' notNull='true'/>
+		<column name='ACC_PWDSTA' type='VARCHAR' length='25' notNull='false'/>
+		<column name='ACC_ASN_ID' type='BIGINT' notNull='false'/>
+		<column name='ACC_CRETYP' type='VARCHAR' length='25' notNull='false'/>
+		<column name='ACC_EXTID' type='VARCHAR' length='100' notNull='false'/>
+		<column name='ACC_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_DELDAT' type='DATE' notNull='false'/>
+		<column name='ACC_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ACC_DELETED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ACCOUN_FK_ACC_DIS_ID' table='SC_ACCOUN' foreignTable='SC_DISPAT'> 
+		<column name='ACC_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCOUN_FK_ACC_VAF_ID' table='SC_ACCOUN' foreignTable='SC_VAUFOL'> 
+		<column name='ACC_VAF_ID'/>
+		<foreignColumn name='VAF_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCOUN_FK_ACC_JSG_ID' table='SC_ACCOUN' foreignTable='SC_JUSEGR'> 
+		<column name='ACC_JSG_ID'/>
+		<foreignColumn name='JSG_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCOUN_FK_ACC_TUS_ID' table='SC_ACCOUN' foreignTable='SC_TIPUSU'> 
+		<column name='ACC_TUS_ID'/>
+		<foreignColumn name='TUS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCOUN_FK_ACC_ASN_ID' table='SC_ACCOUN' foreignTable='SC_ACCSNA'> 
+		<column name='ACC_ASN_ID'/>
+		<foreignColumn name='ASN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.AccountMetadataEntity -->
+
+	<table name='SC_ACCMET'>
+		<column name='AME_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='AME_NAME' type='VARCHAR' length='50' notNull='true'/>
+		<column name='AME_DIS_ID' type='BIGINT' notNull='true'/>
+		<column name='AME_ORDER' type='BIGINT' notNull='true'/>
+		<column name='AME_TYPE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='AME_SIZE' type='INTEGER' notNull='false'/>
+		<column name='AME_REQUIR' type='BIT' notNull='false'/>
+		<column name='AME_MULTIV' type='BIT' notNull='false'/>
+		<column name='AME_MVROWS' type='INTEGER' notNull='false'/>
+		<column name='AME_VALUE' type='CLOB' length='64000' notNull='false'/>
+		<column name='AME_LABEL' type='VARCHAR' length='64' notNull='false'/>
+		<column name='AME_ADMVIS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='AME_OPEVIS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='AME_USEVIS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='AME_UNIQUE' type='BIT' notNull='false'/>
+		<column name='TDA_COT_ID' type='BIGINT' notNull='false'/>
+		<column name='AME_VISEXP' type='CLOB' length='2048' notNull='false'/>
+		<column name='AME_VALEXP' type='CLOB' length='2048' notNull='false'/>
+		<column name='AME_FILEXP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AME_LOATRI' type='CLOB' length='4096' notNull='false'/>
+		<column name='AME_CHATRI' type='CLOB' length='4096' notNull='false'/>
+		<column name='AME_FOCTRI' type='CLOB' length='4096' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ACCMET_FK_AME_DIS_ID' table='SC_ACCMET' cascade='delete' foreignTable='SC_DISPAT'> 
+		<column name='AME_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCMET_FK_TDA_COT_ID' table='SC_ACCMET' foreignTable='SC_CUOBTY'> 
+		<column name='TDA_COT_ID'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.AgentDescriptorEntity -->
+
+	<table name='SC_AGEDES'>
+		<column name='ADE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ADE_DESCRI' type='VARCHAR' length='512' notNull='true'/>
+		<column name='ADE_CLASS' type='VARCHAR' length='512' notNull='true'/>
+		<column name='ADE_UI' type='BLOB' length='65000' notNull='true'/>
+		<column name='ADE_IDSPL' type='BIGINT' notNull='true'/>
+		<column name='ADE_CAC' type='BIT' notNull='true'/>
+		<column name='ADE_SPM_ID' type='BIGINT' notNull='true'/>
+		<column name='ADE_AUTHOR' type='BIT' notNull='true'/>
+		<column name='ADE_ATTMAP' type='BIT' notNull='true'/>
+		<column name='ADE_OBJTRG' type='BIT' notNull='true'/>
+		<column name='ADE_SERVIC' type='BIT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_AGEDES_FK_ADE_IDSPL' table='SC_AGEDES' foreignTable='SC_SERPLU'> 
+		<column name='ADE_IDSPL'/>
+		<foreignColumn name='SPL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AGEDES_FK_ADE_SPM_ID' table='SC_AGEDES' foreignTable='SC_SEPLMO'> 
+		<column name='ADE_SPM_ID'/>
+		<foreignColumn name='SPM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.AgentPropertyEntity -->
+
+	<table name='SC_AGEPRO'>
+		<column name='APR_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='APR_TEMPLA' type='VARCHAR' length='50' notNull='true'/>
+		<column name='APR_TYPE' type='VARCHAR' length='250' notNull='true'/>
+		<column name='APR_ADE_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_AGEPRO_FK_APR_ADE_ID' table='SC_AGEPRO' foreignTable='SC_AGEDES'> 
+		<column name='APR_ADE_ID'/>
+		<foreignColumn name='ADE_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.AuthorizationEntity -->
+
+	<table name='SC_AUTROL'>
+		<column name='AUR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='AUR_AUTCOD' type='VARCHAR' length='100' notNull='true'/>
+		<column name='AUR_ROL' type='BIGINT' notNull='true'/>
+		<column name='AUR_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_AUTROL_FK_AUR_ROL' table='SC_AUTROL' foreignTable='SC_ROLES'> 
+		<column name='AUR_ROL'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUTROL_FK_AUR_TEN_ID' table='SC_AUTROL' foreignTable='SC_TENANT'> 
+		<column name='AUR_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.BlobConfigurationEntity -->
+
+	<table name='SC_BLOCON'>
+		<column name='BCO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='BCO_NAME' type='VARCHAR' length='255' notNull='true'/>
+		<column name='BCO_VALUE' type='BLOB' length='10240000' notNull='true'/>
+		<column name='BCO_VERSIO' type='VARCHAR' length='50' notNull='false'/>
+		<column name='BCO_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_BLOCON_FK_BCO_TEN_ID' table='SC_BLOCON' foreignTable='SC_TENANT'> 
+		<column name='BCO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.ConfigEntity -->
+
+	<table name='SC_CONFIG'>
+		<column name='CON_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='CON_CODI' type='VARCHAR' length='100' notNull='true'/>
+		<column name='CON_VALOR' type='VARCHAR' length='500' notNull='true'/>
+		<column name='CON_IDXAR' type='BIGINT' notNull='false'/>
+		<column name='CON_DESC' type='VARCHAR' length='255' notNull='false'/>
+		<column name='CON_HIDDEN' type='BIT' notNull='false'/>
+		<column name='CON_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='CON_CREDAT' type='DATE' notNull='false'/>
+		<column name='CON_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CON_UPDDAT' type='DATE' notNull='false'/>
+		<column name='CON_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='CON_DELDAT' type='DATE' notNull='false'/>
+		<column name='CON_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_CONFIG_FK_CON_IDXAR' table='SC_CONFIG' foreignTable='SC_XARXES'> 
+		<column name='CON_IDXAR'/>
+		<foreignColumn name='XAR_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CONFIG_FK_CON_TEN_ID' table='SC_CONFIG' foreignTable='SC_TENANT'> 
+		<column name='CON_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.DefaultAttributeMappingEntity -->
+
+	<table name='SC_DEATMA'>
+		<column name='DAM_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='DAM_SOFATR' type='VARCHAR' length='1000' notNull='true'/>
+		<column name='DAM_SYSATR' type='VARCHAR' length='1000' notNull='true'/>
+		<column name='DAM_DIRECT' type='VARCHAR' length='2' notNull='true'/>
+		<column name='DAM_DOM_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_DEATMA_FK_DAM_DOM_ID' table='SC_DEATMA' foreignTable='SC_DEOBMA'> 
+		<column name='DAM_DOM_ID'/>
+		<foreignColumn name='DOM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.DefaultObjectMappingEntity -->
+
+	<table name='SC_DEOBMA'>
+		<column name='DOM_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='DOM_SYSOBJ' type='VARCHAR' length='50' notNull='true'/>
+		<column name='DAM_ADE_ID' type='BIGINT' notNull='true'/>
+		<column name='DOM_SOFOBJ' type='VARCHAR' length='50' notNull='true'/>
+		<column name='DOM_CONDIT' type='VARCHAR' length='2000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_DEOBMA_FK_DAM_ADE_ID' table='SC_DEOBMA' foreignTable='SC_AGEDES'> 
+		<column name='DAM_ADE_ID'/>
+		<foreignColumn name='ADE_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.DefaultObjectMappingPropertyEntity -->
+
+	<table name='SC_DEOBPR'>
+		<column name='DOP_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='DOP_PROPER' type='VARCHAR' length='50' notNull='true'/>
+		<column name='DOP_VALUE' type='VARCHAR' length='250' notNull='true'/>
+		<column name='DOP_DOM_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_DEOBPR_FK_DOP_DOM_ID' table='SC_DEOBPR' foreignTable='SC_DEOBMA'> 
+		<column name='DOP_DOM_ID'/>
+		<foreignColumn name='DOM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.LuceneIndexEntity -->
+
+	<table name='SC_LUNIND'>
+		<column name='LIP_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='LIP_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='LIP_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='LIP_TIMSTA' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_LUNIND_FK_LIP_TEN_ID' table='SC_LUNIND' foreignTable='SC_TENANT'> 
+		<column name='LIP_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.LuceneIndexPartEntity -->
+
+	<table name='SC_LUINPA'>
+		<column name='LIP_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='LIP_LIN_ID' type='BIGINT' notNull='true'/>
+		<column name='LIP_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='LIP_ORDER' type='INTEGER' notNull='true'/>
+		<column name='LIP_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='LIP_DATA' type='BLOB' length='256000' notNull='false'/>
+		<column name='LIP_TIMSTA' type='BIGINT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_LUINPA_FK_LIP_LIN_ID' table='SC_LUINPA' foreignTable='SC_LUNIND'> 
+		<column name='LIP_LIN_ID'/>
+		<foreignColumn name='LIP_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LUINPA_FK_LIP_TEN_ID' table='SC_LUINPA' foreignTable='SC_TENANT'> 
+		<column name='LIP_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.ServerPluginEntity -->
+
+	<table name='SC_SERPLU'>
+		<column name='SPL_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SPL_VERSION' type='VARCHAR' length='30' notNull='true'/>
+		<column name='SPL_CONTEN' type='BLOB' length='40000000' notNull='false'/>
+		<column name='SPL_NAME' type='VARCHAR' length='100' notNull='true'/>
+		<column name='SPL_AUTHOR' type='VARCHAR' length='100' notNull='false'/>
+		<column name='SPL_DEPLOYED' type='DATE' notNull='false'/>
+		<column name='SPL_ENABLE' type='BIT' notNull='true'/>
+		<column name='SPL_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SERPLU_FK_SPL_TEN_ID' table='SC_SERPLU' foreignTable='SC_TENANT'> 
+		<column name='SPL_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.ServerPluginModuleEntity -->
+
+	<table name='SC_SEPLMO'>
+		<column name='SPM_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SPM_NAME' type='VARCHAR' length='255' notNull='true'/>
+		<column name='SPM_DATA' type='BLOB' length='40000000' notNull='true'/>
+		<column name='SPM_TYPE' type='VARCHAR' length='255' notNull='true'/>
+		<column name='SPM_SPL_ID' type='BIGINT' notNull='true'/>
+		<column name='SPM_CLASS' type='VARCHAR' length='255' notNull='false'/>
+		<column name='SPM_RESNAM' type='VARCHAR' length='255' notNull='false'/>
+	</table>
+	<foreignKey name='SC_SEPLMO_FK_SPM_SPL_ID' table='SC_SEPLMO' foreignTable='SC_SERPLU'> 
+		<column name='SPM_SPL_ID'/>
+		<foreignColumn name='SPL_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.SoffidLicenseEntity -->
+
+	<table name='SC_SOFLIC'>
+		<column name='SLI_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SLI_LICENSE' type='CLOB' length='128000' notNull='true'/>
+	</table>
+
+	<!-- com.soffid.iam.base.model.StatsEntity -->
+
+	<table name='SC_STATS'>
+		<column name='STA_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='STA_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='STA_DATE' type='VARCHAR' length='16' notNull='true'/>
+		<column name='STA_SERIE' type='VARCHAR' length='128' notNull='false'/>
+		<column name='STA_VALUE' type='BIGINT' notNull='false'/>
+		<column name='STA_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_STATS_FK_STA_TEN_ID' table='SC_STATS' foreignTable='SC_TENANT'> 
+		<column name='STA_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.TenantDisabledPermissionEntity -->
+
+	<table name='SC_TEDIPE'>
+		<column name='TDP_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TDP_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='TDP_PERMISSION' type='VARCHAR' length='256' notNull='true'/>
+	</table>
+	<foreignKey name='SC_TEDIPE_FK_TDP_TEN_ID' table='SC_TEDIPE' foreignTable='SC_TENANT'> 
+		<column name='TDP_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.TenantEntity -->
+
+	<table name='SC_TENANT'>
+		<column name='TEN_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TEN_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='TEN_DESCRI' type='VARCHAR' length='256' notNull='true'/>
+		<column name='TEN_ENABLE' type='BIT' notNull='true'/>
+	</table>
+
+	<!-- com.soffid.iam.base.model.TenantServerEntity -->
+
+	<table name='SC_TENSER'>
+		<column name='TNS_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TNS_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='TNS_SRV_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_TENSER_FK_TNS_TEN_ID' table='SC_TENSER' foreignTable='SC_TENANT'> 
+		<column name='TNS_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TENSER_FK_TNS_SRV_ID' table='SC_TENSER' foreignTable='SC_SERVER'> 
+		<column name='TNS_SRV_ID'/>
+		<foreignColumn name='SRV_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.UserAccountEntity -->
+
+	<table name='SC_USUACC'>
+		<column name='UAC_USU_ID' type='BIGINT' notNull='true'/>
+		<column name='UAC_ACC_ID' type='BIGINT' notNull='true'/>
+		<column name='UAC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='UAC_UNTIL' type='DATE' notNull='false'/>
+		<column name='UAC_BPM' type='BIGINT' notNull='false'/>
+		<column name='UAC_ENTPOI' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UAC_APPROV' type='BIT' notNull='false'/>
+		<column name='UAC_START' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USUACC_FK_UAC_USU_ID' table='SC_USUACC' foreignTable='SC_USUARI'> 
+		<column name='UAC_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUACC_FK_UAC_ACC_ID' table='SC_USUACC' foreignTable='SC_ACCOUN'> 
+		<column name='UAC_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.UserDataEntity -->
+
+	<table name='SC_DADUSU'>
+		<column name='DUS_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='DUS_IDUSU' type='BIGINT' notNull='true'/>
+		<column name='DUS_TDAID' type='BIGINT' notNull='true'/>
+		<column name='DUS_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='DUS_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_DADUSU_FK_DUS_IDUSU' table='SC_DADUSU' foreignTable='SC_USUARI'> 
+		<column name='DUS_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_DADUSU_FK_DUS_TDAID' table='SC_DADUSU' foreignTable='SC_TIPDAD'> 
+		<column name='DUS_TDAID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.UserEntity -->
+
+	<table name='SC_USUARI'>
+		<column name='USU_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='USU_CODI' type='VARCHAR' length='150' notNull='true'/>
+		<column name='USU_NOM' type='VARCHAR' length='100' notNull='true'/>
+		<column name='USU_PRILLI' type='VARCHAR' length='100' notNull='true'/>
+		<column name='USU_SEGLLI' type='VARCHAR' length='100' notNull='false'/>
+		<column name='USU_FULNAM' type='VARCHAR' length='150' notNull='true'/>
+		<column name='USU_NOMCUR' type='VARCHAR' length='100' notNull='false'/>
+		<column name='USU_EMAIL' type='VARCHAR' length='150' notNull='false'/>
+		<column name='USU_USUMOD' type='VARCHAR' length='50' notNull='false'/>
+		<column name='USU_DATMOD' type='DATE' notNull='false'/>
+		<column name='USU_DATCRE' type='DATE' notNull='true'/>
+		<column name='USU_USUCRE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='USU_ACTIVE' type='BIT' notNull='true'/>
+		<column name='USU_COMENT' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='USU_IDMACO' type='BIGINT' notNull='false'/>
+		<column name='USU_IDMAQ' type='BIGINT' notNull='false'/>
+		<column name='USU_IDDCO' type='BIGINT' notNull='false'/>
+		<column name='USU_IDMAPR' type='BIGINT' notNull='false'/>
+		<column name='USU_IDGRU' type='BIGINT' notNull='false'/>
+		<column name='USU_MULSESS' type='BIT' notNull='false'/>
+		<column name='USU_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='USU_TUS_ID' type='BIGINT' notNull='true'/>
+		<column name='USU_DELDAT' type='DATE' notNull='false'/>
+		<column name='USU_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='USU_DELETED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USUARI_FK_USU_IDMACO' table='SC_USUARI' foreignTable='SC_MAQUIN'> 
+		<column name='USU_IDMACO'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUARI_FK_USU_IDMAQ' table='SC_USUARI' foreignTable='SC_MAQUIN'> 
+		<column name='USU_IDMAQ'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUARI_FK_USU_IDDCO' table='SC_USUARI' foreignTable='SC_DOMCOR'> 
+		<column name='USU_IDDCO'/>
+		<foreignColumn name='DCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUARI_FK_USU_IDMAPR' table='SC_USUARI' foreignTable='SC_MAQUIN'> 
+		<column name='USU_IDMAPR'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUARI_FK_USU_IDGRU' table='SC_USUARI' foreignTable='SC_GRUPS'> 
+		<column name='USU_IDGRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUARI_FK_USU_TEN_ID' table='SC_USUARI' foreignTable='SC_TENANT'> 
+		<column name='USU_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUARI_FK_USU_TUS_ID' table='SC_USUARI' foreignTable='SC_TIPUSU'> 
+		<column name='USU_TUS_ID'/>
+		<foreignColumn name='TUS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.UserPreferenceEntity -->
+
+	<table name='SC_USEPRE'>
+		<column name='id' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='USP_USU_ID' type='BIGINT' notNull='true'/>
+		<column name='USP_NAME' type='VARCHAR' length='250' notNull='true'/>
+		<column name='USP_VALUE' type='VARCHAR' length='500' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USEPRE_FK_USP_USU_ID' table='SC_USEPRE' foreignTable='SC_USUARI'> 
+		<column name='USP_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.base.model.UserTypeEntity -->
+
+	<table name='SC_TIPUSU'>
+		<column name='TUS_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TUS_CODI' type='VARCHAR' length='10' notNull='true'/>
+		<column name='TUS_DESC' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TUS_MANAGE' type='BIT' notNull='false'/>
+		<column name='TUS_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='TUS_CREDAT' type='DATE' notNull='false'/>
+		<column name='TUS_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='TUS_UPDDAT' type='DATE' notNull='false'/>
+		<column name='TUS_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='TUS_DELDAT' type='DATE' notNull='false'/>
+		<column name='TUS_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_TIPUSU_FK_TUS_TEN_ID' table='SC_TIPUSU' foreignTable='SC_TENANT'> 
+		<column name='TUS_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<index name='SC_STATS_NAME_NDX' table='SC_STATS' unique='false'>
+		<column name='STA_NAME'/>
+		<column name='STA_DATE'/>
+	</index>
+	<index name='SC_TEN_NAME_UK' table='SC_TENANT' unique='true'>
+		<column name='TEN_NAME'/>
+	</index>
+	<index name='SC_USEPRE_UK' table='SC_USEPRE' unique='true'>
+		<column name='USP_USU_ID'/>
+		<column name='USP_NAME'/>
+	</index>
+	<index name='USU_UK_CODI' table='SC_USUARI' unique='true'>
+		<column name='USU_TEN_ID'/>
+		<column name='USU_CODI'/>
+	</index>
+	<index name='USU_UK_NOMCUR_IDDCO' table='SC_USUARI' unique='false'>
+		<column name='USU_TEN_ID'/>
+		<column name='USU_NOMCUR'/>
+		<column name='USU_IDDCO'/>
+	</index>
+
+	<!-- com.soffid.iam.doc.model.DocSign -->
+
+	<table name='BPM_SIGN'>
+		<column name='SIG_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SIG_SIGN_TYPE' type='VARCHAR' length='256' notNull='true'/>
+		<column name='SIG_FS_PATH' type='VARCHAR' length='512' notNull='true'/>
+		<column name='SIG_TIMESTAMP' type='DATE' notNull='true'/>
+		<column name='SIG_DOC_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='BPM_SIGN_FK_SIG_DOC_ID' table='BPM_SIGN' foreignTable='BPM_DOCUMENT'> 
+		<column name='SIG_DOC_ID'/>
+		<foreignColumn name='DOC_ID'/>
+	</foreignKey>
+	<index name='BPM_DOCBLO_PATH_NDX' table='BPM_DOCBLO' unique='true'>
+		<column name='DBL_PATH'/>
+		<column name='DBL_SEQNUM'/>
+	</index>
+
+	<!-- com.soffid.iam.doc.model.DocumentEntity -->
+
+	<table name='BPM_DOCUMENT'>
+		<column name='DOC_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='DOC_MIME_TYPE' type='VARCHAR' length='256' notNull='true'/>
+		<column name='DOC_EXTERNAL_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='DOC_HASH' type='VARCHAR' length='128' notNull='false'/>
+		<column name='DOC_FS_PATH' type='VARCHAR' length='128' notNull='false'/>
+		<column name='DOC_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='BPM_DOCUMENT_FK_DOC_TEN_ID' table='BPM_DOCUMENT' foreignTable='SC_TENANT'> 
+		<column name='DOC_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<index name='BPM_DOCUMENT_NAME_NDX' table='BPM_DOCUMENT' unique='true'>
+		<column name='DOC_FS_PATH'/>
+	</index>
+
+	<!-- com.soffid.iam.doc.model.FileSystem -->
+
+	<table name='BPM_FILE_SYSTEM'>
+		<column name='FIL_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='FIL_APPLICATION' type='VARCHAR' length='64' notNull='true'/>
+		<column name='FIL_YEAR' type='INTEGER' notNull='true'/>
+		<column name='FIL_NEXT_DOC' type='BIGINT' notNull='true'/>
+	</table>
+
+	<!-- com.soffid.iam.doc.model.DocumentBlockEntity -->
+
+	<table name='BPM_DOCBLO'>
+		<column name='DBL_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='DBL_PATH' type='VARCHAR' length='256' notNull='true'/>
+		<column name='DBL_SEQNUM' type='BIGINT' notNull='true'/>
+		<column name='DBL_CONTENT' type='BLOB' length='16384' notNull='false'/>
+		<column name='DBL_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='BPM_DOCBLO_FK_DBL_TEN_ID' table='BPM_DOCBLO' foreignTable='SC_TENANT'> 
+		<column name='DBL_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<index name='APL_UK_CODI' table='SC_APLICA' unique='true'>
+		<column name='APL_TEN_ID'/>
+		<column name='APL_CODI'/>
+	</index>
+	<index name='SC_ATTTRA_COL1_NDX' table='SC_ATTTRA' unique='false'>
+		<column name='ATT_TEN_ID'/>
+		<column name='ATT_DOMAIN'/>
+		<column name='ATT_COLUMN1'/>
+	</index>
+	<index name='SC_ATTTRA_COL2_NDX' table='SC_ATTTRA' unique='false'>
+		<column name='ATT_TEN_ID'/>
+		<column name='ATT_DOMAIN'/>
+		<column name='ATT_COLUMN2'/>
+	</index>
+	<index name='BPM_PROHIE_CHI' table='BPM_PROHIE' unique='false'>
+		<column name='PRH_CHIPRO'/>
+	</index>
+	<index name='SC_CUSOBJ_UK' table='SC_CUSOBJ' unique='true'>
+		<column name='COB_COT_ID'/>
+		<column name='COB_NAME'/>
+	</index>
+	<index name='SC_CUOBTY_UK' table='SC_CUOBTY' unique='true'>
+		<column name='COT_TEN_ID'/>
+		<column name='COT_NAME'/>
+	</index>
+	<index name='DIS_UK_CODI' table='SC_DISPAT' unique='true'>
+		<column name='DIS_TEN_ID'/>
+		<column name='DIS_CODI'/>
+	</index>
+	<index name='DOM_UK_NOM_APP' table='SC_DOMAPP' unique='true'>
+		<column name='DOM_APP'/>
+		<column name='DOM_NOM'/>
+	</index>
+	<index name='DCO_UK_CODI' table='SC_DOMCOR' unique='true'>
+		<column name='DCO_TEN_ID'/>
+		<column name='DCO_CODI'/>
+	</index>
+	<index name='GRU_UK_CODI' table='SC_GRUPS' unique='false'>
+		<column name='GRU_TEN_ID'/>
+		<column name='GRU_CODI'/>
+	</index>
+	<index name='IMP_UK_CODI' table='SC_IMPRES' unique='true'>
+		<column name='IMP_TEN_ID'/>
+		<column name='IMP_CODI'/>
+	</index>
+	<index name='LCO_UK_NOM_IDDCO' table='SC_LLICOR' unique='true'>
+		<column name='LCO_NOM'/>
+		<column name='LCO_IDDCO'/>
+	</index>
+
+	<!-- com.soffid.iam.iga.model.AccessControlEntity -->
+
+	<table name='SC_CONACC'>
+		<column name='CAC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='CAC_GEN_USU' type='CLOB' length='2048' notNull='false'/>
+		<column name='CAC_GEN_MAQ' type='CLOB' length='2048' notNull='false'/>
+		<column name='CAC_PROGRAM' type='CLOB' length='2048' notNull='true'/>
+		<column name='CAC_ROL_ID' type='BIGINT' notNull='false'/>
+		<column name='CAC_DIS_ID' type='BIGINT' notNull='true'/>
+		<column name='CAC_IPMAQ_ORA' type='CLOB' length='2048' notNull='false'/>
+		<column name='CAC_COMMEN' type='VARCHAR' length='250' notNull='false'/>
+	</table>
+	<foreignKey name='SC_CONACC_FK_CAC_ROL_ID' table='SC_CONACC' foreignTable='SC_ROLES'> 
+		<column name='CAC_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CONACC_FK_CAC_DIS_ID' table='SC_CONACC' foreignTable='SC_DISPAT'> 
+		<column name='CAC_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.AccountSnapshotEntity -->
+
+	<table name='SC_ACCSNA'>
+		<column name='ASN_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ASN_DATA' type='BLOB' length='128000' notNull='true'/>
+	</table>
+
+	<!-- com.soffid.iam.iga.model.ApplicationDomainEntity -->
+
+	<table name='SC_DOMAPP'>
+		<column name='DOM_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='DOM_NOM' type='VARCHAR' length='30' notNull='true'/>
+		<column name='DOM_APP' type='BIGINT' notNull='false'/>
+		<column name='DOM_DESC' type='VARCHAR' length='50' notNull='false'/>
+		<column name='DOM_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_DOMAPP_FK_DOM_APP' table='SC_DOMAPP' foreignTable='SC_APLICA'> 
+		<column name='DOM_APP'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_DOMAPP_FK_DOM_TEN_ID' table='SC_DOMAPP' foreignTable='SC_TENANT'> 
+		<column name='DOM_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.AttributeMappingEntity -->
+
+	<table name='SC_ATRMAP'>
+		<column name='ATM_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='ATM_SOFATR' type='CLOB' length='3500' notNull='true'/>
+		<column name='ATM_SYSATR' type='CLOB' length='3500' notNull='true'/>
+		<column name='ATM_DIRECT' type='VARCHAR' length='256' notNull='true'/>
+		<column name='ATM_OBM_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_ATRMAP_FK_ATM_OBM_ID' table='SC_ATRMAP' foreignTable='SC_OBJMAP'> 
+		<column name='ATM_OBM_ID'/>
+		<foreignColumn name='OBM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.AttributeTranslationEntity -->
+
+	<table name='SC_ATTTRA'>
+		<column name='ATT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='ATT_DOMAIN' type='VARCHAR' length='450' notNull='true'/>
+		<column name='ATT_COLUMN1' type='VARCHAR' length='450' notNull='true'/>
+		<column name='ATT_COLUMN2' type='VARCHAR' length='450' notNull='false'/>
+		<column name='ATT_COLUMN3' type='VARCHAR' length='450' notNull='false'/>
+		<column name='ATT_COLUMN4' type='VARCHAR' length='450' notNull='false'/>
+		<column name='ATT_COLUMN5' type='VARCHAR' length='450' notNull='false'/>
+		<column name='ATT_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='ATT_CREDAT' type='DATE' notNull='false'/>
+		<column name='ATT_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ATT_UPDDAT' type='DATE' notNull='false'/>
+		<column name='ATT_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ATT_DELDAT' type='DATE' notNull='false'/>
+		<column name='ATT_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ATTTRA_FK_ATT_TEN_ID' table='SC_ATTTRA' foreignTable='SC_TENANT'> 
+		<column name='ATT_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.AuthoritativeChangeEntity -->
+
+	<table name='SC_AUTCHA'>
+		<column name='PAU_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='PAU_USU_ID' type='BIGINT' notNull='false'/>
+		<column name='PAU_PRO_ID' type='BIGINT' notNull='false'/>
+		<column name='PAU_EMPLOY' type='VARCHAR' length='128' notNull='false'/>
+		<column name='PAU_CHANGE' type='VARCHAR' length='128' notNull='false'/>
+		<column name='PAU_DATE' type='DATE' notNull='false'/>
+		<column name='PAU_DIS_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_AUTCHA_FK_PAU_USU_ID' table='SC_AUTCHA' foreignTable='SC_USUARI'> 
+		<column name='PAU_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUTCHA_FK_PAU_DIS_ID' table='SC_AUTCHA' foreignTable='SC_DISPAT'> 
+		<column name='PAU_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.CustomObjectAttributeEntity -->
+
+	<table name='SC_COBATT'>
+		<column name='COA_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='COA_VALUE' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='COA_COB_ID' type='BIGINT' notNull='true'/>
+		<column name='COA_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='COA_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_COBATT_FK_COA_COB_ID' table='SC_COBATT' foreignTable='SC_CUSOBJ'> 
+		<column name='COA_COB_ID'/>
+		<foreignColumn name='COB_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_COBATT_FK_COA_TDA_ID' table='SC_COBATT' foreignTable='SC_TIPDAD'> 
+		<column name='COA_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.CustomObjectEntity -->
+
+	<table name='SC_CUSOBJ'>
+		<column name='COB_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='COB_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='COB_DESCR' type='VARCHAR' length='250' notNull='true'/>
+		<column name='COB_COT_ID' type='BIGINT' notNull='true'/>
+		<column name='COB_CREDAT' type='DATE' notNull='false'/>
+		<column name='COB_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='COB_UPDDAT' type='DATE' notNull='false'/>
+		<column name='COB_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='COB_DELDAT' type='DATE' notNull='false'/>
+		<column name='COB_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='COB_DELETED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_CUSOBJ_FK_COB_COT_ID' table='SC_CUSOBJ' foreignTable='SC_CUOBTY'> 
+		<column name='COB_COT_ID'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.CustomObjectRoleEntity -->
+
+	<table name='SC_CUSBRO'>
+		<column name='COR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='COR_COT_ID' type='BIGINT' notNull='true'/>
+		<column name='COR_ROL_ID' type='BIGINT' notNull='true'/>
+		<column name='COR_LEVEL' type='VARCHAR' length='256' notNull='true'/>
+	</table>
+	<foreignKey name='SC_CUSBRO_FK_COR_COT_ID' table='SC_CUSBRO' foreignTable='SC_CUOBTY'> 
+		<column name='COR_COT_ID'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_CUSBRO_FK_COR_ROL_ID' table='SC_CUSBRO' foreignTable='SC_ROLES'> 
+		<column name='COR_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.CustomObjectTypeEntity -->
+
+	<table name='SC_CUOBTY'>
+		<column name='COT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='COT_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='COT_DESCR' type='VARCHAR' length='250' notNull='true'/>
+		<column name='COT_SCOPE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='COT_BUILTIN' type='BIT' notNull='true'/>
+		<column name='COT_TXTIND' type='BIT' notNull='true'/>
+		<column name='COT_EXOBCL' type='VARCHAR' length='256' notNull='false'/>
+		<column name='COT_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='COT_PUBLIC' type='BIT' notNull='false'/>
+		<column name='COT_CREDAT' type='DATE' notNull='false'/>
+		<column name='COT_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='COT_UPDDAT' type='DATE' notNull='false'/>
+		<column name='COT_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='COT_DELDAT' type='DATE' notNull='false'/>
+		<column name='COT_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_CUOBTY_FK_COT_TEN_ID' table='SC_CUOBTY' foreignTable='SC_TENANT'> 
+		<column name='COT_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.DomainValueEntity -->
+
+	<table name='SC_VALOR_DOMINI'>
+		<column name='VDO_VALOR' type='VARCHAR' length='150' notNull='true'/>
+		<column name='VDO_DOM' type='BIGINT' notNull='true'/>
+		<column name='VDO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='VDO_DESC' type='VARCHAR' length='50' notNull='true'/>
+		<column name='VDO_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='VDO_CREDAT' type='DATE' notNull='false'/>
+		<column name='VDO_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='VDO_UPDDAT' type='DATE' notNull='false'/>
+		<column name='VDO_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='VDO_DELDAT' type='DATE' notNull='false'/>
+		<column name='VDO_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_VALOR_DOMINI_FK_VDO_DOM' table='SC_VALOR_DOMINI' foreignTable='SC_DOMAPP'> 
+		<column name='VDO_DOM'/>
+		<foreignColumn name='DOM_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_VALOR_DOMINI_FK_VDO_TEN_ID' table='SC_VALOR_DOMINI' foreignTable='SC_TENANT'> 
+		<column name='VDO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ExternalNameEntity -->
+
+	<table name='SC_EXTLCO'>
+		<column name='ELC_ADRECA' type='VARCHAR' length='100' notNull='true'/>
+		<column name='ELC_IDLCO' type='BIGINT' notNull='true'/>
+		<column name='ELC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+	</table>
+	<foreignKey name='SC_EXTLCO_FK_ELC_IDLCO' table='SC_EXTLCO' foreignTable='SC_LLICOR'> 
+		<column name='ELC_IDLCO'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.GroupAttributeEntity -->
+
+	<table name='SC_GRUATT'>
+		<column name='GAT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='GAT_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='GAT_GRU_ID' type='BIGINT' notNull='true'/>
+		<column name='GAT_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='GAT_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_GRUATT_FK_GAT_GRU_ID' table='SC_GRUATT' foreignTable='SC_GRUPS'> 
+		<column name='GAT_GRU_ID'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUATT_FK_GAT_TDA_ID' table='SC_GRUATT' foreignTable='SC_TIPDAD'> 
+		<column name='GAT_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.GroupEntity -->
+
+	<table name='SC_GRUPS'>
+		<column name='GRU_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='GRU_CODI' type='VARCHAR' length='150' notNull='true'/>
+		<column name='GRU_DESCRI' type='VARCHAR' length='250' notNull='false'/>
+		<column name='GRU_QUOTA' type='BIGINT' notNull='false'/>
+		<column name='GRU_UNIOFI' type='VARCHAR' length='2' notNull='false'/>
+		<column name='GRU_PARE' type='BIGINT' notNull='false'/>
+		<column name='GRU_IDMAQ' type='BIGINT' notNull='false'/>
+		<column name='GRU_TIPUS' type='BIGINT' notNull='false'/>
+		<column name='GRU_ISOLD' type='BIT' notNull='true'/>
+		<column name='GRU_STADAT' type='DATE' notNull='false'/>
+		<column name='GRU_ENDDAT' type='DATE' notNull='false'/>
+		<column name='GRU_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='GRU_CREDAT' type='DATE' notNull='false'/>
+		<column name='GRU_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='GRU_UPDDAT' type='DATE' notNull='false'/>
+		<column name='GRU_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='GRU_DELDAT' type='DATE' notNull='false'/>
+		<column name='GRU_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_GRUPS_FK_GRU_PARE' table='SC_GRUPS' foreignTable='SC_GRUPS'> 
+		<column name='GRU_PARE'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUPS_FK_GRU_IDMAQ' table='SC_GRUPS' foreignTable='SC_MAQUIN'> 
+		<column name='GRU_IDMAQ'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUPS_FK_GRU_TIPUS' table='SC_GRUPS' foreignTable='SC_TIPUSUO'> 
+		<column name='GRU_TIPUS'/>
+		<foreignColumn name='TUO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUPS_FK_GRU_TEN_ID' table='SC_GRUPS' foreignTable='SC_TENANT'> 
+		<column name='GRU_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.GroupTypeEntity -->
+
+	<table name='SC_TIPUSUO'>
+		<column name='TUO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TUO_CODI' type='VARCHAR' length='20' notNull='true'/>
+		<column name='TUO_DESC' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TUO_ROLHOL' type='BIT' notNull='false'/>
+		<column name='TUO_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='TUO_CREDAT' type='DATE' notNull='false'/>
+		<column name='TUO_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='TUO_UPDDAT' type='DATE' notNull='false'/>
+		<column name='TUO_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='TUO_DELDAT' type='DATE' notNull='false'/>
+		<column name='TUO_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_TIPUSUO_FK_TUO_TEN_ID' table='SC_TIPUSUO' foreignTable='SC_TENANT'> 
+		<column name='TUO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.HostAliasEntity -->
+
+	<table name='SC_MAQUINALIAS'>
+		<column name='MAL_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='MAL_ALIAS' type='CLOB' length='2048' notNull='true'/>
+		<column name='MAL_MAQID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_MAQUINALIAS_FK_MAL_MAQID' table='SC_MAQUINALIAS' foreignTable='SC_MAQUIN'> 
+		<column name='MAL_MAQID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.InformationSystemAttributeEntity -->
+
+	<table name='SC_APPATT'>
+		<column name='AAT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='AAT_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='AAT_APL_ID' type='BIGINT' notNull='true'/>
+		<column name='AAT_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='AAT_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_APPATT_FK_AAT_APL_ID' table='SC_APPATT' foreignTable='SC_APLICA'> 
+		<column name='AAT_APL_ID'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_APPATT_FK_AAT_TDA_ID' table='SC_APPATT' foreignTable='SC_TIPDAD'> 
+		<column name='AAT_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.InformationSystemEntity -->
+
+	<table name='SC_APLICA'>
+		<column name='APL_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='APL_CODI' type='VARCHAR' length='100' notNull='true'/>
+		<column name='APL_RELNAM' type='VARCHAR' length='100' notNull='true'/>
+		<column name='APL_APL_ID' type='BIGINT' notNull='false'/>
+		<column name='APL_NOM' type='VARCHAR' length='100' notNull='true'/>
+		<column name='APL_DIRFON' type='VARCHAR' length='150' notNull='false'/>
+		<column name='APL_DIRECT' type='VARCHAR' length='150' notNull='false'/>
+		<column name='APL_BD' type='VARCHAR' length='150' notNull='false'/>
+		<column name='APL_IDCONTACT' type='BIGINT' notNull='false'/>
+		<column name='APL_BPM' type='BIT' notNull='false'/>
+		<column name='APL_MAILNOTIF' type='VARCHAR' length='512' notNull='false'/>
+		<column name='APL_APRPRO' type='VARCHAR' length='256' notNull='false'/>
+		<column name='APL_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='APL_RODEPR' type='VARCHAR' length='256' notNull='false'/>
+		<column name='APL_SGNROL' type='BIT' notNull='false'/>
+		<column name='APL_TYPE' type='VARCHAR' length='20' notNull='false'/>
+		<column name='APL_CREDAT' type='DATE' notNull='false'/>
+		<column name='APL_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='APL_UPDDAT' type='DATE' notNull='false'/>
+		<column name='APL_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='APL_DELDAT' type='DATE' notNull='false'/>
+		<column name='APL_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_APLICA_FK_APL_APL_ID' table='SC_APLICA' foreignTable='SC_APLICA'> 
+		<column name='APL_APL_ID'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_APLICA_FK_APL_IDCONTACT' table='SC_APLICA' foreignTable='SC_USUARI'> 
+		<column name='APL_IDCONTACT'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_APLICA_FK_APL_TEN_ID' table='SC_APLICA' foreignTable='SC_TENANT'> 
+		<column name='APL_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MailDomainEntity -->
+
+	<table name='SC_DOMCOR'>
+		<column name='DCO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='DCO_DESCRI' type='VARCHAR' length='50' notNull='false'/>
+		<column name='DCO_CODI' type='VARCHAR' length='50' notNull='true'/>
+		<column name='DCO_ISOLD' type='BIT' notNull='true'/>
+		<column name='DCO_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='DCO_CREDAT' type='DATE' notNull='false'/>
+		<column name='DCO_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='DCO_UPDDAT' type='DATE' notNull='false'/>
+		<column name='DCO_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='DCO_DELDAT' type='DATE' notNull='false'/>
+		<column name='DCO_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_DOMCOR_FK_DCO_TEN_ID' table='SC_DOMCOR' foreignTable='SC_TENANT'> 
+		<column name='DCO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MailListAttributeEntity -->
+
+	<table name='SC_MAIATT'>
+		<column name='MAT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='MAT_VALUE' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='MAT_LCO_ID' type='BIGINT' notNull='true'/>
+		<column name='RAT_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='RAT_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_MAIATT_FK_MAT_LCO_ID' table='SC_MAIATT' foreignTable='SC_LLICOR'> 
+		<column name='MAT_LCO_ID'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_MAIATT_FK_RAT_TDA_ID' table='SC_MAIATT' foreignTable='SC_TIPDAD'> 
+		<column name='RAT_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MailListContainerEntity -->
+
+	<table name='SC_LCOLCO'>
+		<column name='LLC_IDLCO1' type='BIGINT' notNull='true'/>
+		<column name='LLC_IDLCO2' type='BIGINT' notNull='true'/>
+		<column name='LLC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+	</table>
+	<foreignKey name='SC_LCOLCO_FK_LLC_IDLCO1' table='SC_LCOLCO' foreignTable='SC_LLICOR'> 
+		<column name='LLC_IDLCO1'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LCOLCO_FK_LLC_IDLCO2' table='SC_LCOLCO' foreignTable='SC_LLICOR'> 
+		<column name='LLC_IDLCO2'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MailListEntity -->
+
+	<table name='SC_LLICOR'>
+		<column name='LCO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='LCO_DESCRI' type='VARCHAR' length='100' notNull='false'/>
+		<column name='LCO_NOM' type='VARCHAR' length='50' notNull='true'/>
+		<column name='LCO_IDDCO' type='BIGINT' notNull='false'/>
+		<column name='LCO_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='LCO_CREDAT' type='DATE' notNull='false'/>
+		<column name='LCO_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='LCO_UPDDAT' type='DATE' notNull='false'/>
+		<column name='LCO_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='LCO_DELDAT' type='DATE' notNull='false'/>
+		<column name='LCO_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='LCO_DELETED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_LLICOR_FK_LCO_IDDCO' table='SC_LLICOR' foreignTable='SC_DOMCOR'> 
+		<column name='LCO_IDDCO'/>
+		<foreignColumn name='DCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LLICOR_FK_LCO_TEN_ID' table='SC_LLICOR' foreignTable='SC_TENANT'> 
+		<column name='LCO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MailListGroupMemberEntity -->
+
+	<table name='SC_LCOGRU'>
+		<column name='LCG_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='LCG_LCO_ID' type='BIGINT' notNull='true'/>
+		<column name='LCR_GRU_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_LCOGRU_FK_LCG_LCO_ID' table='SC_LCOGRU' cascade='delete' foreignTable='SC_LLICOR'> 
+		<column name='LCG_LCO_ID'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LCOGRU_FK_LCR_GRU_ID' table='SC_LCOGRU' cascade='delete' foreignTable='SC_GRUPS'> 
+		<column name='LCR_GRU_ID'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MailListRoleMemberEntity -->
+
+	<table name='SC_LCOROL'>
+		<column name='LCR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='LCR_LCO_ID' type='BIGINT' notNull='true'/>
+		<column name='LCR_ROL_ID' type='BIGINT' notNull='true'/>
+		<column name='LCR_APL_ID' type='BIGINT' notNull='false'/>
+		<column name='LCR_GRU_ID' type='BIGINT' notNull='false'/>
+		<column name='LCR_VDO_ID' type='BIGINT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_LCOROL_FK_LCR_LCO_ID' table='SC_LCOROL' cascade='delete' foreignTable='SC_LLICOR'> 
+		<column name='LCR_LCO_ID'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LCOROL_FK_LCR_ROL_ID' table='SC_LCOROL' cascade='delete' foreignTable='SC_ROLES'> 
+		<column name='LCR_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LCOROL_FK_LCR_APL_ID' table='SC_LCOROL' cascade='delete' foreignTable='SC_APLICA'> 
+		<column name='LCR_APL_ID'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LCOROL_FK_LCR_GRU_ID' table='SC_LCOROL' cascade='delete' foreignTable='SC_GRUPS'> 
+		<column name='LCR_GRU_ID'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_LCOROL_FK_LCR_VDO_ID' table='SC_LCOROL' cascade='delete' foreignTable='SC_VALOR_DOMINI'> 
+		<column name='LCR_VDO_ID'/>
+		<foreignColumn name='VDO_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.MetaDataEntity -->
+
+	<table name='SC_TIPDAD'>
+		<column name='TDA_CODI' type='VARCHAR' length='25' notNull='true'/>
+		<column name='TDA_ORDRE' type='BIGINT' notNull='true'/>
+		<column name='TDA_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TDA_SCOPE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TDA_TYPE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TDA_SIZE' type='INTEGER' notNull='false'/>
+		<column name='TDA_REQUIR' type='BIT' notNull='false'/>
+		<column name='TDA_RDONLY' type='BIT' notNull='false'/>
+		<column name='TDA_MULTIV' type='BIT' notNull='false'/>
+		<column name='TDA_MLTLIN' type='BIT' notNull='false'/>
+		<column name='TDA_QUSECR' type='BIT' notNull='false'/>
+		<column name='TDA_MVROWS' type='INTEGER' notNull='false'/>
+		<column name='TDA_VALUE' type='CLOB' length='64000' notNull='false'/>
+		<column name='TDA_LABEL' type='VARCHAR' length='64' notNull='false'/>
+		<column name='TDA_HINT' type='VARCHAR' length='128' notNull='false'/>
+		<column name='TDA_NLSLAB' type='VARCHAR' length='128' notNull='false'/>
+		<column name='TDA_UIHANDL' type='VARCHAR' length='128' notNull='false'/>
+		<column name='TDA_ADMVIS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TDA_OPEVIS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TDA_USEVIS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TDA_UNIQUE' type='BIT' notNull='false'/>
+		<column name='TDA_DESCRI' type='VARCHAR' length='512' notNull='false'/>
+		<column name='TDA_COT_ID' type='BIGINT' notNull='true'/>
+		<column name='TDA_COT_VAL_ID' type='BIGINT' notNull='false'/>
+		<column name='TDA_VISEXP' type='CLOB' length='2048' notNull='false'/>
+		<column name='TDA_VALEXP' type='CLOB' length='2048' notNull='false'/>
+		<column name='TDA_LOATRI' type='CLOB' length='4096' notNull='false'/>
+		<column name='TDA_CHATRI' type='CLOB' length='4096' notNull='false'/>
+		<column name='TDA_FOCTRI' type='CLOB' length='4096' notNull='false'/>
+		<column name='TDA_VALCLA' type='VARCHAR' length='100' notNull='false'/>
+		<column name='TDA_ENUM' type='VARCHAR' length='100' notNull='false'/>
+		<column name='TDA_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='TDA_FILEXP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='TDA_BUILTI' type='BIT' notNull='false'/>
+		<column name='TDA_LETCAS' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_TIPDAD_FK_TDA_COT_ID' table='SC_TIPDAD' foreignTable='SC_CUOBTY'> 
+		<column name='TDA_COT_ID'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TIPDAD_FK_TDA_COT_VAL_ID' table='SC_TIPDAD' foreignTable='SC_CUOBTY'> 
+		<column name='TDA_COT_VAL_ID'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TIPDAD_FK_TDA_TEN_ID' table='SC_TIPDAD' foreignTable='SC_TENANT'> 
+		<column name='TDA_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.NoticeEntity -->
+
+	<table name='SC_NOTIFICA'>
+		<column name='NTF_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='NTF_DATA' type='DATE' notNull='true'/>
+		<column name='NTF_INFO' type='VARCHAR' length='512' notNull='true'/>
+		<column name='NTF_USU' type='BIGINT' notNull='true'/>
+		<column name='NTF_ROL' type='BIGINT' notNull='false'/>
+		<column name='NTF_APL' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_NOTIFICA_FK_NTF_USU' table='SC_NOTIFICA' foreignTable='SC_USUARI'> 
+		<column name='NTF_USU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_NOTIFICA_FK_NTF_ROL' table='SC_NOTIFICA' foreignTable='SC_ROLES'> 
+		<column name='NTF_ROL'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_NOTIFICA_FK_NTF_APL' table='SC_NOTIFICA' foreignTable='SC_APLICA'> 
+		<column name='NTF_APL'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ObjectMappingEntity -->
+
+	<table name='SC_OBJMAP'>
+		<column name='OBM_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='OBM_SYSOBJ' type='VARCHAR' length='50' notNull='true'/>
+		<column name='OBM_SOFOBJ' type='VARCHAR' length='50' notNull='true'/>
+		<column name='OBM_CUSOBJ' type='BIGINT' notNull='false'/>
+		<column name='OBM_SOEXOB' type='VARCHAR' length='50' notNull='false'/>
+		<column name='OBM_CONDIT' type='VARCHAR' length='2000' notNull='false'/>
+		<column name='OBM_DIS_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_OBJMAP_FK_OBM_CUSOBJ' table='SC_OBJMAP' foreignTable='SC_CUOBTY'> 
+		<column name='OBM_CUSOBJ'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_OBJMAP_FK_OBM_DIS_ID' table='SC_OBJMAP' foreignTable='SC_DISPAT'> 
+		<column name='OBM_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ObjectMappingPropertyEntity -->
+
+	<table name='SC_OBMAPR'>
+		<column name='OMP_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='OMP_PROPER' type='VARCHAR' length='50' notNull='true'/>
+		<column name='OMP_VALUE' type='CLOB' length='3500' notNull='true'/>
+		<column name='OMP_OBM_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_OBMAPR_FK_OMP_OBM_ID' table='SC_OBMAPR' foreignTable='SC_OBJMAP'> 
+		<column name='OMP_OBM_ID'/>
+		<foreignColumn name='OBM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ObjectMappingTriggerEntity -->
+
+	<table name='SC_OBMATR'>
+		<column name='OMT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='OMT_TRIGGER' type='VARCHAR' length='256' notNull='true'/>
+		<column name='OMT_SCRIPT' type='CLOB' length='20000' notNull='true'/>
+		<column name='OMT_OBM_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_OBMATR_FK_OMT_OBM_ID' table='SC_OBMATR' foreignTable='SC_OBJMAP'> 
+		<column name='OMT_OBM_ID'/>
+		<foreignColumn name='OBM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.PrinterEntity -->
+
+	<table name='SC_IMPRES'>
+		<column name='IMP_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='IMP_MODEL' type='VARCHAR' length='50' notNull='false'/>
+		<column name='IMP_CODI' type='VARCHAR' length='20' notNull='true'/>
+		<column name='IMP_DESCR' type='VARCHAR' length='50' notNull='false'/>
+		<column name='IMP_LOCPRI' type='BIT' notNull='false'/>
+		<column name='IMP_IDMAQ' type='BIGINT' notNull='true'/>
+		<column name='IMP_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='IMP_CREDAT' type='DATE' notNull='false'/>
+		<column name='IMP_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='IMP_UPDDAT' type='DATE' notNull='false'/>
+		<column name='IMP_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='IMP_DELDAT' type='DATE' notNull='false'/>
+		<column name='IMP_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_IMPRES_FK_IMP_IDMAQ' table='SC_IMPRES' foreignTable='SC_MAQUIN'> 
+		<column name='IMP_IDMAQ'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_IMPRES_FK_IMP_TEN_ID' table='SC_IMPRES' foreignTable='SC_TENANT'> 
+		<column name='IMP_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.PrinterGroupEntity -->
+
+	<table name='SC_GRUIMP'>
+		<column name='GIM_ORDRE' type='BIGINT' notNull='false'/>
+		<column name='GIM_IDGRU' type='BIGINT' notNull='true'/>
+		<column name='GIM_IDIMP' type='BIGINT' notNull='true'/>
+		<column name='GIM_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+	</table>
+	<foreignKey name='SC_GRUIMP_FK_GIM_IDGRU' table='SC_GRUIMP' foreignTable='SC_GRUPS'> 
+		<column name='GIM_IDGRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUIMP_FK_GIM_IDIMP' table='SC_GRUIMP' foreignTable='SC_IMPRES'> 
+		<column name='GIM_IDIMP'/>
+		<foreignColumn name='IMP_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ProcessHierarchyEntity -->
+
+	<table name='BPM_PROHIE'>
+		<column name='PRH_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='PRH_PARPRO' type='BIGINT' notNull='true'/>
+		<column name='PRH_CHIPRO' type='BIGINT' notNull='true'/>
+	</table>
+
+	<!-- com.soffid.iam.iga.model.ReconcileTriggerEntity -->
+
+	<table name='SC_RECPAR'>
+		<column name='RPA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RPA_TRIGGER' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RPA_SCRIPT' type='CLOB' length='20000' notNull='true'/>
+		<column name='RPA_TYPE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RPA_DIS_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_RECPAR_FK_RPA_DIS_ID' table='SC_RECPAR' foreignTable='SC_DISPAT'> 
+		<column name='RPA_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RoleAccountAttributeEntity -->
+
+	<table name='SC_RACATT'>
+		<column name='RAA_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RAA_VALUE' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='RAA_RAC_ID' type='BIGINT' notNull='true'/>
+		<column name='RAA_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='RAA_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_RACATT_FK_RAA_RAC_ID' table='SC_RACATT' foreignTable='SC_ROLUSU'> 
+		<column name='RAA_RAC_ID'/>
+		<foreignColumn name='RLU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_RACATT_FK_RAA_TDA_ID' table='SC_RACATT' foreignTable='SC_TIPDAD'> 
+		<column name='RAA_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RoleAccountEntity -->
+
+	<table name='SC_ROLUSU'>
+		<column name='RLU_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RLU_ROLUSU_GRU' type='BIGINT' notNull='false'/>
+		<column name='RLU_IDROL' type='BIGINT' notNull='true'/>
+		<column name='RLU_VALDOM' type='BIGINT' notNull='false'/>
+		<column name='RLU_TIPDOM' type='VARCHAR' length='20' notNull='false'/>
+		<column name='RLU_ADMAPP' type='BIGINT' notNull='false'/>
+		<column name='RLU_ACC_ID' type='BIGINT' notNull='true'/>
+		<column name='RLU_RUL_ID' type='BIGINT' notNull='false'/>
+		<column name='RLU_START' type='DATE' notNull='false'/>
+		<column name='RLU_END' type='DATE' notNull='false'/>
+		<column name='RLU_ENABLE' type='BIT' notNull='true'/>
+		<column name='RLU_APRPEN' type='BIT' notNull='true'/>
+		<column name='RLU_REMPEN' type='BIT' notNull='false'/>
+		<column name='RLU_GROUP' type='BIGINT' notNull='false'/>
+		<column name='RLU_APRPRO' type='BIGINT' notNull='false'/>
+		<column name='RLU_CERDAT' type='DATE' notNull='false'/>
+		<column name='RLU_RLU_ID' type='BIGINT' notNull='false'/>
+		<column name='RLU_DELSTA' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RLU_OMNACC_ID' type='BIGINT' notNull='false'/>
+		<column name='RLU_DELACC_ID' type='BIGINT' notNull='false'/>
+		<column name='RLU_DELSIN' type='DATE' notNull='false'/>
+		<column name='RLU_DELUNT' type='DATE' notNull='false'/>
+		<column name='RLU_EXTID' type='VARCHAR' length='100' notNull='false'/>
+		<column name='RLU_CREDAT' type='DATE' notNull='false'/>
+		<column name='RLU_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RLU_UPDDAT' type='DATE' notNull='false'/>
+		<column name='RLU_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RLU_DELDAT' type='DATE' notNull='false'/>
+		<column name='RLU_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ROLUSU_FK_RLU_ROLUSU_GRU' table='SC_ROLUSU' foreignTable='SC_GRUPS'> 
+		<column name='RLU_ROLUSU_GRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_IDROL' table='SC_ROLUSU' foreignTable='SC_ROLES'> 
+		<column name='RLU_IDROL'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_VALDOM' table='SC_ROLUSU' foreignTable='SC_VALOR_DOMINI'> 
+		<column name='RLU_VALDOM'/>
+		<foreignColumn name='VDO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_ADMAPP' table='SC_ROLUSU' foreignTable='SC_APLICA'> 
+		<column name='RLU_ADMAPP'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_ACC_ID' table='SC_ROLUSU' foreignTable='SC_ACCOUN'> 
+		<column name='RLU_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_RUL_ID' table='SC_ROLUSU' foreignTable='SC_RULE'> 
+		<column name='RLU_RUL_ID'/>
+		<foreignColumn name='RUL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_GROUP' table='SC_ROLUSU' foreignTable='SC_GRUPS'> 
+		<column name='RLU_GROUP'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_RLU_ID' table='SC_ROLUSU' foreignTable='SC_ROLUSU'> 
+		<column name='RLU_RLU_ID'/>
+		<foreignColumn name='RLU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_OMNACC_ID' table='SC_ROLUSU' foreignTable='SC_ACCOUN'> 
+		<column name='RLU_OMNACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLUSU_FK_RLU_DELACC_ID' table='SC_ROLUSU' foreignTable='SC_ACCOUN'> 
+		<column name='RLU_DELACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RoleAttributeEntity -->
+
+	<table name='SC_ROLATT'>
+		<column name='RAT_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RAT_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='RAT_ROL_ID' type='BIGINT' notNull='true'/>
+		<column name='RAT_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='RAT_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ROLATT_FK_RAT_ROL_ID' table='SC_ROLATT' foreignTable='SC_ROLES'> 
+		<column name='RAT_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLATT_FK_RAT_TDA_ID' table='SC_ROLATT' foreignTable='SC_TIPDAD'> 
+		<column name='RAT_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RoleDependencyEntity -->
+
+	<table name='SC_ROLROL'>
+		<column name='RRL_CONTINGUT' type='BIGINT' notNull='true'/>
+		<column name='RRL_CONTENIDOR' type='BIGINT' notNull='true'/>
+		<column name='RRL_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RRL_APLICA2' type='BIGINT' notNull='false'/>
+		<column name='RRL_GRUP2' type='BIGINT' notNull='false'/>
+		<column name='RRL_VALDOM2' type='BIGINT' notNull='false'/>
+		<column name='RRL_APLICA' type='BIGINT' notNull='false'/>
+		<column name='RRL_GRUP' type='BIGINT' notNull='false'/>
+		<column name='RRL_VALDOM' type='BIGINT' notNull='false'/>
+		<column name='RRL_STATUS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RRL_MANDAT' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ROLROL_FK_RRL_CONTINGUT' table='SC_ROLROL' foreignTable='SC_ROLES'> 
+		<column name='RRL_CONTINGUT'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_CONTENIDOR' table='SC_ROLROL' foreignTable='SC_ROLES'> 
+		<column name='RRL_CONTENIDOR'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_APLICA2' table='SC_ROLROL' foreignTable='SC_APLICA'> 
+		<column name='RRL_APLICA2'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_GRUP2' table='SC_ROLROL' foreignTable='SC_GRUPS'> 
+		<column name='RRL_GRUP2'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_VALDOM2' table='SC_ROLROL' foreignTable='SC_VALOR_DOMINI'> 
+		<column name='RRL_VALDOM2'/>
+		<foreignColumn name='VDO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_APLICA' table='SC_ROLROL' foreignTable='SC_APLICA'> 
+		<column name='RRL_APLICA'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_GRUP' table='SC_ROLROL' foreignTable='SC_GRUPS'> 
+		<column name='RRL_GRUP'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLROL_FK_RRL_VALDOM' table='SC_ROLROL' foreignTable='SC_VALOR_DOMINI'> 
+		<column name='RRL_VALDOM'/>
+		<foreignColumn name='VDO_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RoleEntity -->
+
+	<table name='SC_ROLES'>
+		<column name='ROL_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ROL_NOM' type='VARCHAR' length='150' notNull='true'/>
+		<column name='ROL_KEY' type='VARCHAR' length='301' notNull='true'/>
+		<column name='ROL_DESCRI' type='VARCHAR' length='150' notNull='true'/>
+		<column name='ROL_CATEGORY' type='VARCHAR' length='150' notNull='false'/>
+		<column name='ROL_DEFECTB' type='BIT' notNull='true'/>
+		<column name='ROL_CONTRA' type='VARCHAR' length='1' notNull='false'/>
+		<column name='ROL_IDAPL' type='BIGINT' notNull='true'/>
+		<column name='ROL_IDDISPAT' type='BIGINT' notNull='false'/>
+		<column name='ROL_DOMAPP' type='BIGINT' notNull='false'/>
+		<column name='ROL_TIPDOM' type='VARCHAR' length='50' notNull='false'/>
+		<column name='ROL_GEST_WF' type='VARCHAR' length='1' notNull='false'/>
+		<column name='ROL_APRPRO' type='BIGINT' notNull='false'/>
+		<column name='ROL_APREND' type='DATE' notNull='false'/>
+		<column name='ROL_APRSTA' type='DATE' notNull='false'/>
+		<column name='ROL_EXTID' type='VARCHAR' length='100' notNull='false'/>
+		<column name='ROL_CREDAT' type='DATE' notNull='false'/>
+		<column name='ROL_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ROL_UPDDAT' type='DATE' notNull='false'/>
+		<column name='ROL_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ROL_DELDAT' type='DATE' notNull='false'/>
+		<column name='ROL_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='ROL_DELETED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ROLES_FK_ROL_IDAPL' table='SC_ROLES' foreignTable='SC_APLICA'> 
+		<column name='ROL_IDAPL'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLES_FK_ROL_IDDISPAT' table='SC_ROLES' foreignTable='SC_DISPAT'> 
+		<column name='ROL_IDDISPAT'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLES_FK_ROL_DOMAPP' table='SC_ROLES' foreignTable='SC_DOMAPP'> 
+		<column name='ROL_DOMAPP'/>
+		<foreignColumn name='DOM_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RoleGroupEntity -->
+
+	<table name='SC_ROLGRUP'>
+		<column name='RLG_GRUP' type='BIGINT' notNull='true'/>
+		<column name='RLG_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='RLG_ROL' type='BIGINT' notNull='true'/>
+		<column name='RLG_APL_ID' type='BIGINT' notNull='false'/>
+		<column name='RLG_GRU_ID' type='BIGINT' notNull='false'/>
+		<column name='RLG_VDO_ID' type='BIGINT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ROLGRUP_FK_RLG_GRUP' table='SC_ROLGRUP' foreignTable='SC_GRUPS'> 
+		<column name='RLG_GRUP'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLGRUP_FK_RLG_ROL' table='SC_ROLGRUP' foreignTable='SC_ROLES'> 
+		<column name='RLG_ROL'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLGRUP_FK_RLG_APL_ID' table='SC_ROLGRUP' foreignTable='SC_APLICA'> 
+		<column name='RLG_APL_ID'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLGRUP_FK_RLG_GRU_ID' table='SC_ROLGRUP' foreignTable='SC_GRUPS'> 
+		<column name='RLG_GRU_ID'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ROLGRUP_FK_RLG_VDO_ID' table='SC_ROLGRUP' foreignTable='SC_VALOR_DOMINI'> 
+		<column name='RLG_VDO_ID'/>
+		<foreignColumn name='VDO_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RuleAssignedRoleEntity -->
+
+	<table name='SC_RULROL'>
+		<column name='RUR_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RUR_DOMEXP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RUR_RUL_ID' type='BIGINT' notNull='true'/>
+		<column name='RUR_ROL_ID' type='BIGINT' notNull='true'/>
+		<column name='RUR_DOMVAL' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_RULROL_FK_RUR_RUL_ID' table='SC_RULROL' foreignTable='SC_RULE'> 
+		<column name='RUR_RUL_ID'/>
+		<foreignColumn name='RUL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_RULROL_FK_RUR_ROL_ID' table='SC_RULROL' foreignTable='SC_ROLES'> 
+		<column name='RUR_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.RuleEntity -->
+
+	<table name='SC_RULE'>
+		<column name='RUL_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RUL_DESCRI' type='VARCHAR' length='150' notNull='true'/>
+		<column name='RUL_COMMEN' type='VARCHAR' length='1500' notNull='false'/>
+		<column name='RUL_EXPRES' type='CLOB' length='10000' notNull='true'/>
+		<column name='RUL_BSHROL' type='CLOB' length='10000' notNull='false'/>
+		<column name='RUL_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_RULE_FK_RUL_TEN_ID' table='SC_RULE' foreignTable='SC_TENANT'> 
+		<column name='RUL_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.SystemEntity -->
+
+	<table name='SC_DISPAT'>
+		<column name='DIS_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='DIS_CODI' type='VARCHAR' length='150' notNull='false'/>
+		<column name='DIS_DESCRI' type='VARCHAR' length='250' notNull='false'/>
+		<column name='DIS_NOMCLA' type='VARCHAR' length='100' notNull='false'/>
+		<column name='DIS_URL' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_URL2' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM0' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM1' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM2' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM3' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM4' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM5' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM6' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM7' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM8' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_PARAM9' type='VARCHAR' length='500' notNull='false'/>
+		<column name='DIS_BASROL' type='VARCHAR' length='1' notNull='false'/>
+		<column name='DIS_TRUSTED' type='VARCHAR' length='1' notNull='false'/>
+		<column name='DIS_MAACCR' type='BIT' notNull='false'/>
+		<column name='DIS_FULREC' type='BIT' notNull='false'/>
+		<column name='DIS_GENTAS' type='BIT' notNull='false'/>
+		<column name='DIS_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='DIS_CONAC' type='VARCHAR' length='1' notNull='false'/>
+		<column name='DIS_DCN_ID' type='BIGINT' notNull='true'/>
+		<column name='DIS_DOU_ID' type='BIGINT' notNull='false'/>
+		<column name='DIS_MAIN' type='BIT' notNull='true'/>
+		<column name='DIS_RDONLY' type='BIT' notNull='true'/>
+		<column name='DIS_PAUSEY' type='BIT' notNull='false'/>
+		<column name='DIS_AUTHRT' type='BIT' notNull='false'/>
+		<column name='DIS_BLOPAR' type='BLOB' notNull='false'/>
+		<column name='DIS_TIMSTA' type='DATE' notNull='false'/>
+		<column name='DIS_CREATED' type='DATE' notNull='false'/>
+		<column name='DIS_AUTPRO' type='VARCHAR' length='250' notNull='false'/>
+		<column name='DIS_SHARED' type='BIT' notNull='false'/>
+		<column name='DIS_THREADS' type='BIGINT' notNull='false'/>
+		<column name='DIS_TIMOUT' type='BIGINT' notNull='false'/>
+		<column name='DIS_LOTIOT' type='BIGINT' notNull='false'/>
+		<column name='DIS_TYPE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='DIS_DELCHA' type='BIT' notNull='false'/>
+		<column name='DIS_RERODA' type='BIT' notNull='false'/>
+		<column name='DIS_CRDIAC' type='BIT' notNull='false'/>
+		<column name='DIS_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='DIS_UPDDAT' type='DATE' notNull='false'/>
+		<column name='DIS_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='DIS_DELDAT' type='DATE' notNull='false'/>
+		<column name='DIS_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='DIS_START' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_DISPAT_FK_DIS_TEN_ID' table='SC_DISPAT' foreignTable='SC_TENANT'> 
+		<column name='DIS_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_DISPAT_FK_DIS_DCN_ID' table='SC_DISPAT' foreignTable='SC_DOMCON'> 
+		<column name='DIS_DCN_ID'/>
+		<foreignColumn name='DCN_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_DISPAT_FK_DIS_DOU_ID' table='SC_DISPAT' foreignTable='SC_DOMUSU'> 
+		<column name='DIS_DOU_ID'/>
+		<foreignColumn name='DOU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.SystemGroupEntity -->
+
+	<table name='SC_GRUDIS'>
+		<column name='GRD_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='GRD_IDGRUP' type='BIGINT' notNull='true'/>
+		<column name='GRD_IDDIS' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_GRUDIS_FK_GRD_IDGRUP' table='SC_GRUDIS' foreignTable='SC_GRUPS'> 
+		<column name='GRD_IDGRUP'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_GRUDIS_FK_GRD_IDDIS' table='SC_GRUDIS' foreignTable='SC_DISPAT'> 
+		<column name='GRD_IDDIS'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.TranslatedLabelEntity -->
+
+	<table name='SC_TRALAB'>
+		<column name='TLA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='TLA_LANG' type='VARCHAR' length='5' notNull='true'/>
+		<column name='TLA_LABEL' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='TLA_COT_ID' type='BIGINT' notNull='false'/>
+		<column name='TLA_TDA_ID' type='BIGINT' notNull='false'/>
+		<column name='TLA_AME_ID' type='BIGINT' notNull='false'/>
+		<column name='TLA_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_TRALAB_FK_TLA_COT_ID' table='SC_TRALAB' foreignTable='SC_CUOBTY'> 
+		<column name='TLA_COT_ID'/>
+		<foreignColumn name='COT_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TRALAB_FK_TLA_TDA_ID' table='SC_TRALAB' foreignTable='SC_TIPDAD'> 
+		<column name='TLA_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TRALAB_FK_TLA_AME_ID' table='SC_TRALAB' foreignTable='SC_ACCMET'> 
+		<column name='TLA_AME_ID'/>
+		<foreignColumn name='AME_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TRALAB_FK_TLA_TEN_ID' table='SC_TRALAB' foreignTable='SC_TENANT'> 
+		<column name='TLA_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.UserDomainEntity -->
+
+	<table name='SC_DOMUSU'>
+		<column name='DOU_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='DOU_CODI' type='VARCHAR' length='50' notNull='true'/>
+		<column name='DOU_DESC' type='VARCHAR' length='100' notNull='false'/>
+		<column name='DOU_TIPUS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='DOU_EXPRES' type='CLOB' length='4097' notNull='false'/>
+		<column name='DOU_EXPCRE' type='CLOB' length='4097' notNull='false'/>
+		<column name='DOU_GENERA' type='VARCHAR' length='64' notNull='false'/>
+		<column name='DOU_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_DOMUSU_FK_DOU_TEN_ID' table='SC_DOMUSU' foreignTable='SC_TENANT'> 
+		<column name='DOU_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.UserGroupAttributeEntity -->
+
+	<table name='SC_UGRATT'>
+		<column name='UGA_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='UGA_VALOR' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='UGA_UGR_ID' type='BIGINT' notNull='true'/>
+		<column name='UGA_TDA_ID' type='BIGINT' notNull='true'/>
+		<column name='UGA_BLOB' type='BLOB' length='400000' notNull='false'/>
+	</table>
+	<foreignKey name='SC_UGRATT_FK_UGA_UGR_ID' table='SC_UGRATT' foreignTable='SC_USUGRU'> 
+		<column name='UGA_UGR_ID'/>
+		<foreignColumn name='UGR_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_UGRATT_FK_UGA_TDA_ID' table='SC_UGRATT' foreignTable='SC_TIPDAD'> 
+		<column name='UGA_TDA_ID'/>
+		<foreignColumn name='TDA_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.UserGroupEntity -->
+
+	<table name='SC_USUGRU'>
+		<column name='UGR_IDUSU' type='BIGINT' notNull='false'/>
+		<column name='UGR_IDGRU' type='BIGINT' notNull='false'/>
+		<column name='UGR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='UGR_START' type='DATE' notNull='false'/>
+		<column name='UGR_END' type='DATE' notNull='false'/>
+		<column name='UGR_DISABLED' type='BIT' notNull='false'/>
+		<column name='UGR_PRIGRP' type='BIT' notNull='false'/>
+		<column name='UGR_CREDAT' type='DATE' notNull='false'/>
+		<column name='UGR_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UGR_UPDDAT' type='DATE' notNull='false'/>
+		<column name='UGR_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UGR_DELDAT' type='DATE' notNull='false'/>
+		<column name='UGR_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USUGRU_FK_UGR_IDUSU' table='SC_USUGRU' foreignTable='SC_USUARI'> 
+		<column name='UGR_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUGRU_FK_UGR_IDGRU' table='SC_USUGRU' foreignTable='SC_GRUPS'> 
+		<column name='UGR_IDGRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.UserMailEntity -->
+
+	<table name='SC_USULCO'>
+		<column name='ULC_IDLCO' type='BIGINT' notNull='true'/>
+		<column name='ULC_IDUSU' type='BIGINT' notNull='true'/>
+		<column name='ULC_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ULC_START' type='DATE' notNull='false'/>
+		<column name='ULC_END' type='DATE' notNull='false'/>
+		<column name='ULC_DISABLED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USULCO_FK_ULC_IDLCO' table='SC_USULCO' foreignTable='SC_LLICOR'> 
+		<column name='ULC_IDLCO'/>
+		<foreignColumn name='LCO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USULCO_FK_ULC_IDUSU' table='SC_USULCO' foreignTable='SC_USUARI'> 
+		<column name='ULC_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.UserPrinterEntity -->
+
+	<table name='SC_USUIMP'>
+		<column name='UIM_ORDRE' type='BIGINT' notNull='false'/>
+		<column name='UIM_IDIMP' type='BIGINT' notNull='true'/>
+		<column name='UIM_IDUSU' type='BIGINT' notNull='true'/>
+		<column name='UIM_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='UIM_CREDAT' type='DATE' notNull='false'/>
+		<column name='UIM_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UIM_UPDDAT' type='DATE' notNull='false'/>
+		<column name='UIM_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UIM_DELDAT' type='DATE' notNull='false'/>
+		<column name='UIM_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USUIMP_FK_UIM_IDIMP' table='SC_USUIMP' foreignTable='SC_IMPRES'> 
+		<column name='UIM_IDIMP'/>
+		<foreignColumn name='IMP_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USUIMP_FK_UIM_IDUSU' table='SC_USUIMP' foreignTable='SC_USUARI'> 
+		<column name='UIM_IDUSU'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.UserProcessEntity -->
+
+	<table name='SC_USUPRO'>
+		<column name='UPR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='UPR_USUCOD' type='VARCHAR' length='150' notNull='false'/>
+		<column name='UPR_IDPROC' type='BIGINT' notNull='true'/>
+		<column name='UPR_END' type='BIT' notNull='true'/>
+		<column name='UPR_USUNIF' type='VARCHAR' length='50' notNull='false'/>
+	</table>
+
+	<!-- com.soffid.iam.iga.model.UserTypeSystemEntity -->
+
+	<table name='SC_TIPDIS'>
+		<column name='TPD_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TPD_IDDIS' type='BIGINT' notNull='true'/>
+		<column name='TPD_TUS_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_TIPDIS_FK_TPD_IDDIS' table='SC_TIPDIS' foreignTable='SC_DISPAT'> 
+		<column name='TPD_IDDIS'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TIPDIS_FK_TPD_TUS_ID' table='SC_TIPDIS' foreignTable='SC_TIPUSU'> 
+		<column name='TPD_TUS_ID'/>
+		<foreignColumn name='TUS_ID'/>
+	</foreignKey>
+	<index name='BPM_PROHIE_PAR' table='BPM_PROHIE' unique='false'>
+		<column name='PRH_PARPRO'/>
+	</index>
+
+	<!-- com.soffid.iam.iga.model.ReconcileAccountAttributesEntity -->
+
+	<table name='SC_RECATT'>
+		<column name='RAA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RAA_RAC_ID' type='BIGINT' notNull='true'/>
+		<column name='RAA_ATTRIB' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAA_VALUE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAA_DATE' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_RECATT_FK_RAA_RAC_ID' table='SC_RECATT' foreignTable='SC_RECACO'> 
+		<column name='RAA_RAC_ID'/>
+		<foreignColumn name='RAC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ReconcileAccountEntity -->
+
+	<table name='SC_RECACO'>
+		<column name='RAC_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RAC_ACNAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAC_DESC' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAC_PROCID' type='BIGINT' notNull='true'/>
+		<column name='RAC_ISNEW' type='BIT' notNull='true'/>
+		<column name='RAC_DELETED' type='BIT' notNull='true'/>
+		<column name='RAC_ACTION' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAC_DISPAT' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAC_USUCOD' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_GROUP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_USUTYP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_USUNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_ACTYPE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAC_ACTIVE' type='BIT' notNull='true'/>
+		<column name='RAC_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_RECACO_FK_RAC_TEN_ID' table='SC_RECACO' foreignTable='SC_TENANT'> 
+		<column name='RAC_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ReconcileAssignmentEntity -->
+
+	<table name='SC_RECASI'>
+		<column name='RAS_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RAS_ASINAM' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAS_PROCID' type='BIGINT' notNull='true'/>
+		<column name='RAS_ACCNAM' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAS_ROLNAM' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAS_ACTION' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAS_DISPAT' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RAS_DOMVAL' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RAS_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_RECASI_FK_RAS_TEN_ID' table='SC_RECASI' foreignTable='SC_TENANT'> 
+		<column name='RAS_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.iga.model.ReconcileRoleEntity -->
+
+	<table name='SC_RECROL'>
+		<column name='RRL_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='RRL_ROLNAM' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RRL_DESC' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RRL_PROCID' type='BIGINT' notNull='true'/>
+		<column name='RRL_ACTION' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RRL_DISPAT' type='VARCHAR' length='256' notNull='true'/>
+		<column name='RRL_APPNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='RRL_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_RECROL_FK_RRL_TEN_ID' table='SC_RECROL' foreignTable='SC_TENANT'> 
+		<column name='RRL_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<index name='ROL_APL_NDX' table='SC_ROLES' unique='false'>
+		<column name='ROL_IDAPL'/>
+	</index>
+	<index name='SC_ROL_EXTID_NDX' table='SC_ROLES' unique='false'>
+		<column name='ROL_EXTID'/>
+	</index>
+	<index name='RLG_ROLGRUP_ROLGRUP' table='SC_ROLGRUP' unique='false'>
+		<column name='RLG_ROL'/>
+		<column name='RLG_GRUP'/>
+	</index>
+	<index name='ROL_UK_NOM_IDDISPAT_IDAPL' table='SC_ROLES' unique='true'>
+		<column name='ROL_NOM'/>
+		<column name='ROL_IDDISPAT'/>
+	</index>
+	<index name='RLU_EXTID_NDX' table='SC_ROLUSU' unique='false'>
+		<column name='RLU_EXTID'/>
+	</index>
+	<index name='TAD_UK_CODE' table='SC_TIPDAD' unique='false'>
+		<column name='TDA_TEN_ID'/>
+		<column name='TDA_SCOPE'/>
+		<column name='TDA_CODI'/>
+	</index>
+	<index name='TDA_UK_ORDRE' table='SC_TIPDAD' unique='false'>
+		<column name='TDA_TEN_ID'/>
+		<column name='TDA_SCOPE'/>
+		<column name='TDA_ORDRE'/>
+	</index>
+	<index name='TUO_UK_CODI' table='SC_TIPUSUO' unique='true'>
+		<column name='TUO_TEN_ID'/>
+		<column name='TUO_CODI'/>
+	</index>
+	<index name='UIM_UK_IDIMP_IDUSU' table='SC_USUIMP' unique='false'>
+		<column name='UIM_IDUSU'/>
+		<column name='UIM_IDIMP'/>
+	</index>
+	<index name='UNIQUE_VALOR_DOMINI' table='SC_VALOR_DOMINI' unique='true'>
+		<column name='VDO_VALOR'/>
+		<column name='VDO_DOM'/>
+		<column name='VDO_TEN_ID'/>
+	</index>
+	<index name='SC_JUSEGR_UK' table='SC_JUSEGR' unique='false'>
+		<column name='JSG_NAME'/>
+	</index>
+
+	<!-- com.soffid.iam.pam.model.AccountAccessEntity -->
+
+	<table name='SC_ACCACC'>
+		<column name='AAC_ROL_ID' type='BIGINT' notNull='false'/>
+		<column name='AAC_GRU_ID' type='BIGINT' notNull='false'/>
+		<column name='AAC_USU_ID' type='BIGINT' notNull='false'/>
+		<column name='AAC_ACC_ID' type='BIGINT' notNull='true'/>
+		<column name='AAC_LEVEL' type='VARCHAR' length='256' notNull='true'/>
+		<column name='AAC_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='AAC_START' type='DATE' notNull='false'/>
+		<column name='AAC_END' type='DATE' notNull='false'/>
+		<column name='AAC_DISABLED' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ACCACC_FK_AAC_ROL_ID' table='SC_ACCACC' foreignTable='SC_ROLES'> 
+		<column name='AAC_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCACC_FK_AAC_GRU_ID' table='SC_ACCACC' foreignTable='SC_GRUPS'> 
+		<column name='AAC_GRU_ID'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCACC_FK_AAC_USU_ID' table='SC_ACCACC' foreignTable='SC_USUARI'> 
+		<column name='AAC_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ACCACC_FK_AAC_ACC_ID' table='SC_ACCACC' foreignTable='SC_ACCOUN'> 
+		<column name='AAC_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.HostAdminEntity -->
+
+	<table name='SC_ADMMAQ'>
+		<column name='ADM_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='ADM_DATCAD' type='DATE' notNull='true'/>
+		<column name='ADM_USUID' type='BIGINT' notNull='true'/>
+		<column name='ADM_MAQID' type='BIGINT' notNull='true'/>
+		<column name='ADM_IDWF' type='BIGINT' notNull='false'/>
+		<column name='ADM_DATINI' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ADMMAQ_FK_ADM_USUID' table='SC_ADMMAQ' foreignTable='SC_USUARI'> 
+		<column name='ADM_USUID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ADMMAQ_FK_ADM_MAQID' table='SC_ADMMAQ' foreignTable='SC_MAQUIN'> 
+		<column name='ADM_MAQID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.HostPortEntity -->
+
+	<table name='SC_MAQPOR'>
+		<column name='MPO_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='MPO_MAQ_ID' type='BIGINT' notNull='true'/>
+		<column name='MPO_PORT' type='VARCHAR' length='256' notNull='true'/>
+		<column name='MPO_PORDES' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_MAQPOR_FK_MPO_MAQ_ID' table='SC_MAQPOR' foreignTable='SC_MAQUIN'> 
+		<column name='MPO_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.HostServiceEntity -->
+
+	<table name='SC_MAQSER'>
+		<column name='MAS_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='MAS_MAQ_ID' type='BIGINT' notNull='true'/>
+		<column name='MAS_SERVICE' type='VARCHAR' length='150' notNull='true'/>
+		<column name='MAS_CMD' type='VARCHAR' length='150' notNull='false'/>
+		<column name='MAS_MANUAL' type='BIT' notNull='true'/>
+		<column name='MAS_ACC_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_MAQSER_FK_MAS_MAQ_ID' table='SC_MAQSER' foreignTable='SC_MAQUIN'> 
+		<column name='MAS_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_MAQSER_FK_MAS_ACC_ID' table='SC_MAQSER' foreignTable='SC_ACCOUN'> 
+		<column name='MAS_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.HostSystemEntity -->
+
+	<table name='SC_MAQDIS'>
+		<column name='MAD_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='MAD_MAQ_ID' type='BIGINT' notNull='true'/>
+		<column name='MAQ_DIS_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_MAQDIS_FK_MAD_MAQ_ID' table='SC_MAQDIS' foreignTable='SC_MAQUIN'> 
+		<column name='MAD_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_MAQDIS_FK_MAQ_DIS_ID' table='SC_MAQDIS' foreignTable='SC_DISPAT'> 
+		<column name='MAQ_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.JumpServerEntity -->
+
+	<table name='SC_JUMSER'>
+		<column name='JSE_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='JSE_url' type='VARCHAR' length='50' notNull='true'/>
+		<column name='JSE_JSG_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_JUMSER_FK_JSE_JSG_ID' table='SC_JUMSER' foreignTable='SC_JUSEGR'> 
+		<column name='JSE_JSG_ID'/>
+		<foreignColumn name='JSG_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.JumpServerGroupEntity -->
+
+	<table name='SC_JUSEGR'>
+		<column name='JSG_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='JSG_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='JSG_NAME' type='VARCHAR' length='50' notNull='true'/>
+		<column name='JSG_DESCRI' type='VARCHAR' length='250' notNull='false'/>
+		<column name='JSG_STORE' type='VARCHAR' length='100' notNull='true'/>
+		<column name='JSG_USER' type='VARCHAR' length='100' notNull='true'/>
+		<column name='JSG_PASSWD' type='VARCHAR' length='100' notNull='true'/>
+	</table>
+	<foreignKey name='SC_JUSEGR_FK_JSG_TEN_ID' table='SC_JUSEGR' foreignTable='SC_TENANT'> 
+		<column name='JSG_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.NetworkDiscoverRangeEntity -->
+
+	<table name='SC_NEDIRA'>
+		<column name='NDR_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='NDR_XAR_ID' type='BIGINT' notNull='true'/>
+		<column name='NDR_RANGE' type='VARCHAR' length='256' notNull='true'/>
+	</table>
+	<foreignKey name='SC_NEDIRA_FK_NDR_XAR_ID' table='SC_NEDIRA' foreignTable='SC_XARXES'> 
+		<column name='NDR_XAR_ID'/>
+		<foreignColumn name='XAR_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.NetworkDiscoveryAccountEntity -->
+
+	<table name='SC_XARACC'>
+		<column name='NDA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='NDA_XAR_ID' type='BIGINT' notNull='true'/>
+		<column name='NDA_ACC_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_XARACC_FK_NDA_XAR_ID' table='SC_XARACC' foreignTable='SC_XARXES'> 
+		<column name='NDA_XAR_ID'/>
+		<foreignColumn name='XAR_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_XARACC_FK_NDA_ACC_ID' table='SC_XARACC' foreignTable='SC_ACCOUN'> 
+		<column name='NDA_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.PamActionEntity -->
+
+	<table name='SC_PAMACT'>
+		<column name='PAC_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='PAC_PPO_ID' type='BIGINT' notNull='true'/>
+		<column name='PAC_PRU_ID' type='BIGINT' notNull='true'/>
+		<column name='PAC_AUTHOR' type='VARCHAR' length='100' notNull='false'/>
+		<column name='PAC_DATE' type='DATE' notNull='false'/>
+		<column name='PAC_TYPE' type='VARCHAR' length='20' notNull='true'/>
+		<column name='PAC_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_PAMACT_FK_PAC_PPO_ID' table='SC_PAMACT' foreignTable='SC_PAMPOL'> 
+		<column name='PAC_PPO_ID'/>
+		<foreignColumn name='PPO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_PAMACT_FK_PAC_PRU_ID' table='SC_PAMACT' foreignTable='SC_PAMRUL'> 
+		<column name='PAC_PRU_ID'/>
+		<foreignColumn name='PRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_PAMACT_FK_PAC_TEN_ID' table='SC_PAMACT' foreignTable='SC_TENANT'> 
+		<column name='PAC_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.PamPolicyEntity -->
+
+	<table name='SC_PAMPOL'>
+		<column name='PPO_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='PPO_NAME' type='VARCHAR' length='100' notNull='true'/>
+		<column name='PPO_DESCR' type='VARCHAR' length='150' notNull='false'/>
+		<column name='PPO_AUTHOR' type='VARCHAR' length='100' notNull='false'/>
+		<column name='PPO_DATE' type='DATE' notNull='false'/>
+		<column name='PPO_RECDUR' type='INTEGER' notNull='false'/>
+		<column name='PPO_EXPRES' type='CLOB' length='16000' notNull='false'/>
+		<column name='PPO_PRIORI' type='INTEGER' notNull='false'/>
+		<column name='PPO_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='PPO_CREDAT' type='DATE' notNull='false'/>
+		<column name='PPO_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PPO_UPDDAT' type='DATE' notNull='false'/>
+		<column name='PPO_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PPO_DELDAT' type='DATE' notNull='false'/>
+		<column name='PPO_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_PAMPOL_FK_PPO_TEN_ID' table='SC_PAMPOL' foreignTable='SC_TENANT'> 
+		<column name='PPO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.PamPolicyJITPermissionEntity -->
+
+	<table name='SC_PPOJTP'>
+		<column name='PJT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='PJT_PPO_ID' type='BIGINT' notNull='true'/>
+		<column name='PJT_NAME' type='VARCHAR' length='100' notNull='true'/>
+		<column name='PPO_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_PPOJTP_FK_PJT_PPO_ID' table='SC_PPOJTP' foreignTable='SC_PAMPOL'> 
+		<column name='PJT_PPO_ID'/>
+		<foreignColumn name='PPO_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_PPOJTP_FK_PPO_TEN_ID' table='SC_PPOJTP' foreignTable='SC_TENANT'> 
+		<column name='PPO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.pam.model.PamRuleEntity -->
+
+	<table name='SC_PAMRUL'>
+		<column name='PRU_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='PRU_NAME' type='VARCHAR' length='100' notNull='true'/>
+		<column name='PRU_DESCRIPTION' type='VARCHAR' length='100' notNull='false'/>
+		<column name='PRU_AUTHOR' type='VARCHAR' length='100' notNull='false'/>
+		<column name='PRU_DATE' type='DATE' notNull='false'/>
+		<column name='PRU_TYPE' type='VARCHAR' length='20' notNull='true'/>
+		<column name='PRU_CONTEN' type='VARCHAR' length='500' notNull='false'/>
+		<column name='PRU_BLOB' type='CLOB' length='50000' notNull='false'/>
+		<column name='PRU_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='PRU_CREDAT' type='DATE' notNull='false'/>
+		<column name='PRU_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PRU_UPDDAT' type='DATE' notNull='false'/>
+		<column name='PRU_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PRU_DELDAT' type='DATE' notNull='false'/>
+		<column name='PRU_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_PAMRUL_FK_PRU_TEN_ID' table='SC_PAMRUL' foreignTable='SC_TENANT'> 
+		<column name='PRU_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+	<index name='SC_PAMPOL_UK' table='SC_PAMPOL' unique='true'>
+		<column name='PPO_TEN_ID'/>
+		<column name='PPO_NAME'/>
+	</index>
+	<index name='SC_PAMRUL_UK' table='SC_PAMRUL' unique='true'>
+		<column name='PRU_TEN_ID'/>
+		<column name='PRU_NAME'/>
+	</index>
+	<index name='SC_AUDITO_BORRAR' table='SC_AUDITO' unique='false'>
+		<column name='AUD_DATA'/>
+	</index>
+	<index name='SC_AUDITO_ACC' table='SC_AUDITO' unique='false'>
+		<column name='AUD_INDEX'/>
+	</index>
+	<index name='SC_AUDITO_USER' table='SC_AUDITO' unique='false'>
+		<column name='AUD_USUAUD'/>
+		<column name='AUD_TEN_ID'/>
+		<column name='AUD_DATA'/>
+	</index>
+	<index name='SCF_GEOIP_UK' table='SCF_GEOIP' unique='false'>
+		<column name='GEO_TEN_ID'/>
+		<column name='GEO_IP'/>
+	</index>
+	<index name='SC_ISSUE_HASH_NDX' table='SC_ISSUE' unique='false'>
+		<column name='EVE_TEN_ID'/>
+		<column name='EVE_HASH'/>
+	</index>
+	<index name='SC_ISSUE_NUM_NDX' table='SC_ISSUE' unique='false'>
+		<column name='EVE_TEN_ID'/>
+		<column name='EVE_NUMBER'/>
+	</index>
+	<index name='SC_ISSUE_STATUS_NDX' table='SC_ISSUE' unique='false'>
+		<column name='EVE_TEN_ID'/>
+		<column name='EVE_STATUS'/>
+		<column name='EVE_ACTOR'/>
+	</index>
+
+	<!-- com.soffid.iam.rc.model.AuditEntity -->
+
+	<table name='SC_AUDITO'>
+		<column name='AUD_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='AUD_DATA' type='DATE' notNull='true'/>
+		<column name='AUD_USUAUD' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_ACCIO' type='VARCHAR' length='1' notNull='true'/>
+		<column name='AUD_INFO' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='AUD_IDGRU' type='BIGINT' notNull='false'/>
+		<column name='AUD_DOMRLU' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_VALDOMRLU' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_CON' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_DIS' type='VARCHAR' length='150' notNull='false'/>
+		<column name='AUD_IMP' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_APL' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_DCO' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_LCO' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_XAR' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_ROL' type='VARCHAR' length='150' notNull='false'/>
+		<column name='AUD_MAQ' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_AUT' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_FITXER' type='BIGINT' notNull='false'/>
+		<column name='AUD_FED' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_LCO2' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_DCO2' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_ACCOUN' type='VARCHAR' length='128' notNull='false'/>
+		<column name='AUD_ACC_ID' type='BIGINT' notNull='false'/>
+		<column name='AUD_MESSAG' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='AUD_TIPUSU' type='VARCHAR' length='255' notNull='false'/>
+		<column name='AUD_DOMUSU' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_DOMCON' type='VARCHAR' length='100' notNull='false'/>
+		<column name='AUD_RULE' type='VARCHAR' length='200' notNull='false'/>
+		<column name='AUD_SCHTAS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_CUOBNA' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_CUOBTY' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='AUD_SRCIP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_JUSEGR' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_PAMSES' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_VALO' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_VALN' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_INDEX' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_CREDAT' type='DATE' notNull='false'/>
+		<column name='AUD_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_UPDDAT' type='DATE' notNull='false'/>
+		<column name='AUD_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='AUD_DELDAT' type='DATE' notNull='false'/>
+		<column name='AUD_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_AUDITO_FK_AUD_IDGRU' table='SC_AUDITO' foreignTable='SC_GRUPS'> 
+		<column name='AUD_IDGRU'/>
+		<foreignColumn name='GRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUDITO_FK_AUD_ACC_ID' table='SC_AUDITO' foreignTable='SC_ACCOUN'> 
+		<column name='AUD_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_AUDITO_FK_AUD_TEN_ID' table='SC_AUDITO' foreignTable='SC_TENANT'> 
+		<column name='AUD_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.GeoInformationEntity -->
+
+	<table name='SCF_GEOIP'>
+		<column name='GEO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='GEO_IP' type='VARCHAR' length='40' notNull='true'/>
+		<column name='GEO_DATE' type='DATE' notNull='true'/>
+		<column name='GEO_COUNTRY' type='VARCHAR' length='2' notNull='false'/>
+		<column name='GEO_COUDIV' type='VARCHAR' length='100' notNull='false'/>
+		<column name='GEO_COUDI2' type='VARCHAR' length='100' notNull='false'/>
+		<column name='GEO_CITY' type='VARCHAR' length='100' notNull='false'/>
+		<column name='GEO_LATITU' type='FLOAT' notNull='false'/>
+		<column name='GEO_LONGIT' type='FLOAT' notNull='false'/>
+		<column name='GEO_ACCURA' type='FLOAT' notNull='false'/>
+		<column name='GEO_DOMAIN' type='VARCHAR' length='150' notNull='false'/>
+		<column name='GEO_ISP' type='VARCHAR' length='150' notNull='false'/>
+		<column name='GEO_USETYP' type='VARCHAR' length='50' notNull='false'/>
+		<column name='GEO_ANONYM' type='FLOAT' notNull='false'/>
+		<column name='GEO_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SCF_GEOIP_FK_GEO_TEN_ID' table='SCF_GEOIP' foreignTable='SC_TENANT'> 
+		<column name='GEO_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.IssueBrowserEntity -->
+
+	<table name='SC_BROEVE'>
+		<column name='BEV_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='BVE_EVE_ID' type='BIGINT' notNull='true'/>
+		<column name='BVE_BRO_ID' type='BIGINT' notNull='false'/>
+		<column name='BVE_ACTION' type='VARCHAR' length='256' notNull='false'/>
+		<column name='BVE_HOSIP' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_BROEVE_FK_BVE_EVE_ID' table='SC_BROEVE' foreignTable='SC_ISSUE'> 
+		<column name='BVE_EVE_ID'/>
+		<foreignColumn name='EVE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_BROEVE_FK_BVE_BRO_ID' table='SC_BROEVE' foreignTable='SC_BROWSE'> 
+		<column name='BVE_BRO_ID'/>
+		<foreignColumn name='BRO_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.IssueEntity -->
+
+	<table name='SC_ISSUE'>
+		<column name='EVE_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='EVE_NUMBER' type='BIGINT' notNull='true'/>
+		<column name='EVE_TYPE' type='VARCHAR' length='256' notNull='true'/>
+		<column name='EVE_STATUS' type='VARCHAR' length='256' notNull='true'/>
+		<column name='EVE_CREATE' type='DATE' notNull='true'/>
+		<column name='EVE_ACKDAT' type='DATE' notNull='false'/>
+		<column name='EVE_SOLDAT' type='DATE' notNull='false'/>
+		<column name='EVE_FALOPC' type='FLOAT' notNull='false'/>
+		<column name='EVE_HUMCON' type='FLOAT' notNull='false'/>
+		<column name='EVE_DIS_ID' type='BIGINT' notNull='false'/>
+		<column name='EVE_DEVICE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_EXCEPT' type='CLOB' length='64000' notNull='false'/>
+		<column name='EVE_IP' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_COUNTR' type='CLOB' length='64000' notNull='false'/>
+		<column name='EVE_RAC_ID' type='BIGINT' notNull='false'/>
+		<column name='EVE_HISTOR' type='CLOB' length='64000' notNull='false'/>
+		<column name='EVE_PRU_ID' type='BIGINT' notNull='false'/>
+		<column name='EVE_ACC_ID' type='BIGINT' notNull='false'/>
+		<column name='EVE_ACTOR' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_LOGNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_JOBNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_REQ_ID' type='BIGINT' notNull='false'/>
+		<column name='EVE_RISK' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='EVE_HASH' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_TIMES' type='INTEGER' notNull='true'/>
+		<column name='EVE_BREEMA' type='VARCHAR' length='64' notNull='false'/>
+		<column name='EVE_DATBRE' type='VARCHAR' length='64' notNull='false'/>
+		<column name='EVE_HTMDES' type='CLOB' length='64000' notNull='false'/>
+		<column name='EVE_UPDDAT' type='DATE' notNull='false'/>
+		<column name='EVE_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_DELDAT' type='DATE' notNull='false'/>
+		<column name='EVE_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVE_START' type='DATE' notNull='false'/>
+	</table>
+	<foreignKey name='SC_ISSUE_FK_EVE_DIS_ID' table='SC_ISSUE' foreignTable='SC_DISPAT'> 
+		<column name='EVE_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ISSUE_FK_EVE_RAC_ID' table='SC_ISSUE' foreignTable='SC_ROLUSU'> 
+		<column name='EVE_RAC_ID'/>
+		<foreignColumn name='RLU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ISSUE_FK_EVE_PRU_ID' table='SC_ISSUE' foreignTable='SC_PAMRUL'> 
+		<column name='EVE_PRU_ID'/>
+		<foreignColumn name='PRU_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ISSUE_FK_EVE_ACC_ID' table='SC_ISSUE' foreignTable='SC_ACCOUN'> 
+		<column name='EVE_ACC_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ISSUE_FK_EVE_REQ_ID' table='SC_ISSUE' foreignTable='SC_ACCOUN'> 
+		<column name='EVE_REQ_ID'/>
+		<foreignColumn name='ACC_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_ISSUE_FK_EVE_TEN_ID' table='SC_ISSUE' foreignTable='SC_TENANT'> 
+		<column name='EVE_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.IssueHostEntity -->
+
+	<table name='SC_HOSEVE'>
+		<column name='HEV_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='HVE_EVE_ID' type='BIGINT' notNull='true'/>
+		<column name='HVE_MAQ_ID' type='BIGINT' notNull='false'/>
+		<column name='HVE_ACTION' type='VARCHAR' length='256' notNull='false'/>
+		<column name='HVE_HOSNAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='HVE_HOSIP' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_HOSEVE_FK_HVE_EVE_ID' table='SC_HOSEVE' foreignTable='SC_ISSUE'> 
+		<column name='HVE_EVE_ID'/>
+		<foreignColumn name='EVE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_HOSEVE_FK_HVE_MAQ_ID' table='SC_HOSEVE' foreignTable='SC_MAQUIN'> 
+		<column name='HVE_MAQ_ID'/>
+		<foreignColumn name='MAQ_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.IssuePolicyActionEntity -->
+
+	<table name='SC_EVPOAC'>
+		<column name='EPA_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='EPA_EVP_ID' type='BIGINT' notNull='true'/>
+		<column name='EPA_STATUS' type='VARCHAR' length='256' notNull='true'/>
+		<column name='EPA_ACTION' type='VARCHAR' length='50' notNull='true'/>
+		<column name='EPA_DESCRI' type='VARCHAR' length='150' notNull='true'/>
+		<column name='EPA_SUBJEC' type='VARCHAR' length='150' notNull='false'/>
+		<column name='EPA_BODY' type='CLOB' length='64000' notNull='false'/>
+		<column name='EPA_ADDRES' type='VARCHAR' length='150' notNull='false'/>
+		<column name='EPA_PRODEF' type='CLOB' length='64000' notNull='false'/>
+		<column name='EPA_SCRIPT' type='CLOB' length='128000' notNull='false'/>
+		<column name='EPA_CREDAT' type='DATE' notNull='false'/>
+		<column name='EPA_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EPA_UPDDAT' type='DATE' notNull='false'/>
+		<column name='EPA_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EPA_DELDAT' type='DATE' notNull='false'/>
+		<column name='EPA_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_EVPOAC_FK_EPA_EVP_ID' table='SC_EVPOAC' foreignTable='SC_EVEPOL'> 
+		<column name='EPA_EVP_ID'/>
+		<foreignColumn name='EVP_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.IssuePolicyEntity -->
+
+	<table name='SC_EVEPOL'>
+		<column name='EVP_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='EVP_TYPE' type='VARCHAR' length='256' notNull='true'/>
+		<column name='EVP_STATUS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVP_DESCRI' type='VARCHAR' length='250' notNull='false'/>
+		<column name='EVP_ACTOR' type='VARCHAR' length='250' notNull='false'/>
+		<column name='EVP_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='EVP_CREDAT' type='DATE' notNull='false'/>
+		<column name='EVP_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVP_UPDDAT' type='DATE' notNull='false'/>
+		<column name='EVP_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='EVP_DELDAT' type='DATE' notNull='false'/>
+		<column name='EVP_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_EVEPOL_FK_EVP_TEN_ID' table='SC_EVEPOL' foreignTable='SC_TENANT'> 
+		<column name='EVP_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.IssueUserEntity -->
+
+	<table name='SC_USEEVE'>
+		<column name='UEV_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='UVE_EVE_ID' type='BIGINT' notNull='true'/>
+		<column name='UVE_USU_ID' type='BIGINT' notNull='false'/>
+		<column name='UVE_ACTION' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UVE_USENAM' type='VARCHAR' length='256' notNull='false'/>
+		<column name='UVE_EXTID' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_USEEVE_FK_UVE_EVE_ID' table='SC_USEEVE' foreignTable='SC_ISSUE'> 
+		<column name='UVE_EVE_ID'/>
+		<foreignColumn name='EVE_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_USEEVE_FK_UVE_USU_ID' table='SC_USEEVE' foreignTable='SC_USUARI'> 
+		<column name='UVE_USU_ID'/>
+		<foreignColumn name='USU_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.SoDRoleEntity -->
+
+	<table name='SC_SODROL'>
+		<column name='SOR_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SOR_ROL_ID' type='BIGINT' notNull='true'/>
+		<column name='SOR_SOD_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SODROL_FK_SOR_ROL_ID' table='SC_SODROL' foreignTable='SC_ROLES'> 
+		<column name='SOR_ROL_ID'/>
+		<foreignColumn name='ROL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SODROL_FK_SOR_SOD_ID' table='SC_SODROL' foreignTable='SC_SODRUL'> 
+		<column name='SOR_SOD_ID'/>
+		<foreignColumn name='SOD_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.SoDRuleEntity -->
+
+	<table name='SC_SODRUL'>
+		<column name='SOD_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SOD_NAME' type='VARCHAR' length='256' notNull='true'/>
+		<column name='SOD_RISK' type='VARCHAR' length='256' notNull='true'/>
+		<column name='SOD_TYPE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SOD_NUMBER' type='INTEGER' notNull='false'/>
+		<column name='SOD_APL_ID' type='BIGINT' notNull='true'/>
+		<column name='SOD_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='SOD_CREDAT' type='DATE' notNull='false'/>
+		<column name='SOD_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SOD_UPDDAT' type='DATE' notNull='false'/>
+		<column name='SOD_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SOD_DELDAT' type='DATE' notNull='false'/>
+		<column name='SOD_DELUSE' type='VARCHAR' length='256' notNull='false'/>
+	</table>
+	<foreignKey name='SC_SODRUL_FK_SOD_APL_ID' table='SC_SODRUL' foreignTable='SC_APLICA'> 
+		<column name='SOD_APL_ID'/>
+		<foreignColumn name='APL_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SODRUL_FK_SOD_TEN_ID' table='SC_SODRUL' foreignTable='SC_TENANT'> 
+		<column name='SOD_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.rc.model.SoDRuleMatrixEntity -->
+
+	<table name='SC_SODMAT'>
+		<column name='id' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SMA_SOD_ID' type='BIGINT' notNull='true'/>
+		<column name='SOD_RISK' type='VARCHAR' length='256' notNull='true'/>
+		<column name='SOD_SOR_ROW' type='BIGINT' notNull='true'/>
+		<column name='SOD_SOR_COL' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SODMAT_FK_SMA_SOD_ID' table='SC_SODMAT' foreignTable='SC_SODRUL'> 
+		<column name='SMA_SOD_ID'/>
+		<foreignColumn name='SOD_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SODMAT_FK_SOD_SOR_ROW' table='SC_SODMAT' foreignTable='SC_SODROL'> 
+		<column name='SOD_SOR_ROW'/>
+		<foreignColumn name='SOR_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SODMAT_FK_SOD_SOR_COL' table='SC_SODMAT' foreignTable='SC_SODROL'> 
+		<column name='SOD_SOR_COL'/>
+		<foreignColumn name='SOR_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.ScheduledTaskEntity -->
+
+	<table name='SC_SCHTAS'>
+		<column name='SCT_HANDLE' type='BIGINT' notNull='true'/>
+		<column name='SCT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SCT_NAME' type='VARCHAR' length='250' notNull='true'/>
+		<column name='SCT_PARAM' type='VARCHAR' length='250' notNull='false'/>
+		<column name='SCT_SCHEDU' type='VARCHAR' length='100' notNull='false'/>
+		<column name='SCT_LASEXE' type='DATE' notNull='false'/>
+		<column name='SCT_LASEND' type='DATE' notNull='false'/>
+		<column name='SCT_LOGDOC' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SCT_ERROR' type='BIT' notNull='true'/>
+		<column name='SCT_SERVER' type='BIGINT' notNull='false'/>
+		<column name='SCT_ACTIVE' type='BIT' notNull='true'/>
+		<column name='SCT_ENABLE' type='BIT' notNull='true'/>
+		<column name='SCT_TEN_ID' type='BIGINT' notNull='true'/>
+		<column name='SCT_STATUS' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SCT_PCT' type='FLOAT' notNull='false'/>
+		<column name='SCT_STOP' type='BIT' notNull='false'/>
+	</table>
+	<foreignKey name='SC_SCHTAS_FK_SCT_HANDLE' table='SC_SCHTAS' foreignTable='SC_SCTAHA'> 
+		<column name='SCT_HANDLE'/>
+		<foreignColumn name='STH_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SCHTAS_FK_SCT_SERVER' table='SC_SCHTAS' foreignTable='SC_SERVER'> 
+		<column name='SCT_SERVER'/>
+		<foreignColumn name='SRV_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_SCHTAS_FK_SCT_TEN_ID' table='SC_SCHTAS' foreignTable='SC_TENANT'> 
+		<column name='SCT_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.ScheduledTaskHandlerEntity -->
+
+	<table name='SC_SCTAHA'>
+		<column name='STH_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='STH_NAME' type='VARCHAR' length='100' notNull='true'/>
+		<column name='STH_CLANAM' type='VARCHAR' length='250' notNull='true'/>
+		<column name='STH_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SCTAHA_FK_STH_TEN_ID' table='SC_SCTAHA' foreignTable='SC_TENANT'> 
+		<column name='STH_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.ScheduledTaskLogEntity -->
+
+	<table name='SC_SCTALO'>
+		<column name='STL_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='STL_SCT_ID' type='BIGINT' notNull='true'/>
+		<column name='SCT_LASEXE' type='DATE' notNull='false'/>
+		<column name='SCT_LASEND' type='DATE' notNull='false'/>
+		<column name='SCT_LOGDOC' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SCT_ERROR' type='BIT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SCTALO_FK_STL_SCT_ID' table='SC_SCTALO' foreignTable='SC_SCHTAS'> 
+		<column name='STL_SCT_ID'/>
+		<foreignColumn name='SCT_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.ServerCertificateEntity -->
+
+	<table name='SC_SRVCER'>
+		<column name='SCR_SER_ID' type='BIGINT' notNull='true'/>
+		<column name='SCR_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SCR_CERT' type='BLOB' length='64000' notNull='true'/>
+		<column name='SCR_SINCE' type='DATE' notNull='true'/>
+		<column name='SCR_UNTIL' type='DATE' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SRVCER_FK_SCR_SER_ID' table='SC_SRVCER' foreignTable='SC_SERVER'> 
+		<column name='SCR_SER_ID'/>
+		<foreignColumn name='SRV_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.ServerEntity -->
+
+	<table name='SC_SERVER'>
+		<column name='SRV_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SRV_NOM' type='VARCHAR' length='100' notNull='true'/>
+		<column name='SRV_PK' type='BLOB' notNull='false'/>
+		<column name='SRV_AUTH' type='VARCHAR' length='50' notNull='false'/>
+		<column name='SRV_TYPE' type='VARCHAR' length='10' notNull='false'/>
+		<column name='SRV_USEMDB' type='BIT' notNull='false'/>
+		<column name='SRV_URL' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SRV_JVMOPT' type='VARCHAR' length='1024' notNull='false'/>
+	</table>
+
+	<!-- com.soffid.iam.sync.model.ServerInstanceEntity -->
+
+	<table name='SC_SERINS'>
+		<column name='SRE_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='SRE_NOM' type='VARCHAR' length='100' notNull='true'/>
+		<column name='SRE_URL' type='VARCHAR' length='128' notNull='false'/>
+		<column name='SRE_SRV_ID' type='BIGINT' notNull='true'/>
+		<column name='SRE_LASSEE' type='DATE' notNull='true'/>
+		<column name='SRE_TOKEN' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SRE_TASKS' type='INTEGER' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SERINS_FK_SRE_SRV_ID' table='SC_SERINS' foreignTable='SC_SERVER'> 
+		<column name='SRE_SRV_ID'/>
+		<foreignColumn name='SRV_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.ServerRegistrationTokenEntity -->
+
+	<table name='SC_SRRETO'>
+		<column name='SRT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
+		<column name='SRT_STEP' type='INTEGER' notNull='true'/>
+		<column name='SRT_TOKEN' type='VARCHAR' length='100' notNull='true'/>
+		<column name='SRT_EXPIR' type='DATE' notNull='true'/>
+		<column name='SRT_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_SRRETO_FK_SRT_TEN_ID' table='SC_SRRETO' foreignTable='SC_TENANT'> 
+		<column name='SRT_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.TaskEntity -->
+
+	<table name='SC_TASQUE'>
+		<column name='TAS_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TAS_USUARI' type='VARCHAR' length='150' notNull='false'/>
+		<column name='TAS_CONTRA' type='VARCHAR' length='128' notNull='false'/>
+		<column name='TAS_CANCON' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TAS_CARPET' type='VARCHAR' length='150' notNull='false'/>
+		<column name='TAS_TIPCAR' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TAS_IMPRES' type='VARCHAR' length='12' notNull='false'/>
+		<column name='TAS_MAQUIN' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_SUBXAR' type='VARCHAR' length='10' notNull='false'/>
+		<column name='TAS_MISSAT' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='TAS_STATUS' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TAS_DATA' type='DATE' notNull='true'/>
+		<column name='TAS_TRANSA' type='VARCHAR' length='50' notNull='true'/>
+		<column name='TAS_GRUP' type='VARCHAR' length='150' notNull='false'/>
+		<column name='TAS_ALIES' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_DOMCOR' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_ROLE' type='VARCHAR' length='150' notNull='false'/>
+		<column name='TAS_BD' type='VARCHAR' length='150' notNull='false'/>
+		<column name='TAS_CODDIS' type='VARCHAR' length='150' notNull='false'/>
+		<column name='TAS_SERVER' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='TAS_SRVINS' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='TAS_PRIORI' type='BIGINT' notNull='false'/>
+		<column name='TAS_DOMUSU' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_DOMCON' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_HASH' type='VARCHAR' length='200' notNull='false'/>
+		<column name='TAS_EXPDAT' type='DATE' notNull='false'/>
+		<column name='TAS_ENTITY' type='VARCHAR' length='100' notNull='false'/>
+		<column name='TAS_PKVAL' type='BIGINT' notNull='false'/>
+		<column name='TAS_CUOBTY' type='VARCHAR' length='100' notNull='false'/>
+		<column name='TAS_CUOBNA' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_CUTANA' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_PARAM' type='CLOB' length='128000' notNull='false'/>
+		<column name='TAS_EXTID' type='VARCHAR' length='100' notNull='false'/>
+		<column name='TAS_SOURCE' type='VARCHAR' length='50' notNull='false'/>
+		<column name='TAS_TEN_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_TASQUE_FK_TAS_TEN_ID' table='SC_TASQUE' foreignTable='SC_TENANT'> 
+		<column name='TAS_TEN_ID'/>
+		<foreignColumn name='TEN_ID'/>
+	</foreignKey>
+
+	<!-- com.soffid.iam.sync.model.TaskLogEntity -->
+
+	<table name='SC_TASKLOG'>
+		<column name='TLO_COMPLETE' type='VARCHAR' length='1' notNull='false'/>
+		<column name='TLO_MISSAT' type='VARCHAR' length='1024' notNull='false'/>
+		<column name='TLO_DATCREA' type='DATE' notNull='false'/>
+		<column name='TLO_DADAEX' type='BIGINT' notNull='false'/>
+		<column name='TLO_PRDAEX' type='BIGINT' notNull='false'/>
+		<column name='TLO_NUMEXE' type='BIGINT' notNull='false'/>
+		<column name='TLO_STACK' type='CLOB' length='4000' notNull='false'/>
+		<column name='TLO_IDTASQUE' type='BIGINT' notNull='true'/>
+		<column name='TLO_ID' type='BIGINT' notNull='true' primaryKey='true' autoIncrement='false'/>
+		<column name='TLO_DIS_ID' type='BIGINT' notNull='true'/>
+	</table>
+	<foreignKey name='SC_TASKLOG_FK_TLO_IDTASQUE' table='SC_TASKLOG' foreignTable='SC_TASQUE'> 
+		<column name='TLO_IDTASQUE'/>
+		<foreignColumn name='TAS_ID'/>
+	</foreignKey>
+	<foreignKey name='SC_TASKLOG_FK_TLO_DIS_ID' table='SC_TASKLOG' foreignTable='SC_DISPAT'> 
+		<column name='TLO_DIS_ID'/>
+		<foreignColumn name='DIS_ID'/>
+	</foreignKey>
+	<index name='SC_SCHTAS_HANDLER_UK' table='SC_SCHTAS' unique='true'>
+		<column name='SCT_HANDLE'/>
+		<column name='SCT_TEN_ID'/>
+		<column name='SCT_PARAM'/>
+	</index>
+	<index name='SC_SCHTAS_NAME_UK' table='SC_SCHTAS' unique='true'>
+		<column name='SCT_TEN_ID'/>
+		<column name='SCT_NAME'/>
+	</index>
+	<index name='SC_SERVER_UK1' table='SC_SERVER' unique='true'>
+		<column name='SRV_NOM'/>
+	</index>
+	<index name='SC_SERINS_UK' table='SC_SERINS' unique='true'>
+		<column name='SRE_NOM'/>
+	</index>
+	<index name='SC_SCTAHA_NAME_UK' table='SC_SCTAHA' unique='true'>
+		<column name='STH_TEN_ID'/>
+		<column name='STH_NAME'/>
+	</index>
+	<index name='SC_TAS_HASH' table='SC_TASQUE' unique='false'>
+		<column name='TAS_TEN_ID'/>
+		<column name='TAS_HASH'/>
+	</index>
+	<index name='SC_TAS_USER_NDX' table='SC_TASQUE' unique='false'>
+		<column name='TAS_TEN_ID'/>
+		<column name='TAS_USUARI'/>
+	</index>
+	<table name='SC_SEQUENCE'>
+		<column name='SEQ_NEXT' type='BIGINT' notNull='true'/>
+		<column name='SEQ_CACHE' type='BIGINT' notNull='true'/>
+		<column name='SEQ_INCREMENT' type='BIGINT' notNull='true'/>
+	</table>
+
+</database>

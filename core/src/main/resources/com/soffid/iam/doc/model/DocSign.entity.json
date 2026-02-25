@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"bpmDocument","targetClass":"com.soffid.iam.doc.model.DocumentEntity","multiple":false,"reverse":"signs"}
+  ]
+}

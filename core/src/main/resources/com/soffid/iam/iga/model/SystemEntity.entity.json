@@ -1,0 +1,19 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":true,"reverse":"system"},
+    {"name":"userType","targetClass":"com.soffid.iam.iga.model.UserTypeSystemEntity","multiple":true,"reverse":"system"},
+    {"name":"systemGroup","targetClass":"com.soffid.iam.iga.model.SystemGroupEntity","multiple":true,"reverse":"system"},
+    {"name":"accessControls","targetClass":"com.soffid.iam.iga.model.AccessControlEntity","multiple":true,"reverse":"agent"},
+    {"name":"passwordDomain","targetClass":"com.soffid.iam.am.model.PasswordDomainEntity","multiple":false,"reverse":"systems"},
+    {"name":"userDomain","targetClass":"com.soffid.iam.iga.model.UserDomainEntity","multiple":false,"reverse":"systems"},
+    {"name":"accounts","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":true,"reverse":"system"},
+    {"name":"objectMappings","targetClass":"com.soffid.iam.iga.model.ObjectMappingEntity","multiple":true,"reverse":"system"},
+    {"name":"pendingChanges","targetClass":"com.soffid.iam.iga.model.AuthoritativeChangeEntity","multiple":true,"reverse":"dispatcher"},
+    {"name":"entryPoints","targetClass":"com.soffid.iam.am.model.EntryPointEntity","multiple":true,"reverse":"system"},
+    {"name":"metaData","targetClass":"com.soffid.iam.base.model.AccountMetadataEntity","multiple":true,"reverse":"system"},
+    {"name":"reconcileTriggers","targetClass":"com.soffid.iam.iga.model.ReconcileTriggerEntity","multiple":true,"reverse":"system"},
+    {"name":"hosts","targetClass":"com.soffid.iam.pam.model.HostSystemEntity","multiple":true,"reverse":"system"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":true,"reverse":"system"}
+  ]
+}

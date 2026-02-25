@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.IssueBrowserEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_BROEVE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='BEV_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='issue' class='com.soffid.iam.rc.model.IssueEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BROEVE_BVE_EVE_ID'>
+			<column name='BVE_EVE_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='browser' class='com.soffid.iam.am.model.BrowserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BROEVE_BVE_BRO_ID'>
+			<column name='BVE_BRO_ID' not-null='false'/>
+		</many-to-one>
+		<property name='action' type='com.soffid.iam.pam.api.HostEventActionEnum'>
+			<column name='BVE_ACTION' not-null='false' />
+		</property>
+		<property name='hostIp' type='java.lang.String'>
+			<column name='BVE_HOSIP' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

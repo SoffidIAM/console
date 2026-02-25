@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.doc.model.DocumentEntityImpl' dynamic-insert='false' dynamic-update='false' table='BPM_DOCUMENT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='DOC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='mimeType' type='java.lang.String'>
+			<column name='DOC_MIME_TYPE' not-null='true' />
+		</property>
+		<property name='externalName' type='java.lang.String'>
+			<column name='DOC_EXTERNAL_NAME' not-null='true' length='256' />
+		</property>
+		<property name='hash' type='java.lang.String'>
+			<column name='DOC_HASH' not-null='false' length='128' />
+		</property>
+		<property name='fsPath' type='java.lang.String'>
+			<column name='DOC_FS_PATH' not-null='false' length='128' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='BPM_DOCUMENT_DOC_TEN_ID'>
+			<column name='DOC_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='signs' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='BPM_SIGN_SIG_DOC_ID'>
+				<column name='SIG_DOC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.doc.model.DocSignImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

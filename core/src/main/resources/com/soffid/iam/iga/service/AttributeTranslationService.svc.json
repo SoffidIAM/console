@@ -1,0 +1,25 @@
+{
+  "class": "com.soffid.iam.iga.service.AttributeTranslationService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.iga.api.AttributeTranslation", "arguments":[
+       {"name":"att","type":"com.soffid.iam.iga.api.AttributeTranslation","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.AttributeTranslation", "arguments":[
+       {"name":"att","type":"com.soffid.iam.iga.api.AttributeTranslation","required": true}    ]},
+    {"name":"findByQuery", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.AttributeTranslation>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findByColumn1", "return":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"column1","type":"java.lang.String","required": true}    ]},
+    {"name":"findByColumn2", "return":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>", "arguments":[
+       {"name":"domain","type":"java.lang.String","required": true},
+       {"name":"column2","type":"java.lang.String","required": true}    ]},
+    {"name":"findByExample", "return":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>", "arguments":[
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"column1","type":"java.lang.String","required":false},
+       {"name":"column2","type":"java.lang.String","required":false}    ]},
+    {"name":"findDomains", "return":"java.util.Collection<java.lang.String>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"att","type":"com.soffid.iam.iga.api.AttributeTranslation","required": true}    ]}
+  ]
+}

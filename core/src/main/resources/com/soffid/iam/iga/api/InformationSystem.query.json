@@ -1,0 +1,29 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.InformationSystemEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"type", "hibernateName":"type"},
+    {"name":"parent",  "hibernateName":"parent.name"},
+    {"name":"relativeName", "hibernateName":"relativeName"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"owner",  "hibernateName":"contactPerson.userName"},
+    {"name":"sourceDir", "hibernateName":"sourceDir"},
+    {"name":"targetDir", "hibernateName":"targetDir"},
+    {"name":"database", "hibernateName":"database"},
+    {"name":"bpmEnabled", "hibernateName":"bpmEnabled"},
+    {"name":"notificationEmails", "hibernateName":"notificationEmails"},
+    {"name":"approvalProcess", "hibernateName":"approvalProcess"},
+    {"name":"roleDefinitionProcess", "hibernateName":"roleDefinitionProcess"},
+    {"name":"singleRole", "hibernateName":"singleRole"},
+    {"name":"attributes", "hibernateName":"attributes"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

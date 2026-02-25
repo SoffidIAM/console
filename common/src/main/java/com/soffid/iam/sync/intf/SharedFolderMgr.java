@@ -6,10 +6,9 @@
  
 package com.soffid.iam.sync.intf;
 
-import com.soffid.iam.api.Group;
-import com.soffid.iam.api.User;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.base.api.User;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.iga.api.Group;
 
 public interface SharedFolderMgr extends java.rmi.Remote {
   public void createUserFolder (User user) 

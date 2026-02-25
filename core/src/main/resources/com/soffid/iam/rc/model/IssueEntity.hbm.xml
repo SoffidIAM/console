@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.IssueEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ISSUE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='EVE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='number' type='java.lang.Long'>
+			<column name='EVE_NUMBER' not-null='true' />
+		</property>
+		<property name='type' type='java.lang.String'>
+			<column name='EVE_TYPE' not-null='true' />
+		</property>
+		<property name='status' type='com.soffid.iam.rc.api.IssueStatusEnum'>
+			<column name='EVE_STATUS' not-null='true' />
+		</property>
+		<property name='created' type='java.util.Date'>
+			<column name='EVE_CREATE' not-null='true' />
+		</property>
+		<property name='acknowledged' type='java.util.Date'>
+			<column name='EVE_ACKDAT' not-null='false' />
+		</property>
+		<property name='solved' type='java.util.Date'>
+			<column name='EVE_SOLDAT' not-null='false' />
+		</property>
+		<property name='failedLoginPct' type='java.lang.Double'>
+			<column name='EVE_FALOPC' not-null='false' />
+		</property>
+		<property name='humanConfidence' type='java.lang.Double'>
+			<column name='EVE_HUMCON' not-null='false' />
+		</property>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ISSUE_EVE_DIS_ID'>
+			<column name='EVE_DIS_ID' not-null='false'/>
+		</many-to-one>
+		<property name='otpDevice' type='java.lang.String'>
+			<column name='EVE_DEVICE' not-null='false' />
+		</property>
+		<property name='exception' type='java.lang.String' lazy='true'>
+			<column name='EVE_EXCEPT' not-null='false' length='64000' />
+		</property>
+		<property name='ip' type='java.lang.String'>
+			<column name='EVE_IP' not-null='false' />
+		</property>
+		<property name='country' type='java.lang.String' lazy='true'>
+			<column name='EVE_COUNTR' not-null='false' length='64000' />
+		</property>
+		<many-to-one name='roleAccount' class='com.soffid.iam.iga.model.RoleAccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ISSUE_EVE_RAC_ID'>
+			<column name='EVE_RAC_ID' not-null='false'/>
+		</many-to-one>
+		<property name='performedActions' type='java.lang.String' lazy='true'>
+			<column name='EVE_HISTOR' not-null='false' length='64000' />
+		</property>
+		<many-to-one name='rule' class='com.soffid.iam.pam.model.PamRuleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ISSUE_EVE_PRU_ID'>
+			<column name='EVE_PRU_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='account' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ISSUE_EVE_ACC_ID'>
+			<column name='EVE_ACC_ID' not-null='false'/>
+		</many-to-one>
+		<property name='actor' type='java.lang.String'>
+			<column name='EVE_ACTOR' not-null='false' />
+		</property>
+		<property name='loginName' type='java.lang.String'>
+			<column name='EVE_LOGNAM' not-null='false' />
+		</property>
+		<property name='jobName' type='java.lang.String'>
+			<column name='EVE_JOBNAM' not-null='false' />
+		</property>
+		<many-to-one name='requester' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ISSUE_EVE_REQ_ID'>
+			<column name='EVE_REQ_ID' not-null='false'/>
+		</many-to-one>
+		<property name='risk' type='com.soffid.iam.rc.api.SoDRiskEnum'>
+			<column name='EVE_RISK' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ISSUE_EVE_TEN_ID'>
+			<column name='EVE_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='hash' type='java.lang.String'>
+			<column name='EVE_HASH' not-null='false' />
+		</property>
+		<property name='times' type='java.lang.Integer'>
+			<column name='EVE_TIMES' not-null='true' />
+		</property>
+		<property name='breachedEmail' type='java.lang.String'>
+			<column name='EVE_BREEMA' not-null='false' length='64' />
+		</property>
+		<property name='dataBreach' type='java.lang.String'>
+			<column name='EVE_DATBRE' not-null='false' length='64' />
+		</property>
+		<property name='htmlDescription' type='java.lang.String' lazy='true'>
+			<column name='EVE_HTMDES' not-null='false' length='64000' />
+		</property>
+		<set name='brosers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_BROEVE_BVE_EVE_ID'>
+				<column name='BVE_EVE_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueBrowserEntityImpl'/>
+		</set>
+		<set name='hosts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_HOSEVE_HVE_EVE_ID'>
+				<column name='HVE_EVE_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueHostEntityImpl'/>
+		</set>
+		<set name='users' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USEEVE_UVE_EVE_ID'>
+				<column name='UVE_EVE_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueUserEntityImpl'/>
+		</set>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='EVE_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='EVE_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='EVE_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='EVE_DELUSE' not-null='false' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='EVE_START' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

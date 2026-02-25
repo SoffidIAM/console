@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.UserDomainEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_DOMUSU' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='DOU_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='DOU_CODI' not-null='true' length='50' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='DOU_DESC' not-null='false' length='100' />
+		</property>
+		<property name='type' type='com.soffid.iam.iga.api.UserDomainTypeEnum'>
+			<column name='DOU_TIPUS' not-null='false' length='1' />
+		</property>
+		<set name='systems' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_DISPAT_DIS_DOU_ID'>
+				<column name='DIS_DOU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.SystemEntityImpl'/>
+		</set>
+		<property name='bshExpr' type='java.lang.String' lazy='true'>
+			<column name='DOU_EXPRES' not-null='false' length='4097' />
+		</property>
+		<property name='bshExprCreate' type='java.lang.String' lazy='true'>
+			<column name='DOU_EXPCRE' not-null='false' length='4097' />
+		</property>
+		<property name='beanGenerator' type='java.lang.String'>
+			<column name='DOU_GENERA' not-null='false' length='64' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DOMUSU_DOU_TEN_ID'>
+			<column name='DOU_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

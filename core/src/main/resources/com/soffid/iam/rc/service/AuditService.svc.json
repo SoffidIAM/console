@@ -1,0 +1,11 @@
+{
+  "class": "com.soffid.iam.rc.service.AuditService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.rc.api.Audit", "arguments":[
+       {"name":"auditoria","type":"com.soffid.iam.rc.api.Audit","required": true}    ]},
+    {"name":"findAuditById", "return":"com.soffid.iam.rc.api.Audit", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"findAudits", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Audit>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]}
+  ]
+}

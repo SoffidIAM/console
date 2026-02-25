@@ -1,8 +1,10 @@
 package com.soffid.iam.service.impl;
 
-import com.soffid.iam.api.Challenge;
+import com.soffid.iam.am.api.Challenge;
 
 public interface OTPHandler {
+	boolean hasToken (String user) throws Exception;
+
 	Challenge selectToken (Challenge challenge) throws Exception;
 	
 	boolean validatePin (Challenge challenge, String pin) throws Exception;

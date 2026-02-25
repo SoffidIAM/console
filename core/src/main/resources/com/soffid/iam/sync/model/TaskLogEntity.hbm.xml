@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.TaskLogEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TASKLOG' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TLO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='completed' type='java.lang.String'>
+			<column name='TLO_COMPLETE' not-null='false' length='1' />
+		</property>
+		<property name='message' type='java.lang.String'>
+			<column name='TLO_MISSAT' not-null='false' length='1024' />
+		</property>
+		<property name='creationDate' type='java.util.Date'>
+			<column name='TLO_DATCREA' not-null='false' />
+		</property>
+		<property name='lastExecution' type='java.lang.Long'>
+			<column name='TLO_DADAEX' not-null='false' />
+		</property>
+		<property name='nextExecution' type='java.lang.Long'>
+			<column name='TLO_PRDAEX' not-null='false' />
+		</property>
+		<property name='executionsNumber' type='java.lang.Long'>
+			<column name='TLO_NUMEXE' not-null='false' />
+		</property>
+		<property name='stackTrace' type='java.lang.String'>
+			<column name='TLO_STACK' not-null='false' length='4000' />
+		</property>
+		<many-to-one name='task' class='com.soffid.iam.sync.model.TaskEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TASKLOG_TLO_IDTASQUE'>
+			<column name='TLO_IDTASQUE' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TASKLOG_TLO_DIS_ID'>
+			<column name='TLO_DIS_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

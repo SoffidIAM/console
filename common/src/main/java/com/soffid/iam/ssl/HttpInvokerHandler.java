@@ -21,16 +21,15 @@ import java.util.Map.Entry;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.PolyglotException;
+import org.graalvm.polyglot.Value;
 import org.mortbay.jetty.HttpHeaders;
-import org.openjdk.nashorn.api.scripting.AbstractJSObject;
-import org.openjdk.nashorn.api.scripting.JSObject;
-import org.openjdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.remote.HeadersFactory;
 import com.soffid.iam.remote.RemoteInvokerFactory;
-
-import es.caib.seycon.util.Base64;
+import com.soffid.iam.util.Base64;
 
 public class HttpInvokerHandler implements InvocationHandler {
     private URL url;
@@ -137,39 +136,61 @@ public class HttpInvokerHandler implements InvocationHandler {
 		
 	}
 
-	protected Object unwrap(Object object) {
-		if (object == null)
+	private Object unwrap(Object r) {
+		if (r == null)
 			return null;
-		if (object instanceof AbstractJSObject) {
-			AbstractJSObject js = (AbstractJSObject) object;
-			if (js.isFunction())
+		if (r instanceof PolyglotException) {
+			PolyglotException som = (PolyglotException) r;
+			throw som;
+		}
+		if (r instanceof Value value) {
+			if (value.isBoolean())
+				return value.asBoolean();
+			else if (value.isDate())
+				return value.asDate();
+			else if (value.isDuration())
+				return value.asDuration();
+			else if (value.isException())
+				value.throwException();
+			else if (value.isHostObject())
+				return value.asHostObject();
+			else if (value.isInstant())
+				return value.asInstant();
+			else if (value.isMetaObject())
+				return value.getMetaObject();
+			else if (value.isNull())
 				return null;
-			if (js.isArray())
-			{
-				List l = new LinkedList();
-				Object length = js.getMember("length");
-				if (length instanceof Number) {
-					int iLength = ((Number)length).intValue();
-					for (int i = 0; i < iLength; i++ ) {
-						Object o = js.getSlot(i);
-						l.add(unwrap(o));
-					}
+			else if (value.isNumber()) {
+				if (value.fitsInInt())
+					return value.asInt();
+				else if (value.fitsInLong())
+					return value.asLong();
+				else
+					return value.asDouble();
+			}
+			else if (value.isString())
+				return value.asString();
+			else if (value.isTime())
+				return value.asTime();
+			else if (value.isTimeZone())
+				return value.asTimeZone();
+			else if (value.hasArrayElements()) {
+				LinkedList<Object> l = new LinkedList<Object>();
+				for (int i = 0; i < value.getArraySize(); i++) {
+					l.add(unwrap(value.getArrayElement(i)));
 				}
 				return l;
 			}
-			else
-			{
-				HashMap m = new HashMap();
-				for (String key: js.keySet()) {
-					Object v = js.getMember(key);
-					if (v != null) {
-						m.put(key, unwrap(v));
-					}
-				}	
+			else {
+				HashMap<String, Object> m = new HashMap<>();
+				for (String o: value.getMemberKeys()) {
+					m.put(o, unwrap(value.getMember(o)));
+				}
 				return m;
 			}
 		}
-		else
-			return object;
+
+		return r;
 	}
+
 }

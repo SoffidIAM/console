@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.soffid.iam.api.Account;
-import com.soffid.iam.api.User;
+import com.soffid.iam.base.api.User;
 
 public class ExtensibleObjects implements Serializable
 {
@@ -29,14 +28,4 @@ public class ExtensibleObjects implements Serializable
 		this.objects = objects;
 	}
 
-	public static ExtensibleObjects toExtensibleObjects (es.caib.seycon.ng.sync.intf.ExtensibleObjects eos)
-	{
-		ExtensibleObjects target = new ExtensibleObjects();
-		for (ExtensibleObject eo: eos.getObjects())
-		{
-			target.objects.add(eo);
-		}
-		return target;
-	}
-	
 }

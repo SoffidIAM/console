@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.MetaDataEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TIPDAD' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TDA_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='TDA_CODI' not-null='true' length='25' />
+		</property>
+		<property name='order' type='java.lang.Long'>
+			<column name='TDA_ORDRE' not-null='true' />
+		</property>
+		<set name='data' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_DADUSU_DUS_TDAID'>
+				<column name='DUS_TDAID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserDataEntityImpl'/>
+		</set>
+		<property name='scope' type='com.soffid.iam.base.api.MetadataScopeEnum'>
+			<column name='TDA_SCOPE' not-null='false' length='50' />
+		</property>
+		<property name='type' type='com.soffid.iam.base.api.TypeEnumerationEnum'>
+			<column name='TDA_TYPE' not-null='false' length='50' />
+		</property>
+		<property name='size' type='java.lang.Integer'>
+			<column name='TDA_SIZE' not-null='false' />
+		</property>
+		<property name='required' type='java.lang.Boolean'>
+			<column name='TDA_REQUIR' not-null='false' />
+		</property>
+		<property name='readOnly' type='java.lang.Boolean'>
+			<column name='TDA_RDONLY' not-null='false' />
+		</property>
+		<property name='multiValued' type='java.lang.Boolean'>
+			<column name='TDA_MULTIV' not-null='false' />
+		</property>
+		<property name='multiLine' type='java.lang.Boolean'>
+			<column name='TDA_MLTLIN' not-null='false' />
+		</property>
+		<property name='searchCriteria' type='java.lang.Boolean'>
+			<column name='TDA_QUSECR' not-null='false' />
+		</property>
+		<property name='multiValuedRows' type='java.lang.Integer'>
+			<column name='TDA_MVROWS' not-null='false' />
+		</property>
+		<property name='values' type='java.lang.String' lazy='true'>
+			<column name='TDA_VALUE' not-null='false' length='64000' />
+		</property>
+		<property name='label' type='java.lang.String'>
+			<column name='TDA_LABEL' not-null='false' length='64' />
+		</property>
+		<property name='hint' type='java.lang.String'>
+			<column name='TDA_HINT' not-null='false' length='128' />
+		</property>
+		<property name='nlsLabel' type='java.lang.String'>
+			<column name='TDA_NLSLAB' not-null='false' length='128' />
+		</property>
+		<property name='builtinHandler' type='java.lang.String'>
+			<column name='TDA_UIHANDL' not-null='false' length='128' />
+		</property>
+		<property name='adminVisibility' type='com.soffid.iam.base.api.AttributeVisibilityEnumEnum'>
+			<column name='TDA_ADMVIS' not-null='false' length='1' />
+		</property>
+		<property name='operatorVisibility' type='com.soffid.iam.base.api.AttributeVisibilityEnumEnum'>
+			<column name='TDA_OPEVIS' not-null='false' length='1' />
+		</property>
+		<property name='userVisibility' type='com.soffid.iam.base.api.AttributeVisibilityEnumEnum'>
+			<column name='TDA_USEVIS' not-null='false' length='1' />
+		</property>
+		<property name='unique' type='java.lang.Boolean'>
+			<column name='TDA_UNIQUE' not-null='false' length='1' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='TDA_DESCRI' not-null='false' length='512' />
+		</property>
+		<many-to-one name='objectType' class='com.soffid.iam.iga.model.CustomObjectTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TIPDAD_TDA_COT_ID'>
+			<column name='TDA_COT_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='dataObjectType' class='com.soffid.iam.iga.model.CustomObjectTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TIPDAD_TDA_COT_VAL_ID'>
+			<column name='TDA_COT_VAL_ID' not-null='false'/>
+		</many-to-one>
+		<property name='visibilityExpression' type='java.lang.String'>
+			<column name='TDA_VISEXP' not-null='false' length='2048' />
+		</property>
+		<property name='validationExpression' type='java.lang.String'>
+			<column name='TDA_VALEXP' not-null='false' length='2048' />
+		</property>
+		<property name='onLoadTrigger' type='java.lang.String' lazy='true'>
+			<column name='TDA_LOATRI' not-null='false' length='4096' />
+		</property>
+		<property name='onChangeTrigger' type='java.lang.String' lazy='true'>
+			<column name='TDA_CHATRI' not-null='false' length='4096' />
+		</property>
+		<property name='onFocusTrigger' type='java.lang.String' lazy='true'>
+			<column name='TDA_FOCTRI' not-null='false' length='4096' />
+		</property>
+		<property name='validator' type='java.lang.String'>
+			<column name='TDA_VALCLA' not-null='false' length='100' />
+		</property>
+		<property name='enumeration' type='java.lang.String'>
+			<column name='TDA_ENUM' not-null='false' length='100' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TIPDAD_TDA_TEN_ID'>
+			<column name='TDA_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='filterExpression' type='java.lang.String'>
+			<column name='TDA_FILEXP' not-null='false' />
+		</property>
+		<property name='builtin' type='java.lang.Boolean'>
+			<column name='TDA_BUILTI' not-null='false' />
+		</property>
+		<property name='letterCase' type='com.soffid.iam.base.api.LetterCaseEnumEnum'>
+			<column name='TDA_LETCAS' not-null='false' />
+		</property>
+		<set name='translations' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_TRALAB_TLA_TDA_ID'>
+				<column name='TLA_TDA_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.TranslatedLabelEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

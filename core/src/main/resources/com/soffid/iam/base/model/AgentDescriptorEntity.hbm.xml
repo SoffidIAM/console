@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.AgentDescriptorEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_AGEDES' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ADE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='description' type='java.lang.String'>
+			<column name='ADE_DESCRI' not-null='true' length='512' />
+		</property>
+		<property name='className' type='java.lang.String'>
+			<column name='ADE_CLASS' not-null='true' length='512' />
+		</property>
+		<property name='userInterface' type='org.springframework.orm.hibernate3.support.BlobByteArrayType' lazy='true'>
+			<column name='ADE_UI' not-null='true' length='65000' />
+		</property>
+		<many-to-one name='plugin' class='com.soffid.iam.base.model.ServerPluginEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AGEDES_ADE_IDSPL'>
+			<column name='ADE_IDSPL' not-null='true'/>
+		</many-to-one>
+		<property name='enableAccessControl' type='boolean'>
+			<column name='ADE_CAC' not-null='true' />
+		</property>
+		<many-to-one name='module' class='com.soffid.iam.base.model.ServerPluginModuleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AGEDES_ADE_SPM_ID'>
+			<column name='ADE_SPM_ID' not-null='true'/>
+		</many-to-one>
+		<property name='authoritativeSource' type='boolean'>
+			<column name='ADE_AUTHOR' not-null='true' />
+		</property>
+		<property name='enableAttributeMapping' type='boolean'>
+			<column name='ADE_ATTMAP' not-null='true' />
+		</property>
+		<property name='enableObjectTriggers' type='java.lang.Boolean'>
+			<column name='ADE_OBJTRG' not-null='true' />
+		</property>
+		<property name='service' type='java.lang.Boolean'>
+			<column name='ADE_SERVIC' not-null='true' />
+		</property>
+		<set name='defaultObjectMappings' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_DEOBMA_DAM_ADE_ID'>
+				<column name='DAM_ADE_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.DefaultObjectMappingEntityImpl'/>
+		</set>
+		<set name='properties' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AGEPRO_APR_ADE_ID'>
+				<column name='APR_ADE_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AgentPropertyEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

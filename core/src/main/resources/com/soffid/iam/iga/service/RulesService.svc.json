@@ -1,0 +1,32 @@
+{
+  "class": "com.soffid.iam.iga.service.RulesService",
+  "methods": [
+    {"name":"applyAsync", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true}    ]},
+    {"name":"queryProcessStatus", "comments":"Query the rule process status", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"process","type":"com.soffid.iam.base.api.AsyncProcessTracker","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.Rule", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.Rule", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.RuleAssignedRole", "arguments":[
+       {"name":"ruleAssignment","type":"com.soffid.iam.iga.api.RuleAssignedRole","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.RuleAssignedRole", "arguments":[
+       {"name":"ruleAssignment","type":"com.soffid.iam.iga.api.RuleAssignedRole","required": true}    ]},
+    {"name":"generateChangesReport", "comments":"Generates an excel file with expected changes", "return":"java.lang.String", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true},
+       {"name":"grants","type":"java.util.Collection<com.soffid.iam.iga.api.RuleAssignedRole>","required": true}    ]},
+    {"name":"findRuleAssignments", "return":"java.util.Collection<com.soffid.iam.iga.api.RuleAssignedRole>", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true}    ]},
+    {"name":"findRules", "return":"java.util.Collection<com.soffid.iam.iga.api.Rule>", "arguments":[
+       {"name":"description","type":"java.lang.String","required":false}    ]},
+    {"name":"findRulesByRole", "return":"java.util.Collection<com.soffid.iam.iga.api.Rule>", "arguments":[
+       {"name":"roleId","type":"java.lang.Long","required": true}    ]},
+    {"name":"apply", "return":"void", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.iga.api.Rule","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"ruleAssignment","type":"com.soffid.iam.iga.api.RuleAssignedRole","required": true}    ]}
+  ]
+}

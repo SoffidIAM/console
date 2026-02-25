@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.EntryPointTreeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_PUEPUE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PPE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='order' type='java.lang.Integer'>
+			<column name='PPE_ORDRE' not-null='true' />
+		</property>
+		<many-to-one name='parent' class='com.soffid.iam.am.model.EntryPointEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PUEPUE_PPE_IDPEPA'>
+			<column name='PPE_IDPEPA' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='child' class='com.soffid.iam.am.model.EntryPointEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PUEPUE_PPE_IDPEFI'>
+			<column name='PPE_IDPEFI' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

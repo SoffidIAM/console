@@ -1,0 +1,9 @@
+{
+  "class": "com.soffid.iam.impl.service.ApplicationShutdownService",
+  "methods": [
+    {"name":"consoleShutdown", "return":"void", "arguments":[
+    ]},
+    {"name":"syncServerShutdown", "return":"void", "arguments":[
+    ]}
+  ]
+}

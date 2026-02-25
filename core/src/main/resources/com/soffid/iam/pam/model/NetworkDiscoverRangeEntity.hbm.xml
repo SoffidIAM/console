@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.NetworkDiscoverRangeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_NEDIRA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='NDR_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='network' class='com.soffid.iam.am.model.NetworkEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_NEDIRA_NDR_XAR_ID'>
+			<column name='NDR_XAR_ID' not-null='true'/>
+		</many-to-one>
+		<property name='range' type='java.lang.String'>
+			<column name='NDR_RANGE' not-null='true' />
+		</property>
+	</class>
+</hibernate-mapping>

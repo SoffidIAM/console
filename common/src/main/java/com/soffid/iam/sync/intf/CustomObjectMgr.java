@@ -30,13 +30,9 @@ package com.soffid.iam.sync.intf;
 
 import java.rmi.RemoteException;
 
-import com.soffid.iam.api.CustomObject;
-import com.soffid.iam.api.User;
-
-import es.caib.seycon.ng.comu.Account;
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.comu.Usuari;
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.iga.api.CustomObject;
+import com.soffid.iam.base.api.User;
+import com.soffid.iam.exception.InternalErrorException;
 
 /** 
  * Interfaz remoto de gestión de usuarios (y contraseñas)
@@ -50,7 +46,7 @@ public interface CustomObjectMgr extends java.rmi.Remote {
     throws java.rmi.RemoteException, 
             InternalErrorException;
 
-  public void removeCustomObject (CustomObject obj) 
+  public void removeCustomObject (String obectType, String name, String externalId) 
 		    throws java.rmi.RemoteException, 
 		            InternalErrorException;
 }

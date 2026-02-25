@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.RoleAccountEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ROLUSU' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RLU_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_ROLUSU_GRU'>
+			<column name='RLU_ROLUSU_GRU' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='role' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_IDROL'>
+			<column name='RLU_IDROL' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='domainValue' class='com.soffid.iam.iga.model.DomainValueEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_VALDOM'>
+			<column name='RLU_VALDOM' not-null='false'/>
+		</many-to-one>
+		<property name='domainType' type='java.lang.String'>
+			<column name='RLU_TIPDOM' not-null='false' length='20' />
+		</property>
+		<many-to-one name='informationSystem' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_ADMAPP'>
+			<column name='RLU_ADMAPP' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='account' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_ACC_ID'>
+			<column name='RLU_ACC_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='rule' class='com.soffid.iam.iga.model.RuleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_RUL_ID'>
+			<column name='RLU_RUL_ID' not-null='false'/>
+		</many-to-one>
+		<property name='startDate' type='java.util.Date'>
+			<column name='RLU_START' not-null='false' />
+		</property>
+		<property name='endDate' type='java.util.Date'>
+			<column name='RLU_END' not-null='false' />
+		</property>
+		<property name='enabled' type='boolean'>
+			<column name='RLU_ENABLE' not-null='true' />
+		</property>
+		<property name='approvalPending' type='boolean'>
+			<column name='RLU_APRPEN' not-null='true' />
+		</property>
+		<property name='removalPending' type='java.lang.Boolean'>
+			<column name='RLU_REMPEN' not-null='false' />
+		</property>
+		<many-to-one name='holderGroup' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_GROUP'>
+			<column name='RLU_GROUP' not-null='false'/>
+		</many-to-one>
+		<property name='approvalProcess' type='java.lang.Long'>
+			<column name='RLU_APRPRO' not-null='false' />
+		</property>
+		<property name='certificationDate' type='java.util.Date'>
+			<column name='RLU_CERDAT' not-null='false' />
+		</property>
+		<many-to-one name='parent' class='com.soffid.iam.iga.model.RoleAccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_RLU_ID'>
+			<column name='RLU_RLU_ID' not-null='false'/>
+		</many-to-one>
+		<property name='delegationStatus' type='com.soffid.iam.iga.api.DelegationStatusEnum'>
+			<column name='RLU_DELSTA' not-null='false' />
+		</property>
+		<many-to-one name='ownerAccount' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_OMNACC_ID'>
+			<column name='RLU_OMNACC_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='delegateAccount' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLUSU_RLU_DELACC_ID'>
+			<column name='RLU_DELACC_ID' not-null='false'/>
+		</many-to-one>
+		<property name='delegateSince' type='java.util.Date'>
+			<column name='RLU_DELSIN' not-null='false' />
+		</property>
+		<property name='delegateUntil' type='java.util.Date'>
+			<column name='RLU_DELUNT' not-null='false' />
+		</property>
+		<property name='externalId' type='java.lang.String'>
+			<column name='RLU_EXTID' not-null='false' length='100' />
+		</property>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_RACATT_RAA_RAC_ID'>
+				<column name='RAA_RAC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleAccountAttributeEntityImpl'/>
+		</set>
+		<set name='children' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLUSU_RLU_RLU_ID'>
+				<column name='RLU_RLU_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleAccountEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ISSUE_EVE_RAC_ID'>
+				<column name='EVE_RAC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='RLU_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='RLU_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='RLU_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='RLU_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='RLU_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='RLU_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

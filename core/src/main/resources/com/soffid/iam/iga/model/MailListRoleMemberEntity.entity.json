@@ -1,0 +1,9 @@
+{
+  "joins": [
+    {"name":"mailList","targetClass":"com.soffid.iam.iga.model.MailListEntity","multiple":false,"reverse":"roles"},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"mailLists"},
+    {"name":"informationSystemScope","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false,"reverse":"roleScopeMailLists"},
+    {"name":"groupScope","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"roleScopeMailLists"},
+    {"name":"domainValueScope","targetClass":"com.soffid.iam.iga.model.DomainValueEntity","multiple":false,"reverse":"roleScopeMailLists"}
+  ]
+}

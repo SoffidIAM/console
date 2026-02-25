@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"appliesTo","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false,"reverse":"disabledPermissions"}
+  ]
+}

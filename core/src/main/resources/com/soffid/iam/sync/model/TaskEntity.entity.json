@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"logs","targetClass":"com.soffid.iam.sync.model.TaskLogEntity","multiple":true,"reverse":"task"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"taskLogs","targetClass":"com.soffid.iam.sync.model.TaskLogEntity","multiple":true,"reverse":"task"}
+  ]
+}

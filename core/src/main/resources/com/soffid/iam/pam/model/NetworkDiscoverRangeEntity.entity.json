@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"network","targetClass":"com.soffid.iam.am.model.NetworkEntity","multiple":false,"reverse":"ranges"}
+  ]
+}

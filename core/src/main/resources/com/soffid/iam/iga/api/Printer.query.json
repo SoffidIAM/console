@@ -1,0 +1,21 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.PrinterEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"model", "hibernateName":"model"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"hostName",  "hibernateName":"server.name"},
+    {"name":"local", "hibernateName":"local"},
+    {"name":"id", "hibernateName":"id"},
+    {"name":"users",  "hibernateName":"users.userName"},
+    {"name":"groups",  "hibernateName":"groups.name"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

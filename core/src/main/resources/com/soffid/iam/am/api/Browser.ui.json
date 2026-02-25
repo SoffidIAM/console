@@ -1,0 +1,19 @@
+{
+  "class": "com.soffid.iam.am.api.Browser",
+  "attributes": [
+    {"name":"serialNumber", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "label":"com.soffid.iam.am.api.Host.serialNumber", "readonly":true, "separator":"__BASIC", "length":"255"},
+    {"name":"deviceType", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"operatingSystem", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "label":"com.soffid.iam.am.api.Host.os", "readonly":false, "length":"100"},
+    {"name":"browser", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"cpu", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"ip", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "label":"com.soffid.iam.am.api.Host.ip", "readonly":false, "separator":"__AUDIT", "length":"60"},
+    {"name":"lastUser", "type":"USER", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"hostName", "type":"HOST", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"lastSeen", "type":"DATE_TIME", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "label":"com.soffid.iam.am.api.Host.lastSeen", "readonly":false},
+    {"name":"locked", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "label":"com.soffid.iam.am.api.Host.locked", "readonly":false},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"task","targetClass":"com.soffid.iam.sync.model.ScheduledTaskEntity","multiple":false,"reverse":"logs"}
+  ]
+}

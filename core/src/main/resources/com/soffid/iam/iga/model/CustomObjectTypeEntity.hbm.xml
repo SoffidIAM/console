@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.CustomObjectTypeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_CUOBTY' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='COT_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='COT_NAME' not-null='true' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='COT_DESCR' not-null='true' length='250' />
+		</property>
+		<property name='scope' type='com.soffid.iam.base.api.MetadataScopeEnum'>
+			<column name='COT_SCOPE' not-null='false' length='50' />
+		</property>
+		<property name='builtin' type='boolean'>
+			<column name='COT_BUILTIN' not-null='true' />
+		</property>
+		<property name='textIndex' type='boolean'>
+			<column name='COT_TXTIND' not-null='true' />
+		</property>
+		<property name='extensibleObjectClass' type='java.lang.String'>
+			<column name='COT_EXOBCL' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_CUOBTY_COT_TEN_ID'>
+			<column name='COT_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='publicAccess' type='java.lang.Boolean'>
+			<column name='COT_PUBLIC' not-null='false' />
+		</property>
+		<set name='refererncedBy' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_ACCMET_TDA_COT_ID'>
+				<column name='TDA_COT_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountMetadataEntityImpl'/>
+		</set>
+		<set name='objects' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_CUSOBJ_COB_COT_ID'>
+				<column name='COB_COT_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.CustomObjectEntityImpl'/>
+		</set>
+		<set name='accessRoles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_CUSBRO_COR_COT_ID'>
+				<column name='COR_COT_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.CustomObjectRoleEntityImpl'/>
+		</set>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_TIPDAD_TDA_COT_ID'>
+				<column name='TDA_COT_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MetaDataEntityImpl'/>
+		</set>
+		<set name='referencedBy' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_TIPDAD_TDA_COT_VAL_ID'>
+				<column name='TDA_COT_VAL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MetaDataEntityImpl'/>
+		</set>
+		<set name='mappings' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_OBJMAP_OBM_CUSOBJ'>
+				<column name='OBM_CUSOBJ'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ObjectMappingEntityImpl'/>
+		</set>
+		<set name='translations' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_TRALAB_TLA_COT_ID'>
+				<column name='TLA_COT_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.TranslatedLabelEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='COT_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='COT_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='COT_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='COT_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='COT_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='COT_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

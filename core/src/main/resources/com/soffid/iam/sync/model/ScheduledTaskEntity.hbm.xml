@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.ScheduledTaskEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SCHTAS' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SCT_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='handler' class='com.soffid.iam.sync.model.ScheduledTaskHandlerEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SCHTAS_SCT_HANDLE'>
+			<column name='SCT_HANDLE' not-null='true'/>
+		</many-to-one>
+		<property name='name' type='java.lang.String'>
+			<column name='SCT_NAME' not-null='true' length='250' />
+		</property>
+		<property name='params' type='java.lang.String'>
+			<column name='SCT_PARAM' not-null='false' length='250' />
+		</property>
+		<property name='schedulePattern' type='java.lang.String'>
+			<column name='SCT_SCHEDU' not-null='false' length='100' />
+		</property>
+		<property name='lastExecution' type='java.util.Date'>
+			<column name='SCT_LASEXE' not-null='false' />
+		</property>
+		<property name='lastEnd' type='java.util.Date'>
+			<column name='SCT_LASEND' not-null='false' />
+		</property>
+		<property name='logReferenceID' type='java.lang.String'>
+			<column name='SCT_LOGDOC' not-null='false' />
+		</property>
+		<property name='error' type='boolean'>
+			<column name='SCT_ERROR' not-null='true' />
+		</property>
+		<many-to-one name='server' class='com.soffid.iam.sync.model.ServerEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SCHTAS_SCT_SERVER'>
+			<column name='SCT_SERVER' not-null='false'/>
+		</many-to-one>
+		<property name='active' type='boolean'>
+			<column name='SCT_ACTIVE' not-null='true' />
+		</property>
+		<property name='enabled' type='boolean'>
+			<column name='SCT_ENABLE' not-null='true' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SCHTAS_SCT_TEN_ID'>
+			<column name='SCT_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='status' type='java.lang.String'>
+			<column name='SCT_STATUS' not-null='false' />
+		</property>
+		<property name='percentageDone' type='java.lang.Double'>
+			<column name='SCT_PCT' not-null='false' />
+		</property>
+		<property name='stop' type='java.lang.Boolean'>
+			<column name='SCT_STOP' not-null='false' />
+		</property>
+		<set name='logs' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SCTALO_STL_SCT_ID'>
+				<column name='STL_SCT_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.ScheduledTaskLogEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

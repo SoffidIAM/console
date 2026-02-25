@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ReconcileAccountAttributesEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_RECATT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RAA_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='account' class='com.soffid.iam.iga.model.ReconcileAccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_RECATT_RAA_RAC_ID'>
+			<column name='RAA_RAC_ID' not-null='true'/>
+		</many-to-one>
+		<property name='attribute' type='java.lang.String'>
+			<column name='RAA_ATTRIB' not-null='true' />
+		</property>
+		<property name='value' type='java.lang.String'>
+			<column name='RAA_VALUE' not-null='false' />
+		</property>
+		<property name='dateValue' type='java.util.Date'>
+			<column name='RAA_DATE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

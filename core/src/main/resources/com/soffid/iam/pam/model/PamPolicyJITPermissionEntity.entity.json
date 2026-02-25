@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"policy","targetClass":"com.soffid.iam.pam.model.PamPolicyEntity","multiple":false,"reverse":"justInTimePermissions"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

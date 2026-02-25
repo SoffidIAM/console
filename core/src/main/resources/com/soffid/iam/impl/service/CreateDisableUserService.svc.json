@@ -1,0 +1,35 @@
+{
+  "class": "com.soffid.iam.impl.service.CreateDisableUserService",
+  "methods": [
+    {"name":"disableUser", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserByShortName", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"nomCurt","type":"java.lang.String","required": true}    ]},
+    {"name":"setServersToUser", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"servidorPerfilId","type":"java.lang.String","required":false},
+       {"name":"servidorCorreuId","type":"java.lang.String","required":false},
+       {"name":"servidorHomeId","type":"java.lang.String","required":false}    ]},
+    {"name":"getSuperGroup", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"codiSubGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"getAdministratorRoleByGroup", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"existShortName", "return":"java.lang.Boolean", "arguments":[
+       {"name":"nomCurt","type":"java.lang.String","required": true}    ]},
+    {"name":"setInitialPasswordToUser", "return":"java.lang.String", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiDominiContrasenyes","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupsByUserCode", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getManagedGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+    ]},
+    {"name":"getManagedGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getContractTypesUserCreate", "return":"java.util.Collection<java.lang.String>", "arguments":[
+    ]},
+    {"name":"getOUDependent", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiUnitatOrganitzativa","type":"java.lang.String","required": true}    ]},
+    {"name":"getUsersByNIF", "return":"java.util.Collection<com.soffid.iam.base.api.User>", "arguments":[
+       {"name":"nif","type":"java.lang.String","required": true}    ]}
+  ]
+}

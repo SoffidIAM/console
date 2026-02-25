@@ -1,0 +1,18 @@
+{
+  "since": "created",
+  "joins": [
+    {"name":"roles","targetClass":"com.soffid.iam.iga.model.RoleAccountEntity","multiple":true,"reverse":"account"},
+    {"name":"users","targetClass":"com.soffid.iam.base.model.UserAccountEntity","multiple":true,"reverse":"account"},
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"accounts"},
+    {"name":"acl","targetClass":"com.soffid.iam.pam.model.AccountAccessEntity","multiple":true,"reverse":"account"},
+    {"name":"folder","targetClass":"com.soffid.iam.am.model.VaultFolderEntity","multiple":false,"reverse":"accounts"},
+    {"name":"jumpServerGroup","targetClass":"com.soffid.iam.pam.model.JumpServerGroupEntity","multiple":false},
+    {"name":"passwords","targetClass":"com.soffid.iam.am.model.AccountPasswordEntity","multiple":true,"reverse":"account"},
+    {"name":"passwordPolicy","targetClass":"com.soffid.iam.base.model.UserTypeEntity","multiple":false,"reverse":"accounts"},
+    {"name":"snapshot","targetClass":"com.soffid.iam.iga.model.AccountSnapshotEntity","multiple":false,"reverse":"accounts"},
+    {"name":"attributes","targetClass":"com.soffid.iam.base.model.AccountAttributeEntity","multiple":true,"reverse":"account"},
+    {"name":"services","targetClass":"com.soffid.iam.pam.model.HostServiceEntity","multiple":true,"reverse":"account"},
+    {"name":"networkDiscovery","targetClass":"com.soffid.iam.pam.model.NetworkDiscoveryAccountEntity","multiple":true,"reverse":"account"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":true,"reverse":"account"}
+  ]
+}

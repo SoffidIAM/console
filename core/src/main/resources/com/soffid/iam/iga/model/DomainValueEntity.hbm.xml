@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.DomainValueEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_VALOR_DOMINI' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='VDO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='value' type='java.lang.String'>
+			<column name='VDO_VALOR' not-null='true' length='150' />
+		</property>
+		<many-to-one name='domain' class='com.soffid.iam.iga.model.ApplicationDomainEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_VALOR_DOMINI_VDO_DOM'>
+			<column name='VDO_DOM' not-null='true'/>
+		</many-to-one>
+		<property name='description' type='java.lang.String'>
+			<column name='VDO_DESC' not-null='true' length='50' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_VALOR_DOMINI_VDO_TEN_ID'>
+			<column name='VDO_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='roleScopeMailLists' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOROL_LCR_VDO_ID'>
+				<column name='LCR_VDO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListRoleMemberEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='VDO_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='VDO_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='VDO_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='VDO_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='VDO_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='VDO_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

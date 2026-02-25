@@ -9,21 +9,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
-import javax.ejb.RemoveException;
+import jakarta.ejb.CreateException;
+import jakarta.ejb.EJBException;
+import jakarta.ejb.RemoveException;
 import javax.naming.NamingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.soffid.iam.EJBLocator;
+import com.soffid.iam.bpm.exception.BPMException;
 import com.soffid.iam.doc.api.DocumentReference;
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.ejb.DocumentService;
-
-import es.caib.bpm.exception.BPMException;
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public abstract class AbstractAttachmentManager {
 
@@ -38,7 +37,7 @@ public abstract class AbstractAttachmentManager {
 
     public void uploadFile(InputStream stream, String contentType,
             String originalName, String tag) throws IOException,
-            NamingException, CreateException, DocumentBeanException,
+            NamingException,  DocumentBeanException,
             InterruptedException, DocumentBeanException, BPMException, InternalErrorException, EJBException, RemoveException {
         DocumentService document = createDocument(contentType, originalName);
         byte[] buffer = new byte[4096];
@@ -69,7 +68,7 @@ public abstract class AbstractAttachmentManager {
 
     public DocumentService createDocument(String contentType,
             String originalName) throws IOException,
-            NamingException, CreateException, DocumentBeanException,
+            NamingException,  DocumentBeanException,
             InterruptedException, DocumentBeanException, BPMException, InternalErrorException {
         
         DocumentService document = EJBLocator.getDocumentService();
@@ -108,7 +107,7 @@ public abstract class AbstractAttachmentManager {
     }
 
     public DocumentService getDocument(String tag) throws NamingException,
-            RemoteException, CreateException, InternalErrorException {
+            RemoteException, InternalErrorException {
         DocumentReference ref = getReference(tag);
 
         if (ref == null)

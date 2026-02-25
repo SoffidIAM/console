@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"attributes"},
+    {"name":"metadata","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":false}
+  ]
+}

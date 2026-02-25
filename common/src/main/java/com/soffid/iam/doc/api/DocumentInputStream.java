@@ -8,8 +8,7 @@ import java.util.Arrays;
 
 import com.soffid.iam.doc.exception.DocumentBeanException;
 import com.soffid.iam.doc.service.DocumentService;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public class DocumentInputStream extends InputStream {
 	@Override

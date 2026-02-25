@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.PamPolicyJITPermissionEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_PPOJTP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PJT_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='policy' class='com.soffid.iam.pam.model.PamPolicyEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PPOJTP_PJT_PPO_ID'>
+			<column name='PJT_PPO_ID' not-null='true'/>
+		</many-to-one>
+		<property name='name' type='java.lang.String'>
+			<column name='PJT_NAME' not-null='true' length='100' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PPOJTP_PPO_TEN_ID'>
+			<column name='PPO_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

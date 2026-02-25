@@ -6,9 +6,8 @@
  
 package com.soffid.iam.sync.intf;
 
-import com.soffid.iam.api.Role;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.iga.api.Role;
 
 public interface RoleMgr extends java.rmi.Remote {
   /** Update role attributes.
@@ -29,7 +28,7 @@ public interface RoleMgr extends java.rmi.Remote {
    * @param rolName  - Role name
    * @param dispatcher - Target system
    */
-  public void removeRole (String rolName, String dispatcher)
+  public void removeRole (String rolName, String externalId, String dispatcher)
 		    throws java.rmi.RemoteException,
             InternalErrorException;
 

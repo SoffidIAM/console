@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.EntryPointEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_PUNENT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PUE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='code' type='java.lang.String'>
+			<column name='PUE_CODI' not-null='false' length='50' />
+		</property>
+		<property name='name' type='java.lang.String'>
+			<column name='PUE_NOM' not-null='true' length='128' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='PUE_DESCRI' not-null='false' length='512' />
+		</property>
+		<property name='visible' type='java.lang.String'>
+			<column name='PUE_VISIBL' not-null='true' length='1' />
+		</property>
+		<property name='menu' type='java.lang.String'>
+			<column name='PUE_MENU' not-null='true' length='1' />
+		</property>
+		<property name='numberOfColumns' type='java.lang.Long'>
+			<column name='PUE_NUMCOL' not-null='false' />
+		</property>
+		<property name='publicAccess' type='java.lang.String'>
+			<column name='PUE_PUBLIC' not-null='false' length='1' />
+		</property>
+		<property name='menuType' type='java.lang.String'>
+			<column name='PUE_TIPMEN' not-null='false' length='1' />
+		</property>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PUNENT_PUE_DIS_ID'>
+			<column name='PUE_DIS_ID' not-null='false'/>
+		</many-to-one>
+		<set name='authorizedRoles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLPUE_RPE_IDPUE'>
+				<column name='RPE_IDPUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointRoleEntityImpl'/>
+		</set>
+		<set name='authorizedUsers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUPUE_UPE_IDPUE'>
+				<column name='UPE_IDPUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointUserEntityImpl'/>
+		</set>
+		<set name='authorizedGroups' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_GRUPUE_GPE_IDPUE'>
+				<column name='GPE_IDPUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointGroupEntityImpl'/>
+		</set>
+		<set name='executionMethod' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_EXEPUE_EPE_IDPUE'>
+				<column name='EPE_IDPUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointExecutableEntityImpl'/>
+		</set>
+		<set name='authorizedAccounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCPUE_CPE_IDPUE'>
+				<column name='CPE_IDPUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointAccountEntityImpl'/>
+		</set>
+		<property name='icon1' type='java.lang.Long'>
+			<column name='PUE_ICON' not-null='false' />
+		</property>
+		<property name='icon2' type='java.lang.Long'>
+			<column name='PUE_ICON2' not-null='false' />
+		</property>
+		<many-to-one name='informationSystem' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PUNENT_PUE_IDAPL'>
+			<column name='PUE_IDAPL' not-null='false'/>
+		</many-to-one>
+		<set name='parentEntryPointTree' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PUEPUE_PPE_IDPEFI'>
+				<column name='PPE_IDPEFI'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointTreeEntityImpl'/>
+		</set>
+		<set name='childrenEntryPointTree' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PUEPUE_PPE_IDPEPA'>
+				<column name='PPE_IDPEPA'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointTreeEntityImpl'/>
+		</set>
+		<property name='xmlEntryPoint' type='java.lang.String' lazy='true'>
+			<column name='PUE_XML' not-null='false' length='64000' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PUNENT_PUE_TEN_ID'>
+			<column name='PUE_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='hosts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQPUE_MAP_PUE_ID'>
+				<column name='MAP_PUE_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.HostEntryPointEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='PUE_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='PUE_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='PUE_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='PUE_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='PUE_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='PUE_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

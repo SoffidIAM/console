@@ -1,0 +1,19 @@
+{
+  "class": "com.soffid.iam.iga.api.MailList",
+  "attributes": [
+    {"name":"name", "type":"STRING", "comments":"Mail list name", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"50"},
+    {"name":"domainName", "type":"MAIL_DOMAIN", "comments":"Mail domain", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "filter_expression":"obsolete eq false"},
+    {"name":"description", "type":"STRING", "comments":"Mail description", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"lists", "type":"MAIL_LIST", "comments":"Embeded mail lists", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":true, "readonly":false},
+    {"name":"externalList", "type":"EMAIL", "comments":"External (unmanaged) mail lists that are subscribed to this one", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":true, "readonly":false},
+    {"name":"roleMembers", "type":"ROLE", "comments":"Role whose gramtee should be subscribed to this list", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":true, "readonly":false},
+    {"name":"groupMembers", "type":"GROUP", "comments":"Business units whose membes should be subscribed to this list", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":true, "readonly":false, "filter_expression":"obsolete eq false"},
+    {"name":"usersList", "type":"USER", "comments":"Contains the users that are directly subscribed to this mail list", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":true, "readonly":false, "filter_expression":"active eq true"},
+    {"name":"listsBelong", "type":"MAIL_LIST", "comments":"Mail lists that this one is subscribed to", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"explodedUsersList", "type":"USER", "comments":"Contains the exploded users list, resolving any group or role membership.", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":true, "readonly":true},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

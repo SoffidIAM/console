@@ -1,0 +1,11 @@
+{
+  "joins": [
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"sessions"},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false},
+    {"name":"clientHost","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false},
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false},
+    {"name":"browser","targetClass":"com.soffid.iam.am.model.BrowserEntity","multiple":false,"reverse":"sessions"},
+    {"name":"loginLogInfo","targetClass":"com.soffid.iam.am.model.AccessLogEntity","multiple":false},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

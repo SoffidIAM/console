@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"accounts","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":true,"reverse":"snapshot"}
+  ]
+}

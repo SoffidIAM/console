@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.ForbiddenWordEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_BADWORD' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='BDW_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='forbiddenWord' type='java.lang.String'>
+			<column name='BDW_WORD' not-null='true' length='200' />
+		</property>
+		<set name='policies' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_BADCON_BDC_BDW_ID'>
+				<column name='BDC_BDW_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.PolicyForbiddenWordEntityImpl'/>
+		</set>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BADWORD_BDW_TEN_ID'>
+			<column name='BDW_TEN_ID' not-null='false'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

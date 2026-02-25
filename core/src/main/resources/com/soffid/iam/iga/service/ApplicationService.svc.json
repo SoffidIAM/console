@@ -1,0 +1,189 @@
+{
+  "class": "com.soffid.iam.iga.service.ApplicationService",
+  "methods": [
+    {"name":"findDomainValueByText", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>", "arguments":[
+       {"name":"domain","type":"com.soffid.iam.iga.api.Domain","required": true},
+       {"name":"text","type":"java.lang.String","required": true}    ]},
+    {"name":"findDomainValueByTextAsync", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>", "arguments":[
+       {"name":"domain","type":"com.soffid.iam.iga.api.Domain","required": true},
+       {"name":"text","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleNames", "return":"java.util.Collection<java.lang.String>", "arguments":[
+       {"name":"systemName","type":"java.lang.String","required": true}    ]},
+    {"name":"removeRedundantRoles", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"query","type":"java.lang.String","required":false}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.InformationSystem", "arguments":[
+       {"name":"aplicacio","type":"com.soffid.iam.iga.api.InformationSystem","required": true}    ]},
+    {"name":"findApplicationByApplicationNameUnrestricted", "return":"com.soffid.iam.iga.api.InformationSystem", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findApplicationByApplicationName", "return":"com.soffid.iam.iga.api.InformationSystem", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findApplicationById", "return":"com.soffid.iam.iga.api.InformationSystem", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"approveRoleDefinition", "comments":"Makes role dependencies persistent", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"create", "comments":"This method does NOT add grants made to the new role", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"create2", "comments":"This method does add grants made to the new role", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"denyRoleDefinition", "comments":"Makes role dependencies persistent", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"findRoleById", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rolId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findRoleByRoleNameAndApplicationNameAndDispatcherName", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"nomRol","type":"java.lang.String","required": true},
+       {"name":"codiAplicacio","type":"java.lang.String","required": true},
+       {"name":"codiDispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleByNameAndSystem", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true},
+       {"name":"system","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleByShortName", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "comments":"Updates role, including grantee roles and groups, but not roles granted to this one", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"update2", "comments":"Updates role, including roles granted to this role, and role and group grantee", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"enableOrDisableOnDates", "comments":"Enables or disable a rolAccount based on the start and end dates", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"findRoleAccountById", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"updateAttributes", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.RoleGrant", "arguments":[
+       {"name":"grant","type":"com.soffid.iam.iga.api.RoleGrant","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.RoleGrant", "arguments":[
+       {"name":"grant","type":"com.soffid.iam.iga.api.RoleGrant","required": true}    ]},
+    {"name":"findApplications", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.InformationSystem>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"findDomainValues", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"findRedundantRoles", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"query","type":"java.lang.String","required":false}    ]},
+    {"name":"findRoleAccounts", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findRoles", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"generateChangesReport", "comments":"Generates a report to view the changes that a role change will generat", "return":"java.lang.String", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"generateChangesReport", "comments":"Generates a report to view the changes that a role change will generat", "return":"java.lang.String", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true},
+       {"name":"grantsToAdd","type":"java.util.List<com.soffid.iam.iga.api.RoleAccount>","required":false},
+       {"name":"grantsToRemove","type":"java.util.List<com.soffid.iam.iga.api.RoleAccount>","required":false}    ]},
+    {"name":"findNetworkACLRolesByRoleNameAndApplicationNameAndDispatcherName", "return":"java.util.Collection<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"nomRole","type":"java.lang.String","required": true},
+       {"name":"codiAplicacioRol","type":"java.lang.String","required": true},
+       {"name":"codiDispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"findApplicationChildren", "return":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>", "arguments":[
+       {"name":"applicationName","type":"java.lang.String","required": true}    ]},
+    {"name":"findApplicationManagementRoles", "comments":"Finds the managers with a set management role for an application", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+    ]},
+    {"name":"findApplicationManagers", "comments":"Finds the management roles for any information system", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"informationSystem","type":"java.lang.String","required": true},
+       {"name":"roleName","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleAuthorizationsByRoleNameAndApplicationNameAndDispatcherName", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+       {"name":"nomRole","type":"java.lang.String","required": true},
+       {"name":"codiAplicacioRol","type":"java.lang.String","required": true},
+       {"name":"codiDispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"findEffectiveRoleGrantByAccount", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"accountId","type":"long","required": true}    ]},
+    {"name":"findEffectiveRoleGrantByUser", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"findEffectiveRoleGrantByUserAndHolderGroup", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"groupId","type":"long","required": true}    ]},
+    {"name":"findEffectiveRoleGrantsByRoleId", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"rolId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findEffectiveUserRolesByInformationSystem", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"informationSystem","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupManagementRoles", "comments":"Finds the managers with a set management role for a group", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+    ]},
+    {"name":"findGroupManagers", "comments":"Finds the management roles for any group", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"group","type":"java.lang.String","required": true},
+       {"name":"roleName","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleHoldersGroupsByRole", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"findApplicationAccessTreeRolesByRoleNameAndRoleApplicationNameAndDispatcherName", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTreeAuthorization>", "arguments":[
+       {"name":"nomRole","type":"java.lang.String","required": true},
+       {"name":"codiAplicacioRol","type":"java.lang.String","required": true},
+       {"name":"codiDispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleAccountByAccount", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"accountId","type":"long","required": true}    ]},
+    {"name":"findRoleGrantByAccount", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"accountId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findRoleGrantByRole", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"rolId","type":"java.lang.Long","required": true},
+       {"name":"numRegistres","type":"java.lang.Long","required":false}    ]},
+    {"name":"findRoleAccountByAccountNoRule", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"accountId","type":"long","required": true}    ]},
+    {"name":"findRoleGrantHierarchyByAccount", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrantHierarchy>", "arguments":[
+       {"name":"accountId","type":"long","required": true}    ]},
+    {"name":"findRoleGrantHierarchyByUser", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrantHierarchy>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"findRoleGrantsByGroup", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"findRolesByApplicationName", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findRolesByApplicationNameUnrestricted", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findRolesByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findRolesByDomainNameAndApplicationName", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"nomDomini","type":"java.lang.String","required": true},
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findGrantedRolesToGroupByGroup", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"findUserRolesByRoleNameAndRoleApplicationNameAndDispatcherName", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"nomRole","type":"java.lang.String","required": true},
+       {"name":"codiAplicacioRol","type":"java.lang.String","required": true},
+       {"name":"codiDispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserRolesByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserRolesHistoryByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserRolesByUserNameNoSoD", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserRolesByInformationSystem", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"informationSystem","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserRolesByUserNameNoRules", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUsersByRoleNameAndRoleApplicationNameAndDispatcherName", "return":"java.util.Collection<com.soffid.iam.base.api.User>", "arguments":[
+       {"name":"nomRole","type":"java.lang.String","required": true},
+       {"name":"codiAplicacioRol","type":"java.lang.String","required": true},
+       {"name":"codiDispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"getPendingAlerts", "return":"java.util.Collection<java.lang.Object>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required":false}    ]},
+    {"name":"getRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+    ]},
+    {"name":"approveDelete", "return":"void", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"aplicacio","type":"com.soffid.iam.iga.api.InformationSystem","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"grant","type":"com.soffid.iam.iga.api.RoleGrant","required": true}    ]},
+    {"name":"deleteByRuleEvaluation", "return":"void", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"removeSentAlerts", "return":"void", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required":false},
+       {"name":"dataDelete","type":"java.util.Date","required": true}    ]},
+    {"name":"denyApproval", "return":"void", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"denyDelete", "return":"void", "arguments":[
+       {"name":"rolsUsuaris","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"enableOrDisableAllOnDates", "comments":"Enables or disable any rolAccount based on the start and end dates", "return":"void", "arguments":[
+    ]},
+    {"name":"revokeRolesHoldedOnGroup", "return":"void", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"groupId","type":"long","required": true}    ]},
+    {"name":"synchronizeRole", "comments":"Synchronize any user with ", "return":"void", "arguments":[
+       {"name":"rol","type":"com.soffid.iam.iga.api.Role","required": true}    ]},
+    {"name":"update", "return":"void", "arguments":[
+       {"name":"aplicacio","type":"com.soffid.iam.iga.api.InformationSystem","required": true}    ]}
+  ]
+}

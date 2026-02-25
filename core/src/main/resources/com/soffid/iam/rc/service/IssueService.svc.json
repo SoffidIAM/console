@@ -1,0 +1,31 @@
+{
+  "class": "com.soffid.iam.rc.service.IssueService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"event","type":"com.soffid.iam.rc.api.Issue","required": true}    ]},
+    {"name":"createInternalIssue", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"event","type":"com.soffid.iam.rc.api.Issue","required": true}    ]},
+    {"name":"notify", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"issue","type":"com.soffid.iam.rc.api.Issue","required": true},
+       {"name":"address","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"registerAction", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"issue","type":"com.soffid.iam.rc.api.Issue","required": true},
+       {"name":"action","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"event","type":"com.soffid.iam.rc.api.Issue","required": true}    ]},
+    {"name":"findIssues", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Issue>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findMyIssues", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.Issue>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"countMyIssues", "return":"int", "arguments":[
+    ]},
+    {"name":"findIssuesByUser", "return":"java.util.List<com.soffid.iam.rc.api.Issue>", "arguments":[
+       {"name":"user","type":"java.lang.String","required":false}    ]},
+    {"name":"listManualActions", "return":"java.util.List<com.soffid.iam.rc.api.IssueActionDefinition>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"event","type":"com.soffid.iam.rc.api.Issue","required": true}    ]}
+  ]
+}

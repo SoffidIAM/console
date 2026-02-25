@@ -1,0 +1,73 @@
+{
+  "class": "com.soffid.iam.pam.service.PamSessionService",
+  "methods": [
+    {"name":"checkJumpServerSession", "comments":"Checks a server session is up", "return":"boolean", "arguments":[
+       {"name":"sessio","type":"com.soffid.iam.am.api.Session","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.pam.api.JumpServerGroup", "arguments":[
+       {"name":"jumpServerGroup","type":"com.soffid.iam.pam.api.JumpServerGroup","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.pam.api.JumpServerGroup", "arguments":[
+       {"name":"jumpServerGroup","type":"com.soffid.iam.pam.api.JumpServerGroup","required": true}    ]},
+    {"name":"createCustomJumpServerSession", "comments":"Creates a jump server session and returns the session URL. Internal method for SSH and RDP proxies", "return":"com.soffid.iam.pam.api.NewPamSession", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"sourceIp","type":"java.lang.String","required":false},
+       {"name":"type","type":"com.soffid.iam.am.api.SessionType","required":false},
+       {"name":"info","type":"java.lang.String","required":false}    ]},
+    {"name":"createJumpServerSession", "comments":"Creates a jump server session and returns the session URL", "return":"com.soffid.iam.pam.api.NewPamSession", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"createJumpServerSession", "comments":"Creates a jump server session and returns the session URL", "return":"com.soffid.iam.pam.api.NewPamSession", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"entryPointPath","type":"java.lang.String","required":false},
+       {"name":"entryPointDescriptor","type":"java.lang.String","required":false}    ]},
+    {"name":"createJumpServerSession", "comments":"Creates a jump server session and returns the session URL", "return":"com.soffid.iam.pam.api.NewPamSession", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"entryPointPath","type":"java.lang.String","required":false},
+       {"name":"entryPointDescriptor","type":"java.lang.String","required":false},
+       {"name":"pamPolicy","type":"java.lang.String","required":false}    ]},
+    {"name":"createManualJumpServerSession", "comments":"Creates a manual jump server session and returns the session URL", "return":"com.soffid.iam.pam.api.NewPamSession", "arguments":[
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountPassword","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"entryPointPath","type":"java.lang.String","required":false},
+       {"name":"entryPointDescriptor","type":"java.lang.String","required":false},
+       {"name":"pamPolicy","type":"java.lang.String","required":false}    ]},
+    {"name":"findSession", "comments":"Retrieves a pam session descriptor", "return":"com.soffid.iam.pam.api.PamSession", "arguments":[
+       {"name":"serverGroup","type":"java.lang.String","required": true},
+       {"name":"sessionId","type":"java.lang.String","required": true}    ]},
+    {"name":"getActiveSessions", "return":"java.lang.Integer", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"getConsoleFreeSpace", "return":"java.lang.Long", "arguments":[
+       {"name":"jumpServerGroup","type":"java.lang.String","required": true}    ]},
+    {"name":"getConsoleUsedSpace", "return":"java.lang.Long", "arguments":[
+       {"name":"jumpServerGroup","type":"java.lang.String","required": true}    ]},
+    {"name":"findJumpServerGroups", "return":"java.util.List<com.soffid.iam.pam.api.JumpServerGroup>", "arguments":[
+    ]},
+    {"name":"search", "comments":"Searches in pam sessions log", "return":"java.util.List<com.soffid.iam.pam.api.PamSession>", "arguments":[
+       {"name":"jumpServerGroup","type":"java.lang.String","required":false},
+       {"name":"url","type":"java.lang.String","required":false},
+       {"name":"text","type":"java.lang.String","required":false},
+       {"name":"screenshots","type":"java.lang.String","required":false},
+       {"name":"user","type":"java.lang.String","required":false},
+       {"name":"since","type":"java.util.Date","required":false},
+       {"name":"until","type":"java.util.Date","required":false}    ]},
+    {"name":"search", "comments":"Searches in pam sessions log", "return":"java.util.List<com.soffid.iam.pam.api.PamSession>", "arguments":[
+       {"name":"jumpServerGroup","type":"java.lang.String","required":false},
+       {"name":"url","type":"java.lang.String","required":false},
+       {"name":"text","type":"java.lang.String","required":false},
+       {"name":"user","type":"java.lang.String","required":false},
+       {"name":"since","type":"java.util.Date","required":false},
+       {"name":"until","type":"java.util.Date","required":false}    ]},
+    {"name":"getVideoSize", "comments":"Retrieves a pam session video", "return":"long", "arguments":[
+       {"name":"session","type":"com.soffid.iam.pam.api.PamSession","required": true},
+       {"name":"chapter","type":"long","required": true}    ]},
+    {"name":"generateKeystrokes", "comments":"Retrieves a pam session keystrokes", "return":"void", "arguments":[
+       {"name":"session","type":"com.soffid.iam.pam.api.PamSession","required": true},
+       {"name":"stream","type":"java.io.OutputStream","required": true}    ]},
+    {"name":"generateVideo", "comments":"Retrieves a pam session video", "return":"void", "arguments":[
+       {"name":"session","type":"com.soffid.iam.pam.api.PamSession","required": true},
+       {"name":"chapter","type":"long","required": true},
+       {"name":"stream","type":"java.io.OutputStream","required": true},
+       {"name":"start","type":"long","required": true},
+       {"name":"end","type":"long","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"jumpServerGroup","type":"com.soffid.iam.pam.api.JumpServerGroup","required": true}    ]}
+  ]
+}

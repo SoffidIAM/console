@@ -1,0 +1,52 @@
+{
+  "class": "com.soffid.iam.base.service.AuthorizationService", "comments":"Manages find-grained, low-level authorization to Soffid objects",
+  "methods": [
+    {"name":"hasPermission", "comments":"Returns true if the user has the selected low-level permission on the selected objects", "return":"boolean", "arguments":[
+       {"name":"action","type":"java.lang.String","required": true},
+       {"name":"object","type":"java.lang.Object","required":false}    ]},
+    {"name":"create", "comments":"Grants a low-level authorizations to role", "return":"com.soffid.iam.base.api.AuthorizationRole", "arguments":[
+       {"name":"autoritzacio","type":"com.soffid.iam.base.api.AuthorizationRole","required": true}    ]},
+    {"name":"getCurrentPrincipal", "comments":"Returns current security principal", "return":"com.soffid.iam.common.security.SoffidPrincipal", "arguments":[
+    ]},
+    {"name":"getUserAuthorizationString", "comments":"Gets the low-level authorizations granted to a user", "return":"java.lang.String[]", "arguments":[
+       {"name":"codiAutoritzacio","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserAuthorizationString", "comments":"Gets the low-level authorizations granted to a user of an specific type", "return":"java.lang.String[]", "arguments":[
+       {"name":"athorizationName","type":"java.lang.String","required": true},
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserAuthorizationsString", "comments":"Get the low-level authorizations granted to current user", "return":"java.lang.String[]", "arguments":[
+    ]},
+    {"name":"getUserAuthorizationsString", "comments":"Get the low-level authorizations granted to a user", "return":"java.lang.String[]", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserAuthorizationsString", "comments":"Gets the autohrization given some login process properties", "return":"java.lang.String[]", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"loginProperties","type":"java.util.Map<java.lang.String,java.lang.String>","required": true}    ]},
+    {"name":"getUserGroupAuthorizationString", "comments":"Gets the low-level authorizations granted to a user as a member of a business group", "return":"java.lang.String[]", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"holderGroup","type":"java.lang.String","required": true}    ]},
+    {"name":"findAuthorizations", "comments":"Get the complete list of low-level authorizations.", "return":"java.util.Collection", "arguments":[
+       {"name":"ambit","type":"java.lang.String","required":false},
+       {"name":"descripcio","type":"java.lang.String","required":false},
+       {"name":"codi","type":"java.lang.String","required":false}    ]},
+    {"name":"getDescriptionUserAuthorizations", "comments":"Gets the description of low-level authorizations to current user", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+    ]},
+    {"name":"getDescriptionUserAuthorizations", "comments":"Get the description of low-level authorizations granted to a user", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"getAuthorizationInfo", "comments":"Get the detail about a low-level authorization.", "return":"java.util.Collection<java.lang.Object>", "arguments":[
+       {"name":"autoritzacio","type":"java.lang.String","required": true}    ]},
+    {"name":"getAuthorizationRoles", "comments":"Get the roles granted with an specific low-level authorization", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+       {"name":"authorization","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserAuthorization", "comments":"Get the roles granted with a low-level authorization.", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+       {"name":"codiAutoritzacio","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserAuthorization", "comments":"Get the low-level authorizations of a specific type granted to a user", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+       {"name":"codiAutoritzacio","type":"java.lang.String","required": true},
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserAuthorizations", "comments":"Get low level authorizations for current user", "return":"java.util.Collection<com.soffid.iam.base.api.AuthorizationRole>", "arguments":[
+    ]},
+    {"name":"getUserAuthorizations", "comments":"Get the low-level authorizations granted to a user", "return":"java.util.Collection", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"getScopeList", "comments":"Get the list of scopes that can be applied to a low-level authorization", "return":"java.util.List", "arguments":[
+    ]},
+    {"name":"delete", "comments":"Revokes a low-level authorization to a role", "return":"void", "arguments":[
+       {"name":"authorization","type":"com.soffid.iam.base.api.AuthorizationRole","required": true}    ]}
+  ]
+}

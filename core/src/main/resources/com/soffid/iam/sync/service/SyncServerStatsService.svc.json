@@ -1,0 +1,13 @@
+{
+  "class": "com.soffid.iam.sync.service.SyncServerStatsService",
+  "methods": [
+    {"name":"getStats", "return":"java.util.Map<java.lang.String,int[]>", "arguments":[
+       {"name":"metric","type":"java.lang.String","required": true},
+       {"name":"seconds","type":"int","required": true},
+       {"name":"step","type":"int","required": true}    ]},
+    {"name":"register", "return":"void", "arguments":[
+       {"name":"metric","type":"java.lang.String","required": true},
+       {"name":"submetric","type":"java.lang.String","required": true},
+       {"name":"value","type":"int","required": true}    ]}
+  ]
+}

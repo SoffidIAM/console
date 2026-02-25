@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.AuthoritativeChangeEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_AUTCHA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PAU_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUTCHA_PAU_USU_ID'>
+			<column name='PAU_USU_ID' not-null='false'/>
+		</many-to-one>
+		<property name='processId' type='java.lang.Long'>
+			<column name='PAU_PRO_ID' not-null='false' />
+		</property>
+		<property name='employeeId' type='java.lang.String'>
+			<column name='PAU_EMPLOY' not-null='false' length='128' />
+		</property>
+		<property name='changeId' type='java.lang.String'>
+			<column name='PAU_CHANGE' not-null='false' length='128' />
+		</property>
+		<property name='changeDate' type='java.util.Date'>
+			<column name='PAU_DATE' not-null='false' />
+		</property>
+		<many-to-one name='dispatcher' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUTCHA_PAU_DIS_ID'>
+			<column name='PAU_DIS_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

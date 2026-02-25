@@ -1,0 +1,50 @@
+{
+  "class": "com.soffid.iam.sync.service.LogonService",
+  "methods": [
+    {"name":"mustChangePassword", "return":"boolean", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false}    ]},
+    {"name":"validatePIN", "return":"boolean", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"pin","type":"java.lang.String","required": true}    ]},
+    {"name":"getChallenge", "return":"com.soffid.iam.am.api.Challenge", "arguments":[
+       {"name":"challengeId","type":"java.lang.String","required": true}    ]},
+    {"name":"requestChallenge", "return":"com.soffid.iam.am.api.Challenge", "arguments":[
+       {"name":"type","type":"int","required": true},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"host","type":"java.lang.String","required": true},
+       {"name":"clientHost","type":"java.lang.String","required":false},
+       {"name":"cardSupport","type":"int","required": true}    ]},
+    {"name":"requestIdpChallenge", "return":"com.soffid.iam.am.api.Challenge", "arguments":[
+       {"name":"type","type":"int","required": true},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"host","type":"java.lang.String","required": true},
+       {"name":"clientHost","type":"java.lang.String","required":false},
+       {"name":"cardSupport","type":"int","required": true},
+       {"name":"identityProvider","type":"java.lang.String","required": true}    ]},
+    {"name":"validatePassword", "return":"com.soffid.iam.am.api.PasswordValidation", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required":false},
+       {"name":"password","type":"java.lang.String","required": true}    ]},
+    {"name":"responseChallenge", "return":"com.soffid.iam.am.api.Session", "arguments":[
+       {"name":"result","type":"com.soffid.iam.am.api.Challenge","required": true}    ]},
+    {"name":"getPasswordPolicy", "return":"java.lang.String", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false}    ]},
+    {"name":"changePassword", "return":"void", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"oldPassword","type":"java.lang.String","required": true},
+       {"name":"newPassword","type":"java.lang.String","required": true}    ]},
+    {"name":"propagatePassword", "return":"void", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"domain","type":"java.lang.String","required":false},
+       {"name":"password","type":"java.lang.String","required": true}    ]},
+    {"name":"purgeChallenges", "return":"void", "arguments":[
+    ]},
+    {"name":"registerChallenge", "return":"void", "arguments":[
+       {"name":"challenge","type":"com.soffid.iam.am.api.Challenge","required": true}    ]}
+  ]
+}

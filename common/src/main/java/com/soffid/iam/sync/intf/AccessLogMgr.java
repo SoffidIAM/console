@@ -9,8 +9,9 @@ package com.soffid.iam.sync.intf;
 import java.util.Collection;
 import java.util.List;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.sync.intf.LogEntry;
+import com.soffid.iam.exception.InternalErrorException;
+
+import com.soffid.iam.sync.intf.LogEntry;
 
  public interface AccessLogMgr extends java.rmi.Remote {
   /** Fetches logs until current date

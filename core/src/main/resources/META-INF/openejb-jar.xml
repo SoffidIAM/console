@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openejb-jar>
+
+	<ejb-deployment ejb-name="AccessLogService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.AccessLogService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="BrowserService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.BrowserService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="CertificateValidationService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.CertificateValidationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="EntryPointService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.EntryPointService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="NetworkService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.NetworkService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="PasswordService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.PasswordService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ServiceService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.ServiceService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="SessionService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.SessionService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="VaultService">
+		<jndi name="soffid.ejb.com.soffid.iam.am.service.VaultService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AccountService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.AccountService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AdditionalDataService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.AdditionalDataService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AuthorizationService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.AuthorizationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ConfigurationService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.ConfigurationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="GenAIProviderService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.GenAIProviderService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="LicenseService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.LicenseService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="PreferencesService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.PreferencesService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ServerPluginService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.ServerPluginService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="StatsService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.StatsService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="TenantService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.TenantService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="UserService">
+		<jndi name="soffid.ejb.com.soffid.iam.base.service.UserService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="BpmConfigService">
+		<jndi name="soffid.ejb.com.soffid.iam.bpm.service.BpmConfigService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="BpmEngine">
+		<jndi name="soffid.ejb.com.soffid.iam.bpm.service.BpmEngine"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="BpmJobExecutor">
+		<jndi name="soffid.ejb.com.soffid.iam.bpm.service.BpmJobExecutor"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="DocumentService">
+		<jndi name="soffid.ejb.com.soffid.iam.doc.service.DocumentService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ApplicationService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.ApplicationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AttributeTranslationService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.AttributeTranslationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="CustomObjectService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.CustomObjectService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="DispatcherService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.DispatcherService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="DomainService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.DomainService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="EntitlementDelegationService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.EntitlementDelegationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="GroupService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.GroupService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="GroupTypeService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.GroupTypeService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="MailListsService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.MailListsService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="MailService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.MailService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="PrinterService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.PrinterService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="RulesService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.RulesService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="SelfService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.SelfService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="UserDomainService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.UserDomainService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ApplicationBootService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.ApplicationBootService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ApplicationShutdownService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.ApplicationShutdownService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AsyncRunnerService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.AsyncRunnerService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AuthorizationInformationService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.AuthorizationInformationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="CreateDisableUserService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.CreateDisableUserService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="CrudRegistryService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.CrudRegistryService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="OTPValidationService">
+		<jndi name="soffid.ejb.com.soffid.iam.impl.service.OTPValidationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="NetworkDiscoveryService">
+		<jndi name="soffid.ejb.com.soffid.iam.pam.service.NetworkDiscoveryService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="PamPolicyService">
+		<jndi name="soffid.ejb.com.soffid.iam.pam.service.PamPolicyService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="PamSessionService">
+		<jndi name="soffid.ejb.com.soffid.iam.pam.service.PamSessionService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="AuditService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.AuditService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="GeoInformationService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.GeoInformationService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="IssuePolicyService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.IssuePolicyService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="IssueService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.IssueService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="NetworkIntelligenceService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.NetworkIntelligenceService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="SamlService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.SamlService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="SoDRuleService">
+		<jndi name="soffid.ejb.com.soffid.iam.rc.service.SoDRuleService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ReconcileService">
+		<jndi name="soffid.ejb.com.soffid.iam.reconcile.service.ReconcileService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="ScheduledTaskService">
+		<jndi name="soffid.ejb.com.soffid.iam.sync.service.ScheduledTaskService"/>
+	</ejb-deployment>
+
+	<ejb-deployment ejb-name="SyncServerService">
+		<jndi name="soffid.ejb.com.soffid.iam.sync.service.SyncServerService"/>
+	</ejb-deployment>
+
+
+</openejb-jar>

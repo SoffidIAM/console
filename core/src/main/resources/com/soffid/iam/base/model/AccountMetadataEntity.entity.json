@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"metaData"},
+    {"name":"data","targetClass":"com.soffid.iam.base.model.AccountAttributeEntity","multiple":true,"reverse":"systemMetadata"},
+    {"name":"dataObjectType","targetClass":"com.soffid.iam.iga.model.CustomObjectTypeEntity","multiple":false,"reverse":"refererncedBy"},
+    {"name":"translations","targetClass":"com.soffid.iam.iga.model.TranslatedLabelEntity","multiple":true,"reverse":"accountMetadata"}
+  ]
+}

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.AccountEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ACCOUN' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ACC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<set name='roles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLUSU_RLU_ACC_ID'>
+				<column name='RLU_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleAccountEntityImpl'/>
+		</set>
+		<set name='users' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUACC_UAC_ACC_ID'>
+				<column name='UAC_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserAccountEntityImpl'/>
+		</set>
+		<property name='type' type='com.soffid.iam.base.api.AccountTypeEnum'>
+			<column name='ACC_TYPE' not-null='true' length='1' />
+		</property>
+		<property name='name' type='java.lang.String'>
+			<column name='ACC_NAME' not-null='false' length='128' />
+		</property>
+		<property name='key' type='java.lang.String'>
+			<column name='ACC_KEY' not-null='true' />
+		</property>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCOUN_ACC_DIS_ID'>
+			<column name='ACC_DIS_ID' not-null='true'/>
+		</many-to-one>
+		<property name='oldName' type='java.lang.String'>
+			<column name='ACC_OLDNAM' not-null='false' length='128' />
+		</property>
+		<set name='acl' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_ACCACC_AAC_ACC_ID'>
+				<column name='AAC_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.AccountAccessEntityImpl'/>
+		</set>
+		<property name='description' type='java.lang.String'>
+			<column name='ACC_DESCRI' not-null='false' length='255' />
+		</property>
+		<property name='created' type='java.util.Date'>
+			<column name='ACC_CREATE' not-null='false' />
+		</property>
+		<property name='lastChange' type='java.util.Date'>
+			<column name='ACC_LASCHG' not-null='false' />
+		</property>
+		<property name='lastUpdated' type='java.util.Date'>
+			<column name='ACC_LASUPD' not-null='false' />
+		</property>
+		<property name='lastPasswordSet' type='java.util.Date'>
+			<column name='ACC_LASPAS' not-null='false' />
+		</property>
+		<property name='passwordExpiration' type='java.util.Date'>
+			<column name='ACC_PASEXP' not-null='false' />
+		</property>
+		<property name='lastLogin' type='java.util.Date'>
+			<column name='ACC_LASLOG' not-null='false' />
+		</property>
+		<property name='secrets' type='java.lang.String' lazy='true'>
+			<column name='ACC_SECRET' not-null='false' length='65000' />
+		</property>
+		<property name='sshPublicKey' type='java.lang.String'>
+			<column name='ACC_SSHPKY' not-null='false' length='1024' />
+		</property>
+		<property name='disabled' type='boolean'>
+			<column name='ACC_DISABL' not-null='true' />
+		</property>
+		<property name='status' type='com.soffid.iam.base.api.AccountStatusEnum'>
+			<column name='ACC_STATUS' not-null='false' />
+		</property>
+		<many-to-one name='folder' class='com.soffid.iam.am.model.VaultFolderEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCOUN_ACC_VAF_ID'>
+			<column name='ACC_VAF_ID' not-null='false'/>
+		</many-to-one>
+		<property name='inheritNewPermissions' type='java.lang.Boolean'>
+			<column name='ACC_INHPER' not-null='false' />
+		</property>
+		<property name='loginUrl' type='java.lang.String'>
+			<column name='ACC_URL' not-null='false' length='255' />
+		</property>
+		<property name='loginName' type='java.lang.String'>
+			<column name='ACC_LOGNAM' not-null='false' />
+		</property>
+		<property name='launchType' type='com.soffid.iam.am.api.LaunchTypeEnum'>
+			<column name='ACC_LAUTYP' not-null='false' />
+		</property>
+		<property name='serverType' type='java.lang.String'>
+			<column name='ACC_SRVTYP' not-null='false' />
+		</property>
+		<property name='serverName' type='java.lang.String'>
+			<column name='ACC_SRVNAM' not-null='false' />
+		</property>
+		<many-to-one name='jumpServerGroup' class='com.soffid.iam.pam.model.JumpServerGroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCOUN_ACC_JSG_ID'>
+			<column name='ACC_JSG_ID' not-null='false'/>
+		</many-to-one>
+		<set name='passwords' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCPWD_APW_ACC_ID'>
+				<column name='APW_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.AccountPasswordEntityImpl'/>
+		</set>
+		<many-to-one name='passwordPolicy' class='com.soffid.iam.base.model.UserTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCOUN_ACC_TUS_ID'>
+			<column name='ACC_TUS_ID' not-null='true'/>
+		</many-to-one>
+		<property name='passwordStatus' type='java.lang.String'>
+			<column name='ACC_PWDSTA' not-null='false' length='25' />
+		</property>
+		<many-to-one name='snapshot' class='com.soffid.iam.iga.model.AccountSnapshotEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ACCOUN_ACC_ASN_ID'>
+			<column name='ACC_ASN_ID' not-null='false'/>
+		</many-to-one>
+		<property name='credentialType' type='com.soffid.iam.base.api.CredentialTypeEnumEnum'>
+			<column name='ACC_CRETYP' not-null='false' length='25' />
+		</property>
+		<property name='externalId' type='java.lang.String'>
+			<column name='ACC_EXTID' not-null='false' length='100' />
+		</property>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_ACCATT_AAT_ACC_ID'>
+				<column name='AAT_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountAttributeEntityImpl'/>
+		</set>
+		<set name='services' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQSER_MAS_ACC_ID'>
+				<column name='MAS_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostServiceEntityImpl'/>
+		</set>
+		<set name='networkDiscovery' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_XARACC_NDA_ACC_ID'>
+				<column name='NDA_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.NetworkDiscoveryAccountEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ISSUE_EVE_ACC_ID'>
+				<column name='EVE_ACC_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueEntityImpl'/>
+		</set>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='ACC_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='ACC_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='ACC_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='ACC_DELUSE' not-null='false' />
+		</property>
+		<property name='deleted' type='java.lang.Boolean'>
+			<column name='ACC_DELETED' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

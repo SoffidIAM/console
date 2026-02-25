@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"jumpServerGroup","targetClass":"com.soffid.iam.pam.model.JumpServerGroupEntity","multiple":false,"reverse":"jumpServers"}
+  ]
+}

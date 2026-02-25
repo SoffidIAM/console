@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"accounts"},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"users"}
+  ]
+}

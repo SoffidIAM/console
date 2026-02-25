@@ -1,0 +1,79 @@
+//
+// (C) 2013 Soffid
+//
+//
+
+package com.soffid.iam.am.model;
+/**
+ * DAO for Entity EntryPointIconEntity
+ * @see com.soffid.iam.am.model.EntryPointIconEntity
+ */
+public interface EntryPointIconEntityDao
+
+{
+	/**
+	 * Creates an instance of {@link com.soffid.iam.am.model.EntryPointIconEntity} .
+	 */
+	public com.soffid.iam.am.model.EntryPointIconEntity newEntryPointIconEntity();
+
+	/**
+	 * Adds an instance of {@link com.soffid.iam.am.model.EntryPointIconEntity} to the persistent store.
+	 */
+	public void create (com.soffid.iam.am.model.EntryPointIconEntity entity);
+
+	/**
+	 * Updates an instance of {@link com.soffid.iam.am.model.EntryPointIconEntity} at the persistent store.
+	 */
+	public void update (com.soffid.iam.am.model.EntryPointIconEntity entity);
+
+	/**
+	 * Removes an instance of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 */
+	public void remove (com.soffid.iam.am.model.EntryPointIconEntity entity);
+
+	/**
+	 * Loads an instance of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 */
+	public com.soffid.iam.am.model.EntryPointIconEntity load(java.lang.Long id);
+
+	/**
+	 * Loads all instances of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 */
+	public java.util.List<com.soffid.iam.am.model.EntryPointIconEntity> loadAll();
+
+	/**
+	 * Creates a collection of {@link com.soffid.iam.am.model.EntryPointIconEntity} and adds it to the persistent store.
+	 */
+	public void create (java.util.Collection<? extends com.soffid.iam.am.model.EntryPointIconEntity> entities);
+
+	/**
+	 * Updates a collection of {@link com.soffid.iam.am.model.EntryPointIconEntity} in the persistent store.
+	 */
+	public void update (java.util.Collection<? extends com.soffid.iam.am.model.EntryPointIconEntity> entities);
+
+	/**
+	 * Removes a collection of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 */
+	public void remove (java.util.Collection<? extends com.soffid.iam.am.model.EntryPointIconEntity> entities);
+
+	/**
+	 * Removes an instance of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 */
+	public void remove (java.lang.Long id);
+
+	/**
+	 * Query of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 * parameter query HQL Query String
+	 * parameter parameters HQL Parameters
+	 */
+	public java.util.List<com.soffid.iam.am.model.EntryPointIconEntity> query (String query, com.soffid.iam.model.Parameter[] parameters);
+
+	/**
+	 * Query of {@link com.soffid.iam.am.model.EntryPointIconEntity} from the persistent store.
+	 * parameter query HQL Query String
+	 * parameter parameters HQL Parameters
+	 * parameter maxResults max number of rows to return
+	 */
+	public java.util.List<com.soffid.iam.am.model.EntryPointIconEntity> query (String query, com.soffid.iam.model.Parameter[] parameters, com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria);
+
+}

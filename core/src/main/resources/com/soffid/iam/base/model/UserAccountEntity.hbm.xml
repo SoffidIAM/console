@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.UserAccountEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_USUACC' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='UAC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUACC_UAC_USU_ID'>
+			<column name='UAC_USU_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='account' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USUACC_UAC_ACC_ID'>
+			<column name='UAC_ACC_ID' not-null='true'/>
+		</many-to-one>
+		<property name='untilDate' type='java.util.Date'>
+			<column name='UAC_UNTIL' not-null='false' />
+		</property>
+		<property name='workflowId' type='java.lang.Long'>
+			<column name='UAC_BPM' not-null='false' />
+		</property>
+		<property name='entryPoint' type='java.lang.String'>
+			<column name='UAC_ENTPOI' not-null='false' />
+		</property>
+		<property name='approved' type='java.lang.Boolean'>
+			<column name='UAC_APPROV' not-null='false' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='UAC_START' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

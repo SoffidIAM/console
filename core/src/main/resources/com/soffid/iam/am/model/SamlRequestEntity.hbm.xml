@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.SamlRequestEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SAMLREQ' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='REQ_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='externalId' type='java.lang.String'>
+			<column name='REQ_EXTID' not-null='true' />
+		</property>
+		<property name='date' type='java.util.Date'>
+			<column name='REQ_DATE' not-null='true' />
+		</property>
+		<property name='expirationDate' type='java.util.Date'>
+			<column name='REQ_EXPDAT' not-null='true' />
+		</property>
+		<property name='finished' type='boolean'>
+			<column name='REQ_FINISHED' not-null='true' />
+		</property>
+		<property name='hostName' type='java.lang.String'>
+			<column name='REQ_HOST' not-null='true' />
+		</property>
+		<property name='user' type='java.lang.String'>
+			<column name='REQ_USER' not-null='false' />
+		</property>
+		<property name='key' type='java.lang.String'>
+			<column name='REQ_KEY' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SAMLREQ_REQ_TEN_ID'>
+			<column name='REQ_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

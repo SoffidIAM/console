@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"accountAccess"},
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"accountAccess"},
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"accountAccess"},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"acl"}
+  ]
+}

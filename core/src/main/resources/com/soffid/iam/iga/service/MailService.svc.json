@@ -1,0 +1,63 @@
+{
+  "class": "com.soffid.iam.iga.service.MailService", "comments":"Service to send emails",
+  "methods": [
+    {"name":"sendHtmlMail", "comments":"Sends HTML email to a given email address", "return":"void", "arguments":[
+       {"name":"to","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendHtmlMail", "comments":"Sends HTML email to a given email address with cc", "return":"void", "arguments":[
+       {"name":"to","type":"java.lang.String","required": true},
+       {"name":"cc","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendHtmlMail", "comments":"Sends HTML email with attachments to a given email address with cc", "return":"void", "arguments":[
+       {"name":"to","type":"java.lang.String","required": true},
+       {"name":"cc","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true},
+       {"name":"mimeBodyParts","type":"java.util.Collection","required": true}    ]},
+    {"name":"sendHtmlMail", "comments":"Sends HTML email to a given email address with attachments", "return":"void", "arguments":[
+       {"name":"to","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true},
+       {"name":"mimeBodyParts","type":"java.util.Collection","required": true}    ]},
+    {"name":"sendHtmlMailToActors", "comments":"Sends HTML email to a set of users, groups or role owners", "return":"void", "arguments":[
+       {"name":"actors","type":"java.lang.String[]","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendHtmlMailToActors", "comments":"Sends HTML email to a set of users, groups or role owners, with cc", "return":"void", "arguments":[
+       {"name":"actors","type":"java.lang.String[]","required": true},
+       {"name":"cc","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendTextMail", "comments":"Sends a plain text email to a given email address", "return":"void", "arguments":[
+       {"name":"to","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendTextMail", "comments":"Sends text email to a given email address with cc", "return":"void", "arguments":[
+       {"name":"to","type":"java.lang.String","required": true},
+       {"name":"cc","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendTextMailToActors", "comments":"Sends a plain text email to a set of users, groups or role owners", "return":"void", "arguments":[
+       {"name":"actors","type":"java.lang.String[]","required": true, "comments":"Set of users, groups or role owners"},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendTextMailToActors", "comments":"Sends a plain text email to a set of users, groups or role owners, with cc", "return":"void", "arguments":[
+       {"name":"actors","type":"java.lang.String[]","required": true},
+       {"name":"cc","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true}    ]},
+    {"name":"sendTextMailToActors", "comments":"Sends a plain text email to a set of users, groups or role owners, with cc and attachments", "return":"void", "arguments":[
+       {"name":"actors","type":"java.lang.String[]","required": true},
+       {"name":"cc","type":"java.lang.String","required": true},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true},
+       {"name":"mimeBodyParts","type":"java.util.Collection","required": true}    ]},
+    {"name":"sendTextMailToActors", "comments":"Sends plain text email with attachments to a set of users, groups or role owners", "return":"void", "arguments":[
+       {"name":"actors","type":"java.lang.String[]","required": true, "comments":"Set of users, groups or role owners"},
+       {"name":"subject","type":"java.lang.String","required": true},
+       {"name":"body","type":"java.lang.String","required": true},
+       {"name":"mimeBodyParts","type":"java.util.Collection","required": true}    ]}
+  ]
+}

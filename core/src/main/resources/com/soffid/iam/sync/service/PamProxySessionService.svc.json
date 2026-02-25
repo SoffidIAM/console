@@ -1,0 +1,35 @@
+{
+  "class": "com.soffid.iam.sync.service.PamProxySessionService",
+  "methods": [
+    {"name":"validatePin", "return":"boolean", "arguments":[
+       {"name":"challenge","type":"com.soffid.iam.am.api.OtpChallengeProxy","required": true},
+       {"name":"value","type":"java.lang.String","required": true}    ]},
+    {"name":"validateSshKey", "comments":"Returns the user name", "return":"boolean", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"sshKey","type":"java.lang.String","required": true}    ]},
+    {"name":"generateOtp", "return":"com.soffid.iam.am.api.OtpChallengeProxy", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"validatePassword", "return":"com.soffid.iam.am.api.PasswordValidation", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"password","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"startWorkflow", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"workflow","type":"java.lang.String","required": true},
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"hours","type":"int","required":false},
+       {"name":"comments","type":"java.lang.String","required":false}    ]},
+    {"name":"openSession", "return":"com.soffid.iam.pam.api.NewPamSession", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"sourceIp","type":"java.lang.String","required":false},
+       {"name":"type","type":"com.soffid.iam.am.api.SessionType","required":false},
+       {"name":"info","type":"java.lang.String","required":false},
+       {"name":"obligations","type":"java.util.Map<java.lang.String,java.util.Map<java.lang.String,java.lang.String>>","required":false}    ]},
+    {"name":"findAccounts", "return":"java.util.List<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"url","type":"java.lang.String","required": true},
+       {"name":"accountName","type":"java.lang.String","required": true}    ]},
+    {"name":"sendEmailNotification", "return":"void", "arguments":[
+       {"name":"obligationDetails","type":"java.util.Map<java.lang.String,java.lang.String>","required": true}    ]}
+  ]
+}

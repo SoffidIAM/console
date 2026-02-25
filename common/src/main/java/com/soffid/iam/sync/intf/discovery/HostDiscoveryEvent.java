@@ -2,7 +2,7 @@ package com.soffid.iam.sync.intf.discovery;
 
 import java.util.List;
 
-import com.soffid.iam.api.HostPort;
+import com.soffid.iam.pam.api.HostPort;
 
 public class HostDiscoveryEvent extends DiscoveryEvent {
 	String ip;

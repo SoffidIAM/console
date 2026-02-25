@@ -1,0 +1,225 @@
+{
+  "class": "com.soffid.iam.bpm.service.BpmEngine",
+  "methods": [
+    {"name":"downloadParFile", "return":"void", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true},
+       {"name":"stream","type":"java.io.OutputStream","required": true}    ]},
+    {"name":"canAdmin", "return":"boolean", "arguments":[
+       {"name":"instanceVO","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"isUserInRole", "return":"boolean", "arguments":[
+       {"name":"role","type":"java.lang.String","required": true}    ]},
+    {"name":"getProcessDefinitionIcon", "return":"byte[]", "arguments":[
+       {"name":"definitionId","type":"java.lang.Long","required": true}    ]},
+    {"name":"getProcessDefinitionImage", "return":"byte[]", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"openDeployParDefinitionTransfer", "return":"com.soffid.iam.bpm.api.DeployToken", "arguments":[
+    ]},
+    {"name":"disableProcessDefinition", "return":"com.soffid.iam.bpm.api.ProcessDefinition", "arguments":[
+       {"name":"defVO","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"enableProcessDefinition", "return":"com.soffid.iam.bpm.api.ProcessDefinition", "arguments":[
+       {"name":"defVO","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"getDefinition", "return":"com.soffid.iam.bpm.api.ProcessDefinition", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getProcessDefinition", "return":"com.soffid.iam.bpm.api.ProcessDefinition", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"cancel", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getProcess", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"getProcessInstance", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"getProcessLightweight", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"newProcess", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"newProcess", "return":"com.soffid.iam.bpm.api.ProcessInstance", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true},
+       {"name":"start","type":"boolean","required": true}    ]},
+    {"name":"getProcessLog", "return":"com.soffid.iam.bpm.api.ProcessLog[]", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getTaskLog", "return":"com.soffid.iam.bpm.api.ProcessLog[]", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"getDefinition", "return":"com.soffid.iam.bpm.api.TaskDefinition", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"addComment", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true},
+       {"name":"comment","type":"java.lang.String","required": true}    ]},
+    {"name":"cancel", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"createDummyTask", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"processDefinitionId","type":"long","required": true}    ]},
+    {"name":"delegateTaskToUser", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true},
+       {"name":"username","type":"java.lang.String","required": true}    ]},
+    {"name":"executeTask", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true},
+       {"name":"transitionName","type":"java.lang.String","required": true}    ]},
+    {"name":"getTask", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"reserveTask", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"startTask", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.bpm.api.TaskInstance", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"getTokens", "return":"com.soffid.iam.bpm.api.Token[]", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"findProcessDefinitionByTextAndJsonQuery", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+       {"name":"text","type":"java.lang.String","required":false},
+       {"name":"jsonQuery","type":"java.lang.String","required":false},
+       {"name":"start","type":"java.lang.Integer","required":false},
+       {"name":"pageSize","type":"java.lang.Integer","required":false}    ]},
+    {"name":"findProcessInstance", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findProcessInstanceByTextAndJsonQuery", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+       {"name":"text","type":"java.lang.String","required":false},
+       {"name":"jsonQuery","type":"java.lang.String","required":false},
+       {"name":"start","type":"java.lang.Integer","required":false},
+       {"name":"pageSize","type":"java.lang.Integer","required":false}    ]},
+    {"name":"findTasksByTextAndJsonQuery", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+       {"name":"text","type":"java.lang.String","required":false},
+       {"name":"jsonQuery","type":"java.lang.String","required":false},
+       {"name":"start","type":"java.lang.Integer","required":false},
+       {"name":"pageSize","type":"java.lang.Integer","required":false}    ]},
+    {"name":"countMyTasks", "return":"int", "arguments":[
+    ]},
+    {"name":"countNewTasks", "return":"int", "arguments":[
+    ]},
+    {"name":"getCoordinates", "return":"int[]", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getCoordinates", "return":"int[]", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"getResourceAsStream", "return":"java.io.InputStream", "arguments":[
+       {"name":"processdef","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true},
+       {"name":"resource","type":"java.lang.String","required": true}    ]},
+    {"name":"getResourceAsStream", "return":"java.io.InputStream", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true},
+       {"name":"resource","type":"java.lang.String","required": true}    ]},
+    {"name":"getUI", "return":"java.lang.String", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getUI", "return":"java.lang.String", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true}    ]},
+    {"name":"getDeployMessages", "return":"java.lang.String[]", "arguments":[
+       {"name":"token","type":"com.soffid.iam.bpm.api.DeployToken","required": true}    ]},
+    {"name":"upgradeProcess", "return":"java.lang.String[]", "arguments":[
+       {"name":"instanceVO","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"findChildProcesses", "return":"java.util.Collection<java.lang.Long>", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findParentProceeses", "return":"java.util.Collection<java.lang.Long>", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findUsers", "return":"java.util.Collection<com.soffid.iam.bpm.api.BPMUser>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required":false},
+       {"name":"givenName","type":"java.lang.String","required":false},
+       {"name":"surName","type":"java.lang.String","required":false},
+       {"name":"group","type":"java.lang.String","required":false}    ]},
+    {"name":"findAllProcessDefinitions", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+       {"name":"onlyEnabled","type":"boolean","required": true}    ]},
+    {"name":"findGroupTasks", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+    ]},
+    {"name":"findInitiatorProcessDefinitions", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+    ]},
+    {"name":"findMyProcesses", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+    ]},
+    {"name":"findMyTasks", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+    ]},
+    {"name":"findMyTasksLightweight", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+    ]},
+    {"name":"findObserverProcessDefinitions", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+    ]},
+    {"name":"findProcessDefinitions", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+       {"name":"name","type":"java.lang.String","required":false},
+       {"name":"onlyEnabled","type":"boolean","required": true}    ]},
+    {"name":"findProcessDefinitions", "comments":"Searches for process definition of a predefined type", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+       {"name":"name","type":"java.lang.String","required":false},
+       {"name":"processType","type":"com.soffid.iam.bpm.api.PredefinedProcessType","required": true}    ]},
+    {"name":"findProcessInstances", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"findProcessInstances", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+       {"name":"definitions","type":"java.util.List","required": true},
+       {"name":"processId","type":"java.lang.String","required":false},
+       {"name":"estado","type":"java.lang.String","required":false},
+       {"name":"actor","type":"java.lang.String","required":false},
+       {"name":"startDate","type":"java.util.Date","required":false},
+       {"name":"finalizada","type":"boolean","required": true}    ]},
+    {"name":"findSupervisorProcessDefinitions", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessDefinition>", "arguments":[
+    ]},
+    {"name":"findTaskDefinitions", "return":"java.util.List<com.soffid.iam.bpm.api.TaskDefinition>", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"findTasks", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+       {"name":"def","type":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>","required": true},
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskDefinition","required": true},
+       {"name":"actor","type":"java.lang.String","required": true},
+       {"name":"processStartDate","type":"java.util.Date","required": true},
+       {"name":"taskCreationDate","type":"java.util.Date","required": true},
+       {"name":"finalizada","type":"boolean","required": true}    ]},
+    {"name":"findTasks", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+       {"name":"def","type":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>","required": true},
+       {"name":"process","type":"java.lang.String","required": true},
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskDefinition","required": true},
+       {"name":"actor","type":"java.lang.String","required": true},
+       {"name":"processStartDate","type":"java.util.Date","required": true},
+       {"name":"taskCreationDate","type":"java.util.Date","required": true},
+       {"name":"finalizada","type":"boolean","required": true}    ]},
+    {"name":"getActiveJobs", "return":"java.util.List<com.soffid.iam.bpm.api.Job>", "arguments":[
+    ]},
+    {"name":"getActiveJobs", "return":"java.util.List<com.soffid.iam.bpm.api.Job>", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getActiveTasks", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"getAllJobs", "return":"java.util.List<com.soffid.iam.bpm.api.Job>", "arguments":[
+    ]},
+    {"name":"getPendingTasks", "return":"java.util.List<com.soffid.iam.bpm.api.TaskInstance>", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"searchProcessInstances", "return":"java.util.List<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+       {"name":"query","type":"java.lang.String","required":false},
+       {"name":"processID","type":"java.lang.String","required":false},
+       {"name":"sinceStartDate","type":"java.util.Date","required":false},
+       {"name":"untilStartDate","type":"java.util.Date","required":false},
+       {"name":"sinceEndDate","type":"java.util.Date","required":false},
+       {"name":"untilEndDate","type":"java.util.Date","required":false},
+       {"name":"finished","type":"boolean","required": true}    ]},
+    {"name":"getUIClassesForTask", "return":"java.util.Map", "arguments":[
+       {"name":"def","type":"com.soffid.iam.bpm.api.ProcessDefinition","required": true}    ]},
+    {"name":"getJBpmConfiguration", "return":"org.jbpm.JbpmConfiguration", "arguments":[
+    ]},
+    {"name":"getContext", "return":"org.jbpm.JbpmContext", "arguments":[
+    ]},
+    {"name":"addComment", "return":"void", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true},
+       {"name":"comment","type":"java.lang.String","required": true}    ]},
+    {"name":"endDeployParDefinitionTransfer", "return":"void", "arguments":[
+       {"name":"token","type":"com.soffid.iam.bpm.api.DeployToken","required": true}    ]},
+    {"name":"linkProcesses", "return":"void", "arguments":[
+       {"name":"parentProcess","type":"java.lang.Long","required": true},
+       {"name":"childProcess","type":"java.lang.Long","required": true}    ]},
+    {"name":"nextDeployParDefinitionPackage", "return":"void", "arguments":[
+       {"name":"token","type":"com.soffid.iam.bpm.api.DeployToken","required": true},
+       {"name":"filePackage","type":"byte[]","required": true},
+       {"name":"length","type":"int","required": true}    ]},
+    {"name":"pauseJob", "return":"void", "arguments":[
+       {"name":"jobvo","type":"com.soffid.iam.bpm.api.Job","required": true}    ]},
+    {"name":"ping", "return":"void", "arguments":[
+    ]},
+    {"name":"reindex", "return":"void", "arguments":[
+    ]},
+    {"name":"resumeJob", "return":"void", "arguments":[
+       {"name":"jobvo","type":"com.soffid.iam.bpm.api.Job","required": true}    ]},
+    {"name":"retryJob", "return":"void", "arguments":[
+       {"name":"jobvo","type":"com.soffid.iam.bpm.api.Job","required": true}    ]},
+    {"name":"signal", "return":"void", "arguments":[
+       {"name":"instanceVO","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"signal", "return":"void", "arguments":[
+       {"name":"instanceVO","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true},
+       {"name":"transitionName","type":"java.lang.String","required": true}    ]},
+    {"name":"startProcess", "return":"void", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"update", "return":"void", "arguments":[
+       {"name":"process","type":"com.soffid.iam.bpm.api.ProcessInstance","required": true}    ]},
+    {"name":"updateSwimlane", "return":"void", "arguments":[
+       {"name":"task","type":"com.soffid.iam.bpm.api.TaskInstance","required": true},
+       {"name":"swimlane","type":"java.lang.String","required": true},
+       {"name":"actorIds","type":"java.lang.String[]","required": true}    ]},
+    {"name":"upgradeParFile", "return":"void", "arguments":[
+       {"name":"stream","type":"java.io.InputStream","required": true}    ]}
+  ]
+}

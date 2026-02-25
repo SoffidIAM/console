@@ -1,0 +1,18 @@
+{
+  "joins": [
+    {"name":"userProfiles","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":true,"reverse":"profileServer"},
+    {"name":"printers","targetClass":"com.soffid.iam.iga.model.PrinterEntity","multiple":true,"reverse":"server"},
+    {"name":"network","targetClass":"com.soffid.iam.am.model.NetworkEntity","multiple":false,"reverse":"hosts"},
+    {"name":"hostAlias","targetClass":"com.soffid.iam.iga.model.HostAliasEntity","multiple":true,"reverse":"host"},
+    {"name":"administratorAuthorizationAccess","targetClass":"com.soffid.iam.pam.model.HostAdminEntity","multiple":true,"reverse":"host"},
+    {"name":"operatingSystem","targetClass":"com.soffid.iam.am.model.OsTypeEntity","multiple":false,"reverse":"operatingSystemHost"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"browsers","targetClass":"com.soffid.iam.am.model.BrowserEntity","multiple":true,"reverse":"host"},
+    {"name":"attributes","targetClass":"com.soffid.iam.am.model.HostAttributeEntity","multiple":true,"reverse":"host"},
+    {"name":"entryPoints","targetClass":"com.soffid.iam.am.model.HostEntryPointEntity","multiple":true,"reverse":"host"},
+    {"name":"ports","targetClass":"com.soffid.iam.pam.model.HostPortEntity","multiple":true,"reverse":"host"},
+    {"name":"services","targetClass":"com.soffid.iam.pam.model.HostServiceEntity","multiple":true,"reverse":"host"},
+    {"name":"systems","targetClass":"com.soffid.iam.pam.model.HostSystemEntity","multiple":true,"reverse":"host"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueHostEntity","multiple":true,"reverse":"host"}
+  ]
+}

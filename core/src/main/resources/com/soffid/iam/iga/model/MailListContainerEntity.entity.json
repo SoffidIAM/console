@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"contains","targetClass":"com.soffid.iam.iga.model.MailListEntity","multiple":false,"reverse":"mailListPertain"},
+    {"name":"pertains","targetClass":"com.soffid.iam.iga.model.MailListEntity","multiple":false,"reverse":"mailListContent"}
+  ]
+}

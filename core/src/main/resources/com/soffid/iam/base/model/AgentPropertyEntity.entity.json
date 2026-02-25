@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"agent","targetClass":"com.soffid.iam.base.model.AgentDescriptorEntity","multiple":false,"reverse":"properties"}
+  ]
+}

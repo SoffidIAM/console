@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

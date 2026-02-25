@@ -1,0 +1,96 @@
+{
+  "class": "com.soffid.iam.iga.service.GroupService",
+  "methods": [
+    {"name":"findGroupMembers", "return":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"getOfficeServer", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required":false}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"createHistoric", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"findGroupByGroupNameAndDate", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true},
+       {"name":"date","type":"java.util.Date","required":false}    ]},
+    {"name":"findGroupByGroupName", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupById", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"grupId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findPrimaryGroupByUserName", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getSuperGroup", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.Group", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.UserGroup", "arguments":[
+       {"name":"usuariGrup","type":"com.soffid.iam.iga.api.UserGroup","required": true}    ]},
+    {"name":"findUserGroupByUserNameAndGroupName", "return":"com.soffid.iam.iga.api.UserGroup", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.UserGroup", "arguments":[
+       {"name":"usuariGrup","type":"com.soffid.iam.iga.api.UserGroup","required": true}    ]},
+    {"name":"findGroupUserByJsonQuery", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"query","type":"java.lang.String","required":false},
+       {"name":"startIndex","type":"java.lang.Integer","required":false},
+       {"name":"count","type":"java.lang.Integer","required":false}    ]},
+    {"name":"findGroups", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findUserGroup", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"findUsersBelongtoGroupByGroupName", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required":false},
+       {"name":"date","type":"java.util.Date","required":false},
+       {"name":"start","type":"java.lang.Integer","required":false},
+       {"name":"pageSize","type":"java.lang.Integer","required":false}    ]},
+    {"name":"findGroupNames", "return":"java.util.Collection<java.lang.String>", "arguments":[
+    ]},
+    {"name":"findGroupsByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupsByGroupsType", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"tipus","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupsFromRolesByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupsFromUsersByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUsersRolesWithGroupByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findUsersRolesDomainTypeAndUserGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"findSubgroupsByGroupName", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"findSubgroupsByGroupNameAndDate", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true},
+       {"name":"date","type":"java.util.Date","required":false}    ]},
+    {"name":"findUserGroupHistoryByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findUsersGroupByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+    ]},
+    {"name":"getParentList", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"getRolesFromGroup", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"getRolesFromGroup", "return":"java.util.Collection<com.soffid.iam.iga.api.GroupRoles>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"getRolesFromGroupAndParentGroup", "return":"java.util.Collection<com.soffid.iam.iga.api.GroupRoles>", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"addGroupToUser", "return":"void", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"grup","type":"com.soffid.iam.iga.api.Group","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"usuariGrup","type":"com.soffid.iam.iga.api.UserGroup","required": true}    ]},
+    {"name":"propagateRolsChangesToDispatcher", "return":"void", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"removeGroupFormUser", "return":"void", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"setSuperGroup", "return":"void", "arguments":[
+       {"name":"codiSubGrup","type":"java.lang.String","required": true},
+       {"name":"codiSuperGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"synchronize", "return":"void", "arguments":[
+       {"name":"groupName","type":"java.lang.String","required": true}    ]}
+  ]
+}

@@ -32,9 +32,8 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
-import com.soffid.iam.api.SoffidObjectType;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.iga.api.SoffidObjectType;
+import com.soffid.iam.exception.InternalErrorException;
 
 /** 
  * Interfaz remoto de gestión de usuarios (y contraseñas)

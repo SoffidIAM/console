@@ -1,0 +1,197 @@
+{
+  "class": "com.soffid.iam.iga.service.DispatcherService",
+  "methods": [
+    {"name":"createRemoteServer", "return":"java.lang.String", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true},
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"findActiveDirectoryDomains", "return":"java.util.Map<java.lang.String,java.lang.String>", "arguments":[
+    ]},
+    {"name":"startVirtualSourceTransaction", "return":"java.lang.String", "arguments":[
+       {"name":"readonly","type":"boolean","required": true},
+       {"name":"server","type":"java.lang.String","required":false}    ]},
+    {"name":"finishVirtualSourceTransaction", "return":"void", "arguments":[
+       {"name":"transactionId","type":"java.lang.String","required": true}    ]},
+    {"name":"isGroupAllowed", "return":"boolean", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true},
+       {"name":"group","type":"java.lang.String","required": true}    ]},
+    {"name":"isRegistrationTokenAlive", "return":"boolean", "arguments":[
+       {"name":"token","type":"java.lang.String","required": true}    ]},
+    {"name":"isUserAllowed", "return":"boolean", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true},
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"isUserAllowed", "return":"boolean", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>","required": true}    ]},
+    {"name":"applyConfigurationAsync", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"queryProcessStatus", "comments":"Query the apply process status", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"process","type":"com.soffid.iam.base.api.AsyncProcessTracker","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.AccessControl", "arguments":[
+       {"name":"controlAcces","type":"com.soffid.iam.iga.api.AccessControl","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.AccessControl", "arguments":[
+       {"name":"controlAcces","type":"com.soffid.iam.iga.api.AccessControl","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.AttributeMapping", "arguments":[
+       {"name":"mapping","type":"com.soffid.iam.iga.api.AttributeMapping","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.AttributeMapping", "arguments":[
+       {"name":"mapping","type":"com.soffid.iam.iga.api.AttributeMapping","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.ObjectMapping", "arguments":[
+       {"name":"om","type":"com.soffid.iam.iga.api.ObjectMapping","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.ObjectMapping", "arguments":[
+       {"name":"om","type":"com.soffid.iam.iga.api.ObjectMapping","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.ObjectMappingProperty", "arguments":[
+       {"name":"omp","type":"com.soffid.iam.iga.api.ObjectMappingProperty","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.ObjectMappingProperty", "arguments":[
+       {"name":"om","type":"com.soffid.iam.iga.api.ObjectMappingProperty","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.ObjectMappingTrigger", "arguments":[
+       {"name":"trigger","type":"com.soffid.iam.iga.api.ObjectMappingTrigger","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.ObjectMappingTrigger", "arguments":[
+       {"name":"trigger","type":"com.soffid.iam.iga.api.ObjectMappingTrigger","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.ReconcileTrigger", "arguments":[
+       {"name":"rp","type":"com.soffid.iam.iga.api.ReconcileTrigger","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.ReconcileTrigger", "arguments":[
+       {"name":"rp","type":"com.soffid.iam.iga.api.ReconcileTrigger","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"findDispatcherByName", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"findSoffidDispatcher", "comments":"Finds the dispatcher bound to soffid itself", "return":"com.soffid.iam.iga.api.System", "arguments":[
+    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.SystemGroup", "arguments":[
+       {"name":"grupDispatcher","type":"com.soffid.iam.iga.api.SystemGroup","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.SystemGroup", "arguments":[
+       {"name":"grupDispatcher","type":"com.soffid.iam.iga.api.SystemGroup","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.UserTypeDispatcher", "arguments":[
+       {"name":"tipusUsuari","type":"com.soffid.iam.iga.api.UserTypeDispatcher","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.UserTypeDispatcher", "arguments":[
+       {"name":"tipusUsuari","type":"com.soffid.iam.iga.api.UserTypeDispatcher","required": true}    ]},
+    {"name":"testPropagateObject", "comments":"Tests and applies an object mapping", "return":"com.soffid.iam.sync.api.DebugTaskResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"getNativeObject", "comments":"Loads system object attributes", "return":"com.soffid.iam.sync.api.GetObjectResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"getSoffidObject", "comments":"Loads system object and transforms into Soffid Object", "return":"com.soffid.iam.sync.api.GetObjectResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"reconcile", "comments":"Loads account into soffid database", "return":"com.soffid.iam.sync.api.GetObjectResults", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"accountName","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.sync.api.Server", "arguments":[
+       {"name":"server","type":"com.soffid.iam.sync.api.Server","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.sync.api.Server", "arguments":[
+       {"name":"server","type":"com.soffid.iam.sync.api.Server","required": true}    ]},
+    {"name":"consumeRegistrationToken", "return":"com.soffid.iam.sync.api.ServerRegistrationToken", "arguments":[
+       {"name":"token","type":"java.lang.String","required": true}    ]},
+    {"name":"findSystems", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.System>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"invokeAsync", "comments":"Invokes a custom method", "return":"java.lang.Long", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"verb","type":"java.lang.String","required": true},
+       {"name":"object","type":"java.lang.String","required":false},
+       {"name":"attributes","type":"java.util.Map<java.lang.String,java.lang.Object>","required":false}    ]},
+    {"name":"generateChangesReport", "return":"java.lang.String", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"preRegisterServer", "comments":"Pre-registers a new sync-server and returns the registration token", "return":"java.lang.String", "arguments":[
+       {"name":"register","type":"com.soffid.iam.sync.api.ServerRegistrationToken","required": true}    ]},
+    {"name":"getServerTenants", "return":"java.lang.String[]", "arguments":[
+       {"name":"server","type":"com.soffid.iam.sync.api.Server","required": true}    ]},
+    {"name":"findAllActiveDispatchers", "return":"java.util.Collection<com.soffid.iam.iga.api.System>", "arguments":[
+    ]},
+    {"name":"findAllServers", "return":"java.util.Collection<com.soffid.iam.sync.api.Server>", "arguments":[
+    ]},
+    {"name":"findAttributeMappingsByObject", "return":"java.util.Collection<com.soffid.iam.iga.api.AttributeMapping>", "arguments":[
+       {"name":"objectId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findAccessControlByDispatcherName", "return":"java.util.Collection<com.soffid.iam.iga.api.AccessControl>", "arguments":[
+       {"name":"codiAgent","type":"java.lang.String","required": true}    ]},
+    {"name":"findObjectMappingPropertiesByObject", "return":"java.util.Collection<com.soffid.iam.iga.api.ObjectMappingProperty>", "arguments":[
+       {"name":"objectId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findObjectMappingTriggersByObject", "return":"java.util.Collection<com.soffid.iam.iga.api.ObjectMappingTrigger>", "arguments":[
+       {"name":"objectId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findObjectMappingsByDispatcher", "return":"java.util.Collection<com.soffid.iam.iga.api.ObjectMapping>", "arguments":[
+       {"name":"dispatcherId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findReconcileTriggersByDispatcher", "return":"java.util.Collection<com.soffid.iam.iga.api.ReconcileTrigger>", "arguments":[
+       {"name":"dispatcherId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findScheduledTasksByDispatcher", "return":"java.util.Collection<com.soffid.iam.sync.api.ScheduledTask>", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"findTenantServers", "return":"java.util.Collection<com.soffid.iam.sync.api.Server>", "arguments":[
+    ]},
+    {"name":"getAccessControl", "return":"java.util.Collection<com.soffid.iam.iga.api.AccessControl>", "arguments":[
+       {"name":"agent","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"getDispatcherGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.SystemGroup>", "arguments":[
+       {"name":"agent","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"getDispatcherUserTypes", "return":"java.util.Collection<com.soffid.iam.iga.api.UserTypeDispatcher>", "arguments":[
+       {"name":"agent","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"invoke", "comments":"Invokes a custom method", "return":"java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>>", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"verb","type":"java.lang.String","required": true},
+       {"name":"object","type":"java.lang.String","required":false},
+       {"name":"attributes","type":"java.util.Map<java.lang.String,java.lang.Object>","required":false}    ]},
+    {"name":"assignTemporaryPermissions", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"host","type":"java.lang.String","required":false},
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountSystem","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+    {"name":"findValidCertificates", "return":"java.util.List<java.security.cert.X509Certificate>", "arguments":[
+    ]},
+    {"name":"testObjectMapping", "comments":"Tests an object mapping for a real object", "return":"java.util.Map<java.lang.String,java.lang.Object>", "arguments":[
+       {"name":"sentences","type":"java.util.Map<java.lang.String,java.lang.String>","required": true},
+       {"name":"dispatcher","type":"java.lang.String","required": true},
+       {"name":"type","type":"com.soffid.iam.iga.api.SoffidObjectType","required": true},
+       {"name":"object1","type":"java.lang.String","required": true},
+       {"name":"object2","type":"java.lang.String","required":false}    ]},
+    {"name":"addCertificate", "return":"void", "arguments":[
+       {"name":"server","type":"com.soffid.iam.sync.api.Server","required": true},
+       {"name":"cert","type":"java.security.cert.X509Certificate","required": true}    ]},
+    {"name":"applyConfiguration", "return":"void", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"checkConnectivity", "comments":"Tests system connectivity", "return":"void", "arguments":[
+       {"name":"dispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"controlAcces","type":"com.soffid.iam.iga.api.AccessControl","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"mapping","type":"com.soffid.iam.iga.api.AttributeMapping","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"om","type":"com.soffid.iam.iga.api.ObjectMapping","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"omp","type":"com.soffid.iam.iga.api.ObjectMappingProperty","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"tirger","type":"com.soffid.iam.iga.api.ObjectMappingTrigger","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"rp","type":"com.soffid.iam.iga.api.ReconcileTrigger","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"grupDispatcher","type":"com.soffid.iam.iga.api.SystemGroup","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"tipusUsuari","type":"com.soffid.iam.iga.api.UserTypeDispatcher","required":false}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"server","type":"com.soffid.iam.sync.api.Server","required":false}    ]},
+    {"name":"propagateGroupsForSystem", "return":"void", "arguments":[
+       {"name":"codiAgent","type":"java.lang.String","required": true},
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required":false}    ]},
+    {"name":"propagateRolesForSystem", "return":"void", "arguments":[
+       {"name":"codiAgent","type":"java.lang.String","required": true},
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required":false}    ]},
+    {"name":"propagateUsersForSystem", "return":"void", "arguments":[
+       {"name":"codiAgent","type":"java.lang.String","required": true},
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required":false}    ]},
+    {"name":"removeTemporaryPermissions", "return":"void", "arguments":[
+       {"name":"host","type":"java.lang.String","required": true},
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountSystem","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+    {"name":"renameAccounts", "return":"void", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"setDefaultMappingsByDispatcher", "return":"void", "arguments":[
+       {"name":"dispatcherId","type":"java.lang.Long","required": true}    ]}
+  ]
+}

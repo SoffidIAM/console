@@ -1,0 +1,12 @@
+{
+  "joins": [
+    {"name":"parent","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false,"reverse":"children"},
+    {"name":"roles","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":true,"reverse":"informationSystem"},
+    {"name":"contactPerson","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"ApplicationResponsible"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"sodRules","targetClass":"com.soffid.iam.rc.model.SoDRuleEntity","multiple":true,"reverse":"application"},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.InformationSystemAttributeEntity","multiple":true,"reverse":"informationSystem"},
+    {"name":"children","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":true,"reverse":"parent"},
+    {"name":"roleScopeMailLists","targetClass":"com.soffid.iam.iga.model.MailListRoleMemberEntity","multiple":true,"reverse":"informationSystemScope"}
+  ]
+}

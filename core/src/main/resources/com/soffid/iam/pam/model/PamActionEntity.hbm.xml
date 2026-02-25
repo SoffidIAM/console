@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.PamActionEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_PAMACT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PAC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='policy' class='com.soffid.iam.pam.model.PamPolicyEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PAMACT_PAC_PPO_ID'>
+			<column name='PAC_PPO_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='rule' class='com.soffid.iam.pam.model.PamRuleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PAMACT_PAC_PRU_ID'>
+			<column name='PAC_PRU_ID' not-null='true'/>
+		</many-to-one>
+		<property name='author' type='java.lang.String'>
+			<column name='PAC_AUTHOR' not-null='false' length='100' />
+		</property>
+		<property name='date' type='java.util.Date'>
+			<column name='PAC_DATE' not-null='false' />
+		</property>
+		<property name='type' type='com.soffid.iam.pam.model.PamActionTypeEnum'>
+			<column name='PAC_TYPE' not-null='true' length='20' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_PAMACT_PAC_TEN_ID'>
+			<column name='PAC_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

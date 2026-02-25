@@ -1,0 +1,47 @@
+{
+  "class": "com.soffid.iam.am.service.SessionService",
+  "methods": [
+    {"name":"getSessionByHost", "return":"com.soffid.iam.am.api.Session", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"hostIp","type":"java.lang.String","required": true}    ]},
+    {"name":"getSession", "return":"com.soffid.iam.am.api.Session", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"key","type":"java.lang.String","required": true}    ]},
+    {"name":"joinEssoSession", "return":"com.soffid.iam.am.api.Session", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"key","type":"java.lang.String","required": true},
+       {"name":"port","type":"int","required": true}    ]},
+    {"name":"registerBrowserSession", "return":"com.soffid.iam.am.api.Session", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"browserSerialNumber","type":"java.lang.String","required":false},
+       {"name":"ipAddress","type":"java.lang.String","required": true},
+       {"name":"sessionType","type":"com.soffid.iam.am.api.SessionType","required": true},
+       {"name":"checkUrl","type":"java.lang.String","required":false},
+       {"name":"pamMonitorUrl","type":"java.lang.String","required":false},
+       {"name":"serviceProvider","type":"java.lang.String","required":false},
+       {"name":"authenticationMethod","type":"java.lang.String","required":false}    ]},
+    {"name":"registerSession", "return":"com.soffid.iam.am.api.Session", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"hostKey","type":"java.lang.String","required": true},
+       {"name":"clientHost","type":"java.lang.String","required":false},
+       {"name":"port","type":"int","required": true},
+       {"name":"key","type":"java.lang.String","required":false},
+       {"name":"authenticationMethod","type":"java.lang.String","required":false}    ]},
+    {"name":"updateTransientKey", "return":"java.lang.String", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"key","type":"java.lang.String","required": true}    ]},
+    {"name":"findActiveSessions", "return":"java.util.Collection<com.soffid.iam.am.api.Session>", "arguments":[
+    ]},
+    {"name":"getActiveSessions", "return":"java.util.Collection<com.soffid.iam.am.api.Session>", "arguments":[
+    ]},
+    {"name":"getActiveSessions", "return":"java.util.Collection<com.soffid.iam.am.api.Session>", "arguments":[
+       {"name":"idUsuari","type":"long","required": true}    ]},
+    {"name":"cleanTransientKey", "return":"void", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"key","type":"java.lang.String","required": true}    ]},
+    {"name":"destroySession", "return":"void", "arguments":[
+       {"name":"sessio","type":"com.soffid.iam.am.api.Session","required": true}    ]},
+    {"name":"sessionKeepAlive", "return":"void", "arguments":[
+       {"name":"session","type":"com.soffid.iam.am.api.Session","required": true}    ]}
+  ]
+}

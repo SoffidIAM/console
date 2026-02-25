@@ -1,0 +1,47 @@
+{
+  "class": "com.soffid.iam.am.service.VaultService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.am.api.VaultElement", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultElement","required": true}    ]},
+    {"name":"findVaultElement", "return":"com.soffid.iam.am.api.VaultElement", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.VaultElement", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultElement","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.VaultFolder", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultFolder","required": true}    ]},
+    {"name":"findFolder", "return":"com.soffid.iam.am.api.VaultFolder", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"getPersonalFolder", "return":"com.soffid.iam.am.api.VaultFolder", "arguments":[
+    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.VaultFolder", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultFolder","required": true}    ]},
+    {"name":"getFolderPermissions", "return":"com.soffid.iam.am.api.VaultFolderPermissions", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultFolder","required": true}    ]},
+    {"name":"addToFolder", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"findFolders", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.VaultFolder>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findAccounts", "return":"java.util.List<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"filter","type":"java.lang.String","required":false}    ]},
+    {"name":"findFolders", "return":"java.util.List<com.soffid.iam.am.api.VaultFolder>", "arguments":[
+       {"name":"filter","type":"java.lang.String","required":false}    ]},
+    {"name":"findVaultElementByText", "return":"java.util.List<com.soffid.iam.am.api.VaultElement>", "arguments":[
+       {"name":"filter","type":"java.lang.String","required":false}    ]},
+    {"name":"getChildren", "return":"java.util.List<com.soffid.iam.am.api.VaultElement>", "arguments":[
+       {"name":"parent","type":"com.soffid.iam.am.api.VaultElement","required": true}    ]},
+    {"name":"getChildren", "return":"java.util.List<com.soffid.iam.am.api.VaultFolder>", "arguments":[
+       {"name":"parent","type":"com.soffid.iam.am.api.VaultFolder","required": true}    ]},
+    {"name":"getPublicRootFolders", "return":"java.util.List<com.soffid.iam.am.api.VaultFolder>", "arguments":[
+    ]},
+    {"name":"getRootFolders", "return":"java.util.List<com.soffid.iam.am.api.VaultFolder>", "arguments":[
+    ]},
+    {"name":"list", "return":"java.util.List<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultFolder","required": true}    ]},
+    {"name":"applyFolderPermissions", "return":"void", "arguments":[
+       {"name":"permissions","type":"com.soffid.iam.am.api.VaultFolderPermissions","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultElement","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"folder","type":"com.soffid.iam.am.api.VaultFolder","required": true}    ]}
+  ]
+}

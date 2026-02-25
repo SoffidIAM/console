@@ -1,0 +1,33 @@
+{
+  "hibernateClass": "com.soffid.iam.am.model.EntryPointEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"code", "hibernateName":"code"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"visible", "hibernateName":"visible"},
+    {"name":"menu", "hibernateName":"menu"},
+    {"name":"columnsNumber"},
+    {"name":"publicAccess", "hibernateName":"publicAccess"},
+    {"name":"menuType", "hibernateName":"menuType"},
+    {"name":"authorizations"},
+    {"name":"executions"},
+    {"name":"icon1Image"},
+    {"name":"icon2Image"},
+    {"name":"informationSystem",  "hibernateName":"informationSystem.name"},
+    {"name":"parentId"},
+    {"name":"order"},
+    {"name":"icon1Id"},
+    {"name":"icon2Id"},
+    {"name":"xmlAccessTree"},
+    {"name":"system",  "hibernateName":"system.name"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

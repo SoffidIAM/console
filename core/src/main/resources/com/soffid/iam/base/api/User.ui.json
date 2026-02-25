@@ -1,0 +1,24 @@
+{
+  "class": "com.soffid.iam.base.api.User", "comments":"Contains the information of a user or identity.\nThe SCIM attribute roles is not supported.\nThe SCIM attribute accounts.account contains the user's accounts as an object of class com.soffid.iam.base.api.Account.\nThe SCIM attribute accounts.account.roles contains the user's grants as an object of class com.soffid.iam.iga.api.RoleAccount.\nThe SCIM attribute accounts.account.roles.role contains the roles granted to a user as an object of class com.soffid.iam.iga.api.Role.\n",
+  "attributes": [
+    {"name":"userName", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "separator":"_commonAttributes", "length":"150"},
+    {"name":"firstName", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.user.FullNameUIHandler", "length":"100"},
+    {"name":"lastName", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.user.FullNameUIHandler", "length":"100"},
+    {"name":"middleName", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.user.FullNameUIHandler", "length":"100"},
+    {"name":"fullName", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"150"},
+    {"name":"userType", "type":"USER_TYPE", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "separator":"_organization"},
+    {"name":"primaryGroup", "type":"GROUP", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"homeServer", "type":"HOST", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "filter_expression":"folders eq \"S\""},
+    {"name":"profileServer", "type":"HOST", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "filter_expression":"folders eq \"S\""},
+    {"name":"emailAddress", "type":"EMAIL", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.user.EmailHandler", "separator":"_emails", "length":"150"},
+    {"name":"mailAlias", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"mailServer", "type":"HOST", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "filter_expression":"mail eq \"S\""},
+    {"name":"active", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "separator":"_status"},
+    {"name":"multiSession", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"comments", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":true, "multivalue":false, "readonly":false, "length":"1024"},
+    {"name":"createdBy", "type":"USER", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "separator":"_audit", "length":"50"},
+    {"name":"createdOn", "type":"DATE_TIME", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"modifiedBy", "type":"USER", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"50"},
+    {"name":"modifiedOn", "type":"DATE_TIME", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true}
+  ]
+}

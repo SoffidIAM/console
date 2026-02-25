@@ -1,0 +1,27 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.GroupEntity",
+  "start": "startDate",
+  "end": "endDate",
+  "deleted": "obsolete",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"quota", "hibernateName":"quota"},
+    {"name":"driveLetter", "hibernateName":"driveLetter"},
+    {"name":"parentGroup",  "hibernateName":"parent.name"},
+    {"name":"type",  "hibernateName":"unitType.name"},
+    {"name":"driveServerName"},
+    {"name":"obsolete", "hibernateName":"obsolete"},
+    {"name":"startDate", "hibernateName":"startDate"},
+    {"name":"endDate", "hibernateName":"endDate"},
+    {"name":"attributes", "hibernateName":"attributes"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

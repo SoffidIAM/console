@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.MailListEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_LLICOR' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='LCO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='description' type='java.lang.String'>
+			<column name='LCO_DESCRI' not-null='false' length='100' />
+		</property>
+		<property name='name' type='java.lang.String'>
+			<column name='LCO_NOM' not-null='true' length='50' />
+		</property>
+		<set name='externals' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_EXTLCO_ELC_IDLCO'>
+				<column name='ELC_IDLCO'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ExternalNameEntityImpl'/>
+		</set>
+		<many-to-one name='domain' class='com.soffid.iam.iga.model.MailDomainEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LLICOR_LCO_IDDCO'>
+			<column name='LCO_IDDCO' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LLICOR_LCO_TEN_ID'>
+			<column name='LCO_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='userMailLists' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USULCO_ULC_IDLCO'>
+				<column name='ULC_IDLCO'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.UserMailEntityImpl'/>
+		</set>
+		<set name='mailListPertain' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOLCO_LLC_IDLCO1'>
+				<column name='LLC_IDLCO1'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListContainerEntityImpl'/>
+		</set>
+		<set name='mailListContent' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOLCO_LLC_IDLCO2'>
+				<column name='LLC_IDLCO2'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListContainerEntityImpl'/>
+		</set>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_MAIATT_MAT_LCO_ID'>
+				<column name='MAT_LCO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListAttributeEntityImpl'/>
+		</set>
+		<set name='groups' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOGRU_LCG_LCO_ID'>
+				<column name='LCG_LCO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListGroupMemberEntityImpl'/>
+		</set>
+		<set name='roles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOROL_LCR_LCO_ID'>
+				<column name='LCR_LCO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListRoleMemberEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='LCO_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='LCO_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='LCO_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='LCO_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='LCO_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='LCO_DELUSE' not-null='false' />
+		</property>
+		<property name='deleted' type='java.lang.Boolean'>
+			<column name='LCO_DELETED' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,26 @@
+{
+  "class": "com.soffid.iam.am.api.VaultFolder",
+  "attributes": [
+    {"name":"name", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"256"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"1024"},
+    {"name":"parentFolder", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"grantedGroups", "type":"STRING", "comments":"Groups that can use the account using SSO", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"grantedUsers", "type":"STRING", "comments":"Users that can use the account using SSO", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"grantedRoles", "type":"STRING", "comments":"Roles that can use the account using SSO", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"managerGroups", "type":"STRING", "comments":"Groups that can use the account using SSO & Self Service", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"managerUsers", "type":"STRING", "comments":"Users that can use the account using SSO & Self Service", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"managerRoles", "type":"STRING", "comments":"Roles that can use the account using SSO & Self Service", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"ownerGroups", "type":"STRING", "comments":"Groups that can manage the account using SSO & Self Service & Console", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"ownerUsers", "type":"STRING", "comments":"Users that can use the account using SSO & Self Service & Console", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"ownerRoles", "type":"STRING", "comments":"Roles that can use the account using SSO & Self Serva	ice & Console", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"navigateGroups", "type":"STRING", "comments":"Groups that can navigate", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"navigateUsers", "type":"STRING", "comments":"Users that can navigate", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"navigateRoles", "type":"STRING", "comments":"Roles that can use the account using SSO & Self Service & Console", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"accessLevel", "type":"STRING", "comments":"Effective access level", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "enumeration":"com.soffid.iam.base.api.AccountAccessLevelEnum"},
+    {"name":"pamPolicy", "type":"STRING", "comments":"PAM Policy", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.vault.PamPolicyUiHandler"},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

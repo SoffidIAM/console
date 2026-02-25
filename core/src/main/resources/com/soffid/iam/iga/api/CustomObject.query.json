@@ -1,0 +1,20 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.CustomObjectEntity",
+  "start": "createdOn",
+  "deleted": "deleted",
+  "tenantFilter": "type.tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"type",  "hibernateName":"type.name"},
+    {"name":"attributes", "hibernateName":"attributes"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"},
+    {"name":"deleted", "hibernateName":"deleted"}
+  ]
+}

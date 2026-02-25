@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.MailListRoleMemberEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_LCOROL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='LCR_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='mailList' class='com.soffid.iam.iga.model.MailListEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LCOROL_LCR_LCO_ID'>
+			<column name='LCR_LCO_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='role' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LCOROL_LCR_ROL_ID'>
+			<column name='LCR_ROL_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='informationSystemScope' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LCOROL_LCR_APL_ID'>
+			<column name='LCR_APL_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='groupScope' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LCOROL_LCR_GRU_ID'>
+			<column name='LCR_GRU_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='domainValueScope' class='com.soffid.iam.iga.model.DomainValueEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_LCOROL_LCR_VDO_ID'>
+			<column name='LCR_VDO_ID' not-null='false'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

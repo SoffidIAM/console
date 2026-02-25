@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.NetworkEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_XARXES' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='XAR_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='XAR_CODI' not-null='true' length='10' />
+		</property>
+		<property name='ip' type='java.lang.String'>
+			<column name='XAR_ADRIP' not-null='true' length='50' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='XAR_DESCRI' not-null='false' length='50' />
+		</property>
+		<property name='mask' type='java.lang.String'>
+			<column name='XAR_MASIP' not-null='false' length='50' />
+		</property>
+		<property name='type' type='com.soffid.iam.am.api.NetworkTypeEnum'>
+			<column name='XAR_TYPE' not-null='false' />
+		</property>
+		<property name='lanAccess' type='java.lang.Boolean'>
+			<column name='XAR_LAN' not-null='true' />
+		</property>
+		<property name='dhcp' type='java.lang.String'>
+			<column name='XAR_PARDHC' not-null='false' length='50' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_XARXES_XAR_TEN_ID'>
+			<column name='XAR_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='authorizations' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AUTXAR_AXA_IDXAR'>
+				<column name='AXA_IDXAR'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.NetworkAuthorizationEntityImpl'/>
+		</set>
+		<set name='hosts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQUIN_MAQ_IDXAR'>
+				<column name='MAQ_IDXAR'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.HostEntityImpl'/>
+		</set>
+		<property name='dchpSupport' type='boolean'>
+			<column name='XAR_DHCPSUP' not-null='true' />
+		</property>
+		<property name='loginRestriction' type='java.lang.Boolean'>
+			<column name='XAR_LOGREC' not-null='false' />
+		</property>
+		<property name='discovery' type='java.lang.Boolean'>
+			<column name='XAR_DISCOV' not-null='false' />
+		</property>
+		<many-to-one name='discoveryServer' class='com.soffid.iam.sync.model.ServerEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_XARXES_XAR_SER_ID'>
+			<column name='XAR_SER_ID' not-null='false'/>
+		</many-to-one>
+		<property name='countryCode' type='java.lang.String'>
+			<column name='XAR_COUNTRY' not-null='false' />
+		</property>
+		<set name='ranges' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_NEDIRA_NDR_XAR_ID'>
+				<column name='NDR_XAR_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.NetworkDiscoverRangeEntityImpl'/>
+		</set>
+		<set name='accounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_XARACC_NDA_XAR_ID'>
+				<column name='NDA_XAR_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.NetworkDiscoveryAccountEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='XAR_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='XAR_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='XAR_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='XAR_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='XAR_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='XAR_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

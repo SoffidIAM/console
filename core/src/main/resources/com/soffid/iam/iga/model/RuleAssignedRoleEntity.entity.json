@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"rule","targetClass":"com.soffid.iam.iga.model.RuleEntity","multiple":false,"reverse":"roles"},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"rules"}
+  ]
+}

@@ -2,7 +2,7 @@ package com.soffid.iam.common.test;
 
 import java.io.UnsupportedEncodingException;
 
-import com.soffid.iam.api.Password;
+import com.soffid.iam.am.api.Password;
 import com.soffid.iam.crypt.Crypt;
 
 import junit.framework.TestCase;

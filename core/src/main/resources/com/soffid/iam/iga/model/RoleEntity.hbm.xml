@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.RoleEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ROLES' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ROL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='ROL_NOM' not-null='true' length='150' />
+		</property>
+		<property name='key' type='java.lang.String'>
+			<column name='ROL_KEY' not-null='true' length='301' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='ROL_DESCRI' not-null='true' length='150' />
+		</property>
+		<property name='category' type='java.lang.String'>
+			<column name='ROL_CATEGORY' not-null='false' length='150' />
+		</property>
+		<property name='enableByDefault' type='java.lang.Boolean'>
+			<column name='ROL_DEFECTB' not-null='true' length='1' />
+		</property>
+		<property name='password' type='java.lang.String'>
+			<column name='ROL_CONTRA' not-null='false' length='1' />
+		</property>
+		<many-to-one name='informationSystem' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLES_ROL_IDAPL'>
+			<column name='ROL_IDAPL' not-null='true'/>
+		</many-to-one>
+		<set name='accounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLUSU_RLU_IDROL'>
+				<column name='RLU_IDROL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleAccountEntityImpl'/>
+		</set>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLES_ROL_IDDISPAT'>
+			<column name='ROL_IDDISPAT' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='applicationDomain' class='com.soffid.iam.iga.model.ApplicationDomainEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLES_ROL_DOMAPP'>
+			<column name='ROL_DOMAPP' not-null='false'/>
+		</many-to-one>
+		<property name='domainType' type='java.lang.String'>
+			<column name='ROL_TIPDOM' not-null='false' length='50' />
+		</property>
+		<set name='ownerRoles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLROL_RRL_CONTINGUT'>
+				<column name='RRL_CONTINGUT'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleDependencyEntityImpl'/>
+		</set>
+		<set name='ownedRoles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLROL_RRL_CONTENIDOR'>
+				<column name='RRL_CONTENIDOR'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleDependencyEntityImpl'/>
+		</set>
+		<set name='containerGroups' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLGRUP_RLG_ROL'>
+				<column name='RLG_ROL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleGroupEntityImpl'/>
+		</set>
+		<set name='networkAuthorization' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AUTXAR_AXA_IDROL'>
+				<column name='AXA_IDROL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.NetworkAuthorizationEntityImpl'/>
+		</set>
+		<set name='accessControl' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_CONACC_CAC_ROL_ID'>
+				<column name='CAC_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.AccessControlEntityImpl'/>
+		</set>
+		<property name='manageableWF' type='java.lang.String'>
+			<column name='ROL_GEST_WF' not-null='false' length='1' />
+		</property>
+		<set name='notificationEntities' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_NOTIFICA_NTF_ROL'>
+				<column name='NTF_ROL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.NoticeEntityImpl'/>
+		</set>
+		<set name='authorizations' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AUTROL_AUR_ROL'>
+				<column name='AUR_ROL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AuthorizationEntityImpl'/>
+		</set>
+		<set name='accountAccess' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_ACCACC_AAC_ROL_ID'>
+				<column name='AAC_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.AccountAccessEntityImpl'/>
+		</set>
+		<set name='rules' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_RULROL_RUR_ROL_ID'>
+				<column name='RUR_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RuleAssignedRoleEntityImpl'/>
+		</set>
+		<set name='sodRules' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SODROL_SOR_ROL_ID'>
+				<column name='SOR_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.SoDRoleEntityImpl'/>
+		</set>
+		<property name='approvalProcess' type='java.lang.Long'>
+			<column name='ROL_APRPRO' not-null='false' />
+		</property>
+		<property name='approvalStart' type='java.util.Date'>
+			<column name='ROL_APREND' not-null='false' />
+		</property>
+		<property name='approvalEnd' type='java.util.Date'>
+			<column name='ROL_APRSTA' not-null='false' />
+		</property>
+		<property name='externalId' type='java.lang.String'>
+			<column name='ROL_EXTID' not-null='false' length='100' />
+		</property>
+		<set name='customObjects' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_CUSBRO_COR_ROL_ID'>
+				<column name='COR_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.CustomObjectRoleEntityImpl'/>
+		</set>
+		<set name='mailLists' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOROL_LCR_ROL_ID'>
+				<column name='LCR_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListRoleMemberEntityImpl'/>
+		</set>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_ROLATT_RAT_ROL_ID'>
+				<column name='RAT_ROL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleAttributeEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='ROL_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='ROL_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='ROL_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='ROL_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='ROL_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='ROL_DELUSE' not-null='false' />
+		</property>
+		<property name='deleted' type='java.lang.Boolean'>
+			<column name='ROL_DELETED' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

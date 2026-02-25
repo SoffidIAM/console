@@ -1,0 +1,32 @@
+{
+  "class": "com.soffid.iam.impl.service.AuthorizationInformationService",
+  "methods": [
+    {"name":"interventionNeeded", "return":"boolean", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required":false},
+       {"name":"codisRols","type":"java.lang.String[]","required":false}    ]},
+    {"name":"findApplicationByApplicationCode", "return":"com.soffid.iam.iga.api.InformationSystem", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"getSystemsRoles", "return":"com.soffid.iam.iga.api.Role", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"isApplicationManager", "return":"java.lang.Boolean", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiApliacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findApplicationManagersByApplicationCode", "return":"java.util.Collection<com.soffid.iam.base.api.User>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findManagedApplicationsByUserCode", "return":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findRolesByApplicationCode", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findRolesByApplicationCodeUnrestricted", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findRolesByUserCode", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getApplicationsByUserCode", "return":"java.util.Collection<com.soffid.iam.iga.api.InformationSystem>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"getApplicationRolesByUserCodeAndApplicationCode", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"getRolesByUserCode", "return":"java.util.Collection<com.soffid.iam.iga.api.Role>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]}
+  ]
+}

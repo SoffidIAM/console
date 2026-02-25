@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"network","targetClass":"com.soffid.iam.am.model.NetworkEntity","multiple":false,"reverse":"authorizations"},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"networkAuthorization"},
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"networkAuthorization"},
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"ACNetwork"}
+  ]
+}

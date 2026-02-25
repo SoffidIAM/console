@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"accessControl"},
+    {"name":"agent","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"accessControls"}
+  ]
+}

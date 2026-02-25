@@ -1,0 +1,207 @@
+//
+// (c) 2014 Soffid
+//
+//
+package com.soffid.iam.am.model;
+/**
+ * DAO Base for Entity HostEntryPointEntity
+ */
+public abstract class HostEntryPointEntityDaoBase
+	extends org.springframework.orm.hibernate3.support.HibernateDaoSupport
+	implements com.soffid.iam.am.model.HostEntryPointEntityDao
+{
+	com.soffid.iam.am.model.EntryPointEntityDao entryPointEntityDao;
+
+	/**
+	 * Sets reference to <code>entryPointEntityDao</code>.
+	 */
+	public void setEntryPointEntityDao (com.soffid.iam.am.model.EntryPointEntityDao entryPointEntityDao) {
+		this.entryPointEntityDao = entryPointEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>entryPointEntityDao</code>.
+	 */
+	public com.soffid.iam.am.model.EntryPointEntityDao getEntryPointEntityDao () {
+		return entryPointEntityDao;
+	}
+
+	com.soffid.iam.am.model.HostEntityDao hostEntityDao;
+
+	/**
+	 * Sets reference to <code>hostEntityDao</code>.
+	 */
+	public void setHostEntityDao (com.soffid.iam.am.model.HostEntityDao hostEntityDao) {
+		this.hostEntityDao = hostEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>hostEntityDao</code>.
+	 */
+	public com.soffid.iam.am.model.HostEntityDao getHostEntityDao () {
+		return hostEntityDao;
+	}
+
+
+	/**
+	 * Creates an instance of {@link com.soffid.iam.am.model.HostEntryPointEntity} .
+	 */
+	public com.soffid.iam.am.model.HostEntryPointEntity newHostEntryPointEntity()
+	{
+		return new com.soffid.iam.am.model.HostEntryPointEntityImpl();
+	}
+
+	/**
+	 * Loads an instance of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 */
+	public com.soffid.iam.am.model.HostEntryPointEntity load(java.lang.Long id) {
+		if (id == null) {
+			throw new IllegalArgumentException("id cannot be null");
+		}
+		com.soffid.iam.am.model.HostEntryPointEntity result = (com.soffid.iam.am.model.HostEntryPointEntity) this.getHibernateTemplate().get(com.soffid.iam.am.model.HostEntryPointEntityImpl.class, id);
+
+		return result;
+	}
+	/**
+	 * Loads all instances of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 */
+	public java.util.List<com.soffid.iam.am.model.HostEntryPointEntity> loadAll() {
+		java.util.List<com.soffid.iam.am.model.HostEntryPointEntity> result = (java.util.List<com.soffid.iam.am.model.HostEntryPointEntity>)
+			this.getHibernateTemplate().loadAll(com.soffid.iam.am.model.HostEntryPointEntity.class);
+		return result;
+	};
+
+	/**
+	 * Adds an instance of {@link com.soffid.iam.am.model.HostEntryPointEntity} to the persistent store.
+	 */
+	public void create (com.soffid.iam.am.model.HostEntryPointEntity entity)
+	{
+		if (entity == null)
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.create - 'entity' can not be null");
+		}
+
+		this.getHibernateTemplate().save(entity);
+		this.getHibernateTemplate().flush();
+	}
+
+	/**
+	 * Updates an instance of {@link com.soffid.iam.am.model.HostEntryPointEntity} at the persistent store.
+	 */
+	public void update (com.soffid.iam.am.model.HostEntryPointEntity entity)
+	{
+		if (entity == null)
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.update - 'entity' can not be null");
+		}
+		this.getHibernateTemplate().update(entity);
+		this.getHibernateTemplate().flush();
+	}
+
+	/**
+	 * Removes an instance of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 */
+	public void remove (com.soffid.iam.am.model.HostEntryPointEntity entity)
+	{
+		if (entity == null)
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.remove - 'entity' can not be null");
+		}
+		this.getHibernateTemplate().delete(entity);
+		this.getHibernateTemplate().flush();
+	}
+
+	/**
+	 * Creates a collection of {@link com.soffid.iam.am.model.HostEntryPointEntity} and adds it to the persistent store.
+	 */
+	public void create (java.util.Collection<? extends com.soffid.iam.am.model.HostEntryPointEntity> entities) {
+		if (entities == null)
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.create - 'entities' cannot be null");
+		}
+		for (com.soffid.iam.am.model.HostEntryPointEntity entity: entities) { 
+			create(entity);
+		}
+	}
+
+	/**
+	 * Updates a collection of {@link com.soffid.iam.am.model.HostEntryPointEntity} in the persistent store.
+	 */
+	public void update (java.util.Collection<? extends com.soffid.iam.am.model.HostEntryPointEntity> entities) {
+		if (entities == null)
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.update - 'entities' cannot be null");
+		}
+		for (com.soffid.iam.am.model.HostEntryPointEntity entity: entities) { 
+			update(entity);
+		}
+	}
+
+	/**
+	 * Removes a collection of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 */
+	public void remove (java.util.Collection<? extends com.soffid.iam.am.model.HostEntryPointEntity> entities) {
+		if (entities == null)
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.remove - 'entities' cannot be null");
+		}
+		for (com.soffid.iam.am.model.HostEntryPointEntity entity: entities) { 
+			remove(entity);
+		}
+	}
+
+	/**
+	 * Removes an instance of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 */
+	public void remove (java.lang.Long id)
+	{
+		if (id == null) 
+		{
+			throw new IllegalArgumentException(
+				"HostEntryPointEntityDao.remove - 'id' can not be null");
+		}
+		com.soffid.iam.am.model.HostEntryPointEntity entity = this.load(id);
+		if (entity != null)
+			this.remove(entity);
+	}
+
+	/**
+	 * Query of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 * parameter query HQL Query String
+	 * parameter parameters HQL Parameters
+	 */
+	public java.util.List<com.soffid.iam.am.model.HostEntryPointEntity> query (String queryString, com.soffid.iam.model.Parameter[] parameters)
+	{
+		try {
+			java.util.List results = new com.soffid.iam.model.QueryBuilder().query(this,
+				queryString, parameters);
+			return (java.util.List<com.soffid.iam.am.model.HostEntryPointEntity>) results;
+		} catch (org.hibernate.HibernateException ex) {
+			throw super.convertHibernateAccessException(ex);
+		}
+	}
+
+	/**
+	 * Query of {@link com.soffid.iam.am.model.HostEntryPointEntity} from the persistent store.
+	 * parameter query HQL Query String
+	 * parameter parameters HQL Parameters
+	 * parameter maxResults max number of rows to return
+	 */
+	public java.util.List<com.soffid.iam.am.model.HostEntryPointEntity> query (String queryString, com.soffid.iam.model.Parameter[] parameters, com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria)
+	{
+		try {
+			java.util.List results = new com.soffid.iam.model.QueryBuilder().query(this,
+				queryString, parameters, criteria);
+			return (java.util.List<com.soffid.iam.am.model.HostEntryPointEntity>) results;
+		} catch (org.hibernate.HibernateException ex) {
+			throw super.convertHibernateAccessException(ex);
+		}
+	}
+
+}

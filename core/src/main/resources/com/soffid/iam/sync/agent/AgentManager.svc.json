@@ -1,0 +1,34 @@
+{
+  "class": "com.soffid.iam.sync.agent.AgentManager",
+  "methods": [
+    {"name":"findLogs", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.LogFileEntry>", "arguments":[
+       {"name":"config","type":"com.soffid.iam.sync.api.LogConfiguration","required": true},
+       {"name":"firstRow","type":"long","required": true},
+       {"name":"numRows","type":"long","required": true}    ]},
+    {"name":"getServerLogs", "return":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>", "arguments":[
+    ]},
+    {"name":"getSyncServerInfo", "return":"com.soffid.iam.sync.api.SyncServerInfo", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required": true}    ]},
+    {"name":"createLocalAgent", "return":"java.lang.Object", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"createLocalAgentDebug", "return":"java.lang.Object", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"createAgent", "return":"java.lang.String", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"createAgentDebug", "return":"java.lang.String", "arguments":[
+       {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"tailServerLog", "return":"java.lang.String[]", "arguments":[
+    ]},
+    {"name":"generateNewKey", "return":"java.security.PublicKey", "arguments":[
+    ]},
+    {"name":"getCertificateValidityDate", "return":"java.util.Date", "arguments":[
+    ]},
+    {"name":"reset", "return":"void", "arguments":[
+    ]},
+    {"name":"storeNewCertificate", "return":"void", "arguments":[
+       {"name":"cert","type":"java.security.cert.X509Certificate","required": true},
+       {"name":"root","type":"java.security.cert.X509Certificate","required": true}    ]},
+    {"name":"configureLog", "return":"void", "arguments":[
+       {"name":"config","type":"com.soffid.iam.sync.api.LogConfiguration","required": true}    ]}
+  ]
+}

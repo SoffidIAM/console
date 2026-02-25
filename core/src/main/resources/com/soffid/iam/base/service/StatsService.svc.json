@@ -1,0 +1,14 @@
+{
+  "class": "com.soffid.iam.base.service.StatsService",
+  "methods": [
+    {"name":"findStats", "return":"com.soffid.iam.base.api.Stats", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true},
+       {"name":"since","type":"java.util.Date","required": true},
+       {"name":"until","type":"java.util.Date","required": true},
+       {"name":"step","type":"int","required": true}    ]},
+    {"name":"purge", "return":"void", "arguments":[
+    ]},
+    {"name":"updateStats", "return":"void", "arguments":[
+    ]}
+  ]
+}

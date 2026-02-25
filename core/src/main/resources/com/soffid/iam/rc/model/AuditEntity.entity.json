@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"audit"},
+    {"name":"accountAssoc","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

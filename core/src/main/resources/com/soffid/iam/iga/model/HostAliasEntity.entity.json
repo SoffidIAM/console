@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"hostAlias"}
+  ]
+}

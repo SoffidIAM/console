@@ -1,0 +1,29 @@
+{
+  "joins": [
+    {"name":"ACNetwork","targetClass":"com.soffid.iam.am.model.NetworkAuthorizationEntity","multiple":true,"reverse":"user"},
+    {"name":"mailServer","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false},
+    {"name":"homeServer","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false},
+    {"name":"mailDomain","targetClass":"com.soffid.iam.iga.model.MailDomainEntity","multiple":false,"reverse":"users"},
+    {"name":"profileServer","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"userProfiles"},
+    {"name":"primaryGroup","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"primaryGroupUsers"},
+    {"name":"attributes","targetClass":"com.soffid.iam.base.model.UserDataEntity","multiple":true,"reverse":"user"},
+    {"name":"secondaryGroups","targetClass":"com.soffid.iam.iga.model.UserGroupEntity","multiple":true,"reverse":"user"},
+    {"name":"printers","targetClass":"com.soffid.iam.iga.model.UserPrinterEntity","multiple":true,"reverse":"user"},
+    {"name":"sessions","targetClass":"com.soffid.iam.am.model.SessionEntity","multiple":true,"reverse":"user"},
+    {"name":"userMailList","targetClass":"com.soffid.iam.iga.model.UserMailEntity","multiple":true,"reverse":"user"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"ApplicationResponsible","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":true,"reverse":"contactPerson"},
+    {"name":"accessHostAsAdministratorAuthorization","targetClass":"com.soffid.iam.pam.model.HostAdminEntity","multiple":true,"reverse":"user"},
+    {"name":"userType","targetClass":"com.soffid.iam.base.model.UserTypeEntity","multiple":false},
+    {"name":"secrets","targetClass":"com.soffid.iam.am.model.SecretEntity","multiple":true,"reverse":"user"},
+    {"name":"accounts","targetClass":"com.soffid.iam.base.model.UserAccountEntity","multiple":true,"reverse":"user"},
+    {"name":"accountAccess","targetClass":"com.soffid.iam.pam.model.AccountAccessEntity","multiple":true,"reverse":"user"},
+    {"name":"passwords","targetClass":"com.soffid.iam.am.model.PasswordEntity","multiple":true,"reverse":"user"},
+    {"name":"pendingAuthoritativeChanges","targetClass":"com.soffid.iam.iga.model.AuthoritativeChangeEntity","multiple":true,"reverse":"user"},
+    {"name":"browsers","targetClass":"com.soffid.iam.am.model.BrowserEntity","multiple":true,"reverse":"lastUser"},
+    {"name":"passwordManagerToken","targetClass":"com.soffid.iam.am.model.PasswordManagerTokenEntity","multiple":true,"reverse":"user"},
+    {"name":"vaultFolders","targetClass":"com.soffid.iam.am.model.VaultFolderAccessEntity","multiple":true,"reverse":"user"},
+    {"name":"preferences","targetClass":"com.soffid.iam.base.model.UserPreferenceEntity","multiple":true,"reverse":"user"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueUserEntity","multiple":true,"reverse":"user"}
+  ]
+}

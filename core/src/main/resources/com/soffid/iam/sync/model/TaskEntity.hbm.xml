@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.TaskEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TASQUE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TAS_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='user' type='java.lang.String'>
+			<column name='TAS_USUARI' not-null='false' length='150' />
+		</property>
+		<property name='password' type='java.lang.String'>
+			<column name='TAS_CONTRA' not-null='false' length='128' />
+		</property>
+		<property name='changePassword' type='java.lang.String'>
+			<column name='TAS_CANCON' not-null='false' length='1' />
+		</property>
+		<property name='folder' type='java.lang.String'>
+			<column name='TAS_CARPET' not-null='false' length='150' />
+		</property>
+		<property name='folderType' type='java.lang.String'>
+			<column name='TAS_TIPCAR' not-null='false' length='1' />
+		</property>
+		<property name='printer' type='java.lang.String'>
+			<column name='TAS_IMPRES' not-null='false' length='12' />
+		</property>
+		<property name='host' type='java.lang.String'>
+			<column name='TAS_MAQUIN' not-null='false' length='50' />
+		</property>
+		<property name='subnet' type='java.lang.String'>
+			<column name='TAS_SUBXAR' not-null='false' length='10' />
+		</property>
+		<property name='message' type='java.lang.String'>
+			<column name='TAS_MISSAT' not-null='false' length='1024' />
+		</property>
+		<property name='status' type='java.lang.String'>
+			<column name='TAS_STATUS' not-null='false' length='1' />
+		</property>
+		<property name='date' type='java.sql.Timestamp'>
+			<column name='TAS_DATA' not-null='true' />
+		</property>
+		<property name='transaction' type='java.lang.String'>
+			<column name='TAS_TRANSA' not-null='true' length='50' />
+		</property>
+		<property name='group' type='java.lang.String'>
+			<column name='TAS_GRUP' not-null='false' length='150' />
+		</property>
+		<property name='alias' type='java.lang.String'>
+			<column name='TAS_ALIES' not-null='false' length='50' />
+		</property>
+		<property name='mailDomain' type='java.lang.String'>
+			<column name='TAS_DOMCOR' not-null='false' length='50' />
+		</property>
+		<property name='role' type='java.lang.String'>
+			<column name='TAS_ROLE' not-null='false' length='150' />
+		</property>
+		<property name='db' type='java.lang.String'>
+			<column name='TAS_BD' not-null='false' length='150' />
+		</property>
+		<property name='systemName' type='java.lang.String'>
+			<column name='TAS_CODDIS' not-null='false' length='150' />
+		</property>
+		<property name='server' type='java.lang.String'>
+			<column name='TAS_SERVER' not-null='false' length='1024' />
+		</property>
+		<property name='serverInstance' type='java.lang.String'>
+			<column name='TAS_SRVINS' not-null='false' length='1024' />
+		</property>
+		<property name='priority' type='java.lang.Long'>
+			<column name='TAS_PRIORI' not-null='false' />
+		</property>
+		<property name='usersDomain' type='java.lang.String'>
+			<column name='TAS_DOMUSU' not-null='false' length='50' />
+		</property>
+		<property name='passwordsDomain' type='java.lang.String'>
+			<column name='TAS_DOMCON' not-null='false' length='50' />
+		</property>
+		<property name='hash' type='java.lang.String'>
+			<column name='TAS_HASH' not-null='false' length='200' />
+		</property>
+		<set name='logs' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_TASKLOG_TLO_IDTASQUE'>
+				<column name='TLO_IDTASQUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.TaskLogEntityImpl'/>
+		</set>
+		<property name='expirationDate' type='java.util.Date'>
+			<column name='TAS_EXPDAT' not-null='false' />
+		</property>
+		<property name='entity' type='java.lang.String'>
+			<column name='TAS_ENTITY' not-null='false' length='100' />
+		</property>
+		<property name='primaryKeyValue' type='java.lang.Long'>
+			<column name='TAS_PKVAL' not-null='false' length='50' />
+		</property>
+		<property name='customObjectType' type='java.lang.String'>
+			<column name='TAS_CUOBTY' not-null='false' length='100' />
+		</property>
+		<property name='customObjectName' type='java.lang.String'>
+			<column name='TAS_CUOBNA' not-null='false' length='50' />
+		</property>
+		<property name='customTaskName' type='java.lang.String'>
+			<column name='TAS_CUTANA' not-null='false' length='50' />
+		</property>
+		<property name='parameters' type='java.lang.String' lazy='true'>
+			<column name='TAS_PARAM' not-null='false' length='128000' />
+		</property>
+		<property name='externalId' type='java.lang.String'>
+			<column name='TAS_EXTID' not-null='false' length='100' />
+		</property>
+		<property name='sourceTransaction' type='java.lang.String'>
+			<column name='TAS_SOURCE' not-null='false' length='50' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TASQUE_TAS_TEN_ID'>
+			<column name='TAS_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='taskLogs' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_TASKLOG_TLO_IDTASQUE'>
+				<column name='TLO_IDTASQUE'/>
+			</key>
+			<one-to-many class='com.soffid.iam.sync.model.TaskLogEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

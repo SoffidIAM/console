@@ -1,0 +1,12 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"refererncedBy","targetClass":"com.soffid.iam.base.model.AccountMetadataEntity","multiple":true,"reverse":"dataObjectType"},
+    {"name":"objects","targetClass":"com.soffid.iam.iga.model.CustomObjectEntity","multiple":true,"reverse":"type"},
+    {"name":"accessRoles","targetClass":"com.soffid.iam.iga.model.CustomObjectRoleEntity","multiple":true,"reverse":"customObjectType"},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":true,"reverse":"objectType"},
+    {"name":"referencedBy","targetClass":"com.soffid.iam.iga.model.MetaDataEntity","multiple":true,"reverse":"dataObjectType"},
+    {"name":"mappings","targetClass":"com.soffid.iam.iga.model.ObjectMappingEntity","multiple":true,"reverse":"soffidCustomObject"},
+    {"name":"translations","targetClass":"com.soffid.iam.iga.model.TranslatedLabelEntity","multiple":true,"reverse":"customObjectType"}
+  ]
+}

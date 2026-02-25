@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"actions","targetClass":"com.soffid.iam.pam.model.PamActionEntity","multiple":true,"reverse":"rule"},
+    {"name":"events","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":true,"reverse":"rule"}
+  ]
+}

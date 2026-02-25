@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.IssuePolicyEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_EVEPOL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='EVP_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='type' type='java.lang.String'>
+			<column name='EVP_TYPE' not-null='true' />
+		</property>
+		<property name='status' type='com.soffid.iam.rc.api.IssuePolicyStatusEnum'>
+			<column name='EVP_STATUS' not-null='false' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='EVP_DESCRI' not-null='false' length='250' />
+		</property>
+		<property name='actor' type='java.lang.String'>
+			<column name='EVP_ACTOR' not-null='false' length='250' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_EVEPOL_EVP_TEN_ID'>
+			<column name='EVP_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='actions' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_EVPOAC_EPA_EVP_ID'>
+				<column name='EPA_EVP_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssuePolicyActionEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='EVP_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='EVP_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='EVP_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='EVP_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='EVP_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='EVP_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

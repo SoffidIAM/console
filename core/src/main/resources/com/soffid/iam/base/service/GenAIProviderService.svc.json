@@ -1,0 +1,13 @@
+{
+  "class": "com.soffid.iam.base.service.GenAIProviderService",
+  "methods": [
+    {"name":"getGenAIMetadata", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"engine","type":"java.lang.String","required": true}    ]},
+    {"name":"getGenAISentences", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"engine","type":"java.lang.String","required": true},
+       {"name":"context","type":"java.lang.String[]","required":false},
+       {"name":"sentence","type":"java.lang.String","required": true}    ]},
+    {"name":"clearCache", "return":"void", "arguments":[
+    ]}
+  ]
+}

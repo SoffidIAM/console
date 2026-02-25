@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.sync.model.ScheduledTaskLogEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SCTALO' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='STL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='task' class='com.soffid.iam.sync.model.ScheduledTaskEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SCTALO_STL_SCT_ID'>
+			<column name='STL_SCT_ID' not-null='true'/>
+		</many-to-one>
+		<property name='time' type='java.util.Date'>
+			<column name='SCT_LASEXE' not-null='false' />
+		</property>
+		<property name='end' type='java.util.Date'>
+			<column name='SCT_LASEND' not-null='false' />
+		</property>
+		<property name='logReferenceID' type='java.lang.String'>
+			<column name='SCT_LOGDOC' not-null='false' />
+		</property>
+		<property name='error' type='boolean'>
+			<column name='SCT_ERROR' not-null='true' />
+		</property>
+	</class>
+</hibernate-mapping>

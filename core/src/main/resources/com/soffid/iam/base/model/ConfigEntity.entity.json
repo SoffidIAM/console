@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"network","targetClass":"com.soffid.iam.am.model.NetworkEntity","multiple":false},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

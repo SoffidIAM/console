@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.SoDRuleEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SODRUL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SOD_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='SOD_NAME' not-null='true' />
+		</property>
+		<property name='risk' type='com.soffid.iam.rc.api.SoDRiskEnum'>
+			<column name='SOD_RISK' not-null='true' />
+		</property>
+		<property name='type' type='com.soffid.iam.rc.api.SodRuleTypeEnum'>
+			<column name='SOD_TYPE' not-null='false' />
+		</property>
+		<property name='number' type='java.lang.Integer'>
+			<column name='SOD_NUMBER' not-null='false' />
+		</property>
+		<many-to-one name='application' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SODRUL_SOD_APL_ID'>
+			<column name='SOD_APL_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SODRUL_SOD_TEN_ID'>
+			<column name='SOD_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='roles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SODROL_SOR_SOD_ID'>
+				<column name='SOR_SOD_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.SoDRoleEntityImpl'/>
+		</set>
+		<set name='matrixCells' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SODMAT_SMA_SOD_ID'>
+				<column name='SMA_SOD_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.SoDRuleMatrixEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='SOD_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='SOD_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='SOD_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='SOD_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='SOD_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='SOD_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

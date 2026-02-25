@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"systems","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":true,"reverse":"userDomain"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

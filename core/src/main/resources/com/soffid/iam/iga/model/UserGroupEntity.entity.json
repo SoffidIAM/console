@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"secondaryGroups"},
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"secondaryGroupUsers"},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.UserGroupAttributeEntity","multiple":true,"reverse":"userGroup"}
+  ]
+}

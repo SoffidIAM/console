@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"plugin","targetClass":"com.soffid.iam.base.model.ServerPluginEntity","multiple":false,"reverse":"modules"},
+    {"name":"agents","targetClass":"com.soffid.iam.base.model.AgentDescriptorEntity","multiple":true,"reverse":"module"}
+  ]
+}

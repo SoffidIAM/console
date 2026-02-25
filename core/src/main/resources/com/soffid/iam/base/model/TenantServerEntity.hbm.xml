@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.TenantServerEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_TENSER' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='TNS_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='serverTenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TENSER_TNS_TEN_ID'>
+			<column name='TNS_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='tenantServer' class='com.soffid.iam.sync.model.ServerEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_TENSER_TNS_SRV_ID'>
+			<column name='TNS_SRV_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

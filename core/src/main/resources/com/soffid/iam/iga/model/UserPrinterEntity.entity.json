@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"printer","targetClass":"com.soffid.iam.iga.model.PrinterEntity","multiple":false,"reverse":"users"},
+    {"name":"user","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":false,"reverse":"printers"}
+  ]
+}

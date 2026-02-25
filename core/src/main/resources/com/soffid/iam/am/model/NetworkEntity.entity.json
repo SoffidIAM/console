@@ -1,0 +1,10 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"authorizations","targetClass":"com.soffid.iam.am.model.NetworkAuthorizationEntity","multiple":true,"reverse":"network"},
+    {"name":"hosts","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":true,"reverse":"network"},
+    {"name":"discoveryServer","targetClass":"com.soffid.iam.sync.model.ServerEntity","multiple":false,"reverse":"networks"},
+    {"name":"ranges","targetClass":"com.soffid.iam.pam.model.NetworkDiscoverRangeEntity","multiple":true,"reverse":"network"},
+    {"name":"accounts","targetClass":"com.soffid.iam.pam.model.NetworkDiscoveryAccountEntity","multiple":true,"reverse":"network"}
+  ]
+}

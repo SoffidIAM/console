@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.AttributeMappingEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ATRMAP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ATM_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='soffidAttribute' type='java.lang.String'>
+			<column name='ATM_SOFATR' not-null='true' length='3500' />
+		</property>
+		<property name='systemAttribute' type='java.lang.String'>
+			<column name='ATM_SYSATR' not-null='true' length='3500' />
+		</property>
+		<property name='direction' type='com.soffid.iam.iga.api.AttributeDirectionEnum'>
+			<column name='ATM_DIRECT' not-null='true' />
+		</property>
+		<many-to-one name='object' class='com.soffid.iam.iga.model.ObjectMappingEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ATRMAP_ATM_OBM_ID'>
+			<column name='ATM_OBM_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

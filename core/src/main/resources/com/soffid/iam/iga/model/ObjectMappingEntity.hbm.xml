@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ObjectMappingEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_OBJMAP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='OBM_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='systemObject' type='java.lang.String'>
+			<column name='OBM_SYSOBJ' not-null='true' length='50' />
+		</property>
+		<property name='soffidObject' type='com.soffid.iam.iga.api.SoffidObjectTypeEnum'>
+			<column name='OBM_SOFOBJ' not-null='true' length='50' />
+		</property>
+		<many-to-one name='soffidCustomObject' class='com.soffid.iam.iga.model.CustomObjectTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_OBJMAP_OBM_CUSOBJ'>
+			<column name='OBM_CUSOBJ' not-null='false'/>
+		</many-to-one>
+		<property name='soffidExtensibleObject' type='java.lang.String'>
+			<column name='OBM_SOEXOB' not-null='false' length='50' />
+		</property>
+		<property name='condition' type='java.lang.String'>
+			<column name='OBM_CONDIT' not-null='false' length='2000' />
+		</property>
+		<set name='properties' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_OBMAPR_OMP_OBM_ID'>
+				<column name='OMP_OBM_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ObjectMappingPropertyEntityImpl'/>
+		</set>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_OBJMAP_OBM_DIS_ID'>
+			<column name='OBM_DIS_ID' not-null='true'/>
+		</many-to-one>
+		<set name='attributeMappings' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ATRMAP_ATM_OBM_ID'>
+				<column name='ATM_OBM_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.AttributeMappingEntityImpl'/>
+		</set>
+		<set name='triggers' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_OBMATR_OMT_OBM_ID'>
+				<column name='OMT_OBM_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ObjectMappingTriggerEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

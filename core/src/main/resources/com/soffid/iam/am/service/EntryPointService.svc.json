@@ -1,0 +1,86 @@
+{
+  "class": "com.soffid.iam.am.service.EntryPointService",
+  "methods": [
+    {"name":"canAdmin", "return":"boolean", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"canExecute", "return":"boolean", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"canQuery", "return":"boolean", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"canView", "return":"boolean", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"copyApplicationAccessLink", "return":"boolean", "arguments":[
+       {"name":"puntEntradaCopiar","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"puntEntradaMenuDesti","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"copyApplicationAccess", "return":"boolean", "arguments":[
+       {"name":"puntEntradaCopiar","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"puntEntradaMenuDesti","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"isAuthorized", "return":"boolean", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"nivell","type":"java.lang.String","required": true}    ]},
+    {"name":"isAuthorized", "return":"boolean", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"idPuntEntrada","type":"java.lang.Long","required": true},
+       {"name":"nivell","type":"java.lang.String","required": true}    ]},
+    {"name":"applicationAccessTreeHasAnyACL", "return":"boolean", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"moveApplicationAccessTreeMenu", "return":"boolean", "arguments":[
+       {"name":"puntEntradaMoure","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"puntEntradaMenuDesti","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"reorderApplicationAccess", "return":"boolean", "arguments":[
+       {"name":"puntEntradaOrdenar","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"puntEntradaSeguent","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.AccessTree", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"findApplicationAccessById", "return":"com.soffid.iam.am.api.AccessTree", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"findRoot", "return":"com.soffid.iam.am.api.AccessTree", "arguments":[
+    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.AccessTree", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"createAuthorization", "return":"com.soffid.iam.am.api.AccessTreeAuthorization", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"autoritzacio","type":"com.soffid.iam.am.api.AccessTreeAuthorization","required": true}    ]},
+    {"name":"createExecution", "return":"com.soffid.iam.am.api.AccessTreeExecution", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"execucio","type":"com.soffid.iam.am.api.AccessTreeExecution","required": true}    ]},
+    {"name":"updateExecution", "return":"com.soffid.iam.am.api.AccessTreeExecution", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"execucio","type":"com.soffid.iam.am.api.AccessTreeExecution","required": true}    ]},
+    {"name":"findAccessTrees", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"getScopeForAddress", "return":"java.lang.String", "arguments":[
+       {"name":"address","type":"java.lang.String","required":false}    ]},
+    {"name":"validateXMLApplicationAccess", "return":"java.lang.String", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"findChildren", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"findMenuChildren", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"findApplicationAccessByFilter", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"nomPUE","type":"java.lang.String","required":false},
+       {"name":"codiPUE","type":"java.lang.String","required":false},
+       {"name":"codiAplicacio","type":"java.lang.String","required":false},
+       {"name":"codiRol","type":"java.lang.String","required":false},
+       {"name":"codiGrup","type":"java.lang.String","required":false},
+       {"name":"codiUsuari","type":"java.lang.String","required":false}    ]},
+    {"name":"getAllMimeTypeExecution", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTreeExecutionType>", "arguments":[
+    ]},
+    {"name":"getReverseApplicationAccessTree", "return":"java.util.Collection<java.lang.String>", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"getAuthorizationsApplicationAcessTree", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTreeAuthorization>", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"getExecutions", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTreeExecution>", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"deleteAuthorization", "return":"void", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"autoritzacio","type":"com.soffid.iam.am.api.AccessTreeAuthorization","required": true}    ]},
+    {"name":"deleteExecution", "return":"void", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true},
+       {"name":"execucio","type":"com.soffid.iam.am.api.AccessTreeExecution","required": true}    ]},
+    {"name":"sortChildren", "return":"void", "arguments":[
+       {"name":"entryPointId","type":"long","required": true}    ]}
+  ]
+}

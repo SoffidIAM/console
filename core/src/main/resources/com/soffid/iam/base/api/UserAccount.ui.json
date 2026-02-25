@@ -1,0 +1,7 @@
+{
+  "class": "com.soffid.iam.base.api.UserAccount",
+  "attributes": [
+    {"name":"user", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true}
+  ]
+}

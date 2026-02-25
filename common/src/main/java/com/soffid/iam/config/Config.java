@@ -10,10 +10,9 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Properties;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.ng.exception.ServerRedirectException;
-
-import com.soffid.iam.api.Password;
+import com.soffid.iam.am.api.Password;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.exception.ServerRedirectException;
 import com.soffid.iam.remote.RemoteServiceLocator;
 import com.soffid.iam.remote.URLManager;
 import com.soffid.iam.sync.service.ServerService;
@@ -421,7 +420,10 @@ public class Config {
     }
 
     public void setPort(String list) throws IOException {
-        prop.setProperty(PORT_PROPERTY, list); //$NON-NLS-1$
+    	if (list == null)
+    		prop.remove(PORT_PROPERTY);
+    	else
+    		prop.setProperty(PORT_PROPERTY, list); //$NON-NLS-1$
         update();
     }
 

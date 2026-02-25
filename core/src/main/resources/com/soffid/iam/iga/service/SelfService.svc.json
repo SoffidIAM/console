@@ -1,0 +1,71 @@
+{
+  "class": "com.soffid.iam.iga.service.SelfService",
+  "methods": [
+    {"name":"setHPAccountPassword", "return":"boolean", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"password","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"untilDate","type":"java.util.Date","required": true},
+       {"name":"force","type":"boolean","required": true}    ]},
+    {"name":"findRoot", "return":"com.soffid.iam.am.api.AccessTree", "arguments":[
+    ]},
+    {"name":"generateAccountTemporaryPassword", "comments":"Generates a temporary password for the account", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"queryAccountPassword", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"queryAccountPasswordBypassPolicy", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"queryAccountSshKey", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"queryAccountSshKeyBypassPolicy", "return":"com.soffid.iam.am.api.Password", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"passwordsStatus", "return":"com.soffid.iam.am.api.PasswordStatus", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"getAccountById", "comments":"Get account", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"updateSharedAccount", "comments":"Updates an account, including ACLs if user is owner", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"getDataTypeDescription", "return":"com.soffid.iam.base.api.DataType", "arguments":[
+       {"name":"systemName","type":"java.lang.String","required":false},
+       {"name":"attName","type":"java.lang.String","required": true}    ]},
+    {"name":"getCurrentUser", "return":"com.soffid.iam.base.api.User", "arguments":[
+    ]},
+    {"name":"createSharedAccountData", "comments":"Created an account attribute", "return":"com.soffid.iam.base.api.UserData", "arguments":[
+       {"name":"data","type":"com.soffid.iam.base.api.UserData","required": true}    ]},
+    {"name":"updateSharedAccountData", "comments":"Updates an account attribute", "return":"com.soffid.iam.base.api.UserData", "arguments":[
+       {"name":"data","type":"com.soffid.iam.base.api.UserData","required": true}    ]},
+    {"name":"updateUserAttribute", "return":"com.soffid.iam.base.api.UserData", "arguments":[
+       {"name":"attribute","type":"com.soffid.iam.base.api.UserData","required": true}    ]},
+    {"name":"getDispatcherInformation", "return":"com.soffid.iam.iga.api.System", "arguments":[
+       {"name":"dispatcherCode","type":"java.lang.String","required": true}    ]},
+    {"name":"getClientHost", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"queryOtherAffectedAccounts", "return":"java.lang.String", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"findChildren", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"puntEntrada","type":"com.soffid.iam.am.api.AccessTree","required": true}    ]},
+    {"name":"findEntryPoints", "comments":"Finds entry points by name", "return":"java.util.Collection<com.soffid.iam.am.api.AccessTree>", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"findRoleAccounts", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+    ]},
+    {"name":"findUserGroupsByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.UserGroup>", "arguments":[
+    ]},
+    {"name":"getUserAccounts", "return":"java.util.Collection<com.soffid.iam.base.api.Account>", "arguments":[
+    ]},
+    {"name":"getUserAttributes", "return":"java.util.Collection<com.soffid.iam.base.api.UserData>", "arguments":[
+    ]},
+    {"name":"getAccountAttributes", "comments":"Get account attributes", "return":"java.util.List<com.soffid.iam.base.api.UserData>", "arguments":[
+       {"name":"acc","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"getSharedAccounts", "comments":"Gets the list of shared accounts granted to the user", "return":"java.util.List<com.soffid.iam.base.api.Account>", "arguments":[
+       {"name":"filter","type":"java.lang.String","required":false}    ]},
+    {"name":"checkCanSetAccountPassword", "return":"void", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"checkinHPAccount", "comments":"Unlocks a high privileged account", "return":"void", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"setAccountPassword", "return":"void", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"password","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"setAccountSshKey", "return":"void", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true},
+       {"name":"password","type":"com.soffid.iam.am.api.Password","required": true}    ]}
+  ]
+}

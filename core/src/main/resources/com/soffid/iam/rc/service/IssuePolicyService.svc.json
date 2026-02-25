@@ -1,0 +1,13 @@
+{
+  "class": "com.soffid.iam.rc.service.IssuePolicyService",
+  "methods": [
+    {"name":"update", "return":"com.soffid.iam.rc.api.IssuePolicy", "arguments":[
+       {"name":"event","type":"com.soffid.iam.rc.api.IssuePolicy","required": true}    ]},
+    {"name":"findIssuePolicies", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.IssuePolicy>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"listAutomaticActions", "return":"java.util.List<com.soffid.iam.rc.api.IssueActionDefinition>", "arguments":[
+    ]},
+    {"name":"createPolicies", "return":"void", "arguments":[
+    ]}
+  ]
+}

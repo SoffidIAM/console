@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.AccessControlEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_CONACC' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='CAC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='genericUser' type='java.lang.String'>
+			<column name='CAC_GEN_USU' not-null='false' length='2048' />
+		</property>
+		<property name='genericHost' type='java.lang.String'>
+			<column name='CAC_GEN_MAQ' not-null='false' length='2048' />
+		</property>
+		<property name='program' type='java.lang.String'>
+			<column name='CAC_PROGRAM' not-null='true' length='2048' />
+		</property>
+		<many-to-one name='role' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_CONACC_CAC_ROL_ID'>
+			<column name='CAC_ROL_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='agent' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_CONACC_CAC_DIS_ID'>
+			<column name='CAC_DIS_ID' not-null='true'/>
+		</many-to-one>
+		<property name='propagatedIPs' type='java.lang.String'>
+			<column name='CAC_IPMAQ_ORA' not-null='false' length='2048' />
+		</property>
+		<property name='comments' type='java.lang.String'>
+			<column name='CAC_COMMEN' not-null='false' length='250' />
+		</property>
+	</class>
+</hibernate-mapping>

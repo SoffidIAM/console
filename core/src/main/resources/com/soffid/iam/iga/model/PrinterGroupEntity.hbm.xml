@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.PrinterGroupEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_GRUIMP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='GIM_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='order' type='java.lang.Long'>
+			<column name='GIM_ORDRE' not-null='false' />
+		</property>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_GRUIMP_GIM_IDGRU'>
+			<column name='GIM_IDGRU' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='printer' class='com.soffid.iam.iga.model.PrinterEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_GRUIMP_GIM_IDIMP'>
+			<column name='GIM_IDIMP' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

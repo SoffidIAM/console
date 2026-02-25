@@ -1,0 +1,40 @@
+{
+  "class": "com.soffid.iam.doc.service.DocumentService",
+  "methods": [
+    {"name":"nextDownloadPackage", "return":"byte[]", "arguments":[
+       {"name":"length","type":"int","required": true}    ]},
+    {"name":"getReference", "return":"com.soffid.iam.doc.api.DocumentReference", "arguments":[
+    ]},
+    {"name":"getExternalName", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"getFsPath", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"getMimeType", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"closeDocument", "return":"void", "arguments":[
+    ]},
+    {"name":"createDocument", "return":"void", "arguments":[
+       {"name":"mimeType","type":"java.lang.String","required": true},
+       {"name":"externalName","type":"java.lang.String","required": true},
+       {"name":"application","type":"java.lang.String","required": true}    ]},
+    {"name":"deleteDocument", "return":"void", "arguments":[
+       {"name":"reference","type":"com.soffid.iam.doc.api.DocumentReference","required": true}    ]},
+    {"name":"endDownloadTransfer", "return":"void", "arguments":[
+    ]},
+    {"name":"endUploadTransfer", "return":"void", "arguments":[
+    ]},
+    {"name":"exportDocuments", "return":"void", "arguments":[
+       {"name":"out","type":"java.io.OutputStream","required": true}    ]},
+    {"name":"importDocuments", "return":"void", "arguments":[
+       {"name":"out","type":"java.io.InputStream","required": true}    ]},
+    {"name":"nextUploadPackage", "return":"void", "arguments":[
+       {"name":"filePackage","type":"byte[]","required": true},
+       {"name":"length","type":"int","required": true}    ]},
+    {"name":"openDocument", "return":"void", "arguments":[
+       {"name":"reference","type":"com.soffid.iam.doc.api.DocumentReference","required": true}    ]},
+    {"name":"openDownloadTransfer", "return":"void", "arguments":[
+    ]},
+    {"name":"openUploadTransfer", "return":"void", "arguments":[
+    ]}
+  ]
+}

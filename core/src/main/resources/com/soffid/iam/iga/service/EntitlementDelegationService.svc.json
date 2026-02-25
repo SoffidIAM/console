@@ -1,0 +1,24 @@
+{
+  "class": "com.soffid.iam.iga.service.EntitlementDelegationService",
+  "methods": [
+    {"name":"acceptDelegation", "comments":"Accepts a delegation not accepted yet", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"ra","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"cancelDelegation", "comments":"Revokes an entitilement", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"rolAccount","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"delegate", "comments":"Delegates an entitilement", "return":"com.soffid.iam.iga.api.RoleAccount", "arguments":[
+       {"name":"rolAccount","type":"com.soffid.iam.iga.api.RoleAccount","required": true},
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"account","type":"java.lang.String","required":false},
+       {"name":"since","type":"java.util.Date","required": true},
+       {"name":"until","type":"java.util.Date","required":false}    ]},
+    {"name":"findAccountsToDelegate", "comments":"Gets the list of accounts that can be delegated for a user", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"rolAccount","type":"com.soffid.iam.iga.api.RoleAccount","required": true},
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"findActiveDelegations", "comments":"Gets list of entitlements delegated by current user", "return":"java.util.List<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+    ]},
+    {"name":"findDelegationsToAccept", "comments":"Gets list of entitlements delegated to current user", "return":"java.util.List<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+    ]},
+    {"name":"revertExpiredDelegations", "comments":"Revernts expired delegation back to the caller", "return":"void", "arguments":[
+    ]}
+  ]
+}

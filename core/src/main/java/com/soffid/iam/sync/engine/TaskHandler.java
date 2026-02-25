@@ -1,14 +1,15 @@
 package com.soffid.iam.sync.engine;
 
-import com.soffid.iam.api.Group;
-import com.soffid.iam.api.RoleGrant;
-import com.soffid.iam.api.Task;
-import com.soffid.iam.api.User;
+import com.soffid.iam.iga.api.RoleGrant;
+import com.soffid.iam.sync.api.Task;
+import com.soffid.iam.base.api.User;
+import com.soffid.iam.exception.InternalErrorException;
+import com.soffid.iam.iga.api.Group;
 import com.soffid.iam.sync.intf.ExtensibleObject;
+import com.soffid.iam.util.Base64;
 
-import es.caib.seycon.ng.comu.Password;
-import es.caib.seycon.ng.exception.InternalErrorException;
-import es.caib.seycon.util.Base64;
+import com.soffid.iam.am.api.Password;
+
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;

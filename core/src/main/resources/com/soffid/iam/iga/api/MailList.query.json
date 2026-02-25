@@ -1,0 +1,27 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.MailListEntity",
+  "start": "createdOn",
+  "deleted": "deleted",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"name", "hibernateName":"name"},
+    {"name":"domainName",  "hibernateName":"domain.name"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"id", "hibernateName":"id"},
+    {"name":"lists"},
+    {"name":"externalList"},
+    {"name":"roleMembers"},
+    {"name":"groupMembers"},
+    {"name":"usersList"},
+    {"name":"attributes", "hibernateName":"attributes"},
+    {"name":"listsBelong"},
+    {"name":"explodedUsersList"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"},
+    {"name":"deleted", "hibernateName":"deleted"}
+  ]
+}

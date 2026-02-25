@@ -1,0 +1,13 @@
+{
+  "class": "com.soffid.iam.am.service.CertificateValidationService",
+  "methods": [
+    {"name":"validateCertificate", "return":"boolean", "arguments":[
+       {"name":"certs","type":"java.util.List<java.security.cert.X509Certificate>","required": true}    ]},
+    {"name":"getCertificateAccount", "return":"com.soffid.iam.base.api.Account", "arguments":[
+       {"name":"certs","type":"java.util.List<java.security.cert.X509Certificate>","required": true}    ]},
+    {"name":"getCertificateUser", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"certs","type":"java.util.List<java.security.cert.X509Certificate>","required": true}    ]},
+    {"name":"getRootCertificateList", "return":"java.util.Collection<java.security.cert.X509Certificate>", "arguments":[
+    ]}
+  ]
+}

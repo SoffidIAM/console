@@ -1,0 +1,9 @@
+{
+  "joins": [
+    {"name":"soffidCustomObject","targetClass":"com.soffid.iam.iga.model.CustomObjectTypeEntity","multiple":false,"reverse":"mappings"},
+    {"name":"properties","targetClass":"com.soffid.iam.iga.model.ObjectMappingPropertyEntity","multiple":true,"reverse":"object"},
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"objectMappings"},
+    {"name":"attributeMappings","targetClass":"com.soffid.iam.iga.model.AttributeMappingEntity","multiple":true,"reverse":"object"},
+    {"name":"triggers","targetClass":"com.soffid.iam.iga.model.ObjectMappingTriggerEntity","multiple":true,"reverse":"object"}
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "class": "com.soffid.iam.sync.service.ScheduledTaskService",
+  "methods": [
+    {"name":"isStopping", "return":"boolean", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.sync.api.ScheduledTask", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"findById", "comments":"Finds a scheduled task by handler and params", "return":"com.soffid.iam.sync.api.ScheduledTask", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"findScheduledTaskByHandlerAndParams", "comments":"Finds a scheduled task by handler and params", "return":"com.soffid.iam.sync.api.ScheduledTask", "arguments":[
+       {"name":"handler","type":"java.lang.String","required": true},
+       {"name":"params","type":"java.lang.String","required": true}    ]},
+    {"name":"load", "return":"com.soffid.iam.sync.api.ScheduledTask", "arguments":[
+       {"name":"taskId","type":"java.lang.Long","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.sync.api.ScheduledTask", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.sync.api.ScheduledTaskHandler", "arguments":[
+       {"name":"handler","type":"com.soffid.iam.sync.api.ScheduledTaskHandler","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.sync.api.ScheduledTaskHandler", "arguments":[
+       {"name":"handler","type":"com.soffid.iam.sync.api.ScheduledTaskHandler","required": true}    ]},
+    {"name":"listEnabledTasks", "return":"java.util.List<com.soffid.iam.sync.api.ScheduledTask>", "arguments":[
+    ]},
+    {"name":"listHandlers", "return":"java.util.List<com.soffid.iam.sync.api.ScheduledTaskHandler>", "arguments":[
+    ]},
+    {"name":"listServerTasks", "return":"java.util.List<com.soffid.iam.sync.api.ScheduledTask>", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true}    ]},
+    {"name":"listTasks", "return":"java.util.List<com.soffid.iam.sync.api.ScheduledTask>", "arguments":[
+    ]},
+    {"name":"registerEndTask", "return":"void", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"registerStartTask", "return":"void", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"handler","type":"com.soffid.iam.sync.api.ScheduledTaskHandler","required": true}    ]},
+    {"name":"startNow", "return":"void", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]},
+    {"name":"stop", "return":"void", "arguments":[
+       {"name":"task","type":"com.soffid.iam.sync.api.ScheduledTask","required": true}    ]}
+  ]
+}

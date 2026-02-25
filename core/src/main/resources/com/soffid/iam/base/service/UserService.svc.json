@@ -1,0 +1,107 @@
+{
+  "class": "com.soffid.iam.base.service.UserService",
+  "methods": [
+    {"name":"getESSORules", "return":"byte[]", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"disableUsers", "comments":"Disable or notify users that has not been active for a while", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"scimQuery","type":"java.lang.String","required":false},
+       {"name":"rules","type":"java.util.List<com.soffid.iam.base.api.DisableObjectRule>","required": true, "comments":"Actions to perform"}    ]},
+    {"name":"disableUsersPreview", "return":"com.soffid.iam.base.api.AsyncProcessTracker", "arguments":[
+       {"name":"scimQuery","type":"java.lang.String","required":false},
+       {"name":"rules","type":"java.util.List<com.soffid.iam.base.api.DisableObjectRule>","required": true},
+       {"name":"actions","type":"java.util.List<java.lang.Object[]>","required": true}    ]},
+    {"name":"disableUser", "comments":"Disable a user", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"usuari","type":"com.soffid.iam.base.api.User","required": true}    ]},
+    {"name":"findUserByUserName", "comments":"Retrieves a user by user name", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserByUserId", "comments":"Retrieves a user by its user id", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
+    {"name":"getCurrentUser", "return":"com.soffid.iam.base.api.User", "arguments":[
+    ]},
+    {"name":"getUserInfo", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "comments":"Update a user", "return":"com.soffid.iam.base.api.User", "arguments":[
+       {"name":"usuari","type":"com.soffid.iam.base.api.User","required": true}    ]},
+    {"name":"create", "comments":"Notifies the workflow is acting on a user", "return":"com.soffid.iam.iga.api.BpmUserProcess", "arguments":[
+       {"name":"userProcess","type":"com.soffid.iam.iga.api.BpmUserProcess","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.BpmUserProcess", "arguments":[
+       {"name":"usuariWFProces","type":"com.soffid.iam.iga.api.BpmUserProcess","required": true}    ]},
+    {"name":"findUsers", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.User>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"isUpdatePendingExtended", "comments":"Identifies if there is any pending change. 0 means no change pending, 1 task is on hald, 2 means synchronization in progress, 3 means error", "return":"int", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"setTemporaryPassword", "comments":"Generates a random temporary password for a user", "return":"java.lang.String", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true, "comments":"The password domain uses to be 'DEFAULT'"}    ]},
+    {"name":"createNewUserProcess", "comments":"Starts a new workflow far a user", "return":"java.lang.String", "arguments":[
+       {"name":"processName","type":"java.lang.String","required": true},
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"canviaAProces","type":"boolean","required": true, "comments":"Must be true to retrieve the current task URL"}    ]},
+    {"name":"setPassword", "comments":"Generates a random password for a user", "return":"java.lang.String", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true, "comments":"The password domain is usually \"DEFAULT\""}    ]},
+    {"name":"getTasks", "comments":"Gets any pending task for the user", "return":"java.lang.String[]", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"refreshChanges", "comments":"Synchronize the user with any target system", "return":"java.lang.String[]", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findPrintersByUserName", "comments":"Fetches all printers assigned to a user", "return":"java.util.Collection<com.soffid.iam.iga.api.Printer>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findBpmUserProcessInstanceByUserName", "return":"java.util.Collection<com.soffid.iam.bpm.api.ProcessInstance>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findBpmUserProcessByUserName", "return":"java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findBpmUserProcessByProcessId", "return":"java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>", "arguments":[
+       {"name":"idProces","type":"java.lang.Long","required": true}    ]},
+    {"name":"findBpmUserProcessByUserNif", "return":"java.util.Collection<com.soffid.iam.iga.api.BpmUserProcess>", "arguments":[
+       {"name":"nifUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findSessionByUserName", "comments":"Retrieves all the sessions a user currently has", "return":"java.util.Collection<com.soffid.iam.am.api.Session>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserNames", "return":"java.util.Collection<java.lang.String>", "arguments":[
+    ]},
+    {"name":"findUserPrintersByUserName", "comments":"Retrieves the printers assigned to a user", "return":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"findNetworksACByUserName", "comments":"Retrieves network authorizations granted to a user", "return":"java.util.Collection<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"getActiveTasks", "comments":"Retrieves current synchronization tasks for user", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncAgentTaskLog>", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserExplicitRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"getUserGroups", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"getUserGroupsHierarchy", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"getUserGroupsHierarchy", "return":"java.util.Collection<com.soffid.iam.iga.api.Group>", "arguments":[
+       {"name":"userId","type":"long","required": true},
+       {"name":"holderGroup","type":"java.lang.String","required": true}    ]},
+    {"name":"getUserRoles", "return":"java.util.Collection<com.soffid.iam.iga.api.RoleGrant>", "arguments":[
+       {"name":"userId","type":"long","required": true}    ]},
+    {"name":"getBpmUserProcessList", "comments":"Gets the list of workflows that can be started for a user", "return":"java.util.Collection<com.soffid.iam.iga.api.BpmProcess>", "arguments":[
+    ]},
+    {"name":"findPasswordDomainStatus", "return":"java.util.List<com.soffid.iam.am.api.PasswordDomainStatus>", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"delete", "comments":"Removes a user", "return":"void", "arguments":[
+       {"name":"user","type":"com.soffid.iam.base.api.User","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"usuariWFProces","type":"com.soffid.iam.iga.api.BpmUserProcess","required": true}    ]},
+    {"name":"merge", "return":"void", "arguments":[
+       {"name":"srcId","type":"java.lang.Long","required": true},
+       {"name":"targetId","type":"java.lang.Long","required": true},
+       {"name":"eventId","type":"java.lang.Long","required":false}    ]},
+    {"name":"sendPassword", "comments":"Sends the current account password back to the target system", "return":"void", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true}    ]},
+    {"name":"setPassword", "comments":"Sets a password for a user", "return":"void", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true, "comments":"The password domain uses to be 'DEFAULT'"},
+       {"name":"newPassword","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"setTemporaryPassword", "comments":"Sets a temporary password for a user", "return":"void", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true, "comments":"The password domain uses to be 'DEFAULT'"},
+       {"name":"newPassword","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"unlockPasswordDomain", "return":"void", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true}    ]}
+  ]
+}

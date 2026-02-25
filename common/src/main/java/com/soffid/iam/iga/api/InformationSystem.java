@@ -1,0 +1,51 @@
+package com.soffid.iam.iga.api;
+
+import java.util.Map;
+
+public class InformationSystem extends AbstractInformationSystem {
+
+	public InformationSystem() {
+		super();
+	}
+
+	public InformationSystem(AbstractInformationSystem otherBean) {
+		super(otherBean);
+	}
+
+	public InformationSystem(String name, String relativeName, String description) {
+		super(name, relativeName, description);
+	}
+
+	@Override
+	public void setParent(String parent) {
+		if (parent == null ?  getParent() != null: ! parent.equals(getParent())) {
+			super.setParent(parent);
+			super.setName(parent == null || parent.isEmpty()? getRelativeName(): parent+"/"+getRelativeName());
+		}
+	}
+
+	@Override
+	public void setRelativeName(String relativeName) {
+		if (relativeName == null ?  getRelativeName() != null: ! relativeName.equals(getRelativeName())) {
+			super.setRelativeName(relativeName);
+			super.setName(getParent() == null || getParent().trim().isEmpty()? getRelativeName(): getParent()+"/"+getRelativeName());
+		}
+	}
+
+	@Override
+	public void setName(String name) {
+		if (name == null ?  getName() != null: ! name.equals(getName())) {
+			super.setName(name);
+			int i = name.lastIndexOf('/');
+			if (i < 0) {
+				super.setParent(null);
+				super.setRelativeName(name);
+			} else {
+				super.setParent(name.substring(0, i));
+				super.setRelativeName(name.substring(i+1));
+			}
+		}
+	}
+
+
+}

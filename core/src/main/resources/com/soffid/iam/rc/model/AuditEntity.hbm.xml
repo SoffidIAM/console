@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.rc.model.AuditEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_AUDITO' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='AUD_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='date' type='java.util.Date'>
+			<column name='AUD_DATA' not-null='true' />
+		</property>
+		<property name='user' type='java.lang.String'>
+			<column name='AUD_USUAUD' not-null='false' length='100' />
+		</property>
+		<property name='action' type='java.lang.String'>
+			<column name='AUD_ACCIO' not-null='true' length='1' />
+		</property>
+		<property name='object' type='java.lang.String'>
+			<column name='AUD_INFO' not-null='false' length='1024' />
+		</property>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUDITO_AUD_IDGRU'>
+			<column name='AUD_IDGRU' not-null='false'/>
+		</many-to-one>
+		<property name='domain' type='java.lang.String'>
+			<column name='AUD_DOMRLU' not-null='false' length='100' />
+		</property>
+		<property name='domainValue' type='java.lang.String'>
+			<column name='AUD_VALDOMRLU' not-null='false' length='100' />
+		</property>
+		<property name='configurationParameter' type='java.lang.String'>
+			<column name='AUD_CON' not-null='false' length='100' />
+		</property>
+		<property name='database' type='java.lang.String'>
+			<column name='AUD_DIS' not-null='false' length='150' />
+		</property>
+		<property name='printer' type='java.lang.String'>
+			<column name='AUD_IMP' not-null='false' length='100' />
+		</property>
+		<property name='informationSystem' type='java.lang.String'>
+			<column name='AUD_APL' not-null='false' length='100' />
+		</property>
+		<property name='mailDomain' type='java.lang.String'>
+			<column name='AUD_DCO' not-null='false' length='100' />
+		</property>
+		<property name='mailList' type='java.lang.String'>
+			<column name='AUD_LCO' not-null='false' length='100' />
+		</property>
+		<property name='network' type='java.lang.String'>
+			<column name='AUD_XAR' not-null='false' length='100' />
+		</property>
+		<property name='role' type='java.lang.String'>
+			<column name='AUD_ROL' not-null='false' length='150' />
+		</property>
+		<property name='host' type='java.lang.String'>
+			<column name='AUD_MAQ' not-null='false' length='100' />
+		</property>
+		<property name='authorization' type='java.lang.String'>
+			<column name='AUD_AUT' not-null='false' length='100' />
+		</property>
+		<property name='fileId' type='java.lang.Long'>
+			<column name='AUD_FITXER' not-null='false' />
+		</property>
+		<property name='identityFederation' type='java.lang.String'>
+			<column name='AUD_FED' not-null='false' length='100' />
+		</property>
+		<property name='belongsMailList' type='java.lang.String'>
+			<column name='AUD_LCO2' not-null='false' length='100' />
+		</property>
+		<property name='belongsmailDomain' type='java.lang.String'>
+			<column name='AUD_DCO2' not-null='false' length='100' />
+		</property>
+		<property name='account' type='java.lang.String'>
+			<column name='AUD_ACCOUN' not-null='false' length='128' />
+		</property>
+		<many-to-one name='accountAssoc' class='com.soffid.iam.base.model.AccountEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUDITO_AUD_ACC_ID'>
+			<column name='AUD_ACC_ID' not-null='false'/>
+		</many-to-one>
+		<property name='comment' type='java.lang.String'>
+			<column name='AUD_MESSAG' not-null='false' length='1024' />
+		</property>
+		<property name='userType' type='java.lang.String'>
+			<column name='AUD_TIPUSU' not-null='false' length='255' />
+		</property>
+		<property name='userDomain' type='java.lang.String'>
+			<column name='AUD_DOMUSU' not-null='false' length='100' />
+		</property>
+		<property name='passwordDomain' type='java.lang.String'>
+			<column name='AUD_DOMCON' not-null='false' length='100' />
+		</property>
+		<property name='rule' type='java.lang.String'>
+			<column name='AUD_RULE' not-null='false' length='200' />
+		</property>
+		<property name='scheduledTask' type='java.lang.String'>
+			<column name='AUD_SCHTAS' not-null='false' />
+		</property>
+		<property name='customObjectName' type='java.lang.String'>
+			<column name='AUD_CUOBNA' not-null='false' />
+		</property>
+		<property name='customObjectType' type='java.lang.String'>
+			<column name='AUD_CUOBTY' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_AUDITO_AUD_TEN_ID'>
+			<column name='AUD_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='sourceIp' type='java.lang.String'>
+			<column name='AUD_SRCIP' not-null='false' />
+		</property>
+		<property name='jumpServerGroup' type='java.lang.String'>
+			<column name='AUD_JUSEGR' not-null='false' />
+		</property>
+		<property name='pamSessionId' type='java.lang.String'>
+			<column name='AUD_PAMSES' not-null='false' />
+		</property>
+		<property name='oldValue' type='java.lang.String'>
+			<column name='AUD_VALO' not-null='false' />
+		</property>
+		<property name='newValue' type='java.lang.String'>
+			<column name='AUD_VALN' not-null='false' />
+		</property>
+		<property name='searchIndex' type='java.lang.String'>
+			<column name='AUD_INDEX' not-null='false' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='AUD_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='AUD_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='AUD_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='AUD_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='AUD_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='AUD_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

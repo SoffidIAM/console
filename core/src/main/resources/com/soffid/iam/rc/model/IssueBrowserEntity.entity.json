@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"issue","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":false,"reverse":"brosers"},
+    {"name":"browser","targetClass":"com.soffid.iam.am.model.BrowserEntity","multiple":false,"reverse":"events"}
+  ]
+}

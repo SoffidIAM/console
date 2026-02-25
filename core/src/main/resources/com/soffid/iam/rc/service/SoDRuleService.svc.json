@@ -1,0 +1,51 @@
+{
+  "class": "com.soffid.iam.rc.service.SoDRuleService",
+  "methods": [
+    {"name":"isGreater", "return":"boolean", "arguments":[
+       {"name":"first","type":"com.soffid.iam.rc.api.SoDRisk","required": true},
+       {"name":"second","type":"com.soffid.iam.rc.api.SoDRisk","required": true}    ]},
+    {"name":"qualifyUser", "return":"com.soffid.iam.rc.api.SoDRisk", "arguments":[
+       {"name":"ra","type":"java.util.Collection<com.soffid.iam.iga.api.RoleAccount>","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.rc.api.SoDRole", "arguments":[
+       {"name":"role","type":"com.soffid.iam.rc.api.SoDRole","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.rc.api.SoDRule", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.rc.api.SoDRule","required": true}    ]},
+    {"name":"getRuleById", "return":"com.soffid.iam.rc.api.SoDRule", "arguments":[
+       {"name":"ruleId","type":"java.lang.Long","required": true}    ]},
+    {"name":"isAllowed", "return":"com.soffid.iam.rc.api.SoDRule", "arguments":[
+       {"name":"ra","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.rc.api.SoDRule", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.rc.api.SoDRule","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.rc.api.SoDRuleMatrix", "arguments":[
+       {"name":"role","type":"com.soffid.iam.rc.api.SoDRuleMatrix","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.rc.api.SoDRuleMatrix", "arguments":[
+       {"name":"role","type":"com.soffid.iam.rc.api.SoDRuleMatrix","required": true}    ]},
+    {"name":"findSodRules", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.rc.api.SoDRule>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"generateChangesReport", "return":"java.lang.String", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.rc.api.SoDRule","required": true},
+       {"name":"grants","type":"java.util.Collection<com.soffid.iam.rc.api.SoDRole>","required":false},
+       {"name":"matrix","type":"java.util.Collection<com.soffid.iam.rc.api.SoDRuleMatrix>","required":false}    ]},
+    {"name":"findAffectingRulesByRolAccount", "return":"java.util.Collection<com.soffid.iam.rc.api.SoDRule>", "arguments":[
+       {"name":"ra","type":"com.soffid.iam.iga.api.RoleAccount","required": true}    ]},
+    {"name":"findMatrixByRule", "return":"java.util.Collection<com.soffid.iam.rc.api.SoDRuleMatrix>", "arguments":[
+       {"name":"ruleId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findRolesByRule", "return":"java.util.Collection<com.soffid.iam.rc.api.SoDRole>", "arguments":[
+       {"name":"ruleId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findRuleByApplication", "return":"java.util.Collection<com.soffid.iam.rc.api.SoDRule>", "arguments":[
+       {"name":"applicationId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findViolotions", "return":"java.util.List<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"applicationName","type":"java.lang.String","required":false},
+       {"name":"riskLevel","type":"com.soffid.iam.rc.api.SoDRisk","required": true}    ]},
+    {"name":"internalRemovingRole", "return":"void", "arguments":[
+       {"name":"roleId","type":"java.lang.Long","required": true}    ]},
+    {"name":"qualifyRolAccountList", "return":"void", "arguments":[
+       {"name":"ra","type":"java.util.List<com.soffid.iam.iga.api.RoleAccount>","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"role","type":"com.soffid.iam.rc.api.SoDRole","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"rule","type":"com.soffid.iam.rc.api.SoDRule","required": true}    ]},
+    {"name":"remove", "return":"void", "arguments":[
+       {"name":"role","type":"com.soffid.iam.rc.api.SoDRuleMatrix","required": true}    ]}
+  ]
+}

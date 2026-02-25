@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"defaultObjectMapping","targetClass":"com.soffid.iam.base.model.DefaultObjectMappingEntity","multiple":false,"reverse":"defaultAttributeMappings"}
+  ]
+}

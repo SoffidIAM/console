@@ -8,7 +8,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 
 import com.soffid.iam.ServiceLocator;
-
 import com.soffid.iam.model.criteria.CriteriaSearchConfiguration;
 
 public class QueryBuilder {

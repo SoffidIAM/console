@@ -1,6 +1,0 @@
-FROM soffid/iam-console:k
-
-VOLUME  /opt/soffid/iam-console-3/logs
-VOLUME  /opt/soffid/iam-console-3/index
-
-

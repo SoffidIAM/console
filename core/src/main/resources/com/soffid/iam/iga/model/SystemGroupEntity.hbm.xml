@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.SystemGroupEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_GRUDIS' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='GRD_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_GRUDIS_GRD_IDGRUP'>
+			<column name='GRD_IDGRUP' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='system' class='com.soffid.iam.iga.model.SystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_GRUDIS_GRD_IDDIS'>
+			<column name='GRD_IDDIS' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

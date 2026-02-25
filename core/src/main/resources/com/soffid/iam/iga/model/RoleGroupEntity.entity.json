@@ -1,0 +1,9 @@
+{
+  "joins": [
+    {"name":"group","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false,"reverse":"grantedRoles"},
+    {"name":"grantedRole","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false,"reverse":"containerGroups"},
+    {"name":"grantedApplicationDomain","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false},
+    {"name":"grantedGroupDomain","targetClass":"com.soffid.iam.iga.model.GroupEntity","multiple":false},
+    {"name":"grantedDomainValue","targetClass":"com.soffid.iam.iga.model.DomainValueEntity","multiple":false}
+  ]
+}

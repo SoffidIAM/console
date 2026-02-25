@@ -1,0 +1,18 @@
+{
+  "hibernateClass": "com.soffid.iam.iga.model.DomainValueEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"value", "hibernateName":"value"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"domainName",  "hibernateName":"domain.name"},
+    {"name":"informationSystemName",  "hibernateName":"domain.informationSystem.name"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

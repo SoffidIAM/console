@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"roles","targetClass":"com.soffid.iam.iga.model.RuleAssignedRoleEntity","multiple":true,"reverse":"rule"},
+    {"name":"generated","targetClass":"com.soffid.iam.iga.model.RoleAccountEntity","multiple":true,"reverse":"rule"}
+  ]
+}

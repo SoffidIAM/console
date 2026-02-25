@@ -1,0 +1,22 @@
+{
+  "class": "com.soffid.iam.iga.api.InformationSystem",
+  "attributes": [
+    {"name":"type", "type":"STRING", "comments":"Business process or application", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "separator":"_basic", "enumeration":"com.soffid.iam.iga.api.ApplicationType"},
+    {"name":"parent", "type":"APPLICATION", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.application.ParentFieldHandler"},
+    {"name":"relativeName", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.application.NameFieldHandler", "length":"100"},
+    {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
+    {"name":"owner", "type":"USER", "comments":"User name of the owner of the application.", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "separator":"_management"},
+    {"name":"sourceDir", "type":"STRING", "comments":"where source files are located", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"targetDir", "type":"STRING", "comments":"Where the executables are located", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"database", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"150"},
+    {"name":"bpmEnabled", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"notificationEmails", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"512"},
+    {"name":"approvalProcess", "type":"STRING", "comments":"Approval process needed for workflow managed roles belonging to this application. Null value means no approval process is needed", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.application.RoleApprovalProcessFieldHandler", "length":"256"},
+    {"name":"roleDefinitionProcess", "type":"STRING", "comments":"Process needed for any change applied to this application roles. Null value means no approval process is needed", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "custom_ui_handler":"com.soffid.iam.web.application.RoleDefinitionProcessFieldHandler", "length":"256"},
+    {"name":"singleRole", "type":"BOOLEAN", "comments":"Only one single role can be assigned to each user", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"createdOn", "type":"DATE_TIME", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "separator":"_audit"},
+    {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},
+    {"name":"updatedOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
+    {"name":"updatedBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"}
+  ]
+}

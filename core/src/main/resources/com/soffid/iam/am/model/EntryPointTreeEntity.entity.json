@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"parent","targetClass":"com.soffid.iam.am.model.EntryPointEntity","multiple":false,"reverse":"childrenEntryPointTree"},
+    {"name":"child","targetClass":"com.soffid.iam.am.model.EntryPointEntity","multiple":false,"reverse":"parentEntryPointTree"}
+  ]
+}

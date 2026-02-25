@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"vaultFolders","targetClass":"com.soffid.iam.am.model.VaultFolderEntity","multiple":true,"reverse":"pamPolicy"},
+    {"name":"actions","targetClass":"com.soffid.iam.pam.model.PamActionEntity","multiple":true,"reverse":"policy"},
+    {"name":"justInTimePermissions","targetClass":"com.soffid.iam.pam.model.PamPolicyJITPermissionEntity","multiple":true,"reverse":"policy"}
+  ]
+}

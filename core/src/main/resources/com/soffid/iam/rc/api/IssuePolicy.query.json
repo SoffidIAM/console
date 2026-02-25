@@ -1,0 +1,19 @@
+{
+  "hibernateClass": "com.soffid.iam.rc.model.IssuePolicyEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"type", "hibernateName":"type"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"actor", "hibernateName":"actor"},
+    {"name":"status", "hibernateName":"status"},
+    {"name":"actions", "hibernateName":"actions"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

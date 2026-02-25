@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"entryPoint","targetClass":"com.soffid.iam.am.model.EntryPointEntity","multiple":false,"reverse":"authorizedRoles"},
+    {"name":"role","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":false}
+  ]
+}

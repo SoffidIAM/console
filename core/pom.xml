@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>root</artifactId>
-		<groupId>com.soffid.iam.console</groupId>
-		<version>3.6.65-SNAPSHOT</version>
+		<groupId>com.soffid.iam.console-open</groupId>
+		<version>4.0.39</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>iam-core</artifactId>
@@ -34,14 +34,7 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20</version>
-				<configuration>
-					<argLine>-Djava.security.manager -Djava.security.policy=${project.basedir}/src/test/resources/security.policy</argLine>
-				</configuration>
-			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ejb-plugin</artifactId>
@@ -88,71 +81,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>17</source>
+					<target>17</target>
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<phase>generate-sources</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<artifactItems>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-meta</artifactId>
-							<version>${project.version}</version>
-							<classifier>core</classifier>
-							<type>zip</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${project.build.directory}/src</outputDirectory>
-						</artifactItem>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-meta</artifactId>
-							<version>${project.version}</version>
-							<classifier>core-resource</classifier>
-							<type>zip</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${project.build.directory}/resources</outputDirectory>
-						</artifactItem>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-meta</artifactId>
-							<version>${project.version}</version>
-							<classifier>core-src</classifier>
-							<type>zip</type>
-							<overWrite>false</overWrite>
-							<outputDirectory>${project.build.directory}/src-template</outputDirectory>
-						</artifactItem>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-meta</artifactId>
-							<version>${project.version}</version>
-							<classifier>test</classifier>
-							<type>zip</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${project.build.directory}/src-test</outputDirectory>
-						</artifactItem>
-						<artifactItem>
-							<groupId>${project.groupId}</groupId>
-							<artifactId>iam-meta</artifactId>
-							<version>${project.version}</version>
-							<classifier>test-resource</classifier>
-							<type>zip</type>
-							<overWrite>true</overWrite>
-							<outputDirectory>${project.build.directory}/test-resources</outputDirectory>
-						</artifactItem>
-					</artifactItems>
-				</configuration>
-			</plugin>
+			
 
 		</plugins>
 		<pluginManagement>
@@ -182,7 +116,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -201,7 +135,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -220,7 +154,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -240,7 +174,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -286,7 +220,7 @@
 			<artifactId>aopalliance</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>com.soffid</groupId>
 			<artifactId>hibernate</artifactId>
 			<exclusions>
 				<exclusion>
@@ -320,7 +254,6 @@
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -357,13 +290,6 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>es.caib.signatura.valcert</groupId>
-			<artifactId>valcert-client-axis</artifactId>
-			<version>1.6.6</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 			<version>2.1.3</version>
@@ -373,13 +299,6 @@
 					<artifactId>xml-apis</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mortbay.jetty</groupId>
-			<artifactId>jetty</artifactId>
-			<version>6.1.11</version>
-			<scope>provided</scope>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
@@ -413,6 +332,10 @@
 				<exclusion>
 					<artifactId>dom4j</artifactId>
 					<groupId>dom4j</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -497,6 +420,10 @@
 					<groupId>org.bouncycastle</groupId>
 					<artifactId>bcprov-jdk15on</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-collections4</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
  		<dependency>
@@ -529,25 +456,18 @@
 			<artifactId>client</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.soffid.iam.console</groupId>
-			<artifactId>scim-query</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.soffid.iam.console</groupId>
-			<artifactId>iam-tomee</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomee</groupId>
-			<artifactId>javaee-api</artifactId>
-		</dependency>
+		<dependency xmlns:pom="http://maven.apache.org/POM/4.0.0"><groupId>org.json</groupId><artifactId>json</artifactId><version>20240303</version></dependency>
+		
 		<dependency>
 			<groupId>org.apache.tomee</groupId>
 			<artifactId>tomee-catalina</artifactId>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.tomee</groupId>
+					<artifactId>javaee-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomee</groupId>
@@ -557,16 +477,15 @@
 					<groupId>org.hsqldb</groupId>
 					<artifactId>hsqldb</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.apache.tomee</groupId>
+					<artifactId>javaee-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
-		</dependency>
-		<dependency>
-		    <groupId>jaxen</groupId>
-		    <artifactId>jaxen</artifactId>
-		    <version>1.1.6</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.opensaml</groupId>
@@ -603,16 +522,42 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml-lite</artifactId>
 			<version>5.2.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			  <groupId>org.apache.poi</groupId>
 			  <artifactId>poi</artifactId>
 			  <version>5.2.3</version>
+			  <exclusions>
+			  	<exclusion>
+			  		<groupId>org.apache.commons</groupId>
+			  		<artifactId>commons-collections4</artifactId>
+			  	</exclusion>
+			  	<exclusion>
+			  		<groupId>org.apache.logging.log4j</groupId>
+			  		<artifactId>log4j-api</artifactId>
+			  	</exclusion>
+			  </exclusions>
 		</dependency>
 		<dependency>
 			  <groupId>org.apache.poi</groupId>
 			  <artifactId>poi-ooxml</artifactId>
 			  <version>5.2.3</version>
+			  <exclusions>
+			  	<exclusion>
+			  		<groupId>org.apache.commons</groupId>
+			  		<artifactId>commons-collections4</artifactId>
+			  	</exclusion>
+			  	<exclusion>
+			  		<groupId>org.apache.logging.log4j</groupId>
+			  		<artifactId>log4j-api</artifactId>
+			  	</exclusion>
+			  </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>
@@ -640,11 +585,7 @@
     		<artifactId>xmlsec</artifactId>
     		<version>2.1.7</version>
 		</dependency>
-		<dependency>
-			<groupId>com.soffid.iam.console</groupId>
-			<artifactId>dbtools</artifactId>
-			<version>1.19</version>
-		</dependency>
+		<dependency xmlns:pom="http://maven.apache.org/POM/4.0.0"><groupId>com.soffid.iam.console</groupId><artifactId>dbtools</artifactId><version>1.17</version></dependency>
 		<dependency>
 		    <groupId>org.apache.commons</groupId>
 		    <artifactId>commons-jcs-core</artifactId>
@@ -653,7 +594,7 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-rs-client</artifactId>
-			<version>3.1.10</version>
+			<version>4.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -678,32 +619,41 @@
 		    <version>2.2.11</version>
 		    <scope>provided</scope>
 		</dependency>
-		<dependency>
-		  <groupId>com.sun.activation</groupId>
-		  <artifactId>jakarta.activation</artifactId>
-		  <version>1.2.1</version>
-		  <scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.soffid.iam.console</groupId>
-			<artifactId>iam-juli</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-queryparser</artifactId>
 			<version>9.5.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.soffid.iam</groupId>
-			<artifactId>nashorn-core</artifactId>
+			<groupId>org.graalvm.js</groupId>
+			<artifactId>js</artifactId>
+			<version>22.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.graalvm.js</groupId>
+			<artifactId>js-scriptengine</artifactId>
+			<version>22.3.1</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.auth0</groupId>
 		    <artifactId>java-jwt</artifactId>
 		    <version>4.0.0</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.18.0</version>
+		</dependency>
+		<dependency>
+			<groupId>nl.basjes.parse.useragent</groupId>
+			<artifactId>yauaa</artifactId>
+			<version>7.22.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-to-jul</artifactId>
+		    <version>2.24.3</version>
+		</dependency>
 	</dependencies>
 </project>
-

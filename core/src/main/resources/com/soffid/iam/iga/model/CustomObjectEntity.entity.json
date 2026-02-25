@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"type","targetClass":"com.soffid.iam.iga.model.CustomObjectTypeEntity","multiple":false,"reverse":"objects"},
+    {"name":"attributes","targetClass":"com.soffid.iam.iga.model.CustomObjectAttributeEntity","multiple":true,"reverse":"customObject"}
+  ]
+}

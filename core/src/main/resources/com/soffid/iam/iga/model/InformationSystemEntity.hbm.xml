@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.InformationSystemEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_APLICA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='APL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='APL_CODI' not-null='true' length='100' />
+		</property>
+		<property name='relativeName' type='java.lang.String'>
+			<column name='APL_RELNAM' not-null='true' length='100' />
+		</property>
+		<many-to-one name='parent' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_APLICA_APL_APL_ID'>
+			<column name='APL_APL_ID' not-null='false'/>
+		</many-to-one>
+		<property name='description' type='java.lang.String'>
+			<column name='APL_NOM' not-null='true' length='100' />
+		</property>
+		<property name='sourceDir' type='java.lang.String'>
+			<column name='APL_DIRFON' not-null='false' length='150' />
+		</property>
+		<property name='targetDir' type='java.lang.String'>
+			<column name='APL_DIRECT' not-null='false' length='150' />
+		</property>
+		<property name='database' type='java.lang.String'>
+			<column name='APL_BD' not-null='false' length='150' />
+		</property>
+		<set name='roles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLES_ROL_IDAPL'>
+				<column name='ROL_IDAPL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleEntityImpl'/>
+		</set>
+		<many-to-one name='contactPerson' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_APLICA_APL_IDCONTACT'>
+			<column name='APL_IDCONTACT' not-null='false'/>
+		</many-to-one>
+		<property name='bpmEnabled' type='java.lang.Boolean'>
+			<column name='APL_BPM' not-null='false' length='1' />
+		</property>
+		<property name='notificationEmails' type='java.lang.String'>
+			<column name='APL_MAILNOTIF' not-null='false' length='512' />
+		</property>
+		<property name='approvalProcess' type='java.lang.String'>
+			<column name='APL_APRPRO' not-null='false' length='256' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_APLICA_APL_TEN_ID'>
+			<column name='APL_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='roleDefinitionProcess' type='java.lang.String'>
+			<column name='APL_RODEPR' not-null='false' length='256' />
+		</property>
+		<property name='singleRole' type='java.lang.Boolean'>
+			<column name='APL_SGNROL' not-null='false' />
+		</property>
+		<property name='type' type='com.soffid.iam.iga.api.ApplicationTypeEnum'>
+			<column name='APL_TYPE' not-null='false' length='20' />
+		</property>
+		<set name='sodRules' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SODRUL_SOD_APL_ID'>
+				<column name='SOD_APL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.SoDRuleEntityImpl'/>
+		</set>
+		<set name='attributes' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_APPATT_AAT_APL_ID'>
+				<column name='AAT_APL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.InformationSystemAttributeEntityImpl'/>
+		</set>
+		<set name='children' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_APLICA_APL_APL_ID'>
+				<column name='APL_APL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.InformationSystemEntityImpl'/>
+		</set>
+		<set name='roleScopeMailLists' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_LCOROL_LCR_APL_ID'>
+				<column name='LCR_APL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.MailListRoleMemberEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='APL_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='APL_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='APL_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='APL_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='APL_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='APL_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

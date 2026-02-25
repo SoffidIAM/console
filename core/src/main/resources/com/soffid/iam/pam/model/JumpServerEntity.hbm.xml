@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.pam.model.JumpServerEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_JUMSER' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='JSE_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='url' type='java.lang.String'>
+			<column name='JSE_url' not-null='true' length='50' />
+		</property>
+		<many-to-one name='jumpServerGroup' class='com.soffid.iam.pam.model.JumpServerGroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_JUMSER_JSE_JSG_ID'>
+			<column name='JSE_JSG_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

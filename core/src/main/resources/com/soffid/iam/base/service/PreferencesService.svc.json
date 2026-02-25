@@ -1,0 +1,19 @@
+{
+  "class": "com.soffid.iam.base.service.PreferencesService", "comments":"Manages user preferences",
+  "methods": [
+    {"name":"findMyPreference", "comments":"Retrieves current user preference", "return":"java.lang.String", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"findUserPreferences", "comments":"Retrieves all the preferences for the selected user", "return":"java.util.Map<java.lang.String,java.lang.String>", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]},
+    {"name":"setUserPreferences", "comments":"Sets all user preferences for the selected user", "return":"java.util.Map<java.lang.String,java.lang.String>", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"preferences","type":"java.util.Map<java.lang.String,java.lang.String>","required":false}    ]},
+    {"name":"setUserPreference", "return":"void", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"preference","type":"java.lang.String","required": true},
+       {"name":"value","type":"java.lang.String","required":false}    ]},
+    {"name":"updateMyPreference", "comments":"Changes current user preference", "return":"void", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true},
+       {"name":"value","type":"java.lang.String","required":false}    ]}
+  ]
+}

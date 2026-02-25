@@ -2,7 +2,7 @@ package com.soffid.iam.sync.intf;
 
 import java.rmi.Remote;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public interface KerberosAgent extends Remote {
     public KerberosPrincipalInfo createServerPrincipal (String server) throws InternalErrorException;

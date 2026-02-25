@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"operatingSystemHost","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":true,"reverse":"operatingSystem"}
+  ]
+}

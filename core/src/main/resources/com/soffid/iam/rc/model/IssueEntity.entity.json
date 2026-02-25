@@ -1,0 +1,13 @@
+{
+  "joins": [
+    {"name":"system","targetClass":"com.soffid.iam.iga.model.SystemEntity","multiple":false,"reverse":"events"},
+    {"name":"roleAccount","targetClass":"com.soffid.iam.iga.model.RoleAccountEntity","multiple":false,"reverse":"events"},
+    {"name":"rule","targetClass":"com.soffid.iam.pam.model.PamRuleEntity","multiple":false,"reverse":"events"},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"events"},
+    {"name":"requester","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"brosers","targetClass":"com.soffid.iam.rc.model.IssueBrowserEntity","multiple":true,"reverse":"issue"},
+    {"name":"hosts","targetClass":"com.soffid.iam.rc.model.IssueHostEntity","multiple":true,"reverse":"issue"},
+    {"name":"users","targetClass":"com.soffid.iam.rc.model.IssueUserEntity","multiple":true,"reverse":"issue"}
+  ]
+}

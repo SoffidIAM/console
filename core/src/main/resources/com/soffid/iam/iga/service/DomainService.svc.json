@@ -1,0 +1,39 @@
+{
+  "class": "com.soffid.iam.iga.service.DomainService",
+  "methods": [
+    {"name":"create", "return":"com.soffid.iam.iga.api.Domain", "arguments":[
+       {"name":"domini","type":"com.soffid.iam.iga.api.Domain","required": true}    ]},
+    {"name":"findDomainByApplicationAndName", "return":"com.soffid.iam.iga.api.Domain", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true},
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"findApplicationDomainByDomianNameAndApplicationName", "return":"com.soffid.iam.iga.api.Domain", "arguments":[
+       {"name":"nomDomini","type":"java.lang.String","required": true},
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findGroupsDomain", "return":"com.soffid.iam.iga.api.Domain", "arguments":[
+    ]},
+    {"name":"findUserDomainGroup", "return":"com.soffid.iam.iga.api.Domain", "arguments":[
+    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.Domain", "arguments":[
+       {"name":"domini","type":"com.soffid.iam.iga.api.Domain","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.iga.api.DomainValue", "arguments":[
+       {"name":"valorDomini","type":"com.soffid.iam.iga.api.DomainValue","required": true}    ]},
+    {"name":"findApplicationDomainValueByDomainNameAndDomainApplicationNameAndValue", "return":"com.soffid.iam.iga.api.DomainValue", "arguments":[
+       {"name":"nomDomini","type":"java.lang.String","required": true},
+       {"name":"codiAplicacio","type":"java.lang.String","required": true},
+       {"name":"valor","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.iga.api.DomainValue", "arguments":[
+       {"name":"valorDomini","type":"com.soffid.iam.iga.api.DomainValue","required": true}    ]},
+    {"name":"findDomainValues", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.DomainValue>", "arguments":[
+       {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findApplicationDomainsByApplicationName", "return":"java.util.Collection<com.soffid.iam.iga.api.Domain>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findDomainsByApplicationName", "return":"java.util.Collection<com.soffid.iam.iga.api.Domain>", "arguments":[
+       {"name":"codiAplicacio","type":"java.lang.String","required": true}    ]},
+    {"name":"findDomainValuesByDomain", "return":"java.util.List<com.soffid.iam.iga.api.DomainValue>", "arguments":[
+       {"name":"domini","type":"com.soffid.iam.iga.api.Domain","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"domini","type":"com.soffid.iam.iga.api.Domain","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"valorDomini","type":"com.soffid.iam.iga.api.DomainValue","required": true}    ]}
+  ]
+}

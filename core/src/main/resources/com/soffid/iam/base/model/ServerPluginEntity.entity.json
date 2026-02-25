@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"agents","targetClass":"com.soffid.iam.base.model.AgentDescriptorEntity","multiple":true,"reverse":"plugin"},
+    {"name":"modules","targetClass":"com.soffid.iam.base.model.ServerPluginModuleEntity","multiple":true,"reverse":"plugin"}
+  ]
+}

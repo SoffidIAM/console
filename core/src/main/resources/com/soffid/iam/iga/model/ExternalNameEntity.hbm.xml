@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ExternalNameEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_EXTLCO' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ELC_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='address' type='java.lang.String'>
+			<column name='ELC_ADRECA' not-null='true' length='100' />
+		</property>
+		<many-to-one name='mailList' class='com.soffid.iam.iga.model.MailListEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_EXTLCO_ELC_IDLCO'>
+			<column name='ELC_IDLCO' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

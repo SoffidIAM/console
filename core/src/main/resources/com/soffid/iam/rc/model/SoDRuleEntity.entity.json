@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"application","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false,"reverse":"sodRules"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"roles","targetClass":"com.soffid.iam.rc.model.SoDRoleEntity","multiple":true,"reverse":"rule"},
+    {"name":"matrixCells","targetClass":"com.soffid.iam.rc.model.SoDRuleMatrixEntity","multiple":true,"reverse":"rule"}
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"policies","targetClass":"com.soffid.iam.am.model.PasswordPolicyEntity","multiple":true,"reverse":"userType"},
+    {"name":"accounts","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":true,"reverse":"passwordPolicy"}
+  ]
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ProcessHierarchyEntityImpl' dynamic-insert='false' dynamic-update='false' table='BPM_PROHIE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='PRH_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='parentProcess' type='java.lang.Long'>
+			<column name='PRH_PARPRO' not-null='true' length='1024' />
+		</property>
+		<property name='childProcess' type='java.lang.Long'>
+			<column name='PRH_CHIPRO' not-null='true' length='1024' />
+		</property>
+	</class>
+</hibernate-mapping>

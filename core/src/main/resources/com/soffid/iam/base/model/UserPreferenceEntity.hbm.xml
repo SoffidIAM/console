@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.UserPreferenceEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_USEPRE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='id'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='user' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_USEPRE_USP_USU_ID'>
+			<column name='USP_USU_ID' not-null='true'/>
+		</many-to-one>
+		<property name='name' type='java.lang.String'>
+			<column name='USP_NAME' not-null='true' length='250' />
+		</property>
+		<property name='value' type='java.lang.String'>
+			<column name='USP_VALUE' not-null='false' length='500' />
+		</property>
+	</class>
+</hibernate-mapping>

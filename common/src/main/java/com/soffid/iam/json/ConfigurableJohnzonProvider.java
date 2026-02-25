@@ -12,22 +12,22 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import javax.json.JsonReaderFactory;
-import javax.json.stream.JsonGeneratorFactory;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
+import jakarta.json.JsonReaderFactory;
+import jakarta.json.stream.JsonGeneratorFactory;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 
 import org.apache.johnzon.jaxrs.JohnzonProvider;
 import org.apache.johnzon.mapper.MapperBuilder;
 import org.apache.johnzon.mapper.access.AccessMode;
 import org.apache.johnzon.mapper.internal.ConverterAdapter;
 
-import es.caib.seycon.ng.comu.AccountType;
+import com.soffid.iam.base.api.AccountType;
 
 @Provider
 @Produces({"application/scim+json","application/json"})
@@ -35,9 +35,12 @@ import es.caib.seycon.ng.comu.AccountType;
 public class ConfigurableJohnzonProvider<T> implements MessageBodyWriter<T>, MessageBodyReader<T> {
     public ConfigurableJohnzonProvider() {
 		super();
-		builder.addAdapter(Calendar.class, String.class, new ConverterAdapter<Calendar>(new CalendarConverter()));
-		builder.addAdapter(Date.class, String.class, new ConverterAdapter<Date>(new DateConverter()));
-		builder.addAdapter(AccountType.class, String.class, new ConverterAdapter<AccountType>(new AccountTypeConverter()));
+		builder.addAdapter(Calendar.class, String.class, 
+				new ConverterAdapter<Calendar>(new CalendarConverter(), Calendar.class));
+		builder.addAdapter(Date.class, String.class, 
+				new ConverterAdapter<Date>(new DateConverter(), Date.class));
+		builder.addAdapter(AccountType.class, String.class, 
+				new ConverterAdapter<AccountType>(new AccountTypeConverter(), AccountType.class));
 	}
 
 	// build/configuration
@@ -181,10 +184,6 @@ public class ConfigurableJohnzonProvider<T> implements MessageBodyWriter<T>, Mes
 
     public void setReadAttributeBeforeWrite(final boolean rabw) {
         builder.setReadAttributeBeforeWrite(rabw);
-    }
-
-    public void setEnforceQuoteString(final boolean val) {
-        builder.setEnforceQuoteString(val);
     }
 
     public void setPrimitiveConverters(final boolean val) {

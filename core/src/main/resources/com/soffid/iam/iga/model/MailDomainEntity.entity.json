@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"users","targetClass":"com.soffid.iam.base.model.UserEntity","multiple":true,"reverse":"mailDomain"},
+    {"name":"mailLists","targetClass":"com.soffid.iam.iga.model.MailListEntity","multiple":true,"reverse":"domain"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

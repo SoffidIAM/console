@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"account","targetClass":"com.soffid.iam.iga.model.ReconcileAccountEntity","multiple":false,"reverse":"attributes"}
+  ]
+}

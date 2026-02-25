@@ -1,0 +1,33 @@
+{
+  "hibernateClass": "com.soffid.iam.am.model.VaultFolderEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"name", "hibernateName":"name"},
+    {"name":"personal", "hibernateName":"personal"},
+    {"name":"description", "hibernateName":"description"},
+    {"name":"parentId"},
+    {"name":"parentFolder",  "hibernateName":"parent.name"},
+    {"name":"grantedGroups"},
+    {"name":"grantedUsers"},
+    {"name":"grantedRoles"},
+    {"name":"managerGroups"},
+    {"name":"managerUsers"},
+    {"name":"managerRoles"},
+    {"name":"ownerGroups"},
+    {"name":"ownerUsers"},
+    {"name":"ownerRoles"},
+    {"name":"navigateGroups"},
+    {"name":"navigateUsers"},
+    {"name":"navigateRoles"},
+    {"name":"accessLevel"},
+    {"name":"pamPolicy", "hibernateName":"pamPolicy"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

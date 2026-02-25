@@ -1,0 +1,32 @@
+{
+  "class": "com.soffid.iam.base.service.ServerPluginService",
+  "methods": [
+    {"name":"deployPlugin", "comments":"Returns true if the console must be restarted", "return":"boolean", "arguments":[
+       {"name":"i","type":"byte[]","required": true}    ]},
+    {"name":"getAgentDescriptor", "return":"com.soffid.iam.base.api.AgentDescriptor", "arguments":[
+       {"name":"className","type":"java.lang.String","required": true}    ]},
+    {"name":"getServerVersion", "return":"java.lang.String", "arguments":[
+    ]},
+    {"name":"findAgentDescriptorWorkflows", "return":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptorWorkflow>", "arguments":[
+       {"name":"agent","type":"com.soffid.iam.base.api.AgentDescriptor","required": true}    ]},
+    {"name":"getAgentDescriptors", "return":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>", "arguments":[
+    ]},
+    {"name":"getAllAgentDescriptorsInfo", "return":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>", "arguments":[
+    ]},
+    {"name":"getPluginAgentDescriptors", "return":"java.util.Collection<com.soffid.iam.base.api.AgentDescriptor>", "arguments":[
+       {"name":"plugin","type":"com.soffid.iam.base.api.ServerPlugin","required": true}    ]},
+    {"name":"listServerPlugins", "return":"java.util.Collection<com.soffid.iam.base.api.ServerPlugin>", "arguments":[
+    ]},
+    {"name":"deletePlugin", "return":"void", "arguments":[
+       {"name":"plugin","type":"com.soffid.iam.base.api.ServerPlugin","required": true}    ]},
+    {"name":"enablePlugin", "return":"void", "arguments":[
+       {"name":"plugin","type":"com.soffid.iam.base.api.ServerPlugin","required": true},
+       {"name":"status","type":"boolean","required": true}    ]},
+    {"name":"updatePlugin", "comments":"Only deploys if it's a newer version", "return":"void", "arguments":[
+       {"name":"i","type":"byte[]","required": true}    ]},
+    {"name":"updatePlugin", "return":"void", "arguments":[
+       {"name":"plugin","type":"com.soffid.iam.base.api.ServerPlugin","required": true}    ]},
+    {"name":"updatePlugin", "comments":"Only deploys if it's a newer version", "return":"void", "arguments":[
+       {"name":"f","type":"java.io.File","required": true}    ]}
+  ]
+}

@@ -14,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.KeyParameter;
 
-import es.caib.seycon.util.Base64;
+import com.soffid.iam.util.Base64;
 
 public class Crypt
 {

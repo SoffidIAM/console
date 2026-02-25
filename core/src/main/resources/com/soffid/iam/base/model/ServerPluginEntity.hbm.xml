@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.base.model.ServerPluginEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_SERPLU' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='SPL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='version' type='java.lang.String'>
+			<column name='SPL_VERSION' not-null='true' length='30' />
+		</property>
+		<property name='content' type='java.sql.Blob' lazy='true'>
+			<column name='SPL_CONTEN' not-null='false' length='40000000' />
+		</property>
+		<property name='name' type='java.lang.String'>
+			<column name='SPL_NAME' not-null='true' length='100' />
+		</property>
+		<property name='author' type='java.lang.String'>
+			<column name='SPL_AUTHOR' not-null='false' length='100' />
+		</property>
+		<property name='deployed' type='java.util.Date'>
+			<column name='SPL_DEPLOYED' not-null='false' length='100' />
+		</property>
+		<property name='enabled' type='boolean'>
+			<column name='SPL_ENABLE' not-null='true' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SERPLU_SPL_TEN_ID'>
+			<column name='SPL_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='agents' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AGEDES_ADE_IDSPL'>
+				<column name='ADE_IDSPL'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AgentDescriptorEntityImpl'/>
+		</set>
+		<set name='modules' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SEPLMO_SPM_SPL_ID'>
+				<column name='SPM_SPL_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.ServerPluginModuleEntityImpl'/>
+		</set>
+	</class>
+</hibernate-mapping>

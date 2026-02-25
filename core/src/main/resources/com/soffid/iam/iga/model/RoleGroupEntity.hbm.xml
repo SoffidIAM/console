@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.RoleGroupEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ROLGRUP' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RLG_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<many-to-one name='group' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLGRUP_RLG_GRUP'>
+			<column name='RLG_GRUP' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='grantedRole' class='com.soffid.iam.iga.model.RoleEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLGRUP_RLG_ROL'>
+			<column name='RLG_ROL' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='grantedApplicationDomain' class='com.soffid.iam.iga.model.InformationSystemEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLGRUP_RLG_APL_ID'>
+			<column name='RLG_APL_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='grantedGroupDomain' class='com.soffid.iam.iga.model.GroupEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLGRUP_RLG_GRU_ID'>
+			<column name='RLG_GRU_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='grantedDomainValue' class='com.soffid.iam.iga.model.DomainValueEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ROLGRUP_RLG_VDO_ID'>
+			<column name='RLG_VDO_ID' not-null='false'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

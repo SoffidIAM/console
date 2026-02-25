@@ -1,0 +1,5 @@
+{
+  "joins": [
+    {"name":"mailList","targetClass":"com.soffid.iam.iga.model.MailListEntity","multiple":false,"reverse":"externals"}
+  ]
+}

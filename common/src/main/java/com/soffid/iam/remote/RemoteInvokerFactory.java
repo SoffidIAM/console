@@ -21,8 +21,7 @@ import javax.net.ssl.HttpsURLConnection;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.ssl.ConnectionFactory;
 import com.soffid.iam.ssl.HttpInvokerHandler;
-
-import es.caib.seycon.util.Base64;
+import com.soffid.iam.util.Base64;
 
 public class RemoteInvokerFactory {
     public Object getInvoker(URL url) throws IOException {

@@ -1,0 +1,37 @@
+{
+  "class": "com.soffid.iam.base.service.ConfigurationService",
+  "methods": [
+    {"name":"getBlob", "return":"byte[]", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.base.api.Configuration", "arguments":[
+       {"name":"configuracio","type":"com.soffid.iam.base.api.Configuration","required": true}    ]},
+    {"name":"findMasterParameterByNameAndNetwork", "return":"com.soffid.iam.base.api.Configuration", "arguments":[
+       {"name":"paramter","type":"java.lang.String","required":false},
+       {"name":"networkName","type":"java.lang.String","required":false}    ]},
+    {"name":"findParameterByNameAndNetworkName", "return":"com.soffid.iam.base.api.Configuration", "arguments":[
+       {"name":"codiParametre","type":"java.lang.String","required":false},
+       {"name":"codiXarxa","type":"java.lang.String","required":false}    ]},
+    {"name":"update", "return":"com.soffid.iam.base.api.Configuration", "arguments":[
+       {"name":"configuracio","type":"com.soffid.iam.base.api.Configuration","required": true}    ]},
+    {"name":"findConfigurations", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.base.api.Configuration>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"findTenantParameter", "return":"java.lang.String", "arguments":[
+       {"name":"tenant","type":"java.lang.String","required": true},
+       {"name":"parameter","type":"java.lang.String","required": true}    ]},
+    {"name":"getBlobVersion", "return":"java.lang.String", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"getParameters", "return":"java.util.Collection<com.soffid.iam.base.api.Configuration>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"configuracio","type":"com.soffid.iam.base.api.Configuration","required": true}    ]},
+    {"name":"deleteBlob", "return":"void", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"updateBlob", "return":"void", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true},
+       {"name":"data","type":"byte[]","required": true}    ]},
+    {"name":"updateBlob", "return":"void", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true},
+       {"name":"data","type":"byte[]","required": true},
+       {"name":"version","type":"java.lang.String","required": true}    ]}
+  ]
+}

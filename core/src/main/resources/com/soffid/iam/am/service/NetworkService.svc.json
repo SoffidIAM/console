@@ -1,0 +1,128 @@
+{
+  "class": "com.soffid.iam.am.service.NetworkService",
+  "methods": [
+    {"name":"canLogin", "return":"boolean", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true},
+       {"name":"host","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"maquina","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"findHostById", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"idMaquina","type":"java.lang.Long","required": true}    ]},
+    {"name":"findHostByIp", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"ip","type":"java.lang.String","required": true}    ]},
+    {"name":"findHostByName", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"nom","type":"java.lang.String","required": true}    ]},
+    {"name":"findHostBySerialNumber", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"serialNumber","type":"java.lang.String","required": true}    ]},
+    {"name":"registerDynamicIP", "return":"com.soffid.iam.am.api.Host", "arguments":[
+       {"name":"nomMaquina","type":"java.lang.String","required": true},
+       {"name":"ip","type":"java.lang.String","required": true},
+       {"name":"serialNumber","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.HostAlias", "arguments":[
+       {"name":"aliasMaquina","type":"com.soffid.iam.am.api.HostAlias","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.Network", "arguments":[
+       {"name":"xarxa","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"findNetworkByIpAddress", "return":"com.soffid.iam.am.api.Network", "arguments":[
+       {"name":"ipAdress","type":"java.lang.String","required": true}    ]},
+    {"name":"findNetworkByName", "return":"com.soffid.iam.am.api.Network", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.NetworkAuthorization", "arguments":[
+       {"name":"accessList","type":"com.soffid.iam.am.api.NetworkAuthorization","required": true}    ]},
+    {"name":"findNetworkAuthorizationsByNetworkNameAndIdentityName", "return":"com.soffid.iam.am.api.NetworkAuthorization", "arguments":[
+       {"name":"codiXarxa","type":"java.lang.String","required": true},
+       {"name":"codiIdentitat","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.am.api.NetworkAuthorization", "arguments":[
+       {"name":"accessList","type":"com.soffid.iam.am.api.NetworkAuthorization","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.am.api.OsType", "arguments":[
+       {"name":"osType","type":"com.soffid.iam.am.api.OsType","required": true}    ]},
+    {"name":"findOSTypeById", "return":"com.soffid.iam.am.api.OsType", "arguments":[
+       {"name":"osId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findOSTypeByName", "return":"com.soffid.iam.am.api.OsType", "arguments":[
+       {"name":"osName","type":"java.lang.String","required": true}    ]},
+    {"name":"findIdentityByName", "return":"com.soffid.iam.base.api.Identity", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.pam.api.HostAdmin", "arguments":[
+       {"name":"autoritzacioAccesComAdministrador","type":"com.soffid.iam.pam.api.HostAdmin","required": true}    ]},
+    {"name":"revokeAdministratorAccessHost", "return":"com.soffid.iam.pam.api.HostAdmin", "arguments":[
+       {"name":"autoritzacioAccesComAdministrador","type":"com.soffid.iam.pam.api.HostAdmin","required": true}    ]},
+    {"name":"findHosts", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Host>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"findNetworks", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.am.api.Network>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"isManaged", "return":"java.lang.Boolean", "arguments":[
+       {"name":"codiXarxa","type":"java.lang.String","required": true}    ]},
+    {"name":"hasAnyACLNetworks", "return":"java.lang.Boolean", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"launchVNC", "return":"java.lang.Boolean", "arguments":[
+       {"name":"sessioId","type":"java.lang.Long","required": true}    ]},
+    {"name":"hasNetworkAccess", "return":"java.lang.Boolean", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true},
+       {"name":"codiXarxa","type":"java.lang.String","required": true}    ]},
+    {"name":"hasManagedNetwork", "return":"java.lang.Boolean", "arguments":[
+    ]},
+    {"name":"findAccessLevelByHostNameAndNetworkName", "return":"java.lang.Long", "arguments":[
+       {"name":"nomMaquina","type":"java.lang.String","required": true},
+       {"name":"codiXarxa","type":"java.lang.String","required": true}    ]},
+    {"name":"getAvailableIPs", "return":"java.lang.Long", "arguments":[
+       {"name":"codiXarxa","type":"java.lang.String","required": true}    ]},
+    {"name":"getNotAvailableIPs", "return":"java.lang.Long", "arguments":[
+       {"name":"codiXarxa","type":"java.lang.String","required": true}    ]},
+    {"name":"getFirstAvailableIP", "return":"java.lang.String", "arguments":[
+       {"name":"codiXarxa","type":"java.lang.String","required": true}    ]},
+    {"name":"getTasks", "return":"java.lang.String[]", "arguments":[
+       {"name":"nomMaquina","type":"java.lang.String","required": true}    ]},
+    {"name":"getHostAdminUserAndPassword", "return":"java.lang.String[]", "arguments":[
+       {"name":"nomMaquina","type":"java.lang.String","required": true}    ]},
+    {"name":"findAllNetworkAuthorizationsByUserName", "return":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findAliasByHostName", "return":"java.util.List<com.soffid.iam.am.api.HostAlias>", "arguments":[
+       {"name":"nomMaquina","type":"java.lang.String","required": true}    ]},
+    {"name":"findAllOSTypes", "return":"java.util.List<com.soffid.iam.am.api.OsType>", "arguments":[
+    ]},
+    {"name":"findAuthorizationsToAccessHostWithAdministratorRigthsByHostsAndRequestDate", "return":"java.util.List<com.soffid.iam.pam.api.HostAdmin>", "arguments":[
+       {"name":"nomHost","type":"java.lang.String","required": true},
+       {"name":"dataPeticio","type":"java.lang.String","required":false},
+       {"name":"dataCaducitat","type":"java.lang.String","required":false}    ]},
+    {"name":"findHostsByNetwork_Discovery", "comments":"Finds all hosts or search contained host by name or description or IP", "return":"java.util.List<com.soffid.iam.am.api.Host>", "arguments":[
+       {"name":"parent","type":"com.soffid.iam.am.api.Network","required": true},
+       {"name":"text","type":"java.lang.String","required":false}    ]},
+    {"name":"findIdentitiesByName", "return":"java.util.List<com.soffid.iam.base.api.Identity>", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"findNetworkAuthorizationsByGroupName", "return":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"codiGrup","type":"java.lang.String","required": true}    ]},
+    {"name":"findNetworkAuthorizationsByUserName", "return":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"codiUsuari","type":"java.lang.String","required": true}    ]},
+    {"name":"findNetworkAuthorizationsByRoleName", "return":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"nomRol","type":"java.lang.String","required": true}    ]},
+    {"name":"findNetworkByText_Discovery", "comments":"Finds network by network name or network description or network IP or contained host name or description or IP", "return":"java.util.List<com.soffid.iam.am.api.Network>", "arguments":[
+       {"name":"text","type":"java.lang.String","required":false}    ]},
+    {"name":"findSessionsByHostName", "return":"java.util.List<com.soffid.iam.am.api.Session>", "arguments":[
+       {"name":"codiMaquina","type":"java.lang.String","required": true}    ]},
+    {"name":"getACL", "return":"java.util.List<com.soffid.iam.am.api.NetworkAuthorization>", "arguments":[
+       {"name":"xarxa","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"getNetworks", "return":"java.util.List<com.soffid.iam.am.api.Network>", "arguments":[
+    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"maquina","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"aliasMaquina","type":"com.soffid.iam.am.api.HostAlias","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"xarxa","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"accessList","type":"com.soffid.iam.am.api.NetworkAuthorization","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"osType","type":"com.soffid.iam.am.api.OsType","required": true}    ]},
+    {"name":"setAdministratorPassword", "return":"void", "arguments":[
+       {"name":"nomMaquina","type":"java.lang.String","required": true},
+       {"name":"adminUser","type":"java.lang.String","required": true},
+       {"name":"adminPass","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"void", "arguments":[
+       {"name":"maquina","type":"com.soffid.iam.am.api.Host","required": true}    ]},
+    {"name":"update", "return":"void", "arguments":[
+       {"name":"aliasMaquina","type":"com.soffid.iam.am.api.HostAlias","required": true}    ]},
+    {"name":"update", "return":"void", "arguments":[
+       {"name":"xarxa","type":"com.soffid.iam.am.api.Network","required": true}    ]},
+    {"name":"update", "return":"void", "arguments":[
+       {"name":"osType","type":"com.soffid.iam.am.api.OsType","required": true}    ]}
+  ]
+}

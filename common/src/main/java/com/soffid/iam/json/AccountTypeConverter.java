@@ -4,7 +4,7 @@ import java.lang.reflect.Type;
 
 import org.apache.johnzon.mapper.Converter;
 
-import es.caib.seycon.ng.comu.AccountType;
+import com.soffid.iam.base.api.AccountType;
 
 public class AccountTypeConverter implements Converter<AccountType>, Converter.TypeAccess
 {

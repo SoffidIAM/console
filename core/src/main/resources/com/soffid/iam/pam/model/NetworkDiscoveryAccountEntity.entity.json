@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"network","targetClass":"com.soffid.iam.am.model.NetworkEntity","multiple":false,"reverse":"accounts"},
+    {"name":"account","targetClass":"com.soffid.iam.base.model.AccountEntity","multiple":false,"reverse":"networkDiscovery"}
+  ]
+}

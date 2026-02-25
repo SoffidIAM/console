@@ -8,7 +8,7 @@
 package com.soffid.iam.sync.intf;
 import java.util.Date;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public interface AgentMgr  {
   public String getInstance (String agentName, String agentClass, boolean roleBased, String grups[], String tipusUsuaris[], String params[])

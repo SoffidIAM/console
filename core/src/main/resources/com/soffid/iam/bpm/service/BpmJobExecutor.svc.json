@@ -1,0 +1,21 @@
+{
+  "class": "com.soffid.iam.bpm.service.BpmJobExecutor",
+  "methods": [
+    {"name":"lockJob", "return":"boolean", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"lockOwner","type":"java.lang.String","required": true}    ]},
+    {"name":"getNextDueDate", "return":"java.util.Date", "arguments":[
+       {"name":"lockOwner","type":"java.lang.String","required": true}    ]},
+    {"name":"getJobs", "return":"java.util.List", "arguments":[
+       {"name":"lockOwner","type":"java.lang.String","required": true}    ]},
+    {"name":"anotateFailure", "return":"void", "arguments":[
+       {"name":"id","type":"long","required": true},
+       {"name":"e","type":"java.lang.Exception","required": true}    ]},
+    {"name":"executeJob", "return":"void", "arguments":[
+       {"name":"id","type":"long","required": true}    ]},
+    {"name":"indexPendingProcesses", "return":"void", "arguments":[
+    ]},
+    {"name":"unlockOverdueJobs", "return":"void", "arguments":[
+       {"name":"threshold","type":"java.util.Date","required": true}    ]}
+  ]
+}

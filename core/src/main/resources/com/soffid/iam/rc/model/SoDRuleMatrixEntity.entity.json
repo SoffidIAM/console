@@ -1,0 +1,7 @@
+{
+  "joins": [
+    {"name":"rule","targetClass":"com.soffid.iam.rc.model.SoDRuleEntity","multiple":false,"reverse":"matrixCells"},
+    {"name":"row","targetClass":"com.soffid.iam.rc.model.SoDRoleEntity","multiple":false,"reverse":"columns"},
+    {"name":"column","targetClass":"com.soffid.iam.rc.model.SoDRoleEntity","multiple":false,"reverse":"rows"}
+  ]
+}

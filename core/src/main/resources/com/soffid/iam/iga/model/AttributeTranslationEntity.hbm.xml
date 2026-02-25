@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.AttributeTranslationEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_ATTTRA' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='ATT_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='domain' type='java.lang.String'>
+			<column name='ATT_DOMAIN' not-null='true' length='450' />
+		</property>
+		<property name='column1' type='java.lang.String'>
+			<column name='ATT_COLUMN1' not-null='true' length='450' />
+		</property>
+		<property name='column2' type='java.lang.String'>
+			<column name='ATT_COLUMN2' not-null='false' length='450' />
+		</property>
+		<property name='column3' type='java.lang.String'>
+			<column name='ATT_COLUMN3' not-null='false' length='450' />
+		</property>
+		<property name='column4' type='java.lang.String'>
+			<column name='ATT_COLUMN4' not-null='false' length='450' />
+		</property>
+		<property name='column5' type='java.lang.String'>
+			<column name='ATT_COLUMN5' not-null='false' length='450' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_ATTTRA_ATT_TEN_ID'>
+			<column name='ATT_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='ATT_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='ATT_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='ATT_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='ATT_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='ATT_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='ATT_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

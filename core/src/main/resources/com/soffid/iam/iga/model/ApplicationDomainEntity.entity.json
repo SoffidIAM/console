@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"values","targetClass":"com.soffid.iam.iga.model.DomainValueEntity","multiple":true,"reverse":"domain"},
+    {"name":"roles","targetClass":"com.soffid.iam.iga.model.RoleEntity","multiple":true,"reverse":"applicationDomain"},
+    {"name":"informationSystem","targetClass":"com.soffid.iam.iga.model.InformationSystemEntity","multiple":false},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false}
+  ]
+}

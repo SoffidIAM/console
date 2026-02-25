@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.SystemEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_DISPAT' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='DIS_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='DIS_CODI' not-null='false' length='150' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='DIS_DESCRI' not-null='false' length='250' />
+		</property>
+		<property name='className' type='java.lang.String'>
+			<column name='DIS_NOMCLA' not-null='false' length='100' />
+		</property>
+		<property name='url' type='java.lang.String'>
+			<column name='DIS_URL' not-null='false' length='500' />
+		</property>
+		<property name='url2' type='java.lang.String'>
+			<column name='DIS_URL2' not-null='false' length='500' />
+		</property>
+		<property name='param0' type='java.lang.String'>
+			<column name='DIS_PARAM0' not-null='false' length='500' />
+		</property>
+		<property name='param1' type='java.lang.String'>
+			<column name='DIS_PARAM1' not-null='false' length='500' />
+		</property>
+		<property name='param2' type='java.lang.String'>
+			<column name='DIS_PARAM2' not-null='false' length='500' />
+		</property>
+		<property name='param3' type='java.lang.String'>
+			<column name='DIS_PARAM3' not-null='false' length='500' />
+		</property>
+		<property name='param4' type='java.lang.String'>
+			<column name='DIS_PARAM4' not-null='false' length='500' />
+		</property>
+		<property name='param5' type='java.lang.String'>
+			<column name='DIS_PARAM5' not-null='false' length='500' />
+		</property>
+		<property name='param6' type='java.lang.String'>
+			<column name='DIS_PARAM6' not-null='false' length='500' />
+		</property>
+		<property name='param7' type='java.lang.String'>
+			<column name='DIS_PARAM7' not-null='false' length='500' />
+		</property>
+		<property name='param8' type='java.lang.String'>
+			<column name='DIS_PARAM8' not-null='false' length='500' />
+		</property>
+		<property name='param9' type='java.lang.String'>
+			<column name='DIS_PARAM9' not-null='false' length='500' />
+		</property>
+		<property name='roleBased' type='java.lang.String'>
+			<column name='DIS_BASROL' not-null='false' length='1' />
+		</property>
+		<property name='trusted' type='java.lang.String'>
+			<column name='DIS_TRUSTED' not-null='false' length='1' />
+		</property>
+		<property name='manualAccountCreation' type='java.lang.Boolean'>
+			<column name='DIS_MAACCR' not-null='false' length='1' />
+		</property>
+		<property name='fullReconciliation' type='java.lang.Boolean'>
+			<column name='DIS_FULREC' not-null='false' length='1' />
+		</property>
+		<property name='generateTasksOnLoad' type='java.lang.Boolean'>
+			<column name='DIS_GENTAS' not-null='false' length='1' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DISPAT_DIS_TEN_ID'>
+			<column name='DIS_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='role' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ROLES_ROL_IDDISPAT'>
+				<column name='ROL_IDDISPAT'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.RoleEntityImpl'/>
+		</set>
+		<set name='userType' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_TIPDIS_TPD_IDDIS'>
+				<column name='TPD_IDDIS'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.UserTypeSystemEntityImpl'/>
+		</set>
+		<set name='systemGroup' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_GRUDIS_GRD_IDDIS'>
+				<column name='GRD_IDDIS'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.SystemGroupEntityImpl'/>
+		</set>
+		<property name='enableAccessControl' type='java.lang.String'>
+			<column name='DIS_CONAC' not-null='false' length='1' />
+		</property>
+		<set name='accessControls' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_CONACC_CAC_DIS_ID'>
+				<column name='CAC_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.AccessControlEntityImpl'/>
+		</set>
+		<many-to-one name='passwordDomain' class='com.soffid.iam.am.model.PasswordDomainEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DISPAT_DIS_DCN_ID'>
+			<column name='DIS_DCN_ID' not-null='true'/>
+		</many-to-one>
+		<many-to-one name='userDomain' class='com.soffid.iam.iga.model.UserDomainEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_DISPAT_DIS_DOU_ID'>
+			<column name='DIS_DOU_ID' not-null='false'/>
+		</many-to-one>
+		<set name='accounts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCOUN_ACC_DIS_ID'>
+				<column name='ACC_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountEntityImpl'/>
+		</set>
+		<property name='mainSystem' type='boolean'>
+			<column name='DIS_MAIN' not-null='true' />
+		</property>
+		<property name='readOnly' type='boolean'>
+			<column name='DIS_RDONLY' not-null='true' />
+		</property>
+		<property name='pause' type='java.lang.Boolean'>
+			<column name='DIS_PAUSEY' not-null='false' />
+		</property>
+		<property name='authoritative' type='java.lang.Boolean'>
+			<column name='DIS_AUTHRT' not-null='false' />
+		</property>
+		<property name='blobParam' type='org.springframework.orm.hibernate3.support.BlobByteArrayType'>
+			<column name='DIS_BLOPAR' not-null='false' />
+		</property>
+		<property name='timeStamp' type='java.util.Date'>
+			<column name='DIS_TIMSTA' not-null='false' />
+		</property>
+		<property name='created' type='java.util.Date'>
+			<column name='DIS_CREATED' not-null='false' />
+		</property>
+		<set name='objectMappings' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_OBJMAP_OBM_DIS_ID'>
+				<column name='OBM_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ObjectMappingEntityImpl'/>
+		</set>
+		<property name='authoritativeProcess' type='java.lang.String'>
+			<column name='DIS_AUTPRO' not-null='false' length='250' />
+		</property>
+		<property name='sharedDispatcher' type='java.lang.Boolean'>
+			<column name='DIS_SHARED' not-null='false' />
+		</property>
+		<property name='threads' type='java.lang.Long'>
+			<column name='DIS_THREADS' not-null='false' />
+		</property>
+		<set name='pendingChanges' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_AUTCHA_PAU_DIS_ID'>
+				<column name='PAU_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.AuthoritativeChangeEntityImpl'/>
+		</set>
+		<property name='timeout' type='java.lang.Long'>
+			<column name='DIS_TIMOUT' not-null='false' />
+		</property>
+		<property name='longTimeout' type='java.lang.Long'>
+			<column name='DIS_LOTIOT' not-null='false' />
+		</property>
+		<property name='usage' type='java.lang.String'>
+			<column name='DIS_TYPE' not-null='false' />
+		</property>
+		<property name='deltaChanges' type='java.lang.Boolean'>
+			<column name='DIS_DELCHA' not-null='false' />
+		</property>
+		<property name='removeRolesFromDisabledAccounts' type='java.lang.Boolean'>
+			<column name='DIS_RERODA' not-null='false' />
+		</property>
+		<property name='createDisabledAccounts' type='java.lang.Boolean'>
+			<column name='DIS_CRDIAC' not-null='false' />
+		</property>
+		<set name='entryPoints' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_PUNENT_PUE_DIS_ID'>
+				<column name='PUE_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.EntryPointEntityImpl'/>
+		</set>
+		<set name='metaData' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ACCMET_AME_DIS_ID'>
+				<column name='AME_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.AccountMetadataEntityImpl'/>
+		</set>
+		<set name='reconcileTriggers' lazy='true' fetch='select' inverse='true' cascade='all,delete-orphan'>
+			<key foreign-key='SC_RECPAR_RPA_DIS_ID'>
+				<column name='RPA_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.ReconcileTriggerEntityImpl'/>
+		</set>
+		<set name='hosts' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQDIS_MAQ_DIS_ID'>
+				<column name='MAQ_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostSystemEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ISSUE_EVE_DIS_ID'>
+				<column name='EVE_DIS_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueEntityImpl'/>
+		</set>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='DIS_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='DIS_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='DIS_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='DIS_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='DIS_DELUSE' not-null='false' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='DIS_START' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

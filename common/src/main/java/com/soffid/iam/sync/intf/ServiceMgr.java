@@ -8,11 +8,10 @@ package com.soffid.iam.sync.intf;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import com.soffid.iam.api.Account;
-import com.soffid.iam.api.HostService;
-import com.soffid.iam.api.Password;
-
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.am.api.Password;
+import com.soffid.iam.base.api.Account;
+import com.soffid.iam.pam.api.HostService;
+import com.soffid.iam.exception.InternalErrorException;
 
 /** 
  * Remote interface to change service passwords

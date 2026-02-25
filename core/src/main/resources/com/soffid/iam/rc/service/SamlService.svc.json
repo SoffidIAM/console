@@ -1,0 +1,23 @@
+{
+  "class": "com.soffid.iam.rc.service.SamlService",
+  "methods": [
+    {"name":"generateSamlRequest", "comments":"Generates a SAML request to formard to the IdP", "return":"com.soffid.iam.am.api.SamlRequest", "arguments":[
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"app","type":"java.lang.String","required":false}    ]},
+    {"name":"checkAuthenticationToken", "comments":"Validates the single use username and password generated on previous step. Returns the underlying account name", "return":"java.lang.String", "arguments":[
+       {"name":"token","type":"java.lang.String[]","required": true}    ]},
+    {"name":"generateMetadata", "comments":"Generates SAML metadata to publish to SAML federation discovery database", "return":"java.lang.String", "arguments":[
+       {"name":"hostName","type":"java.lang.String","required": true}    ]},
+    {"name":"validateOpenidToken", "return":"java.lang.String", "arguments":[
+       {"name":"token","type":"java.lang.String","required": true}    ]},
+    {"name":"authenticate", "comments":"Validates the SAML response, and returns a single use username and password", "return":"java.lang.String[]", "arguments":[
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"app","type":"java.lang.String","required":false},
+       {"name":"protocol","type":"java.lang.String","required": true},
+       {"name":"response","type":"java.util.Map<java.lang.String,java.lang.String>","required": true}    ]},
+    {"name":"findIdentityProviders", "comments":"Gets the list of Identity Providers from medatata URL", "return":"java.util.List<java.lang.String>", "arguments":[
+    ]},
+    {"name":"findIdentityProviders", "comments":"Gets the list of Identity Providers from arbitrary URL", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true}    ]}
+  ]
+}

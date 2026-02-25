@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.BrowserEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_BROWSE' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='BRO_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='ip' type='java.lang.String'>
+			<column name='BRO_IP' not-null='false' length='60' />
+		</property>
+		<many-to-one name='host' class='com.soffid.iam.am.model.HostEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BROWSE_BRO_MAQ_ID'>
+			<column name='BRO_MAQ_ID' not-null='false'/>
+		</many-to-one>
+		<property name='serialNumber' type='java.lang.String'>
+			<column name='BRO_SERIAL' not-null='false' length='255' />
+		</property>
+		<property name='lastSeen' type='java.util.Date'>
+			<column name='BRO_LASTSEEN' not-null='false' />
+		</property>
+		<property name='created' type='java.util.Date'>
+			<column name='BRO_CREATED' not-null='false' />
+		</property>
+		<property name='deleted' type='java.lang.Boolean'>
+			<column name='BRO_DELETED' not-null='false' />
+		</property>
+		<property name='locked' type='java.lang.Boolean'>
+			<column name='BRO_LOCKED' not-null='false' />
+		</property>
+		<property name='deviceType' type='java.lang.String'>
+			<column name='BRO_DEVICE' not-null='false' />
+		</property>
+		<property name='operatingSystem' type='java.lang.String'>
+			<column name='BRO_OS' not-null='false' />
+		</property>
+		<property name='browser' type='java.lang.String'>
+			<column name='BRO_BROWSER' not-null='false' />
+		</property>
+		<property name='cpu' type='java.lang.String'>
+			<column name='BRO_CPU' not-null='false' />
+		</property>
+		<many-to-one name='lastUser' class='com.soffid.iam.base.model.UserEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BROWSE_BRO_USU_ID'>
+			<column name='BRO_USU_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_BROWSE_BRO_TEN_ID'>
+			<column name='BRO_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='sessions' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_SESSIO_SES_IDBRO'>
+				<column name='SES_IDBRO'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.SessionEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_BROEVE_BVE_BRO_ID'>
+				<column name='BVE_BRO_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueBrowserEntityImpl'/>
+		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='BRO_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='BRO_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='BRO_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='BRO_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='BRO_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='BRO_DELUSE' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

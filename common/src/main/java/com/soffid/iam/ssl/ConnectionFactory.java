@@ -27,9 +27,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
+import com.soffid.iam.am.api.Password;
 import com.soffid.iam.ssl.SeyconTrustManager;
-
-import com.soffid.iam.api.Password;
 
 
 public class ConnectionFactory {

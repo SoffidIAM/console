@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ReconcileAssignmentEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_RECASI' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RAS_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='assignmentName' type='java.lang.String'>
+			<column name='RAS_ASINAM' not-null='true' />
+		</property>
+		<property name='processId' type='java.lang.Long'>
+			<column name='RAS_PROCID' not-null='true' />
+		</property>
+		<property name='accountName' type='java.lang.String'>
+			<column name='RAS_ACCNAM' not-null='true' />
+		</property>
+		<property name='roleName' type='java.lang.String'>
+			<column name='RAS_ROLNAM' not-null='true' />
+		</property>
+		<property name='proposedAction' type='com.soffid.iam.iga.api.ProposedActionEnum'>
+			<column name='RAS_ACTION' not-null='true' />
+		</property>
+		<property name='dispatcher' type='java.lang.String'>
+			<column name='RAS_DISPAT' not-null='true' />
+		</property>
+		<property name='domainValue' type='java.lang.String'>
+			<column name='RAS_DOMVAL' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_RECASI_RAS_TEN_ID'>
+			<column name='RAS_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.iga.model.ReconcileRoleEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_RECROL' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='RRL_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='roleName' type='java.lang.String'>
+			<column name='RRL_ROLNAM' not-null='true' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='RRL_DESC' not-null='true' />
+		</property>
+		<property name='processId' type='java.lang.Long'>
+			<column name='RRL_PROCID' not-null='true' />
+		</property>
+		<property name='proposedAction' type='com.soffid.iam.iga.api.ProposedActionEnum'>
+			<column name='RRL_ACTION' not-null='true' />
+		</property>
+		<property name='dispatcher' type='java.lang.String'>
+			<column name='RRL_DISPAT' not-null='true' />
+		</property>
+		<property name='appName' type='java.lang.String'>
+			<column name='RRL_APPNAM' not-null='false' />
+		</property>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_RECROL_RRL_TEN_ID'>
+			<column name='RRL_TEN_ID' not-null='true'/>
+		</many-to-one>
+	</class>
+</hibernate-mapping>

@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"actions","targetClass":"com.soffid.iam.rc.model.IssuePolicyActionEntity","multiple":true,"reverse":"issuePolicy"}
+  ]
+}

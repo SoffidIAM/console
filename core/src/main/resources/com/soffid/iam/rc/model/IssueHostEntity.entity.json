@@ -1,0 +1,6 @@
+{
+  "joins": [
+    {"name":"issue","targetClass":"com.soffid.iam.rc.model.IssueEntity","multiple":false,"reverse":"hosts"},
+    {"name":"host","targetClass":"com.soffid.iam.am.model.HostEntity","multiple":false,"reverse":"events"}
+  ]
+}

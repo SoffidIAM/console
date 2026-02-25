@@ -6,7 +6,7 @@
  
 package com.soffid.iam.sync.intf;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 public interface NetworkMgr extends java.rmi.Remote {
   /** Actualizar el inventario de redes

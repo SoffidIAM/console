@@ -1,0 +1,47 @@
+{
+  "class": "com.soffid.iam.reconcile.service.ReconcileService",
+  "methods": [
+    {"name":"isPendingTasks", "return":"boolean", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true},
+       {"name":"taskId","type":"java.lang.Long","required": true}    ]},
+    {"name":"addUser", "return":"com.soffid.iam.iga.api.ReconcileAccount", "arguments":[
+       {"name":"userInfo","type":"com.soffid.iam.iga.api.ReconcileAccount","required": true}    ]},
+    {"name":"findReconAccountById", "return":"com.soffid.iam.iga.api.ReconcileAccount", "arguments":[
+       {"name":"accountId","type":"java.lang.Long","required": true}    ]},
+    {"name":"addAssignment", "return":"com.soffid.iam.iga.api.ReconcileAssignment", "arguments":[
+       {"name":"assignmentInfo","type":"com.soffid.iam.iga.api.ReconcileAssignment","required": true}    ]},
+    {"name":"findReconAssignmentById", "return":"com.soffid.iam.iga.api.ReconcileAssignment", "arguments":[
+       {"name":"assignId","type":"java.lang.Long","required": true}    ]},
+    {"name":"addRole", "return":"com.soffid.iam.iga.api.ReconcileRole", "arguments":[
+       {"name":"roleInfo","type":"com.soffid.iam.iga.api.ReconcileRole","required": true}    ]},
+    {"name":"findReconRoleById", "return":"com.soffid.iam.iga.api.ReconcileRole", "arguments":[
+       {"name":"roleId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findAllReconAccounts", "return":"java.util.List<com.soffid.iam.iga.api.ReconcileAccount>", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findAllReconAssignment", "return":"java.util.List<com.soffid.iam.iga.api.ReconcileAssignment>", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"findAllReconRole", "return":"java.util.List<com.soffid.iam.iga.api.ReconcileRole>", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"createReconcileTask", "return":"void", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true},
+       {"name":"dispatcher","type":"java.lang.String","required": true}    ]},
+    {"name":"reconcileAssignment", "return":"void", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"reconcileData", "return":"void", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"reconcileRoles", "return":"void", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"reconcileUsers", "return":"void", "arguments":[
+       {"name":"processId","type":"java.lang.Long","required": true}    ]},
+    {"name":"updateAssignment", "return":"void", "arguments":[
+       {"name":"assignInfo","type":"com.soffid.iam.iga.api.ReconcileAssignment","required": true}    ]},
+    {"name":"updateRole", "return":"void", "arguments":[
+       {"name":"roleInfo","type":"com.soffid.iam.iga.api.ReconcileRole","required": true}    ]},
+    {"name":"updateUser", "return":"void", "arguments":[
+       {"name":"userInfo","type":"com.soffid.iam.iga.api.ReconcileAccount","required": true}    ]},
+    {"name":"validateReconcileAccount", "return":"void", "arguments":[
+       {"name":"accountinfo","type":"com.soffid.iam.iga.api.ReconcileAccount","required": true}    ]},
+    {"name":"validateReconcileRole", "return":"void", "arguments":[
+       {"name":"roleInfo","type":"com.soffid.iam.iga.api.ReconcileRole","required": true}    ]}
+  ]
+}

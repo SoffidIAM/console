@@ -1,0 +1,67 @@
+{
+  "class": "com.soffid.iam.base.service.AdditionalDataService",
+  "methods": [
+    {"name":"getAccessLevel", "return":"com.soffid.iam.base.api.AccountAccessLevelEnum", "arguments":[
+       {"name":"type","type":"com.soffid.iam.iga.api.CustomObjectType","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.base.api.DataType", "arguments":[
+       {"name":"tipusDada","type":"com.soffid.iam.base.api.DataType","required": true}    ]},
+    {"name":"findSystemDataType", "return":"com.soffid.iam.base.api.DataType", "arguments":[
+       {"name":"system","type":"java.lang.String","required": true},
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"findDataTypeByName", "return":"com.soffid.iam.base.api.DataType", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.base.api.DataType", "arguments":[
+       {"name":"tipusDada","type":"com.soffid.iam.base.api.DataType","required": true}    ]},
+    {"name":"create", "return":"com.soffid.iam.base.api.UserData", "arguments":[
+       {"name":"dadaUsuari","type":"com.soffid.iam.base.api.UserData","required": true}    ]},
+    {"name":"update", "return":"com.soffid.iam.base.api.UserData", "arguments":[
+       {"name":"dadaUsuari","type":"com.soffid.iam.base.api.UserData","required": true}    ]},
+    {"name":"createCustomObjectType", "return":"com.soffid.iam.iga.api.CustomObjectType", "arguments":[
+       {"name":"obj","type":"com.soffid.iam.iga.api.CustomObjectType","required": true}    ]},
+    {"name":"findCustomObjectTypeByName", "return":"com.soffid.iam.iga.api.CustomObjectType", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"updateCustomObjectType", "return":"com.soffid.iam.iga.api.CustomObjectType", "arguments":[
+       {"name":"obj","type":"com.soffid.iam.iga.api.CustomObjectType","required": true}    ]},
+    {"name":"findExtensibleObjectRegister", "return":"com.soffid.iam.iga.api.ExtensibleObjectRegister", "arguments":[
+       {"name":"name","type":"java.lang.String","required": true}    ]},
+    {"name":"findCustomObjectType", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.iga.api.CustomObjectType>", "arguments":[
+       {"name":"query","type":"com.soffid.zkdb.api.Query","required":false}    ]},
+    {"name":"findDataTypes", "comments":"Retrieves the not builtin attributes", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"scope","type":"com.soffid.iam.base.api.MetadataScope","required": true}    ]},
+    {"name":"findDataTypes2", "comments":"Retrieves the bultin and not builtin attributes", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"scope","type":"com.soffid.iam.base.api.MetadataScope","required": true}    ]},
+    {"name":"findDataTypesByObjectTypeAndName", "comments":"Retrieves the not builtin attributes", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"objectType","type":"java.lang.String","required": true},
+       {"name":"codi","type":"java.lang.String","required":false}    ]},
+    {"name":"findDataTypesByObjectTypeAndName2", "comments":"Retrieves the bultin and not builtin attributes", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"objectType","type":"java.lang.String","required": true},
+       {"name":"codi","type":"java.lang.String","required":false}    ]},
+    {"name":"findDataTypesByName", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"codi","type":"java.lang.String","required": true}    ]},
+    {"name":"findDataTypesByScopeAndName", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"scope","type":"com.soffid.iam.base.api.MetadataScope","required":false},
+       {"name":"codi","type":"java.lang.String","required":false}    ]},
+    {"name":"getDataTypes", "return":"java.util.Collection<com.soffid.iam.base.api.DataType>", "arguments":[
+    ]},
+    {"name":"findExtensibleObjectRegisters", "return":"java.util.List<com.soffid.iam.iga.api.ExtensibleObjectRegister>", "arguments":[
+    ]},
+    {"name":"findSystemDataTypes", "comments":"Retrieves the not builtin attributes", "return":"java.util.List<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"system","type":"java.lang.String","required": true}    ]},
+    {"name":"findSystemDataTypes2", "comments":"Retrieves the bultin and not builtin attributes", "return":"java.util.List<com.soffid.iam.base.api.DataType>", "arguments":[
+       {"name":"system","type":"java.lang.String","required": true}    ]},
+    {"name":"getGenAIMetadata", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"engine","type":"java.lang.String","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"tipusDada","type":"com.soffid.iam.base.api.DataType","required": true}    ]},
+    {"name":"delete", "return":"void", "arguments":[
+       {"name":"dadaUsuari","type":"com.soffid.iam.base.api.UserData","required": true}    ]},
+    {"name":"deleteCustomObjectType", "return":"void", "arguments":[
+       {"name":"obj","type":"com.soffid.iam.iga.api.CustomObjectType","required": true}    ]},
+    {"name":"registerExtensibleObject", "return":"void", "arguments":[
+       {"name":"register","type":"com.soffid.iam.iga.api.ExtensibleObjectRegister","required": true}    ]},
+    {"name":"registerStandardObject", "return":"void", "arguments":[
+       {"name":"resourceName","type":"java.lang.String","required": true},
+       {"name":"scope","type":"com.soffid.iam.base.api.MetadataScope","required":false},
+       {"name":"reset","type":"boolean","required": true}    ]}
+  ]
+}

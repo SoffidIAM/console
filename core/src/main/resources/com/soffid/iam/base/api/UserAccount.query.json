@@ -1,0 +1,9 @@
+{
+  "hibernateClass": "com.soffid.iam.base.model.UserAccountEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"user", "hibernateName":"user"},
+    {"name":"createdOn", "hibernateName":"createdOn"}
+  ]
+}

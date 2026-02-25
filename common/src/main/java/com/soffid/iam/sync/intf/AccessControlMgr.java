@@ -1,6 +1,6 @@
 package com.soffid.iam.sync.intf;
 
-import es.caib.seycon.ng.exception.InternalErrorException;
+import com.soffid.iam.exception.InternalErrorException;
 
 /**
  * Gestiona els accessos dels usuaris a les bases de dades mitjançant un trigger

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   (c) Soffid 2012 
+   This file is licensed under GPL v3 license terms 
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-cascade='none' >
+	<class name = 'com.soffid.iam.am.model.HostEntityImpl' dynamic-insert='false' dynamic-update='false' table='SC_MAQUIN' >
+		<id name='id' type='java.lang.Long' unsaved-value='null'>
+			<column name='MAQ_ID'/>
+			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
+		</id>
+		<property name='name' type='java.lang.String'>
+			<column name='MAQ_NOM' not-null='true' length='75' />
+		</property>
+		<property name='ip' type='java.lang.String'>
+			<column name='MAQ_ADRIP' not-null='false' length='60' />
+		</property>
+		<property name='description' type='java.lang.String'>
+			<column name='MAQ_DESCRI' not-null='false' length='250' />
+		</property>
+		<property name='dhcp' type='java.lang.String'>
+			<column name='MAQ_PARDHC' not-null='false' length='150' />
+		</property>
+		<property name='mail' type='java.lang.Boolean'>
+			<column name='MAQ_MAIL' not-null='true' length='1' />
+		</property>
+		<property name='folders' type='java.lang.Boolean'>
+			<column name='MAQ_FOLDER' not-null='true' length='1' />
+		</property>
+		<set name='userProfiles' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_USUARI_USU_IDMAPR'>
+				<column name='USU_IDMAPR'/>
+			</key>
+			<one-to-many class='com.soffid.iam.base.model.UserEntityImpl'/>
+		</set>
+		<set name='printers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_IMPRES_IMP_IDMAQ'>
+				<column name='IMP_IDMAQ'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.PrinterEntityImpl'/>
+		</set>
+		<many-to-one name='network' class='com.soffid.iam.am.model.NetworkEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_MAQUIN_MAQ_IDXAR'>
+			<column name='MAQ_IDXAR' not-null='false'/>
+		</many-to-one>
+		<property name='printersServer' type='java.lang.Boolean'>
+			<column name='MAQ_PRINTER' not-null='true' length='1' />
+		</property>
+		<property name='mac' type='java.lang.String'>
+			<column name='MAQ_ADRMAC' not-null='false' length='25' />
+		</property>
+		<set name='hostAlias' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQUINALIAS_MAL_MAQID'>
+				<column name='MAL_MAQID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.iga.model.HostAliasEntityImpl'/>
+		</set>
+		<set name='administratorAuthorizationAccess' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_ADMMAQ_ADM_MAQID'>
+				<column name='ADM_MAQID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostAdminEntityImpl'/>
+		</set>
+		<property name='administratorUser' type='java.lang.String'>
+			<column name='MAQ_USUADM' not-null='false' length='50' />
+		</property>
+		<property name='administratorPassword' type='java.lang.String'>
+			<column name='MAQ_CONTRA' not-null='false' length='150' />
+		</property>
+		<property name='administratorPasswordDate' type='java.util.Date'>
+			<column name='MAQ_DATCON' not-null='false' />
+		</property>
+		<property name='serialNumber' type='java.lang.String'>
+			<column name='MAQ_SERIAL' not-null='false' length='255' />
+		</property>
+		<property name='dynamicIp' type='java.lang.Boolean'>
+			<column name='MAQ_DYNIP' not-null='false' />
+		</property>
+		<property name='lastSeen' type='java.util.Date'>
+			<column name='MAQ_LASTSEEN' not-null='false' />
+		</property>
+		<property name='created' type='java.util.Date'>
+			<column name='MAQ_CREATED' not-null='false' />
+		</property>
+		<property name='deleted' type='java.lang.Boolean'>
+			<column name='MAQ_DELETED' not-null='false' />
+		</property>
+		<property name='locked' type='java.lang.Boolean'>
+			<column name='MAQ_LOCKED' not-null='false' />
+		</property>
+		<many-to-one name='operatingSystem' class='com.soffid.iam.am.model.OsTypeEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_MAQUIN_MAQ_OST_ID'>
+			<column name='MAQ_OST_ID' not-null='false'/>
+		</many-to-one>
+		<many-to-one name='tenant' class='com.soffid.iam.base.model.TenantEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_MAQUIN_MAQ_TEN_ID'>
+			<column name='MAQ_TEN_ID' not-null='true'/>
+		</many-to-one>
+		<set name='browsers' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_BROWSE_BRO_MAQ_ID'>
+				<column name='BRO_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.BrowserEntityImpl'/>
+		</set>
+		<set name='attributes' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_HOSATT_HAT_MAQ_ID'>
+				<column name='HAT_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.HostAttributeEntityImpl'/>
+		</set>
+		<set name='entryPoints' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQPUE_MAP_MAQ_ID'>
+				<column name='MAP_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.am.model.HostEntryPointEntityImpl'/>
+		</set>
+		<set name='ports' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQPOR_MPO_MAQ_ID'>
+				<column name='MPO_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostPortEntityImpl'/>
+		</set>
+		<set name='services' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQSER_MAS_MAQ_ID'>
+				<column name='MAS_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostServiceEntityImpl'/>
+		</set>
+		<set name='systems' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_MAQDIS_MAD_MAQ_ID'>
+				<column name='MAD_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.pam.model.HostSystemEntityImpl'/>
+		</set>
+		<set name='events' lazy='true' fetch='select' inverse='true'>
+			<key foreign-key='SC_HOSEVE_HVE_MAQ_ID'>
+				<column name='HVE_MAQ_ID'/>
+			</key>
+			<one-to-many class='com.soffid.iam.rc.model.IssueHostEntityImpl'/>
+		</set>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='MAQ_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='MAQ_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='MAQ_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='MAQ_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='MAQ_DELUSE' not-null='false' />
+		</property>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='MAQ_START' not-null='false' />
+		</property>
+	</class>
+</hibernate-mapping>

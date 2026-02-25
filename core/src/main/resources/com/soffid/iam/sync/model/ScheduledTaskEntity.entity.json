@@ -1,0 +1,8 @@
+{
+  "joins": [
+    {"name":"handler","targetClass":"com.soffid.iam.sync.model.ScheduledTaskHandlerEntity","multiple":false,"reverse":"tasks"},
+    {"name":"server","targetClass":"com.soffid.iam.sync.model.ServerEntity","multiple":false,"reverse":"scheduledTasks"},
+    {"name":"tenant","targetClass":"com.soffid.iam.base.model.TenantEntity","multiple":false},
+    {"name":"logs","targetClass":"com.soffid.iam.sync.model.ScheduledTaskLogEntity","multiple":true,"reverse":"task"}
+  ]
+}

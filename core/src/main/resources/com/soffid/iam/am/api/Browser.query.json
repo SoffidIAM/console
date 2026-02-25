@@ -1,0 +1,26 @@
+{
+  "hibernateClass": "com.soffid.iam.am.model.BrowserEntity",
+  "start": "createdOn",
+  "tenantFilter": "tenant.id",
+  "attributes": [
+    {"name":"id", "hibernateName":"id"},
+    {"name":"serialNumber", "hibernateName":"serialNumber"},
+    {"name":"deviceType", "hibernateName":"deviceType"},
+    {"name":"operatingSystem", "hibernateName":"operatingSystem"},
+    {"name":"browser", "hibernateName":"browser"},
+    {"name":"cpu", "hibernateName":"cpu"},
+    {"name":"ip", "hibernateName":"ip"},
+    {"name":"lastUser",  "hibernateName":"lastUser.userName"},
+    {"name":"hostName",  "hibernateName":"host.name"},
+    {"name":"lastSeen", "hibernateName":"lastSeen"},
+    {"name":"created", "hibernateName":"created"},
+    {"name":"deleted", "hibernateName":"deleted"},
+    {"name":"locked", "hibernateName":"locked"},
+    {"name":"createdOn", "hibernateName":"createdOn"},
+    {"name":"createdBy", "hibernateName":"createdBy"},
+    {"name":"updatedOn", "hibernateName":"updatedOn"},
+    {"name":"updatedBy", "hibernateName":"updatedBy"},
+    {"name":"deletedOn", "hibernateName":"deletedOn"},
+    {"name":"deletedBy", "hibernateName":"deletedBy"}
+  ]
+}

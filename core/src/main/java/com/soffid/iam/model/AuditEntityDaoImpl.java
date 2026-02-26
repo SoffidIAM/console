@@ -208,6 +208,8 @@ public class AuditEntityDaoImpl extends
 					outputStream.write(Integer.toString(buf.length).getBytes());
 					outputStream.write(32);
 					outputStream.write(buf);
+					outputStream.flush();
+					Thread.sleep(100);
 					s.close();
 				} catch (Exception e) {
 					log.warn("Error sending syslog message: "+SoffidStackTrace.generateShortDescription(e));
@@ -229,6 +231,8 @@ public class AuditEntityDaoImpl extends
 						outputStream.write(buf);
 						outputStream.write(10);
 					}
+					outputStream.flush();
+					Thread.sleep(100);
 					s.close();
 				} catch (Exception e) {
 					log.warn("Error sending syslog message: "+SoffidStackTrace.generateShortDescription(e));

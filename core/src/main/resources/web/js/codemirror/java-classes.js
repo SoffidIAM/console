@@ -4234,6 +4234,7 @@ CodeMirrorJavaTypes["com.soffid.iam.sync.service.ServerService"]={
 	"reverseTranslate2":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
 	"translate2":"java.util.Collection<com.soffid.iam.iga.api.AttributeTranslation>",
 	"getAddonList":"java.util.List<java.lang.String>",
+	"findActiveDirectoryDomains":"java.util.Map<java.lang.String,java.lang.String>",
 	"getUserAttributes":"java.util.Map<java.lang.String,java.lang.Object>",
 	"propagateOBUser":"java.util.Map",
 	"getMyConfig":"java.util.Properties",

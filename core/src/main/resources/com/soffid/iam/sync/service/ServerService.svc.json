@@ -176,6 +176,8 @@
        {"name":"column1","type":"java.lang.String","required": true}    ]},
     {"name":"getAddonList", "return":"java.util.List<java.lang.String>", "arguments":[
     ]},
+    {"name":"findActiveDirectoryDomains", "return":"java.util.Map<java.lang.String,java.lang.String>", "arguments":[
+    ]},
     {"name":"getUserAttributes", "return":"java.util.Map<java.lang.String,java.lang.Object>", "arguments":[
        {"name":"userId","type":"long","required": true}    ]},
     {"name":"propagateOBUser", "return":"java.util.Map", "arguments":[

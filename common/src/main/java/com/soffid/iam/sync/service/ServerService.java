@@ -754,6 +754,14 @@ public interface ServerService {
 			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation findActiveDirectoryDomains
+
+	 * @return 
+	 */
+	java.util.Map<java.lang.String,java.lang.String> findActiveDirectoryDomains()
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation getUserAttributes
 
 	 * @param userId 

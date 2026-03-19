@@ -3,6 +3,7 @@ com.soffid.iam.am.api.AccessTree
 com.soffid.iam.am.api.Browser
 com.soffid.iam.am.api.Host
 com.soffid.iam.am.api.Network
+com.soffid.iam.am.api.PasswordPolicy
 com.soffid.iam.am.api.VaultFolder
 com.soffid.iam.base.api.Account
 com.soffid.iam.base.api.Configuration

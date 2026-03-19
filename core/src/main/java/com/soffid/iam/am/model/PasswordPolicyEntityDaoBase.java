@@ -245,6 +245,12 @@ public abstract class PasswordPolicyEntityDaoBase
 		target.setValidationScript(source.getValidationScript());
 		target.setValidationScriptDescription(source.getValidationScriptDescription());
 		target.setCheckPasswordBreached(java.lang.Boolean.TRUE.equals(source.getCheckPasswordBreached()));
+		target.setCreatedOn(source.getCreatedOn());
+		target.setCreatedBy(source.getCreatedBy());
+		target.setUpdatedOn(source.getUpdatedOn());
+		target.setUpdatedBy(source.getUpdatedBy());
+		target.setDeletedOn(source.getDeletedOn());
+		target.setDeletedBy(source.getDeletedBy());
 	}
 
 	/**
@@ -375,6 +381,30 @@ public abstract class PasswordPolicyEntityDaoBase
 			target.setValidationScriptDescription(source.getValidationScriptDescription());
 		}
 		target.setCheckPasswordBreached(new java.lang.Boolean(source.isCheckPasswordBreached()));
+		if (copyIfNull || source.getCreatedOn() != null)
+		{
+			target.setCreatedOn(source.getCreatedOn());
+		}
+		if (copyIfNull || source.getCreatedBy() != null)
+		{
+			target.setCreatedBy(source.getCreatedBy());
+		}
+		if (copyIfNull || source.getUpdatedOn() != null)
+		{
+			target.setUpdatedOn(source.getUpdatedOn());
+		}
+		if (copyIfNull || source.getUpdatedBy() != null)
+		{
+			target.setUpdatedBy(source.getUpdatedBy());
+		}
+		if (copyIfNull || source.getDeletedOn() != null)
+		{
+			target.setDeletedOn(source.getDeletedOn());
+		}
+		if (copyIfNull || source.getDeletedBy() != null)
+		{
+			target.setDeletedBy(source.getDeletedBy());
+		}
 	}
 
 	/**
@@ -445,6 +475,10 @@ public abstract class PasswordPolicyEntityDaoBase
 				"PasswordPolicyEntityDao.create - 'entity' can not be null");
 		}
 
+		entity.setCreatedOn(new java.util.Date());
+		entity.setCreatedBy(com.soffid.iam.utils.Security.getCurrentAccount());
+		entity.setUpdatedOn(new java.util.Date());
+		entity.setUpdatedBy(com.soffid.iam.utils.Security.getCurrentAccount());
 		this.getHibernateTemplate().save(entity);
 		this.getHibernateTemplate().flush();
 	}
@@ -459,6 +493,8 @@ public abstract class PasswordPolicyEntityDaoBase
 			throw new IllegalArgumentException(
 				"PasswordPolicyEntityDao.update - 'entity' can not be null");
 		}
+		entity.setUpdatedOn(new java.util.Date());
+		entity.setUpdatedBy(com.soffid.iam.utils.Security.getCurrentAccount());
 		this.getHibernateTemplate().update(entity);
 		this.getHibernateTemplate().flush();
 	}

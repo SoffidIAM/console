@@ -594,6 +594,12 @@
 		<column name='PCD_PACHSC' type='CLOB' length='5000' notNull='false'/>
 		<column name='PCD_PACHDE' type='VARCHAR' length='256' notNull='false'/>
 		<column name='PCD_BREACH' type='BIT' notNull='true'/>
+		<column name='PCD_CREDAT' type='DATE' notNull='false'/>
+		<column name='PCD_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PCD_UPDDAT' type='DATE' notNull='false'/>
+		<column name='PCD_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='PCD_DELDAT' type='DATE' notNull='false'/>
+		<column name='PCD_DELUSE' type='VARCHAR' length='256' notNull='false'/>
 	</table>
 	<foreignKey name='SC_POCODO_FK_PCD_TUS_ID' table='SC_POCODO' foreignTable='SC_TIPUSU'> 
 		<column name='PCD_TUS_ID'/>

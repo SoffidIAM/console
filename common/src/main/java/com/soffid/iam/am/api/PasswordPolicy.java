@@ -78,60 +78,70 @@ public class PasswordPolicy
 
 	/**
 	 * Attribute minimumUppercase
+	 * Minimum number of uppercase letters
 
 	 */
 	private java.lang.Long minimumUppercase;
 
 	/**
 	 * Attribute maximumUppercase
+	 * Maximum number of uppercase letters
 
 	 */
 	private java.lang.Long maximumUppercase;
 
 	/**
 	 * Attribute minimumLowercase
+	 * Minimum number of lowercase letters
 
 	 */
 	private java.lang.Long minimumLowercase;
 
 	/**
 	 * Attribute maximumLowercase
+	 * Maximum number of lowercase letters
 
 	 */
 	private java.lang.Long maximumLowercase;
 
 	/**
 	 * Attribute minimumNumbers
+	 * Minimum number of numbers
 
 	 */
 	private java.lang.Long minimumNumbers;
 
 	/**
 	 * Attribute maximumNumbers
+	 * Minimum number of numbers
 
 	 */
 	private java.lang.Long maximumNumbers;
 
 	/**
 	 * Attribute minimumSymbols
+	 * Minimum number of non alphanumeric symbols
 
 	 */
 	private java.lang.Long minimumSymbols;
 
 	/**
 	 * Attribute maximumSymbols
+	 * Maximum number of non alphanumeric symbols
 
 	 */
 	private java.lang.Long maximumSymbols;
 
 	/**
 	 * Attribute maximumHistorical
+	 * The password should not be the same as any of the previous ones. This field contains the number of old passwords to check
 
 	 */
 	private java.lang.Long maximumHistorical;
 
 	/**
 	 * Attribute userType
+	 * User type. The most comman values are I for internals and E for externals.
 
 	 */
 	private java.lang.String userType;
@@ -144,12 +154,14 @@ public class PasswordPolicy
 
 	/**
 	 * Attribute usersDomainCode
+	 * Users domain. Default value is DEFAULT
 
 	 */
 	private java.lang.String usersDomainCode;
 
 	/**
 	 * Attribute passwordDomainCode
+	 * Password domain. Default value is DEFAULT
 
 	 */
 	private java.lang.String passwordDomainCode;
@@ -203,16 +215,58 @@ public class PasswordPolicy
 
 	/**
 	 * Attribute checkPasswordBreached
-	 * Allows Soffid to check it the password has been breached if if has the network intelligence license active
+	 * Allows Soffid to check it the password has been breached. Prevens user to use compromised credentials.
 
 	 */
 	private boolean checkPasswordBreached;
+
+	/**
+	 * Attribute createdOn
+
+
+	 */
+	private java.util.Date createdOn;
+
+	/**
+	 * Attribute createdBy
+
+
+	 */
+	private java.lang.String createdBy;
+
+	/**
+	 * Attribute updatedOn
+
+
+	 */
+	private java.util.Date updatedOn;
+
+	/**
+	 * Attribute updatedBy
+
+
+	 */
+	private java.lang.String updatedBy;
+
+	/**
+	 * Attribute deletedOn
+
+
+	 */
+	private java.util.Date deletedOn;
+
+	/**
+	 * Attribute deletedBy
+
+
+	 */
+	private java.lang.String deletedBy;
 
 	public PasswordPolicy()
 	{
 	}
 
-	public PasswordPolicy(java.lang.Long id, java.lang.String description, java.lang.String type, java.lang.Long renewalTime, java.lang.Long maximumPeriod, java.lang.Long maximumPeriodExpired, java.lang.Long minimumPeriod, java.lang.Long minimumLength, java.lang.Long maximumLength, java.lang.String regularExpression, java.lang.Long minimumUppercase, java.lang.Long maximumUppercase, java.lang.Long minimumLowercase, java.lang.Long maximumLowercase, java.lang.Long minimumNumbers, java.lang.Long maximumNumbers, java.lang.Long minimumSymbols, java.lang.Long maximumSymbols, java.lang.Long maximumHistorical, java.lang.String userType, java.lang.String userTypeDescription, java.lang.String usersDomainCode, java.lang.String passwordDomainCode, java.lang.Integer maxFailures, java.lang.Integer unlockAfterSeconds, boolean allowPasswordQuery, boolean allowPasswordChange, boolean complexPasswords, java.lang.String validationScript, java.lang.String validationScriptDescription, boolean checkPasswordBreached)
+	public PasswordPolicy(java.lang.Long id, java.lang.String description, java.lang.String type, java.lang.Long renewalTime, java.lang.Long maximumPeriod, java.lang.Long maximumPeriodExpired, java.lang.Long minimumPeriod, java.lang.Long minimumLength, java.lang.Long maximumLength, java.lang.String regularExpression, java.lang.Long minimumUppercase, java.lang.Long maximumUppercase, java.lang.Long minimumLowercase, java.lang.Long maximumLowercase, java.lang.Long minimumNumbers, java.lang.Long maximumNumbers, java.lang.Long minimumSymbols, java.lang.Long maximumSymbols, java.lang.Long maximumHistorical, java.lang.String userType, java.lang.String userTypeDescription, java.lang.String usersDomainCode, java.lang.String passwordDomainCode, java.lang.Integer maxFailures, java.lang.Integer unlockAfterSeconds, boolean allowPasswordQuery, boolean allowPasswordChange, boolean complexPasswords, java.lang.String validationScript, java.lang.String validationScriptDescription, boolean checkPasswordBreached, java.util.Date createdOn, java.lang.String createdBy, java.util.Date updatedOn, java.lang.String updatedBy, java.util.Date deletedOn, java.lang.String deletedBy)
 	{
 		super();
 		this.id = id;
@@ -246,6 +300,12 @@ public class PasswordPolicy
 		this.validationScript = validationScript;
 		this.validationScriptDescription = validationScriptDescription;
 		this.checkPasswordBreached = checkPasswordBreached;
+		this.createdOn = createdOn;
+		this.createdBy = createdBy;
+		this.updatedOn = updatedOn;
+		this.updatedBy = updatedBy;
+		this.deletedOn = deletedOn;
+		this.deletedBy = deletedBy;
 	}
 
 	public PasswordPolicy(boolean allowPasswordQuery, boolean allowPasswordChange, boolean complexPasswords, boolean checkPasswordBreached)
@@ -259,7 +319,7 @@ public class PasswordPolicy
 
 	public PasswordPolicy(PasswordPolicy otherBean)
 	{
-		this(otherBean.id, otherBean.description, otherBean.type, otherBean.renewalTime, otherBean.maximumPeriod, otherBean.maximumPeriodExpired, otherBean.minimumPeriod, otherBean.minimumLength, otherBean.maximumLength, otherBean.regularExpression, otherBean.minimumUppercase, otherBean.maximumUppercase, otherBean.minimumLowercase, otherBean.maximumLowercase, otherBean.minimumNumbers, otherBean.maximumNumbers, otherBean.minimumSymbols, otherBean.maximumSymbols, otherBean.maximumHistorical, otherBean.userType, otherBean.userTypeDescription, otherBean.usersDomainCode, otherBean.passwordDomainCode, otherBean.maxFailures, otherBean.unlockAfterSeconds, otherBean.allowPasswordQuery, otherBean.allowPasswordChange, otherBean.complexPasswords, otherBean.validationScript, otherBean.validationScriptDescription, otherBean.checkPasswordBreached);
+		this(otherBean.id, otherBean.description, otherBean.type, otherBean.renewalTime, otherBean.maximumPeriod, otherBean.maximumPeriodExpired, otherBean.minimumPeriod, otherBean.minimumLength, otherBean.maximumLength, otherBean.regularExpression, otherBean.minimumUppercase, otherBean.maximumUppercase, otherBean.minimumLowercase, otherBean.maximumLowercase, otherBean.minimumNumbers, otherBean.maximumNumbers, otherBean.minimumSymbols, otherBean.maximumSymbols, otherBean.maximumHistorical, otherBean.userType, otherBean.userTypeDescription, otherBean.usersDomainCode, otherBean.passwordDomainCode, otherBean.maxFailures, otherBean.unlockAfterSeconds, otherBean.allowPasswordQuery, otherBean.allowPasswordChange, otherBean.complexPasswords, otherBean.validationScript, otherBean.validationScriptDescription, otherBean.checkPasswordBreached, otherBean.createdOn, otherBean.createdBy, otherBean.updatedOn, otherBean.updatedBy, otherBean.deletedOn, otherBean.deletedBy);
 	}
 
 	/**
@@ -711,6 +771,90 @@ public class PasswordPolicy
 	}
 
 	/**
+	 * Gets value for attribute createdOn
+	 */
+	public java.util.Date getCreatedOn() {
+		return this.createdOn;
+	}
+
+	/**
+	 * Sets value for attribute createdOn
+	 */
+	public void setCreatedOn(java.util.Date createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	/**
+	 * Gets value for attribute createdBy
+	 */
+	public java.lang.String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	/**
+	 * Sets value for attribute createdBy
+	 */
+	public void setCreatedBy(java.lang.String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	/**
+	 * Gets value for attribute updatedOn
+	 */
+	public java.util.Date getUpdatedOn() {
+		return this.updatedOn;
+	}
+
+	/**
+	 * Sets value for attribute updatedOn
+	 */
+	public void setUpdatedOn(java.util.Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+
+	/**
+	 * Gets value for attribute updatedBy
+	 */
+	public java.lang.String getUpdatedBy() {
+		return this.updatedBy;
+	}
+
+	/**
+	 * Sets value for attribute updatedBy
+	 */
+	public void setUpdatedBy(java.lang.String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	/**
+	 * Gets value for attribute deletedOn
+	 */
+	public java.util.Date getDeletedOn() {
+		return this.deletedOn;
+	}
+
+	/**
+	 * Sets value for attribute deletedOn
+	 */
+	public void setDeletedOn(java.util.Date deletedOn) {
+		this.deletedOn = deletedOn;
+	}
+
+	/**
+	 * Gets value for attribute deletedBy
+	 */
+	public java.lang.String getDeletedBy() {
+		return this.deletedBy;
+	}
+
+	/**
+	 * Sets value for attribute deletedBy
+	 */
+	public void setDeletedBy(java.lang.String deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+
+	/**
 	 * Returns a string representation of the value object.
 	 */
 	public String toString()
@@ -779,6 +923,18 @@ public class PasswordPolicy
 		b.append (this.validationScriptDescription);
 		b.append (", checkPasswordBreached: ");
 		b.append (this.checkPasswordBreached);
+		b.append (", createdOn: ");
+		b.append (this.createdOn);
+		b.append (", createdBy: ");
+		b.append (this.createdBy);
+		b.append (", updatedOn: ");
+		b.append (this.updatedOn);
+		b.append (", updatedBy: ");
+		b.append (this.updatedBy);
+		b.append (", deletedOn: ");
+		b.append (this.deletedOn);
+		b.append (", deletedBy: ");
+		b.append (this.deletedBy);
 		b.append ("]");
 		return b.toString();
 	}

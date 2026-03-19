@@ -480,7 +480,13 @@ CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordPolicy"]={
 	"complexPasswords":"boolean",
 	"validationScript":"java.lang.String",
 	"validationScriptDescription":"java.lang.String",
-	"checkPasswordBreached":"boolean"
+	"checkPasswordBreached":"boolean",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
 };
 CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordPolicyForbbidenWord"]={
 	"id":"java.lang.Long",

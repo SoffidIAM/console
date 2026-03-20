@@ -262,7 +262,7 @@ public class LoginServiceImpl implements LoginService {
     	String holderGroup = null;
     	
     	if (isHolderGroup(user.getPrimaryGroup())) {
-    		holderGroup = user.getPrimaryGroup();
+//    		holderGroup = user.getPrimaryGroup();
 			List<Long> groupIds = new LinkedList<Long>();
 			List<String> groups = getUserGroups (acc, user.getPrimaryGroup(), groupIds);
 			List<Long> accountIds = getAccounts(acc, user);
@@ -284,7 +284,7 @@ public class LoginServiceImpl implements LoginService {
     	
 		for (GroupUser ug: ServiceLocator.instance().getGroupService().findUsersGroupByUserName(user.getUserName())) {
     		if (!r.containsKey(ug.getGroup()) && isHolderGroup(ug.getGroup())) {
-    			if (holderGroup == null) holderGroup = ug.getGroup();
+//    			if (holderGroup == null) holderGroup = ug.getGroup();
     			List<Long> groupIds = new LinkedList<Long>();
     			List<String> groups = getUserGroups (acc, ug.getGroup(), groupIds);
     			List<Long> accountIds = getAccounts(acc, user);

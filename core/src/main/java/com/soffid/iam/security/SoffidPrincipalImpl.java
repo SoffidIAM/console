@@ -273,10 +273,7 @@ public class SoffidPrincipalImpl extends GenericPrincipal implements SoffidPrinc
 			// UpdateHolderGroups
 			updateHolderGroups(acc);
 			if (! holderGroups.contains(holderGroup)) {
-				if (holderGroups.isEmpty())
-					holderGroup = null;
-				else
-					holderGroup = holderGroups.get(0);
+				holderGroup = null;
 			}
 
 			// Update authorizations

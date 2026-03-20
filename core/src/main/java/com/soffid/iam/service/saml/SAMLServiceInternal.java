@@ -281,11 +281,15 @@ public class SAMLServiceInternal {
 
 		for ( EncryptedAssertion encryptedAssertion: saml2Response.getEncryptedAssertions())
 		{
-			Assertion assertion = decrypt (encryptedAssertion);
 			if (debug()) {
 				log.info("Encrypted assertion:\n" + marshall(assertion));
 			}
-			if (validateAssertion(tenantName, assertion, responseSigned))
+			Assertion assertion = decrypt (encryptedAssertion);
+			if (!assertion.isSigned() && !saml2Response.isSigned()) {
+				log.info("Neither response or assertions are signed");
+				result.setFailureReason("Neither response or assertion are signed. Signature is required");
+			} 
+			else if (validateAssertion(tenantName, assertion, responseSigned))
 			{
 				log.info("Encrypted assertion is valid");
 				return createAuthenticationRecord(tenantName, requestEntity, assertion);
@@ -293,7 +297,11 @@ public class SAMLServiceInternal {
 		}
 		for ( Assertion assertion: saml2Response.getAssertions())
 		{
-			if (validateAssertion(tenantName, assertion, responseSigned))
+			if (!assertion.isSigned() && !saml2Response.isSigned()) {
+				log.info("Neither response or assertions are signed");
+				result.setFailureReason("Neither response or assertion are signed. Signature is required");
+			}
+			else if (validateAssertion(tenantName, assertion, responseSigned))
 			{
 				log.info("Encrypted assertion is valid");
 				return createAuthenticationRecord(tenantName, requestEntity, assertion);

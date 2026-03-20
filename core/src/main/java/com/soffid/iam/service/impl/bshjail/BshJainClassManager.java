@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.soffid.iam.interp.SoffidClassFilter;
 import com.soffid.iam.utils.Security;
 
 import es.caib.seycon.ng.ServiceLocator;
@@ -60,6 +61,9 @@ public class BshJainClassManager extends BshClassManager {
 
 	private boolean isAllowed(String name) {
 		if (disabled) return true;
+		
+		if ("true".equals(System.getenv("SECURE_SCRIPT"))) 
+			return new SoffidClassFilter().exposeToScripts(name);
 		
 		if (name.equals("java.lang.Class"))
 			return false;

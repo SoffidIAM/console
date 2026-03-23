@@ -954,8 +954,10 @@ public class SAMLServiceInternal {
     	org.opensaml.saml.common.assertion.ValidationContext ctx = new ValidationContext(params);
 
     	ValidationResult result = validator.validate(assertion, ctx);
-		if (result != ValidationResult.VALID)
+		if (result != ValidationResult.VALID) {
 			log.info("Error validating Assertion: "+ctx.getValidationFailureMessage());
+			return false;
+		}
 		
 		if ( ! validDate (assertion.getIssueInstant()))
 			return false;
@@ -1054,8 +1056,10 @@ public class SAMLServiceInternal {
     	org.opensaml.saml.common.assertion.ValidationContext ctx = new ValidationContext();
     	
 		ValidationResult result = validator.validate(assertion, ctx);
-		if (result != ValidationResult.VALID)
+		if (result != ValidationResult.VALID) {
 			log.info("Error validating SAML message: "+ctx.getValidationFailureMessage());
+			return false;
+		}
 		
 		if ( ! validDate (assertion.getIssueInstant()))
 			return false;

@@ -54,7 +54,9 @@ public class SamlDataModel extends SimpleDataNode {
 				c.samlMethod = "true".equals(ConfigurationCache.getProperty("soffid.auth.saml"));
 				c.samlDebug =  ! "false".equals( ConfigurationCache.getProperty("soffid.saml.debug"));
 				c.principalAttribute = ConfigurationCache.getProperty("soffid.saml.principalAttribute");
-				c.trustedAuthentication = "true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"));
+				c.trustedAuthentication = ConfigurationCache.getProperty("soffid.auth.trustedLogin");
+				if (c.trustedAuthentication == null)
+					c.trustedAuthentication = "true";
 				c.alwaysTrust = "true".equals(ConfigurationCache.getProperty("soffid.saml.metadata.alwaysTrust"));
 				c.metadata = ConfigurationCache.getProperty("soffid.saml.metadata.url");
 				c.hostName = ConfigurationCache.getProperty("soffid.externalURL");

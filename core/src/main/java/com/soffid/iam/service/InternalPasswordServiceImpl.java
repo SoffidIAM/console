@@ -942,89 +942,92 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		if (ppe == null)
 			return PasswordValidation.PASSWORD_WRONG;
 		
+		String trustedLogins = ConfigurationCache.getProperty("soffid.auth.trustedLogin");
 		PasswordEntity lastContra = null;
 		for (PasswordEntity contra : getPasswordEntityDao().findLastByUserDomain(user, passwordDomain)) {
 			if (contra != null && (contra.getActive().equals("S") || contra.getActive().equals("N") //$NON-NLS-1$
 					|| contra.getActive().equals("E"))) {
 				lastContra = contra;
-				if ( isLocked (contra, ppe)) {
-					log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Password is temporarily locked");
-					if (checkTrusted) updateFailures (contra, account, ppe);
-					return PasswordValidation.PASSWORD_WRONG;
-				}
-				if ( isRightPassword(password, contra) ) {
-					if (debugPasswords()) {
-		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password matches");
-		            }				
-					if (new Date().before(contra.getExpirationDate())) {
-
-						UserEntity ue = getUsuari(account);
-						User u = getUserEntityDao().toUser(ue);
-						Account a = getAccountEntityDao().toAccount(account);
-						final long contraId = lastContra.getId();
-						SoffidPrincipal p = Security.getSoffidPrincipal();
-						new Thread( () -> {
-							Security.nestedLogin(p);
-							try {
-								getAsyncRunnerService().runTransaction( () -> {
-									try {
-										if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(a)) {
-											Boolean isBreached = ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword());
-											if (isBreached!=null && isBreached.booleanValue()) {
-
-												PasswordEntity pe = getPasswordEntityDao().load(contraId);
-												pe.setExpirationDate(new Date());
-												getPasswordEntityDao().update(pe);
-
-												AccountEntity ae = getAccountEntityDao().load(a.getId());
-												ae.setPasswordExpiration(new Date());
-												getAccountEntityDao().update(ae);
-
-												(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedExpired(u.getUserName(), a);
-											}
-										}
-									} catch(Exception e) {
-										log.warn("Error trying to check if a password has been breached: "+e);
-									}
-									return null;
-								});
-							} catch (InternalErrorException e) {
-								log.warn("Error when checking if a password has been breached", e);
-							} finally {
-								Security.nestedLogoff();
-							}
-						}).start();
-
-						if (debugPasswords()) 
-			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD");
-						if (account == null)
-							updateAccountLastLogin(user, passwordDomain);
-						else { 
-							Date ll = account.getLastLogin();
-							if (ll == null || 
-									System.currentTimeMillis() - ll.getTime() > 600_000) {
-								getAsyncRunnerService().runNewTransaction(() -> {
-									getAccountEntityDao().updateLastLogin(account);
-									return null;
-								});
-							}
-						}
-						resetFailures (contra, ppe);
-						return PasswordValidation.PASSWORD_GOOD;
-					} else if (checkExpired) {
-						if (debugPasswords()) 
-			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : EXPIRED");
-						resetFailures (contra, ppe);
-						return PasswordValidation.PASSWORD_GOOD_EXPIRED;
-					} else {
-						if (debugPasswords()) 
-			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName()+ " : WRONG (Expired)");
+				if ( ! "remote".equals(trustedLogins) || noTrustedSystem() ) {
+					if ( isLocked (contra, ppe)) {
+						log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Password is temporarily locked");
+						if (checkTrusted) updateFailures (contra, account, ppe);
 						return PasswordValidation.PASSWORD_WRONG;
 					}
-				} else {
-					if (debugPasswords()) {
-		            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password does not match "+hash(password.getPassword()));
-		            }				
+					if ( isRightPassword(password, contra) ) {
+						if (debugPasswords()) {
+			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password matches");
+			            }				
+						if (new Date().before(contra.getExpirationDate())) {
+	
+							UserEntity ue = getUsuari(account);
+							User u = getUserEntityDao().toUser(ue);
+							Account a = getAccountEntityDao().toAccount(account);
+							final long contraId = lastContra.getId();
+							SoffidPrincipal p = Security.getSoffidPrincipal();
+							new Thread( () -> {
+								Security.nestedLogin(p);
+								try {
+									getAsyncRunnerService().runTransaction( () -> {
+										try {
+											if (NetworkIntelligencePolicyCheckUtils.isCheckPasswordBreached(a)) {
+												Boolean isBreached = ServiceLocator.instance().getNetworkIntelligenceService().isPasswordBreached(password.getPassword());
+												if (isBreached!=null && isBreached.booleanValue()) {
+	
+													PasswordEntity pe = getPasswordEntityDao().load(contraId);
+													pe.setExpirationDate(new Date());
+													getPasswordEntityDao().update(pe);
+	
+													AccountEntity ae = getAccountEntityDao().load(a.getId());
+													ae.setPasswordExpiration(new Date());
+													getAccountEntityDao().update(ae);
+	
+													(new NetworkIntelligenceIssuesUtils()).openIssuePasswordBreachedExpired(u.getUserName(), a);
+												}
+											}
+										} catch(Exception e) {
+											log.warn("Error trying to check if a password has been breached: "+e);
+										}
+										return null;
+									});
+								} catch (InternalErrorException e) {
+									log.warn("Error when checking if a password has been breached", e);
+								} finally {
+									Security.nestedLogoff();
+								}
+							}).start();
+	
+							if (debugPasswords()) 
+				            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : GOOD");
+							if (account == null)
+								updateAccountLastLogin(user, passwordDomain);
+							else { 
+								Date ll = account.getLastLogin();
+								if (ll == null || 
+										System.currentTimeMillis() - ll.getTime() > 600_000) {
+									getAsyncRunnerService().runNewTransaction(() -> {
+										getAccountEntityDao().updateLastLogin(account);
+										return null;
+									});
+								}
+							}
+							resetFailures (contra, ppe);
+							return PasswordValidation.PASSWORD_GOOD;
+						} else if (checkExpired) {
+							if (debugPasswords()) 
+				            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : EXPIRED");
+							resetFailures (contra, ppe);
+							return PasswordValidation.PASSWORD_GOOD_EXPIRED;
+						} else {
+							if (debugPasswords()) 
+				            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName()+ " : WRONG (Expired)");
+							return PasswordValidation.PASSWORD_WRONG;
+						}
+					} else {
+						if (debugPasswords()) {
+			            	log.info("CheckUserPassword " +user.getUserName() + " / " + passwordDomain.getName() + " : Current password does not match "+hash(password.getPassword()));
+			            }				
+					}
 				}
 			}
 		}
@@ -1070,7 +1073,7 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		if (checkTrusted) {
 			if (!taskQueue) {
 				// Console
-				if ("true".equals(ConfigurationCache.getProperty("soffid.auth.trustedLogin"))) {
+				if ("true".equals(trustedLogins) || "remote".equals(trustedLogins)) {
 					log.info("Checking password for "+user.getUserName()+"/"+passwordDomain.getName()+" on trusted systems. Invoking sync server");
 					for (UserAccountEntity userAccount : user.getAccounts()) {
 						AccountEntity ae = userAccount.getAccount();
@@ -1096,6 +1099,12 @@ public class InternalPasswordServiceImpl extends com.soffid.iam.service.Internal
 		}
 
 		return PasswordValidation.PASSWORD_WRONG;
+	}
+
+	private boolean noTrustedSystem() {
+		List<SystemEntity> l = getSystemEntityDao().query("from com.soffid.iam.model.SystemEntity "
+				+ "where trusted  = 'S'", new Parameter[0]);
+		return l.isEmpty();
 	}
 
 	private void resetFailures(PasswordEntity contra, PasswordPolicyEntity ppe) {

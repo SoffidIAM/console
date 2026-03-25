@@ -5,7 +5,7 @@ import java.util.List;
 public class SAMLConfig {
 	public boolean classicMethod;
 	public boolean samlMethod;
-	public boolean trustedAuthentication;
+	public String trustedAuthentication;
 	public String metadata;
 	public String idp;
 	public int cache;
@@ -46,10 +46,10 @@ public class SAMLConfig {
 	public void setSamlMethod(boolean samlMethod) {
 		this.samlMethod = samlMethod;
 	}
-	public boolean isTrustedAuthentication() {
+	public String getTrustedAuthentication() {
 		return trustedAuthentication;
 	}
-	public void setTrustedAuthentication(boolean trustedAuthentication) {
+	public void setTrustedAuthentication(String trustedAuthentication) {
 		this.trustedAuthentication = trustedAuthentication;
 	}
 	public String getMetadata() {

@@ -30,7 +30,7 @@ public class SamlDataNode extends SimpleDataNode {
 		SAMLConfig c = (SAMLConfig) getDataContext().getData();
 		updateParam ("soffid.auth.classic", c.classicMethod ? "true" : "false");
 		updateParam ("soffid.auth.saml", c.samlMethod ? "true" : "false");
-		updateParam ("soffid.auth.trustedLogin", c.trustedAuthentication ? "true" : "false");
+		updateParam ("soffid.auth.trustedLogin", c.trustedAuthentication);
 		updateParam ("soffid.saml.metadata.alwaysTrust", c.alwaysTrust?"true":"false");
 		updateParam ("soffid.saml.metadata.url", c.metadata);
 		updateParam ("soffid.saml.idp", c.idp);

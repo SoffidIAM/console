@@ -49,8 +49,12 @@
 				<label value="${c:l('deploy.lblEnable')}"  style="margin-left: 16px" />
 			</div>
 			<div width="100%">
-				<switch bind="trustedAuthentication"></switch>
-				<label value="${c:l('parametres.zul.trustedAuthentication')}"  style="margin-left: 16px" />
+				<label value="${c:l('parametres.zul.authenticationType') } :"></label>
+				<listbox bind="trustedAuthentication" mold="select">
+					<listitem value="false" label="${c:l('parametres.zul.authenticationType.local') }"/>
+					<listitem value="true" label="${c:l('parametres.zul.authenticationType.both') }"/>
+					<listitem value="remote" label="${c:l('parametres.zul.authenticationType.remote') }"/>
+				</listbox>
 			</div>
 		</div>
 		<label  sclass="separator" value="${c:l('parametres.zul.samlMethod')}"/>

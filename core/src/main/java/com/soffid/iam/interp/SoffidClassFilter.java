@@ -1,9 +1,29 @@
 package com.soffid.iam.interp;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import org.openjdk.nashorn.api.scripting.ClassFilter;
 
 public class SoffidClassFilter implements ClassFilter {
-
+	static String sc = null;
+	static String ss = null;
+	static boolean init = false;
+	
+	public SoffidClassFilter() {
+		if (!init) {
+			AccessController.doPrivileged( new PrivilegedAction<Object> () {
+				@Override
+				public Object run() {
+					sc = System.getenv("TRUSTED_CLASSES");
+					ss = System.getenv("SECURE_SCRIPT");
+					init = true;
+					return null;
+				}
+			});
+		}
+	}
+	
 	@Override
 	public boolean exposeToScripts(String className) {
 		if (className.startsWith("es.caib.seycon.ng.comu"))
@@ -13,11 +33,10 @@ public class SoffidClassFilter implements ClassFilter {
 		else if (className.startsWith("com.soffid.iam.addon") &&
 					(className.contains(".common.") || className.contains(".api.")))
 			return true;
-		else if ("true".equals(System.getenv("SECURE_SCRIPT"))) {
+		else if ("true".equals(ss)) {
 			for (Class c: TRUSTED_CLASSES)
 				if (c.getName().equals(className))
 					return true;
-			String sc = System.getenv("TRUSTED_CLASSES");
 			if (sc != null) {
 				for (String s: sc.split(" +"))
 					if (className.equals(s))

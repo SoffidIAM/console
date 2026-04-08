@@ -629,7 +629,7 @@ public abstract class RoleEntityDaoBase
 	public com.soffid.iam.iga.model.RoleEntity findByNameAndSystemDeleted(final com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.String roleName, java.lang.String system)
 	
 	{
-		return findByNameAndSystemDeleted("select rolEntity \nfrom com.soffid.iam.iga.model.RoleEntity rolEntity \nwhere rolEntity.name = :roleName and\nrolEntity.system.name = :system and (rolEntity.deleted is null or rolEntity.deleted is false)",
+		return findByNameAndSystemDeleted("select rolEntity \nfrom com.soffid.iam.iga.model.RoleEntity rolEntity \nwhere rolEntity.name = :roleName and\nrolEntity.system.name = :system",
 			criteria, roleName, system);
 	}
 	/**

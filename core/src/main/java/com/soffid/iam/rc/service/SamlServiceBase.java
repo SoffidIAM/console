@@ -66,6 +66,39 @@ public abstract class SamlServiceBase
 
 
 	/**
+	 * @see com.soffid.iam.rc.service.SamlService#	 * @see com.soffid.iam.rc.service.SamlService#com.soffid.iam.am.api.SamlRequest generateLogoutRequest(java.lang.String hostName, java.lang.String user)
+	 */
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public com.soffid.iam.am.api.SamlRequest generateLogoutRequest(
+		final java.lang.String hostName, 
+		final java.lang.String user)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		if (hostName == null || hostName.trim().length() == 0) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.SamlRequest com.soffid.iam.rc.service.SamlService.generateLogoutRequest(java.lang.String hostName, java.lang.String user) - hostName cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					return new Object[] {handleGenerateLogoutRequest(hostName, user)};
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r.length == 1 ) 
+			return (com.soffid.iam.am.api.SamlRequest) __r[0];
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.rc.service.SamlService.class).
+			warn ("Error on SamlService.generateLogoutRequest", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on SamlService.generateLogoutRequest", (Throwable) __r[1]);
+	}
+
+	protected abstract com.soffid.iam.am.api.SamlRequest handleGenerateLogoutRequest(java.lang.String hostName, java.lang.String user) throws Exception;
+
+	/**
 	 * @see com.soffid.iam.rc.service.SamlService#	 * @see com.soffid.iam.rc.service.SamlService#com.soffid.iam.am.api.SamlRequest generateSamlRequest(java.lang.String hostName, java.lang.String app)
 	 */
 	@Transactional(rollbackFor={java.lang.Exception.class})

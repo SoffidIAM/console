@@ -11,6 +11,11 @@ public interface SamlService
 
  {
 
+	com.soffid.iam.am.api.SamlRequest generateLogoutRequest(
+		final java.lang.String hostName, 
+		final java.lang.String user)
+	throws com.soffid.iam.exception.InternalErrorException;
+
 	com.soffid.iam.am.api.SamlRequest generateSamlRequest(
 		final java.lang.String hostName, 
 		final java.lang.String app)

@@ -11,6 +11,19 @@ public interface SamlService {
 	public final static String SERVICE_NAME = "com.soffid.iam.rc.service.SamlService";
 
 	/**
+	 * Operation generateLogoutRequest
+	 * Validates the SAML response, and returns a single use username and password
+
+	 * @param hostName 
+	 * @param user 
+	 * @return 
+	 */
+	com.soffid.iam.am.api.SamlRequest generateLogoutRequest(
+		final java.lang.String hostName, 
+		final java.lang.String user)
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation generateSamlRequest
 	 * Generates a SAML request to formard to the IdP
 

@@ -125,9 +125,13 @@ public class HttpInvokerHandler implements InvocationHandler {
                     throw (Throwable) result;
             }
             if (result instanceof Throwable)
-                throw new UndeclaredThrowableException((Throwable) result);
+                throw new RemoteException(
+                		"Undeclared exception returned by "+url.toString(),
+                		(Throwable) result);
             else
-                throw new RemoteException (result.toString());
+                throw new RemoteException("from "+url.toString()+ 
+                		": " + 
+                		result.toString());
         }
             
     }

@@ -8,6 +8,8 @@ package com.soffid.iam.rc.service;
  * Service IssueService
  */
 public interface IssueService {
+	public final static String REMOTE_PATH = "/seycon/com.soffid.iam.rc.service.IssueService";
+
 	public final static String SERVICE_NAME = "com.soffid.iam.rc.service.IssueService";
 
 	/**

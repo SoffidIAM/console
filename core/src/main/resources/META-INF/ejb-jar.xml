@@ -12180,6 +12180,21 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[com.soffid.iam.am.api.SamlRequest generateLogoutRequest(java.lang.String hostName, java.lang.String user) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[Validates the SAML response, and returns a single use username and password]]></description>
+				<ejb-name>SamlService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>generateLogoutRequest</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+					<method-param>java.lang.String</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[com.soffid.iam.am.api.SamlRequest generateSamlRequest(java.lang.String hostName, java.lang.String app) security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -24678,6 +24693,18 @@
 				<method-name>verifyDomains</method-name>
 				<method-params>
 					<method-param>java.io.PrintWriter</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>SamlService</ejb-name>
+				<method-name>generateLogoutRequest</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+					<method-param>java.lang.String</method-param>
 				</method-params>
 			</method>
 			<trans-attribute>Supports</trans-attribute>

@@ -3813,6 +3813,7 @@ CodeMirrorJavaTypes["com.soffid.iam.rc.service.NetworkIntelligenceService"]={
 	"verifyDomains":"void"
 };
 CodeMirrorJavaTypes["com.soffid.iam.rc.service.SamlService"]={
+	"generateLogoutRequest":"com.soffid.iam.am.api.SamlRequest",
 	"generateSamlRequest":"com.soffid.iam.am.api.SamlRequest",
 	"checkAuthenticationToken":"java.lang.String",
 	"generateMetadata":"java.lang.String",

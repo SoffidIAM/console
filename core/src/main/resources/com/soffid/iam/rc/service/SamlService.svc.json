@@ -1,6 +1,9 @@
 {
   "class": "com.soffid.iam.rc.service.SamlService",
   "methods": [
+    {"name":"generateLogoutRequest", "comments":"Validates the SAML response, and returns a single use username and password", "return":"com.soffid.iam.am.api.SamlRequest", "arguments":[
+       {"name":"hostName","type":"java.lang.String","required": true},
+       {"name":"user","type":"java.lang.String","required":false}    ]},
     {"name":"generateSamlRequest", "comments":"Generates a SAML request to formard to the IdP", "return":"com.soffid.iam.am.api.SamlRequest", "arguments":[
        {"name":"hostName","type":"java.lang.String","required": true},
        {"name":"app","type":"java.lang.String","required":false}    ]},

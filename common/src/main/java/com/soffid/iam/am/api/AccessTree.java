@@ -24,6 +24,7 @@ public class AccessTree
 
 	/**
 	 * Attribute code
+	 * This field is optional, and is usually ignored
 
 	 */
 	private java.lang.String code;
@@ -102,6 +103,7 @@ public class AccessTree
 
 	/**
 	 * Attribute parentId
+	 * This field contains its parent's attribute id
 
 	 */
 	private java.lang.Long parentId;

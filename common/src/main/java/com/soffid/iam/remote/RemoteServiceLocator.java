@@ -418,6 +418,18 @@ public class RemoteServiceLocator
 	}
 	
 	/**
+	 * Gets the remote service IssueService.
+	 *
+	 * @return Remote object
+	 **/
+	public com.soffid.iam.rc.service.IssueService getIssueService( ) throws IOException, com.soffid.iam.exception.InternalErrorException {
+		if (serviceLocatorProxy != null && server == null)
+			return (com.soffid.iam.rc.service.IssueService) serviceLocatorProxy.getService("com.soffid.iam.rc.service.IssueService");
+		else
+			return ( com.soffid.iam.rc.service.IssueService ) getRemoteService ("/seycon/com.soffid.iam.rc.service.IssueService");
+	}
+	
+	/**
 	 * Gets the remote service AgentManager.
 	 *
 	 * @return Remote object

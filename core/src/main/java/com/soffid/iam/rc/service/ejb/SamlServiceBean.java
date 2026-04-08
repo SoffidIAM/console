@@ -18,6 +18,30 @@ public class SamlServiceBean extends org.springframework.ejb.support.AbstractSta
 	private com.soffid.iam.rc.service.SamlService samlService;
 
 	/**
+	 * @see com.soffid.iam.rc.service.SamlService#com.soffid.iam.am.api.SamlRequest generateLogoutRequest(java.lang.String hostName, java.lang.String user)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public com.soffid.iam.am.api.SamlRequest generateLogoutRequest(
+		final java.lang.String hostName, 
+		final java.lang.String user)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		try
+		{
+			return this.samlService.generateLogoutRequest(hostName, user); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * @see com.soffid.iam.rc.service.SamlService#com.soffid.iam.am.api.SamlRequest generateSamlRequest(java.lang.String hostName, java.lang.String app)
 	 */
 	@jakarta.annotation.security.PermitAll

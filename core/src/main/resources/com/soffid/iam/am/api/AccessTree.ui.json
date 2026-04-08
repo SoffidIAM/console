@@ -1,7 +1,7 @@
 {
   "class": "com.soffid.iam.am.api.AccessTree",
   "attributes": [
-    {"name":"code", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"50"},
+    {"name":"code", "type":"STRING", "comments":"This field is optional, and is usually ignored", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"50"},
     {"name":"name", "type":"STRING", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"128"},
     {"name":"description", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":true, "multiline":false, "multivalue":false, "readonly":false, "length":"512"},
     {"name":"visible", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":true, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"1"},

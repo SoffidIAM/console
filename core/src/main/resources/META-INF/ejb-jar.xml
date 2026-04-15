@@ -10390,6 +10390,20 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[com.soffid.iam.am.api.PasswordPolicy getPasswordPolicy(com.soffid.iam.base.api.Account account) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>SelfService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>getPasswordPolicy</method-name>
+				<method-params>
+					<method-param>com.soffid.iam.base.api.MetaAccount</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[com.soffid.iam.am.api.PasswordStatus passwordsStatus(com.soffid.iam.base.api.Account account) security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -22715,6 +22729,17 @@
 			<method>
 				<ejb-name>SelfService</ejb-name>
 				<method-name>queryAccountSshKeyBypassPolicy</method-name>
+				<method-params>
+					<method-param>com.soffid.iam.base.api.MetaAccount</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>SelfService</ejb-name>
+				<method-name>getPasswordPolicy</method-name>
 				<method-params>
 					<method-param>com.soffid.iam.base.api.MetaAccount</method-param>
 				</method-params>

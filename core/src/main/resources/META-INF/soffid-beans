@@ -33,3 +33,4 @@ com.soffid.iam.rc.api.Issue
 com.soffid.iam.rc.api.IssuePolicy
 com.soffid.iam.rc.api.IssuePolicyAction
 com.soffid.iam.rc.api.SoDRule
+com.soffid.iam.sync.api.ScheduledTask

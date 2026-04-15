@@ -148,11 +148,53 @@ public class ScheduledTask
 	 */
 	private java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog> logs = new java.util.LinkedList<>();
 
+	/**
+	 * Attribute createdOn
+
+
+	 */
+	private java.util.Date createdOn;
+
+	/**
+	 * Attribute createdBy
+
+
+	 */
+	private java.lang.String createdBy;
+
+	/**
+	 * Attribute updatedOn
+
+
+	 */
+	private java.util.Date updatedOn;
+
+	/**
+	 * Attribute updatedBy
+
+
+	 */
+	private java.lang.String updatedBy;
+
+	/**
+	 * Attribute deletedOn
+
+
+	 */
+	private java.util.Date deletedOn;
+
+	/**
+	 * Attribute deletedBy
+
+
+	 */
+	private java.lang.String deletedBy;
+
 	public ScheduledTask()
 	{
 	}
 
-	public ScheduledTask(java.lang.Long id, java.lang.String tenant, java.lang.String name, java.lang.String params, java.lang.String handlerName, java.util.Calendar nextExecution, java.util.Calendar lastExecution, java.util.Calendar lastEnd, java.lang.String logReferenceID, java.lang.String dayPattern, java.lang.String hoursPattern, java.lang.String monthsPattern, java.lang.String dayOfWeekPattern, java.lang.String minutesPattern, boolean error, boolean active, boolean enabled, java.lang.String status, java.lang.Double percentageDone, java.lang.Boolean stop, java.lang.String serverName, java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog> logs)
+	public ScheduledTask(java.lang.Long id, java.lang.String tenant, java.lang.String name, java.lang.String params, java.lang.String handlerName, java.util.Calendar nextExecution, java.util.Calendar lastExecution, java.util.Calendar lastEnd, java.lang.String logReferenceID, java.lang.String dayPattern, java.lang.String hoursPattern, java.lang.String monthsPattern, java.lang.String dayOfWeekPattern, java.lang.String minutesPattern, boolean error, boolean active, boolean enabled, java.lang.String status, java.lang.Double percentageDone, java.lang.Boolean stop, java.lang.String serverName, java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog> logs, java.util.Date createdOn, java.lang.String createdBy, java.util.Date updatedOn, java.lang.String updatedBy, java.util.Date deletedOn, java.lang.String deletedBy)
 	{
 		super();
 		this.id = id;
@@ -177,6 +219,12 @@ public class ScheduledTask
 		this.stop = stop;
 		this.serverName = serverName;
 		this.logs = logs;
+		this.createdOn = createdOn;
+		this.createdBy = createdBy;
+		this.updatedOn = updatedOn;
+		this.updatedBy = updatedBy;
+		this.deletedOn = deletedOn;
+		this.deletedBy = deletedBy;
 	}
 
 	public ScheduledTask(java.lang.String name, java.lang.String handlerName, java.lang.String dayPattern, java.lang.String hoursPattern, java.lang.String monthsPattern, java.lang.String dayOfWeekPattern, java.lang.String minutesPattern, boolean error, boolean active, boolean enabled)
@@ -196,7 +244,7 @@ public class ScheduledTask
 
 	public ScheduledTask(ScheduledTask otherBean)
 	{
-		this(otherBean.id, otherBean.tenant, otherBean.name, otherBean.params, otherBean.handlerName, otherBean.nextExecution, otherBean.lastExecution, otherBean.lastEnd, otherBean.logReferenceID, otherBean.dayPattern, otherBean.hoursPattern, otherBean.monthsPattern, otherBean.dayOfWeekPattern, otherBean.minutesPattern, otherBean.error, otherBean.active, otherBean.enabled, otherBean.status, otherBean.percentageDone, otherBean.stop, otherBean.serverName, otherBean.logs);
+		this(otherBean.id, otherBean.tenant, otherBean.name, otherBean.params, otherBean.handlerName, otherBean.nextExecution, otherBean.lastExecution, otherBean.lastEnd, otherBean.logReferenceID, otherBean.dayPattern, otherBean.hoursPattern, otherBean.monthsPattern, otherBean.dayOfWeekPattern, otherBean.minutesPattern, otherBean.error, otherBean.active, otherBean.enabled, otherBean.status, otherBean.percentageDone, otherBean.stop, otherBean.serverName, otherBean.logs, otherBean.createdOn, otherBean.createdBy, otherBean.updatedOn, otherBean.updatedBy, otherBean.deletedOn, otherBean.deletedBy);
 	}
 
 	/**
@@ -508,6 +556,90 @@ public class ScheduledTask
 	}
 
 	/**
+	 * Gets value for attribute createdOn
+	 */
+	public java.util.Date getCreatedOn() {
+		return this.createdOn;
+	}
+
+	/**
+	 * Sets value for attribute createdOn
+	 */
+	public void setCreatedOn(java.util.Date createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	/**
+	 * Gets value for attribute createdBy
+	 */
+	public java.lang.String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	/**
+	 * Sets value for attribute createdBy
+	 */
+	public void setCreatedBy(java.lang.String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	/**
+	 * Gets value for attribute updatedOn
+	 */
+	public java.util.Date getUpdatedOn() {
+		return this.updatedOn;
+	}
+
+	/**
+	 * Sets value for attribute updatedOn
+	 */
+	public void setUpdatedOn(java.util.Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+
+	/**
+	 * Gets value for attribute updatedBy
+	 */
+	public java.lang.String getUpdatedBy() {
+		return this.updatedBy;
+	}
+
+	/**
+	 * Sets value for attribute updatedBy
+	 */
+	public void setUpdatedBy(java.lang.String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	/**
+	 * Gets value for attribute deletedOn
+	 */
+	public java.util.Date getDeletedOn() {
+		return this.deletedOn;
+	}
+
+	/**
+	 * Sets value for attribute deletedOn
+	 */
+	public void setDeletedOn(java.util.Date deletedOn) {
+		this.deletedOn = deletedOn;
+	}
+
+	/**
+	 * Gets value for attribute deletedBy
+	 */
+	public java.lang.String getDeletedBy() {
+		return this.deletedBy;
+	}
+
+	/**
+	 * Sets value for attribute deletedBy
+	 */
+	public void setDeletedBy(java.lang.String deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+
+	/**
 	 * Returns a string representation of the value object.
 	 */
 	public String toString()
@@ -558,6 +690,18 @@ public class ScheduledTask
 		b.append (this.serverName);
 		b.append (", logs: ");
 		b.append (this.logs);
+		b.append (", createdOn: ");
+		b.append (this.createdOn);
+		b.append (", createdBy: ");
+		b.append (this.createdBy);
+		b.append (", updatedOn: ");
+		b.append (this.updatedOn);
+		b.append (", updatedBy: ");
+		b.append (this.updatedBy);
+		b.append (", deletedOn: ");
+		b.append (this.deletedOn);
+		b.append (", deletedBy: ");
+		b.append (this.deletedBy);
 		b.append ("]");
 		return b.toString();
 	}

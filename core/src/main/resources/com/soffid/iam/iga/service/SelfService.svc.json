@@ -18,6 +18,8 @@
        {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
     {"name":"queryAccountSshKeyBypassPolicy", "return":"com.soffid.iam.am.api.Password", "arguments":[
        {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
+    {"name":"getPasswordPolicy", "return":"com.soffid.iam.am.api.PasswordPolicy", "arguments":[
+       {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
     {"name":"passwordsStatus", "return":"com.soffid.iam.am.api.PasswordStatus", "arguments":[
        {"name":"account","type":"com.soffid.iam.base.api.Account","required": true}    ]},
     {"name":"getAccountById", "comments":"Get account", "return":"com.soffid.iam.base.api.Account", "arguments":[

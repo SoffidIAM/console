@@ -477,6 +477,7 @@ CodeMirrorJavaTypes["com.soffid.iam.am.api.PasswordPolicy"]={
 	"unlockAfterSeconds":"java.lang.Integer",
 	"allowPasswordQuery":"boolean",
 	"allowPasswordChange":"boolean",
+	"storeUserPasswords":"java.lang.Boolean",
 	"complexPasswords":"boolean",
 	"validationScript":"java.lang.String",
 	"validationScriptDescription":"java.lang.String",
@@ -3117,6 +3118,7 @@ CodeMirrorJavaTypes["com.soffid.iam.iga.service.SelfService"]={
 	"queryAccountPasswordBypassPolicy":"com.soffid.iam.am.api.Password",
 	"queryAccountSshKey":"com.soffid.iam.am.api.Password",
 	"queryAccountSshKeyBypassPolicy":"com.soffid.iam.am.api.Password",
+	"getPasswordPolicy":"com.soffid.iam.am.api.PasswordPolicy",
 	"passwordsStatus":"com.soffid.iam.am.api.PasswordStatus",
 	"getAccountById":"com.soffid.iam.base.api.Account",
 	"updateSharedAccount":"com.soffid.iam.base.api.Account",
@@ -3949,7 +3951,13 @@ CodeMirrorJavaTypes["com.soffid.iam.sync.api.ScheduledTask"]={
 	"percentageDone":"java.lang.Double",
 	"stop":"java.lang.Boolean",
 	"serverName":"java.lang.String",
-	"logs":"java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog>"
+	"logs":"java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog>",
+	"createdOn":"java.util.Date",
+	"createdBy":"java.lang.String",
+	"updatedOn":"java.util.Date",
+	"updatedBy":"java.lang.String",
+	"deletedOn":"java.util.Date",
+	"deletedBy":"java.lang.String"
 };
 CodeMirrorJavaTypes["com.soffid.iam.sync.api.ScheduledTaskHandler"]={
 	"id":"java.lang.Long",

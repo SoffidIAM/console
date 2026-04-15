@@ -193,6 +193,13 @@ public class PasswordPolicy
 	private boolean allowPasswordChange;
 
 	/**
+	 * Attribute storeUserPasswords
+	 * Store user passwords in password vault
+
+	 */
+	private java.lang.Boolean storeUserPasswords = true;
+
+	/**
 	 * Attribute complexPasswords
 	 * Enable complex password just like MS AD
 
@@ -266,7 +273,7 @@ public class PasswordPolicy
 	{
 	}
 
-	public PasswordPolicy(java.lang.Long id, java.lang.String description, java.lang.String type, java.lang.Long renewalTime, java.lang.Long maximumPeriod, java.lang.Long maximumPeriodExpired, java.lang.Long minimumPeriod, java.lang.Long minimumLength, java.lang.Long maximumLength, java.lang.String regularExpression, java.lang.Long minimumUppercase, java.lang.Long maximumUppercase, java.lang.Long minimumLowercase, java.lang.Long maximumLowercase, java.lang.Long minimumNumbers, java.lang.Long maximumNumbers, java.lang.Long minimumSymbols, java.lang.Long maximumSymbols, java.lang.Long maximumHistorical, java.lang.String userType, java.lang.String userTypeDescription, java.lang.String usersDomainCode, java.lang.String passwordDomainCode, java.lang.Integer maxFailures, java.lang.Integer unlockAfterSeconds, boolean allowPasswordQuery, boolean allowPasswordChange, boolean complexPasswords, java.lang.String validationScript, java.lang.String validationScriptDescription, boolean checkPasswordBreached, java.util.Date createdOn, java.lang.String createdBy, java.util.Date updatedOn, java.lang.String updatedBy, java.util.Date deletedOn, java.lang.String deletedBy)
+	public PasswordPolicy(java.lang.Long id, java.lang.String description, java.lang.String type, java.lang.Long renewalTime, java.lang.Long maximumPeriod, java.lang.Long maximumPeriodExpired, java.lang.Long minimumPeriod, java.lang.Long minimumLength, java.lang.Long maximumLength, java.lang.String regularExpression, java.lang.Long minimumUppercase, java.lang.Long maximumUppercase, java.lang.Long minimumLowercase, java.lang.Long maximumLowercase, java.lang.Long minimumNumbers, java.lang.Long maximumNumbers, java.lang.Long minimumSymbols, java.lang.Long maximumSymbols, java.lang.Long maximumHistorical, java.lang.String userType, java.lang.String userTypeDescription, java.lang.String usersDomainCode, java.lang.String passwordDomainCode, java.lang.Integer maxFailures, java.lang.Integer unlockAfterSeconds, boolean allowPasswordQuery, boolean allowPasswordChange, java.lang.Boolean storeUserPasswords, boolean complexPasswords, java.lang.String validationScript, java.lang.String validationScriptDescription, boolean checkPasswordBreached, java.util.Date createdOn, java.lang.String createdBy, java.util.Date updatedOn, java.lang.String updatedBy, java.util.Date deletedOn, java.lang.String deletedBy)
 	{
 		super();
 		this.id = id;
@@ -296,6 +303,7 @@ public class PasswordPolicy
 		this.unlockAfterSeconds = unlockAfterSeconds;
 		this.allowPasswordQuery = allowPasswordQuery;
 		this.allowPasswordChange = allowPasswordChange;
+		this.storeUserPasswords = storeUserPasswords;
 		this.complexPasswords = complexPasswords;
 		this.validationScript = validationScript;
 		this.validationScriptDescription = validationScriptDescription;
@@ -319,7 +327,7 @@ public class PasswordPolicy
 
 	public PasswordPolicy(PasswordPolicy otherBean)
 	{
-		this(otherBean.id, otherBean.description, otherBean.type, otherBean.renewalTime, otherBean.maximumPeriod, otherBean.maximumPeriodExpired, otherBean.minimumPeriod, otherBean.minimumLength, otherBean.maximumLength, otherBean.regularExpression, otherBean.minimumUppercase, otherBean.maximumUppercase, otherBean.minimumLowercase, otherBean.maximumLowercase, otherBean.minimumNumbers, otherBean.maximumNumbers, otherBean.minimumSymbols, otherBean.maximumSymbols, otherBean.maximumHistorical, otherBean.userType, otherBean.userTypeDescription, otherBean.usersDomainCode, otherBean.passwordDomainCode, otherBean.maxFailures, otherBean.unlockAfterSeconds, otherBean.allowPasswordQuery, otherBean.allowPasswordChange, otherBean.complexPasswords, otherBean.validationScript, otherBean.validationScriptDescription, otherBean.checkPasswordBreached, otherBean.createdOn, otherBean.createdBy, otherBean.updatedOn, otherBean.updatedBy, otherBean.deletedOn, otherBean.deletedBy);
+		this(otherBean.id, otherBean.description, otherBean.type, otherBean.renewalTime, otherBean.maximumPeriod, otherBean.maximumPeriodExpired, otherBean.minimumPeriod, otherBean.minimumLength, otherBean.maximumLength, otherBean.regularExpression, otherBean.minimumUppercase, otherBean.maximumUppercase, otherBean.minimumLowercase, otherBean.maximumLowercase, otherBean.minimumNumbers, otherBean.maximumNumbers, otherBean.minimumSymbols, otherBean.maximumSymbols, otherBean.maximumHistorical, otherBean.userType, otherBean.userTypeDescription, otherBean.usersDomainCode, otherBean.passwordDomainCode, otherBean.maxFailures, otherBean.unlockAfterSeconds, otherBean.allowPasswordQuery, otherBean.allowPasswordChange, otherBean.storeUserPasswords, otherBean.complexPasswords, otherBean.validationScript, otherBean.validationScriptDescription, otherBean.checkPasswordBreached, otherBean.createdOn, otherBean.createdBy, otherBean.updatedOn, otherBean.updatedBy, otherBean.deletedOn, otherBean.deletedBy);
 	}
 
 	/**
@@ -715,6 +723,20 @@ public class PasswordPolicy
 	}
 
 	/**
+	 * Gets value for attribute storeUserPasswords
+	 */
+	public java.lang.Boolean getStoreUserPasswords() {
+		return this.storeUserPasswords;
+	}
+
+	/**
+	 * Sets value for attribute storeUserPasswords
+	 */
+	public void setStoreUserPasswords(java.lang.Boolean storeUserPasswords) {
+		this.storeUserPasswords = storeUserPasswords;
+	}
+
+	/**
 	 * Gets value for attribute complexPasswords
 	 */
 	public boolean isComplexPasswords() {
@@ -915,6 +937,8 @@ public class PasswordPolicy
 		b.append (this.allowPasswordQuery);
 		b.append (", allowPasswordChange: ");
 		b.append (this.allowPasswordChange);
+		b.append (", storeUserPasswords: ");
+		b.append (this.storeUserPasswords);
 		b.append (", complexPasswords: ");
 		b.append (this.complexPasswords);
 		b.append (", validationScript: ");

@@ -457,7 +457,8 @@ public class Config {
                 if (manager.getServerURL().getHost().equals(getHostName()))
                     return manager;
             }
-            return null;
+            return new URLManager("https://" + getHostName() + ":" + getPort() //$NON-NLS-1$ //$NON-NLS-2$
+            	+ "/"); //$NON-NLS-1$
         } else {
             return new URLManager("https://" + getHostName() + ":" + getPort() //$NON-NLS-1$ //$NON-NLS-2$
                     + "/seycon/Agent"); //$NON-NLS-1$

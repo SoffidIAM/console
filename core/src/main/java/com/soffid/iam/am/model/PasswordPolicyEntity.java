@@ -403,6 +403,22 @@ public abstract class PasswordPolicyEntity {
 		this.allowPasswordChange = allowPasswordChange;
 	}
 	/**
+	 * Attribute storeUserPasswords
+	 */
+	private java.lang.Boolean storeUserPasswords;
+	/**
+	 * Gets value for attribute storeUserPasswords
+	 */
+	public java.lang.Boolean getStoreUserPasswords() {
+		return this.storeUserPasswords;
+	}
+	/**
+	 * Sets value for attribute storeUserPasswords
+	 */
+	public void setStoreUserPasswords(java.lang.Boolean storeUserPasswords) {
+		this.storeUserPasswords = storeUserPasswords;
+	}
+	/**
 	 * Attribute complexPasswords
 	 * Enable complex password just like MS AD
 	 */

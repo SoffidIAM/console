@@ -62,5 +62,23 @@
 			</key>
 			<one-to-many class='com.soffid.iam.sync.model.ScheduledTaskLogEntityImpl'/>
 		</set>
+		<property name='createdOn' type='java.util.Date'>
+			<column name='SCT_CREDAT' not-null='false' />
+		</property>
+		<property name='createdBy' type='java.lang.String'>
+			<column name='SCT_CREUSE' not-null='false' />
+		</property>
+		<property name='updatedOn' type='java.util.Date'>
+			<column name='SCT_UPDDAT' not-null='false' />
+		</property>
+		<property name='updatedBy' type='java.lang.String'>
+			<column name='SCT_UPDUSE' not-null='false' />
+		</property>
+		<property name='deletedOn' type='java.util.Date'>
+			<column name='SCT_DELDAT' not-null='false' />
+		</property>
+		<property name='deletedBy' type='java.lang.String'>
+			<column name='SCT_DELUSE' not-null='false' />
+		</property>
 	</class>
 </hibernate-mapping>

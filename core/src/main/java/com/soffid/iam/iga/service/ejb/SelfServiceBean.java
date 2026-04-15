@@ -195,6 +195,31 @@ public class SelfServiceBean extends org.springframework.ejb.support.AbstractSta
 		}
 	}
 	/**
+	 * @see com.soffid.iam.iga.service.SelfService#com.soffid.iam.am.api.PasswordPolicy getPasswordPolicy(com.soffid.iam.base.api.Account account)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public com.soffid.iam.am.api.PasswordPolicy getPasswordPolicy(
+		final com.soffid.iam.base.api.Account account)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		try
+		{
+			return this.selfService.getPasswordPolicy(account); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * @see com.soffid.iam.iga.service.SelfService#com.soffid.iam.am.api.PasswordStatus passwordsStatus(com.soffid.iam.base.api.Account account)
 	 */
 	@jakarta.annotation.security.PermitAll

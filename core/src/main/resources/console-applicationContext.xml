@@ -4966,6 +4966,7 @@
 				<property name="metaDataEntityDao"><ref bean="com.soffid.iam.iga.model.MetaDataEntity"/></property>
 				<lookup-method name="getNetworkService" bean="com.soffid.iam.am.service.NetworkService"/>
 				<lookup-method name="getPamSecurityHandlerService" bean="com.soffid.iam.pam.service.PamSecurityHandlerService"/>
+				<property name="passwordPolicyEntityDao"><ref bean="com.soffid.iam.am.model.PasswordPolicyEntity"/></property>
 				<property name="userDataEntityDao"><ref bean="com.soffid.iam.base.model.UserDataEntity"/></property>
 				<property name="userEntityDao"><ref bean="com.soffid.iam.base.model.UserEntity"/></property>
 				<lookup-method name="getUserService" bean="com.soffid.iam.base.service.UserService"/>

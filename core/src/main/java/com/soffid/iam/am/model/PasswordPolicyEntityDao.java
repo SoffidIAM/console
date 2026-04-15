@@ -12,6 +12,19 @@ public interface PasswordPolicyEntityDao
 
 {
 	/**
+	 * Operation findByAccount
+	 * @param id
+	 * @return
+	**/
+	public com.soffid.iam.am.model.PasswordPolicyEntity findByAccount(
+		java.lang.Long id)  ;
+
+	/**
+	 * CriteriaSearchConfiguration finder
+	 */
+	public com.soffid.iam.am.model.PasswordPolicyEntity findByAccount(final com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.Long id)
+	;
+	/**
 	 * Operation findByPasswordDomainAndUserType
 	 * @param passwordDomain
 	 * @param userType

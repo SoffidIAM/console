@@ -363,6 +363,12 @@ public abstract class ScheduledTaskEntityDaoBase
 		target.setStop(source.getStop());
 		// Missing attribute serverName on entity
 		// Incompatible types source.logs and target.logs
+		target.setCreatedOn(source.getCreatedOn());
+		target.setCreatedBy(source.getCreatedBy());
+		target.setUpdatedOn(source.getUpdatedOn());
+		target.setUpdatedBy(source.getUpdatedBy());
+		target.setDeletedOn(source.getDeletedOn());
+		target.setDeletedBy(source.getDeletedBy());
 	}
 
 	/**
@@ -449,6 +455,30 @@ public abstract class ScheduledTaskEntityDaoBase
 		{
 			// Incompatible types source.logs and target.logs
 		}
+		if (copyIfNull || source.getCreatedOn() != null)
+		{
+			target.setCreatedOn(source.getCreatedOn());
+		}
+		if (copyIfNull || source.getCreatedBy() != null)
+		{
+			target.setCreatedBy(source.getCreatedBy());
+		}
+		if (copyIfNull || source.getUpdatedOn() != null)
+		{
+			target.setUpdatedOn(source.getUpdatedOn());
+		}
+		if (copyIfNull || source.getUpdatedBy() != null)
+		{
+			target.setUpdatedBy(source.getUpdatedBy());
+		}
+		if (copyIfNull || source.getDeletedOn() != null)
+		{
+			target.setDeletedOn(source.getDeletedOn());
+		}
+		if (copyIfNull || source.getDeletedBy() != null)
+		{
+			target.setDeletedBy(source.getDeletedBy());
+		}
 	}
 
 	/**
@@ -524,6 +554,10 @@ public abstract class ScheduledTaskEntityDaoBase
 		}
 
 		entity.setTenant  ( getTenantEntityDao().load (com.soffid.iam.utils.Security.getCurrentTenantId()) );
+		entity.setCreatedOn(new java.util.Date());
+		entity.setCreatedBy(com.soffid.iam.utils.Security.getCurrentAccount());
+		entity.setUpdatedOn(new java.util.Date());
+		entity.setUpdatedBy(com.soffid.iam.utils.Security.getCurrentAccount());
 		this.getHibernateTemplate().save(entity);
 		this.getHibernateTemplate().flush();
 	}
@@ -538,6 +572,8 @@ public abstract class ScheduledTaskEntityDaoBase
 			throw new IllegalArgumentException(
 				"ScheduledTaskEntityDao.update - 'entity' can not be null");
 		}
+		entity.setUpdatedOn(new java.util.Date());
+		entity.setUpdatedBy(com.soffid.iam.utils.Security.getCurrentAccount());
 		this.getHibernateTemplate().update(entity);
 		this.getHibernateTemplate().flush();
 	}

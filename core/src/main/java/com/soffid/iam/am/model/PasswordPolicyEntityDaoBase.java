@@ -108,6 +108,59 @@ public abstract class PasswordPolicyEntityDaoBase
 
 
 	/**
+	 * Operation findByAccount
+	 * @param id
+	 * @return
+	**/
+	public com.soffid.iam.am.model.PasswordPolicyEntity findByAccount(
+	    java.lang.Long id)
+	
+	{
+		return findByAccount((com.soffid.iam.model.criteria.CriteriaSearchConfiguration) null			, id);
+	}
+	/**
+	 * CriteriaSearchConfiguration implementation
+	 */
+	public com.soffid.iam.am.model.PasswordPolicyEntity findByAccount(final com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.Long id)
+	
+	{
+		return findByAccount("select pp from \ncom.soffid.iam.base.model.AccountEntity as acc, com.soffid.iam.am.model.PasswordPolicyEntity as pp, com.soffid.iam.iga.model.SystemEntity as sys where acc.id=:id  and  acc.system.id = sys.id  and  acc.passwordPolicy.id = pp.userType.id and  sys.passwordDomain.id = pp.passwordDomain.id ",
+			criteria, id);
+	}
+	/**
+	 * Internal implementation
+	 */
+	public com.soffid.iam.am.model.PasswordPolicyEntity findByAccount(final java.lang.String queryString, com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.Long id)
+	
+	{
+		try
+		{
+			org.hibernate.Query queryObject = super.getSession(false).createQuery(queryString);
+			queryObject.setParameter("id", id, org.hibernate.Hibernate.LONG);
+			if (criteria != null && criteria.getMaximumResultSize () != null) {
+				queryObject.setMaxResults (criteria.getMaximumResultSize ().intValue()); 
+			}
+			if (criteria != null && criteria.getFirstResult () != null) {
+				queryObject.setFirstResult (criteria.getFirstResult().intValue()); 
+			}
+			java.util.Set results = new java.util.LinkedHashSet(queryObject.list());
+			com.soffid.iam.am.model.PasswordPolicyEntity result = null;
+			if (results.size() > 1) {
+				throw new org.springframework.dao.InvalidDataAccessResourceUsageException(
+					"More than one instance of 'com.soffid.iam.am.model.PasswordPolicyEntity' was found when executing query --> '" + queryString + "'");
+			}
+			else if (results.size() == 1)
+			{
+				result = (com.soffid.iam.am.model.PasswordPolicyEntity) results.iterator().next();
+			}
+			return result;
+		}
+		catch (org.hibernate.HibernateException ex) 
+		{
+			throw super.convertHibernateAccessException(ex);
+		}
+	}
+	/**
 	 * Operation findByPasswordDomainAndUserType
 	 * @param passwordDomain
 	 * @param userType
@@ -241,6 +294,7 @@ public abstract class PasswordPolicyEntityDaoBase
 		target.setUnlockAfterSeconds(source.getUnlockAfterSeconds());
 		target.setAllowPasswordQuery(java.lang.Boolean.TRUE.equals(source.getAllowPasswordQuery()));
 		target.setAllowPasswordChange(java.lang.Boolean.TRUE.equals(source.getAllowPasswordChange()));
+		target.setStoreUserPasswords(source.getStoreUserPasswords());
 		target.setComplexPasswords(java.lang.Boolean.TRUE.equals(source.getComplexPasswords()));
 		target.setValidationScript(source.getValidationScript());
 		target.setValidationScriptDescription(source.getValidationScriptDescription());
@@ -363,6 +417,10 @@ public abstract class PasswordPolicyEntityDaoBase
 		// Missing attribute forbiddenWords on entity
 		target.setAllowPasswordQuery(new java.lang.Boolean(source.isAllowPasswordQuery()));
 		target.setAllowPasswordChange(new java.lang.Boolean(source.isAllowPasswordChange()));
+		if (copyIfNull || source.getStoreUserPasswords() != null)
+		{
+			target.setStoreUserPasswords(source.getStoreUserPasswords());
+		}
 		target.setComplexPasswords(new java.lang.Boolean(source.isComplexPasswords()));
 		if (copyIfNull || source.getMaxFailures() != null)
 		{

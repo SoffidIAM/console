@@ -41,6 +41,10 @@ public interface SelfService
 		final com.soffid.iam.base.api.Account account)
 	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
+	com.soffid.iam.am.api.PasswordPolicy getPasswordPolicy(
+		final com.soffid.iam.base.api.Account account)
+	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
+
 	com.soffid.iam.am.api.PasswordStatus passwordsStatus(
 		final com.soffid.iam.base.api.Account account)
 	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;

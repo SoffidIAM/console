@@ -240,6 +240,22 @@ public abstract class SelfServiceBase
 		return pamSecurityHandlerService;
 	}
 
+	private com.soffid.iam.am.model.PasswordPolicyEntityDao passwordPolicyEntityDao;
+
+	/**
+	 * Sets reference to <code>passwordPolicyEntityDao</code>.
+	 */
+	public void setPasswordPolicyEntityDao (com.soffid.iam.am.model.PasswordPolicyEntityDao passwordPolicyEntityDao) {
+		this.passwordPolicyEntityDao = passwordPolicyEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>passwordPolicyEntityDao</code>.
+	 */
+	public com.soffid.iam.am.model.PasswordPolicyEntityDao getPasswordPolicyEntityDao () {
+		return passwordPolicyEntityDao;
+	}
+
 	private com.soffid.iam.base.model.UserDataEntityDao userDataEntityDao;
 
 	/**
@@ -628,6 +644,56 @@ public abstract class SelfServiceBase
 	}
 
 	protected abstract com.soffid.iam.am.api.Password handleQueryAccountSshKeyBypassPolicy(com.soffid.iam.base.api.Account account) throws Exception;
+
+	/**
+	 * @see com.soffid.iam.iga.service.SelfService#	 * @see com.soffid.iam.iga.service.SelfService#com.soffid.iam.am.api.PasswordPolicy getPasswordPolicy(com.soffid.iam.base.api.Account account)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRED, 
+		rollbackFor={java.lang.Exception.class})
+	public com.soffid.iam.am.api.PasswordPolicy getPasswordPolicy(
+		final com.soffid.iam.base.api.Account account)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		if (account == null) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.PasswordPolicy com.soffid.iam.iga.service.SelfService.getPasswordPolicy(com.soffid.iam.base.api.Account account) - account cannot be null");
+		}
+		if (account.getSystem() == null || account.getSystem().trim().length() == 0) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.PasswordPolicy com.soffid.iam.iga.service.SelfService.getPasswordPolicy(com.soffid.iam.base.api.Account account) - account.system cannot be null");
+		}
+		if (account.getName() == null || account.getName().trim().length() == 0) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.PasswordPolicy com.soffid.iam.iga.service.SelfService.getPasswordPolicy(com.soffid.iam.base.api.Account account) - account.name cannot be null");
+		}
+		if (account.getKey() == null || account.getKey().trim().length() == 0) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.PasswordPolicy com.soffid.iam.iga.service.SelfService.getPasswordPolicy(com.soffid.iam.base.api.Account account) - account.key cannot be null");
+		}
+		if (account.getType() == null ) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.PasswordPolicy com.soffid.iam.iga.service.SelfService.getPasswordPolicy(com.soffid.iam.base.api.Account account) - account.type cannot be null");
+		}
+		if (account.getPasswordPolicy() == null || account.getPasswordPolicy().trim().length() == 0) {
+			throw new IllegalArgumentException("com.soffid.iam.am.api.PasswordPolicy com.soffid.iam.iga.service.SelfService.getPasswordPolicy(com.soffid.iam.base.api.Account account) - account.passwordPolicy cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					return new Object[] {handleGetPasswordPolicy(account)};
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r.length == 1 ) 
+			return (com.soffid.iam.am.api.PasswordPolicy) __r[0];
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.iga.service.SelfService.class).
+			warn ("Error on SelfService.getPasswordPolicy", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on SelfService.getPasswordPolicy", (Throwable) __r[1]);
+	}
+
+	protected abstract com.soffid.iam.am.api.PasswordPolicy handleGetPasswordPolicy(com.soffid.iam.base.api.Account account) throws Exception;
 
 	/**
 	 * @see com.soffid.iam.iga.service.SelfService#	 * @see com.soffid.iam.iga.service.SelfService#com.soffid.iam.am.api.PasswordStatus passwordsStatus(com.soffid.iam.base.api.Account account)

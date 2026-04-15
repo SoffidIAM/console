@@ -290,6 +290,108 @@ public abstract class ScheduledTaskEntity {
 		this.logs = logs;
 	}
 	/**
+	 * Attribute createdOn
+
+	 */
+	private java.util.Date createdOn;
+	/**
+	 * Gets value for attribute createdOn
+	 */
+	public java.util.Date getCreatedOn() {
+		return this.createdOn;
+	}
+	/**
+	 * Sets value for attribute createdOn
+	 */
+	public void setCreatedOn(java.util.Date createdOn) {
+		this.createdOn = createdOn;
+	}
+	/**
+	 * Attribute createdBy
+
+	 */
+	private java.lang.String createdBy;
+	/**
+	 * Gets value for attribute createdBy
+	 */
+	public java.lang.String getCreatedBy() {
+		return this.createdBy;
+	}
+	/**
+	 * Sets value for attribute createdBy
+	 */
+	public void setCreatedBy(java.lang.String createdBy) {
+		this.createdBy = createdBy;
+	}
+	/**
+	 * Attribute updatedOn
+
+	 */
+	private java.util.Date updatedOn;
+	/**
+	 * Gets value for attribute updatedOn
+	 */
+	public java.util.Date getUpdatedOn() {
+		return this.updatedOn;
+	}
+	/**
+	 * Sets value for attribute updatedOn
+	 */
+	public void setUpdatedOn(java.util.Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+	/**
+	 * Attribute updatedBy
+
+	 */
+	private java.lang.String updatedBy;
+	/**
+	 * Gets value for attribute updatedBy
+	 */
+	public java.lang.String getUpdatedBy() {
+		return this.updatedBy;
+	}
+	/**
+	 * Sets value for attribute updatedBy
+	 */
+	public void setUpdatedBy(java.lang.String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+	/**
+	 * Attribute deletedOn
+
+	 */
+	private java.util.Date deletedOn;
+	/**
+	 * Gets value for attribute deletedOn
+	 */
+	public java.util.Date getDeletedOn() {
+		return this.deletedOn;
+	}
+	/**
+	 * Sets value for attribute deletedOn
+	 */
+	public void setDeletedOn(java.util.Date deletedOn) {
+		this.deletedOn = deletedOn;
+	}
+	/**
+	 * Attribute deletedBy
+
+	 */
+	private java.lang.String deletedBy;
+	/**
+	 * Gets value for attribute deletedBy
+	 */
+	public java.lang.String getDeletedBy() {
+		return this.deletedBy;
+	}
+	/**
+	 * Sets value for attribute deletedBy
+	 */
+	public void setDeletedBy(java.lang.String deletedBy) {
+		this.deletedBy = deletedBy;
+	}
+	/**
 	 * Returns <code>true</code> if the argument is an ScheduledTaskEntity instance and all identifiers for this entity 
 	 * equal the identifiers of the argument entity. Returns <code>false</code> otherwise.
 	 */

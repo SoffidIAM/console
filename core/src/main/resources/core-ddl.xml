@@ -588,6 +588,7 @@
 		<column name='PCD_DCN_ID' type='BIGINT' notNull='false'/>
 		<column name='PCD_PASQRY' type='BIT' notNull='false'/>
 		<column name='PCD_PASCHG' type='BIT' notNull='false'/>
+		<column name='PCD_PASSTO' type='BIT' notNull='false'/>
 		<column name='PCD_COMPLEX' type='BIT' notNull='true'/>
 		<column name='PCD_MAXFAI' type='INTEGER' notNull='false'/>
 		<column name='PCD_UNLSEC' type='INTEGER' notNull='false'/>
@@ -3422,6 +3423,12 @@
 		<column name='SCT_STATUS' type='VARCHAR' length='256' notNull='false'/>
 		<column name='SCT_PCT' type='FLOAT' notNull='false'/>
 		<column name='SCT_STOP' type='BIT' notNull='false'/>
+		<column name='SCT_CREDAT' type='DATE' notNull='false'/>
+		<column name='SCT_CREUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SCT_UPDDAT' type='DATE' notNull='false'/>
+		<column name='SCT_UPDUSE' type='VARCHAR' length='256' notNull='false'/>
+		<column name='SCT_DELDAT' type='DATE' notNull='false'/>
+		<column name='SCT_DELUSE' type='VARCHAR' length='256' notNull='false'/>
 	</table>
 	<foreignKey name='SC_SCHTAS_FK_SCT_HANDLE' table='SC_SCHTAS' foreignTable='SC_SCTAHA'> 
 		<column name='SCT_HANDLE'/>

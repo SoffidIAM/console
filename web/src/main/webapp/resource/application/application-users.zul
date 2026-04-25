@@ -29,7 +29,8 @@
 - name: ${c:l('aplica_rolinfo.zul.Domini')}
   value: domainValue.value
 - name: ${c:l('usuaris.zul.recertification')}
-  value: certificationDate_date
+  value: certificationDate
+  template: #{certificationDate_date}
 ]]></attribute>
 	</datatable>
 

@@ -133,6 +133,11 @@ public class SystemEntityDaoImpl extends com.soffid.iam.model.SystemEntityDaoBas
 					+ "(select acc.id from com.soffid.iam.model.AccountEntity as acc where acc.system.id=:system)")
 				.setLong("system", dispatcherEntity.getId())
 				.executeUpdate();
+	 		// Remove account services
+			getSession().createQuery("delete from com.soffid.iam.model.HostServiceEntity where account.id in "
+					+ "(select acc.id from com.soffid.iam.model.AccountEntity as acc where acc.system.id=:system)")
+				.setLong("system", dispatcherEntity.getId())
+				.executeUpdate();
 	 		// Remove accounts
 			getSession().createQuery("delete from com.soffid.iam.model.AccountEntity where system.id=:system")
 				.setLong("system", dispatcherEntity.getId())

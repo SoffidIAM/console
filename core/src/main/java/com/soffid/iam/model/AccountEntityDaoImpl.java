@@ -90,7 +90,10 @@ public class AccountEntityDaoImpl extends
 		getUserAccountEntityDao().remove(
 				new LinkedList<com.soffid.iam.model.UserAccountEntity>(entity
 						.getUsers()));
-			
+		
+		getHostServiceEntityDao().remove(entity.getServices());
+		entity.getServices().clear();
+		
 		entity.getUsers().clear();
 		getAccountPasswordEntityDao().remove(
 				new LinkedList<com.soffid.iam.model.AccountPasswordEntity>(

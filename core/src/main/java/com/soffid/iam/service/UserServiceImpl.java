@@ -1327,73 +1327,33 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 		}
 	}
 
-	private void arreglaAlias(User usuari) throws InternalErrorException {
+	private void arreglaAlias(User usuari, User previousUser) throws InternalErrorException {
 		// des de update(usuari), altaUsuari(Signatura) i baixaUsuari
-		String aliesDeCorreuCollectionNou = usuari.getMailAlias();
-		User usuariVell = findUserByUserName(usuari.getUserName());
-		String aliesDeCorreuCollectionVell = null;
-		if (usuariVell != null) {
-			aliesDeCorreuCollectionVell = usuariVell.getMailAlias();
-		} else {
-			aliesDeCorreuCollectionVell = ""; //$NON-NLS-1$
+		HashSet<String> oldAlias = parseMailAlias(previousUser);
+		HashSet<String> newAlias = parseMailAlias(usuari);
+
+		for (String o: oldAlias) {
+			if (! newAlias.contains(o) && ! o.trim().isEmpty())
+				desassociaIEsborraLlista(o, usuari.getUserName());
+		}
+		
+		for (String n: newAlias) {
+			if (!oldAlias.contains(n) &&
+					!n.trim().isEmpty())
+				crearIAssociarLlista(n, usuari.getUserName());
 		}
 
-		String aliesDeCorreuNou[];
-		boolean aliesTrobatNou[];
-		if (aliesDeCorreuCollectionNou != null
-				&& aliesDeCorreuCollectionNou.trim().compareTo("") != 0) { //$NON-NLS-1$
-			aliesDeCorreuNou = aliesDeCorreuCollectionNou.split("[ ,]+"); //$NON-NLS-1$
-			for (int i = 0; i < aliesDeCorreuNou.length; i++) {
-				aliesDeCorreuNou[i] = aliesDeCorreuNou[i].trim();
-			}
-			aliesTrobatNou = new boolean[aliesDeCorreuNou.length];
-			for (int i = 0; i < aliesTrobatNou.length; i++) {
-				aliesTrobatNou[i] = false;
-			}
-		} else {
-			aliesDeCorreuNou = new String[0];
-			aliesTrobatNou = new boolean[0];
-		}
+	}
 
-		String aliesDeCorreuVell[];
-		boolean aliesTrobatVell[];
-		if (aliesDeCorreuCollectionVell != null
-				&& aliesDeCorreuCollectionVell.trim().compareTo("") != 0) { //$NON-NLS-1$
-			aliesDeCorreuVell = aliesDeCorreuCollectionVell.split("[ ,]+"); //$NON-NLS-1$
-			for (int i = 0; i < aliesDeCorreuVell.length; i++) {
-				aliesDeCorreuVell[i] = aliesDeCorreuVell[i].trim();
-			}
-			aliesTrobatVell = new boolean[aliesDeCorreuVell.length];
-			for (int i = 0; i < aliesTrobatVell.length; i++) {
-				aliesTrobatVell[i] = false;
-			}
-		} else {
-			aliesDeCorreuVell = new String[0];
-			aliesTrobatVell = new boolean[0];
-		}
-
-		for (int i = 0; i < aliesDeCorreuNou.length; i++) {
-			for (int j = 0; j < aliesDeCorreuVell.length; j++) {
-				if (aliesIguals(aliesDeCorreuNou[i], aliesDeCorreuVell[j])) {
-					aliesTrobatNou[i] = true;
-					aliesTrobatVell[j] = true;
-				}
+	private HashSet<String> parseMailAlias(User previousUser) {
+		HashSet<String> oldAlias = new HashSet<String>();
+		if (previousUser != null && previousUser.getMailAlias() != null &&
+				!previousUser.getMailAlias().trim().isEmpty()) {
+			for (String s: previousUser.getMailAlias().split("(\\s*,\\s*)|(\\s+)")) {
+				oldAlias.add(s);
 			}
 		}
-
-		for (int i = 0; i < aliesDeCorreuNou.length; i++) {
-			if (!aliesTrobatNou[i] && aliesDeCorreuNou[i].length() > 0) {
-				crearIAssociarLlista(aliesDeCorreuNou[i], usuari.getUserName());
-			}
-		}
-
-		for (int i = 0; i < aliesDeCorreuVell.length; i++) {
-			if (!aliesTrobatVell[i] && aliesDeCorreuVell[i].length() > 0) {
-				desassociaIEsborraLlista(aliesDeCorreuVell[i],
-						usuari.getUserName());
-			}
-		}
-
+		return oldAlias;
 	}
 
 	private void desassociaIEsborraLlista(String aliesDeCorreu,
@@ -1406,34 +1366,19 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 			domini = parts[1];
 		}
 
-		UserMailList llistaCorreuUsuari = getMailListsService()
-				.findUserMailListByListNameAndDomainNameAndUserName(alies,
-						domini, codiUsuari);
-		if (llistaCorreuUsuari != null) {
-			getMailListsService().deleteUserMailList(llistaCorreuUsuari);
+		MailList mailList = getMailListsService().findMailListByNameAndDomainName(alies, domini);
+		if (mailList != null &&
+			mailList.getUsersList().contains(codiUsuari)) {
+			mailList.getUsersList().remove(codiUsuari);
+			if (mailList.getUsersList().isEmpty() &&
+					mailList.getExternalList().isEmpty() &&
+					mailList.getRoleMembers().isEmpty() &&
+					mailList.getGroupMembers().isEmpty() &&
+					mailList.getLists().isEmpty())
+				getMailListsService().delete(mailList);
+			else
+				getMailListsService().update(mailList);
 		}
-
-		// La neteja de llistes es fa al delete de listaCorreuUsuari
-		// Això es comprova ara a nivell de llistesDeCorreuUsuari.delete()
-
-		/*
-		 * LlistaCorreu llistaCorreu = getLlistesDeCorreuService()
-		 * .findLlistaCorreuByNomAndCodiDomini(alies, domini); if (llistaCorreu
-		 * != null) { Collection correuseExterns = getLlistesDeCorreuService()
-		 * .findCorreusExternsByNomLlistaCorreuAndCodiDomini(alies, domini);
-		 * Collection usuaris = getLlistesDeCorreuService()
-		 * .findLlistaCorreuUsuariByNomLlistaCorreuAndCodiDomini( alies,
-		 * domini); Collection llistesDeCorreuConte =
-		 * getLlistesDeCorreuService()
-		 * .findRelacionsLlistaCorreuByNomLlistaCorreuConteAndCodiDomini( alies,
-		 * domini); Collection llistesDeCorreuPertany =
-		 * getLlistesDeCorreuService()
-		 * .findRelacionsLlistaCorreuByNomLlistaCorreuPertanyAndCodiDomini(
-		 * alies, domini); if (correuseExterns.size() == 0 && usuaris.size() ==
-		 * 0 && llistesDeCorreuConte.size() == 0 &&
-		 * llistesDeCorreuPertany.size() == 0) {
-		 * getLlistesDeCorreuService().delete(llistaCorreu); } }
-		 */
 
 	}
 
@@ -1612,7 +1557,7 @@ public class UserServiceImpl extends com.soffid.iam.service.UserServiceBase {
 
 		}
 
-		arreglaAlias(usuari);
+		arreglaAlias(usuari, previousUser);
 		usuari.setCreatedByUser(previousUser.getCreatedByUser());
 		usuari.setCreatedDate(previousUser.getCreatedDate());
 		usuari.setModifiedByUser(Security.getCurrentAccount());

@@ -52,7 +52,6 @@ import es.caib.zkib.component.DataTable;
 
 public class LaunchHelper {
 	Log log = LogFactory.getLog(getClass());
-	
 	public void launchAccount( Account account, boolean directLink ) throws InternalErrorException, NamingException, CreateException, UnsupportedEncodingException
 	{
 		String url = account.getLoginUrl();

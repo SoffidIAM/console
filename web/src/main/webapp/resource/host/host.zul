@@ -47,7 +47,7 @@
 				dataPath="/model:/host" sortColumn="0"
 				onSelect="ref:frame.showDetails" enablefilter="false">
 			</datatable>
-			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('network:all:create')}" >
+			<div width="100%" style="text-align: right"  if="${soffid:isUserInRole('network:all:create') || hasManagedNetwork }" >
 				<div class="deleteButton" onClick="ref:frame.deleteSelected" visible="false">-</div>
 				<div class="addButton" onClick="ref:frame.addNew">+</div>
 			</div>

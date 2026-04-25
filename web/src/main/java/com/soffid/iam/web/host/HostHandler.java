@@ -22,6 +22,7 @@ import com.soffid.iam.EJBLocator;
 import com.soffid.iam.api.Host;
 import com.soffid.iam.api.Network;
 import com.soffid.iam.service.ejb.NetworkService;
+import com.soffid.iam.utils.Security;
 import com.soffid.iam.web.component.CustomField3;
 import com.soffid.iam.web.component.DynamicColumnsDatatable;
 import com.soffid.iam.web.component.FrameHandler;
@@ -40,6 +41,19 @@ import es.caib.zkib.zkiblaf.Missatgebox;
 
 public class HostHandler extends FrameHandler {
 	public HostHandler() throws InternalErrorException {
+	}
+
+	@Override
+	public void onPageAttached(Page newpage, Page oldpage) {
+		super.onPageAttached(newpage, oldpage);
+		getNamespace().setVariable("hasManagedNetwork", false, true);
+		try {
+			if (EJBLocator.getNetworkService()
+					.hasAnyACLNetworks(Security.getCurrentUser()))
+				getNamespace().setVariable("hasManagedNetwork", true, true);
+		} catch (Exception e) {
+			// No permission to use network service
+		}
 	}
 
 	@Override

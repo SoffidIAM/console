@@ -1,5 +1,6 @@
 package com.soffid.iam.model;
 
+import java.sql.Blob;
 import java.util.Collection;
 
 import com.soffid.mda.annotation.Column;
@@ -26,7 +27,7 @@ public class LuceneIndexPartEntity {
 	TenantEntity tenant;
 	
 	@Column(name = "LIP_DATA", length = 256000)
-	@Nullable byte[] data;
+	@Nullable Blob data;
 	
 	@Column(name = "LIP_TIMSTA")
 	@Nullable Long timestamp;

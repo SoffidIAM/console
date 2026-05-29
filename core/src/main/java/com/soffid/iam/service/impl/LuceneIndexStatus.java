@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -95,7 +98,7 @@ public class LuceneIndexStatus {
 		return f2;
 	}
 	
-	public synchronized void fetchFromDatabase() throws FileNotFoundException, IOException {
+	public synchronized void fetchFromDatabase() throws FileNotFoundException, IOException, SQLException {
 		File dir = getIndexDir();
 		Long lastTimeStamp = null;
 		File lastFile = null;
@@ -120,7 +123,13 @@ public class LuceneIndexStatus {
 					out = new FileOutputStream(lastFile);
 					lastTimeStamp = part.getTimestamp();
 				}
-				out.write(part.getData());
+				Blob blob = part.getData();
+				InputStream in = blob.getBinaryStream();
+				byte b[] = new byte[64000];
+				for (int read = in.read(b); read >= 0; read = in.read(b))
+					out.write(b, 0, read);
+				in.close();
+				blob.free();
 			}
 			if (out != null) {
 				out.close();
@@ -137,7 +146,7 @@ public class LuceneIndexStatus {
 		return dir;
 	}
 
-	public synchronized void fetchIfNeeded() throws FileNotFoundException, IOException {
+	public synchronized void fetchIfNeeded() throws FileNotFoundException, IOException, SQLException {
 		if (!dirty) {
 			LuceneIndexEntity current = luceneIndexEntityDao.findByName(name);
 			if (current != null && current.getTimestamp() > timestamp) {
@@ -146,7 +155,7 @@ public class LuceneIndexStatus {
 		}
 	}
 
-	public void save() throws FileNotFoundException, IOException, InternalErrorException {
+	public void save() throws FileNotFoundException, IOException, InternalErrorException, SQLException {
 		File dir = getIndexDir();
 		
 		dir.mkdirs();
@@ -163,7 +172,7 @@ public class LuceneIndexStatus {
 		synchronizedSave(dir, current);
 	}
 	
-	private synchronized void synchronizedSave(File dir, LuceneIndexEntity current) throws FileNotFoundException, IOException {
+	private synchronized void synchronizedSave(File dir, LuceneIndexEntity current) throws FileNotFoundException, IOException, SQLException {
 		// Keep files not modified. Remove others from database
 		List<File> files = new LinkedList<>( Arrays.asList( dir.listFiles() ) );
 		String partName = null;
@@ -210,10 +219,11 @@ public class LuceneIndexStatus {
 				part.setOrder(order ++);
 				part.setTimestamp(f.lastModified());
 				if (read == b.length)
-					part.setData(b);
+					part.setData(Hibernate.createBlob(b));
 				else
-					part.setData(Arrays.copyOf(b, read));
+					part.setData(Hibernate.createBlob(Arrays.copyOf(b, read)));
 				luceneIndexPartEntityDao.create(part);
+				part.getData().free();
 			}
 			in.close();
 		}
@@ -229,7 +239,7 @@ public class LuceneIndexStatus {
 		dirty = true;
 	}
 	
-	public void saveIfNeeded() throws FileNotFoundException, IOException, InternalErrorException {
+	public void saveIfNeeded() throws FileNotFoundException, IOException, InternalErrorException, SQLException {
 		if (dirty) {
 			try {
 				save();
@@ -238,7 +248,7 @@ public class LuceneIndexStatus {
 			}
 		}
 	}
-	public synchronized void reset() throws FileNotFoundException, IOException, InternalErrorException {
+	public synchronized void reset() throws FileNotFoundException, IOException, InternalErrorException, SQLException {
 		dirty = false;
 		File dir = getIndexDir();
 			
@@ -261,7 +271,7 @@ public class LuceneIndexStatus {
 		useFullContentPositions = true;
 	}
 	
-	public void fetchforWriting() throws InterruptedException, FileNotFoundException, IOException, InternalErrorException {
+	public void fetchforWriting() throws InterruptedException, FileNotFoundException, IOException, InternalErrorException, SQLException {
 		if (dirty )
 			return;
 		do {

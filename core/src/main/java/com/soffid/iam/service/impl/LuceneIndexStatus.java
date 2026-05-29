@@ -59,7 +59,7 @@ public class LuceneIndexStatus {
 		this.timestamp = timestamp;
 	}
 	
-	public Directory getDirectory() throws IOException {
+	public Directory getDirectory() throws IOException, SQLException {
 		if (directory == null) {
 			fetchFromDatabase();
 			directory = new NIOFSDirectory(getIndexDir().toPath());
@@ -129,7 +129,7 @@ public class LuceneIndexStatus {
 				for (int read = in.read(b); read >= 0; read = in.read(b))
 					out.write(b, 0, read);
 				in.close();
-				blob.free();
+//				blob.free();
 			}
 			if (out != null) {
 				out.close();
@@ -223,7 +223,7 @@ public class LuceneIndexStatus {
 				else
 					part.setData(Hibernate.createBlob(Arrays.copyOf(b, read)));
 				luceneIndexPartEntityDao.create(part);
-				part.getData().free();
+//				part.getData().free();
 			}
 			in.close();
 		}

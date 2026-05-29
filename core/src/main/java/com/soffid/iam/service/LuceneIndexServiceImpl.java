@@ -3,6 +3,7 @@ package com.soffid.iam.service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -200,7 +201,7 @@ public class LuceneIndexServiceImpl extends LuceneIndexServiceBase implements In
 		}
 	}
 	
-	private LuceneIndexStatus getStatus(String index) throws FileNotFoundException, IOException, InternalErrorException {
+	private LuceneIndexStatus getStatus(String index) throws FileNotFoundException, IOException, InternalErrorException, SQLException {
 		String realName = Security.getCurrentTenantName()+"/"+index;
 		LuceneIndexStatus s = status.get(realName);
 		if (s == null)

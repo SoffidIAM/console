@@ -12,7 +12,7 @@
 			<generator class='com.soffid.iam.model.identity.IdentityGenerator'/>
 		</id>
 		<property name='domain' type='java.lang.String'>
-			<column name='ATT_DOMAIN' not-null='true' length='450' />
+			<column name='ATT_DOMAIN' not-null='true' length='100' />
 		</property>
 		<property name='column1' type='java.lang.String'>
 			<column name='ATT_COLUMN1' not-null='true' length='450' />

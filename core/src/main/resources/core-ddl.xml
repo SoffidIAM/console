@@ -854,7 +854,7 @@
 		<column name='XAR_TEN_ID'/>
 		<column name='XAR_CODI'/>
 	</index>
-	<index name='SC_ACCOUN_EXTID_NDX' table='SC_ROLES' unique='false'>
+	<index name='SC_ACCOUN_EXTID_NDX' table='SC_ACCOUN' unique='false'>
 		<column name='ACC_EXTID'/>
 	</index>
 	<index name='SC_ACCOUN_NAME' table='SC_ACCOUN' unique='true'>
@@ -1581,7 +1581,7 @@
 
 	<table name='SC_ATTTRA'>
 		<column name='ATT_ID' type='BIGINT' notNull='false' primaryKey='true' autoIncrement='false'/>
-		<column name='ATT_DOMAIN' type='VARCHAR' length='450' notNull='true'/>
+		<column name='ATT_DOMAIN' type='VARCHAR' length='100' notNull='true'/>
 		<column name='ATT_COLUMN1' type='VARCHAR' length='450' notNull='true'/>
 		<column name='ATT_COLUMN2' type='VARCHAR' length='450' notNull='false'/>
 		<column name='ATT_COLUMN3' type='VARCHAR' length='450' notNull='false'/>

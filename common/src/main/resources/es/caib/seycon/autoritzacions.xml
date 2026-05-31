@@ -2035,4 +2035,10 @@
 		<descripcio>Use the Generative AI tool</descripcio>
 		<ambit>Soffid</ambit>
 	</autoritzacio>
+
+	<autoritzacio>
+		<codi>webservice:user</codi>
+		<descripcio>Use console web services</descripcio>
+		<ambit>Soffid</ambit>
+	</autoritzacio>
 </autoritzacions>

@@ -5,6 +5,8 @@
        {"name":"event","type":"com.soffid.iam.rc.api.Issue","required": true}    ]},
     {"name":"createInternalIssue", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
        {"name":"event","type":"com.soffid.iam.rc.api.Issue","required": true}    ]},
+    {"name":"findIssueById", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
+       {"name":"id","type":"java.lang.Long","required": true}    ]},
     {"name":"notify", "return":"com.soffid.iam.rc.api.Issue", "arguments":[
        {"name":"issue","type":"com.soffid.iam.rc.api.Issue","required": true},
        {"name":"address","type":"java.lang.String","required": true},

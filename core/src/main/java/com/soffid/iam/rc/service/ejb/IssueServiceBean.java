@@ -43,6 +43,29 @@ public class IssueServiceBean extends org.springframework.ejb.support.AbstractSt
 		}
 	}
 	/**
+	 * @see com.soffid.iam.rc.service.IssueService#com.soffid.iam.rc.api.Issue findIssueById(java.lang.Long id)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public com.soffid.iam.rc.api.Issue findIssueById(
+		final java.lang.Long id)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		try
+		{
+			return this.issueService.findIssueById(id); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * @see com.soffid.iam.rc.service.IssueService#com.soffid.iam.rc.api.Issue notify(com.soffid.iam.rc.api.Issue issue, java.lang.String address, java.lang.String subject, java.lang.String body)
 	 */
 	@jakarta.annotation.security.PermitAll

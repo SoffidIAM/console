@@ -3742,6 +3742,7 @@
 				<lookup-method name="getApplicationService" bean="com.soffid.iam.iga.service.ApplicationService"/>
 				<lookup-method name="getAsyncRunnerService" bean="com.soffid.iam.impl.service.AsyncRunnerService"/>
 				<property name="auditEntityDao"><ref bean="com.soffid.iam.rc.model.AuditEntity"/></property>
+				<lookup-method name="getConfigurationService" bean="com.soffid.iam.base.service.ConfigurationService"/>
 				<lookup-method name="getDispatcherService" bean="com.soffid.iam.iga.service.DispatcherService"/>
 				<property name="entryPointAccountEntityDao"><ref bean="com.soffid.iam.am.model.EntryPointAccountEntity"/></property>
 				<property name="entryPointEntityDao"><ref bean="com.soffid.iam.am.model.EntryPointEntity"/></property>

@@ -33,6 +33,16 @@ public interface IssueService {
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation findIssueById
+
+	 * @param id 
+	 * @return 
+	 */
+	com.soffid.iam.rc.api.Issue findIssueById(
+		final java.lang.Long id)
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation notify
 
 	 * @param issue 

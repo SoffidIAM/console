@@ -96,6 +96,22 @@ public abstract class EntryPointServiceBase
 		return auditEntityDao;
 	}
 
+	private com.soffid.iam.base.service.ConfigurationService configurationService;
+
+	/**
+	 * Sets reference to <code>configurationService</code>.
+	 */
+	public void setConfigurationService (com.soffid.iam.base.service.ConfigurationService configurationService) {
+		this.configurationService = configurationService;
+	}
+
+	/**
+	 * Gets reference to <code>configurationService</code>.
+	 */
+	public com.soffid.iam.base.service.ConfigurationService getConfigurationService () {
+		return configurationService;
+	}
+
 	private com.soffid.iam.iga.service.DispatcherService dispatcherService;
 
 	/**

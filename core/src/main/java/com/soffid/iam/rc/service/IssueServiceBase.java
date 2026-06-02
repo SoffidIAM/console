@@ -308,6 +308,38 @@ public abstract class IssueServiceBase
 	protected abstract com.soffid.iam.rc.api.Issue handleCreateInternalIssue(com.soffid.iam.rc.api.Issue event) throws Exception;
 
 	/**
+	 * @see com.soffid.iam.rc.service.IssueService#	 * @see com.soffid.iam.rc.service.IssueService#com.soffid.iam.rc.api.Issue findIssueById(java.lang.Long id)
+	 */
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public com.soffid.iam.rc.api.Issue findIssueById(
+		final java.lang.Long id)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		if (id == null) {
+			throw new IllegalArgumentException("com.soffid.iam.rc.api.Issue com.soffid.iam.rc.service.IssueService.findIssueById(java.lang.Long id) - id cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					return new Object[] {handleFindIssueById(id)};
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r.length == 1 ) 
+			return (com.soffid.iam.rc.api.Issue) __r[0];
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.rc.service.IssueService.class).
+			warn ("Error on IssueService.findIssueById", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on IssueService.findIssueById", (Throwable) __r[1]);
+	}
+
+	protected abstract com.soffid.iam.rc.api.Issue handleFindIssueById(java.lang.Long id) throws Exception;
+
+	/**
 	 * @see com.soffid.iam.rc.service.IssueService#	 * @see com.soffid.iam.rc.service.IssueService#com.soffid.iam.rc.api.Issue notify(com.soffid.iam.rc.api.Issue issue, java.lang.String address, java.lang.String subject, java.lang.String body)
 	 */
 	@Transactional(rollbackFor={java.lang.Exception.class})

@@ -15,6 +15,10 @@ public interface IssueService
 		final com.soffid.iam.rc.api.Issue event)
 	throws com.soffid.iam.exception.InternalErrorException;
 
+	com.soffid.iam.rc.api.Issue findIssueById(
+		final java.lang.Long id)
+	throws com.soffid.iam.exception.InternalErrorException;
+
 	com.soffid.iam.rc.api.Issue notify(
 		final com.soffid.iam.rc.api.Issue issue, 
 		final java.lang.String address, 

@@ -11973,6 +11973,20 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[com.soffid.iam.rc.api.Issue findIssueById(java.lang.Long id) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>IssueService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>findIssueById</method-name>
+				<method-params>
+					<method-param>java.lang.Long</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[com.soffid.iam.rc.api.Issue notify(com.soffid.iam.rc.api.Issue issue, java.lang.String address, java.lang.String subject, java.lang.String body) security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -24539,6 +24553,17 @@
 				<method-name>createInternalIssue</method-name>
 				<method-params>
 					<method-param>com.soffid.iam.rc.api.MetaIssue</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>IssueService</ejb-name>
+				<method-name>findIssueById</method-name>
+				<method-params>
+					<method-param>java.lang.Long</method-param>
 				</method-params>
 			</method>
 			<trans-attribute>Supports</trans-attribute>

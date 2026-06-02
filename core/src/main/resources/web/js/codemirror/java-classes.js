@@ -3795,6 +3795,7 @@ CodeMirrorJavaTypes["com.soffid.iam.rc.service.IssuePolicyService"]={
 CodeMirrorJavaTypes["com.soffid.iam.rc.service.IssueService"]={
 	"create":"com.soffid.iam.rc.api.Issue",
 	"createInternalIssue":"com.soffid.iam.rc.api.Issue",
+	"findIssueById":"com.soffid.iam.rc.api.Issue",
 	"notify":"com.soffid.iam.rc.api.Issue",
 	"registerAction":"com.soffid.iam.rc.api.Issue",
 	"update":"com.soffid.iam.rc.api.Issue",

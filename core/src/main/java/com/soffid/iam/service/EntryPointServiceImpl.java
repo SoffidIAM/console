@@ -234,6 +234,39 @@ public class EntryPointServiceImpl extends
 			res.setIcon2Image(icona2.getIcon());
 		}
 
+		for (EntryPointAccountEntity acc: pareE.getAuthorizedAccounts()) {
+			EntryPointAccountEntity acc2 = getEntryPointAccountEntityDao().newEntryPointAccountEntity();
+			acc2.setAccount(acc.getAccount());
+			acc2.setAuthorizationlevel(acc.getAuthorizationlevel());
+			acc2.setEntryPoint(entity);
+			getEntryPointAccountEntityDao().create(acc2);
+		}
+		
+		for (EntryPointUserEntity acc: pareE.getAuthorizedUsers()) {
+			EntryPointUserEntity acc2 = getEntryPointUserEntityDao().newEntryPointUserEntity();
+			acc2.setUser(acc.getUser());
+			acc2.setAuthorizationLevel(acc.getAuthorizationLevel());
+			acc2.setEntryPoint(entity);
+			getEntryPointUserEntityDao().create(acc2);
+		}
+		
+		for (EntryPointGroupEntity acc: pareE.getAuthorizedGroups()) {
+			EntryPointGroupEntity acc2 = getEntryPointGroupEntityDao().newEntryPointGroupEntity();
+			acc2.setGroup(acc.getGroup());
+			acc2.setAuhtorizationLevel(acc.getAuhtorizationLevel());
+			acc2.setEntryPoint(entity);
+			getEntryPointGroupEntityDao().create(acc2);
+		}
+		
+		for (EntryPointRoleEntity acc: pareE.getAuthorizedRoles()) {
+			EntryPointRoleEntity acc2 = getEntryPointRoleEntityDao().newEntryPointRoleEntity();
+			acc2.setRole(acc.getRole());
+			acc2.setAuthorizationLevel(acc.getAuthorizationLevel());
+			acc2.setEntryPoint(entity);
+			getEntryPointRoleEntityDao().create(acc2);
+		}
+		
+		
 		auditarPuntEntrada(
 				"C", res.getName() + Messages.getString("EntryPointServiceImpl.15") + pareE.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 

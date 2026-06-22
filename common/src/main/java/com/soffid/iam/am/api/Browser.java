@@ -164,13 +164,11 @@ public class Browser
 		this.deletedBy = deletedBy;
 	}
 
-	public Browser(java.lang.Long id, java.lang.String ip, java.lang.Boolean deleted, java.lang.Boolean locked)
+	public Browser(java.lang.Long id, java.lang.String ip)
 	{
 		super();
 		this.id = id;
 		this.ip = ip;
-		this.deleted = deleted;
-		this.locked = locked;
 	}
 
 	public Browser(Browser otherBean)

@@ -146,12 +146,6 @@ public abstract class BrowserServiceBase
 		if (browser.getIp() == null || browser.getIp().trim().length() == 0) {
 			throw new IllegalArgumentException("com.soffid.iam.am.api.Browser com.soffid.iam.am.service.BrowserService.create(com.soffid.iam.am.api.Browser browser) - browser.ip cannot be null");
 		}
-		if (browser.getDeleted() == null ) {
-			throw new IllegalArgumentException("com.soffid.iam.am.api.Browser com.soffid.iam.am.service.BrowserService.create(com.soffid.iam.am.api.Browser browser) - browser.deleted cannot be null");
-		}
-		if (browser.getLocked() == null ) {
-			throw new IllegalArgumentException("com.soffid.iam.am.api.Browser com.soffid.iam.am.service.BrowserService.create(com.soffid.iam.am.api.Browser browser) - browser.locked cannot be null");
-		}
 		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
 			public Object run() {
 				try {
@@ -291,12 +285,6 @@ public abstract class BrowserServiceBase
 		if (browser.getIp() == null || browser.getIp().trim().length() == 0) {
 			throw new IllegalArgumentException("com.soffid.iam.am.api.Browser com.soffid.iam.am.service.BrowserService.update(com.soffid.iam.am.api.Browser browser) - browser.ip cannot be null");
 		}
-		if (browser.getDeleted() == null ) {
-			throw new IllegalArgumentException("com.soffid.iam.am.api.Browser com.soffid.iam.am.service.BrowserService.update(com.soffid.iam.am.api.Browser browser) - browser.deleted cannot be null");
-		}
-		if (browser.getLocked() == null ) {
-			throw new IllegalArgumentException("com.soffid.iam.am.api.Browser com.soffid.iam.am.service.BrowserService.update(com.soffid.iam.am.api.Browser browser) - browser.locked cannot be null");
-		}
 		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
 			public Object run() {
 				try {
@@ -398,12 +386,6 @@ public abstract class BrowserServiceBase
 		}
 		if (browser.getIp() == null || browser.getIp().trim().length() == 0) {
 			throw new IllegalArgumentException("void com.soffid.iam.am.service.BrowserService.delete(com.soffid.iam.am.api.Browser browser) - browser.ip cannot be null");
-		}
-		if (browser.getDeleted() == null ) {
-			throw new IllegalArgumentException("void com.soffid.iam.am.service.BrowserService.delete(com.soffid.iam.am.api.Browser browser) - browser.deleted cannot be null");
-		}
-		if (browser.getLocked() == null ) {
-			throw new IllegalArgumentException("void com.soffid.iam.am.service.BrowserService.delete(com.soffid.iam.am.api.Browser browser) - browser.locked cannot be null");
 		}
 		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
 			public Object run() {

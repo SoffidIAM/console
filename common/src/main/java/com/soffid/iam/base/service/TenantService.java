@@ -22,6 +22,17 @@ public interface TenantService {
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation getTenantToken
+	 * Gets a token for a remote Soffid service
+
+	 * @param purpose 
+	 * @return 
+	 */
+	java.lang.String getTenantToken(
+		final java.lang.String[] purpose)
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation create
 	 * Create a new tenant
 

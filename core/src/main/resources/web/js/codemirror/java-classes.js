@@ -1429,6 +1429,7 @@ CodeMirrorJavaTypes["com.soffid.iam.base.service.StatsService"]={
 };
 CodeMirrorJavaTypes["com.soffid.iam.base.service.TenantService"]={
 	"importTenant":"com.soffid.iam.base.api.Tenant",
+	"getTenantToken":"java.lang.String",
 	"create":"com.soffid.iam.base.api.Tenant",
 	"getMasterTenant":"com.soffid.iam.base.api.Tenant",
 	"getTenant":"com.soffid.iam.base.api.Tenant",
@@ -4795,6 +4796,7 @@ CodeMirrorJavaTypes["java.lang.Class"]={
 	"name":"java.lang.String",
 	"module":"java.lang.Module",
 	"packageName":"java.lang.String",
+	"allPermDomain":"java.security.ProtectionDomain",
 	"classRedefinedCount":"int",
 	"genericInfo":"sun.reflect.generics.repository.ClassRepository",
 	"EMPTY_CLASS_ARRAY":"java.lang.Class<?>[]",
@@ -7687,6 +7689,7 @@ CodeMirrorJavaTypes["java.lang.Class<E>"]={
 	"name":"java.lang.String",
 	"module":"java.lang.Module",
 	"packageName":"java.lang.String",
+	"allPermDomain":"java.security.ProtectionDomain",
 	"classRedefinedCount":"int",
 	"genericInfo":"sun.reflect.generics.repository.ClassRepository",
 	"EMPTY_CLASS_ARRAY":"java.lang.Class<?>[]",

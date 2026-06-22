@@ -4297,6 +4297,7 @@
 			<bean class="com.soffid.iam.base.service.TenantServiceImpl">
 				<lookup-method name="getApplicationBootService" bean="com.soffid.iam.impl.service.ApplicationBootService"/>
 				<property name="serverEntityDao"><ref bean="com.soffid.iam.sync.model.ServerEntity"/></property>
+				<property name="soffidLicenseEntityDao"><ref bean="com.soffid.iam.base.model.SoffidLicenseEntity"/></property>
 				<property name="tenantDisabledPermissionEntityDao"><ref bean="com.soffid.iam.base.model.TenantDisabledPermissionEntity"/></property>
 				<property name="tenantEntityDao"><ref bean="com.soffid.iam.base.model.TenantEntity"/></property>
 				<property name="tenantServerEntityDao"><ref bean="com.soffid.iam.base.model.TenantServerEntity"/></property>
@@ -5540,6 +5541,8 @@
 			<bean class="com.soffid.iam.rc.service.GeoInformationServiceImpl">
 				<property name="geoInformationEntityDao"><ref bean="com.soffid.iam.rc.model.GeoInformationEntity"/></property>
 				<lookup-method name="getNetworkService" bean="com.soffid.iam.am.service.NetworkService"/>
+				<property name="soffidLicenseEntityDao"><ref bean="com.soffid.iam.base.model.SoffidLicenseEntity"/></property>
+				<lookup-method name="getTenantService" bean="com.soffid.iam.base.service.TenantService"/>
 			</bean>
 		</property>
 		<property name="proxyInterfaces">

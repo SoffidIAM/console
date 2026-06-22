@@ -16848,6 +16848,17 @@
 		<container-transaction>
 			<method>
 				<ejb-name>TenantService</ejb-name>
+				<method-name>getTenantToken</method-name>
+				<method-params>
+					<method-param>java.lang.String[]</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>TenantService</ejb-name>
 				<method-name>create</method-name>
 				<method-params>
 					<method-param>com.soffid.iam.base.api.MetaTenant</method-param>

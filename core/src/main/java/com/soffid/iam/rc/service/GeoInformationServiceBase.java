@@ -48,6 +48,38 @@ public abstract class GeoInformationServiceBase
 		return networkService;
 	}
 
+	private com.soffid.iam.base.model.SoffidLicenseEntityDao soffidLicenseEntityDao;
+
+	/**
+	 * Sets reference to <code>soffidLicenseEntityDao</code>.
+	 */
+	public void setSoffidLicenseEntityDao (com.soffid.iam.base.model.SoffidLicenseEntityDao soffidLicenseEntityDao) {
+		this.soffidLicenseEntityDao = soffidLicenseEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>soffidLicenseEntityDao</code>.
+	 */
+	public com.soffid.iam.base.model.SoffidLicenseEntityDao getSoffidLicenseEntityDao () {
+		return soffidLicenseEntityDao;
+	}
+
+	private com.soffid.iam.base.service.TenantService tenantService;
+
+	/**
+	 * Sets reference to <code>tenantService</code>.
+	 */
+	public void setTenantService (com.soffid.iam.base.service.TenantService tenantService) {
+		this.tenantService = tenantService;
+	}
+
+	/**
+	 * Gets reference to <code>tenantService</code>.
+	 */
+	public com.soffid.iam.base.service.TenantService getTenantService () {
+		return tenantService;
+	}
+
 
 	/**
 	 * @see com.soffid.iam.rc.service.GeoInformationService#	 * @see com.soffid.iam.rc.service.GeoInformationService#com.soffid.iam.rc.api.GeoInformation getGeoInformation(java.lang.String ip)

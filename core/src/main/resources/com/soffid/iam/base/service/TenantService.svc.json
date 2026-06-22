@@ -3,6 +3,8 @@
   "methods": [
     {"name":"importTenant", "comments":"Ipmorts a tenant to a file", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
        {"name":"in","type":"java.io.InputStream","required": true}    ]},
+    {"name":"getTenantToken", "comments":"Gets a token for a remote Soffid service", "return":"java.lang.String", "arguments":[
+       {"name":"purpose","type":"java.lang.String[]","required": true}    ]},
     {"name":"create", "comments":"Create a new tenant", "return":"com.soffid.iam.base.api.Tenant", "arguments":[
        {"name":"tenant","type":"com.soffid.iam.base.api.Tenant","required": true}    ]},
     {"name":"getMasterTenant", "comments":"Gets master tenant", "return":"com.soffid.iam.base.api.Tenant", "arguments":[

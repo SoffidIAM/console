@@ -48,6 +48,22 @@ public abstract class TenantServiceBase
 		return serverEntityDao;
 	}
 
+	private com.soffid.iam.base.model.SoffidLicenseEntityDao soffidLicenseEntityDao;
+
+	/**
+	 * Sets reference to <code>soffidLicenseEntityDao</code>.
+	 */
+	public void setSoffidLicenseEntityDao (com.soffid.iam.base.model.SoffidLicenseEntityDao soffidLicenseEntityDao) {
+		this.soffidLicenseEntityDao = soffidLicenseEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>soffidLicenseEntityDao</code>.
+	 */
+	public com.soffid.iam.base.model.SoffidLicenseEntityDao getSoffidLicenseEntityDao () {
+		return soffidLicenseEntityDao;
+	}
+
 	private com.soffid.iam.base.model.TenantDisabledPermissionEntityDao tenantDisabledPermissionEntityDao;
 
 	/**
@@ -128,6 +144,38 @@ public abstract class TenantServiceBase
 	}
 
 	protected abstract com.soffid.iam.base.api.Tenant handleImportTenant(java.io.InputStream in) throws Exception;
+
+	/**
+	 * @see com.soffid.iam.base.service.TenantService#	 * @see com.soffid.iam.base.service.TenantService#java.lang.String getTenantToken(java.lang.String[] purpose)
+	 */
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public java.lang.String getTenantToken(
+		final java.lang.String[] purpose)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		if (purpose == null ) {
+			throw new IllegalArgumentException("java.lang.String com.soffid.iam.base.service.TenantService.getTenantToken(java.lang.String[] purpose) - purpose cannot be empty");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					return new Object[] {handleGetTenantToken(purpose)};
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r.length == 1 ) 
+			return (java.lang.String) __r[0];
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.base.service.TenantService.class).
+			warn ("Error on TenantService.getTenantToken", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on TenantService.getTenantToken", (Throwable) __r[1]);
+	}
+
+	protected abstract java.lang.String handleGetTenantToken(java.lang.String[] purpose) throws Exception;
 
 	/**
 	 * @see com.soffid.iam.base.service.TenantService#	 * @see com.soffid.iam.base.service.TenantService#com.soffid.iam.base.api.Tenant create(com.soffid.iam.base.api.Tenant tenant)

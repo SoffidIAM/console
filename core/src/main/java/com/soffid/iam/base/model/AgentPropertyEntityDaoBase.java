@@ -28,6 +28,50 @@ public abstract class AgentPropertyEntityDaoBase
 
 
 	/**
+	 * Operation findByClassName
+	 * @param className
+	 * @return
+	**/
+	public java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity> findByClassName(
+	    java.lang.String className)
+	
+	{
+		return findByClassName((com.soffid.iam.model.criteria.CriteriaSearchConfiguration) null			, className);
+	}
+	/**
+	 * CriteriaSearchConfiguration implementation
+	 */
+	public java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity> findByClassName(final com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.String className)
+	
+	{
+		return findByClassName("select ap\nfrom com.soffid.iam.base.model.AgentPropertyEntity as ap\nwhere ap.agent.className=:className\n",
+			criteria, className);
+	}
+	/**
+	 * Internal implementation
+	 */
+	public java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity> findByClassName(final java.lang.String queryString, com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.String className)
+	
+	{
+		try
+		{
+			org.hibernate.Query queryObject = super.getSession(false).createQuery(queryString);
+			queryObject.setParameter("className", className, org.hibernate.Hibernate.STRING);
+			if (criteria != null && criteria.getMaximumResultSize () != null) {
+				queryObject.setMaxResults (criteria.getMaximumResultSize ().intValue()); 
+			}
+			if (criteria != null && criteria.getFirstResult () != null) {
+				queryObject.setFirstResult (criteria.getFirstResult().intValue()); 
+			}
+			java.util.List results = queryObject.list();
+			return (java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity>) results;
+		}
+		catch (org.hibernate.HibernateException ex) 
+		{
+			throw super.convertHibernateAccessException(ex);
+		}
+	}
+	/**
 	 *  Copy data to {@link com.soffid.iam.base.api.AgentProperty} object 
 	 */
 	public void toAgentProperty(com.soffid.iam.base.model.AgentPropertyEntity source, com.soffid.iam.base.api.AgentProperty target) {

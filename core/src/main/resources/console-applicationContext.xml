@@ -4663,6 +4663,7 @@
 				<property name="accountMetadataEntityDao"><ref bean="com.soffid.iam.base.model.AccountMetadataEntity"/></property>
 				<lookup-method name="getAccountService" bean="com.soffid.iam.base.service.AccountService"/>
 				<property name="agentDescriptorEntityDao"><ref bean="com.soffid.iam.base.model.AgentDescriptorEntity"/></property>
+				<property name="agentPropertyEntityDao"><ref bean="com.soffid.iam.base.model.AgentPropertyEntity"/></property>
 				<lookup-method name="getApplicationService" bean="com.soffid.iam.iga.service.ApplicationService"/>
 				<lookup-method name="getAsyncRunnerService" bean="com.soffid.iam.impl.service.AsyncRunnerService"/>
 				<property name="attributeMappingEntityDao"><ref bean="com.soffid.iam.iga.model.AttributeMappingEntity"/></property>

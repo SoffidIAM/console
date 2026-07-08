@@ -112,6 +112,22 @@ public abstract class DispatcherServiceBase
 		return agentDescriptorEntityDao;
 	}
 
+	private com.soffid.iam.base.model.AgentPropertyEntityDao agentPropertyEntityDao;
+
+	/**
+	 * Sets reference to <code>agentPropertyEntityDao</code>.
+	 */
+	public void setAgentPropertyEntityDao (com.soffid.iam.base.model.AgentPropertyEntityDao agentPropertyEntityDao) {
+		this.agentPropertyEntityDao = agentPropertyEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>agentPropertyEntityDao</code>.
+	 */
+	public com.soffid.iam.base.model.AgentPropertyEntityDao getAgentPropertyEntityDao () {
+		return agentPropertyEntityDao;
+	}
+
 	private com.soffid.iam.iga.service.ApplicationService applicationService;
 
 	/**

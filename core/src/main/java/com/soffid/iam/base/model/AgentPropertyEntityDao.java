@@ -12,6 +12,19 @@ public interface AgentPropertyEntityDao
 
 {
 	/**
+	 * Operation findByClassName
+	 * @param className
+	 * @return
+	**/
+	public java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity> findByClassName(
+		java.lang.String className)  ;
+
+	/**
+	 * CriteriaSearchConfiguration finder
+	 */
+	public java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity> findByClassName(final com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.String className)
+	;
+	/**
 	 *  Copy data to {@link com.soffid.iam.base.api.AgentProperty} object 
 	 */
 	public void toAgentProperty(com.soffid.iam.base.model.AgentPropertyEntity source, com.soffid.iam.base.api.AgentProperty target) ;

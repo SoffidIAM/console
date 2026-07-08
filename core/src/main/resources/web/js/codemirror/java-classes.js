@@ -7904,6 +7904,10 @@ CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AgentDescrip
 	"size": "int",
 	"get": "com.soffid.iam.base.model.AgentDescriptorEntity"
 };
+CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AgentPropertyEntity>"]={
+	"size": "int",
+	"get": "com.soffid.iam.base.model.AgentPropertyEntity"
+};
 CodeMirrorJavaTypes["java.util.Collection<com.soffid.iam.base.model.AuthorizationEntity>"]={
 	"size": "int",
 	"get": "com.soffid.iam.base.model.AuthorizationEntity"

@@ -45,6 +45,9 @@
 			<p>
 				<input name="formUCboton" type="button" value="${c:l('LogoutServlet.4')}" onClick="reload()">
 			</p>
+			<p>
+				${globalLogout}
+			</p>
 		</div>
        	<div class="soffid-logo-corner"><a href="http://www.soffid.com/"><img src="/soffid/anonymous/logo - pb-orig.svg" style="width: 100%" alt="Soffid logo" /></a></div> 
 ]]></html>

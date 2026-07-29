@@ -42,4 +42,7 @@ public class SamlService {
 	List<String> findIdentityProviders (String url) {return null;}
 	
 	String validateOpenidToken(String token) {return null;}
+
+	@Description("Validates the SAML response, and returns a single use username and password")
+	SamlRequest generateLogoutRequest(String hostName, @Nullable String user) {return null;}
 }

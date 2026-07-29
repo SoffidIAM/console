@@ -87,7 +87,14 @@ public class MainWindow extends Window {
 							}
 							else
 							{
-								getDesktop().getExecution().sendRedirect("/anonymous/logout.zul");
+								SoffidPrincipal p = Security.getSoffidPrincipal();
+								if (p != null &&
+										"SAML".equals(p.getAuthenticationMethod()) &&
+										p.getUserName() != null)
+									getDesktop().getExecution().sendRedirect("/anonymous/logout.zul?samlLogout="
+											+ p.getUserName());
+								else
+									getDesktop().getExecution().sendRedirect("/anonymous/logout.zul");
 								session.invalidate();
 							}
 						}

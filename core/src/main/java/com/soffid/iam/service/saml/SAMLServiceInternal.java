@@ -423,6 +423,22 @@ public class SAMLServiceInternal {
 	}
 
 	public String generateMetadata(String hostName) throws MarshallingException, InvalidKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
+		EntityDescriptor entity = generateConsoleDescriptor(hostName);
+		
+		MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+		 
+		// Get the Subject marshaller
+		Marshaller marshaller = marshallerFactory.getMarshaller(entity);
+		 
+		// Marshall the Subject
+		Element xml = marshaller.marshall(entity);
+
+		return generateString(xml, true);
+	}
+
+	private EntityDescriptor generateConsoleDescriptor(String hostName) throws InternalErrorException,
+			KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, InvalidKeyException,
+			NoSuchProviderException, SignatureException, CertificateEncodingException {
 		EntityDescriptor entity = new EntityDescriptorBuilder().buildObject();
 		// Generate entity descriptor
 		entity.setEntityID(getEntityId(hostName, true));		
@@ -480,16 +496,7 @@ public class SAMLServiceInternal {
 		NameIDFormat nid = new NameIDFormatBuilder().buildObject();
 		spsso.getNameIDFormats().add(nid);
 		nid.setFormat("urn:oasis:names:tc:SAML:2.0:nameid-format:persistent");
-		
-		MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
-		 
-		// Get the Subject marshaller
-		Marshaller marshaller = marshallerFactory.getMarshaller(entity);
-		 
-		// Marshall the Subject
-		Element xml = marshaller.marshall(entity);
-
-		return generateString(xml, true);
+		return entity;
 	}
 
 	private KeyInfo generateKeyInfo(boolean complete) throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
@@ -1435,6 +1442,105 @@ public class SAMLServiceInternal {
 				throw new InternalErrorException(e.getMessage(), e);
 		}
 
+	}
+
+	public SamlRequest generateSamlLogout(String hostName, String userName) throws InternalErrorException {
+		try {
+			// Get the assertion builder based on the assertion element name
+			SAMLObjectBuilder<LogoutRequest> builder = (SAMLObjectBuilder<LogoutRequest>) builderFactory.getBuilder(LogoutRequest.DEFAULT_ELEMENT_NAME);
+			 
+			EntityDescriptor idp = getIdpMetadata(hostName);
+			if (idp == null)
+				throw new InternalErrorException(String.format("Unable to find Identity Provider metadata"));
+			IDPSSODescriptor idpssoDescriptor = idp.getIDPSSODescriptor(SAMLConstants.SAML20P_NS);
+
+			EntityDescriptor sp = generateConsoleDescriptor(hostName);
+			
+			// Create the assertion
+			LogoutRequest req = builder.buildObject( );
+			
+			String newID = generateRandomId();
+			
+			SamlRequest r = new SamlRequest();
+			r.setParameters(new HashMap<String, String>());
+			SPSSODescriptor spsso = sp.getSPSSODescriptor(SAMLConstants.SAML20P_NS);
+			boolean found = false;
+			req.setID(newID);
+			req.setIssueInstant(new DateTime ());
+			NameID nameId = ((SAMLObjectBuilder<NameID>) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME)).buildObject();
+			nameId.setValue( userName );
+			req.setNameID(nameId);
+
+			req.setReason("urn:oasis:names:tc:SAML:2.0:logout:user");
+			
+			Issuer issuer = ( (SAMLObjectBuilder<Issuer>) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME)).buildObject();
+			issuer.setValue( sp.getEntityID() );
+			
+			req.setIssuer( issuer );
+
+			
+			String encodedRequest = null;
+			for (SingleLogoutService sss : idpssoDescriptor.getSingleLogoutServices()) {
+				if (sss.getBinding().equals(SAMLConstants.SAML2_REDIRECT_BINDING_URI)) { // Max GET length is usually 8192
+					req.setDestination(sss.getLocation());
+					encodedRequest = signAndEncode(req, sss, idp);
+					if (encodedRequest.length() <= 2000)
+					{
+						r.setMethod(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
+						r.setUrl(sss.getLocation());
+						break;
+					}
+				}
+				if (sss.getBinding().equals(SAMLConstants.SAML2_POST_BINDING_URI)) {
+					req.setDestination(sss.getLocation());
+					r.setMethod(SAMLConstants.SAML2_POST_BINDING_URI);
+					r.setUrl(sss.getLocation());
+					encodedRequest = signAndEncode(req, sss, idp);
+					break;
+				}
+			}
+			if (r.getUrl() == null)
+				throw new InternalErrorException(String.format("Unable to find a suitable endpoint for IdP %s", idp.getEntityID()));
+			
+			
+			r.getParameters().put("SAMLRequest", encodedRequest);
+
+
+			return r;
+		} catch (Exception e) {
+			if (e instanceof InternalErrorException)
+				throw (InternalErrorException) e;
+			else
+				throw new InternalErrorException(e.getMessage(), e);
+		}
+	}
+	
+	private String signAndEncode(LogoutRequest req, SingleLogoutService sss, EntityDescriptor idp) throws InvalidKeyException, UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IllegalStateException, NoSuchProviderException, SignatureException, IOException, InternalErrorException, MarshallingException, org.opensaml.xmlsec.signature.support.SignatureException, UnmarshallingException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
+		Element xml = sign (builderFactory, req);
+		
+		String xmlString = generateString(xml, false);
+		
+		return xmlString;
+	}
+
+	private String generateRandomId() {
+		StringBuffer sb = new StringBuffer();
+		SecureRandom sr = new SecureRandom();
+		for (int i = 0; i < 32; i++)
+		{
+			int random = sr.nextInt(64);
+			if (random < 26)
+				sb.append((char) ('A'+random));
+			else if (random < 52)
+				sb.append((char) ('a'+random-26));
+			else if (random < 62)
+				sb.append((char) ('0'+random-52));
+			else if (random < 63)
+				sb.append('+');
+			else
+				sb.append('/');
+		}
+		return sb.toString();
 	}
 
 }

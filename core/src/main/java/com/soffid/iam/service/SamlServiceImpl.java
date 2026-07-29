@@ -111,4 +111,8 @@ public class SamlServiceImpl extends SamlServiceBase {
 		return getDelegate().generateLogoutRequest(hostName);
 	}
 
+	@Override
+	protected SamlRequest handleGenerateLogoutRequest(String hostName, String user) throws Exception {
+		return getDelegate().generateSamlLogout(hostName, user);
+	}
 }

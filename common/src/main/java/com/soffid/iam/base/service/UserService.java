@@ -737,6 +737,23 @@ public interface UserService {
 			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.BadPasswordException;
 
 	/**
+	 * Operation setTemporaryPassword
+	 * Sets a temporary password for a user
+
+	 * @param userName 
+	 * @param passwordDomain The password domain uses to be 'DEFAULT'
+
+	 * @param newPassword 
+	 * @param expirationDate 
+	 */
+	void setTemporaryPassword(
+		final java.lang.String userName, 
+		final java.lang.String passwordDomain, 
+		final com.soffid.iam.am.api.Password newPassword, 
+		final java.util.Date expirationDate)
+			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.BadPasswordException;
+
+	/**
 	 * Operation unlockPasswordDomain
 
 	 * @param user 

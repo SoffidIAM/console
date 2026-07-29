@@ -828,6 +828,38 @@ public class UserServiceBean extends org.springframework.ejb.support.AbstractSta
 		}
 	}
 	/**
+	 * @see com.soffid.iam.base.service.UserService#void setTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public void setTemporaryPassword(
+		final java.lang.String userName, 
+		final java.lang.String passwordDomain, 
+		final com.soffid.iam.am.api.Password newPassword, 
+		final java.util.Date expirationDate)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.BadPasswordException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		if (! com.soffid.iam.utils.Security.isUserInRole("user:password:update"))
+			throw new SecurityException("Unable to execute UserService.setTemporaryPassword. Required roles: [user:password:update]");
+		try
+		{
+			this.userService.setTemporaryPassword(userName, passwordDomain, newPassword, expirationDate); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (cause instanceof com.soffid.iam.exception.BadPasswordException)
+				throw (com.soffid.iam.exception.BadPasswordException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * @see com.soffid.iam.base.service.UserService#void unlockPasswordDomain(java.lang.String user, java.lang.String passwordDomain)
 	 */
 	@jakarta.annotation.security.PermitAll

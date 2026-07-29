@@ -100,6 +100,11 @@
        {"name":"userName","type":"java.lang.String","required": true},
        {"name":"passwordDomain","type":"java.lang.String","required": true, "comments":"The password domain uses to be 'DEFAULT'"},
        {"name":"newPassword","type":"com.soffid.iam.am.api.Password","required": true}    ]},
+    {"name":"setTemporaryPassword", "comments":"Sets a temporary password for a user", "return":"void", "arguments":[
+       {"name":"userName","type":"java.lang.String","required": true},
+       {"name":"passwordDomain","type":"java.lang.String","required": true, "comments":"The password domain uses to be 'DEFAULT'"},
+       {"name":"newPassword","type":"com.soffid.iam.am.api.Password","required": true},
+       {"name":"expirationDate","type":"java.util.Date","required":false}    ]},
     {"name":"unlockPasswordDomain", "return":"void", "arguments":[
        {"name":"user","type":"java.lang.String","required": true},
        {"name":"passwordDomain","type":"java.lang.String","required": true}    ]}

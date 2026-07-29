@@ -3171,6 +3171,52 @@ public abstract class UserServiceBase
 	protected abstract void handleSetTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword) throws Exception;
 
 	/**
+	 * @see com.soffid.iam.base.service.UserService#	 * @see com.soffid.iam.base.service.UserService#void setTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRED, 
+		rollbackFor={java.lang.Exception.class})
+	public void setTemporaryPassword(
+		final java.lang.String userName, 
+		final java.lang.String passwordDomain, 
+		final com.soffid.iam.am.api.Password newPassword, 
+		final java.util.Date expirationDate)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.BadPasswordException
+	{
+		if (userName == null || userName.trim().length() == 0) {
+			throw new IllegalArgumentException("void com.soffid.iam.base.service.UserService.setTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate) - userName cannot be null");
+		}
+		if (passwordDomain == null || passwordDomain.trim().length() == 0) {
+			throw new IllegalArgumentException("void com.soffid.iam.base.service.UserService.setTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate) - passwordDomain cannot be null");
+		}
+		if (newPassword == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.base.service.UserService.setTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate) - newPassword cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					handleSetTemporaryPassword(userName, passwordDomain, newPassword, expirationDate);
+					return null;
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r == null) return;
+		if (__r[1] instanceof com.soffid.iam.exception.BadPasswordException) 
+			throw (com.soffid.iam.exception.BadPasswordException) __r[1];
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.base.service.UserService.class).
+			warn ("Error on UserService.setTemporaryPassword", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on UserService.setTemporaryPassword", (Throwable) __r[1]);
+	}
+
+	protected abstract void handleSetTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate) throws Exception;
+
+	/**
 	 * @see com.soffid.iam.base.service.UserService#	 * @see com.soffid.iam.base.service.UserService#void unlockPasswordDomain(java.lang.String user, java.lang.String passwordDomain)
 	 */
 	@Transactional(rollbackFor={java.lang.Exception.class})

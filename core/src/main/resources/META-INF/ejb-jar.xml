@@ -4941,6 +4941,23 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[void setTemporaryPassword(java.lang.String userName, java.lang.String passwordDomain, com.soffid.iam.am.api.Password newPassword, java.util.Date expirationDate) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[Sets a temporary password for a user]]></description>
+				<ejb-name>UserService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>setTemporaryPassword</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+					<method-param>java.lang.String</method-param>
+					<method-param>com.soffid.iam.am.api.MetaPassword</method-param>
+					<method-param>java.util.Date</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[void unlockPasswordDomain(java.lang.String user, java.lang.String passwordDomain) security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -17732,6 +17749,20 @@
 					<method-param>java.lang.String</method-param>
 					<method-param>java.lang.String</method-param>
 					<method-param>com.soffid.iam.am.api.MetaPassword</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>UserService</ejb-name>
+				<method-name>setTemporaryPassword</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+					<method-param>java.lang.String</method-param>
+					<method-param>com.soffid.iam.am.api.MetaPassword</method-param>
+					<method-param>java.util.Date</method-param>
 				</method-params>
 			</method>
 			<trans-attribute>Supports</trans-attribute>

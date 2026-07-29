@@ -505,6 +505,23 @@ public interface InternalPasswordService {
 			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation storeAndForwardPassword
+
+	 * @param user 
+	 * @param passwordDomain 
+	 * @param password 
+	 * @param mustChange 
+	 * @param expirationDate 
+	 */
+	void storeAndForwardPassword(
+		final com.soffid.iam.base.model.UserEntity user, 
+		final com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, 
+		final com.soffid.iam.am.api.Password password, 
+		final boolean mustChange, 
+		final java.util.Date expirationDate)
+			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation storeAndForwardPasswordById
 
 	 * @param user 
@@ -517,6 +534,23 @@ public interface InternalPasswordService {
 		final long passwordDomain, 
 		final com.soffid.iam.am.api.Password password, 
 		final boolean mustChange)
+			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
+
+	/**
+	 * Operation storeAndForwardPasswordById
+
+	 * @param user 
+	 * @param passwordDomain 
+	 * @param password 
+	 * @param mustChange 
+	 * @param expirationDate 
+	 */
+	void storeAndForwardPasswordById(
+		final long user, 
+		final long passwordDomain, 
+		final com.soffid.iam.am.api.Password password, 
+		final boolean mustChange, 
+		final java.util.Date expirationDate)
 			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
 	/**
@@ -562,6 +596,23 @@ public interface InternalPasswordService {
 		final com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, 
 		final com.soffid.iam.am.api.Password password, 
 		final boolean mustChange)
+			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
+
+	/**
+	 * Operation storePassword
+
+	 * @param user 
+	 * @param passwordDomain 
+	 * @param password 
+	 * @param mustChange 
+	 * @param expirationDate 
+	 */
+	void storePassword(
+		final com.soffid.iam.base.model.UserEntity user, 
+		final com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, 
+		final com.soffid.iam.am.api.Password password, 
+		final boolean mustChange, 
+		final java.util.Date expirationDate)
 			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
 	/**

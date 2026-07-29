@@ -146,6 +146,13 @@ public interface UserService
 		final com.soffid.iam.am.api.Password newPassword)
 	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.BadPasswordException;
 
+	void setTemporaryPassword(
+		final java.lang.String userName, 
+		final java.lang.String passwordDomain, 
+		final com.soffid.iam.am.api.Password newPassword, 
+		final java.util.Date expirationDate)
+	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.BadPasswordException;
+
 	void unlockPasswordDomain(
 		final java.lang.String user, 
 		final java.lang.String passwordDomain)

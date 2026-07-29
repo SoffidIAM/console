@@ -1855,6 +1855,51 @@ public abstract class InternalPasswordServiceBase
 	protected abstract void handleStoreAndForwardPassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange) throws Exception;
 
 	/**
+	 * @see com.soffid.iam.impl.service.InternalPasswordService#	 * @see com.soffid.iam.impl.service.InternalPasswordService#void storeAndForwardPassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRED, 
+		rollbackFor={java.lang.Exception.class})
+	public void storeAndForwardPassword(
+		final com.soffid.iam.base.model.UserEntity user, 
+		final com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, 
+		final com.soffid.iam.am.api.Password password, 
+		final boolean mustChange, 
+		final java.util.Date expirationDate)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		if (user == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storeAndForwardPassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - user cannot be null");
+		}
+		if (passwordDomain == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storeAndForwardPassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - passwordDomain cannot be null");
+		}
+		if (password == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storeAndForwardPassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - password cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					handleStoreAndForwardPassword(user, passwordDomain, password, mustChange, expirationDate);
+					return null;
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r == null) return;
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.impl.service.InternalPasswordService.class).
+			warn ("Error on InternalPasswordService.storeAndForwardPassword", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on InternalPasswordService.storeAndForwardPassword", (Throwable) __r[1]);
+	}
+
+	protected abstract void handleStoreAndForwardPassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) throws Exception;
+
+	/**
 	 * @see com.soffid.iam.impl.service.InternalPasswordService#	 * @see com.soffid.iam.impl.service.InternalPasswordService#void storeAndForwardPasswordById(long user, long passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange)
 	 */
 	// Trasaction attribute 
@@ -1891,6 +1936,45 @@ public abstract class InternalPasswordServiceBase
 	}
 
 	protected abstract void handleStoreAndForwardPasswordById(long user, long passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange) throws Exception;
+
+	/**
+	 * @see com.soffid.iam.impl.service.InternalPasswordService#	 * @see com.soffid.iam.impl.service.InternalPasswordService#void storeAndForwardPasswordById(long user, long passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRED, 
+		rollbackFor={java.lang.Exception.class})
+	public void storeAndForwardPasswordById(
+		final long user, 
+		final long passwordDomain, 
+		final com.soffid.iam.am.api.Password password, 
+		final boolean mustChange, 
+		final java.util.Date expirationDate)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		if (password == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storeAndForwardPasswordById(long user, long passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - password cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					handleStoreAndForwardPasswordById(user, passwordDomain, password, mustChange, expirationDate);
+					return null;
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r == null) return;
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.impl.service.InternalPasswordService.class).
+			warn ("Error on InternalPasswordService.storeAndForwardPasswordById", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on InternalPasswordService.storeAndForwardPasswordById", (Throwable) __r[1]);
+	}
+
+	protected abstract void handleStoreAndForwardPasswordById(long user, long passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) throws Exception;
 
 	/**
 	 * @see com.soffid.iam.impl.service.InternalPasswordService#	 * @see com.soffid.iam.impl.service.InternalPasswordService#void storeAndSynchronizeAccountPassword(com.soffid.iam.base.model.AccountEntity account, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate)
@@ -2020,6 +2104,51 @@ public abstract class InternalPasswordServiceBase
 	}
 
 	protected abstract void handleStorePassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange) throws Exception;
+
+	/**
+	 * @see com.soffid.iam.impl.service.InternalPasswordService#	 * @see com.soffid.iam.impl.service.InternalPasswordService#void storePassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRED, 
+		rollbackFor={java.lang.Exception.class})
+	public void storePassword(
+		final com.soffid.iam.base.model.UserEntity user, 
+		final com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, 
+		final com.soffid.iam.am.api.Password password, 
+		final boolean mustChange, 
+		final java.util.Date expirationDate)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		if (user == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storePassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - user cannot be null");
+		}
+		if (passwordDomain == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storePassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - passwordDomain cannot be null");
+		}
+		if (password == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.InternalPasswordService.storePassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) - password cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					handleStorePassword(user, passwordDomain, password, mustChange, expirationDate);
+					return null;
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r == null) return;
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.impl.service.InternalPasswordService.class).
+			warn ("Error on InternalPasswordService.storePassword", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on InternalPasswordService.storePassword", (Throwable) __r[1]);
+	}
+
+	protected abstract void handleStorePassword(com.soffid.iam.base.model.UserEntity user, com.soffid.iam.am.model.PasswordDomainEntity passwordDomain, com.soffid.iam.am.api.Password password, boolean mustChange, java.util.Date expirationDate) throws Exception;
 
 	/**
 	 * @see com.soffid.iam.impl.service.InternalPasswordService#	 * @see com.soffid.iam.impl.service.InternalPasswordService#void storePassword(java.lang.String user, java.lang.String passwordDomain, java.lang.String password, boolean mustChange)

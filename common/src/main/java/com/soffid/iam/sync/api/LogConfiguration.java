@@ -29,6 +29,12 @@ public class LogConfiguration
 	private boolean debug;
 
 	/**
+	 * Attribute syslog
+
+	 */
+	private boolean syslog;
+
+	/**
 	 * Attribute numRows
 
 	 */
@@ -44,18 +50,19 @@ public class LogConfiguration
 	{
 	}
 
-	public LogConfiguration(java.lang.String name, boolean debug, long numRows, long maxFiles)
+	public LogConfiguration(java.lang.String name, boolean debug, boolean syslog, long numRows, long maxFiles)
 	{
 		super();
 		this.name = name;
 		this.debug = debug;
+		this.syslog = syslog;
 		this.numRows = numRows;
 		this.maxFiles = maxFiles;
 	}
 
 	public LogConfiguration(LogConfiguration otherBean)
 	{
-		this(otherBean.name, otherBean.debug, otherBean.numRows, otherBean.maxFiles);
+		this(otherBean.name, otherBean.debug, otherBean.syslog, otherBean.numRows, otherBean.maxFiles);
 	}
 
 	/**
@@ -84,6 +91,20 @@ public class LogConfiguration
 	 */
 	public void setDebug(boolean debug) {
 		this.debug = debug;
+	}
+
+	/**
+	 * Gets value for attribute syslog
+	 */
+	public boolean isSyslog() {
+		return this.syslog;
+	}
+
+	/**
+	 * Sets value for attribute syslog
+	 */
+	public void setSyslog(boolean syslog) {
+		this.syslog = syslog;
 	}
 
 	/**
@@ -125,6 +146,8 @@ public class LogConfiguration
 		b.append (this.name);
 		b.append (", debug: ");
 		b.append (this.debug);
+		b.append (", syslog: ");
+		b.append (this.syslog);
 		b.append (", numRows: ");
 		b.append (this.numRows);
 		b.append (", maxFiles: ");

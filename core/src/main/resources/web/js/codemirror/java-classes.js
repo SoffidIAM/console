@@ -3921,6 +3921,7 @@ CodeMirrorJavaTypes["com.soffid.iam.sync.api.AuthoritativeChangeIdentifier"]={
 CodeMirrorJavaTypes["com.soffid.iam.sync.api.LogConfiguration"]={
 	"name":"java.lang.String",
 	"debug":"boolean",
+	"syslog":"boolean",
 	"numRows":"long",
 	"maxFiles":"long"
 };

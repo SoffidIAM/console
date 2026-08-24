@@ -569,20 +569,11 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 	}
 
 	private boolean esPotEliminarUsuariGrup(UserGroupEntity usuariGrup) {
-		// Obtenim el grup primari de l'usuari
-		GroupEntity gp = usuariGrup.getUser().getPrimaryGroup();
-		String codiGrupPrimari = gp != null && gp.getName() != null ? gp.getName() : ""; //$NON-NLS-1$
-		for (RoleAccountEntity rolUsuari : getRoleAccountEntityDao().findByUserName(usuariGrup.getUser().getUserName())) {
-            if (TipusDomini.GRUPS_USUARI.equals(rolUsuari.getDomainType()) ||
-            		TipusDomini.MEMBERSHIPS.equals(rolUsuari.getDomainType())) {
-                String codiGrupValorDomini = rolUsuari.getGroup().getName();
-                String codiGrupGrupUsuari = usuariGrup.getGroup().getName();
-                if (codiGrupValorDomini.compareTo(codiGrupGrupUsuari) == 0) {
-                    if (!codiGrupPrimari.equals(codiGrupValorDomini)) return false;
-                }
-            }
-        }
-		return true;
+		String codiGrupPrimari = usuariGrup.getGroup().getName();
+		if (Security.isUserInRole("user:group:delete/"+codiGrupPrimari))
+			return true;
+		else
+			return false;
 	}
 
 	protected void handleDelete(GroupUser usuariGrup) throws Exception {

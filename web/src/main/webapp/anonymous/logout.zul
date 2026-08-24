@@ -36,7 +36,7 @@
 			document.location.href="..";
 		}
 	</script>
-	<html id="htmlData"><![CDATA[
+	<html id="htmlData" use="com.soffid.iam.web.main.LogoutSamlHandler"><![CDATA[
 		<div class="login" id='login'>
 			<div class="loginimage">
 				<img src="/soffid/anonymous/logo.png" style="max-width: 280px; max-height: 125px;"  alt="" />

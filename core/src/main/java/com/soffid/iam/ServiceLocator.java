@@ -471,6 +471,15 @@ public class ServiceLocator
 	}
 
 	/**
+	 * Gets an instance of {@link com.soffid.iam.iga.service.RoleSuggestionService}.
+	 */
+	public final com.soffid.iam.iga.service.RoleSuggestionService getRoleSuggestionService()
+	{
+		return (com.soffid.iam.iga.service.RoleSuggestionService)
+			getContext().getBean("com.soffid.iam.iga.service.RoleSuggestionService");
+	}
+
+	/**
 	 * Gets an instance of {@link com.soffid.iam.iga.service.RulesService}.
 	 */
 	public final com.soffid.iam.iga.service.RulesService getRulesService()

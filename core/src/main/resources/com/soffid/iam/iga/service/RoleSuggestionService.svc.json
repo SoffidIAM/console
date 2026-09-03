@@ -1,0 +1,7 @@
+{
+  "class": "com.soffid.iam.iga.service.RoleSuggestionService",
+  "methods": [
+    {"name":"suggest", "return":"java.util.List<com.soffid.iam.iga.api.RoleAccount>", "arguments":[
+       {"name":"user","type":"java.lang.String","required": true}    ]}
+  ]
+}

@@ -505,6 +505,20 @@
 				
 				]]>
 			</description>
+			<ejb-name>RoleSuggestionService</ejb-name>
+			<business-local>com.soffid.iam.iga.service.ejb.RoleSuggestionService</business-local>
+			<ejb-class>com.soffid.iam.iga.service.ejb.RoleSuggestionServiceBean</ejb-class>
+			<session-type>Stateless</session-type>
+		   
+			<transaction-type>Container</transaction-type>
+		</session>
+
+		<session>
+			<description>
+				<![CDATA[
+				
+				]]>
+			</description>
 			<ejb-name>RulesService</ejb-name>
 			<business-local>com.soffid.iam.iga.service.ejb.RulesService</business-local>
 			<ejb-class>com.soffid.iam.iga.service.ejb.RulesServiceBean</ejb-class>
@@ -10121,6 +10135,20 @@
 				<method-name>delete</method-name>
 				<method-params>
 					<method-param>com.soffid.iam.iga.api.MetaPrinterUser</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
+			<description><![CDATA[java.util.List<com.soffid.iam.iga.api.RoleAccount> suggest(java.lang.String user) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>RoleSuggestionService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>suggest</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
 				</method-params>
 			</method>
 		</method-permission>
@@ -22564,6 +22592,17 @@
 				<method-name>delete</method-name>
 				<method-params>
 					<method-param>com.soffid.iam.iga.api.MetaPrinterUser</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>RoleSuggestionService</ejb-name>
+				<method-name>suggest</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
 				</method-params>
 			</method>
 			<trans-attribute>Supports</trans-attribute>

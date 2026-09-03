@@ -141,6 +141,10 @@
 		<jndi name="soffid.ejb.com.soffid.iam.iga.service.PrinterService"/>
 	</ejb-deployment>
 
+	<ejb-deployment ejb-name="RoleSuggestionService">
+		<jndi name="soffid.ejb.com.soffid.iam.iga.service.RoleSuggestionService"/>
+	</ejb-deployment>
+
 	<ejb-deployment ejb-name="RulesService">
 		<jndi name="soffid.ejb.com.soffid.iam.iga.service.RulesService"/>
 	</ejb-deployment>

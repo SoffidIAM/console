@@ -33,6 +33,7 @@ com.soffid.iam.iga.service.GroupTypeService
 com.soffid.iam.iga.service.MailListsService
 com.soffid.iam.iga.service.MailService
 com.soffid.iam.iga.service.PrinterService
+com.soffid.iam.iga.service.RoleSuggestionService
 com.soffid.iam.iga.service.RulesService
 com.soffid.iam.iga.service.SelfService
 com.soffid.iam.iga.service.UserDomainService

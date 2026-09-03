@@ -4925,6 +4925,27 @@
 
 	</bean>
 
+	<!-- com.soffid.iam.iga.service.RoleSuggestionService Service Proxy with inner RoleSuggestionService Service Implementation -->
+	<bean id="com.soffid.iam.iga.service.RoleSuggestionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<bean class="com.soffid.iam.iga.service.RoleSuggestionServiceImpl">
+			</bean>
+		</property>
+		<property name="proxyInterfaces">
+			<value>com.soffid.iam.iga.service.RoleSuggestionService</value>
+		</property>
+
+		<property name="interceptorNames">
+			<list>
+				<value>serviceTransactionInterceptor</value>
+				<value>hibernateInterceptor</value>
+				<value>serviceInterceptor-*</value>
+				<value>com.soffid.iam.iga.service.RoleSuggestionServiceInterceptor-*</value>
+			</list>
+		</property>
+
+	</bean>
+
 	<!-- com.soffid.iam.iga.service.RulesService Service Proxy with inner RulesService Service Implementation -->
 	<bean id="com.soffid.iam.iga.service.RulesService" class="org.springframework.aop.framework.ProxyFactoryBean">
 		<property name="target">

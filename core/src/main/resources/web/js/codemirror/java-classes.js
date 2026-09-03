@@ -3099,6 +3099,9 @@ CodeMirrorJavaTypes["com.soffid.iam.iga.service.PrinterService"]={
 	"getUserPrintersByPrinterName":"java.util.Collection<com.soffid.iam.iga.api.PrinterUser>",
 	"delete":"void"
 };
+CodeMirrorJavaTypes["com.soffid.iam.iga.service.RoleSuggestionService"]={
+	"suggest":"java.util.List<com.soffid.iam.iga.api.RoleAccount>"
+};
 CodeMirrorJavaTypes["com.soffid.iam.iga.service.RulesService"]={
 	"applyAsync":"com.soffid.iam.base.api.AsyncProcessTracker",
 	"queryProcessStatus":"com.soffid.iam.base.api.AsyncProcessTracker",
@@ -9180,6 +9183,7 @@ CodeMirrorJavaTypes["es.caib.seycon.ng.ServiceLocator"]={
 	"getMailListsService":"com.soffid.iam.iga.service.MailListsService",
 	"getMailService":"com.soffid.iam.iga.service.MailService",
 	"getPrinterService":"com.soffid.iam.iga.service.PrinterService",
+	"getRoleSuggestionService":"com.soffid.iam.iga.service.RoleSuggestionService",
 	"getRulesService":"com.soffid.iam.iga.service.RulesService",
 	"getSelfService":"com.soffid.iam.iga.service.SelfService",
 	"getUserDomainService":"com.soffid.iam.iga.service.UserDomainService",
@@ -9269,6 +9273,7 @@ CodeMirrorJavaTypes["com.soffid.iam.ServiceLocator"]={
 	"getMailListsService":"com.soffid.iam.iga.service.MailListsService",
 	"getMailService":"com.soffid.iam.iga.service.MailService",
 	"getPrinterService":"com.soffid.iam.iga.service.PrinterService",
+	"getRoleSuggestionService":"com.soffid.iam.iga.service.RoleSuggestionService",
 	"getRulesService":"com.soffid.iam.iga.service.RulesService",
 	"getSelfService":"com.soffid.iam.iga.service.SelfService",
 	"getUserDomainService":"com.soffid.iam.iga.service.UserDomainService",
@@ -9796,6 +9801,7 @@ CodeMirrorJavaPackages["com.soffid.iam.iga.service"]=[
 	"SelfService",
 	"AuthoritativeChangeService",
 	"ApplicationService",
+	"RoleSuggestionService",
 	"UserDomainService"];
 CodeMirrorJavaPackages["com"]=[
 

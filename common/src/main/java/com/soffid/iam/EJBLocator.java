@@ -432,6 +432,18 @@ public class EJBLocator
 	}
 
 	/**
+	 * Gets an instance of {@link com.soffid.iam.iga.service.ejb.RoleSuggestionService}.
+	 */
+	public static com.soffid.iam.iga.service.ejb.RoleSuggestionService getRoleSuggestionService()
+		throws javax.naming.NamingException
+	{
+
+		return (com.soffid.iam.iga.service.ejb.RoleSuggestionService) 
+			new javax.naming.InitialContext().
+				lookup(com.soffid.iam.iga.service.ejb.RoleSuggestionServiceHome.JNDI_NAME);
+	}
+
+	/**
 	 * Gets an instance of {@link com.soffid.iam.iga.service.ejb.RulesService}.
 	 */
 	public static com.soffid.iam.iga.service.ejb.RulesService getRulesService()

@@ -145,7 +145,7 @@ public class SecurityFilter extends TenantFilter {
 		String s = auth.substring(7);
 		Principal p = svc.authenticateJWT(s);
 		if (p != null) {
-			registerCache ( auth, p);
+			registerCache ( auth, (SoffidPrincipal) p);
 			proceed(httpReq, httpResp, chain, p);
 		} else {
 			httpResp.setHeader("WWW-Authenticate",

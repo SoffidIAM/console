@@ -5,7 +5,7 @@
   <artifactId>root</artifactId>
   <packaging>pom</packaging>
   <name>Soffid IAM Console</name>
-  <version>4.0.74</version>
+  <version>4.0.75</version>
   <description>SOFFID IAM Console</description>
   <prerequisites>
     <maven>2.0.1</maven>
@@ -19,7 +19,7 @@
   <url>http://www.soffid.com/doc/console/${project.version}</url>
   <scm>
         <connection>scm:git:ssh://git@github.com/SoffidIAM/console.git</connection>
-    <tag>version-4.0.74</tag>
+    <tag>version-4.0.75</tag>
   </scm>
   <build>
     <defaultGoal>install</defaultGoal>
@@ -356,7 +356,7 @@
       <dependency>
         <groupId>com.soffid.zkib</groupId>
         <artifactId>zkdb</artifactId>
-        <version>4.0.34</version>
+        <version>4.0.35</version>
       </dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

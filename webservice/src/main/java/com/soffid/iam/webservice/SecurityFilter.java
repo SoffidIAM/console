@@ -42,7 +42,6 @@ public class SecurityFilter extends TenantFilter {
 		} catch (NamingException e) {
 			throw new ServletException("Cannot locate LoginService");
 		}
-
 	}
 
 	public void nextStep(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -78,7 +77,10 @@ public class SecurityFilter extends TenantFilter {
 			HttpServletResponse httpResp, 
 			FilterChain chain, 
 			String authorization) throws IOException, ServletException {
-		SoffidPrincipal p = (SoffidPrincipal) map.get(authorization);
+		CacheEntry cache = (CacheEntry) map.get(authorization);
+		if (cache == null || cache.ts < System.currentTimeMillis() - 120_000)
+			return false;
+		SoffidPrincipal p = cache.principal;
 		if (p == null) return false;
 		if (svc.hasPasswordChange(p))
 			return false;
@@ -152,8 +154,11 @@ public class SecurityFilter extends TenantFilter {
 		}
 	}
 
-	private void registerCache(String auth, Principal p) {
-		map.put(auth, p);
+	private void registerCache(String auth, SoffidPrincipal p) {
+		CacheEntry entry = new CacheEntry();
+		entry.principal = p;
+		entry.ts = System.currentTimeMillis();
+		map.put(auth, entry);
 	}
 
 	protected void proceed(HttpServletRequest httpReq, HttpServletResponse httpResp, FilterChain chain, Principal p)
@@ -192,4 +197,9 @@ public class SecurityFilter extends TenantFilter {
 	public void destroy() {
 	}
 
+}
+
+class CacheEntry {
+	long ts;
+	SoffidPrincipal principal;
 }

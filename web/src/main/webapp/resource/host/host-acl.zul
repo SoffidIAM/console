@@ -28,9 +28,11 @@
 		- name: ${c:l('maquines.zul.Nom-2')}
 		  value: userName
 		- name: ${c:l('maquines.zul.DataPeticia')}
-		  value: requestDate_datetime
+		  value: requestDate
+		  template: #{requestDate_datetime}
 		- name: ${c:l('maquines.zul.DataCaducitat')}
-		  value: authorizationAccessExpirationDate_datetime
+		  template: #{authorizationAccessExpirationDate_datetime}
+		  value: authorizationAccessExpirationDate
 		]]>
 		</attribute>
 	</datatable>

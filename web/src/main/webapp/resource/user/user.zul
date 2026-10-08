@@ -144,11 +144,13 @@
 - name: ${c:l('seyconserver.zul.Executions')}
   value: executionsNumber
 - name: ${c:l('seyconserver.zul.Executiontime')}
-  value: lastExecutionDate_datetime
+  value: lastExecutionDate
+  template: #{lastExecutionDate_datetime}
 - name: ${c:l('seyconserver.zul.Message')}
   value: message
 - name: ${c:l('seyconserver.zul.Scheduled')}
-  value: nextExecutionDate_datetime
+  value: nextExecutionDate
+  template: #{nextExecutionDate_datetime}
 		]]></attribute></datatable>
 		<customfield3 id="taskError" label="${c:l('seyconserver.zul.Message')}" multiline="true"
 			visible="false"/>

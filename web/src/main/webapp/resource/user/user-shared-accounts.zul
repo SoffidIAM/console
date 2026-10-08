@@ -27,16 +27,20 @@
 		  value: description
 		- name: ${c:l('usuaris.zul.DataUpdate')}
 		  width: 150px
-		  value: lastUpdated_datetime
+		  value: lastUpdated
+		  template: #{lastUpdated_datetime}
 		- name: ${c:l('accounts.lastLogin')}
 		  width: 150px
-		  value: lastLogin_datetime
+		  template: #{lastLogin_datetime}
+		  value: lastLogin
 		- name: ${c:l('usuaris.zul.DataAssignacia')}
 		  width: 150px
-		  value: lastPasswordSet_datetime
+		  template: #{lastPasswordSet_datetime}
+		  value: lastPasswordSet
 		- name: ${c:l('usuaris.zul.DataCaducitat')}
 		  width: 150px
-		  value: passwordExpiration_datetime
+		  value: passwordExpiration
+		  template: #{passwordExpiration_datetime}
 		- name: ${c:l('com.soffid.iam.api.Account.accessLevel')}
 		  width: 150px
 		  value: accessLevel

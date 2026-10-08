@@ -46,7 +46,8 @@
   value: author
   default: false
 - name: ${c:l('com.soffid.iam.api.PamPolicy.date')}
-  value: date_datetime
+  value: date
+  template: #{date_datetime}
   default: false
 ]]></attribute>
 			</datatable>

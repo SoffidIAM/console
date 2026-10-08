@@ -163,12 +163,14 @@
   value: executions
   className: statusColumn
 - name: ${c:l('seyconserver.zul.Executiontime')}
-  value: executiontime_datetime
+  value: executiontime
+  template: #{executiontime_datetime}
   className: datetimeColumn
 - name: ${c:l('seyconserver.zul.Message')}
   value: message
 - name: ${c:l('seyconserver.zul.Scheduled')}
-  value: scheduled_datetime
+  value: scheduled
+  template: #{scheduled_datetime}
   className: datetimeColumn
 		]]></attribute>
 		</datatable>

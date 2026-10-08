@@ -48,15 +48,18 @@
   default: false
 - name: ${c:l('usuaris.zul.startDate')}
   className: dateColumn
-  value: startDate_date
+  value: startDate
+  template: #{startDate_date}
   default: true
 - name: ${c:l('usuaris.zul.endDate')}
   className: dateColumn
-  value: endDate_date
+  value: endDate
+  template: #{endDate_date}
   default: true
 - name: ${c:l('usuaris.zul.recertification')}
   className: dateColumn
-  value: certificationDate_date
+  value: certificationDate
+  template: #{certificationDate_date}
   default: true
 - name: ${c:l('usuaris.zul.holderGroup')}
   width: 150px

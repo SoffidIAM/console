@@ -2684,29 +2684,33 @@ public abstract class DispatcherServiceBase
 	protected abstract java.util.Collection<java.util.Map<java.lang.String,java.lang.Object>> handleInvoke(java.lang.String dispatcher, java.lang.String verb, java.lang.String object, java.util.Map<java.lang.String,java.lang.Object> attributes) throws Exception;
 
 	/**
-	 * @see com.soffid.iam.iga.service.DispatcherService#	 * @see com.soffid.iam.iga.service.DispatcherService#java.util.List<java.lang.String> assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions)
+	 * @see com.soffid.iam.iga.service.DispatcherService#	 * @see com.soffid.iam.iga.service.DispatcherService#java.util.List<java.lang.String> assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions, java.lang.String pamPolicy)
 	 */
 	@Transactional(rollbackFor={java.lang.Exception.class})
 	public java.util.List<java.lang.String> assignTemporaryPermissions(
 		final java.lang.String host, 
 		final java.lang.String accountName, 
 		final java.lang.String accountSystem, 
-		final java.util.List<java.lang.String> permissions)
+		final java.util.List<java.lang.String> permissions, 
+		final java.lang.String pamPolicy)
 		throws com.soffid.iam.exception.InternalErrorException
 	{
 		if (accountName == null || accountName.trim().length() == 0) {
-			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions) - accountName cannot be null");
+			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions, java.lang.String pamPolicy) - accountName cannot be null");
 		}
 		if (accountSystem == null || accountSystem.trim().length() == 0) {
-			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions) - accountSystem cannot be null");
+			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions, java.lang.String pamPolicy) - accountSystem cannot be null");
 		}
 		if (permissions == null ) {
-			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions) - permissions cannot be empty");
+			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions, java.lang.String pamPolicy) - permissions cannot be empty");
+		}
+		if (pamPolicy == null || pamPolicy.trim().length() == 0) {
+			throw new IllegalArgumentException("java.util.List<java.lang.String> com.soffid.iam.iga.service.DispatcherService.assignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions, java.lang.String pamPolicy) - pamPolicy cannot be null");
 		}
 		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
 			public Object run() {
 				try {
-					return new Object[] {handleAssignTemporaryPermissions(host, accountName, accountSystem, permissions)};
+					return new Object[] {handleAssignTemporaryPermissions(host, accountName, accountSystem, permissions, pamPolicy)};
 				} catch (Throwable th) {
 					return new Object[] {null,th};
 				}
@@ -2722,7 +2726,7 @@ public abstract class DispatcherServiceBase
 			"Unexpected error on DispatcherService.assignTemporaryPermissions", (Throwable) __r[1]);
 	}
 
-	protected abstract java.util.List<java.lang.String> handleAssignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions) throws Exception;
+	protected abstract java.util.List<java.lang.String> handleAssignTemporaryPermissions(java.lang.String host, java.lang.String accountName, java.lang.String accountSystem, java.util.List<java.lang.String> permissions, java.lang.String pamPolicy) throws Exception;
 
 	/**
 	 * @see com.soffid.iam.iga.service.DispatcherService#	 * @see com.soffid.iam.iga.service.DispatcherService#java.util.List<java.security.cert.X509Certificate> findValidCertificates()

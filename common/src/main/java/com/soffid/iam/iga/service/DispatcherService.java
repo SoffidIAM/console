@@ -621,13 +621,15 @@ public interface DispatcherService {
 	 * @param accountName 
 	 * @param accountSystem 
 	 * @param permissions 
+	 * @param pamPolicy 
 	 * @return 
 	 */
 	java.util.List<java.lang.String> assignTemporaryPermissions(
 		final java.lang.String host, 
 		final java.lang.String accountName, 
 		final java.lang.String accountSystem, 
-		final java.util.List<java.lang.String> permissions)
+		final java.util.List<java.lang.String> permissions, 
+		final java.lang.String pamPolicy)
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**

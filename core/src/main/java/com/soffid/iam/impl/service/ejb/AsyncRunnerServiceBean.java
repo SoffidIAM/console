@@ -64,6 +64,54 @@ public class AsyncRunnerServiceBean extends org.springframework.ejb.support.Abst
 		}
 	}
 	/**
+	 * @see com.soffid.iam.impl.service.AsyncRunnerService#void run(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public void run(
+		final java.lang.Runnable runnable, 
+		final com.soffid.zkdb.api.PagedResult result)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		try
+		{
+			this.asyncRunnerService.run(runnable, result); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
+	 * @see com.soffid.iam.impl.service.AsyncRunnerService#void runWrite(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public void runWrite(
+		final java.lang.Runnable runnable, 
+		final com.soffid.zkdb.api.PagedResult result)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		try
+		{
+			this.asyncRunnerService.runWrite(runnable, result); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * Initizlizes been
 	 *
 	 * @see org.springframework.ejb.support.AbstractStatelessSessionBean#onEjbCreate()

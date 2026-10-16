@@ -88,6 +88,31 @@ public class GenAIProviderServiceBean extends org.springframework.ejb.support.Ab
 		}
 	}
 	/**
+	 * @see com.soffid.iam.base.service.GenAIProviderService#void runScript(java.lang.String script, java.io.PrintWriter out, java.util.Map<java.lang.String,java.lang.Object> vars)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public void runScript(
+		final java.lang.String script, 
+		final java.io.PrintWriter out, 
+		final java.util.Map<java.lang.String,java.lang.Object> vars)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		try
+		{
+			this.genAIProviderService.runScript(script, out, vars); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * Initizlizes been
 	 *
 	 * @see org.springframework.ejb.support.AbstractStatelessSessionBean#onEjbCreate()

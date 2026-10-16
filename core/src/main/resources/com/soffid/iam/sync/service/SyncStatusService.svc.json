@@ -83,6 +83,12 @@
        {"name":"accountName","type":"java.lang.String","required": true},
        {"name":"accountSystem","type":"java.lang.String","required": true},
        {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+    {"name":"assignTemporaryPermissions", "return":"java.util.List<java.lang.String>", "arguments":[
+       {"name":"host","type":"java.lang.String","required":false},
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountSystem","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true},
+       {"name":"pamPolicy","type":"java.lang.String","required": true}    ]},
     {"name":"testObjectMapping", "return":"java.util.Map<java.lang.String,java.lang.Object>", "arguments":[
        {"name":"sentences","type":"java.util.Map<java.lang.String,java.lang.String>","required": true},
        {"name":"dispatcher","type":"java.lang.String","required": true},
@@ -102,6 +108,12 @@
        {"name":"accountName","type":"java.lang.String","required": true},
        {"name":"accountSystem","type":"java.lang.String","required": true},
        {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+    {"name":"removeTemporaryPermissions", "return":"void", "arguments":[
+       {"name":"host","type":"java.lang.String","required":false},
+       {"name":"accountName","type":"java.lang.String","required": true},
+       {"name":"accountSystem","type":"java.lang.String","required": true},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true},
+       {"name":"pamPolicy","type":"java.lang.String","required": true}    ]},
     {"name":"resendAccountPassword", "return":"void", "arguments":[
        {"name":"accountId","type":"java.lang.Long","required": true}    ]},
     {"name":"resendUserPassword", "return":"void", "arguments":[

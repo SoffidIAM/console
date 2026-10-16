@@ -24,4 +24,10 @@ public interface GenAIProviderService
 	void clearCache()
 	throws com.soffid.iam.exception.InternalErrorException;
 
+	void runScript(
+		final java.lang.String script, 
+		final java.io.PrintWriter out, 
+		final java.util.Map<java.lang.String,java.lang.Object> vars)
+	throws com.soffid.iam.exception.InternalErrorException;
+
 }

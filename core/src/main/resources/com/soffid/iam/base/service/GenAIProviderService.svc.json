@@ -8,6 +8,10 @@
        {"name":"context","type":"java.lang.String[]","required":false},
        {"name":"sentence","type":"java.lang.String","required": true}    ]},
     {"name":"clearCache", "return":"void", "arguments":[
-    ]}
+    ]},
+    {"name":"runScript", "return":"void", "arguments":[
+       {"name":"script","type":"java.lang.String","required": true},
+       {"name":"out","type":"java.io.PrintWriter","required": true},
+       {"name":"vars","type":"java.util.Map<java.lang.String,java.lang.Object>","required":false}    ]}
   ]
 }

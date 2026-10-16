@@ -115,6 +115,43 @@ public abstract class GenAIProviderServiceBase
 	protected abstract void handleClearCache() throws Exception;
 
 	/**
+	 * @see com.soffid.iam.base.service.GenAIProviderService#	 * @see com.soffid.iam.base.service.GenAIProviderService#void runScript(java.lang.String script, java.io.PrintWriter out, java.util.Map<java.lang.String,java.lang.Object> vars)
+	 */
+	@Transactional(rollbackFor={java.lang.Exception.class})
+	public void runScript(
+		final java.lang.String script, 
+		final java.io.PrintWriter out, 
+		final java.util.Map<java.lang.String,java.lang.Object> vars)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		if (script == null || script.trim().length() == 0) {
+			throw new IllegalArgumentException("void com.soffid.iam.base.service.GenAIProviderService.runScript(java.lang.String script, java.io.PrintWriter out, java.util.Map<java.lang.String,java.lang.Object> vars) - script cannot be null");
+		}
+		if (out == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.base.service.GenAIProviderService.runScript(java.lang.String script, java.io.PrintWriter out, java.util.Map<java.lang.String,java.lang.Object> vars) - out cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					handleRunScript(script, out, vars);
+					return null;
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r == null) return;
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.base.service.GenAIProviderService.class).
+			warn ("Error on GenAIProviderService.runScript", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on GenAIProviderService.runScript", (Throwable) __r[1]);
+	}
+
+	protected abstract void handleRunScript(java.lang.String script, java.io.PrintWriter out, java.util.Map<java.lang.String,java.lang.Object> vars) throws Exception;
+
+	/**
 	 * Gets the current <code>principal</code> if one has been set,
 	 * otherwise returns <code>null</code>.
 	 *

@@ -4040,6 +4040,22 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[void runScript(java.lang.String script, java.io.PrintWriter out, java.util.Map<java.lang.String,java.lang.Object> vars) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>GenAIProviderService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>runScript</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+					<method-param>java.io.PrintWriter</method-param>
+					<method-param>java.util.Map</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[java.lang.String getApplicationToken() security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -11176,6 +11192,36 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[void run(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>AsyncRunnerService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>run</method-name>
+				<method-params>
+					<method-param>java.lang.Runnable</method-param>
+					<method-param>com.soffid.zkdb.api.PagedResult</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
+			<description><![CDATA[void runWrite(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>AsyncRunnerService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>runWrite</method-name>
+				<method-params>
+					<method-param>java.lang.Runnable</method-param>
+					<method-param>com.soffid.zkdb.api.PagedResult</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[java.lang.String setInitialPasswordToUser(java.lang.String codiUsuari, java.lang.String codiDominiContrasenyes) security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -16607,6 +16653,19 @@
 
 		<container-transaction>
 			<method>
+				<ejb-name>GenAIProviderService</ejb-name>
+				<method-name>runScript</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+					<method-param>java.io.PrintWriter</method-param>
+					<method-param>java.util.Map</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
 				<ejb-name>LicenseService</ejb-name>
 				<method-name>getApplicationToken</method-name>
 				<method-params>
@@ -20749,6 +20808,7 @@
 					<method-param>java.lang.String</method-param>
 					<method-param>java.lang.String</method-param>
 					<method-param>java.util.List</method-param>
+					<method-param>java.lang.String</method-param>
 				</method-params>
 			</method>
 			<trans-attribute>Supports</trans-attribute>
@@ -23526,6 +23586,18 @@
 			<method>
 				<ejb-name>AsyncRunnerService</ejb-name>
 				<method-name>runInternal</method-name>
+				<method-params>
+					<method-param>java.lang.Runnable</method-param>
+					<method-param>com.soffid.zkdb.api.PagedResult</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>AsyncRunnerService</ejb-name>
+				<method-name>runWrite</method-name>
 				<method-params>
 					<method-param>java.lang.Runnable</method-param>
 					<method-param>com.soffid.zkdb.api.PagedResult</method-param>

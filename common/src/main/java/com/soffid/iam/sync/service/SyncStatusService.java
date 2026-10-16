@@ -332,6 +332,24 @@ public interface SyncStatusService {
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation assignTemporaryPermissions
+
+	 * @param host 
+	 * @param accountName 
+	 * @param accountSystem 
+	 * @param permissions 
+	 * @param pamPolicy 
+	 * @return 
+	 */
+	java.util.List<java.lang.String> assignTemporaryPermissions(
+		final java.lang.String host, 
+		final java.lang.String accountName, 
+		final java.lang.String accountSystem, 
+		final java.util.List<java.lang.String> permissions, 
+		final java.lang.String pamPolicy)
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation testObjectMapping
 
 	 * @param sentences 
@@ -396,6 +414,23 @@ public interface SyncStatusService {
 		final java.lang.String accountName, 
 		final java.lang.String accountSystem, 
 		final java.util.List<java.lang.String> permissions)
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
+	 * Operation removeTemporaryPermissions
+
+	 * @param host 
+	 * @param accountName 
+	 * @param accountSystem 
+	 * @param permissions 
+	 * @param pamPolicy 
+	 */
+	void removeTemporaryPermissions(
+		final java.lang.String host, 
+		final java.lang.String accountName, 
+		final java.lang.String accountSystem, 
+		final java.util.List<java.lang.String> permissions, 
+		final java.lang.String pamPolicy)
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**

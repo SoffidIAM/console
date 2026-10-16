@@ -182,6 +182,45 @@ public abstract class AsyncRunnerServiceBase
 	protected abstract void handleRunInternal(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result) throws Exception;
 
 	/**
+	 * @see com.soffid.iam.impl.service.AsyncRunnerService#	 * @see com.soffid.iam.impl.service.AsyncRunnerService#void runWrite(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRES_NEW, 
+		noRollbackFor={java.lang.Exception.class})
+	public void runWrite(
+		final java.lang.Runnable runnable, 
+		final com.soffid.zkdb.api.PagedResult result)
+		throws com.soffid.iam.exception.InternalErrorException
+	{
+		if (runnable == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.AsyncRunnerService.runWrite(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result) - runnable cannot be null");
+		}
+		if (result == null) {
+			throw new IllegalArgumentException("void com.soffid.iam.impl.service.AsyncRunnerService.runWrite(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result) - result cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					handleRunWrite(runnable, result);
+					return null;
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r == null) return;
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.impl.service.AsyncRunnerService.class).
+			warn ("Error on AsyncRunnerService.runWrite", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on AsyncRunnerService.runWrite", (Throwable) __r[1]);
+	}
+
+	protected abstract void handleRunWrite(java.lang.Runnable runnable, com.soffid.zkdb.api.PagedResult result) throws Exception;
+
+	/**
 	 * Gets the current <code>principal</code> if one has been set,
 	 * otherwise returns <code>null</code>.
 	 *

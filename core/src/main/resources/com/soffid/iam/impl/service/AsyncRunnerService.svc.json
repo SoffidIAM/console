@@ -10,6 +10,9 @@
        {"name":"result","type":"com.soffid.zkdb.api.PagedResult","required": true}    ]},
     {"name":"runInternal", "return":"void", "arguments":[
        {"name":"runnable","type":"java.lang.Runnable","required": true},
+       {"name":"result","type":"com.soffid.zkdb.api.PagedResult","required": true}    ]},
+    {"name":"runWrite", "return":"void", "arguments":[
+       {"name":"runnable","type":"java.lang.Runnable","required": true},
        {"name":"result","type":"com.soffid.zkdb.api.PagedResult","required": true}    ]}
   ]
 }

@@ -139,7 +139,8 @@
        {"name":"host","type":"java.lang.String","required":false},
        {"name":"accountName","type":"java.lang.String","required": true},
        {"name":"accountSystem","type":"java.lang.String","required": true},
-       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true}    ]},
+       {"name":"permissions","type":"java.util.List<java.lang.String>","required": true},
+       {"name":"pamPolicy","type":"java.lang.String","required": true}    ]},
     {"name":"findValidCertificates", "return":"java.util.List<java.security.cert.X509Certificate>", "arguments":[
     ]},
     {"name":"testObjectMapping", "comments":"Tests an object mapping for a real object", "return":"java.util.Map<java.lang.String,java.lang.Object>", "arguments":[

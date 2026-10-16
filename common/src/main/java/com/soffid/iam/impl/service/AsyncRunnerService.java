@@ -52,4 +52,15 @@ public interface AsyncRunnerService {
 		final com.soffid.zkdb.api.PagedResult result)
 			throws com.soffid.iam.exception.InternalErrorException;
 
+	/**
+	 * Operation runWrite
+
+	 * @param runnable 
+	 * @param result 
+	 */
+	void runWrite(
+		final java.lang.Runnable runnable, 
+		final com.soffid.zkdb.api.PagedResult result)
+			throws com.soffid.iam.exception.InternalErrorException;
+
 }

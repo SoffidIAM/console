@@ -1391,7 +1391,8 @@ CodeMirrorJavaTypes["com.soffid.iam.base.service.ConfigurationService"]={
 CodeMirrorJavaTypes["com.soffid.iam.base.service.GenAIProviderService"]={
 	"getGenAIMetadata":"java.util.List<java.lang.String>",
 	"getGenAISentences":"java.util.List<java.lang.String>",
-	"clearCache":"void"
+	"clearCache":"void",
+	"runScript":"void"
 };
 CodeMirrorJavaTypes["com.soffid.iam.base.service.LicenseService"]={
 	"getApplicationToken":"java.lang.String",
@@ -3200,7 +3201,8 @@ CodeMirrorJavaTypes["com.soffid.iam.impl.service.AsyncRunnerService"]={
 	"runNewTransaction":"java.lang.Object",
 	"runTransaction":"java.lang.Object",
 	"run":"void",
-	"runInternal":"void"
+	"runInternal":"void",
+	"runWrite":"void"
 };
 CodeMirrorJavaTypes["com.soffid.iam.impl.service.AuthorizationInformationService"]={
 	"interventionNeeded":"boolean",

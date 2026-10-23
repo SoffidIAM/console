@@ -18,6 +18,10 @@ public class InformationSystemEntityImpl extends com.soffid.iam.model.Informatio
 		if (Security.isUserInRole(permission+Security.AUTO_ALL))
 			return true;
 	
-		return Security.isUserInRole(permission+"/"+getName());
+		if (Security.isUserInRole(permission+"/"+getName()))
+			return true;
+		if (getParent() != null)
+			return getParent().isAllowed(permission);
+		return false;
 	}
 }

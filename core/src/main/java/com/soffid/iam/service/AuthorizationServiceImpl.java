@@ -488,7 +488,7 @@ public class AuthorizationServiceImpl extends
 
         // Si no es troba cap autorització: sortim
         if (autoritzacionsRol == null || autoritzacionsRol.size() == 0)
-            return new ArrayList();
+            return new LinkedList();
 
         // Pasem a VO
 
@@ -541,7 +541,7 @@ public class AuthorizationServiceImpl extends
             // amb HashSet de valor de domini
             HashMap autoVD = new HashMap();
             // aquí posarem les autoritzacions finals:
-            ArrayList autoritzacionsFiltrades = new ArrayList();
+            LinkedList autoritzacionsFiltrades = new LinkedList();
 
             for (Iterator it = autoritzacioRols.iterator(); it.hasNext(); ) {
                 AuthorizationRole autoVO = (AuthorizationRole) it.next();

@@ -57,6 +57,9 @@ public class GroupEntityImpl extends com.soffid.iam.model.GroupEntity
 	
 		if (Security.isUserInRole(permission+"/"+getName()))
 			return true;
+
+		if (getParent() != null)
+			return getParent().isAllowed(permission);
 		
 		return false;
 	}

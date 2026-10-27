@@ -1036,7 +1036,7 @@ public abstract class AccountEntityDaoBase
 	public java.util.List<com.soffid.iam.base.model.AccountEntity> findByUserAndSystem(final com.soffid.iam.model.criteria.CriteriaSearchConfiguration criteria, java.lang.String user, java.lang.String dispatcher)
 	
 	{
-		return findByUserAndSystem("select acc\nfrom   com.soffid.iam.base.model.AccountEntity acc\nleft join     acc.users as users\nleft join     users.user as user\nleft join     acc.system as dispatcher\nwhere acc.type='U' and user.userName = :user and dispatcher.name = :dispatcher and dispatcher.tenant.id = :tenantId and (acc.deleted is null or acc.deleted is false) order by user.userName, acc.name",
+		return findByUserAndSystem("select acc\nfrom   com.soffid.iam.base.model.UserEntity user\nleft join user.accounts as userAccount\nleft join userAccount.account as acc\nleft join acc.system as dispatcher\nwhere user.userName = :user and\n      user.tenant.id = :tenantId and\n      (acc.deleted is null or acc.deleted is false) and\n      acc.type='U' and\n      dispatcher.name = :dispatcher\norder by acc.name\n",
 			criteria, user, dispatcher);
 	}
 	/**

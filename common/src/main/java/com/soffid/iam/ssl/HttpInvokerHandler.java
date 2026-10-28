@@ -29,6 +29,7 @@ import org.mortbay.jetty.HttpHeaders;
 import com.soffid.iam.lang.MessageFactory;
 import com.soffid.iam.remote.HeadersFactory;
 import com.soffid.iam.remote.RemoteInvokerFactory;
+import com.soffid.iam.remote.RemoteTimeout;
 import com.soffid.iam.util.Base64;
 
 public class HttpInvokerHandler implements InvocationHandler {
@@ -36,8 +37,22 @@ public class HttpInvokerHandler implements InvocationHandler {
     private String authToken;
 	private String tenantName;
 	private List<HeadersFactory> headersFactory = null;
+    int connectionTimeout = 0;
+    int readTimeout = 0;
     
-    public HttpInvokerHandler (URL url, String tenantName, String authToken)
+    public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+	public int getReadTimeout() {
+		return readTimeout;
+	}
+	public void setReadTimeout(int readTimeout) {
+		this.readTimeout = readTimeout;
+	}
+	public HttpInvokerHandler (URL url, String tenantName, String authToken)
     {
         this.url = url;
         this.tenantName = tenantName;
@@ -46,6 +61,12 @@ public class HttpInvokerHandler implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
 
+    	if (method.getDeclaringClass().equals(RemoteTimeout.class)) {
+			if ("setReadTimeout".equals(method.getName())) {
+				setReadTimeout((Integer) args[0]);
+				return null;
+			}
+		}
     	Object result = null;
     	String[] success = new String[1];
         try {
@@ -53,9 +74,11 @@ public class HttpInvokerHandler implements InvocationHandler {
 				@Override
 				public Object run() throws Exception {
 		        	HttpURLConnection c;
-		            // Cambiar la factoria SSL
 		            c = ConnectionFactory.getConnection(url);
-		            
+		            if (connectionTimeout > 0)
+		            	c.setConnectTimeout(connectionTimeout);
+		            if (readTimeout > 0)
+		            	c.setReadTimeout(readTimeout);
 		            c.setDoInput(true);
 		            c.setDoOutput(true);
 		            c.setRequestMethod("POST"); //$NON-NLS-1$

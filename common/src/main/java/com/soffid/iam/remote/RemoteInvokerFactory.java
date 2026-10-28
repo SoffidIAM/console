@@ -24,7 +24,26 @@ import com.soffid.iam.ssl.HttpInvokerHandler;
 import com.soffid.iam.util.Base64;
 
 public class RemoteInvokerFactory {
-    public Object getInvoker(URL url) throws IOException {
+	int connectionTimeout = 30_000; // 30 seconds to connect
+	int readTimeout = 5 * 60_000; // 5 minutes to get response
+	
+    public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
+
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
+
+	public int getReadTimeout() {
+		return readTimeout;
+	}
+
+	public void setReadTimeout(int readTimeout) {
+		this.readTimeout = readTimeout;
+	}
+
+	public Object getInvoker(URL url) throws IOException {
         return getInvoker (url, null, null);
     }
     
@@ -40,6 +59,10 @@ public class RemoteInvokerFactory {
 				public Object run() throws Exception {
 					HttpURLConnection c;
 		            c = ConnectionFactory.getConnection(url);
+		            if (connectionTimeout > 0)
+		            	c.setConnectTimeout(connectionTimeout);
+		            if (readTimeout > 0)
+		            	c.setReadTimeout(readTimeout);
 
 		            c.setDoInput(true);
 		            c.setDoOutput(false);
@@ -49,7 +72,6 @@ public class RemoteInvokerFactory {
 		                byte bytes[] = seu.getBytes("UTF-8"); //$NON-NLS-1$
 		                String tag = "Basic "+ Base64.encodeBytes(bytes, 0, bytes.length, Base64.DONT_BREAK_LINES); //$NON-NLS-1$
 		                c.addRequestProperty("Authorization", tag); //$NON-NLS-1$
-		                
 		            }
 		            Locale locale = MessageFactory.getLocale();
 		            if (locale != null)
@@ -71,7 +93,7 @@ public class RemoteInvokerFactory {
 		            if (classes == null)
 		                throw new IOException("Invalid response from " + url); //$NON-NLS-1$
 		            String[] split = classes.split("[, ]+"); //$NON-NLS-1$
-		            Class[] interfaces = new Class[split.length];
+		            Class[] interfaces = new Class[split.length + 1];
 		            for (int i = 0; i < split.length; i++) {
 		            	try {
 			                interfaces[i] = Class.forName(split[i], false, 
@@ -81,8 +103,11 @@ public class RemoteInvokerFactory {
 			                		Thread.currentThread().getContextClassLoader());
 		            	}
 		            }
+		            interfaces[split.length] = RemoteTimeout.class;
 		            HttpInvokerHandler invoker = new HttpInvokerHandler(url, tenantName, authToken);
 		            invoker.setHeadersFactory(headersFactory);
+		            invoker.setConnectionTimeout(connectionTimeout);
+		            invoker.setReadTimeout(readTimeout);
 		            
 					return Proxy.newProxyInstance(RemoteInvokerFactory.class.getClassLoader(),
 		                    interfaces, invoker);

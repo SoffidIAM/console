@@ -580,12 +580,12 @@ public class GroupServiceImpl extends com.soffid.iam.service.GroupServiceBase {
 
 		UserGroupEntity usuariGrupEntity = getUserGroupEntityDao().groupUserToEntity(usuariGrup);
 
-		if (!esPotEliminarUsuariGrup(usuariGrupEntity)) {
-			throw new InternalErrorException(String.format(Messages.getString("GroupServiceImpl.8"), usuariGrup.getGroup(), usuariGrup.getUser()));
-		}
+//		if (!esPotEliminarUsuariGrup(usuariGrupEntity)) {
+//			throw new InternalErrorException(String.format(Messages.getString("GroupServiceImpl.8"), usuariGrup.getGroup(), usuariGrup.getUser()));
+//		}
 
 		// Mirem les autoritzacions
-		if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_CREATE, usuariGrupEntity)) {
+		if (getAuthorizationService().hasPermission(Security.AUTO_USER_GROUP_DELETE, usuariGrupEntity)) {
 			
 			UserEntity usuari = usuariGrupEntity.getUser();
 			usuari.setLastModificationDate(GregorianCalendar.getInstance().getTime());

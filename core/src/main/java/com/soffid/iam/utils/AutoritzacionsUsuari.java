@@ -209,16 +209,6 @@ public class AutoritzacionsUsuari
 		return Security.isUserInRole(Security.AUTO_GROUP_ROLE_QUERY + Security.AUTO_ALL);
 	}
 
-	public static boolean hasQueryGroupUsers ()
-	{
-		return Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY);
-	}
-
-	public static boolean canQueryAllGroupUsers ()
-	{
-		return Security.isUserInRole(Security.AUTO_GROUP_USER_QUERY + Security.AUTO_ALL);
-	}
-
 	public static boolean hasCreateGroupPrinter ()
 	{
 		// group:printer:create [GRUPS] - children

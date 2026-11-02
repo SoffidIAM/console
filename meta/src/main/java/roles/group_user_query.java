@@ -7,6 +7,6 @@
 package roles;
 import com.soffid.mda.annotation.*;
 
-@Role (name="group:user:query" )
+@Role (name="user:group:query" )
 public abstract class group_user_query {
 }

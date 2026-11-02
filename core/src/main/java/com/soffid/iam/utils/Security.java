@@ -118,7 +118,6 @@ public class Security {
     public static final String AUTO_GROUP_UPDATE = "group:update"; //$NON-NLS-1$
     public static final String AUTO_GROUP_QUERY = "group:query"; //$NON-NLS-1$
     public static final String AUTO_GROUP_ROLE_QUERY = "group:role:query"; //$NON-NLS-1$
-    public static final String AUTO_GROUP_USER_QUERY = "group:user:query"; //$NON-NLS-1$
     public static final String AUTO_GROUP_PRINTER_CREATE = "group:printer:create"; //$NON-NLS-1$
     public static final String AUTO_GROUP_PRINTER_DELETE = "group:printer:delete"; //$NON-NLS-1$
 

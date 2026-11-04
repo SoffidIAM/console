@@ -3456,6 +3456,7 @@
 		<property name="target">
 			<bean class="com.soffid.iam.sync.model.ScheduledTaskEntityDaoImpl">
 				<property name="sessionFactory"><ref bean="sessionFactory"/></property>
+				<lookup-method name="getDocumentService" bean="com.soffid.iam.doc.service.DocumentService"/>
 				<lookup-method name="getScheduledTaskHandlerEntityDao" bean="com.soffid.iam.sync.model.ScheduledTaskHandlerEntity"/>
 				<lookup-method name="getServerEntityDao" bean="com.soffid.iam.sync.model.ServerEntity"/>
 				<lookup-method name="getTenantEntityDao" bean="com.soffid.iam.base.model.TenantEntity"/>
@@ -5797,6 +5798,7 @@
 				<property name="scheduledTaskHandlerEntityDao"><ref bean="com.soffid.iam.sync.model.ScheduledTaskHandlerEntity"/></property>
 				<property name="scheduledTaskLogEntityDao"><ref bean="com.soffid.iam.sync.model.ScheduledTaskLogEntity"/></property>
 				<property name="serverEntityDao"><ref bean="com.soffid.iam.sync.model.ServerEntity"/></property>
+				<property name="serverInstanceEntityDao"><ref bean="com.soffid.iam.sync.model.ServerInstanceEntity"/></property>
 				<property name="taskEntityDao"><ref bean="com.soffid.iam.sync.model.TaskEntity"/></property>
 			</bean>
 		</property>

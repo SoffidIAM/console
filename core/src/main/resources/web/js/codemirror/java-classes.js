@@ -3959,6 +3959,7 @@ CodeMirrorJavaTypes["com.soffid.iam.sync.api.ScheduledTask"]={
 	"percentageDone":"java.lang.Double",
 	"stop":"java.lang.Boolean",
 	"serverName":"java.lang.String",
+	"serverInstance":"java.lang.String",
 	"logs":"java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog>",
 	"createdOn":"java.util.Date",
 	"createdBy":"java.lang.String",

@@ -3417,6 +3417,7 @@
 		<column name='SCT_LOGDOC' type='VARCHAR' length='256' notNull='false'/>
 		<column name='SCT_ERROR' type='BIT' notNull='true'/>
 		<column name='SCT_SERVER' type='BIGINT' notNull='false'/>
+		<column name='SCT_SRVINS' type='VARCHAR' length='256' notNull='false'/>
 		<column name='SCT_ACTIVE' type='BIT' notNull='true'/>
 		<column name='SCT_ENABLE' type='BIT' notNull='true'/>
 		<column name='SCT_TEN_ID' type='BIGINT' notNull='true'/>

@@ -10,6 +10,22 @@ public abstract class ScheduledTaskEntityDaoBase
 	extends org.springframework.orm.hibernate3.support.HibernateDaoSupport
 	implements com.soffid.iam.sync.model.ScheduledTaskEntityDao
 {
+	com.soffid.iam.doc.service.DocumentService documentService;
+
+	/**
+	 * Sets reference to <code>documentService</code>.
+	 */
+	public void setDocumentService (com.soffid.iam.doc.service.DocumentService documentService) {
+		this.documentService = documentService;
+	}
+
+	/**
+	 * Gets reference to <code>documentService</code>.
+	 */
+	public com.soffid.iam.doc.service.DocumentService getDocumentService () {
+		return documentService;
+	}
+
 	com.soffid.iam.sync.model.ScheduledTaskHandlerEntityDao scheduledTaskHandlerEntityDao;
 
 	/**
@@ -362,6 +378,7 @@ public abstract class ScheduledTaskEntityDaoBase
 		target.setPercentageDone(source.getPercentageDone());
 		target.setStop(source.getStop());
 		// Missing attribute serverName on entity
+		target.setServerInstance(source.getServerInstance());
 		// Incompatible types source.logs and target.logs
 		target.setCreatedOn(source.getCreatedOn());
 		target.setCreatedBy(source.getCreatedBy());
@@ -433,6 +450,10 @@ public abstract class ScheduledTaskEntityDaoBase
 		}
 		target.setError(source.isError());
 		// Missing attribute server on entity
+		if (copyIfNull || source.getServerInstance() != null)
+		{
+			target.setServerInstance(source.getServerInstance());
+		}
 		target.setActive(source.isActive());
 		target.setEnabled(source.isEnabled());
 		if (copyIfNull || source.getTenant() != null)

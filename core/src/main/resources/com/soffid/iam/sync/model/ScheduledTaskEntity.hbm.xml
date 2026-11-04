@@ -38,6 +38,9 @@
 		<many-to-one name='server' class='com.soffid.iam.sync.model.ServerEntityImpl' lazy='proxy' fetch='select' foreign-key='SC_SCHTAS_SCT_SERVER'>
 			<column name='SCT_SERVER' not-null='false'/>
 		</many-to-one>
+		<property name='serverInstance' type='java.lang.String'>
+			<column name='SCT_SRVINS' not-null='false' />
+		</property>
 		<property name='active' type='boolean'>
 			<column name='SCT_ACTIVE' not-null='true' />
 		</property>

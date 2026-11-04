@@ -143,6 +143,12 @@ public class ScheduledTask
 	private java.lang.String serverName;
 
 	/**
+	 * Attribute serverInstance
+
+	 */
+	private java.lang.String serverInstance;
+
+	/**
 	 * Attribute logs
 
 	 */
@@ -194,7 +200,7 @@ public class ScheduledTask
 	{
 	}
 
-	public ScheduledTask(java.lang.Long id, java.lang.String tenant, java.lang.String name, java.lang.String params, java.lang.String handlerName, java.util.Calendar nextExecution, java.util.Calendar lastExecution, java.util.Calendar lastEnd, java.lang.String logReferenceID, java.lang.String dayPattern, java.lang.String hoursPattern, java.lang.String monthsPattern, java.lang.String dayOfWeekPattern, java.lang.String minutesPattern, boolean error, boolean active, boolean enabled, java.lang.String status, java.lang.Double percentageDone, java.lang.Boolean stop, java.lang.String serverName, java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog> logs, java.util.Date createdOn, java.lang.String createdBy, java.util.Date updatedOn, java.lang.String updatedBy, java.util.Date deletedOn, java.lang.String deletedBy)
+	public ScheduledTask(java.lang.Long id, java.lang.String tenant, java.lang.String name, java.lang.String params, java.lang.String handlerName, java.util.Calendar nextExecution, java.util.Calendar lastExecution, java.util.Calendar lastEnd, java.lang.String logReferenceID, java.lang.String dayPattern, java.lang.String hoursPattern, java.lang.String monthsPattern, java.lang.String dayOfWeekPattern, java.lang.String minutesPattern, boolean error, boolean active, boolean enabled, java.lang.String status, java.lang.Double percentageDone, java.lang.Boolean stop, java.lang.String serverName, java.lang.String serverInstance, java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog> logs, java.util.Date createdOn, java.lang.String createdBy, java.util.Date updatedOn, java.lang.String updatedBy, java.util.Date deletedOn, java.lang.String deletedBy)
 	{
 		super();
 		this.id = id;
@@ -218,6 +224,7 @@ public class ScheduledTask
 		this.percentageDone = percentageDone;
 		this.stop = stop;
 		this.serverName = serverName;
+		this.serverInstance = serverInstance;
 		this.logs = logs;
 		this.createdOn = createdOn;
 		this.createdBy = createdBy;
@@ -244,7 +251,7 @@ public class ScheduledTask
 
 	public ScheduledTask(ScheduledTask otherBean)
 	{
-		this(otherBean.id, otherBean.tenant, otherBean.name, otherBean.params, otherBean.handlerName, otherBean.nextExecution, otherBean.lastExecution, otherBean.lastEnd, otherBean.logReferenceID, otherBean.dayPattern, otherBean.hoursPattern, otherBean.monthsPattern, otherBean.dayOfWeekPattern, otherBean.minutesPattern, otherBean.error, otherBean.active, otherBean.enabled, otherBean.status, otherBean.percentageDone, otherBean.stop, otherBean.serverName, otherBean.logs, otherBean.createdOn, otherBean.createdBy, otherBean.updatedOn, otherBean.updatedBy, otherBean.deletedOn, otherBean.deletedBy);
+		this(otherBean.id, otherBean.tenant, otherBean.name, otherBean.params, otherBean.handlerName, otherBean.nextExecution, otherBean.lastExecution, otherBean.lastEnd, otherBean.logReferenceID, otherBean.dayPattern, otherBean.hoursPattern, otherBean.monthsPattern, otherBean.dayOfWeekPattern, otherBean.minutesPattern, otherBean.error, otherBean.active, otherBean.enabled, otherBean.status, otherBean.percentageDone, otherBean.stop, otherBean.serverName, otherBean.serverInstance, otherBean.logs, otherBean.createdOn, otherBean.createdBy, otherBean.updatedOn, otherBean.updatedBy, otherBean.deletedOn, otherBean.deletedBy);
 	}
 
 	/**
@@ -542,6 +549,20 @@ public class ScheduledTask
 	}
 
 	/**
+	 * Gets value for attribute serverInstance
+	 */
+	public java.lang.String getServerInstance() {
+		return this.serverInstance;
+	}
+
+	/**
+	 * Sets value for attribute serverInstance
+	 */
+	public void setServerInstance(java.lang.String serverInstance) {
+		this.serverInstance = serverInstance;
+	}
+
+	/**
 	 * Gets value for attribute logs
 	 */
 	public java.util.List<com.soffid.iam.sync.api.ScheduledTaskLog> getLogs() {
@@ -688,6 +709,8 @@ public class ScheduledTask
 		b.append (this.stop);
 		b.append (", serverName: ");
 		b.append (this.serverName);
+		b.append (", serverInstance: ");
+		b.append (this.serverInstance);
 		b.append (", logs: ");
 		b.append (this.logs);
 		b.append (", createdOn: ");

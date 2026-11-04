@@ -22,6 +22,7 @@
     {"name":"percentageDone", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
     {"name":"stop", "type":"BOOLEAN", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
     {"name":"serverName", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
+    {"name":"serverInstance", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false, "length":"100"},
     {"name":"logs", "type":"STRING", "lettercase":"MIXEDCASE", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":false},
     {"name":"createdOn", "type":"DATE_TIME", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true},
     {"name":"createdBy", "type":"USER", "comments":"", "lettercase":"null", "required":false, "searchCriteria":false, "multiline":false, "multivalue":false, "readonly":true, "length":"100"},

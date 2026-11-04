@@ -24,6 +24,7 @@
     {"name":"percentageDone", "hibernateName":"percentageDone"},
     {"name":"stop", "hibernateName":"stop"},
     {"name":"serverName"},
+    {"name":"serverInstance", "hibernateName":"serverInstance"},
     {"name":"logs", "hibernateName":"logs"},
     {"name":"createdOn", "hibernateName":"createdOn"},
     {"name":"createdBy", "hibernateName":"createdBy"},

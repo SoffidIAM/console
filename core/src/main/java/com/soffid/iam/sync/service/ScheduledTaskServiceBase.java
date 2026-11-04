@@ -160,6 +160,22 @@ public abstract class ScheduledTaskServiceBase
 		return serverEntityDao;
 	}
 
+	private com.soffid.iam.sync.model.ServerInstanceEntityDao serverInstanceEntityDao;
+
+	/**
+	 * Sets reference to <code>serverInstanceEntityDao</code>.
+	 */
+	public void setServerInstanceEntityDao (com.soffid.iam.sync.model.ServerInstanceEntityDao serverInstanceEntityDao) {
+		this.serverInstanceEntityDao = serverInstanceEntityDao;
+	}
+
+	/**
+	 * Gets reference to <code>serverInstanceEntityDao</code>.
+	 */
+	public com.soffid.iam.sync.model.ServerInstanceEntityDao getServerInstanceEntityDao () {
+		return serverInstanceEntityDao;
+	}
+
 	private com.soffid.iam.sync.model.TaskEntityDao taskEntityDao;
 
 	/**

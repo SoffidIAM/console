@@ -177,6 +177,22 @@ public abstract class ScheduledTaskEntity {
 		this.server = server;
 	}
 	/**
+	 * Attribute serverInstance
+	 */
+	private java.lang.String serverInstance;
+	/**
+	 * Gets value for attribute serverInstance
+	 */
+	public java.lang.String getServerInstance() {
+		return this.serverInstance;
+	}
+	/**
+	 * Sets value for attribute serverInstance
+	 */
+	public void setServerInstance(java.lang.String serverInstance) {
+		this.serverInstance = serverInstance;
+	}
+	/**
 	 * Attribute active
 	 */
 	private boolean active = false;

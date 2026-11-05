@@ -36,6 +36,10 @@ public interface SyncServerService
 		final java.lang.String urlServer)
 	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
+	java.lang.String getThreadDumpAsJson(
+		final java.lang.String url)
+	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
+
 	java.lang.String[] tailServerLog(
 		final java.lang.String urlServer)
 	throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;

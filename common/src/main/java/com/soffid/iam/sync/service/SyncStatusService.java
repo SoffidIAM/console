@@ -47,6 +47,16 @@ public interface SyncStatusService {
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation getThreadDumpAsJson
+
+	 * @param server 
+	 * @return 
+	 */
+	java.lang.String getThreadDumpAsJson(
+		final java.lang.String server)
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation getServerLogs
 
 	 * @param server 

@@ -412,6 +412,41 @@ public abstract class SyncServerServiceBase
 	protected abstract java.lang.Object handleGetServerService(java.lang.String servicePath) throws Exception;
 
 	/**
+	 * @see com.soffid.iam.sync.service.SyncServerService#	 * @see com.soffid.iam.sync.service.SyncServerService#java.lang.String getThreadDumpAsJson(java.lang.String url)
+	 */
+	// Trasaction attribute 
+	@Transactional(isolation=org.springframework.transaction.annotation.Isolation.DEFAULT,
+		propagation=org.springframework.transaction.annotation.Propagation.REQUIRED, 
+		rollbackFor={java.lang.Exception.class})
+	public java.lang.String getThreadDumpAsJson(
+		final java.lang.String url)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		if (url == null || url.trim().length() == 0) {
+			throw new IllegalArgumentException("java.lang.String com.soffid.iam.sync.service.SyncServerService.getThreadDumpAsJson(java.lang.String url) - url cannot be null");
+		}
+		Object[] __r = (Object[]) java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
+			public Object run() {
+				try {
+					return new Object[] {handleGetThreadDumpAsJson(url)};
+				} catch (Throwable th) {
+					return new Object[] {null,th};
+				}
+			}
+		});
+		if (__r.length == 1 ) 
+			return (java.lang.String) __r[0];
+		if (__r[1] instanceof com.soffid.iam.exception.InternalErrorException) 
+			throw (com.soffid.iam.exception.InternalErrorException) __r[1];
+		org.apache.commons.logging.LogFactory.getLog(com.soffid.iam.sync.service.SyncServerService.class).
+			warn ("Error on SyncServerService.getThreadDumpAsJson", (Throwable) __r[1]);
+		throw new com.soffid.iam.exception.InternalErrorException(
+			"Unexpected error on SyncServerService.getThreadDumpAsJson", (Throwable) __r[1]);
+	}
+
+	protected abstract java.lang.String handleGetThreadDumpAsJson(java.lang.String url) throws Exception;
+
+	/**
 	 * @see com.soffid.iam.sync.service.SyncServerService#	 * @see com.soffid.iam.sync.service.SyncServerService#java.lang.String[] tailServerLog(java.lang.String urlServer)
 	 */
 	// Trasaction attribute 

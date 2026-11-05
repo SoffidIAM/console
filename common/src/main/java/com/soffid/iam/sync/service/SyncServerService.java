@@ -82,6 +82,16 @@ public interface SyncServerService {
 			throws com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation getThreadDumpAsJson
+
+	 * @param url 
+	 * @return 
+	 */
+	java.lang.String getThreadDumpAsJson(
+		final java.lang.String url)
+			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation tailServerLog
 
 	 * @param urlServer 

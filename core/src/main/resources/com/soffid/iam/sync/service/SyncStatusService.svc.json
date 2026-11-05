@@ -10,6 +10,8 @@
        {"name":"numRows","type":"long","required": true}    ]},
     {"name":"getTasks", "return":"com.soffid.zkdb.api.PagedResult<com.soffid.iam.sync.api.SyncAgentTaskLog>", "arguments":[
        {"name":"q","type":"com.soffid.zkdb.api.Query","required": true}    ]},
+    {"name":"getThreadDumpAsJson", "return":"java.lang.String", "arguments":[
+       {"name":"server","type":"java.lang.String","required": true}    ]},
     {"name":"getServerLogs", "return":"java.util.Collection<com.soffid.iam.sync.api.LogConfiguration>", "arguments":[
        {"name":"server","type":"java.lang.String","required": true}    ]},
     {"name":"findActiveDirectoryDomains", "return":"java.util.Map<java.lang.String,java.lang.String>", "arguments":[

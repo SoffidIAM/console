@@ -13145,6 +13145,20 @@
 		</method-permission>
 
 		<method-permission>
+			<description><![CDATA[java.lang.String getThreadDumpAsJson(java.lang.String url) security constraint]]></description>
+			<role-name>*</role-name>
+			<method>
+				<description><![CDATA[]]></description>
+				<ejb-name>SyncServerService</ejb-name>
+				<method-intf>Local</method-intf>
+				<method-name>getThreadDumpAsJson</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+				</method-params>
+			</method>
+		</method-permission>
+
+		<method-permission>
 			<description><![CDATA[java.lang.String[] tailServerLog(java.lang.String urlServer) security constraint]]></description>
 			<role-name>*</role-name>
 			<method>
@@ -25710,6 +25724,17 @@
 			<method>
 				<ejb-name>SyncServerService</ejb-name>
 				<method-name>getServerService</method-name>
+				<method-params>
+					<method-param>java.lang.String</method-param>
+				</method-params>
+			</method>
+			<trans-attribute>Supports</trans-attribute>
+		</container-transaction>
+
+		<container-transaction>
+			<method>
+				<ejb-name>SyncServerService</ejb-name>
+				<method-name>getThreadDumpAsJson</method-name>
 				<method-params>
 					<method-param>java.lang.String</method-param>
 				</method-params>

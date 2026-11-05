@@ -17,6 +17,8 @@
        {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
     {"name":"createAgentDebug", "return":"java.lang.String", "arguments":[
        {"name":"dispatcher","type":"com.soffid.iam.iga.api.System","required": true}    ]},
+    {"name":"getThreadDumpAsJson", "return":"java.lang.String", "arguments":[
+    ]},
     {"name":"tailServerLog", "return":"java.lang.String[]", "arguments":[
     ]},
     {"name":"generateNewKey", "return":"java.security.PublicKey", "arguments":[

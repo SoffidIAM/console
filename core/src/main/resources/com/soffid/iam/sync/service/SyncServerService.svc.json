@@ -18,6 +18,8 @@
        {"name":"urlServer","type":"java.lang.String","required": true}    ]},
     {"name":"getServerService", "comments":"Gets a remote interface for any server, using the console specific authorization key", "return":"java.lang.Object", "arguments":[
        {"name":"servicePath","type":"java.lang.String","required": true}    ]},
+    {"name":"getThreadDumpAsJson", "return":"java.lang.String", "arguments":[
+       {"name":"url","type":"java.lang.String","required": true}    ]},
     {"name":"tailServerLog", "return":"java.lang.String[]", "arguments":[
        {"name":"urlServer","type":"java.lang.String","required": true}    ]},
     {"name":"findUnscheduledTasks", "return":"java.util.Collection<com.soffid.iam.sync.api.SyncserverTask>", "arguments":[

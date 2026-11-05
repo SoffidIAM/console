@@ -85,6 +85,14 @@ public interface AgentManager {
 			throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException;
 
 	/**
+	 * Operation getThreadDumpAsJson
+
+	 * @return 
+	 */
+	java.lang.String getThreadDumpAsJson()
+			throws com.soffid.iam.exception.InternalErrorException;
+
+	/**
 	 * Operation tailServerLog
 
 	 * @return 

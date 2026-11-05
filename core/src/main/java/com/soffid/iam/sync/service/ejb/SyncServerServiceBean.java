@@ -154,6 +154,33 @@ public class SyncServerServiceBean extends org.springframework.ejb.support.Abstr
 		}
 	}
 	/**
+	 * @see com.soffid.iam.sync.service.SyncServerService#java.lang.String getThreadDumpAsJson(java.lang.String url)
+	 */
+	@jakarta.annotation.security.PermitAll
+	public java.lang.String getThreadDumpAsJson(
+		final java.lang.String url)
+		throws com.soffid.iam.exception.InternalErrorException, com.soffid.iam.exception.InternalErrorException
+	{
+		com.soffid.iam.PrincipalStore.set(super.getSessionContext().getCallerPrincipal());
+		if (! com.soffid.iam.utils.Security.isUserInRole("monitor:server:list"))
+			throw new SecurityException("Unable to execute SyncServerService.getThreadDumpAsJson. Required roles: [monitor:server:list]");
+		try
+		{
+			return this.syncServerService.getThreadDumpAsJson(url); 
+		}
+		catch (Exception exception)
+		{
+			final Throwable cause = getRootCause(exception);
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (cause instanceof com.soffid.iam.exception.InternalErrorException)
+				throw (com.soffid.iam.exception.InternalErrorException) cause;
+			if (exception instanceof RuntimeException)
+				throw (RuntimeException)exception;
+			throw new jakarta.ejb.EJBException (exception);
+		}
+	}
+	/**
 	 * @see com.soffid.iam.sync.service.SyncServerService#java.lang.String[] tailServerLog(java.lang.String urlServer)
 	 */
 	@jakarta.annotation.security.PermitAll

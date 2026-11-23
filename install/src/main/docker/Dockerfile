@@ -1,5 +1,6 @@
 FROM ubuntu:22.04
 
+RUN echo Update JVM
 RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y openjdk-11-jre-headless
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales

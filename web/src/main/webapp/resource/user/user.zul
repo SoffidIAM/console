@@ -25,7 +25,7 @@
 				<menu2>
 					<menu2item image="/img/change-columns.svg" label="${c:l('select-columns.title') }" onClick="ref:frame.changeColumns"/>
 					<menu2item image="/img/add.svg" label="${c:l('agents.zul.Afegeixnou') }" if="${canCreateUser}"  onClick="ref:frame.addNew"/>
-					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUser &amp;&amp; canUpdateUser &amp;&amp; canDeleteUser}" onClick="ref:frame.importCsv"/>
+					<menu2item image="/img/import.svg" label="${c:l('tenant.zul.import') }" if="${canCreateUser || canUpdateUser}" onClick="ref:frame.importCsv"/>
 					<menu2item image="/img/download.svg" label="${c:l('zkdb.download') }" onClick="ref:frame.downloadCsv"/>
 					<menu2item image="/img/bulk.svg" label="${c:l('common.bulkActions') }" onClick="ref:frame.bulkAction" />
 					<menu2item image="/img/merge.svg" label="${c:l('common.merge') }" onClick="ref:frame.mergeAction" />
